@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>.options.fromAttr() - Miew API</title>
+
+  <link rel="stylesheet" href="../dist/Miew.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.auto.min.js"></script>
+  <script src="../dist/Miew.min.js"></script>
+</head>
+<body>
+  <div class="miew-container" style="width:640px; height:480px" data-miew="m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&theme=light&axes=0&fps=0"></div>
+
+  <script>
+    (function() {
+      var _ = Miew.thirdParty.lodash;
+      var container = document.getElementsByClassName('miew-container')[0];
+      var viewer = new Miew(_.merge({
+          container: container,
+          load: '1CRN',
+        },
+        Miew.options.fromAttr(container.dataset.miew)
+      ));
+
+      if (viewer.init()) {
+        viewer.run();
+      }
+    })();
+  </script>
+</body>
+</html>

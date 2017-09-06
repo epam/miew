@@ -1,0 +1,11 @@
+{
+  "embed": {
+    "title": "Embedding the Viewer"
+  },
+  "selectors": {
+    "title": "Selection Language"
+  },
+  "url": {
+    "title": "URL Query String"
+  }
+}

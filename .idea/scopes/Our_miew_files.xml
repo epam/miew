@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Our miew files" pattern="(file[miew]:*||file[miew]:demo/*||file[miew]:src/*||file[miew]:src//*||file[miew]:demo//*)&amp;&amp;!file[miew]:vendor//*&amp;&amp;!file[miew]:demo/images//*&amp;&amp;!file[miew]:demo/data//*&amp;&amp;!file[miew]:vendor/fonts//*" />
+</component>

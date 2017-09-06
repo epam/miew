@@ -1,0 +1,11 @@
+node_modules/
+build/
+coverage/
+dist/*.map
+docs/auto/
+.sonar/
+.idea/workspace.xml
+.idea/tasks.xml
+demo/styles/*.map
+!*.pdb
+*.pyc

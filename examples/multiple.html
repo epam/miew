@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiple Miew Instances</title>
+
+  <link rel="stylesheet" href="../dist/Miew.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.1.1/es6-promise.auto.min.js"></script>
+  <script src="../dist/Miew.min.js"></script>
+</head>
+<body>
+  <div>
+    <div class="miew-container" style="width:512px; height:512px; float:left" data-miew="load=1CRN"></div>
+    <div class="miew-container" style="width:512px; height:512px; float:right" data-miew="load=mmtf:1CRN"></div>
+    <div style="clear: both"></div>
+  </div>
+
+  <script>
+    (function() {
+      var _ = Miew.thirdParty.lodash;
+      var containers = document.getElementsByClassName('miew-container');
+      for (var i = 0, n = containers.length; i < n; ++i) {
+        var viewer = new Miew(_.merge({
+            container: containers[i],
+            settings: {
+              autoRotation: 0.5,
+            },
+          },
+          Miew.options.fromAttr(containers[i].dataset.miew)
+        ));
+
+        if (viewer.init()) {
+          viewer.run();
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
