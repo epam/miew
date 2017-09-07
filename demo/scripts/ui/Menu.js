@@ -2564,7 +2564,7 @@ Menu.prototype.hide = function() {
   if (this._curPanelID.indexOf('mode') !== -1) {
     this._removeActiveFromCombo('mode');
   } else if (this._curPanelID.indexOf('color') !== -1) {
-    this._removeActiveFromCombo('color');
+    this._removeActiveFromCombo('colorer');
   }
 
   // Resume rendering
