@@ -801,6 +801,7 @@ var defaults = {
     stereoBarrel: 0.25,
   },
   use: {
+    multiFile: false,
   },
 };
 

@@ -1531,7 +1531,7 @@ Miew.prototype.load = function(file, opts) {
     this._fileSourceAnim = opts.mdFile;
   }
 
-  if (opts && opts.animation !== true) {
+  if (!this.settings.now.use.multiFile && !(opts && opts.animation)) {
     this.reset(true);
   }
 

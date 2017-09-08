@@ -1454,7 +1454,6 @@ Menu.prototype._presetsPanelActionsPdbRegister = function(self) {
 
 Menu.prototype._presetsPanelActionsPdbLoad = function(self) {
   self._onMenuOff();
-  self._viewer.reset();
   if (self.presetsPanel.inputs && !self.presetsPanel.inputs.mainIsAMBER) {
     self._viewer.load(self.presetsPanel.inputs.main);
   } else {

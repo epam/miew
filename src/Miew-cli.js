@@ -163,7 +163,6 @@ CLIUtils.prototype.load = function(miew, arg) {
   }
   miew.awaitWhileCMDisInProcess();
   const finish = () => miew.finishAwaitingCMDInProcess();
-  miew.unload();
   miew.load(arg).then(finish, finish);
 };
 
