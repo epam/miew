@@ -103,11 +103,13 @@ ResidueType.Flags = {
   PURINE: 0x0200,
   /** Pyrimidine nucleic residue */
   PYRIMIDINE: 0x0400,
-
-  // Other
+  /** DNA */
+  DNA: 0x0800,
+  /** RNA */
+  RNA: 0x1000,
 
   /** Water */
-  WATER: 0x1000,
+  WATER: 0x10000,
 };
 
 // Flag combinations
@@ -140,7 +142,8 @@ _addFlag(Flags.NUCLEIC, [
 ]);
 _addFlag(Flags.PURINE,     ['A', 'G', 'I', 'DA', 'DG', 'DI', '+A', '+G', '+I']);
 _addFlag(Flags.PYRIMIDINE, ['C', 'T', 'U', 'DC', 'DT', 'DU', '+C', '+T', '+U']);
-
+_addFlag(Flags.DNA, ['DA', 'DG', 'DI', 'DC', 'DT', 'DU']);
+_addFlag(Flags.RNA, ['A', 'G', 'I', 'C', 'T', 'U']);
 // Table of kdHydrophobicity
 var hydro = {
   'ILE': 4.5,

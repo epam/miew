@@ -224,7 +224,9 @@ palette.chainColors = [
 
 palette.secondaryColors = {
   'helix': {1: 0xFF0080, 5: 0xA00080},
-  'strand': 0xFFC800
+  'strand': 0xFFC800,
+  'dna': 0xAE00FE,
+  'rna': 0xFD0162,
 };
 
 export default palette;
