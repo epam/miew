@@ -285,7 +285,7 @@ AddRepresentation
     ;
 
 EditRepresentation
-    : REP RepresentationReference                 -> yy.miew.repCurrent($2)
+    : REP RepresentationReference                 -> yy.miew.rep($2); yy.miew.repCurrent($2)
     | REP RepresentationReference Description     -> yy.miew.rep($2, $3); yy.miew.repCurrent($2)
     ;
 
