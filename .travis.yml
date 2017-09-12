@@ -6,6 +6,10 @@ cache:
   yarn: true
   directories:
     - "node_modules"
+    - "$HOME/.sonar/cache"
+addons:
+  sonarcloud:
+    organization: "epam"
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 0.27.5
   - export PATH="$HOME/.yarn/bin:$PATH"
@@ -16,5 +20,6 @@ before_script:
 script:
   - gulp
 after_success:
+  - sonar-scanner
   - gulp test:coveralls
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
