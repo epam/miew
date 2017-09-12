@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/epam/miew.svg?branch=master)](https://travis-ci.org/epam/miew)
 [![Build status](https://ci.appveyor.com/api/projects/status/i7yhdhsxcktndpsw/branch/master?svg=true)](https://ci.appveyor.com/project/paulsmirnov/miew/branch/master)
+[![bitHound Overall Score](https://www.bithound.io/github/epam/miew/badges/score.svg)](https://www.bithound.io/github/epam/miew)
 [![Coverage Status](https://coveralls.io/repos/github/epam/miew/badge.svg)](https://coveralls.io/github/epam/miew)
 [![Code Climate](https://codeclimate.com/github/epam/miew/badges/gpa.svg)](https://codeclimate.com/github/epam/miew)
 [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=epam:miew)](https://sonarcloud.io/dashboard/index/epam:miew)
