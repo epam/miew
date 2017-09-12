@@ -1,5 +1,7 @@
 # Miew – 3D Molecular Viewer
 
+[![Build Status](https://travis-ci.org/epam/miew.svg?branch=master)](https://travis-ci.org/epam/miew)
+
 Copyright (c) 2015–2017 [EPAM Systems, Inc.](https://www.epam.com/)
 
 Miew is a high performance web tool for advanced visualization and manipulation of molecular
