@@ -12,3 +12,5 @@ before_install:
   - yarn global add gulp-cli
 script:
   - gulp
+after_success:
+  - gulp test:coveralls

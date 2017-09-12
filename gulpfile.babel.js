@@ -30,6 +30,7 @@ const plugins = {
   ignore:       require('gulp-ignore'),
   istanbul:     require('gulp-babel-istanbul'),
   cleanCss:     require('gulp-clean-css'),
+  coveralls:    require('gulp-coveralls'),
 };
 
 import rollupPluginReplace from 'rollup-plugin-replace';
@@ -114,6 +115,10 @@ gulp.task('test:cover-hook', () =>
   ])
     .pipe(plugins.istanbul({includeUntested: true}))
     .pipe(plugins.istanbul.hookRequire()));
+
+gulp.task('test:coveralls', () =>
+  gulp.src('coverage/lcov.info')
+    .pipe(plugins.coveralls()));
 
 //////////////////////////////////////////////////////////////////////////////
 

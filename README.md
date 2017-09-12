@@ -1,6 +1,7 @@
 # Miew – 3D Molecular Viewer
 
 [![Build Status](https://travis-ci.org/epam/miew.svg?branch=master)](https://travis-ci.org/epam/miew)
+[![Coverage Status](https://coveralls.io/repos/github/epam/miew/badge.svg)](https://coveralls.io/github/epam/miew)
 
 Copyright (c) 2015–2017 [EPAM Systems, Inc.](https://www.epam.com/)
 
