@@ -1,0 +1,7 @@
+exclude_paths:
+- ".github/"
+- ".idea/"
+- "dist/"
+- "docs/"
+- "tools/"
+- "vendor/"
