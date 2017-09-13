@@ -1,3 +1,17 @@
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript:
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+
+ratings:
+  paths:
+  - "src/**.js"
 exclude_paths:
 - ".github/"
 - ".idea/"
@@ -5,3 +19,5 @@ exclude_paths:
 - "docs/"
 - "tools/"
 - "vendor/"
+- "src/utils/SelectionParser.js"
+- "src/utils/MiewCLIParser.js"
