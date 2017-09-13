@@ -2,10 +2,10 @@
 
 [![Build Status](https://travis-ci.org/epam/miew.svg?branch=master)](https://travis-ci.org/epam/miew)
 [![Build status](https://ci.appveyor.com/api/projects/status/i7yhdhsxcktndpsw/branch/master?svg=true)](https://ci.appveyor.com/project/paulsmirnov/miew/branch/master)
-[![dependencies Status](https://david-dm.org/epam/miew/master/status.svg)](https://david-dm.org/epam/miew/master)
-[![devDependencies Status](https://david-dm.org/epam/miew/master/dev-status.svg)](https://david-dm.org/epam/miew/master?type=dev)
-[![Greenkeeper badge](https://badges.greenkeeper.io/epam/miew.svg)](https://greenkeeper.io/)
+[![bitHound Dependencies](https://www.bithound.io/github/epam/miew/badges/dependencies.svg)](https://www.bithound.io/github/epam/miew/master/dependencies/npm)
+[![bitHound Dev Dependencies](https://www.bithound.io/github/epam/miew/badges/devDependencies.svg)](https://www.bithound.io/github/epam/miew/master/dependencies/npm)
 [![bitHound Overall Score](https://www.bithound.io/github/epam/miew/badges/score.svg)](https://www.bithound.io/github/epam/miew)
+[![Greenkeeper badge](https://badges.greenkeeper.io/epam/miew.svg)](https://greenkeeper.io/)
 [![Coverage Status](https://coveralls.io/repos/github/epam/miew/badge.svg)](https://coveralls.io/github/epam/miew)
 [![Code Climate](https://codeclimate.com/github/epam/miew/badges/gpa.svg)](https://codeclimate.com/github/epam/miew)
 [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=epam:miew)](https://sonarcloud.io/dashboard/index/epam:miew)
