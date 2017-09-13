@@ -73,7 +73,7 @@
     "gulp-istanbul": "^1.1.2",
     "gulp-jison": "^1.2.0",
     "gulp-jsdoc3": "^1.0.1",
-    "gulp-mocha": "4.3.1",
+    "gulp-mocha": "3.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
     "gulp-sourcemaps": "^2.6.1",
@@ -81,8 +81,8 @@
     "gulp-util": "^3.0.7",
     "gulp-webserver": "^0.9.1",
     "html-webpack-plugin": "^2.29.0",
-    "jquery": "^3.2.1",
-    "jquery.terminal": "1.7.0",
+    "jquery": "^2.2.4",
+    "jquery.terminal": "1.2.0",
     "jsdoc": "~3.5.1",
     "lodash": "^4.17.4",
     "mocha": "^3.4.2",
@@ -111,5 +111,12 @@
     "webpack": "^3.5.5",
     "webpack-dev-server": "^2.5.1",
     "yargs": "^8.0.2"
+  },
+  "greenkeeper": {
+    "ignore": [
+      "gulp-mocha",
+      "jquery",
+      "jquery.terminal"
+    ]
   }
 }
