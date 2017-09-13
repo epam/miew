@@ -1,0 +1,15 @@
+{
+  "ignore": [
+    ".github/**",
+    ".idea/**",
+    "dist/**",
+    "docs/**",
+    "tools/**",
+    "vendor/**",
+    "src/utils/SelectionParser.js",
+    "src/utils/MiewCLIParser.js"
+  ],
+  "test": [
+    "test/**"
+  ]
+}
