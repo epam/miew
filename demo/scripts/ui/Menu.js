@@ -428,7 +428,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
             'role'         : 'button',
             'data-toggle'  : 'collapse',
             'data-parent'  : '.panel-menu[data-panel-type=miew-menu-panel-representation] .miew-repr-list',
-            'href'         : '#',
+            'href'         : `#repr${index + 1}`,
             'aria-expanded' : 'true',
             'aria-controls' : '[data-number=repr-' + String(index + 1) + ']'
           },
@@ -494,7 +494,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
           'Uniform color',
           createElement('span', {'class' : 'pull-right'}, [
             createElement('a', {
-              'href' : '#',
+              'href' : '#ucolor',
               'class' : 'thumbnail',
               'data-id': hexColor(settings.now.colorers.UN.color)
             }, createElement('img', {
