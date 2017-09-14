@@ -405,7 +405,7 @@ Menu.prototype._initReprListItemListeners = function(index) {
 Menu.prototype._addReprListItem = function(panel, index, repr) {
   var self = this;
   var reprList = $(self._menuId + ' [data-panel-type=miew-menu-panel-representation] .miew-repr-list');
-  var validReprN = reprList.find('.panel.valid').size();
+  var validReprN = reprList.find('.panel.valid').length;
   var newItem = createElement('div', {
     'class': 'panel panel-default valid'
   }, [
@@ -679,7 +679,7 @@ Menu.prototype._copyCurReprListItem = function(index) {
 
   selector = selector.find('.panel-heading a');
   var header = selector.html();
-  var validReprN = reprList.find('.panel.valid').size();
+  var validReprN = reprList.find('.panel.valid').length;
   selector.html('#' + String(validReprN) + header.substring(header.indexOf(':')));
 
   var zClipState = curSelector.find('[type=checkbox][data-toggle=surfZClip]')[0].checked;
@@ -1078,7 +1078,7 @@ Menu.prototype._initReprPanel = function() {
   var reprList = $(self._menuId + ' .panel-menu[data-panel-type=miew-menu-panel-representation] .miew-repr-list');
 
   $(self._menuId + ' .miew-repr-list-controls [data-btn-type=miew-menu-btn-add-repr]').on('click', function() {
-    var index =  reprList.find('.panel').size();
+    var index =  reprList.find('.panel').length;
     if (index > 0) {
       self._copyCurReprListItem(index);
     } else {
@@ -1088,7 +1088,7 @@ Menu.prototype._initReprPanel = function() {
       selector.addClass('added');
     }
 
-    var validReprN = reprList.find('.panel.valid').size();
+    var validReprN = reprList.find('.panel.valid').length;
     if (validReprN === 2) {
       $(self._menuId + ' .miew-repr-list-controls [data-btn-type=miew-menu-btn-del-repr]').removeClass('disabled');
     } else if (validReprN === self._viewer.getMaxRepresentationCount()) {
@@ -1100,7 +1100,7 @@ Menu.prototype._initReprPanel = function() {
   });
 
   $(self._menuId + ' .miew-repr-list-controls [data-btn-type=miew-menu-btn-del-repr]').on('click', function() {
-    var validReprN = reprList.find('.panel.valid').size();
+    var validReprN = reprList.find('.panel.valid').length;
     var removeIdx = self._curReprIdx;
     var removeSelector = reprList.find('.panel.valid:eq(' + removeIdx + ')');
     removeSelector.addClass('deleted');
@@ -1117,7 +1117,7 @@ Menu.prototype._initReprPanel = function() {
       }
     }
 
-    validReprN = reprList.find('.panel.valid').size();
+    validReprN = reprList.find('.panel.valid').length;
     if (validReprN === 1) {
       $(self._menuId + ' .miew-repr-list-controls [data-btn-type=miew-menu-btn-del-repr]').addClass('disabled');
     } else if (validReprN === self._viewer.getMaxRepresentationCount() - 1) {
