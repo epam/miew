@@ -15,8 +15,6 @@
   "dependencies": {
     "mute": [
       "gulp-mocha",
-      "jquery",
-      "jquery.terminal",
 
       "gulp-webserver",
       "gulp-insert"
