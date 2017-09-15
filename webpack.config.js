@@ -87,7 +87,6 @@ export default {
     new webpack.IgnorePlugin(/vertx/),
     new webpack.ProvidePlugin({
       jQuery: 'jquery',
-      Promise: 'es6-promise',
     }),
     new HtmlWebpackPlugin({
       title: 'Miew – 3D Molecular Viewer',
