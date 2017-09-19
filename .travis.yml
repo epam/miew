@@ -27,3 +27,13 @@ after_success:
   - sonar-scanner
   - gulp test:coveralls
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+deploy:
+  - provider: npm
+    skip_cleanup: true
+    email: "$NPM_EMAIL"
+    api_key: "$NPM_AUTH_TOKEN"
+    tag: latest
+    on:
+      tags: true
+      node: "8.4"
+      condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$

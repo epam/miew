@@ -1,5 +1,6 @@
 # Miew – 3D Molecular Viewer
 
+[![npm version](https://img.shields.io/npm/v/miew.svg)](https://www.npmjs.com/package/miew)
 [![Build Status](https://travis-ci.org/epam/miew.svg?branch=master)](https://travis-ci.org/epam/miew)
 [![Build status](https://ci.appveyor.com/api/projects/status/i7yhdhsxcktndpsw/branch/master?svg=true)](https://ci.appveyor.com/project/paulsmirnov/miew/branch/master)
 [![bitHound Dependencies](https://www.bithound.io/github/epam/miew/badges/dependencies.svg)](https://www.bithound.io/github/epam/miew/master/dependencies/npm)
