@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.1 Copyright (c) 2015-2017 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.2 Copyright (c) 2015-2017 EPAM Systems, Inc. */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -55835,6 +55835,8 @@ Object.assign( AnimationMixer.prototype, {
 
 		remove_empty_map: {
 
+			for ( var _ in bindingByName ) break remove_empty_map;
+
 			delete bindingsByRoot[ rootUuid ];
 
 		}
@@ -60390,7 +60392,7 @@ var THREE$1 = Object.freeze({
 	CanvasRenderer: CanvasRenderer
 });
 
-var spin$1 = createCommonjsModule(function (module) {
+var spin = createCommonjsModule(function (module) {
 /**
  * Copyright (c) 2011-2014 Felix Gnass
  * Licensed under the MIT license
@@ -62341,7 +62343,9 @@ var defaults = {
     ssaoFactor: 0.7,
     stereoBarrel: 0.25
   },
-  use: {}
+  use: {
+    multiFile: false
+  }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -62427,7 +62431,6 @@ Settings.prototype = {
 
 var settings = new Settings();
 
-var babelHelpers = {};
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
@@ -62620,28 +62623,6 @@ var possibleConstructorReturn = function (self, call) {
 
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-babelHelpers;
 
 var repIndex = 0;
 
@@ -63808,11 +63789,13 @@ ResidueType.Flags = {
   PURINE: 0x0200,
   /** Pyrimidine nucleic residue */
   PYRIMIDINE: 0x0400,
-
-  // Other
+  /** DNA */
+  DNA: 0x0800,
+  /** RNA */
+  RNA: 0x1000,
 
   /** Water */
-  WATER: 0x1000
+  WATER: 0x10000
 };
 
 // Flag combinations
@@ -63838,7 +63821,8 @@ _addFlag(Flags.AROMATIC, ['PHE', 'TRP', 'TYR']);
 _addFlag(Flags.NUCLEIC, ['A', 'G', 'I', 'DA', 'DG', 'DI', '+A', '+G', '+I', 'C', 'T', 'U', 'DC', 'DT', 'DU', '+C', '+T', '+U']);
 _addFlag(Flags.PURINE, ['A', 'G', 'I', 'DA', 'DG', 'DI', '+A', '+G', '+I']);
 _addFlag(Flags.PYRIMIDINE, ['C', 'T', 'U', 'DC', 'DT', 'DU', '+C', '+T', '+U']);
-
+_addFlag(Flags.DNA, ['DA', 'DG', 'DI', 'DC', 'DT', 'DU']);
+_addFlag(Flags.RNA, ['A', 'G', 'I', 'C', 'T', 'U']);
 // Table of kdHydrophobicity
 var hydro = {
   'ILE': 4.5,
@@ -67085,7 +67069,7 @@ function _checkCycleComplex(cycle) {
   return true;
 }
 
-function AromaticLoopsMarker$1(complex) {
+function AromaticLoopsMarker(complex) {
   this._complex = complex;
   var bondsData = new Array(complex._bonds.length);
   var bondMarks = new Array(complex._bonds.length);
@@ -67098,12 +67082,12 @@ function AromaticLoopsMarker$1(complex) {
   this._resetCycles();
 }
 
-AromaticLoopsMarker$1.prototype._resetCycles = function () {
+AromaticLoopsMarker.prototype._resetCycles = function () {
   this._cycles = [];
   this._currIdx = -1;
 };
 
-AromaticLoopsMarker$1.prototype._haveSameCycle = function (bondsData, bond1, bond2) {
+AromaticLoopsMarker.prototype._haveSameCycle = function (bondsData, bond1, bond2) {
   var arr1 = bondsData[bond1._index];
   var arr2 = bondsData[bond2._index];
   var n1 = arr1.length;
@@ -67123,7 +67107,7 @@ AromaticLoopsMarker$1.prototype._haveSameCycle = function (bondsData, bond1, bon
   return false;
 };
 
-AromaticLoopsMarker$1.prototype._tryBond = function (prevBond, currRight, currDir) {
+AromaticLoopsMarker.prototype._tryBond = function (prevBond, currRight, currDir) {
   var bondsOrder = [];
   var bondsData = this._bondsData;
   var currLeft = _anotherAtom(prevBond, currRight);
@@ -67172,7 +67156,7 @@ AromaticLoopsMarker$1.prototype._tryBond = function (prevBond, currRight, currDi
   return false;
 };
 
-AromaticLoopsMarker$1.prototype._startCycle = function (bond) {
+AromaticLoopsMarker.prototype._startCycle = function (bond) {
   // start from left to right
   this._currStart = bond._left;
   if (this._tryBond(bond, bond._right, new Vector3())) {
@@ -67181,7 +67165,7 @@ AromaticLoopsMarker$1.prototype._startCycle = function (bond) {
   }
 };
 
-AromaticLoopsMarker$1.prototype._findLoops = function (checkBond, checkCycle) {
+AromaticLoopsMarker.prototype._findLoops = function (checkBond, checkCycle) {
   this._checkBond = checkBond;
   var complex = this._complex;
   var self = this;
@@ -67206,11 +67190,11 @@ AromaticLoopsMarker$1.prototype._findLoops = function (checkBond, checkCycle) {
   });
 };
 
-AromaticLoopsMarker$1.prototype.markCycles = function () {
+AromaticLoopsMarker.prototype.markCycles = function () {
   this._findLoops(_isAromatic, _checkCycleSimple);
 };
 
-AromaticLoopsMarker$1.prototype.detectCycles = function () {
+AromaticLoopsMarker.prototype.detectCycles = function () {
   this._findLoops(_isPossibleAromatic, _checkCycleComplex);
 };
 
@@ -68055,7 +68039,7 @@ Complex.prototype.finalize = function (opts) {
   this._finalizeBonds();
   this._fillComponents(opts.enableEditing);
 
-  var marker = new AromaticLoopsMarker$1(this);
+  var marker = new AromaticLoopsMarker(this);
   marker.markCycles();
   if (opts.detectAromaticLoops) {
     // TODO remove this condition clause, it is for debug purposes only!
@@ -69813,7 +69797,7 @@ Visual.prototype.getBoundaries = function () {
   return _defaultBoundaries;
 };
 
-function makeContextDependent$1(prototype) {
+function makeContextDependent(prototype) {
   Object.defineProperties(prototype, {
     logger: {
       get: function get() {
@@ -69856,19 +69840,19 @@ CollisionSphere.prototype.raycast = function () {
 
 //////////////////////////////////////////////////////////////////////////////
 
-function CollisionSpheresGeo$1(count) {
+function CollisionSpheresGeo(count) {
   this._objects = new Array(count);
   this.boundingSphere = null;
   this.boundingBox = null;
 }
 
-CollisionSpheresGeo$1.constructor = CollisionSpheresGeo$1;
+CollisionSpheresGeo.constructor = CollisionSpheresGeo;
 
-CollisionSpheresGeo$1.prototype.setSphere = function (idx, position, radius) {
+CollisionSpheresGeo.prototype.setSphere = function (idx, position, radius) {
   this._objects[idx] = new CollisionSphere(position, radius);
 };
 
-CollisionSpheresGeo$1.prototype.raycast = function (raycaster, intersects) {
+CollisionSpheresGeo.prototype.raycast = function (raycaster, intersects) {
   // TODO raycast with bounding sphere? How to deal with updates?
   for (var i = 0, n = this._objects.length; i < n; ++i) {
     var inters = this._objects[i].raycast(raycaster);
@@ -69879,7 +69863,7 @@ CollisionSpheresGeo$1.prototype.raycast = function (raycaster, intersects) {
   }
 };
 
-CollisionSpheresGeo$1.prototype.computeBoundingBox = function () {
+CollisionSpheresGeo.prototype.computeBoundingBox = function () {
   var objects = this._objects;
   var boundingBox = this.boundingBox;
   if (boundingBox === null) {
@@ -69891,7 +69875,7 @@ CollisionSpheresGeo$1.prototype.computeBoundingBox = function () {
   }
 };
 
-CollisionSpheresGeo$1.prototype.computeBoundingSphere = function () {
+CollisionSpheresGeo.prototype.computeBoundingSphere = function () {
   this.computeBoundingBox();
   var objects = this._objects;
   var boundingBox = this.boundingBox;
@@ -69932,13 +69916,13 @@ function setArrayXYZW(arr, idx, x, y, z, w) {
 
 function InstancedSpheresGeometry(spheresCount, sphereComplexity, useZSprites) {
   InstancedBufferGeometry.call(this);
-  CollisionSpheresGeo$1.call(this, spheresCount);
+  CollisionSpheresGeo.call(this, spheresCount);
   this._sphGeometry = useZSprites ? new PlaneBufferGeometry(2, 2, 1, 1) : new SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
   this._init(spheresCount, this._sphGeometry);
 }
 
 InstancedSpheresGeometry.prototype = Object.create(InstancedBufferGeometry.prototype);
-lodash.mixin(InstancedSpheresGeometry.prototype, CollisionSpheresGeo$1.prototype);
+lodash.mixin(InstancedSpheresGeometry.prototype, CollisionSpheresGeo.prototype);
 InstancedSpheresGeometry.prototype.constructor = InstancedSpheresGeometry;
 
 InstancedSpheresGeometry.prototype.setItem = function (itemIdx, itemPos, itemRad) {
@@ -70251,7 +70235,7 @@ var VEC_SIZE = 3;
 function SimpleSpheresGeometry(spheresCount, sphereComplexity) {
   var sphGeometry = new SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
   ChunkedObjectsGeometry.call(this, sphGeometry, spheresCount);
-  CollisionSpheresGeo$1.call(this, spheresCount);
+  CollisionSpheresGeo.call(this, spheresCount);
 
   var normals = this._normals;
   var geoNormals = sphGeometry.attributes.normal.array;
@@ -70264,7 +70248,7 @@ function SimpleSpheresGeometry(spheresCount, sphereComplexity) {
 }
 
 SimpleSpheresGeometry.prototype = Object.create(ChunkedObjectsGeometry.prototype);
-lodash.mixin(SimpleSpheresGeometry.prototype, CollisionSpheresGeo$1.prototype);
+lodash.mixin(SimpleSpheresGeometry.prototype, CollisionSpheresGeo.prototype);
 SimpleSpheresGeometry.prototype.constructor = SimpleSpheresGeometry;
 
 SimpleSpheresGeometry.prototype.setItem = function (itemIdx, itemPos, itemRad) {
@@ -70289,7 +70273,7 @@ var centerPos = new Vector3();
 var tmpVector = new Vector3();
 var normMtx = new Matrix3();
 
-function Simple2CCylinderGeometry$1(instanceCount, polyComplexity) {
+function Simple2CCylinderGeometry(instanceCount, polyComplexity) {
   var cylGeometry = new CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, true);
   ChunkedObjectsGeometry.call(this, cylGeometry, 2 * instanceCount);
 
@@ -70299,10 +70283,10 @@ function Simple2CCylinderGeometry$1(instanceCount, polyComplexity) {
   this._tmpVector = utils.allocateTyped(Float32Array, chunkSize * VEC_SIZE$2);
 }
 
-Simple2CCylinderGeometry$1.prototype = Object.create(ChunkedObjectsGeometry.prototype);
-Simple2CCylinderGeometry$1.prototype.constructor = Simple2CCylinderGeometry$1;
+Simple2CCylinderGeometry.prototype = Object.create(ChunkedObjectsGeometry.prototype);
+Simple2CCylinderGeometry.prototype.constructor = Simple2CCylinderGeometry;
 
-Simple2CCylinderGeometry$1.prototype.setItem = function (itemIdx, botPos, topPos, itemRad) {
+Simple2CCylinderGeometry.prototype.setItem = function (itemIdx, botPos, topPos, itemRad) {
   var chunkSize = this._chunkSize;
   var firstOffset = chunkSize * 2 * itemIdx * VEC_SIZE$2;
   var secondOffset = firstOffset + chunkSize * VEC_SIZE$2;
@@ -70345,7 +70329,7 @@ Simple2CCylinderGeometry$1.prototype.setItem = function (itemIdx, botPos, topPos
   this._normals.set(tmpArray, secondOffset);
 };
 
-Simple2CCylinderGeometry$1.prototype.setColor = function (itemIdx, colorVal1, colorVal2) {
+Simple2CCylinderGeometry.prototype.setColor = function (itemIdx, colorVal1, colorVal2) {
   var first = 2 * itemIdx;
   parentSetColor.call(this, first, colorVal1);
 
@@ -70559,7 +70543,7 @@ function Instanced2CCylindersGeometry(instanceCount, polyComplexity, useZSprites
   this._cylGeometry = useZSprites ? new PlaneBufferGeometry(2, 2, 1, 1) : new CylinderBufferGeometry$1(1, 1, 1.0, Math.max(3, polyComplexity), 2, openEnded);
   this._init(instanceCount, this._cylGeometry, this._useZSprites);
 
-  this._collisionGeo = new Simple2CCylinderGeometry$1(instanceCount, 3);
+  this._collisionGeo = new Simple2CCylinderGeometry(instanceCount, 3);
 }
 
 Instanced2CCylindersGeometry.prototype = Object.create(InstancedBufferGeometry.prototype);
@@ -71178,7 +71162,7 @@ var tmpVector$2 = new Vector3();
 function TwoColorLinesGeometry(segmentsCount) {
   LinesGeometry.call(this, segmentsCount * 2);
   this._init(segmentsCount);
-  this._collisionGeo = new Simple2CCylinderGeometry$1(segmentsCount, 3);
+  this._collisionGeo = new Simple2CCylinderGeometry(segmentsCount, 3);
 }
 
 TwoColorLinesGeometry.prototype = Object.create(LinesGeometry.prototype);
@@ -71238,7 +71222,7 @@ var tempPos2 = new Vector3();
 function CrossGeometry(chunksCount) {
   ChunkedLinesGeometry.call(this, chunksCount, vecCount / 2 | 0, false);
 
-  this._collisionGeo = new CollisionSpheresGeo$1(chunksCount);
+  this._collisionGeo = new CollisionSpheresGeo(chunksCount);
 }
 
 CrossGeometry.prototype = Object.create(ChunkedLinesGeometry.prototype);
@@ -72850,7 +72834,7 @@ function IsoSurfaceAtomColored(vCenter, radiusAt) {
  * @param {number} probeRadius     - Normals for output
  *
  */
-function IsosurfaceBuildNormals$1(numAtoms, atoms, vBoxMin, vBoxMax, probeRadius) {
+function IsosurfaceBuildNormals(numAtoms, atoms, vBoxMin, vBoxMax, probeRadius) {
   this._numAtoms = numAtoms;
   this._atoms = atoms;
   this._vBoxMin = new Vector3();
@@ -72863,7 +72847,7 @@ function IsosurfaceBuildNormals$1(numAtoms, atoms, vBoxMin, vBoxMax, probeRadius
   this._voxelList = null;
 }
 
-IsosurfaceBuildNormals$1.prototype.createVoxels = function () {
+IsosurfaceBuildNormals.prototype.createVoxels = function () {
   var numAtomsRefs;
   var rad;
   var ATOM_VOXEL_REF_SCALE = 4.5;
@@ -72990,7 +72974,7 @@ IsosurfaceBuildNormals$1.prototype.createVoxels = function () {
   return 0;
 };
 
-IsosurfaceBuildNormals$1.prototype.destroyVoxels = function () {
+IsosurfaceBuildNormals.prototype.destroyVoxels = function () {
   this._atomsList = null;
   this._voxelList = null;
 
@@ -73006,7 +72990,7 @@ IsosurfaceBuildNormals$1.prototype.destroyVoxels = function () {
  * @param {Vector3}    point    - point in 3D
  * @param {func(atom)} process  - function to call for each atom
  */
-IsosurfaceBuildNormals$1.prototype.forEachRelatedAtom = function (point, process) {
+IsosurfaceBuildNormals.prototype.forEachRelatedAtom = function (point, process) {
   // find corresponding voxel
   var xInd = Math.floor((point.x - this._vBoxMin.x) * this._numCells * this._xScale);
   var yInd = Math.floor((point.y - this._vBoxMin.y) * this._numCells * this._yScale);
@@ -73028,7 +73012,7 @@ IsosurfaceBuildNormals$1.prototype.forEachRelatedAtom = function (point, process
  *
  * @returns {IsoSurfaceAtomColored} atom, or null if not found
  */
-IsosurfaceBuildNormals$1.prototype.getClosestAtom = function (point) {
+IsosurfaceBuildNormals.prototype.getClosestAtom = function (point) {
   var closest = null;
   var minDist2 = Number.MAX_VALUE;
 
@@ -73052,7 +73036,7 @@ IsosurfaceBuildNormals$1.prototype.getClosestAtom = function (point) {
  *
  * @returns {number} 0, if success
  */
-IsosurfaceBuildNormals$1.prototype.buildNormals = function (numVertices, vertices, normals) {
+IsosurfaceBuildNormals.prototype.buildNormals = function (numVertices, vertices, normals) {
   var self = this;
   var numCloseAtoms = 0;
   var vx = 0,
@@ -73132,7 +73116,7 @@ IsosurfaceBuildNormals$1.prototype.buildNormals = function (numVertices, vertice
  *
  * @returns {number} 0, if success
  */
-IsosurfaceBuildNormals$1.prototype.buildColors = function (numVertices, vertices, colors, radiusColorSmoothness) {
+IsosurfaceBuildNormals.prototype.buildColors = function (numVertices, vertices, colors, radiusColorSmoothness) {
   var self = this;
   var vx = 0.0,
       vy = 0.0,
@@ -74281,10 +74265,10 @@ SSIsosurfaceGeometry.prototype._innerBuild = function () {
   }
   this.voxelWorld = null;
   if (this.clusterizationType > 0) {
-    this.voxelWorld = new IsosurfaceBuildNormals$1(atomsClustered.length, atomsClustered, //NOSONAR
+    this.voxelWorld = new IsosurfaceBuildNormals(atomsClustered.length, atomsClustered, //NOSONAR
     vBoxMin, vBoxMax, probeRadForNormalsColors);
   } else {
-    this.voxelWorld = new IsosurfaceBuildNormals$1(atomsColored.length, atomsColored, vBoxMin, vBoxMax, probeRadForNormalsColors);
+    this.voxelWorld = new IsosurfaceBuildNormals(atomsColored.length, atomsColored, vBoxMin, vBoxMax, probeRadForNormalsColors);
   }
   this.voxelWorld.createVoxels();
 
@@ -74456,7 +74440,7 @@ LabelsGeometry.prototype.getSubset = function () {
 var geometries = {
   InstancedSpheresGeometry: InstancedSpheresGeometry,
   SimpleSpheresGeometry: SimpleSpheresGeometry,
-  Simple2CCylindersGeometry: Simple2CCylinderGeometry$1,
+  Simple2CCylindersGeometry: Simple2CCylinderGeometry,
   Instanced2CCylinderGeometry: Instanced2CCylindersGeometry,
   ExtrudedObjectsGeometry: ExtrudedObjectsGroup,
   ChunkedLinesGeometry: ChunkedLinesGeometry,
@@ -75987,7 +75971,7 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   return { centerPoints: centerPoints, topPoints: topPoints };
 }
 
-function MatrixHelper$1(residues, startIdx, endIdx, segmentsCount, tension, boundaries) {
+function MatrixHelper(residues, startIdx, endIdx, segmentsCount, tension, boundaries) {
   var pointsArrays = _calcPoints(residues, startIdx, endIdx, boundaries);
   this._topInterp = _buildStructureInterpolator(pointsArrays.topPoints, tension);
   this._centerInterp = _buildStructureInterpolator(pointsArrays.centerPoints, tension);
@@ -75997,7 +75981,7 @@ function MatrixHelper$1(residues, startIdx, endIdx, segmentsCount, tension, boun
   this._segmentsCount = segmentsCount;
 }
 
-MatrixHelper$1.prototype.prepareMatrices = function (idx, firstRad, secondRad) {
+MatrixHelper.prototype.prepareMatrices = function (idx, firstRad, secondRad) {
   var mtcCount = this._segmentsCount;
   var outMtc = new Array(mtcCount);
   var currRad = new Vector2(0, 0);
@@ -76040,7 +76024,7 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
     var boundaries = subDiv[subDivI].boundaries;
     for (var i = 0, n = subs.length; i < n; ++i) {
       var idc = [subs[i].start, subs[i].end];
-      var matrixHelper = new MatrixHelper$1(residues, idc[0], idc[1], segmentsHeight, tension, boundaries);
+      var matrixHelper = new MatrixHelper(residues, idc[0], idc[1], segmentsHeight, tension, boundaries);
       var prevLast = null;
       var startIdx = subs[i].start * 2;
       var endIdx = subs[i].end * 2 + 1;
@@ -77024,7 +77008,7 @@ function Mode(opts) {
   this.opts = lodash.merge(utils.deriveDeep(this.settings.now.modes[this.id], true), opts);
 }
 
-makeContextDependent$1(Mode.prototype);
+makeContextDependent(Mode.prototype);
 /**
  * Mode identifier.
  * @type {string}
@@ -77991,7 +77975,9 @@ palette$1.chainColors = [
 
 palette$1.secondaryColors = {
   'helix': { 1: 0xFF0080, 5: 0xA00080 },
-  'strand': 0xFFC800
+  'strand': 0xFFC800,
+  'dna': 0xAE00FE,
+  'rna': 0xFD0162
 };
 
 var palette$2 = new Palette('VMD', 'VM');
@@ -78272,6 +78258,11 @@ SecondaryStructureColorer.prototype.getAtomColor = function (atom, complex) {
 };
 
 SecondaryStructureColorer.prototype.getResidueColor = function (residue, _complex) {
+  if (residue._type.flags & ResidueType.Flags.DNA) {
+    return this.palette.getSecondaryColor('dna');
+  } else if (residue._type.flags & ResidueType.Flags.RNA) {
+    return this.palette.getSecondaryColor('rna');
+  }
   var secondary = residue.getSecondary();
   if (secondary) {
     return this.palette.getSecondaryColor(secondary.type, secondary._type);
@@ -80658,7 +80649,7 @@ Loader$1.prototype.abort = function () {
   this._agent.abort();
 };
 
-makeContextDependent$1(Loader$1.prototype);
+makeContextDependent(Loader$1.prototype);
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -80876,7 +80867,7 @@ function Parser(data, options) {
 ////////////////////////////////////////////////////////////////////////////
 // Instance methods
 
-makeContextDependent$1(Parser.prototype);
+makeContextDependent(Parser.prototype);
 
 Parser.prototype.parse = function (callback) {
   var self = this;
@@ -85438,7 +85429,7 @@ SceneObject.prototype.destroy = function () {
   }
 };
 
-function LinesObj$1(params, opts) {
+function LinesObj(params, opts) {
   SceneObject.call(this, params, opts);
   if (params.length < 2) {
     throw new Error('Wrong number of argumets on line object creation!');
@@ -85447,13 +85438,13 @@ function LinesObj$1(params, opts) {
   this._id2 = params[1];
 }
 
-utils.deriveClass(LinesObj$1, SceneObject, {
+utils.deriveClass(LinesObj, SceneObject, {
   type: 'line'
 });
 
-LinesObj$1.prototype.constructor = LinesObj$1;
+LinesObj.prototype.constructor = LinesObj;
 
-LinesObj$1.prototype._getAtomFromName = function (complex, atomId) {
+LinesObj.prototype._getAtomFromName = function (complex, atomId) {
   var err = ' - Wrong atom format it must be \'#CHAIN_NAME.#NUMBER.#ATOM_NAME\' (e.g. \'A.38.CO1\')';
   var atom1 = complex.getAtomByFullname(atomId);
   if (!atom1) {
@@ -85462,7 +85453,7 @@ LinesObj$1.prototype._getAtomFromName = function (complex, atomId) {
   return atom1;
 };
 
-LinesObj$1.prototype.build = function (complex) {
+LinesObj.prototype.build = function (complex) {
   var geom = new Geometry();
   this._atom1 = this._getAtomFromName(complex, this._id1);
   this._atom2 = this._getAtomFromName(complex, this._id2);
@@ -85491,7 +85482,7 @@ LinesObj$1.prototype.build = function (complex) {
   }
 };
 
-LinesObj$1.prototype.updateToFrame = function (frameData) {
+LinesObj.prototype.updateToFrame = function (frameData) {
   if (!this._atom1 || !this._atom2 || !this._line) {
     return;
   }
@@ -85527,7 +85518,7 @@ function overrideUniforms$1(params) {
   return uniforms;
 }
 
-function createOutlineMaterial$1(params) {
+function createOutlineMaterial(params) {
   var settings = {
     uniforms: overrideUniforms$1(params),
     vertexShader: vertexShader$1,
@@ -85558,7 +85549,7 @@ function overrideUniforms$2(params) {
   return uniforms;
 }
 
-function createFXAAMaterial$1(params) {
+function createFXAAMaterial(params) {
   var settings = {
     uniforms: overrideUniforms$2(params),
     vertexShader: vertexShader$1,
@@ -85678,7 +85669,7 @@ function overrideUniforms$4(params) {
   return uniforms;
 }
 
-function createAnaglyphMaterial$1(params) {
+function createAnaglyphMaterial(params) {
   var settings = {
     uniforms: overrideUniforms$4(params),
     vertexShader: vertexShader$1,
@@ -86040,7 +86031,7 @@ function Cookies(context, opts) {
   }, opts);
 }
 
-makeContextDependent$1(Cookies.prototype);
+makeContextDependent(Cookies.prototype);
 
 /**
  * Remove cookie by the name.
@@ -86128,7 +86119,7 @@ Cookies.prototype._exists = function (key) {
   return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
 };
 
-/* global "0.7.1":false */
+/* global "0.7.2":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -86341,7 +86332,7 @@ Miew$1.prototype.init = function () {
     this._initGfx();
 
     this._initListeners();
-    this._spinner = new spin$1({
+    this._spinner = new spin({
       lines: 13,
       length: 28,
       width: 14,
@@ -87000,7 +86991,7 @@ Miew$1.prototype._onRender = function () {
 
 Miew$1.prototype._renderFrame = function () {
 
-  var _anaglyphMat = new createAnaglyphMaterial$1();
+  var _anaglyphMat = new createAnaglyphMaterial();
 
   return function (stereo) {
     var gfx = this._gfx;
@@ -87220,7 +87211,7 @@ Miew$1.prototype._renderTestPattern = function (numCellsX, numCellsY, target) {
 
 Miew$1.prototype.renderSelection = function () {
 
-  var _outlineMaterial = new createOutlineMaterial$1();
+  var _outlineMaterial = new createOutlineMaterial();
 
   return function (camera, srcBuffer, targetBuffer) {
 
@@ -87332,7 +87323,7 @@ Miew$1.prototype.renderWithPrepassTransparency = function () {
 
 Miew$1.prototype.performFXAA = function () {
 
-  var _fxaaMaterial = new createFXAAMaterial$1();
+  var _fxaaMaterial = new createFXAAMaterial();
 
   return function (srcBuffer, targetBuffer) {
 
@@ -87509,7 +87500,7 @@ Miew$1.prototype.load = function (file, opts) {
     this._fileSourceAnim = opts.mdFile;
   }
 
-  if (opts && opts.animation !== true) {
+  if (!this.settings.now.use.multiFile && !(opts && opts.animation)) {
     this.reset(true);
   }
 
@@ -89096,8 +89087,8 @@ Miew$1.prototype.addObject = function (objData, bThrow) {
   var Ctor = null;
 
   // TODO change this to factory when better times come.
-  if (objData.type === LinesObj$1.prototype.type) {
-    Ctor = LinesObj$1;
+  if (objData.type === LinesObj.prototype.type) {
+    Ctor = LinesObj;
   }
 
   if (Ctor === null) {
@@ -89850,7 +89841,7 @@ function load(file, loadOptions, master, context) {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew$1.prototype.VERSION = typeof "0.7.1" !== 'undefined' && "0.7.1" || '0.0.0-dev';
+Miew$1.prototype.VERSION = typeof "0.7.2" !== 'undefined' && "0.7.2" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew$1, /** @lends Miew */{
@@ -89893,7 +89884,7 @@ lodash.assign(Miew$1, /** @lends Miew */{
 var MiewCLIParser = createCommonjsModule(function (module, exports) {
 /* eslint-disable */
 // DO NOT EDIT! Automatically generated from .jison
-/* parser generated by jison 0.4.17 */
+/* parser generated by jison 0.4.18 */
 /*
   Returns a Parser object of the following structure:
 
@@ -90219,7 +90210,7 @@ case 112:
 this.$ = yy.echo(yy.representations.add($$[$0-1], yy.miew.repAdd($$[$0])));
 break;
 case 113:
-this.$ = yy.miew.repCurrent($$[$0]);
+this.$ = yy.miew.rep($$[$0]); yy.miew.repCurrent($$[$0]);
 break;
 case 114:
 this.$ = yy.miew.rep($$[$0-1], $$[$0]); yy.miew.repCurrent($$[$0-1]);
@@ -90304,13 +90295,9 @@ parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
     } else {
-        function _parseError (msg, hash) {
-            this.message = msg;
-            this.hash = hash;
-        }
-        _parseError.prototype = Error;
-
-        throw new _parseError(str, hash);
+        var error = new Error(str);
+        error.hash = hash;
+        throw error;
     }
 },
 parse: function parse(input) {
@@ -91270,7 +91257,7 @@ function _createSelectorFromNode(node) {
   return selector;
 }
 
-var JSONtoSelectorConverter$1 = function () {
+var JSONtoSelectorConverter = function () {
   function JSONtoSelectorConverter() {
     classCallCheck(this, JSONtoSelectorConverter);
   }
@@ -91375,7 +91362,7 @@ CLIUtils.prototype.listRep = function (miew, repMap, repIndex, key) {
   if (key !== undefined) {
     var selectionStr = opts.selector;
     if (selectionStr instanceof Array) {
-      var converter = new JSONtoSelectorConverter$1();
+      var converter = new JSONtoSelectorConverter();
       selectionStr = converter.createSelectorFromNode(selectionStr);
     }
 
@@ -91442,7 +91429,6 @@ CLIUtils.prototype.load = function (miew, arg) {
   var finish = function finish() {
     return miew.finishAwaitingCMDInProcess();
   };
-  miew.unload();
   miew.load(arg).then(finish, finish);
 };
 
@@ -92239,7 +92225,7 @@ Miew$1.prototype.callNextCmd = function () {
   return '';
 };
 
-Miew$1.JSONConverter = JSONtoSelectorConverter$1;
+Miew$1.JSONConverter = JSONtoSelectorConverter;
 
 MiewCLIParser_1.yy = cliutils;
 // FIXME: workaround for incorrect JISON parser generator for AMD module
