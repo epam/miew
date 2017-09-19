@@ -112,7 +112,6 @@ function reportProgress(log, action, percent) {
  *
  * @param {object} opts - Viewer options.
  * @param {HTMLElement=} opts.container - DOM element that serves as a viewer container.
- * @param {HTMLElement=} opts.iframe - parent IFRAME element if any.
  * @param {object=} opts.settings - An object with properties to override default settings.
  * @param {string=} opts.settingsCookie='settings' - The name of the cookie to save current settings to.
  * @param {string=} opts.cookiePath='/' - The path option for cookies. Defaults to root.
@@ -176,9 +175,6 @@ function Miew(opts) {
   /** @type {?string} */
   this._curVisualName = null;
 
-  /** @type {object} */
-  this._iframe = opts.iframe;
-
   /** @type {array} */
   this._objects = [];
 
@@ -192,21 +188,8 @@ function Miew(opts) {
 
   this.reset();
 
-  if (window.addEventListener) {
-    window.addEventListener('message', Miew.prototype.messageListener.bind(this), false);
-  } else {
-    window.attachEvent('onmessage', Miew.prototype.messageListener.bind(this));
-  }
-
   if (this._repr) {
     log.debug('Selected ' + this._repr.mode.name + ' mode with ' + this._repr.colorer.name + ' colorer.');
-  }
-
-  // notify parent IFRAME
-  if (this._iframe) {
-    var doc = this._iframe.ownerDocument;
-    var win = doc.defaultView || doc.parentWindow;
-    win.postMessage('miewLoadComplete', doc.location.origin);
   }
 
   var self = this;
@@ -2898,180 +2881,6 @@ Miew.prototype.setOptions = function(opts) {
     }
     this.resetView();
     this.rebuildAll();
-  }
-};
-
-Miew.prototype._processMessageData = function(data) {
-  var self = this;
-  var idx = 0 - 1;
-  idx = data.indexOf(':', 0);
-  if (idx > 0) {
-    switch (data.substring(0, idx)) {
-    case 'load': {
-      if (self._gfx === null) {
-        if (self.init()) {
-          self.benchmarkGfx().then(function() {
-            self.run();
-            self.load(data.substring(idx + 1), {sourceType: 'message'});
-          });
-        }
-      } else {
-        self.load(data.substring(idx + 1), {sourceType: 'message'});
-      }
-
-      break;
-    }
-    case 'setOptions': {
-      if (self._gfx === null || (!self._getComplexVisual())) {
-        setTimeout(function() {
-          self._processMessageData(data);
-        }, 10);
-        return;
-      }
-      this.setOptions(data.substring(idx + 1));
-      break;
-    }
-    default: {
-      self.logger.debug('Unknown message: ' + data);
-    }
-    }
-    self.logger.info(data.substring(0, idx) + ' message received.');
-  }
-};
-
-Miew.prototype._serializeData = function(complex) {
-  if (complex !== null) {
-    var oSerializer = new XMLSerializer();
-    var sXML = oSerializer.serializeToString(complex.originalCML);
-    return window.btoa(sXML);
-  }
-  return null;
-};
-
-Miew.prototype._getMasterWindow = function() {
-  var dstWindow = this._sourceWindow;
-  if (!dstWindow) {
-    if (typeof window.parent !== 'undefined' && window.parent !== null) {
-      dstWindow = window.parent;
-    }
-  }
-  if (!dstWindow) {
-    dstWindow = null;
-  }
-  return dstWindow;
-};
-
-Miew.prototype.saveData = function() {
-  function extractRotation(m) {
-    var xAxis = new THREE.Vector3();
-    var yAxis = new THREE.Vector3();
-    var zAxis = new THREE.Vector3();
-    m.extractBasis(xAxis, yAxis, zAxis);
-    xAxis.normalize();
-    yAxis.normalize();
-    zAxis.normalize();
-    var retMat = new THREE.Matrix4();
-    retMat.identity();
-    retMat.makeBasis(xAxis, yAxis, zAxis);
-    return retMat;
-  }
-  //saves data
-  var root = this._gfx.root;
-  var mat = extractRotation(root.matrixWorld);
-  var v4 = new THREE.Vector4(0, 0, 0, 0);
-  var vCenter = new THREE.Vector4(0, 0, 0, 0);
-  var xml = null;
-  var ap = null;
-  var cp = null;
-  var dstWindow = this._getMasterWindow();
-  //prepare matrix
-
-  // FIXME save data for all complexes (not only current)
-  var visual = this._getComplexVisual();
-  var fi = visual ? visual.getComplex() : null;
-  if (fi && fi.originalCML) {
-    fi.forEachAtom(function(atom) {
-      if (atom.xmlNodeRef && atom.xmlNodeRef.xmlNode) {
-        xml = atom.xmlNodeRef.xmlNode;
-        ap = atom.getPosition();
-        v4.set(ap.x, ap.y, ap.z, 1.0);
-        v4.applyMatrix4(mat);
-        xml.setAttribute('x3', v4.x.toString());
-        xml.setAttribute('y3', v4.y.toString());
-        xml.setAttribute('z3', v4.z.toString());
-        xml.removeAttribute('x2');
-        xml.removeAttribute('y2');
-      }
-    });
-    fi.forEachSGroup(function(sGroup) {
-      if (sGroup.xmlNodeRef && sGroup.xmlNodeRef.xmlNode) {
-        xml = sGroup.xmlNodeRef.xmlNode;
-        ap = sGroup.getPosition();
-        v4.set(ap.x, ap.y, ap.z, 1.0);
-        cp = sGroup.getCentralPoint();
-        if (cp === null) {
-          v4.applyMatrix4(mat);
-        } else {
-          vCenter.set(cp.x, cp.y, cp.z, 0.0);
-          v4.add(vCenter);
-          v4.applyMatrix4(mat); // pos in global space
-          vCenter.set(cp.x, cp.y, cp.z, 1.0);
-          vCenter.applyMatrix4(mat);
-          v4.sub(vCenter);
-        }
-
-        xml.setAttribute('x', v4.x.toString());
-        xml.setAttribute('y', v4.y.toString());
-        xml.setAttribute('z', v4.z.toString());
-      }
-    });
-  }
-  if (fi !== null) {
-    if (dstWindow !== null) {
-      dstWindow.postMessage('CML:' + this._serializeData(fi), dstWindow.location.origin);
-    }
-  }
-};
-
-Miew.prototype.resetData = function() {
-  // FIXME reset all complexes (not only current)
-  var visual = this._getComplexVisual();
-  if (!visual) {
-    return;
-  }
-
-  var com = visual.getComplex();
-  if (Array.isArray(com)) {
-    com = com[0];
-  }
-
-  var s = 'load:CML:' + this._serializeData(com);
-  this._processMessageData(s);
-};
-
-Miew.prototype.canSaveData = function() {
-  var canSave = false;
-  this._forEachComplexVisual(function(visual) {
-    var com = visual.getComplex();
-    if (Array.isArray(com)) {
-      com = com[0];
-    }
-    canSave = canSave || com.originalCML;
-  });
-  return canSave && (this._getMasterWindow() !== null);
-};
-
-
-Miew.prototype.messageListener = function(event) {
-  var self = this;
-  var origin = event.origin || event.originalEvent.origin;
-  if (origin === document.location.origin) {
-    var data = event.data;
-    if (_.isString(data)) {
-      var callF = self._processMessageData.bind(self);
-      this._sourceWindow = event.source;
-      callF(data);
-    }
   }
 };
 

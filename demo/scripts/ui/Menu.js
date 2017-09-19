@@ -2103,14 +2103,6 @@ Menu.prototype._initToolsPanel = function() {
   $(self._menuId + ' [data-toggle=miew-menu-tools]').on('click', function() {
     var type = this.getAttribute('data-value');
     switch (type) {
-    case 'pass-data':
-      self._viewer.saveData();
-      self._onMenuOff();
-      break;
-    case 'reset-data':
-      self._viewer.resetData();
-      self._onMenuOff();
-      break;
     case 'reset-view':
       self._viewer.resetView();
       self._initReprList();
@@ -2516,14 +2508,6 @@ Menu.prototype.show = function(panelID, menuItem) {
   var labelSelector = $(self._menuId + ' [data-toggle=labeling][data-value="' + settings.now.labels + '"]');
   elements[0].firstElementChild.firstElementChild.textContent = labelSelector.text();
   labelSelector.addClass('active');
-
-  if (self._viewer.canSaveData() === true) {
-    $(self._menuId + ' [data-toggle=miew-menu-tools][data-value=pass-data]').show();
-    $(self._menuId + ' [data-toggle=miew-menu-tools][data-value=reset-data]').show();
-  } else {
-    $(self._menuId + ' [data-toggle=miew-menu-tools][data-value=pass-data]').hide();
-    $(self._menuId + ' [data-toggle=miew-menu-tools][data-value=reset-data]').hide();
-  }
 
   // renew currently opened mode- o colorer- combobox panel (need, when mode or colorer was changed from toolbar)
   if (self._curPanelID.indexOf('mode') !== -1 || self._curPanelID.indexOf('color') !== -1) {

@@ -82,8 +82,6 @@ window.onerror = function(err, url, line, col, obj) {
 // Uncomment this to profile parsing
 // Miew.profile('data/4TNW.pdb', 10, $('miew-container').first.firstChild.firstChild);
 
-var iframe = window.parent && window.parent.document.getElementById('miew-iframe');
-
 // allow to access viewer objects from console
 if (DEBUG) {
   window.MIEWS = [];
@@ -96,7 +94,6 @@ $('.miew-container').each(function(i, container) {
     true,
     {
       container: container,
-      iframe: iframe,
       load: 'data/1CRN.pdb',
       cookiePath: typeof COOKIE_PATH !== 'undefined' && COOKIE_PATH || '/',
     },
@@ -123,9 +120,7 @@ $('.miew-container').each(function(i, container) {
 
   var menu = new Menu(viewer);
 
-  // postpone startup inside iframe
-  // TODO: Think of a better way to check if we need to initialize immediately
-  if (!viewer._iframe && viewer.init()) {
+  if (viewer.init()) {
     viewer.benchmarkGfx().then(function() {
       menu.showOverlay();
       viewer.run();
