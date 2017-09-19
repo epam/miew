@@ -17,7 +17,6 @@
     "url": "git+https://github.com/epam/miew.git"
   },
   "license": "MIT",
-  "private": true,
   "scripts": {
     "build": "gulp build",
     "lint": "gulp lint",
