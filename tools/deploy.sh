@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ "$TRAVIS_BRANCH" == "latest" ]
 then
   DEPLOY_APP=ROOT
@@ -6,7 +8,7 @@ else
 fi
 
 # pack the application
-$JAVA_HOME/bin/jar cvf $DEPLOY_APP.war -C build .
+jar cvf $DEPLOY_APP.war -C build .
 
 # set identity
 eval "$(ssh-agent -s)"
@@ -16,7 +18,7 @@ ssh-add $DEPLOY_KEY_FILE
 
 # upload the application
 scp $DEPLOY_APP.war $DEPLOY_USER@$DEPLOY_SERVER:.
-ssh $DEPLOY_USER@$DEPLOY_SERVER "cd /opt/tomcat/webapps && sudo cp ~/$DEPLOY_APP.war"
+ssh $DEPLOY_USER@$DEPLOY_SERVER "cd /opt/tomcat/webapps && sudo cp ~/$DEPLOY_APP.war ."
 
 # clean up
 rm -f $DEPLOY_APP.war $DEPLOY_KEY_FILE 

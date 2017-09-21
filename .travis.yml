@@ -41,7 +41,7 @@ deploy:
       condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$
   - provider: script
     skip_cleanup: true
-    script: ./tools/deploy.sh
+    script: "chmod +x ./tools/deploy.sh && ./tools/deploy.sh"
     on:
       all_branches: true
       node: "node"
