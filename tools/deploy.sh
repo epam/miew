@@ -1,4 +1,5 @@
-if [ "$TRAVIS_BRANCH" == "latest" ]; then
+if [ "$TRAVIS_BRANCH" == "latest" ]
+then
   DEPLOY_APP=ROOT
 else
   DEPLOY_APP=${TRAVIS_BRANCH//[^A-Za-z0-9_\-.]/-}

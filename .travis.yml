@@ -10,6 +10,8 @@ cache:
 addons:
   sonarcloud:
     organization: "epam"
+  ssh_known_hosts:
+    - "$DEPLOY_SERVER"
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.0.2
   - export PATH="$HOME/.yarn/bin:$PATH"
@@ -39,7 +41,7 @@ deploy:
       condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$
   - provider: script
     skip_cleanup: true
-    script: if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./tools/deploy.sh; fi
+    script: ./tools/deploy.sh
     on:
       all_branches: true
       node: "node"
