@@ -48,7 +48,7 @@ export default {
     rollupPluginBabel({
       babelrc: false,
       runtimeHelpers: true,
-      presets: [['es2015', {modules: false}]],
+      presets: [['env', {modules: false}]],
       plugins: ['external-helpers'],
       exclude: [
         './node_modules/**',
