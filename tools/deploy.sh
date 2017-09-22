@@ -23,7 +23,7 @@ ssh-add $DEPLOY_KEY_FILE
 
 # upload the application
 echo "Uploading the application..."
-scp $DEPLOY_APP.war $DEPLOY_USER@$DEPLOY_SERVER:.
+scp -o "StrictHostKeyChecking=no" $DEPLOY_APP.war $DEPLOY_USER@$DEPLOY_SERVER:.
 echo "Executing remote commands..."
 ssh -o "StrictHostKeyChecking=no" $DEPLOY_USER@$DEPLOY_SERVER "cd /opt/tomcat/webapps && sudo cp ~/$DEPLOY_APP.war ."
 
