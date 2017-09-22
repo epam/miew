@@ -33,7 +33,7 @@ ResiduesGroup.prototype._calcChunksList = function(mask) {
   var resIdc = this._chunksIdc;
   for (var i = 0, n = resIdc.length; i < n; ++i) {
     var res = residues[resIdc[i]];
-    if (res._mask & mask !== 0) {
+    if ((res._mask & mask) !== 0) {
       chunksList.push(i);
     }
   }

@@ -33,7 +33,7 @@ AtomsGroup.prototype._calcChunksList = function(mask) {
   var atomsIdc  = this._chunksIdc;
   for (var i = 0, n = atomsIdc.length; i < n; ++i) {
     var atom = atoms[atomsIdc[i]];
-    if (atom._mask & mask !== 0) {
+    if ((atom._mask & mask) !== 0) {
       chunksList.push(i);
     }
   }
