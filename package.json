@@ -42,7 +42,6 @@
     "last 2 Safari major versions",
     "last 2 Edge versions",
     "IE >= 11",
-
     "last 2 iOS major versions",
     "last 1 Android version",
     "last 2 ChromeAndroid versions",
@@ -88,7 +87,7 @@
     "gulp-webserver": "^0.9.1",
     "html-webpack-plugin": "^2.29.0",
     "jquery": "^3.2.1",
-    "jquery.terminal": "^1.7.2",
+    "jquery.terminal": "=1.7.0",
     "jsdoc": "^3.5.5",
     "lodash": "^4.17.4",
     "mocha": "^3.5.3",
