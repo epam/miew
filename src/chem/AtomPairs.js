@@ -38,7 +38,6 @@ PairCollection.prototype.destroy = function() {
  * Add pair of atoms to collection
  * @param {number} indexA - Index of the 1st vertex.
  * @param {number} indexB - Index of the 2nd vertex.
- * @returns {number} zero on success
  */
 PairCollection.prototype.addPair = function(indexA, indexB) {
   var ia = (indexA < indexB) ? indexA : indexB;
@@ -54,7 +53,7 @@ PairCollection.prototype.addPair = function(indexA, indexB) {
       break;
     }
     if (code === codeToAdd) {
-      return 0;
+      return;
     }
   }
   // add this new hash code
@@ -72,7 +71,6 @@ PairCollection.prototype.addPair = function(indexA, indexB) {
   this.intBuffer[j + 1] = ib;
   this.intBuffer[j + 2] = codeToAdd;
   this.numPairs++;
-  return 0;
 };
 
 export default PairCollection;

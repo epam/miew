@@ -243,7 +243,7 @@ VoxelWorld.prototype.forEachAtomWithinRadius = function(center, radius, process)
 VoxelWorld.prototype.forEachAtomWithinDistFromMasked = function(complex, mask, dist, process) {
   this._forEachAtomWithinDistFromGroup(function(atomProc) {
     complex.forEachAtom(function(atom) {
-      if (atom._mask & mask) {
+      if (atom._mask & mask !== 0) {
         atomProc(atom);
       }
     });

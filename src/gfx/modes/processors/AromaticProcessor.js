@@ -31,7 +31,7 @@ function ComponentsAromaticProcessor(
       var cycAtoms = cycle.atoms;
       var perCycle = 0;
       for (var i = 0, n = cycAtoms.length; i < n; ++i) {
-        if (cycAtoms[i]._mask & mask) {
+        if (cycAtoms[i]._mask & mask !== 0) {
           ++perCycle;
           atomsIdc[chunksCount++] = cycAtoms[i]._index;
         }

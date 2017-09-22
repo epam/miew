@@ -51,7 +51,7 @@ NucleicItemGroup.prototype._calcChunksList = function(mask) {
 
   for (var i = 0, n = resIdc.length; i < n; ++i) {
     var res = residues[resIdc[i]];
-    if (res._mask & mask) {
+    if (res._mask & mask !== 0) {
       chunksList[chunkIdx++] =  2 * i;
       chunksList[chunkIdx++] =  2 * i + 1;
     }

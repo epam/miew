@@ -26,7 +26,7 @@ function inverseColor(color) {
   var g = (color >> 8) & 255;
   var b = color & 255;
 
-  return ((255 - r) << 16) | ((255 - g << 8)) | (255 - b);
+  return ((255 - r) << 16) | ((255 - g) << 8) | (255 - b);
 }
 
 function getAtomText(atom) {

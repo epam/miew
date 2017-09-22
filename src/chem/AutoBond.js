@@ -20,15 +20,12 @@ var cEpsilon = 0.001;
  * @returns {number} special value for bonding radius for this atom
  */
 function _getBondingRadius(atom) {
-  var bondRad = 0.0;
-  var element = atom.element;
+  const element = atom.element;
   if (element) {
-    bondRad = element.radiusBonding;
+    return element.radiusBonding;
   } else {
     throw new Error('_getBondingRadius: Logic error.');
   }
-
-  return bondRad;
 }
 
 /**
