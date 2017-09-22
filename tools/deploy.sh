@@ -25,7 +25,7 @@ ssh-add $DEPLOY_KEY_FILE
 echo "Uploading the application..."
 scp $DEPLOY_APP.war $DEPLOY_USER@$DEPLOY_SERVER:.
 echo "Executing remote commands..."
-ssh $DEPLOY_USER@$DEPLOY_SERVER "cd /opt/tomcat/webapps && sudo cp ~/$DEPLOY_APP.war ."
+ssh -o "StrictHostKeyChecking=no" $DEPLOY_USER@$DEPLOY_SERVER "cd /opt/tomcat/webapps && sudo cp ~/$DEPLOY_APP.war ."
 
 # clean up
 echo "Removing temporary files..."
