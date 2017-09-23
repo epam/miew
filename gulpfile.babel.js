@@ -91,16 +91,12 @@ gulp.task('lint:css');
 //////////////////////////////////////////////////////////////////////////////
 
 gulp.task('test', () =>
-  gulp.src('test/**/*.js', {read: false})
-    .pipe(plugins.mocha({
-      compilers: 'js:babel-core/register',
-      reporter: 'dot',
-    })));
+  gulp.src(config.test.src, {read: false})
+    .pipe(plugins.mocha()));
 
 gulp.task('test:cover', ['test:cover-hook'], () =>
-  gulp.src('test/**/*.js', {read: false})
+  gulp.src(config.test.src, {read: false})
     .pipe(plugins.mocha({
-      compilers: 'js:babel-core/register',
       reporter: 'dot',
     }))
     .pipe(plugins.istanbul.writeReports({
@@ -110,14 +106,12 @@ gulp.task('test:cover', ['test:cover-hook'], () =>
     })));
 
 gulp.task('test:cover-hook', () =>
-  gulp.src([
-    'src/**/*.js',
-  ])
+  gulp.src(config.cover.src)
     .pipe(plugins.istanbul({includeUntested: true}))
     .pipe(plugins.istanbul.hookRequire()));
 
 gulp.task('test:coveralls', () =>
-  gulp.src('coverage/lcov.info')
+  gulp.src(config.cover.dst + 'lcov.info')
     .pipe(plugins.coveralls()));
 
 //////////////////////////////////////////////////////////////////////////////

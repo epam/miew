@@ -7,6 +7,9 @@ export default {
     dst: 'docs/auto/',
   },
   cover: {
+    src: [
+      'src/**/*.js',
+    ],
     dst: 'coverage/',
   },
   lib: {
@@ -29,6 +32,12 @@ export default {
       'examples/**/*.js',
       'test/**/*.js',
       'tools/**/*.js',
+    ],
+  },
+  test: {
+    src: [
+      'src/**/*.test.js',
+      'test/**/*.js',
     ],
   },
   roServer: Boolean(process.env.MIEW_READONLY_SERVER || yargs.argv.roServer),
