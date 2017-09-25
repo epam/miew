@@ -5,7 +5,7 @@ export default class PDBStream {
   constructor(data) {
     this._data = data;
     this._start = 0;
-    this._next = 0;
+    this._next = -CRLF_LENGTH;
     this._end = data.length;
 
     this.next();
@@ -26,15 +26,17 @@ export default class PDBStream {
   }
 
   readString(begin, end) {
-    return this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next));
+    const from = this._start + begin - 1;
+    const to = this._start + end;
+    return this._data.slice(from, to < this._next ? to : this._next);
   }
 
   readInt(begin, end) {
-    return parseInt(this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next)), 10);
+    return parseInt(this.readString(begin, end), 10);
   }
 
   readFloat(begin, end) {
-    return parseFloat(this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next)));
+    return parseFloat(this.readString(begin, end));
   }
 
   end() {
@@ -42,8 +44,9 @@ export default class PDBStream {
   }
 
   next() {
-    this._start = this._next;
+    const start = this._next + CRLF_LENGTH;
+    this._start = start < this._end ? start : this._end;
     const next = this._data.indexOf(CRLF, this._start);
-    this._next = next > 0 ? next + CRLF_LENGTH : this._end;
+    this._next = next > 0 ? next : this._end;
   }
 }

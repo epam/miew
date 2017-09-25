@@ -9,6 +9,7 @@ export default {
   cover: {
     src: [
       'src/**/*.js',
+      '!src/**/*.test.js',
     ],
     dst: 'coverage/',
   },
