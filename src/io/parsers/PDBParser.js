@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import _ from 'lodash';
 import Remark290 from './pdb/Remark290';
 import Remark350 from './pdb/Remark350';
+import PDBStream from './PDBStream';
 
 var
   Complex = chem.Complex,
@@ -17,8 +18,6 @@ var
   Molecule = chem.Molecule;
 
 var TAG_LENGTH = 6;
-var CRLF = '\n';
-var CRLF_LENGTH = CRLF.length; // FIXME: It is always 1, isn't it?
 
 function nameToElement(name) {
   // http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
@@ -75,53 +74,6 @@ PDBParser.canParse = function(data, options) {
   }
   return (typeof data === 'string') &&
     (Parser.checkDataTypeOptions(options, 'pdb') || Parser.checkDataTypeOptions(options, 'pdb', '.ent'));
-};
-
-////////////////////////////////////////////////////////////////////////////
-// Auxiliary class
-function PDBStream(data) {
-  this._data = data;
-  this._start = 0;
-  this._next = 0;
-  this._end = data.length;
-
-  this.next();
-}
-
-PDBStream.prototype = {
-  constructor: PDBStream,
-
-  end: function() {
-    return this._start >= this._end;
-  },
-
-  next: function() {
-    this._start = this._next;
-    var next = this._data.indexOf(CRLF, this._start);
-    this._next = next > 0 ? next + CRLF_LENGTH : this._end;
-  },
-
-  readString: function(begin, end) {
-    return this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next));
-  },
-
-  readChar: function(pos) {
-    pos = this._start + pos - 1;
-    return pos < this._next ? this._data[pos] : ' ';
-  },
-
-  readCharCode: function(pos) {
-    pos = this._start + pos - 1;
-    return pos < this._next ? this._data.charCodeAt(pos) : 32;
-  },
-
-  readInt: function(begin, end) {
-    return parseInt(this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next)), 10);
-  },
-
-  readFloat: function(begin, end) {
-    return parseFloat(this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next)));
-  },
 };
 
 ////////////////////////////////////////////////////////////////////////////
