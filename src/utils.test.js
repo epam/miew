@@ -1,14 +1,14 @@
+import utils from './utils';
+
 import chai, {expect} from 'chai';
 import dirtyChai from 'dirty-chai';
-import utils from '../src/utils';
 
 chai.use(dirtyChai);
 
 //////////////////////////////////////////////////////////////////////////////
 
-describe('utils.deriveDeep', function() {
-  var
-    num = 42,
+describe('utils.deriveDeep()', function() {
+  const num = 42,
     str = 'hello',
     simpleObject = {
       num: num,
@@ -42,11 +42,18 @@ describe('utils.deriveDeep', function() {
       str,
       simpleObject
     ],
-    obj1 = {a:1, b: {x: 2, y: {s: 'hello'}, z: [3, {p: 4, q: 5}]}},
+    obj1 = {
+      a: 1,
+      b: {
+        x: 2, y: {s: 'hello'}, z: [3, {p: 4, q: 5}],
+      },
+    },
     obj2 = {
-      a:10, b: {
-        x: 20, y: {s: 'bye'}, z: [30, {p: 40, q: 50, r: 60}, 70], w: 80
-      }, c: 90
+      a: 10,
+      b: {
+        x: 20, y: {s: 'bye'}, z: [30, {p: 40, q: 50, r: 60}, 70], w: 80,
+      },
+      c: 90,
     };
 
   it('should copy numbers / strings', function() {
@@ -93,39 +100,24 @@ describe('utils.deriveDeep', function() {
     expect(utils.deriveDeep(complexObject, true)).to.be.empty();
   });
 
-  it('should modify own properties instead of prototype', function() {
-    var obj  = {a:1, b: {x: 2, y: {s: 'hello'}, z: [3, {p: 4, q: 5}]}};
-    var res = utils.deriveDeep(obj);
-    res.a = 10;
-    res.b.x = 20;
-    res.b.y.s = 'bye';
-    res.b.z[0] = 30;
-    res.b.z[1].p = 40;
-    res.b.z[1].q = 50;
-    res.b.z[1].r = 60;
-    res.b.z[2] = 70;
-    res.b.w = 80;
-    res.c = 90;
+  [false, true].forEach((boolValue) => {
+    it(`should modify own properties instead of prototype (needZeroOwnProperties = ${boolValue})`, function() {
+      const obj = {a: 1, b: {x: 2, y: {s: 'hello'}, z: [3, {p: 4, q: 5}]}};
+      const res = utils.deriveDeep(obj, boolValue);
+      res.a = 10;
+      res.b.x = 20;
+      res.b.y.s = 'bye';
+      res.b.z[0] = 30;
+      res.b.z[1].p = 40;
+      res.b.z[1].q = 50;
+      res.b.z[1].r = 60;
+      res.b.z[2] = 70;
+      res.b.w = 80;
+      res.c = 90;
 
-    expect(obj).to.deep.equal(obj1);
-    expect(res).to.deep.equal(obj2);
+      expect(obj).to.deep.equal(obj1);
+      expect(res).to.deep.equal(obj2);
+    });
   });
 
-  it('should modify own properties instead of prototype even when needZeroOwnProperties = true', function() {
-    var obj  = {a:1, b: {x: 2, y: {s: 'hello'}, z: [3, {p: 4, q: 5}]}};
-    var res = utils.deriveDeep(obj, true);
-    res.a = 10;
-    res.b.x = 20;
-    res.b.y.s = 'bye';
-    res.b.z[0] = 30;
-    res.b.z[1].p = 40;
-    res.b.z[1].q = 50;
-    res.b.z[1].r = 60;
-    res.b.z[2] = 70;
-    res.b.w = 80;
-    res.c = 90;
-
-    expect(obj).to.deep.equal(obj1);
-    expect(res).to.deep.equal(obj2);
-  });
 });

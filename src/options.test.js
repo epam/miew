@@ -1,17 +1,21 @@
+import options from './options';
+
 import _ from 'lodash';
 import chai, {expect} from 'chai';
-import options from '../src/options';
+import dirtyChai from 'dirty-chai';
+
+chai.use(dirtyChai);
 
 //////////////////////////////////////////////////////////////////////////////
 
 describe('options', function() {
   /********** REP LIST ************/
-  var simplestRep = {
+  const simplestRep = {
     mode: 'BS',
     colorer: 'EL'
   };
 
-  var parameterRep = {
+  const parameterRep = {
     mode: [
       'TR', {
         radius: 0.5
@@ -23,7 +27,7 @@ describe('options', function() {
       }
     ]
   };
-  var subsetRepSimple = {
+  const subsetRepSimple = {
     mode: [
       'CS', {
         subset: 'chain A and sequence 29 or serial 196'
@@ -31,7 +35,7 @@ describe('options', function() {
     ]
   };
 
-  var bigRep = {
+  const bigRep = {
     selector: 'sequence 85, 175, 256 and name CB and sequence 1:286',
     mode: 'TX',
     colorer: 'EL',
@@ -39,28 +43,28 @@ describe('options', function() {
   };
 
   /********** REP TEST SETS ************/
-  var simpleRepsOpts = {
+  const simpleRepsOpts = {
     reps: [simplestRep]
   };
-  var simpleRepsStr = 'r=0&m=BS&c=EL';
+  const simpleRepsStr = 'r=0&m=BS&c=EL';
 
-  var bigRepsOpts = {
+  const bigRepsOpts = {
     reps: [bigRep]
   };
-  var bigRepsStr = 'r=0&s=sequence+85,+175,+256+and+name+CB+and+sequence+1:286&m=TX&c=EL&mt=SF';
+  const bigRepsStr = 'r=0&s=sequence+85,+175,+256+and+name+CB+and+sequence+1:286&m=TX&c=EL&mt=SF';
 
-  var paramRepsOpts = {
+  const paramRepsOpts = {
     preset: 'default',
     reps: [parameterRep]
   };
-  var paramRepStr = 'p=default&r=0&m=TR!radius:0.5&c=EL!carbon:0';
+  const paramRepStr = 'p=default&r=0&m=TR!radius:0.5&c=EL!carbon:0';
 
-  var subsetRepsSimpleOpts = {
+  const subsetRepsSimpleOpts = {
     reps: [subsetRepSimple]
   };
-  var subsetRepsSimpleStr = 'r=0&m=CS!subset:chain+A+and+sequence+29+or+serial+196';
+  const subsetRepsSimpleStr = 'r=0&m=CS!subset:chain+A+and+sequence+29+or+serial+196';
 
-  var textModeOpts = {
+  const textModeOpts = {
     reps: [{
       mode: ['TX', {
         template: 'The {{Chain}}.{{Residue}}.{{Sequence}}.{{Name}}'
@@ -68,17 +72,17 @@ describe('options', function() {
     }]
   };
 
-  var textModeStr = 'r=0&m=TX!template:The+%257B%257BChain%257D%257D.%257B%257BResidue' +
-                    '%257D%257D.%257B%257BSequence%257D%257D.%257B%257BName%257D%257D';
+  const textModeStr = 'r=0&m=TX!template:The+%257B%257BChain%257D%257D.%257B%257BResidue' +
+    '%257D%257D.%257B%257BSequence%257D%257D.%257B%257BName%257D%257D';
 
-  var multipleRepsOpts = {
+  const multipleRepsOpts = {
     preset: 'default',
     reps: [simplestRep, parameterRep]
   };
-  var multipleRepsStr = 'p=default&r=0&m=BS&c=EL&r=1&m=TR!radius:0.5&c=EL!carbon:0';
+  const multipleRepsStr = 'p=default&r=0&m=BS&c=EL&r=1&m=TR!radius:0.5&c=EL!carbon:0';
 
   /********** OBJECTS TEST SETS ************/
-  var objectsList = [
+  const objectsList = [
     {
       type: 'line',
       params: ['A.38.CO1', 'A.38.CO2']
@@ -92,20 +96,20 @@ describe('options', function() {
     }
   ];
 
-  var objectsOpts = {
+  const objectsOpts = {
     _objects: objectsList
   };
-  var objectsStr = 'o=line,A.38.CO1,A.38.CO2&o=line,A.38.CO1,A.38.CO2!color:4291624959,dashSize:0.5';
+  const objectsStr = 'o=line,A.38.CO1,A.38.CO2&o=line,A.38.CO1,A.38.CO2!color:4291624959,dashSize:0.5';
 
-  var miscOpts = {
+  const miscOpts = {
     view: '1+n4pwTVeI8Erh8LAHI6CPW63vD40uzs/Ne4ovg==',
     unit: 1,
     load: 'mmtf:1crn'
   };
-  var miscStr = 'l=mmtf:1crn&u=1&v=1%2Bn4pwTVeI8Erh8LAHI6CPW63vD40uzs/Ne4ovg%3D%3D';
+  const miscStr = 'l=mmtf:1crn&u=1&v=1%2Bn4pwTVeI8Erh8LAHI6CPW63vD40uzs/Ne4ovg%3D%3D';
 
   /********** SETTINGS TEST SETS ************/
-  var settings = {
+  const settings = {
     colorers: {
       EL: {
         carbon: -3
@@ -122,14 +126,14 @@ describe('options', function() {
     labels: 'label'
   };
 
-  var settingsOpts = {
+  const settingsOpts = {
     settings: settings
   };
 
-  var settingsStr = 'colorers.EL.carbon=-3&colorers.UN.color=16711680&camFov=45' +
-                    '&camNear=0&resolution=lowest&autoResolution=true&labels=label';
+  const settingsStr = 'colorers.EL.carbon=-3&colorers.UN.color=16711680&camFov=45' +
+    '&camNear=0&resolution=lowest&autoResolution=true&labels=label';
 
-  var overallOpts = {
+  const overallOpts = {
     preset: 'default',
     reps: [
       simplestRep, bigRep, parameterRep, subsetRepSimple
@@ -137,36 +141,36 @@ describe('options', function() {
     _objects: objectsList,
     settings: settings
   };
-  var overallStr = 'p=default&r=0&m=BS&c=EL&r=1&s=sequence+85,+175,+256+and+name+CB+and+sequence+1:286' +
-                   '&m=TX&c=EL&mt=SF&r=2&m=TR!radius:0.5&c=EL!carbon:0&r=3&m=CS!subset:chain+A+' +
-                   'and+sequence+29+or+serial+196&o=line,A.38.CO1,A.38.CO2&o=line,A.38.CO1,A.38.CO2!' +
-                   'color:4291624959,dashSize:0.5&colorers.EL.carbon=-3&colorers.UN.color=16711680&' +
-                   'camFov=45&camNear=0&resolution=lowest&autoResolution=true&labels=label';
+  const overallStr = 'p=default&r=0&m=BS&c=EL&r=1&s=sequence+85,+175,+256+and+name+CB+and+sequence+1:286' +
+    '&m=TX&c=EL&mt=SF&r=2&m=TR!radius:0.5&c=EL!carbon:0&r=3&m=CS!subset:chain+A+' +
+    'and+sequence+29+or+serial+196&o=line,A.38.CO1,A.38.CO2&o=line,A.38.CO1,A.38.CO2!' +
+    'color:4291624959,dashSize:0.5&colorers.EL.carbon=-3&colorers.UN.color=16711680&' +
+    'camFov=45&camNear=0&resolution=lowest&autoResolution=true&labels=label';
 
   /********** SOPHISTICATED TEST SETS ************/
-  var complexSubsetOpts = {
+  const complexSubsetOpts = {
     reps: [{
       mode: ['CS', {
         subset: 'serial 1,13:139'
       }]
     }]
   };
-  var complexSubsetStr = 'r=0&m=CS!subset:serial+1%252C13%253A139';
+  const complexSubsetStr = 'r=0&m=CS!subset:serial+1%252C13%253A139';
 
-  var complexTextModeOpts = {
+  const complexTextModeOpts = {
     reps: [{
       mode: ['TX', {
         template: '~-=!{{Chain}}.{{Residue}}:{{Sequence}},{{Name}}+'
       }]
     }]
   };
-  var complexTextModeStr = 'r=0&m=TX!template:~-%253D!%257B%257BChain%257D%257D.%257B%257B' +
-                           'Residue%257D%257D%253A%257B%257BSequence%257D%257D%252C%257B%257BName%257D%257D%252B';
+  const complexTextModeStr = 'r=0&m=TX!template:~-%253D!%257B%257BChain%257D%257D.%257B%257B' +
+    'Residue%257D%257D%253A%257B%257BSequence%257D%257D%252C%257B%257BName%257D%257D%252B';
 
   describe('.toURL', function() {
     // extract only options from our URL
     function getOpts(url) {
-      var dashIdx = url.lastIndexOf('#');
+      let dashIdx = url.lastIndexOf('#');
       dashIdx = dashIdx > 0 ? dashIdx : url.length;
       return url.substring(url.indexOf('?') + 1, dashIdx);
     }
@@ -227,12 +231,12 @@ describe('options', function() {
   describe('.fromURL', function() {
     function equalOptions(original, generated) {
       function compareAllExceptReps(one, another) {
-        var origKeys = Object.keys(one);
+        const origKeys = Object.keys(one);
 
-        var i, n;
+        let i, n;
 
         for (i = 0, n = origKeys.length; i < n; ++i) {
-          var key = origKeys[i];
+          const key = origKeys[i];
           if (key !== 'preset' && key !== 'reps' &&
              (!another.hasOwnProperty(key) ||
               !_.isEqual(one[key], another[key]))) {
@@ -256,8 +260,8 @@ describe('options', function() {
         return true;
       }
 
-      var origReps = original.reps;
-      var genReps = generated.reps;
+      const origReps = original.reps;
+      const genReps = generated.reps;
       // generated reps count must be no less than original
       if (origReps !== undefined && genReps.length < origReps.length) {
         return false;
@@ -275,7 +279,7 @@ describe('options', function() {
 
     chai.use(function() {
       chai.Assertion.addMethod('equalOptions', function(target) {
-        var source = this._obj;
+        const source = this._obj;
         this.assert(
           equalOptions(target, source),
           'expected #{this} to equal #{exp}',

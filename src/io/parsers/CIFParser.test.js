@@ -1,5 +1,9 @@
-import {expect} from 'chai';
-import CIFParser from '../src/io/parsers/CIFParser';
+import CIFParser from './CIFParser';
+
+import chai, {expect} from 'chai';
+import dirtyChai from 'dirty-chai';
+
+chai.use(dirtyChai);
 
 let parseCif = CIFParser._parseToObject;
 
