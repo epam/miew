@@ -56,52 +56,52 @@ describe('utils.deriveDeep()', function() {
       c: 90,
     };
 
-  it('should copy numbers / strings', function() {
+  it('copies numbers / strings', function() {
     expect(utils.deriveDeep(num)).to.equal(num);
     expect(utils.deriveDeep(str)).to.equal(str);
   });
 
-  it('should copy null / undefined', function() {
+  it('copies null / undefined', function() {
     expect(utils.deriveDeep(null)).to.be.a('null');
     expect(utils.deriveDeep(undefined)).to.be.an('undefined');
   });
 
-  it('should not just copy objects / arrays', function() {
+  it('does not just copy objects / arrays', function() {
     expect(utils.deriveDeep(simpleObject)).not.equal(simpleObject);
     expect(utils.deriveDeep(simpleArray)).not.equal(simpleArray);
     expect(utils.deriveDeep(complexObject)).not.equal(complexObject);
     expect(utils.deriveDeep(complexArray)).not.equal(complexArray);
   });
 
-  it('should recreate all fields in simple objects / arrays', function() {
+  it('recreates all fields in simple objects / arrays', function() {
     expect(utils.deriveDeep(simpleObject)).to.deep.equal(simpleObject);
     expect(utils.deriveDeep(simpleArray)).to.deep.equal(simpleArray);
   });
 
-  it('should recreate all fields in complex objects / arrays', function() {
+  it('recreates all fields in complex objects / arrays', function() {
     expect(utils.deriveDeep(complexObject)).to.deep.equal(complexObject);
     expect(utils.deriveDeep(complexArray)).to.deep.equal(complexArray);
   });
 
-  it('should set original object as a prototype', function() {
+  it('sets original object as a prototype', function() {
     expect(Object.getPrototypeOf(utils.deriveDeep(simpleObject))).to.equal(simpleObject);
     expect(Object.getPrototypeOf(utils.deriveDeep(complexObject))).to.equal(complexObject);
   });
 
-  it('should not create own properties for simple object', function() {
+  it('does not create own properties for simple object', function() {
     expect(utils.deriveDeep(simpleObject)).to.be.empty();
   });
 
-  it('should create own properties for complex object', function() {
+  it('creates own properties for complex object', function() {
     expect(utils.deriveDeep(complexObject)).be.not.empty();
   });
 
-  it('should not create own properties when needZeroOwnProperties = true', function() {
+  it('does not create own properties when needZeroOwnProperties = true', function() {
     expect(utils.deriveDeep(complexObject, true)).to.be.empty();
   });
 
   [false, true].forEach((boolValue) => {
-    it(`should modify own properties instead of prototype (needZeroOwnProperties = ${boolValue})`, function() {
+    it(`modifies own properties instead of prototype (needZeroOwnProperties = ${boolValue})`, function() {
       const obj = {a: 1, b: {x: 2, y: {s: 'hello'}, z: [3, {p: 4, q: 5}]}};
       const res = utils.deriveDeep(obj, boolValue);
       res.a = 10;

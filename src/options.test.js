@@ -178,52 +178,52 @@ describe('options', function() {
       done();
     });
 
-    it('should generate proper URL for simplest rep lists', function() {
+    it('generates proper URL for simplest rep lists', function() {
       expect(getOpts(options.toURL(simpleRepsOpts))).to.equal(simpleRepsStr);
       expect(getOpts(options.toURL(bigRepsOpts))).to.equal(bigRepsStr);
     });
 
-    it('should generate proper URL for parametrized modes and colorers', function() {
+    it('generates proper URL for parametrized modes and colorers', function() {
       expect(getOpts(options.toURL(paramRepsOpts))).to.equal(paramRepStr);
     });
 
-    it('should generate proper URL for modes with string params', function() {
+    it('generates proper URL for modes with string params', function() {
       expect(getOpts(options.toURL(subsetRepsSimpleOpts))).to.equal(subsetRepsSimpleStr);
     });
 
-    it('should generate proper URL for multi mode rep lists', function() {
+    it('generates proper URL for multi mode rep lists', function() {
       expect(getOpts(options.toURL(multipleRepsOpts))).to.equal(multipleRepsStr);
     });
 
-    it('should generate proper URL for text mode', function() {
+    it('generates proper URL for text mode', function() {
       expect(getOpts(options.toURL(textModeOpts))).to.equal(textModeStr);
     });
 
     // objects
-    it('should generate proper URL for scene objects', function() {
+    it('generates proper URL for scene objects', function() {
       expect(getOpts(options.toURL(objectsOpts))).to.equal(objectsStr);
     });
 
-    it('should generate proper URL for scene objects', function() {
+    it('generates proper URL for scene objects', function() {
       expect(getOpts(options.toURL(miscOpts))).to.equal(miscStr);
     });
 
     // settings params
-    it('should generate proper URL for settings', function() {
+    it('generates proper URL for settings', function() {
       expect(getOpts(options.toURL(settingsOpts))).to.equal(settingsStr);
     });
 
     // overall
-    it('should generate proper long URLs', function() {
+    it('generates proper long URLs', function() {
       expect(getOpts(options.toURL(overallOpts))).to.equal(overallStr);
     });
 
     // sophisticated examples
-    it('should generate proper URL for complex subset opts', function() {
+    it('generates proper URL for complex subset opts', function() {
       expect(getOpts(options.toURL(complexSubsetOpts))).to.equal(complexSubsetStr);
     });
 
-    it('should generate proper URL for complex text mode opts', function() {
+    it('generates proper URL for complex text mode opts', function() {
       expect(getOpts(options.toURL(complexTextModeOpts))).to.equal(complexTextModeStr);
     });
   });
@@ -295,51 +295,51 @@ describe('options', function() {
       return '?' + opts;
     }
 
-    it('should restore high level mode properties', function() {
+    it('restores high level mode properties', function() {
       expect(options.fromURL(urlize(simpleRepsStr))).to.equalOptions(simpleRepsOpts);
       expect(options.fromURL(urlize(bigRepsStr))).to.equalOptions(bigRepsOpts);
     });
 
-    it('should restore mode/colorer options', function() {
+    it('restores mode/colorer options', function() {
       expect(options.fromURL(urlize(paramRepStr))).to.equalOptions(paramRepsOpts);
     });
 
-    it('should restore string params', function() {
+    it('restores string params', function() {
       expect(options.fromURL(urlize(subsetRepsSimpleStr))).to.equalOptions(subsetRepsSimpleOpts);
     });
 
-    it('should restore multi rep lists', function() {
+    it('restores multi rep lists', function() {
       expect(options.fromURL(urlize(multipleRepsStr))).to.equalOptions(multipleRepsOpts);
     });
 
-    it('should generate proper URL for text mode', function() {
+    it('restores text mode options', function() {
       expect(options.fromURL(urlize(textModeStr))).to.equalOptions(textModeOpts);
     });
 
-    it('should restore objects', function() {
+    it('restores objects', function() {
       expect(options.fromURL(urlize(objectsStr))).to.equalOptions(objectsOpts);
     });
 
-    it('should restore high level properties', function() {
+    it('restores high level properties', function() {
       expect(options.fromURL(urlize(miscStr))).to.equalOptions(miscOpts);
     });
 
     // settings params
-    it('should restore proper URL for settings', function() {
+    it('restores proper URL for settings', function() {
       expect(options.fromURL(urlize(settingsStr))).to.equalOptions(settingsOpts);
     });
 
     // overall
-    it('should restore proper URLs', function() {
+    it('restores proper URLs', function() {
       expect(options.fromURL(urlize(overallStr))).to.equalOptions(overallOpts);
     });
 
     // sophisticated examples
-    it('should restore proper URL for complex subset opts', function() {
+    it('restores proper URL for complex subset opts', function() {
       expect(options.fromURL(urlize(complexSubsetStr))).to.equalOptions(complexSubsetOpts);
     });
 
-    it('should restore proper URL for complex text mode opts', function() {
+    it('restores proper URL for complex text mode opts', function() {
       expect(options.fromURL(urlize(complexTextModeStr))).to.equalOptions(complexTextModeOpts);
     });
   });
