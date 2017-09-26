@@ -4080,9 +4080,9 @@ jison@~0.4.15:
     lex-parser "~0.1.3"
     nomnom "1.5.2"
 
-jquery.terminal@=1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/jquery.terminal/-/jquery.terminal-1.7.0.tgz#f26476dfd6a3c606d0d40597826cffbe98367f4e"
+jquery.terminal@1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/jquery.terminal/-/jquery.terminal-1.8.0.tgz#2afbd88636cc33e469cade3700264d88b53e3683"
   dependencies:
     jquery "~3"
 
