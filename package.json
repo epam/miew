@@ -105,7 +105,7 @@
     "run-sequence": "^2.0.0",
     "sass-loader": "^6.0.6",
     "sass-module-importer": "^1.4.0",
-    "sinon": "^3.3.0",
+    "sinon": "^4.0.0",
     "sinon-chai": "^2.11.0",
     "spin.js": "https://github.com/fgnass/spin.js#2.3.2",
     "string-replace-webpack-plugin": "^0.1.3",
