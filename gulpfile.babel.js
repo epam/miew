@@ -49,6 +49,7 @@ gulp.task('default', done =>
   sequence(['clean', 'lint'], 'test:cover', ['build', 'docs'], done));
 
 //////////////////////////////////////////////////////////////////////////////
+
 function _cleanTasks(names) {
   for (let i = 0; i < names.length; ++i) {
     const name = names[i];
@@ -56,7 +57,8 @@ function _cleanTasks(names) {
   }
 }
 
-gulp.task('clean', ['clean:docs', 'clean:lib', 'clean:demo']);
+gulp.task('clean', ['clean:docs', 'clean:cover', 'clean:lib', 'clean:demo']);
+
 _cleanTasks([
   'docs',
   'cover',
@@ -88,6 +90,7 @@ gulp.task('lint:js-fix', () =>
     .pipe(gulp.dest('.')));
 
 gulp.task('lint:css');
+
 //////////////////////////////////////////////////////////////////////////////
 
 gulp.task('test', () =>
