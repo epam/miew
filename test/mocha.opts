@@ -1,4 +1,4 @@
 --recursive
 --compilers js:babel-core/register
 src/**/*.test.js
-test/**/*.js
+test/**/*.test.js

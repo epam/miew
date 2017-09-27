@@ -38,7 +38,7 @@ export default {
   test: {
     src: [
       'src/**/*.test.js',
-      'test/**/*.js',
+      'test/**/*.test.js',
     ],
   },
   roServer: Boolean(process.env.MIEW_READONLY_SERVER || yargs.argv.roServer),
