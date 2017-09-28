@@ -21,11 +21,16 @@ const roServerReplacer = {
 export default {
   entry: {
     demo: './demo/scripts/index.js',
+    vendor: [
+      'three',
+      'mmtf',
+      'Smooth',
+    ],
   },
   output: {
     publicPath: './',
     path: path.resolve(__dirname, 'build'),
-    filename: '[name].bundle.js',
+    filename: '[name].[chunkhash].js',
   },
   module: {
     rules: [{
@@ -81,8 +86,6 @@ export default {
       PRESET_SERVER: JSON.stringify(yargs.argv.service),
       COOKIE_PATH: JSON.stringify(yargs.argv.cookiePath),
     }),
-    // new webpack.HotModuleReplacementPlugin(),
-    // new webpack.NamedModulesPlugin(),
     new webpack.IgnorePlugin(/vertx/), // https://github.com/webpack/webpack/issues/353
     new webpack.ProvidePlugin({
       jQuery: 'jquery',
@@ -96,6 +99,15 @@ export default {
       {from: 'demo/images', to: 'images'},
     ]),
     new StringReplaceWebpackPlugin(),
+    new webpack.HashedModuleIdsPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: module => module.context && module.context.indexOf('node_modules') !== -1,
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest',
+      minChunks: Infinity,
+    }),
   ],
   watchOptions: {
     ignored: /node_modules/,

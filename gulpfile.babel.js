@@ -189,6 +189,7 @@ gulp.task('build:demo', done =>
     util.log('[webpack]', stats.toString({
       colors: true,
       assets: false,
+      chunks: true,
     }));
     done();
   }));
