@@ -23,7 +23,7 @@ Ccp4Model.prototype.load = function(array) {
   header.angles = new THREE.Vector3();
   header.origin = new THREE.Vector3();
 
-  // read header
+  // read header (http://www.ccp4.ac.uk/html/maplib.html)
   var idx = 0;
   header.extent.push(u32[idx++]);
   header.extent.push(u32[idx++]);
@@ -61,7 +61,6 @@ Ccp4Model.prototype.load = function(array) {
   header.arms = f32[idx++];
   header.nlabel = u32[idx++];
   header.label = new Uint8Array(array.buffer, idx * 4, 800);
-  idx += 200;
 
   // Apply header conversion
   // Mapping between CCP4 column, row, section and VMD x, y, z.
@@ -119,12 +118,9 @@ Ccp4Model.prototype.load = function(array) {
   yaxis.multiplyScalar(header.extent[yIndex] - 1);
   zaxis.multiplyScalar(header.extent[zIndex] - 1);
 
-  // skip some data
-  idx += header.nsymbt;
-
   switch (header.type) {
   case 2:
-    this._data = new Float32Array(array, idx * 4, header.extent[0] * header.extent[1] * header.extent[2]);
+    this._data = new Float32Array(array, 1024 + header.nsymbt, header.extent[0] * header.extent[1] * header.extent[2]);
     break;
   default:
     this.logger.error('CCP4: Unsupported format');
