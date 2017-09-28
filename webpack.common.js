@@ -2,13 +2,12 @@
 
 import path from 'path';
 import webpack from 'webpack';
+import yargs from 'yargs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import StringReplaceWebpackPlugin from 'string-replace-webpack-plugin';
 import version from './tools/version';
 import config from './tools/config';
-
-const buildPath = 'build';
 
 const roServerReplacer = {
   loader: StringReplaceWebpackPlugin.replace({
@@ -20,13 +19,12 @@ const roServerReplacer = {
 };
 
 export default {
-  devtool: 'inline-source-map',
   entry: {
-    demo: './demo/scripts/main-webpack.js',
+    demo: './demo/scripts/index.js',
   },
   output: {
     publicPath: './',
-    path: path.resolve(__dirname, buildPath),
+    path: path.resolve(__dirname, 'build'),
     filename: '[name].bundle.js',
   },
   module: {
@@ -79,12 +77,13 @@ export default {
   plugins: [
     new webpack.DefinePlugin({
       PACKAGE_VERSION: JSON.stringify(version.combined),
+      READONLY_SERVER: config.roServer,
+      PRESET_SERVER: JSON.stringify(yargs.argv.service),
+      COOKIE_PATH: JSON.stringify(yargs.argv.cookiePath),
     }),
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(),
-
-    // https://github.com/webpack/webpack/issues/353
-    new webpack.IgnorePlugin(/vertx/),
+    // new webpack.HotModuleReplacementPlugin(),
+    // new webpack.NamedModulesPlugin(),
+    new webpack.IgnorePlugin(/vertx/), // https://github.com/webpack/webpack/issues/353
     new webpack.ProvidePlugin({
       jQuery: 'jquery',
     }),
@@ -97,27 +96,7 @@ export default {
       {from: 'demo/images', to: 'images'},
     ]),
     new StringReplaceWebpackPlugin(),
-    // new webpack.optimize.UglifyJsPlugin({
-    //   sourceMap: true,
-    // }),
   ],
-  devServer: {
-    // hot: true,
-    contentBase: [
-      path.resolve(__dirname, buildPath),
-      path.resolve(__dirname, './demo'),
-      path.resolve(__dirname, './')
-    ],
-    publicPath: '/',
-    compress: true,
-    clientLogLevel: 'info',
-    stats: {
-      assets: false,
-      colors: true,
-      cached: false,
-      cachedAssets: false,
-    },
-  },
   watchOptions: {
     ignored: /node_modules/,
   },

@@ -12,6 +12,7 @@ import open     from 'open';
 import webpack  from 'webpack';
 import {rollup} from 'rollup';
 import sassModuleImporter from 'sass-module-importer'; // eslint-disable-line import/no-unresolved, import/extensions
+import rollupPluginReplace from 'rollup-plugin-replace';
 
 import WebpackDevServer from 'webpack-dev-server';
 
@@ -33,12 +34,11 @@ const plugins = {
   coveralls:    require('gulp-coveralls'),
 };
 
-import rollupPluginReplace from 'rollup-plugin-replace';
-
 import version from './tools/version';
 util.log(version.copyright);
 
-import webpackConfig from './webpack.config';
+import webpackConfig from './webpack.config.babel';
+import webpackDevConfig from './webpack.dev.babel';
 import rollupConfig  from './rollup.config';
 import packageJson   from './package';
 import config from './tools/config';
@@ -182,25 +182,14 @@ gulp.task('build:css', () =>
 //////////////////////////////////////////////////////////////////////////////
 
 gulp.task('build:demo', done =>
-  webpack(_.merge(webpackConfig, {
-    entry: {
-      demo: [
-        './demo/scripts/main-webpack.js',
-      ],
-    },
-    plugins: [
-      new webpack.DefinePlugin({
-        PACKAGE_VERSION: JSON.stringify(version.combined),
-        READONLY_SERVER: config.roServer,
-        PRESET_SERVER: JSON.stringify(yargs.argv.service),
-        COOKIE_PATH: JSON.stringify(yargs.argv.cookiePath),
-      }),
-    ]
-  }), function(err, stats) {
+  webpack(webpackConfig, function(err, stats) {
     if (err) {
       throw new util.PluginError('webpack', err);
     }
-    util.log('[webpack]', stats.toString(webpackConfig.devServer.stats));
+    util.log('[webpack]', stats.toString({
+      colors: true,
+      assets: false,
+    }));
     done();
   }));
 
@@ -389,15 +378,6 @@ gulp.task('serve:docs', () =>
 const webpackPort = 8080;
 
 gulp.task('serve:webpack', () => {
-  const webpackDevConfig = _.merge({}, webpackConfig, {
-    entry: {
-      demo: [
-        // 'webpack-dev-server/client?http://localhost:' + webpackPort,
-        // 'webpack/hot/only-dev-server',
-        './demo/scripts/main-webpack.js',
-      ],
-    },
-  });
   new WebpackDevServer(webpack(webpackDevConfig), webpackDevConfig.devServer)
     .listen(webpackPort, 'localhost', (err) => {
       if (err) {
