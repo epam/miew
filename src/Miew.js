@@ -1757,32 +1757,31 @@ Miew.prototype._onLoad = function(dataSource, opts) {
         break;
       }
     }
-
-    gfx.camera.updateProjectionMatrix();
-
-    this._updateFog();
-
-    // reset global transform & camera pan
-    gfx.root.resetTransform();
-    this.resetPivot();
-    this.resetPan();
-
-    // set scale to fit everything on the screen
-    this._objectControls.setScale(settings.now.radiusToFit / this._getBSphereRadius());
-
-    this.resetObjects();
-
-    if (settings.now.autoResolution) {
-      this._tweakResolution();
-    }
-
-    if (this._opts.view) {
-      this.view(this._opts.view);
-      delete this._opts.view;
-    }
   } else if (dataSource.id === 'Volume') {
     this.resetEd();
     visualName = this._onLoadEd(dataSource);
+  }
+
+  gfx.camera.updateProjectionMatrix();
+  this._updateFog();
+
+  // reset global transform & camera pan
+  gfx.root.resetTransform();
+  this.resetPivot();
+  this.resetPan();
+
+  // set scale to fit everything on the screen
+  this._objectControls.setScale(settings.now.radiusToFit / this._getBSphereRadius());
+
+  this.resetObjects();
+
+  if (settings.now.autoResolution) {
+    this._tweakResolution();
+  }
+
+  if (this._opts.view) {
+    this.view(this._opts.view);
+    delete this._opts.view;
   }
 
   if (opts.error) {
@@ -2550,7 +2549,7 @@ Miew.prototype._getAltObj = function() {
 
 Miew.prototype.resetPivot = function() {
   var boundingBox = new THREE.Box3();
-  this._forEachComplexVisual(function(visual) {
+  this._forEachVisual(function(visual) {
     boundingBox.union(visual.getBoundaries().boundingBox);
   });
 
