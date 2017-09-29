@@ -133,7 +133,7 @@ _addFlag(Flags.PROTEIN, [
 _addFlag(Flags.BASIC,      ['ARG', 'HIS', 'LYS']);
 _addFlag(Flags.ACIDIC,     ['ASP', 'GLU']);
 _addFlag(Flags.POLAR,      ['ASN', 'CYS', 'GLN', 'SER', 'THR', 'TYR']);
-_addFlag(Flags.NONPOLAR,   ['ALA', 'ILE', 'LEU', 'MET', 'PHE', 'PRO', 'TRP', 'VAL']);
+_addFlag(Flags.NONPOLAR,   ['ALA', 'ILE', 'LEU', 'MET', 'PHE', 'PRO', 'TRP', 'VAL', 'GLY']);
 _addFlag(Flags.AROMATIC,   ['PHE', 'TRP', 'TYR']);
 
 _addFlag(Flags.NUCLEIC, [
