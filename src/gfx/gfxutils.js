@@ -7,7 +7,7 @@ import RCGroup from './RCGroup';
 import UberMaterial from './shaders/UberMaterial';
 
 var LAYERS = {
-  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3
+  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4
 };
 
 THREE.Object3D.prototype.resetTransform = function() {

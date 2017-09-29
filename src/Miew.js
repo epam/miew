@@ -400,6 +400,7 @@ Miew.prototype._initGfx = function() {
   gfx.camera.updateProjectionMatrix();
   gfx.camera.layers.set(gfxutils.LAYERS.DEFAULT);
   gfx.camera.layers.enable(gfxutils.LAYERS.VOLUME);
+  gfx.camera.layers.enable(gfxutils.LAYERS.VOLUME_BFPLANE);
 
   gfx.stereoCam = new THREE.StereoCamera();
 
@@ -1233,11 +1234,18 @@ Miew.prototype.renderVolume = (function() {
     gfx.renderer.clearTarget(tmpBuf2);
     gfx.renderer.clearTarget(tmpBuf3);
 
+    // draw plane with its own material, because it differs slightly from volumeBFMat
+    camera.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
+    gfx.renderer.render(gfx.scene, camera, tmpBuf1);
+
     camera.layers.set(gfxutils.LAYERS.VOLUME);
     gfx.scene.overrideMaterial = volumeBFMat;
     gfx.renderer.render(gfx.scene, camera, tmpBuf1);
+
+    camera.layers.set(gfxutils.LAYERS.VOLUME);
     gfx.scene.overrideMaterial = volumeFFMat;
     gfx.renderer.render(gfx.scene, camera, tmpBuf2);
+
     gfx.scene.overrideMaterial = null;
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
 
