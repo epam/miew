@@ -46,6 +46,7 @@ function VolumeMesh() {
   geo.addAttribute('position', new THREE.BufferAttribute(new Float32Array(this.vertices.length * 3), 3));
 
   THREE.Mesh.call(this, geo);
+  this.name = 'VolumeMesh';
 }
 
 utils.deriveClass(VolumeMesh, THREE.Mesh);
@@ -192,9 +193,7 @@ VolumeMesh.prototype._updateVertices = (function() {
       }
     }
 
-    if (face.indices.length >= 3) {
-      this.faces[6] = face;
-    }
+    this.faces[6] = face;
 
     var diff = new THREE.Vector3();
     for (i = 0; i < vert.length; ++i) {
