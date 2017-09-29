@@ -1,5 +1,4 @@
-
-
+import _ from 'lodash';
 import Parser from './Parser';
 import chem from '../../chem';
 import * as THREE from 'three';
@@ -10,10 +9,16 @@ var Volume = chem.Volume;
 function Ccp4Model() {
 }
 
-Ccp4Model.prototype.load = function(array) {
-  var u32 = new Uint32Array(array);
-  var i32 = new Int32Array(array);
-  var f32 = new Float32Array(array);
+Ccp4Model.prototype.load = function(buffer) {
+  if (_.isTypedArray(buffer)) {
+    buffer = buffer.buffer;
+  } else if (!_.isArrayBuffer(buffer)) {
+    throw new TypeError('Expected ArrayBuffer or TypedArray');
+  }
+
+  var u32 = new Uint32Array(buffer);
+  var i32 = new Int32Array(buffer);
+  var f32 = new Float32Array(buffer);
 
   var header = this._header = {};
   header.extent = [];
@@ -50,17 +55,17 @@ Ccp4Model.prototype.load = function(array) {
   header.ispg = u32[idx++];
   header.nsymbt = u32[idx++];
   header.lksflg = u32[idx++];
-  header.customData = new Uint8Array(array.buffer, idx * 4, 96);
+  header.customData = new Uint8Array(buffer, idx * 4, 96);
   idx += 24;
   header.origin.x = f32[idx++];
   header.origin.y = f32[idx++];
   header.origin.z = f32[idx++];
-  header.map = new Uint8Array(array.buffer, idx * 4, 4);
+  header.map = new Uint8Array(buffer, idx * 4, 4);
   idx++;
   header.machine = u32[idx++];
   header.arms = f32[idx++];
   header.nlabel = u32[idx++];
-  header.label = new Uint8Array(array.buffer, idx * 4, 800);
+  header.label = new Uint8Array(buffer, idx * 4, 800);
 
   // Apply header conversion
   // Mapping between CCP4 column, row, section and VMD x, y, z.
@@ -120,16 +125,13 @@ Ccp4Model.prototype.load = function(array) {
 
   switch (header.type) {
   case 2:
-    this._data = new Float32Array(array, 1024 + header.nsymbt, header.extent[0] * header.extent[1] * header.extent[2]);
+    this._data = new Float32Array(buffer, 1024 + header.nsymbt, header.extent[0] * header.extent[1] * header.extent[2]);
     break;
   default:
-    this.logger.error('CCP4: Unsupported format');
-    return false;
+    throw new Error('CCP4: Unsupported format ' + header.type);
   }
 
   this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
-
-  return true;
 };
 
 Ccp4Model.prototype.getXYZdim = function() {
@@ -200,12 +202,8 @@ CCP4Parser.canParse = function(data, options) {
 };
 
 CCP4Parser.prototype._parse = function(callback) {
-  var ccp4 = new Ccp4Model();
-  if (!ccp4.load(this._data)) {
-    callback.error(new Error('error'));
-    return;
-  }
-
+  const ccp4 = new Ccp4Model();
+  ccp4.load(this._data);
   callback.ready(new Volume(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData()));
 };
 
