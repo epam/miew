@@ -1,5 +1,5 @@
 export default [{
-  // just small protein loaded by default
+  // just a small file with a protein and DNA
   name: '4RTN',
   formats: ['ccp4'],
   subdivisions: {
