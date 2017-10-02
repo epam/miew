@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.2 Copyright (c) 2015-2017 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.3 Copyright (c) 2015-2017 EPAM Systems, Inc. */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -63815,7 +63815,7 @@ _addFlag(Flags.PROTEIN, ['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLY', 'GLU', 'GLN',
 _addFlag(Flags.BASIC, ['ARG', 'HIS', 'LYS']);
 _addFlag(Flags.ACIDIC, ['ASP', 'GLU']);
 _addFlag(Flags.POLAR, ['ASN', 'CYS', 'GLN', 'SER', 'THR', 'TYR']);
-_addFlag(Flags.NONPOLAR, ['ALA', 'ILE', 'LEU', 'MET', 'PHE', 'PRO', 'TRP', 'VAL']);
+_addFlag(Flags.NONPOLAR, ['ALA', 'ILE', 'LEU', 'MET', 'PHE', 'PRO', 'TRP', 'VAL', 'GLY']);
 _addFlag(Flags.AROMATIC, ['PHE', 'TRP', 'TYR']);
 
 _addFlag(Flags.NUCLEIC, ['A', 'G', 'I', 'DA', 'DG', 'DI', '+A', '+G', '+I', 'C', 'T', 'U', 'DC', 'DT', 'DU', '+C', '+T', '+U']);
@@ -66592,7 +66592,6 @@ PairCollection.prototype.destroy = function () {
  * Add pair of atoms to collection
  * @param {number} indexA - Index of the 1st vertex.
  * @param {number} indexB - Index of the 2nd vertex.
- * @returns {number} zero on success
  */
 PairCollection.prototype.addPair = function (indexA, indexB) {
   var ia = indexA < indexB ? indexA : indexB;
@@ -66608,7 +66607,7 @@ PairCollection.prototype.addPair = function (indexA, indexB) {
       break;
     }
     if (code === codeToAdd) {
-      return 0;
+      return;
     }
   }
   // add this new hash code
@@ -66626,7 +66625,6 @@ PairCollection.prototype.addPair = function (indexA, indexB) {
   this.intBuffer[j + 1] = ib;
   this.intBuffer[j + 2] = codeToAdd;
   this.numPairs++;
-  return 0;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -66646,15 +66644,12 @@ var cEpsilon = 0.001;
  * @returns {number} special value for bonding radius for this atom
  */
 function _getBondingRadius(atom) {
-  var bondRad = 0.0;
   var element = atom.element;
   if (element) {
-    bondRad = element.radiusBonding;
+    return element.radiusBonding;
   } else {
     throw new Error('_getBondingRadius: Logic error.');
   }
-
-  return bondRad;
 }
 
 /**
@@ -68842,7 +68837,7 @@ VoxelWorld.prototype.forEachAtomWithinRadius = function (center, radius, process
 VoxelWorld.prototype.forEachAtomWithinDistFromMasked = function (complex, mask, dist, process) {
   this._forEachAtomWithinDistFromGroup(function (atomProc) {
     complex.forEachAtom(function (atom) {
-      if (atom._mask & mask) {
+      if ((atom._mask & mask) !== 0) {
         atomProc(atom);
       }
     });
@@ -69387,7 +69382,7 @@ UberMaterial.prototype.updateUniforms = function () {
 
 /* eslint-disable no-magic-numbers */
 var LAYERS = {
-  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3
+  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4
 };
 
 Object3D.prototype.resetTransform = function () {
@@ -74919,7 +74914,7 @@ AtomsGroup.prototype._calcChunksList = function (mask) {
   var atomsIdc = this._chunksIdc;
   for (var i = 0, n = atomsIdc.length; i < n; ++i) {
     var atom = atoms[atomsIdc[i]];
-    if (atom._mask & mask) {
+    if ((atom._mask & mask) !== 0) {
       chunksList.push(i);
     }
   }
@@ -75348,7 +75343,7 @@ ResiduesGroup.prototype._calcChunksList = function (mask) {
   var resIdc = this._chunksIdc;
   for (var i = 0, n = resIdc.length; i < n; ++i) {
     var res = residues[resIdc[i]];
-    if (res._mask & mask) {
+    if ((res._mask & mask) !== 0) {
       chunksList.push(i);
     }
   }
@@ -75404,7 +75399,7 @@ NucleicItemGroup.prototype._calcChunksList = function (mask) {
 
   for (var i = 0, n = resIdc.length; i < n; ++i) {
     var res = residues[resIdc[i]];
-    if (res._mask & mask) {
+    if ((res._mask & mask) !== 0) {
       chunksList[chunkIdx++] = 2 * i;
       chunksList[chunkIdx++] = 2 * i + 1;
     }
@@ -76780,7 +76775,7 @@ function ComponentsAromaticProcessor(AromaticGroup, geoParams, complex, colorer,
       var cycAtoms = cycle.atoms;
       var perCycle = 0;
       for (var i = 0, n = cycAtoms.length; i < n; ++i) {
-        if (cycAtoms[i]._mask & mask) {
+        if ((cycAtoms[i]._mask & mask) !== 0) {
           ++perCycle;
           atomsIdc[chunksCount++] = cycAtoms[i]._index;
         }
@@ -80077,6 +80072,35 @@ function BackFacePosMaterial(params) {
   return new ShaderMaterial(settings);
 }
 
+function BackFacePosMaterialFarPlane(params) {
+  var matUniforms = UniformsUtils.merge([{
+    aspectRatio: { type: 'f', value: 0.0 },
+    farZ: { type: 'f', value: 0.0 },
+    tanHalfFOV: { type: 'f', value: 0.0 },
+    matWorld2Volume: { type: '4fv', value: new Matrix4() }
+  }]);
+
+  var settings = {
+    uniforms: overrideUniforms(params, matUniforms),
+    vertexShader: 'varying vec4 volPos;\n' + 'uniform float aspectRatio;\n' + 'uniform float farZ;\n' + 'uniform float tanHalfFOV;\n' + 'uniform mat4  matWorld2Volume\n;' + 'void main() {\n' +
+    // rescale plane to fill in the whole far plane area seen from camera
+    'vec3 pos = position.xyz;\n' + 'pos.x = pos.x * tanHalfFOV * farZ * aspectRatio;\n' + 'pos.y = pos.y * tanHalfFOV * farZ;\n' +
+    // common transformation
+    'gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);\n' +
+    // calc pos in volume CS
+    'volPos = matWorld2Volume * modelMatrix * vec4(pos, 1.0);\n' +
+    // we're assuming local position is in [-0.5, 0.5]
+    // we need to offset it to be represented in RGB
+    'volPos = volPos + 0.5;\n' + 'volPos.w = 0.5;' + '}',
+    fragmentShader: 'varying vec4 volPos; \n' + 'void main() { gl_FragColor = volPos; }',
+    transparent: false,
+    depthTest: false,
+    depthWrite: false,
+    side: FrontSide
+  };
+  return new ShaderMaterial(settings);
+}
+
 function FrontFacePosMaterial(params) {
   var settings = {
     uniforms: overrideUniforms(params, {}),
@@ -80108,6 +80132,7 @@ function VolumeMaterial(params) {
 
 var VolumeMaterial$1 = {
   BackFacePosMaterial: BackFacePosMaterial,
+  BackFacePosMaterialFarPlane: BackFacePosMaterialFarPlane,
   FrontFacePosMaterial: FrontFacePosMaterial,
   VolumeMaterial: VolumeMaterial
 };
@@ -80128,6 +80153,7 @@ function VolumeMesh() {
   geo.addAttribute('position', new BufferAttribute(new Float32Array(this.vertices.length * 3), 3));
 
   Mesh.call(this, geo);
+  this.name = 'VolumeMesh';
 }
 
 utils.deriveClass(VolumeMesh, Mesh);
@@ -80253,9 +80279,7 @@ VolumeMesh.prototype._updateVertices = function () {
       }
     }
 
-    if (face.indices.length >= 3) {
-      this.faces[6] = face;
-    }
+    this.faces[6] = face;
 
     var diff = new Vector3();
     for (i = 0; i < vert.length; ++i) {
@@ -80457,9 +80481,58 @@ function VolumeVisual(name, dataSource) {
   this._mesh = new VolumeMesh();
   this._mesh.setDataSource(dataSource);
   this.add(this._mesh);
+
+  this.buildFarPlane();
 }
 
 utils.deriveClass(VolumeVisual, Visual);
+
+// Thes geometric far plane is required for correct filling in the BFTexture in case, when far plane cuts the volume
+// cube. In cut place of cube there is no correct data in BFTexture and volume rendering integral is calculated
+// with errors.
+// Far plane cuts the cube in case of large volume scale (zoom), because farplane doesn't change
+VolumeVisual.prototype.buildFarPlane = function () {
+  // create plane with unit corners coords (for future rescale in vshader according to camera properties)
+  var planeGeo = new PlaneGeometry(2, 2, 1, 1); // FIXME create custom plane geometry (without normals and uvs)
+  var mat = VolumeMaterial$1.BackFacePosMaterialFarPlane();
+  this._plane = new meshes.Mesh(planeGeo, mat);
+  this._plane.frustumCulled = false;
+  this._plane.doubleSided = true;
+  var matWorldToVolume = new Matrix4();
+
+  this._plane._onBeforeRender = function (_renderer, _scene, camera) {
+    var volume = this.parent.getObjectByName('VolumeMesh');
+    var material = this.material;
+    if (!volume || !material) {
+      return;
+    }
+
+    // count point in world at farplane place
+    var planeCamPos = new Vector4(0, 0, -(camera.far - 0.1), 1);
+    planeCamPos.applyMatrix4(camera.matrixWorld);
+
+    // recalc matrices to make plane be placed as farplane in the World relative to camera
+    this.matrix.identity();
+    this.matrix.makeTranslation(planeCamPos.x, planeCamPos.y, planeCamPos.z);
+    this.matrixWorld.copy(this.matrix);
+    this.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.matrixWorld);
+    this.normalMatrix.getNormalMatrix(this.modelViewMatrix);
+
+    // build worldToVolume matrix to transform plane into volumeCS (volumeCS coords are written to BackFaceTexture)
+    var volumeMatrix = this.parent.getObjectByName('VolumeMesh').matrixWorld;
+    matWorldToVolume.getInverse(volumeMatrix);
+
+    // update material props
+    material.uniforms.aspectRatio.value = camera.aspect;
+    material.uniforms.farZ.value = camera.far;
+    material.uniforms.tanHalfFOV.value = Math.tan(_Math.DEG2RAD * 0.5 * camera.fov);
+    material.uniforms.matWorld2Volume.value = matWorldToVolume;
+  };
+  this.add(this._plane);
+
+  // set it to special layer to draw only into BFTexture
+  this._plane.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
+};
 
 VolumeVisual.prototype.getBoundaries = function () {
   var box = this._dataSource.getBox();
@@ -81005,6 +81078,72 @@ Remark350.prototype.parse = function (stream) {
   }
 };
 
+var CRLF = '\n';
+var CRLF_LENGTH = CRLF.length; // FIXME: It is always 1, isn't it?
+
+var PDBStream = function () {
+  function PDBStream(data) {
+    classCallCheck(this, PDBStream);
+
+    this._data = data;
+    this._start = 0;
+    this._next = -CRLF_LENGTH;
+    this._end = data.length;
+
+    this.next();
+  }
+
+  createClass(PDBStream, [{
+    key: 'readLine',
+    value: function readLine() {
+      return this._data.slice(this._start, this._next);
+    }
+  }, {
+    key: 'readChar',
+    value: function readChar(pos) {
+      pos = this._start + pos - 1;
+      return pos < this._next ? this._data[pos] : ' ';
+    }
+  }, {
+    key: 'readCharCode',
+    value: function readCharCode(pos) {
+      pos = this._start + pos - 1;
+      return pos < this._next ? this._data.charCodeAt(pos) : 32;
+    }
+  }, {
+    key: 'readString',
+    value: function readString(begin, end) {
+      var from = this._start + begin - 1;
+      var to = this._start + end;
+      return this._data.slice(from, to < this._next ? to : this._next);
+    }
+  }, {
+    key: 'readInt',
+    value: function readInt(begin, end) {
+      return parseInt(this.readString(begin, end), 10);
+    }
+  }, {
+    key: 'readFloat',
+    value: function readFloat(begin, end) {
+      return parseFloat(this.readString(begin, end));
+    }
+  }, {
+    key: 'end',
+    value: function end() {
+      return this._start >= this._end;
+    }
+  }, {
+    key: 'next',
+    value: function next() {
+      var start = this._next + CRLF_LENGTH;
+      this._start = start < this._end ? start : this._end;
+      var next = this._data.indexOf(CRLF, this._start);
+      this._next = next > 0 ? next : this._end;
+    }
+  }]);
+  return PDBStream;
+}();
+
 var Complex$2 = chem.Complex;
 var Element$3 = chem.Element;
 var Helix$2 = chem.Helix;
@@ -81014,8 +81153,6 @@ var Bond$2 = chem.Bond;
 var Molecule$2 = chem.Molecule;
 
 var TAG_LENGTH = 6;
-var CRLF = '\n';
-var CRLF_LENGTH = CRLF.length; // FIXME: It is always 1, isn't it?
 
 function nameToElement(name) {
   // http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
@@ -81071,53 +81208,6 @@ PDBParser.canParse = function (data, options) {
     return false;
   }
   return typeof data === 'string' && (Parser.checkDataTypeOptions(options, 'pdb') || Parser.checkDataTypeOptions(options, 'pdb', '.ent'));
-};
-
-////////////////////////////////////////////////////////////////////////////
-// Auxiliary class
-function PDBStream(data) {
-  this._data = data;
-  this._start = 0;
-  this._next = 0;
-  this._end = data.length;
-
-  this.next();
-}
-
-PDBStream.prototype = {
-  constructor: PDBStream,
-
-  end: function end() {
-    return this._start >= this._end;
-  },
-
-  next: function next() {
-    this._start = this._next;
-    var next = this._data.indexOf(CRLF, this._start);
-    this._next = next > 0 ? next + CRLF_LENGTH : this._end;
-  },
-
-  readString: function readString(begin, end) {
-    return this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next));
-  },
-
-  readChar: function readChar(pos) {
-    pos = this._start + pos - 1;
-    return pos < this._next ? this._data[pos] : ' ';
-  },
-
-  readCharCode: function readCharCode(pos) {
-    pos = this._start + pos - 1;
-    return pos < this._next ? this._data.charCodeAt(pos) : 32;
-  },
-
-  readInt: function readInt(begin, end) {
-    return parseInt(this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next)), 10);
-  },
-
-  readFloat: function readFloat(begin, end) {
-    return parseFloat(this._data.slice(this._start + begin - 1, Math.min(this._start + end, this._next)));
-  }
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -83486,10 +83576,16 @@ var Volume$4 = chem.Volume;
 
 function Ccp4Model() {}
 
-Ccp4Model.prototype.load = function (array) {
-  var u32 = new Uint32Array(array);
-  var i32 = new Int32Array(array);
-  var f32 = new Float32Array(array);
+Ccp4Model.prototype.load = function (buffer) {
+  if (lodash.isTypedArray(buffer)) {
+    buffer = buffer.buffer;
+  } else if (!lodash.isArrayBuffer(buffer)) {
+    throw new TypeError('Expected ArrayBuffer or TypedArray');
+  }
+
+  var u32 = new Uint32Array(buffer);
+  var i32 = new Int32Array(buffer);
+  var f32 = new Float32Array(buffer);
 
   var header = this._header = {};
   header.extent = [];
@@ -83499,7 +83595,7 @@ Ccp4Model.prototype.load = function (array) {
   header.angles = new Vector3();
   header.origin = new Vector3();
 
-  // read header
+  // read header (http://www.ccp4.ac.uk/html/maplib.html)
   var idx = 0;
   header.extent.push(u32[idx++]);
   header.extent.push(u32[idx++]);
@@ -83526,18 +83622,17 @@ Ccp4Model.prototype.load = function (array) {
   header.ispg = u32[idx++];
   header.nsymbt = u32[idx++];
   header.lksflg = u32[idx++];
-  header.customData = new Uint8Array(array.buffer, idx * 4, 96);
+  header.customData = new Uint8Array(buffer, idx * 4, 96);
   idx += 24;
   header.origin.x = f32[idx++];
   header.origin.y = f32[idx++];
   header.origin.z = f32[idx++];
-  header.map = new Uint8Array(array.buffer, idx * 4, 4);
+  header.map = new Uint8Array(buffer, idx * 4, 4);
   idx++;
   header.machine = u32[idx++];
   header.arms = f32[idx++];
   header.nlabel = u32[idx++];
-  header.label = new Uint8Array(array.buffer, idx * 4, 800);
-  idx += 200;
+  header.label = new Uint8Array(buffer, idx * 4, 800);
 
   // Apply header conversion
   // Mapping between CCP4 column, row, section and VMD x, y, z.
@@ -83594,21 +83689,15 @@ Ccp4Model.prototype.load = function (array) {
   yaxis.multiplyScalar(header.extent[yIndex] - 1);
   zaxis.multiplyScalar(header.extent[zIndex] - 1);
 
-  // skip some data
-  idx += header.nsymbt;
-
   switch (header.type) {
     case 2:
-      this._data = new Float32Array(array, idx * 4, header.extent[0] * header.extent[1] * header.extent[2]);
+      this._data = new Float32Array(buffer, 1024 + header.nsymbt, header.extent[0] * header.extent[1] * header.extent[2]);
       break;
     default:
-      this.logger.error('CCP4: Unsupported format');
-      return false;
+      throw new Error('CCP4: Unsupported format ' + header.type);
   }
 
   this._bboxSize = new Vector3(xaxis.length(), yaxis.length(), zaxis.length());
-
-  return true;
 };
 
 Ccp4Model.prototype.getXYZdim = function () {
@@ -83681,11 +83770,7 @@ CCP4Parser.canParse = function (data, options) {
 
 CCP4Parser.prototype._parse = function (callback) {
   var ccp4 = new Ccp4Model();
-  if (!ccp4.load(this._data)) {
-    callback.error(new Error('error'));
-    return;
-  }
-
+  ccp4.load(this._data);
   callback.ready(new Volume$4(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData()));
 };
 
@@ -86119,7 +86204,7 @@ Cookies.prototype._exists = function (key) {
   return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
 };
 
-/* global "0.7.2":false */
+/* global "0.7.3":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -86193,7 +86278,6 @@ function reportProgress(log, action, percent) {
  *
  * @param {object} opts - Viewer options.
  * @param {HTMLElement=} opts.container - DOM element that serves as a viewer container.
- * @param {HTMLElement=} opts.iframe - parent IFRAME element if any.
  * @param {object=} opts.settings - An object with properties to override default settings.
  * @param {string=} opts.settingsCookie='settings' - The name of the cookie to save current settings to.
  * @param {string=} opts.cookiePath='/' - The path option for cookies. Defaults to root.
@@ -86257,9 +86341,6 @@ function Miew$1(opts) {
   /** @type {?string} */
   this._curVisualName = null;
 
-  /** @type {object} */
-  this._iframe = opts.iframe;
-
   /** @type {array} */
   this._objects = [];
 
@@ -86273,21 +86354,8 @@ function Miew$1(opts) {
 
   this.reset();
 
-  if (window.addEventListener) {
-    window.addEventListener('message', Miew$1.prototype.messageListener.bind(this), false);
-  } else {
-    window.attachEvent('onmessage', Miew$1.prototype.messageListener.bind(this));
-  }
-
   if (this._repr) {
     log.debug('Selected ' + this._repr.mode.name + ' mode with ' + this._repr.colorer.name + ' colorer.');
-  }
-
-  // notify parent IFRAME
-  if (this._iframe) {
-    var doc = this._iframe.ownerDocument;
-    var win = doc.defaultView || doc.parentWindow;
-    win.postMessage('miewLoadComplete', doc.location.origin);
   }
 
   var self = this;
@@ -86486,6 +86554,7 @@ Miew$1.prototype._initGfx = function () {
   gfx.camera.updateProjectionMatrix();
   gfx.camera.layers.set(gfxutils.LAYERS.DEFAULT);
   gfx.camera.layers.enable(gfxutils.LAYERS.VOLUME);
+  gfx.camera.layers.enable(gfxutils.LAYERS.VOLUME_BFPLANE);
 
   gfx.stereoCam = new StereoCamera();
 
@@ -87262,11 +87331,18 @@ Miew$1.prototype.renderVolume = function () {
     gfx.renderer.clearTarget(tmpBuf2);
     gfx.renderer.clearTarget(tmpBuf3);
 
+    // draw plane with its own material, because it differs slightly from volumeBFMat
+    camera.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
+    gfx.renderer.render(gfx.scene, camera, tmpBuf1);
+
     camera.layers.set(gfxutils.LAYERS.VOLUME);
     gfx.scene.overrideMaterial = volumeBFMat;
     gfx.renderer.render(gfx.scene, camera, tmpBuf1);
+
+    camera.layers.set(gfxutils.LAYERS.VOLUME);
     gfx.scene.overrideMaterial = volumeFFMat;
     gfx.renderer.render(gfx.scene, camera, tmpBuf2);
+
     gfx.scene.overrideMaterial = null;
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
 
@@ -87729,32 +87805,31 @@ Miew$1.prototype._onLoad = function (dataSource, opts) {
           break;
       }
     }
-
-    gfx.camera.updateProjectionMatrix();
-
-    this._updateFog();
-
-    // reset global transform & camera pan
-    gfx.root.resetTransform();
-    this.resetPivot();
-    this.resetPan();
-
-    // set scale to fit everything on the screen
-    this._objectControls.setScale(settings.now.radiusToFit / this._getBSphereRadius());
-
-    this.resetObjects();
-
-    if (settings.now.autoResolution) {
-      this._tweakResolution();
-    }
-
-    if (this._opts.view) {
-      this.view(this._opts.view);
-      delete this._opts.view;
-    }
   } else if (dataSource.id === 'Volume') {
     this.resetEd();
     visualName = this._onLoadEd(dataSource);
+  }
+
+  gfx.camera.updateProjectionMatrix();
+  this._updateFog();
+
+  // reset global transform & camera pan
+  gfx.root.resetTransform();
+  this.resetPivot();
+  this.resetPan();
+
+  // set scale to fit everything on the screen
+  this._objectControls.setScale(settings.now.radiusToFit / this._getBSphereRadius());
+
+  this.resetObjects();
+
+  if (settings.now.autoResolution) {
+    this._tweakResolution();
+  }
+
+  if (this._opts.view) {
+    this.view(this._opts.view);
+    delete this._opts.view;
   }
 
   if (opts.error) {
@@ -88518,7 +88593,7 @@ Miew$1.prototype._getAltObj = function () {
 
 Miew$1.prototype.resetPivot = function () {
   var boundingBox = new Box3();
-  this._forEachComplexVisual(function (visual) {
+  this._forEachVisual(function (visual) {
     boundingBox.union(visual.getBoundaries().boundingBox);
   });
 
@@ -88845,182 +88920,6 @@ Miew$1.prototype.setOptions = function (opts) {
     }
     this.resetView();
     this.rebuildAll();
-  }
-};
-
-Miew$1.prototype._processMessageData = function (data) {
-  var self = this;
-  var idx = 0 - 1;
-  idx = data.indexOf(':', 0);
-  if (idx > 0) {
-    switch (data.substring(0, idx)) {
-      case 'load':
-        {
-          if (self._gfx === null) {
-            if (self.init()) {
-              self.benchmarkGfx().then(function () {
-                self.run();
-                self.load(data.substring(idx + 1), { sourceType: 'message' });
-              });
-            }
-          } else {
-            self.load(data.substring(idx + 1), { sourceType: 'message' });
-          }
-
-          break;
-        }
-      case 'setOptions':
-        {
-          if (self._gfx === null || !self._getComplexVisual()) {
-            setTimeout(function () {
-              self._processMessageData(data);
-            }, 10);
-            return;
-          }
-          this.setOptions(data.substring(idx + 1));
-          break;
-        }
-      default:
-        {
-          self.logger.debug('Unknown message: ' + data);
-        }
-    }
-    self.logger.info(data.substring(0, idx) + ' message received.');
-  }
-};
-
-Miew$1.prototype._serializeData = function (complex) {
-  if (complex !== null) {
-    var oSerializer = new XMLSerializer();
-    var sXML = oSerializer.serializeToString(complex.originalCML);
-    return window.btoa(sXML);
-  }
-  return null;
-};
-
-Miew$1.prototype._getMasterWindow = function () {
-  var dstWindow = this._sourceWindow;
-  if (!dstWindow) {
-    if (typeof window.parent !== 'undefined' && window.parent !== null) {
-      dstWindow = window.parent;
-    }
-  }
-  if (!dstWindow) {
-    dstWindow = null;
-  }
-  return dstWindow;
-};
-
-Miew$1.prototype.saveData = function () {
-  function extractRotation(m) {
-    var xAxis = new Vector3();
-    var yAxis = new Vector3();
-    var zAxis = new Vector3();
-    m.extractBasis(xAxis, yAxis, zAxis);
-    xAxis.normalize();
-    yAxis.normalize();
-    zAxis.normalize();
-    var retMat = new Matrix4();
-    retMat.identity();
-    retMat.makeBasis(xAxis, yAxis, zAxis);
-    return retMat;
-  }
-  //saves data
-  var root = this._gfx.root;
-  var mat = extractRotation(root.matrixWorld);
-  var v4 = new Vector4(0, 0, 0, 0);
-  var vCenter = new Vector4(0, 0, 0, 0);
-  var xml = null;
-  var ap = null;
-  var cp = null;
-  var dstWindow = this._getMasterWindow();
-  //prepare matrix
-
-  // FIXME save data for all complexes (not only current)
-  var visual = this._getComplexVisual();
-  var fi = visual ? visual.getComplex() : null;
-  if (fi && fi.originalCML) {
-    fi.forEachAtom(function (atom) {
-      if (atom.xmlNodeRef && atom.xmlNodeRef.xmlNode) {
-        xml = atom.xmlNodeRef.xmlNode;
-        ap = atom.getPosition();
-        v4.set(ap.x, ap.y, ap.z, 1.0);
-        v4.applyMatrix4(mat);
-        xml.setAttribute('x3', v4.x.toString());
-        xml.setAttribute('y3', v4.y.toString());
-        xml.setAttribute('z3', v4.z.toString());
-        xml.removeAttribute('x2');
-        xml.removeAttribute('y2');
-      }
-    });
-    fi.forEachSGroup(function (sGroup) {
-      if (sGroup.xmlNodeRef && sGroup.xmlNodeRef.xmlNode) {
-        xml = sGroup.xmlNodeRef.xmlNode;
-        ap = sGroup.getPosition();
-        v4.set(ap.x, ap.y, ap.z, 1.0);
-        cp = sGroup.getCentralPoint();
-        if (cp === null) {
-          v4.applyMatrix4(mat);
-        } else {
-          vCenter.set(cp.x, cp.y, cp.z, 0.0);
-          v4.add(vCenter);
-          v4.applyMatrix4(mat); // pos in global space
-          vCenter.set(cp.x, cp.y, cp.z, 1.0);
-          vCenter.applyMatrix4(mat);
-          v4.sub(vCenter);
-        }
-
-        xml.setAttribute('x', v4.x.toString());
-        xml.setAttribute('y', v4.y.toString());
-        xml.setAttribute('z', v4.z.toString());
-      }
-    });
-  }
-  if (fi !== null) {
-    if (dstWindow !== null) {
-      dstWindow.postMessage('CML:' + this._serializeData(fi), dstWindow.location.origin);
-    }
-  }
-};
-
-Miew$1.prototype.resetData = function () {
-  // FIXME reset all complexes (not only current)
-  var visual = this._getComplexVisual();
-  if (!visual) {
-    return;
-  }
-
-  var com = visual.getComplex();
-  if (Array.isArray(com)) {
-    com = com[0];
-  }
-
-  var s = 'load:CML:' + this._serializeData(com);
-  this._processMessageData(s);
-};
-
-Miew$1.prototype.canSaveData = function () {
-  var canSave = false;
-  this._forEachComplexVisual(function (visual) {
-    var com = visual.getComplex();
-    if (Array.isArray(com)) {
-      com = com[0];
-    }
-    canSave = canSave || com.originalCML;
-  });
-  return canSave && this._getMasterWindow() !== null;
-};
-
-Miew$1.prototype.messageListener = function (event) {
-  var self = this;
-  var origin = event.origin || event.originalEvent.origin;
-  if (origin === document.location.origin) {
-    var data = event.data;
-    if (lodash.isString(data)) {
-      var callF = self._processMessageData.bind(self);
-      this._sourceWindow = event.source;
-      callF(data);
-    }
   }
 };
 
@@ -89841,7 +89740,7 @@ function load(file, loadOptions, master, context) {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew$1.prototype.VERSION = typeof "0.7.2" !== 'undefined' && "0.7.2" || '0.0.0-dev';
+Miew$1.prototype.VERSION = typeof "0.7.3" !== 'undefined' && "0.7.3" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew$1, /** @lends Miew */{
