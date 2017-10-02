@@ -74,4 +74,19 @@ export default [{
     helices: 36,
     sheets: {mmtf: 20, default: 10},
   },
+}, {
+  // small molecule
+  name: 'serotonin',
+  formats: ['pubchem'],
+  num: {
+    atoms: 25,
+    bonds: 26,
+    residues: 1,
+    chains: 1,
+    molecules: 0,
+    structures: 1,
+    symmetries: 0,
+    helices: 0,
+    sheets: 0,
+  },
 }];

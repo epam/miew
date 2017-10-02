@@ -1,6 +1,7 @@
 import PDBParser from '../../src/io/parsers/PDBParser';
 import CIFParser from '../../src/io/parsers/CIFParser';
 import MMTFParser from '../../src/io/parsers/MMTFParser';
+import PubChemParser from '../../src/io/parsers/PubChemParser';
 import CCP4Parser from '../../src/io/parsers/CCP4Parser';
 
 import fs from 'fs';
@@ -34,6 +35,12 @@ const formats = {
     extension: 'mmtf',
     encoding: null,
     Parser: MMTFParser,
+  },
+  pubchem: {
+    name: 'PubChem JSON',
+    extension: 'json',
+    encoding: 'ascii',
+    Parser: PubChemParser,
   },
   ccp4: {
     name: 'CCP4',
