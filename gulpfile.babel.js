@@ -57,13 +57,14 @@ function _cleanTasks(names) {
   }
 }
 
-gulp.task('clean', ['clean:docs', 'clean:cover', 'clean:lib', 'clean:demo']);
+gulp.task('clean', ['clean:docs', 'clean:cover', 'clean:lib', 'clean:demo', 'clean:e2e']);
 
 _cleanTasks([
   'docs',
   'cover',
   'lib',
-  'demo'
+  'demo',
+  'e2e',
 ]);
 
 //////////////////////////////////////////////////////////////////////////////
@@ -116,6 +117,10 @@ gulp.task('test:cover-hook', () =>
 gulp.task('test:coveralls', () =>
   gulp.src(config.cover.dst + 'lcov.info')
     .pipe(plugins.coveralls()));
+
+gulp.task('test:e2e', () =>
+  gulp.src(config.e2e.src, {read: false})
+    .pipe(plugins.mocha()));
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -393,7 +398,10 @@ gulp.task('serve:webpack', () => {
 //////////////////////////////////////////////////////////////////////////////
 
 gulp.task('show:cover', () =>
-  open(config.cover.dst + 'lcov-report/index.html'));
+  open(config.cover.show));
 
 gulp.task('show:docs', () =>
-  open(config.docs.dst + 'index.html'));
+  open(config.docs.show));
+
+gulp.task('show:e2e', () =>
+  open(config.e2e.show));

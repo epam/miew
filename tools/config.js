@@ -5,6 +5,7 @@ import yargs from 'yargs';
 export default {
   docs: {
     dst: 'docs/auto/',
+    show: 'docs/auto/index.html',
   },
   cover: {
     src: [
@@ -12,6 +13,7 @@ export default {
       '!src/**/*.test.js',
     ],
     dst: 'coverage/',
+    show: 'coverage/lcov-report/index.html',
   },
   lib: {
     src: 'src/',
@@ -40,6 +42,14 @@ export default {
       'src/**/*.test.js',
       'test/**/*.test.js',
     ],
+  },
+  e2e: {
+    src: 'test/**/*.e2e.js',
+    dst: [
+      'test/e2e/mismatch/*.png',
+      'test/e2e/mismatch/*.html',
+    ],
+    show: 'test/e2e/mismatch/index.html',
   },
   roServer: Boolean(process.env.MIEW_READONLY_SERVER || yargs.argv.roServer),
 };
