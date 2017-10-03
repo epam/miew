@@ -90,7 +90,7 @@
     "jquery.terminal": "1.8.0",
     "jsdoc": "^3.5.5",
     "lodash": "^4.17.4",
-    "mocha": "^3.5.3",
+    "mocha": "^4.0.0",
     "open": "^0.0.5",
     "raw-loader": "^0.5.1",
     "rollup": "^0.50.0",
