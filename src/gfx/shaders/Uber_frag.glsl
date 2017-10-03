@@ -163,8 +163,7 @@ varying vec3 vNormal;
 #endif
 
 /////////////////////////////////////////// Lighting ////////////////////////////////////////////////
-
-#if NUM_DIR_LIGHTS > 0
+#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
   struct ReflectedLight {
     vec3 directDiffuse;
     vec3 directSpecular;
