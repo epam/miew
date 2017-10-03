@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import utils from '../utils';
 import VolumeMaterial from './shaders/VolumeMaterial';
 
+const matrixWorldToLocal = new THREE.Matrix4();
+
 function VolumeMesh() {
   this.clipPlane = new THREE.Plane();
   var size = new THREE.Vector3(0.5, 0.5, 0.5);
@@ -363,8 +365,16 @@ VolumeMesh.prototype.rebuild = function(camera) {
   var norm = camera.getWorldDirection();
   var pos = camera.getWorldPosition();
   pos.addScaledVector(norm, camera.near + nearClipPlaneOffset);
-  this.worldToLocal(pos);
-  this.worldToLocal(norm);
+
+  // transform pos to local CS
+  matrixWorldToLocal.getInverse(this.matrixWorld);
+  pos.applyMatrix4(matrixWorldToLocal);
+
+  // transform norm to local CS
+  const norm4D = new THREE.Vector4();
+  norm4D.set(norm.x, norm.y, norm.z, 0.0);  // NOTE: create homogeneous norm for proper transformation
+  norm4D.applyMatrix4(matrixWorldToLocal);
+  norm.copy(norm4D);
   norm.normalize();
 
   var clipPlane = new THREE.Plane(norm, pos);
