@@ -4,8 +4,6 @@ import * as THREE from 'three';
 import utils from '../utils';
 import VolumeMaterial from './shaders/VolumeMaterial';
 
-const matrixWorldToLocal = new THREE.Matrix4();
-
 function VolumeMesh() {
   this.clipPlane = new THREE.Plane();
   var size = new THREE.Vector3(0.5, 0.5, 0.5);
@@ -97,7 +95,7 @@ VolumeMesh.prototype._updateVertices = (function() {
     var i;
 
     var norm = this.clipPlane.normal;
-    var D = -norm.dot(this.clipPlane.constant);
+    var D = this.clipPlane.constant;
 
     var vert = this.vertices;
     var size = this.size;
@@ -198,11 +196,13 @@ VolumeMesh.prototype._updateVertices = (function() {
     this.faces[6] = face;
 
     var diff = new THREE.Vector3();
+    var coplanarPoint = new THREE.Vector3();
+    this.clipPlane.coplanarPoint(coplanarPoint);
     for (i = 0; i < vert.length; ++i) {
       this.cullFlag[i] = false;
       if (i < 8) {
         // corners should be culled by clipping plane
-        diff.subVectors(vert[i], this.clipPlane.constant);
+        diff.subVectors(vert[i], coplanarPoint);
         this.cullFlag[i] = (norm.dot(diff) >= 0.0);
       } else if (i < 8 + face.indices.length) {
         // cross section vertices don't get culled
@@ -358,34 +358,41 @@ VolumeMesh.prototype.setDataSource = function(dataSource) {
   bbox.getCenter(this.position);
 };
 
-VolumeMesh.prototype.rebuild = function(camera) {
-  var nearClipPlaneOffset = 0.2;
+VolumeMesh.prototype.rebuild = (function() {
 
-  // get clip plane in local space
-  var norm = camera.getWorldDirection();
-  var pos = camera.getWorldPosition();
-  pos.addScaledVector(norm, camera.near + nearClipPlaneOffset);
-
-  // transform pos to local CS
-  matrixWorldToLocal.getInverse(this.matrixWorld);
-  pos.applyMatrix4(matrixWorldToLocal);
-
-  // transform norm to local CS
+  const nearClipPlaneOffset = 0.2;
+  const pos = new THREE.Vector3();
+  const norm = new THREE.Vector3();
   const norm4D = new THREE.Vector4();
-  norm4D.set(norm.x, norm.y, norm.z, 0.0);  // NOTE: create homogeneous norm for proper transformation
-  norm4D.applyMatrix4(matrixWorldToLocal);
-  norm.copy(norm4D);
-  norm.normalize();
+  const matrixWorldToLocal = new THREE.Matrix4();
+  const clipPlane = new THREE.Plane();
 
-  var clipPlane = new THREE.Plane(norm, pos);
+  return function(camera) {
 
-  if (!this.clipPlane.equals(clipPlane)) {
-    this.clipPlane = clipPlane;
+    // get clip plane in local space
+    camera.getWorldDirection(norm);
+    camera.getWorldPosition(pos);
+    pos.addScaledVector(norm, camera.near + nearClipPlaneOffset);
 
-    this._updateVertices();
-    this._updateIndices();
-  }
-};
+    // transform pos to local CS
+    matrixWorldToLocal.getInverse(this.matrixWorld);
+    pos.applyMatrix4(matrixWorldToLocal);
+
+    // transform norm to local CS
+    norm4D.set(norm.x, norm.y, norm.z, 0.0);  // NOTE: use homogeneous norm for proper transformation
+    norm4D.applyMatrix4(matrixWorldToLocal);
+    norm.copy(norm4D);
+    norm.normalize();
+
+    clipPlane.setFromNormalAndCoplanarPoint(norm, pos);
+
+    if (!this.clipPlane.equals(clipPlane)) {
+      this.clipPlane = clipPlane.clone();
+      this._updateVertices();
+      this._updateIndices();
+    }
+  };
+})();
 
 export default VolumeMesh;
 
