@@ -95,7 +95,7 @@ case 4:
 this.$ = yy.miew.rebuild();
 break;
 case 5:
-this.$ = yy.miew.rebuildAll();
+this.$ = yy.miew.rebuildAll(); yy.miew.rebuild();
 break;
 case 6:
 this.$ = yy.echo(yy.utils.help().toString());

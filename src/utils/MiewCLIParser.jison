@@ -145,7 +145,7 @@ Program
 Command
     : RESET                               -> yy.miew.reset(false); yy.ClearContext(); yy.miew.resetReps("empty")
     | BUILD                               -> yy.miew.rebuild()
-    | BUILD ALL                           -> yy.miew.rebuildAll()
+    | BUILD ALL                           -> yy.miew.rebuildAll(); yy.miew.rebuild()
     | HELP                                -> yy.echo(yy.utils.help().toString())
     | HELP Path                           -> yy.echo(yy.utils.help($2).toString())
     | OneArgCommand
