@@ -3,6 +3,8 @@ import Miew from './Miew';
 import {parser as parsercli} from './utils/MiewCLIParser';
 import clihelp from './utils/MiewCLIHelp';
 import JSONConverter from './utils/JSONtoSelectorConverter';
+import logger from './utils/logger';
+
 
 var
   selectors = Miew.chem.selectors,
@@ -86,29 +88,27 @@ CLIUtils.prototype.list = function(miew, repMap, key) {
 };
 
 CLIUtils.prototype.listRep = function(miew, repMap, repIndex, key) {
-  var ret = '';
-  var opts = miew.rep(repIndex);
-  var index = repIndex;
-  var repName = repMap.get(index);
+  let ret = '';
+  const rep = miew.repGet(repIndex);
+  if (!rep) {
+    logger.warn(`Rep ${repIndex} does not exist!`);
+    return ret;
+  }
+  const index = repIndex;
+  const repName = repMap.get(index);
 
-  var modeId = opts.mode instanceof Array ? opts.mode[0] : opts.mode;
+  const mode = rep.mode;
+  const selectionStr = rep.selectorString;
+  const colorer = rep.colorer;
+  const material = rep.materialPreset;
 
-  ret += '#' + index + ' : ' + modes.get(modeId).name + (repName === '<no name>' ? '' : repName) + '\n';
+  ret += '#' + index + ' : ' + mode.name + (repName === '<no name>' ? '' : repName) + '\n';
 
   if (key !== undefined) {
-    var selectionStr = opts.selector;
-    if (selectionStr instanceof Array) {
-      var converter = new JSONConverter();
-      selectionStr = converter.createSelectorFromNode(selectionStr);
-    }
-
-    var colorerId = opts.colorer instanceof Array ? opts.colorer[0] : opts.colorer;
-    var materialId = opts.material;
-
     ret += '    selection : "' + selectionStr + '"\n';
-    ret += '    mode      : (' + modeId + '), ' + modes.get(modeId).name + '\n';
-    ret += '    colorer   : (' + colorerId + '), ' + colorers.get(colorerId).name + '\n';
-    ret += '    material  : (' + materialId + '), ' + materials.get(materialId).name + '\n';
+    ret += '    mode      : (' + mode.id + '), ' + mode.name + '\n';
+    ret += '    colorer   : (' + colorer.id + '), ' + colorer.name + '\n';
+    ret += '    material  : (' + material.id + '), ' + material.name + '\n';
   }
 
   return ret;
