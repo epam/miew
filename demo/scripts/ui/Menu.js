@@ -2509,10 +2509,12 @@ Menu.prototype.show = function(panelID, menuItem) {
   elements[0].firstElementChild.firstElementChild.textContent = labelSelector.text();
   labelSelector.addClass('active');
 
-  // renew currently opened mode- o colorer- combobox panel (need, when mode or colorer was changed from toolbar)
-  if (self._curPanelID.indexOf('mode') !== -1 || self._curPanelID.indexOf('color') !== -1) {
-    var reprList = $(self._menuId + ' [data-panel-type=miew-menu-panel-representation] .miew-repr-list');
-    var comboPanel = reprList.find('.panel:eq(' + self._curReprIdx + ') [data-value="' + self._curPanelID + '"]');
+  // renew currently opened mode-, colorer-, matpreset- combobox panel (need, when they were changed from toolbar)
+  if (self._curPanelID.indexOf('mode') !== -1 ||
+    self._curPanelID.indexOf('color') !== -1 ||
+    self._curPanelID.indexOf('matpreset') !== -1) {
+    const reprList = $(self._menuId + ' [data-panel-type=miew-menu-panel-representation] .miew-repr-list');
+    const comboPanel = reprList.find('.panel:eq(' + self._curReprIdx + ') [data-value="' + self._curPanelID + '"]');
     if (comboPanel) {
       comboPanel.click(); // call update of active item, getting value from current reprList
     }
@@ -2548,6 +2550,8 @@ Menu.prototype.hide = function() {
     this._removeActiveFromCombo('mode');
   } else if (this._curPanelID.indexOf('color') !== -1) {
     this._removeActiveFromCombo('colorer');
+  } else if (this._curPanelID.indexOf('matpreset') !== -1) {
+    this._removeActiveFromCombo('material');
   }
 
   // Resume rendering
