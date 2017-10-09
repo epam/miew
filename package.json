@@ -20,7 +20,7 @@
   "scripts": {
     "build": "gulp build",
     "lint": "gulp lint",
-    "start": "gulp serve:demo",
+    "start": "gulp serve:webpack",
     "test": "gulp test",
     "e2e": "gulp test:e2e",
     "preversion": "npm test",
