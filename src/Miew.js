@@ -2407,6 +2407,8 @@ Miew.prototype._onKeyDown = function(event) {
     }
     break;
   case 'S'.charCodeAt(0):
+    event.preventDefault();
+    event.stopPropagation();
     settings.now.ao = !settings.now.ao;
     this._needRender = true;
     break;
