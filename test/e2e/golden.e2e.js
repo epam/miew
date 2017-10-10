@@ -145,7 +145,7 @@ set interpolateViews false
 load 1AID
 view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="
 preset small`;
-      const keys = command.replace(/\n/g, Key.chord(Key.SHIFT, Key.ENTER)) + Key.ENTER;
+      const keys = command.replace(/[\r\n]+/g, Key.ENTER) + Key.ENTER;
       driver.findElement(cfg.dom.terminal.clipboard).sendKeys(keys);
       const title = driver.findElement(cfg.dom.title);
       driver.wait(until.elementTextContains(title, '1AID'), cfg.timeout);
