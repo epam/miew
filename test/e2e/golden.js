@@ -8,6 +8,12 @@ resemble.outputSettings({
   transparency: 0.25
 });
 
+let driver = null;
+
+function use(drv) {
+  driver = drv;
+}
+
 const report = {
   path: {
     golden: path.resolve(__dirname, 'golden/'),
@@ -88,7 +94,7 @@ function matchAsPromised(first, second) {
   });
 }
 
-function shouldMatch(driver, id) {
+function shouldMatch(id, test) {
   const prefix = 'data:image/png;base64,';
   const prefixLength = prefix.length;
 
@@ -103,8 +109,11 @@ function shouldMatch(driver, id) {
           expect(Number.parseFloat(diff.misMatchPercentage)).to.be.not.greaterThan(report.data.threshold);
         })
         .catch((err) => {
+          // "Why doesn't instanceof work on instances of Error subclasses under babel-node?"
+          // https://stackoverflow.com/a/33877501/1852238
           if (err instanceof URIError) {
             report.add(id, shot, null);
+            test.skip();
           }
           return Promise.reject(err);
         });
@@ -113,5 +122,6 @@ function shouldMatch(driver, id) {
 
 export default {
   report,
+  use,
   shouldMatch,
 };
