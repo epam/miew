@@ -90,7 +90,7 @@
     "handlebars": "^4.0.10",
     "html-webpack-plugin": "^2.29.0",
     "jquery": "^3.2.1",
-    "jquery.terminal": "1.9.0",
+    "jquery.terminal": "^1.9.0",
     "jsdoc": "^3.5.5",
     "lodash": "^4.17.4",
     "mocha": "^4.0.0",
