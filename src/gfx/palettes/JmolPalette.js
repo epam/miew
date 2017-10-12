@@ -223,8 +223,13 @@ palette.chainColors = [
 ];
 
 palette.secondaryColors = {
-  'helix': {1: 0xFF0080, 5: 0xA00080},
+  'helix': {
+    1: 0xFF0080, // RH alpha
+    3: 0x600080, // RH pi
+    5: 0xA00080, // RH 3-10
+  },
   'strand': 0xFFC800,
+  'turn': 0x6080FF,
   'dna': 0xAE00FE,
   'rna': 0xFD0162,
 };
