@@ -41,6 +41,7 @@ import fbxExport from './gfx/FBXExport';
 import EventDispatcher from './utils/EventDispatcher';
 import logger from './utils/logger';
 import Cookies from './utils/Cookies';
+import capabilities from './gfx/capabilities';
 //////////////////////////////////////////////////////////////////////////////
 
 var
@@ -374,6 +375,7 @@ Miew.prototype._initGfx = function() {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
+  capabilities.init(gfx.renderer);
 
   // z-sprites and ambient occlusion possibility
   if (!gfx.renderer.getContext().getExtension('EXT_frag_depth')) {

@@ -1,6 +1,3 @@
-precision mediump float;
-precision mediump int;
-
 #ifdef ATTR_ALPHA_COLOR
   varying float alphaCol;
 #endif

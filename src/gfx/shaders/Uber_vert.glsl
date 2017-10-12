@@ -1,6 +1,3 @@
-precision mediump float;
-precision mediump int;
-
 float INSTANCED_SPRITE_OVERSCALE = 1.3;
 
 attribute vec3 normal;
@@ -10,7 +7,6 @@ varying vec3 vNormal;
 #else
   attribute vec3 position;
 #endif
-varying vec3 vPosition;
 
 varying vec3 vWorldPosition;
 varying vec3 vViewPosition;

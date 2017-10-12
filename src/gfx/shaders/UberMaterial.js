@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import vertexShader from './Uber_vert.glsl';
 import fragmentShader from './Uber_frag.glsl';
+import capabilities from './../capabilities';
 
 //  var INSTANCED_SPRITE_OVERSCALE = 1.3;
 
@@ -92,8 +93,8 @@ function UberMaterial(params) {
   // set default values
   THREE.RawShaderMaterial.prototype.setValues.call(this, {
     uniforms: THREE.UniformsUtils.clone(defaultUniforms),
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
+    vertexShader: this.precisionString() + vertexShader,
+    fragmentShader: this.precisionString() + fragmentShader,
     lights: true,
     fog: true,
     side: THREE.DoubleSide,
@@ -104,6 +105,13 @@ function UberMaterial(params) {
 
 UberMaterial.prototype = Object.create(THREE.RawShaderMaterial.prototype);
 UberMaterial.prototype.constructor = UberMaterial;
+
+UberMaterial.prototype.precisionString = function() {
+  const precision = capabilities.precision;
+  const str = 'precision ' + precision + ' float;\n' +
+    'precision ' + precision + ' int;\n\n';
+  return str;
+};
 
 // properties that convert to uniforms
 UberMaterial.prototype.uberOptions = {
