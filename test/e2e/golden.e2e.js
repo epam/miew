@@ -70,6 +70,7 @@ describe('Miew demo application', function() {
         return prepareServer(cfg.url);
       })
       .then((url) => {
+        golden.report.data.url = url;
         page = new MiewPage(driver, url);
         return page.waitForMiew();
       })
@@ -101,6 +102,7 @@ describe('Miew demo application', function() {
   [
     ['modes', 'BS'],
     ['colorers', 'EL'],
+    ['materials', 'SF'],
   ].forEach(([listName, sampleId]) => {
     it(`provides a list of ${listName} including "${sampleId}"`, function() {
       retrieve[listName] = page.getValueFor(`miew.constructor.${listName}.descriptions`);
@@ -150,6 +152,35 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
       });
     });
 
+  });
+
+  describe('displays all materials, i.e.', function() {
+
+    it('applies "small" preset', function() {
+      return page.runScript('preset small')
+        .then(() => page.waitUntilRebuildIsDone())
+        .then(() => golden.shouldMatch('1aid_BS_EL', this));
+    });
+
+    it('adds a surface', function() {
+      return page.runScript('add m=QS')
+        .then(() => page.waitUntilRebuildIsDone())
+        .then(() => golden.shouldMatch('1aid_QS_EL', this));
+    });
+
+    const suite = this;
+    before(function() {
+      return retrieve.materials.then((materials) => {
+        _.each(materials, (material) => {
+          const command = `clear\nrep 1 m=QS mt=${material.id}`;
+          suite.addTest(it(`displays ${material.name} material`, function() {
+            return page.runScript(command)
+              .then(() => page.waitUntilRepresentationIs(1, 'QS', 'EL'))
+              .then(() => golden.shouldMatch(`1aid_QS_EL_${material.id}`, this));
+          }));
+        });
+      });
+    });
   });
 
 });

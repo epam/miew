@@ -1,5 +1,6 @@
 
 
+import _ from 'lodash';
 import * as THREE from 'three';
 import settings from '../settings';
 
@@ -81,6 +82,8 @@ for (var i = 0, n = materialList.length; i < n; ++i) {
 
 export default {
   list: materialList,
+
+  descriptions: _.map(materialList, (m) => _.pick(m, ['id', 'name'])),
 
   any: materialDict[settings.now.presets.default.material] || materialList[0],
 
