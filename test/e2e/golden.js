@@ -73,7 +73,7 @@ const report = {
       actualImage: report.getHtmlPath(report.getActualPath(id)),
       differenceImage: report.getHtmlPath(diff ? report.getDifferencePath(id) : report.path.missing),
       mismatch,
-      rowClass: mismatch > this.data.threshold ? 'fail' : 'pass',
+      rowClass: !diff ? 'skip' : (mismatch > this.data.threshold ? 'fail' : 'pass'),
     });
   },
 

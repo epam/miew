@@ -65,13 +65,16 @@ export default class MiewPage {
   }
 
   /**
-   * Schedule a version request.
-   * @returns {promise.Thenable<string|undefined>} A promise which resolves with the miew version string, e.g. "v0.1.0".
+   * Schedule a request for evaluating expression.
+   * The evaluation context contains `miew` object and `Miew` class.
+   * @returns {promise.Thenable<*>} A promise which resolves with the expression value.
    */
-  getVersion() {
+  getValueFor(expression) {
     return this.driver.executeScript(`\
 var miew = window && window.MIEWS && window.MIEWS[0];
-return miew && miew.VERSION`);
+var Miew = miew && miew.constructor;
+return miew && Miew && JSON.stringify(${expression});`)
+      .then((json) => JSON.parse(json));
   }
 
   /**
@@ -79,7 +82,7 @@ return miew && miew.VERSION`);
    * @returns {promise.Thenable<string>} A promise which resolves with the miew version string, e.g. "v0.1.0".
    */
   waitForMiew() {
-    return this.driver.wait(() => this.getVersion(), timeout);
+    return this.driver.wait(() => this.getValueFor('Miew.VERSION'), timeout);
   }
 
   /**
@@ -105,14 +108,15 @@ return rep && !miew._needRebuild() && !miew._needRender;`));
 
   /**
    * Wait until representation is set correctly, geometry is built and displayed.
+   * @param {number} index - target representation index
    * @param {string} mode - mode ID, e.g. "BS"
    * @param {string} colorer - colorer ID, e.g. "EL"
    * @returns {promise.Thenable} A promise.
    */
-  waitUntilRepresentationIs(mode, colorer) {
+  waitUntilRepresentationIs(index, mode, colorer) {
     return this.driver.wait(() => this.driver.executeScript(`\
 var miew = window && window.MIEWS && window.MIEWS[0];
-var rep = miew && miew.repGet(0);
+var rep = miew && miew.repGet(${index});
 var modeOk = rep && (rep.mode.id === '${mode.toUpperCase()}');
 var colorerOk = rep && (rep.colorer.id === '${colorer.toUpperCase()}');
 return modeOk && colorerOk && !miew._needRebuild() && !miew._needRender;`));

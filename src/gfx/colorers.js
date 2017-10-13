@@ -4,6 +4,7 @@
  * Colorer list.
  * @module gfx/colorers
  */
+import _ from 'lodash';
 import settings from '../settings';
 import _EL from './colorers/ElementColorer';
 import _RT from './colorers/ResidueTypeColorer';
@@ -45,6 +46,12 @@ var exports = /** @alias module:gfx/colorers */ {
    *  @type {Function[]}
    */
   list: colorerList,
+
+  /**
+   * The list of colorer descriptions.
+   * @type {Array<{id:string, name:string}>}
+   */
+  descriptions: _.map(colorerList, (m) => _.pick(m.prototype, ['id', 'name'])),
 
   /**
    * The colorer constructor one can use if he doesn't care (the default one).

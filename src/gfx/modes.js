@@ -5,6 +5,7 @@
  * @module gfx/modes
  */
 
+import _ from 'lodash';
 import settings from '../settings';
 import _LN from './modes/LinesMode';
 import _LC from './modes/LicoriceMode';
@@ -41,6 +42,12 @@ var exports = /** @alias module:gfx/modes */ {
    *  @type {Array<function(new:Mode)>}
    */
   list: modeList,
+
+  /**
+   * The list of mode descriptions.
+   * @type {Array<{id:string, name:string}>}
+   */
+  descriptions: _.map(modeList, (m) => _.pick(m.prototype, ['id', 'name'])),
 
   /**
    * The mode constructor one can use if he doesn't care (the default one).
