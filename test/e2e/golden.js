@@ -14,6 +14,10 @@ function use(drv) {
   driver = drv;
 }
 
+function zeroes(num, len) {
+  return ('000000' + num).slice(-len);
+}
+
 const report = {
   path: {
     golden: path.resolve(__dirname, 'golden/'),
@@ -25,11 +29,12 @@ const report = {
 
   context: {
     desc: 'N/A',
+    index: 0,
   },
 
   getExpectedPath: (id) => path.join(report.path.golden, `${id}.png`),
-  getActualPath: (id) => path.join(report.path.mismatch, `${id}.png`),
-  getDifferencePath: (id) => path.join(report.path.mismatch, `${id}.diff.png`),
+  getActualPath: (id) => path.join(report.path.mismatch, `${zeroes(report.context.index, 3)}_${id}.png`),
+  getDifferencePath: (id) => path.join(report.path.mismatch, `${zeroes(report.context.index, 3)}_${id}.diff.png`),
 
   getHtmlPath(filename) {
     if (!fs.existsSync(filename)) {
@@ -54,6 +59,7 @@ const report = {
   },
 
   add(id, shot, diff) {
+    ++report.context.index;
     fs.writeFileSync(report.getActualPath(id), shot);
     let mismatch = 100;
     if (diff) {

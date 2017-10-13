@@ -118,7 +118,7 @@ gulp.task('test:coveralls', () =>
   gulp.src(config.cover.dst + 'lcov.info')
     .pipe(plugins.coveralls()));
 
-gulp.task('test:e2e', () =>
+gulp.task('test:e2e', ['clean:e2e'], () =>
   gulp.src(config.e2e.src, {read: false})
     .pipe(plugins.mocha()));
 
