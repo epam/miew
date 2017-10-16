@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.3 Copyright (c) 2015-2017 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.4 Copyright (c) 2015-2017 EPAM Systems, Inc. */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -69114,9 +69114,22 @@ RCGroup.prototype.getSubset = function (mask, innerOnly) {
   return totalSubset;
 };
 
-var vertexShader = "precision mediump float;\r\nprecision mediump int;\r\n\r\nfloat INSTANCED_SPRITE_OVERSCALE = 1.3;\r\n\r\nattribute vec3 normal;\r\nvarying vec3 vNormal;\r\n#ifdef THICK_LINE\r\n  attribute vec4 position; // W contains vert pos or neg offset\r\n#else\r\n  attribute vec3 position;\r\n#endif\r\nvarying vec3 vPosition;\r\n\r\nvarying vec3 vWorldPosition;\r\nvarying vec3 vViewPosition;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  attribute float alphaColor;\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  attribute vec3 color;\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  attribute vec3 color2;\r\n  varying vec3 vColor2;\r\n  attribute vec2 uv;\r\n  varying vec2 vUv;\r\n#endif\r\n\r\n#ifdef INSTANCED_POS\r\n  attribute vec4 offset;\r\n  varying vec4 instOffset;\r\n#endif\r\n\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  varying vec4 spritePosEye;\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  attribute vec4 matVector1;\r\n  attribute vec4 matVector2;\r\n  attribute vec4 matVector3;\r\n  attribute vec4 invmatVector1;\r\n  attribute vec4 invmatVector2;\r\n  attribute vec4 invmatVector3;\r\n\r\n  varying vec4 matVec1;\r\n  varying vec4 matVec2;\r\n  varying vec4 matVec3;\r\n  varying vec4 invmatVec1;\r\n  varying vec4 invmatVec2;\r\n  varying vec4 invmatVec3;\r\n#endif\r\n\r\nuniform mat4 modelViewMatrix; // optional\r\nuniform mat4 projectionMatrix; // optional\r\nuniform mat3 normalMatrix; // optional\r\nuniform mat4 modelMatrix; // optional\r\nuniform mat4 projMatrixInv; // TODO move to thick line\r\n\r\n#ifdef DASHED_LINE\r\n  attribute float lineDistance;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec3 direction;\r\n  uniform vec2 viewport;\r\n  uniform float lineWidth;\r\n\r\n  vec4 transform(vec4 coord){\r\n    return projectionMatrix * modelViewMatrix * coord;\r\n  }\r\n\r\n  vec2 project(vec4 device){\r\n    vec3 device_normal = device.xyz/device.w;\r\n    vec2 clip_pos = (device_normal*0.5+0.5).xy;\r\n    return clip_pos * viewport;\r\n  }\r\n\r\n  vec4 unproject(vec2 screen, float z, float w){\r\n    vec2 clip_pos = screen/viewport;\r\n    vec2 device_normal = clip_pos*2.0-1.0;\r\n    return vec4(device_normal*w, z, w);\r\n  }\r\n#endif\r\n\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  alphaCol = alphaColor;\r\n#endif\r\n\r\n  vec3 objectNormal = vec3( normal );\r\n#ifdef INSTANCED_MATRIX\r\n  vec3 transformedNormal = vec3(\r\n    dot(objectNormal, matVector1.xyz),\r\n    dot(objectNormal, matVector2.xyz),\r\n    dot(objectNormal, matVector3.xyz));\r\n  transformedNormal = normalMatrix * transformedNormal;\r\n#else\r\n  vec3 transformedNormal = normalMatrix * objectNormal;\r\n#endif\r\n  vNormal = normalize(transformedNormal);\r\n\r\n  vec4 localPos = vec4(position.xyz, 1.0);\r\n  vec4 worldPos = modelMatrix * localPos;\r\n  vec4 mvPosition = modelViewMatrix * localPos;\r\n\r\n// make thick line offset\r\n#ifdef THICK_LINE\r\n   // get screen pos\r\n   vec4 dPos = transform(vec4(position.xyz, 1.0));\r\n   vec2 sPos = project(dPos);\r\n   // move pos forward\r\n   vec3 position2 = position.xyz + direction.xyz * 0.5;\r\n   // get screen offset pos\r\n   vec4 dPos2 = transform(vec4(position2.xyz, 1.0));\r\n   vec2 sPos2 = project(dPos2);\r\n   // screen line direction\r\n   vec2 sDir = normalize(sPos2 - sPos);\r\n   // vertex offset (orthogonal to line direction)\r\n   vec2 offset1 = vec2(-sDir.y, sDir.x);\r\n   // move screen vertex\r\n   vec2 newPos = sPos + offset1 * position.w * lineWidth;\r\n   // get moved pos in view space\r\n   vec4 dNewPos =  unproject(newPos, dPos.z, dPos.w);\r\n   mvPosition.xyz = (projMatrixInv * dNewPos).xyz;\r\n#endif // THICK_LINE\r\n\r\n#ifdef INSTANCED_POS\r\n  instOffset = offset;\r\n\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    spritePosEye = modelViewMatrix * vec4( offset.xyz, 1.0 );\r\n    float scale = length(modelViewMatrix[0]);\r\n    mvPosition = spritePosEye + vec4( position.xyz * offset.w * scale * INSTANCED_SPRITE_OVERSCALE, 0.0 );\r\n    spritePosEye.w = offset.w * scale;\r\n  #else\r\n    localPos = vec4( offset.xyz + position.xyz * offset.w, 1.0 );\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  matVec1 = matVector1;\r\n  matVec2 = matVector2;\r\n  matVec3 = matVector3;\r\n  invmatVec1 = invmatVector1;\r\n  invmatVec2 = invmatVector2;\r\n  invmatVec3 = invmatVector3;\r\n\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    // calculate eye coords of cylinder endpoints\r\n    vec4 v = vec4(0, -0.5, 0, 1);\r\n    vec4 p1 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n    v.y = 0.5;\r\n    vec4 p2 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n\r\n    // sprite is placed at the center of cylinder\r\n    spritePosEye.xyz = mix(p1.xyz, p2.xyz, 0.5);\r\n    spritePosEye.w = 1.0;\r\n\r\n    // basic sprite size at screen plane (covers only cylinder axis)\r\n    vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);\r\n\r\n    // cylinder radius in eye space\r\n    float rad = length(modelViewMatrix[0]) * length(vec3(matVector1.x, matVector2.x, matVector3.x));\r\n\r\n    // full sprite size in eye coords\r\n    float minZ = min(abs(p1.z), abs(p2.z));\r\n    vec2 spriteSize = INSTANCED_SPRITE_OVERSCALE  * abs(spritePosEye.z) *\r\n      (spriteSizeScreen + 2.0 * rad / minZ);\r\n\r\n    mvPosition = spritePosEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );\r\n  #else\r\n    localPos = vec4(dot(localPos, matVector1), dot(localPos, matVector2), dot(localPos, matVector3), 1.0);\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n  gl_Position = projectionMatrix * mvPosition;\r\n\r\n  vWorldPosition = worldPos.xyz;\r\n  vViewPosition = - mvPosition.xyz;\r\n\r\n#ifdef ATTR_COLOR\r\n  vColor = color.xyz;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  vColor2 = color2;\r\n  vUv = uv;\r\n#endif\r\n\r\n#ifdef DASHED_LINE\r\n  vLineDistance = lineDistance;\r\n#endif\r\n}\r\n";
+var vertexShader = "float INSTANCED_SPRITE_OVERSCALE = 1.3;\r\n\r\nattribute vec3 normal;\r\nvarying vec3 vNormal;\r\n#ifdef THICK_LINE\r\n  attribute vec4 position; // W contains vert pos or neg offset\r\n#else\r\n  attribute vec3 position;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition;\r\nvarying vec3 vViewPosition;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  attribute float alphaColor;\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  attribute vec3 color;\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  attribute vec3 color2;\r\n  varying vec3 vColor2;\r\n  attribute vec2 uv;\r\n  varying vec2 vUv;\r\n#endif\r\n\r\n#ifdef INSTANCED_POS\r\n  attribute vec4 offset;\r\n  varying vec4 instOffset;\r\n#endif\r\n\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  varying vec4 spritePosEye;\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  attribute vec4 matVector1;\r\n  attribute vec4 matVector2;\r\n  attribute vec4 matVector3;\r\n  attribute vec4 invmatVector1;\r\n  attribute vec4 invmatVector2;\r\n  attribute vec4 invmatVector3;\r\n\r\n  varying vec4 matVec1;\r\n  varying vec4 matVec2;\r\n  varying vec4 matVec3;\r\n  varying vec4 invmatVec1;\r\n  varying vec4 invmatVec2;\r\n  varying vec4 invmatVec3;\r\n#endif\r\n\r\nuniform mat4 modelViewMatrix; // optional\r\nuniform mat4 projectionMatrix; // optional\r\nuniform mat3 normalMatrix; // optional\r\nuniform mat4 modelMatrix; // optional\r\nuniform mat4 projMatrixInv; // TODO move to thick line\r\n\r\n#ifdef DASHED_LINE\r\n  attribute float lineDistance;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec3 direction;\r\n  uniform vec2 viewport;\r\n  uniform float lineWidth;\r\n\r\n  vec4 transform(vec4 coord){\r\n    return projectionMatrix * modelViewMatrix * coord;\r\n  }\r\n\r\n  vec2 project(vec4 device){\r\n    vec3 device_normal = device.xyz/device.w;\r\n    vec2 clip_pos = (device_normal*0.5+0.5).xy;\r\n    return clip_pos * viewport;\r\n  }\r\n\r\n  vec4 unproject(vec2 screen, float z, float w){\r\n    vec2 clip_pos = screen/viewport;\r\n    vec2 device_normal = clip_pos*2.0-1.0;\r\n    return vec4(device_normal*w, z, w);\r\n  }\r\n#endif\r\n\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  alphaCol = alphaColor;\r\n#endif\r\n\r\n  vec3 objectNormal = vec3( normal );\r\n#ifdef INSTANCED_MATRIX\r\n  vec3 transformedNormal = vec3(\r\n    dot(objectNormal, matVector1.xyz),\r\n    dot(objectNormal, matVector2.xyz),\r\n    dot(objectNormal, matVector3.xyz));\r\n  transformedNormal = normalMatrix * transformedNormal;\r\n#else\r\n  vec3 transformedNormal = normalMatrix * objectNormal;\r\n#endif\r\n  vNormal = normalize(transformedNormal);\r\n\r\n  vec4 localPos = vec4(position.xyz, 1.0);\r\n  vec4 worldPos = modelMatrix * localPos;\r\n  vec4 mvPosition = modelViewMatrix * localPos;\r\n\r\n// make thick line offset\r\n#ifdef THICK_LINE\r\n   // get screen pos\r\n   vec4 dPos = transform(vec4(position.xyz, 1.0));\r\n   vec2 sPos = project(dPos);\r\n   // move pos forward\r\n   vec3 position2 = position.xyz + direction.xyz * 0.5;\r\n   // get screen offset pos\r\n   vec4 dPos2 = transform(vec4(position2.xyz, 1.0));\r\n   vec2 sPos2 = project(dPos2);\r\n   // screen line direction\r\n   vec2 sDir = normalize(sPos2 - sPos);\r\n   // vertex offset (orthogonal to line direction)\r\n   vec2 offset1 = vec2(-sDir.y, sDir.x);\r\n   // move screen vertex\r\n   vec2 newPos = sPos + offset1 * position.w * lineWidth;\r\n   // get moved pos in view space\r\n   vec4 dNewPos =  unproject(newPos, dPos.z, dPos.w);\r\n   mvPosition.xyz = (projMatrixInv * dNewPos).xyz;\r\n#endif // THICK_LINE\r\n\r\n#ifdef INSTANCED_POS\r\n  instOffset = offset;\r\n\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    spritePosEye = modelViewMatrix * vec4( offset.xyz, 1.0 );\r\n    float scale = length(modelViewMatrix[0]);\r\n    mvPosition = spritePosEye + vec4( position.xyz * offset.w * scale * INSTANCED_SPRITE_OVERSCALE, 0.0 );\r\n    spritePosEye.w = offset.w * scale;\r\n  #else\r\n    localPos = vec4( offset.xyz + position.xyz * offset.w, 1.0 );\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  matVec1 = matVector1;\r\n  matVec2 = matVector2;\r\n  matVec3 = matVector3;\r\n  invmatVec1 = invmatVector1;\r\n  invmatVec2 = invmatVector2;\r\n  invmatVec3 = invmatVector3;\r\n\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    // calculate eye coords of cylinder endpoints\r\n    vec4 v = vec4(0, -0.5, 0, 1);\r\n    vec4 p1 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n    v.y = 0.5;\r\n    vec4 p2 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n\r\n    // sprite is placed at the center of cylinder\r\n    spritePosEye.xyz = mix(p1.xyz, p2.xyz, 0.5);\r\n    spritePosEye.w = 1.0;\r\n\r\n    // basic sprite size at screen plane (covers only cylinder axis)\r\n    vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);\r\n\r\n    // cylinder radius in eye space\r\n    float rad = length(modelViewMatrix[0]) * length(vec3(matVector1.x, matVector2.x, matVector3.x));\r\n\r\n    // full sprite size in eye coords\r\n    float minZ = min(abs(p1.z), abs(p2.z));\r\n    vec2 spriteSize = INSTANCED_SPRITE_OVERSCALE  * abs(spritePosEye.z) *\r\n      (spriteSizeScreen + 2.0 * rad / minZ);\r\n\r\n    mvPosition = spritePosEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );\r\n  #else\r\n    localPos = vec4(dot(localPos, matVector1), dot(localPos, matVector2), dot(localPos, matVector3), 1.0);\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n  gl_Position = projectionMatrix * mvPosition;\r\n\r\n  vWorldPosition = worldPos.xyz;\r\n  vViewPosition = - mvPosition.xyz;\r\n\r\n#ifdef ATTR_COLOR\r\n  vColor = color.xyz;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  vColor2 = color2;\r\n  vUv = uv;\r\n#endif\r\n\r\n#ifdef DASHED_LINE\r\n  vLineDistance = lineDistance;\r\n#endif\r\n}\r\n";
 
-var fragmentShader = "precision mediump float;\r\nprecision mediump int;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#ifdef COLOR_FROM_POS\r\n  uniform mat4 world2colorMatrix;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  varying vec3 vColor2;\r\n  varying vec2 vUv;\r\n#endif\r\n\r\nuniform vec3 diffuse;\r\nuniform vec3 emissive;\r\nuniform vec3 specular;\r\nuniform float shininess;\r\nuniform vec3 fixedColor;\r\nuniform float opacity;\r\nuniform float zClipValue;\r\nuniform float clipPlaneValue;\r\n\r\n#define PI 3.14159265359\r\n#define RECIPROCAL_PI 0.31830988618\r\n#define saturate(a) clamp( a, 0.0, 1.0 )\r\n\r\n#ifdef USE_FOG\r\n  uniform vec3 fogColor;\r\n  uniform float fogNear;\r\n  uniform float fogFar;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)\r\nvarying vec3 vViewPosition;\r\nvarying vec3 vNormal;\r\n\r\n/////////////////////////////////////////// ZSprites ////////////////////////////////////////////////\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  uniform float zOffset;\r\n  uniform mat4 projectionMatrix;\r\n  varying vec4 spritePosEye;\r\n\r\n  float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {\r\n    vec4 pixelPosScreen = projMatrix * pixelPosEye;\r\n    return 0.5 * (pixelPosScreen.z / pixelPosScreen.w + 1.0) + zOffset;\r\n  }\r\n#endif\r\n\r\n#ifdef SPHERE_SPRITE\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n  varying vec4 instOffset;\r\n\r\n  float intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray, ray);\r\n    float b = dot(ray, origin);\r\n    float c = dot(origin, origin) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    if (t1 >= 0.0) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_sphere_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into sphere local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = (v.xyz - instOffset.xyz) / instOffset.w;\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = normalize(v.xyz);\r\n\r\n    return intersect_ray_sphere(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n  varying vec4 matVec1;\r\n  varying vec4 matVec2;\r\n  varying vec4 matVec3;\r\n  varying vec4 invmatVec1;\r\n  varying vec4 invmatVec2;\r\n  varying vec4 invmatVec3;\r\n\r\n  float intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray.xz, ray.xz);\r\n    float b = dot(ray.xz, origin.xz);\r\n    float c = dot(origin.xz, origin.xz) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    float halfHeight = 0.5;\r\n    if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_cylinder_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into cylinder local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n    ray = normalize(ray);\r\n\r\n    return intersect_ray_cylinder(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n/////////////////////////////////////////// Lighting ////////////////////////////////////////////////\r\n\r\n#if NUM_DIR_LIGHTS > 0\r\n  struct ReflectedLight {\r\n    vec3 directDiffuse;\r\n    vec3 directSpecular;\r\n    vec3 indirectDiffuse;\r\n  };\r\n\r\n  struct BlinnPhongMaterial {\r\n    vec3  diffuseColor;\r\n    vec3  specularColor;\r\n    float specularShininess;\r\n  };\r\n\r\n  struct GeometricContext {\r\n    vec3 normal;\r\n    vec3 viewDir;\r\n  };\r\n\r\n  struct DirectionalLight {\r\n    vec3 direction;\r\n    vec3 color;\r\n  };\r\n\r\n  uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\r\n  uniform vec3 ambientLightColor;\r\n\r\n  vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\r\n    return RECIPROCAL_PI * diffuseColor;\r\n  } // validated\r\n\r\n  vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\r\n    // Original approximation by Christophe Schlick '94\r\n    //;float fresnel = pow( 1.0 - dotLH, 5.0 );\r\n    // Optimized variant (presented by Epic at SIGGRAPH '13)\r\n    float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\r\n    return ( 1.0 - specularColor ) * fresnel + specularColor;\r\n  } // validated\r\n\r\n  float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) {\r\n    // geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)\r\n    return 0.25;\r\n  }\r\n\r\n  float D_BlinnPhong( const in float shininess, const in float dotNH ) {\r\n    return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\r\n  }\r\n\r\n  vec3 BRDF_Specular_BlinnPhong( const in DirectionalLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\r\n    vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\r\n    float dotNH = saturate(dot( geometry.normal, halfDir ));\r\n    float dotLH = saturate(dot( incidentLight.direction, halfDir ));\r\n\r\n    vec3 F = F_Schlick( specularColor, dotLH );\r\n    float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );\r\n    float D = D_BlinnPhong( shininess, dotNH );\r\n\r\n    return F * ( G * D );\r\n  } // validated\r\n\r\n  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\r\n\r\n    float dotNL = saturate( dot( geometry.normal, directLight.direction ));\r\n    vec3 irradiance = dotNL * directLight.color * PI;\r\n    reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n    reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );\r\n  }\r\n\r\n  void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\r\n    reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n  }\r\n\r\n  vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material) {\r\n    ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));\r\n    vec3 irradiance = ambientLightColor * PI;\r\n\r\n    // use loop for number\r\n    #if NUM_DIR_LIGHTS > 1\r\n      for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n        RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight);\r\n    #else\r\n        RE_Direct_BlinnPhong(directionalLights[0], geometry, material, reflectedLight);\r\n    #endif\r\n\r\n        RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);\r\n\r\n    #if NUM_DIR_LIGHTS > 1\r\n      }\r\n    #endif\r\n\r\n    return reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;\r\n  }\r\n#endif\r\n\r\n/////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////\r\n#ifdef DASHED_LINE\r\n  uniform float dashedLineSize;\r\n  uniform float dashedLinePeriod;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef CLIP_PLANE\r\n  if (vViewPosition.z < clipPlaneValue) discard;\r\n#endif\r\n\r\n#ifdef ZCLIP\r\n  if (vViewPosition.z < zClipValue) discard;\r\n#endif\r\n\r\n  vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);\r\n  vec4 pixelPosEye;\r\n\r\n#ifdef SPHERE_SPRITE\r\n\r\n  vec3 normal;\r\n\r\n/* quick-and-dirty method\r\n  normal.xy = ' + INSTANCED_SPRITE_OVERSCALE + ' * (2.0 * vUv - 1.0);\r\n  float r2 = dot(normal.xy, normal.xy);\r\n  if (r2 > 1.0) discard;\r\n  float normalZ = sqrt(1.0 - r2);\r\n  normal.z = normalZ;\r\n  normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\r\n  pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n  pixelPosEye.z += spritePosEye.w * normalZ;\r\n*/\r\n\r\n  // ray-trace sphere surface\r\n  {\r\n    vec3 p;\r\n    if (get_sphere_point(-vViewPosition, p) < 0.0) discard;\r\n    pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n    pixelPosEye.z += instOffset.w *\r\n      (modelViewMatrix[0][2] * p.x +\r\n       modelViewMatrix[1][2] * p.y +\r\n       modelViewMatrix[2][2] * p.z);\r\n    normal = normalize(normalMatrix * p);\r\n  }\r\n\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  vec3 normal;\r\n  float cylinderY = 0.0;\r\n\r\n  // ray-trace cylinder surface\r\n  {\r\n    vec3 p;\r\n    if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;\r\n\r\n    cylinderY = 0.5 * (p.y + 1.0);\r\n\r\n    vec4 v = vec4(p, 1.0);\r\n    v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);\r\n    pixelPosWorld = modelMatrix * v;\r\n    pixelPosEye = modelViewMatrix * v;\r\n\r\n    vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));\r\n    normal = vec3(\r\n      dot(localNormal, matVec1.xyz),\r\n      dot(localNormal, matVec2.xyz),\r\n      dot(localNormal, matVec3.xyz));\r\n    normal = normalize(normalMatrix * normal);\r\n  }\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  vec3 vertexColor = vColor;\r\n#else\r\n  vec3 vertexColor = vec3(1.0, 1.0, 1.0);\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  #ifdef CYLINDER_SPRITE\r\n    float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing\r\n  #else\r\n    float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord\r\n  #endif\r\n    // choose either color or color2\r\n  vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));\r\n#endif\r\n\r\n  // negative red component is a special condition\r\n  if (vertexColor.x < 0.0) discard;\r\n\r\n#ifdef DASHED_LINE\r\n  if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;\r\n#endif\r\n\r\n// transparency prepass writes only z, so we don't need to calc the color\r\n#ifdef PREPASS_TRANSP\r\n  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n  #endif\r\n  return;\r\n#endif\r\n\r\n  float totalOpacity = opacity;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  totalOpacity *= alphaCol;\r\n#endif\r\n\r\n  // discard fully transparent pixels\r\n  if (totalOpacity == 0.0) discard;\r\n\r\n#ifdef FAKE_OPACITY\r\n  // discard pixels in checker pattern\r\n  vec2 dm_coord = floor(gl_FragCoord.xy);\r\n  dm_coord = fract(dm_coord * 0.5);\r\n  if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;\r\n  vec4 diffuseColor = vec4(diffuse, 1.0);\r\n#else\r\n  vec4 diffuseColor = vec4(diffuse, totalOpacity);\r\n#endif\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  #ifdef DOUBLE_SIDED\r\n    float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\r\n  #else\r\n    float flipNormal = 1.0;\r\n  #endif\r\n  vec3 normal = normalize( vNormal ) * flipNormal;\r\n#endif\r\n\r\n  diffuseColor.rgb *= vertexColor;\r\n\r\n#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n  GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));\r\n  BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);\r\n  vec3 outgoingLight = calcLighting(geometry, material);\r\n#else\r\n  vec3 outgoingLight = diffuseColor.rgb;\r\n#endif\r\n\r\n#ifdef COLOR_FROM_POS\r\n  gl_FragColor = world2colorMatrix * pixelPosWorld;\r\n#else\r\n  #ifdef OVERRIDE_COLOR\r\n    gl_FragColor = vec4(fixedColor, diffuseColor.a);\r\n  #else\r\n    gl_FragColor = vec4(outgoingLight, diffuseColor.a);\r\n  #endif\r\n\r\n  #ifdef USE_FOG\r\n    float fogFactor = smoothstep( fogNear, fogFar, vViewPosition.z );\r\n    gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\r\n  #endif\r\n#endif\r\n\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n#endif\r\n}\r\n";
+var fragmentShader = "#ifdef ATTR_ALPHA_COLOR\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#ifdef COLOR_FROM_POS\r\n  uniform mat4 world2colorMatrix;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  varying vec3 vColor2;\r\n  varying vec2 vUv;\r\n#endif\r\n\r\nuniform vec3 diffuse;\r\nuniform vec3 emissive;\r\nuniform vec3 specular;\r\nuniform float shininess;\r\nuniform vec3 fixedColor;\r\nuniform float opacity;\r\nuniform float zClipValue;\r\nuniform float clipPlaneValue;\r\n\r\n#define PI 3.14159265359\r\n#define RECIPROCAL_PI 0.31830988618\r\n#define saturate(a) clamp( a, 0.0, 1.0 )\r\n\r\n#ifdef USE_FOG\r\n  uniform vec3 fogColor;\r\n  uniform float fogNear;\r\n  uniform float fogFar;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)\r\nvarying vec3 vViewPosition;\r\nvarying vec3 vNormal;\r\n\r\n/////////////////////////////////////////// ZSprites ////////////////////////////////////////////////\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  uniform float zOffset;\r\n  uniform mat4 projectionMatrix;\r\n  varying vec4 spritePosEye;\r\n\r\n  float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {\r\n    vec4 pixelPosScreen = projMatrix * pixelPosEye;\r\n    return 0.5 * (pixelPosScreen.z / pixelPosScreen.w + 1.0) + zOffset;\r\n  }\r\n#endif\r\n\r\n#ifdef SPHERE_SPRITE\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n  varying vec4 instOffset;\r\n\r\n  float intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray, ray);\r\n    float b = dot(ray, origin);\r\n    float c = dot(origin, origin) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    if (t1 >= 0.0) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_sphere_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into sphere local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = (v.xyz - instOffset.xyz) / instOffset.w;\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = normalize(v.xyz);\r\n\r\n    return intersect_ray_sphere(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n  varying vec4 matVec1;\r\n  varying vec4 matVec2;\r\n  varying vec4 matVec3;\r\n  varying vec4 invmatVec1;\r\n  varying vec4 invmatVec2;\r\n  varying vec4 invmatVec3;\r\n\r\n  float intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray.xz, ray.xz);\r\n    float b = dot(ray.xz, origin.xz);\r\n    float c = dot(origin.xz, origin.xz) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    float halfHeight = 0.5;\r\n    if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_cylinder_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into cylinder local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n    ray = normalize(ray);\r\n\r\n    return intersect_ray_cylinder(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n/////////////////////////////////////////// Lighting ////////////////////////////////////////////////\r\n#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n  struct ReflectedLight {\r\n    vec3 directDiffuse;\r\n    vec3 directSpecular;\r\n    vec3 indirectDiffuse;\r\n  };\r\n\r\n  struct BlinnPhongMaterial {\r\n    vec3  diffuseColor;\r\n    vec3  specularColor;\r\n    float specularShininess;\r\n  };\r\n\r\n  struct GeometricContext {\r\n    vec3 normal;\r\n    vec3 viewDir;\r\n  };\r\n\r\n  struct DirectionalLight {\r\n    vec3 direction;\r\n    vec3 color;\r\n  };\r\n\r\n  uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\r\n  uniform vec3 ambientLightColor;\r\n\r\n  vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\r\n    return RECIPROCAL_PI * diffuseColor;\r\n  } // validated\r\n\r\n  vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\r\n    // Original approximation by Christophe Schlick '94\r\n    //;float fresnel = pow( 1.0 - dotLH, 5.0 );\r\n    // Optimized variant (presented by Epic at SIGGRAPH '13)\r\n    float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\r\n    return ( 1.0 - specularColor ) * fresnel + specularColor;\r\n  } // validated\r\n\r\n  float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) {\r\n    // geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)\r\n    return 0.25;\r\n  }\r\n\r\n  float D_BlinnPhong( const in float shininess, const in float dotNH ) {\r\n    return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\r\n  }\r\n\r\n  vec3 BRDF_Specular_BlinnPhong( const in DirectionalLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\r\n    vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\r\n    float dotNH = saturate(dot( geometry.normal, halfDir ));\r\n    float dotLH = saturate(dot( incidentLight.direction, halfDir ));\r\n\r\n    vec3 F = F_Schlick( specularColor, dotLH );\r\n    float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );\r\n    float D = D_BlinnPhong( shininess, dotNH );\r\n\r\n    return F * ( G * D );\r\n  } // validated\r\n\r\n  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\r\n\r\n    float dotNL = saturate( dot( geometry.normal, directLight.direction ));\r\n    vec3 irradiance = dotNL * directLight.color * PI;\r\n    reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n    reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );\r\n  }\r\n\r\n  void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\r\n    reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n  }\r\n\r\n  vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material) {\r\n    ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));\r\n    vec3 irradiance = ambientLightColor * PI;\r\n\r\n    // use loop for number\r\n    #if NUM_DIR_LIGHTS > 1\r\n      for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n        RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight);\r\n    #else\r\n        RE_Direct_BlinnPhong(directionalLights[0], geometry, material, reflectedLight);\r\n    #endif\r\n\r\n        RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);\r\n\r\n    #if NUM_DIR_LIGHTS > 1\r\n      }\r\n    #endif\r\n\r\n    return reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;\r\n  }\r\n#endif\r\n\r\n/////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////\r\n#ifdef DASHED_LINE\r\n  uniform float dashedLineSize;\r\n  uniform float dashedLinePeriod;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef CLIP_PLANE\r\n  if (vViewPosition.z < clipPlaneValue) discard;\r\n#endif\r\n\r\n#ifdef ZCLIP\r\n  if (vViewPosition.z < zClipValue) discard;\r\n#endif\r\n\r\n  vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);\r\n  vec4 pixelPosEye;\r\n\r\n#ifdef SPHERE_SPRITE\r\n\r\n  vec3 normal;\r\n\r\n/* quick-and-dirty method\r\n  normal.xy = ' + INSTANCED_SPRITE_OVERSCALE + ' * (2.0 * vUv - 1.0);\r\n  float r2 = dot(normal.xy, normal.xy);\r\n  if (r2 > 1.0) discard;\r\n  float normalZ = sqrt(1.0 - r2);\r\n  normal.z = normalZ;\r\n  normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\r\n  pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n  pixelPosEye.z += spritePosEye.w * normalZ;\r\n*/\r\n\r\n  // ray-trace sphere surface\r\n  {\r\n    vec3 p;\r\n    if (get_sphere_point(-vViewPosition, p) < 0.0) discard;\r\n    pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n    pixelPosEye.z += instOffset.w *\r\n      (modelViewMatrix[0][2] * p.x +\r\n       modelViewMatrix[1][2] * p.y +\r\n       modelViewMatrix[2][2] * p.z);\r\n    normal = normalize(normalMatrix * p);\r\n  }\r\n\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  vec3 normal;\r\n  float cylinderY = 0.0;\r\n\r\n  // ray-trace cylinder surface\r\n  {\r\n    vec3 p;\r\n    if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;\r\n\r\n    cylinderY = 0.5 * (p.y + 1.0);\r\n\r\n    vec4 v = vec4(p, 1.0);\r\n    v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);\r\n    pixelPosWorld = modelMatrix * v;\r\n    pixelPosEye = modelViewMatrix * v;\r\n\r\n    vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));\r\n    normal = vec3(\r\n      dot(localNormal, matVec1.xyz),\r\n      dot(localNormal, matVec2.xyz),\r\n      dot(localNormal, matVec3.xyz));\r\n    normal = normalize(normalMatrix * normal);\r\n  }\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  vec3 vertexColor = vColor;\r\n#else\r\n  vec3 vertexColor = vec3(1.0, 1.0, 1.0);\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  #ifdef CYLINDER_SPRITE\r\n    float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing\r\n  #else\r\n    float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord\r\n  #endif\r\n    // choose either color or color2\r\n  vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));\r\n#endif\r\n\r\n  // negative red component is a special condition\r\n  if (vertexColor.x < 0.0) discard;\r\n\r\n#ifdef DASHED_LINE\r\n  if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;\r\n#endif\r\n\r\n// transparency prepass writes only z, so we don't need to calc the color\r\n#ifdef PREPASS_TRANSP\r\n  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n  #endif\r\n  return;\r\n#endif\r\n\r\n  float totalOpacity = opacity;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  totalOpacity *= alphaCol;\r\n#endif\r\n\r\n  // discard fully transparent pixels\r\n  if (totalOpacity == 0.0) discard;\r\n\r\n#ifdef FAKE_OPACITY\r\n  // discard pixels in checker pattern\r\n  vec2 dm_coord = floor(gl_FragCoord.xy);\r\n  dm_coord = fract(dm_coord * 0.5);\r\n  if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;\r\n  vec4 diffuseColor = vec4(diffuse, 1.0);\r\n#else\r\n  vec4 diffuseColor = vec4(diffuse, totalOpacity);\r\n#endif\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  #ifdef DOUBLE_SIDED\r\n    float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\r\n  #else\r\n    float flipNormal = 1.0;\r\n  #endif\r\n  vec3 normal = normalize( vNormal ) * flipNormal;\r\n#endif\r\n\r\n  diffuseColor.rgb *= vertexColor;\r\n\r\n#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n  GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));\r\n  BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);\r\n  vec3 outgoingLight = calcLighting(geometry, material);\r\n#else\r\n  vec3 outgoingLight = diffuseColor.rgb;\r\n#endif\r\n\r\n#ifdef COLOR_FROM_POS\r\n  gl_FragColor = world2colorMatrix * pixelPosWorld;\r\n#else\r\n  #ifdef OVERRIDE_COLOR\r\n    gl_FragColor = vec4(fixedColor, diffuseColor.a);\r\n  #else\r\n    gl_FragColor = vec4(outgoingLight, diffuseColor.a);\r\n  #endif\r\n\r\n  #ifdef USE_FOG\r\n    float fogFactor = smoothstep( fogNear, fogFar, vViewPosition.z );\r\n    gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );\r\n  #endif\r\n#endif\r\n\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n#endif\r\n}\r\n";
+
+var capabilities = {
+
+  precision: 'mediump',
+
+  /**
+   *
+   * @param {THREE.WebGLRenderer} renderer
+   */
+  init: function init(renderer) {
+    this.precision = renderer.capabilities.getMaxPrecision('highp');
+  }
+};
 
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
@@ -69185,8 +69198,8 @@ function UberMaterial(params) {
   // set default values
   RawShaderMaterial.prototype.setValues.call(this, {
     uniforms: UniformsUtils.clone(defaultUniforms),
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
+    vertexShader: this.precisionString() + vertexShader,
+    fragmentShader: this.precisionString() + fragmentShader,
     lights: true,
     fog: true,
     side: DoubleSide
@@ -69197,6 +69210,12 @@ function UberMaterial(params) {
 
 UberMaterial.prototype = Object.create(RawShaderMaterial.prototype);
 UberMaterial.prototype.constructor = UberMaterial;
+
+UberMaterial.prototype.precisionString = function () {
+  var precision = capabilities.precision;
+  var str = 'precision ' + precision + ' float;\n' + 'precision ' + precision + ' int;\n\n';
+  return str;
+};
 
 // properties that convert to uniforms
 UberMaterial.prototype.uberOptions = {
@@ -77575,6 +77594,14 @@ var exports$1 = /** @alias module:gfx/modes */{
   list: modeList,
 
   /**
+   * The list of mode descriptions.
+   * @type {Array<{id:string, name:string}>}
+   */
+  descriptions: lodash.map(modeList, function (m) {
+    return lodash.pick(m.prototype, ['id', 'name']);
+  }),
+
+  /**
    * The mode constructor one can use if he doesn't care (the default one).
    * @type {function(new:Mode)}
    */
@@ -77969,8 +77996,13 @@ palette$1.chainColors = [
 0xFFB22222];
 
 palette$1.secondaryColors = {
-  'helix': { 1: 0xFF0080, 5: 0xA00080 },
+  'helix': {
+    1: 0xFF0080, // RH alpha
+    3: 0x600080, // RH pi
+    5: 0xA00080 // RH 3-10
+  },
   'strand': 0xFFC800,
+  'turn': 0x6080FF,
   'dna': 0xAE00FE,
   'rna': 0xFD0162
 };
@@ -78520,6 +78552,14 @@ var exports$2 = /** @alias module:gfx/colorers */{
   list: colorerList,
 
   /**
+   * The list of colorer descriptions.
+   * @type {Array<{id:string, name:string}>}
+   */
+  descriptions: lodash.map(colorerList, function (m) {
+    return lodash.pick(m.prototype, ['id', 'name']);
+  }),
+
+  /**
    * The colorer constructor one can use if he doesn't care (the default one).
    * @type {Function}
    */
@@ -78637,6 +78677,10 @@ for (var i$2 = 0, n$1 = materialList.length; i$2 < n$1; ++i$2) {
 
 var materials = {
   list: materialList,
+
+  descriptions: lodash.map(materialList, function (m) {
+    return lodash.pick(m, ['id', 'name']);
+  }),
 
   any: materialDict[settings.now.presets.default.material] || materialList[0],
 
@@ -80181,7 +80225,7 @@ VolumeMesh.prototype._updateVertices = function () {
     var i;
 
     var norm = this.clipPlane.normal;
-    var D = -norm.dot(this.clipPlane.constant);
+    var D = this.clipPlane.constant;
 
     var vert = this.vertices;
     var size = this.size;
@@ -80282,11 +80326,13 @@ VolumeMesh.prototype._updateVertices = function () {
     this.faces[6] = face;
 
     var diff = new Vector3();
+    var coplanarPoint = new Vector3();
+    this.clipPlane.coplanarPoint(coplanarPoint);
     for (i = 0; i < vert.length; ++i) {
       this.cullFlag[i] = false;
       if (i < 8) {
         // corners should be culled by clipping plane
-        diff.subVectors(vert[i], this.clipPlane.constant);
+        diff.subVectors(vert[i], coplanarPoint);
         this.cullFlag[i] = norm.dot(diff) >= 0.0;
       } else if (i < 8 + face.indices.length) {
         // cross section vertices don't get culled
@@ -80454,26 +80500,41 @@ VolumeMesh.prototype.setDataSource = function (dataSource) {
   bbox.getCenter(this.position);
 };
 
-VolumeMesh.prototype.rebuild = function (camera) {
+VolumeMesh.prototype.rebuild = function () {
+
   var nearClipPlaneOffset = 0.2;
+  var pos = new Vector3();
+  var norm = new Vector3();
+  var norm4D = new Vector4();
+  var matrixWorldToLocal = new Matrix4();
+  var clipPlane = new Plane();
 
-  // get clip plane in local space
-  var norm = camera.getWorldDirection();
-  var pos = camera.getWorldPosition();
-  pos.addScaledVector(norm, camera.near + nearClipPlaneOffset);
-  this.worldToLocal(pos);
-  this.worldToLocal(norm);
-  norm.normalize();
+  return function (camera) {
 
-  var clipPlane = new Plane(norm, pos);
+    // get clip plane in local space
+    camera.getWorldDirection(norm);
+    camera.getWorldPosition(pos);
+    pos.addScaledVector(norm, camera.near + nearClipPlaneOffset);
 
-  if (!this.clipPlane.equals(clipPlane)) {
-    this.clipPlane = clipPlane;
+    // transform pos to local CS
+    matrixWorldToLocal.getInverse(this.matrixWorld);
+    pos.applyMatrix4(matrixWorldToLocal);
 
-    this._updateVertices();
-    this._updateIndices();
-  }
-};
+    // transform norm to local CS
+    norm4D.set(norm.x, norm.y, norm.z, 0.0); // NOTE: use homogeneous norm for proper transformation
+    norm4D.applyMatrix4(matrixWorldToLocal);
+    norm.copy(norm4D);
+    norm.normalize();
+
+    clipPlane.setFromNormalAndCoplanarPoint(norm, pos);
+
+    if (!this.clipPlane.equals(clipPlane)) {
+      this.clipPlane = clipPlane.clone();
+      this._updateVertices();
+      this._updateIndices();
+    }
+  };
+}();
 
 function VolumeVisual(name, dataSource) {
   Visual.call(this, name, dataSource);
@@ -86204,7 +86265,7 @@ Cookies.prototype._exists = function (key) {
   return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
 };
 
-/* global "0.7.3":false */
+/* global "0.7.4":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -86531,6 +86592,7 @@ Miew$1.prototype._initGfx = function () {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new WebGLRenderer(webGLOptions);
+  capabilities.init(gfx.renderer);
 
   // z-sprites and ambient occlusion possibility
   if (!gfx.renderer.getContext().getExtension('EXT_frag_depth')) {
@@ -88451,6 +88513,8 @@ Miew$1.prototype._onKeyDown = function (event) {
       }
       break;
     case 'S'.charCodeAt(0):
+      event.preventDefault();
+      event.stopPropagation();
       settings.now.ao = !settings.now.ao;
       this._needRender = true;
       break;
@@ -88690,6 +88754,14 @@ Miew$1.prototype.benchmarkGfx = function (force) {
 Miew$1.prototype.screenshot = function (width, height) {
   var gfx = this._gfx;
 
+  function Fov2Tan(fov) {
+    return Math.tan(_Math.degToRad(0.5 * fov));
+  }
+
+  function Tan2Fov(tan) {
+    return _Math.radToDeg(Math.atan(tan)) * 2.0;
+  }
+
   height = height || width || gfx.height;
   width = width || gfx.width;
 
@@ -88700,17 +88772,19 @@ Miew$1.prototype.screenshot = function (width, height) {
     screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
   } else {
 
-    var originalAspect = gfx.width / gfx.height;
+    var originalAspect = gfx.camera.aspect;
     var originalFov = gfx.camera.fov;
+    var originalTanFov2 = Fov2Tan(gfx.camera.fov);
 
     // screenshot should contain the principal area of interest (a centered square touching screen sides)
     var areaOfInterestSize = Math.min(gfx.width, gfx.height);
-    var areaOfInterestFov = originalFov * areaOfInterestSize / gfx.height;
+    //var areaOfInterestFov = originalFov * areaOfInterestSize / gfx.height;
+    var areaOfInterestTanFov2 = originalTanFov2 * areaOfInterestSize / gfx.height;
 
     // set appropriate camera aspect & FOV
     var shotAspect = width / height;
     gfx.camera.aspect = shotAspect;
-    gfx.camera.fov = areaOfInterestFov / Math.min(shotAspect, 1.0);
+    gfx.camera.fov = Tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
     gfx.camera.updateProjectionMatrix();
 
     // resize canvas to the required size of screenshot
@@ -89740,7 +89814,7 @@ function load(file, loadOptions, master, context) {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew$1.prototype.VERSION = typeof "0.7.3" !== 'undefined' && "0.7.3" || '0.0.0-dev';
+Miew$1.prototype.VERSION = typeof "0.7.4" !== 'undefined' && "0.7.4" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew$1, /** @lends Miew */{
@@ -89878,7 +89952,7 @@ case 4:
 this.$ = yy.miew.rebuild();
 break;
 case 5:
-this.$ = yy.miew.rebuildAll();
+this.$ = yy.miew.rebuildAll(); yy.miew.rebuild();
 break;
 case 6:
 this.$ = yy.echo(yy.utils.help().toString());
@@ -91250,28 +91324,26 @@ CLIUtils.prototype.list = function (miew, repMap, key) {
 
 CLIUtils.prototype.listRep = function (miew, repMap, repIndex, key) {
   var ret = '';
-  var opts = miew.rep(repIndex);
+  var rep = miew.repGet(repIndex);
+  if (!rep) {
+    logger.warn('Rep ' + repIndex + ' does not exist!');
+    return ret;
+  }
   var index = repIndex;
   var repName = repMap.get(index);
 
-  var modeId = opts.mode instanceof Array ? opts.mode[0] : opts.mode;
+  var mode = rep.mode;
+  var selectionStr = rep.selectorString;
+  var colorer = rep.colorer;
+  var material = rep.materialPreset;
 
-  ret += '#' + index + ' : ' + modes$1.get(modeId).name + (repName === '<no name>' ? '' : repName) + '\n';
+  ret += '#' + index + ' : ' + mode.name + (repName === '<no name>' ? '' : repName) + '\n';
 
   if (key !== undefined) {
-    var selectionStr = opts.selector;
-    if (selectionStr instanceof Array) {
-      var converter = new JSONtoSelectorConverter();
-      selectionStr = converter.createSelectorFromNode(selectionStr);
-    }
-
-    var colorerId = opts.colorer instanceof Array ? opts.colorer[0] : opts.colorer;
-    var materialId = opts.material;
-
     ret += '    selection : "' + selectionStr + '"\n';
-    ret += '    mode      : (' + modeId + '), ' + modes$1.get(modeId).name + '\n';
-    ret += '    colorer   : (' + colorerId + '), ' + colorers$1.get(colorerId).name + '\n';
-    ret += '    material  : (' + materialId + '), ' + materials$1.get(materialId).name + '\n';
+    ret += '    mode      : (' + mode.id + '), ' + mode.name + '\n';
+    ret += '    colorer   : (' + colorer.id + '), ' + colorer.name + '\n';
+    ret += '    material  : (' + material.id + '), ' + material.name + '\n';
   }
 
   return ret;
