@@ -8,8 +8,8 @@ most popular module loading schemes:
   - CommonJS module for [Node.js], [Browserify], and [Webpack],
   - ES2015 module for [Rollup].
 
-Please note that Miew doesn't work under [Node.js] directly since the major viewer requirement
-is WebGL rendering. However, it still can be installed via [NPM] and `require`-ed in your
+Please note that Miew does not work under [Node.js] directly since the major viewer requirement
+is WebGL rendering. However, you still can install it via [NPM] and `require` it in your
 browserify or webpack-based projects.
 
 [UMD module]: https://github.com/umdjs/umd

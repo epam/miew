@@ -1,7 +1,7 @@
 # Thumbnails
 
 The demo application uses a set of thumbnails to denote available modes, colorings and materials.
-Should you decide to update the thumbnails here're the instructions.
+If you decide to update the thumbnails, here are the instructions.
 
 ## Display Modes
 

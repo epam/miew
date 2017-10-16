@@ -1,7 +1,7 @@
 # Selection Language
 
 Miew allows to view different molecule parts (subsets of atoms) using specific visualizations.
-To select these subsets one should use a _Selection Language_; its syntax is described below.
+To select these subsets one should use a _Selection Language_; find the description of its syntax below.
 
 ## Quick Examples
 
@@ -29,10 +29,10 @@ _Selector_ consists of a keyword followed by an optional comma separated paramet
 Some keywords accept integer parameters (e.g. atom or residue indices), others accept strings
 (e.g. atom or residue names). Keywords are **case insensitive**.
 
-Integer parameter can be a single value or range of values, where range borders are delimited
-by a colon. Example: `3:7` defines an integer range: 3, 4, 5, 6, and 7).
+Integer parameter can be a single value or range of values, where colon delimits range borders.
+Example: `3:7` defines an integer range: 3, 4, 5, 6, and 7).
 
-String parameters should be flanked by quotation marks unless the string consists of letters,
+There should be quotation marks for string parameters unless the string consists of letters,
 digits and underscores only.
 
     Selector ::=

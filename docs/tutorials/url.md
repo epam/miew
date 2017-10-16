@@ -50,7 +50,7 @@ You may also apply the same options from any source, e.g. data attribute of the 
 <div class="miew-container" data-miew="m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&theme=light&axes=0&fps=0"></div>
 ```
 
-It doesn't happen automatically, you need to retrieve and transform the string to an options object. Then combine
+It does not happen automatically, you need to retrieve and transform the string to an options object. Then combine
 options together and pass them to the `Miew` constructor.
 
 ```js
@@ -69,11 +69,11 @@ var viewer = new Miew(_.merge({
 The easiest way to obtain a URL is to call `miew.getURL()`, however, you may decide to build the URL manually,
 step by step. While constructing the string be aware that such special characters as whitespaces,
 `+`, `=`, `&`, `:`, `!` must be URL-encoded unless they are a part of formal syntax described below.
-It is allowed to replace a space with a plus sign (`+`) instead of a `%20` code for better readability. 
+You may replace a space with a plus sign (`+`) instead of a `%20` code for better readability. 
 
 ### Change Settings
 
-The query string consists of ampersand-separated `key=value` pairs. By default, they are treated as a global setting
+The query string consists of ampersand-separated `key=value` pairs. By default, the application treats them as a global setting
 assignment. Use [`theme=light`] to select light background, or [`fog=0`] to switch the fog off. You may even adjust
 nested settings such as [`modes.CA.radius=0.05`] to change default tube radius in Cartoon Mode.
 See `Settings` object for details.
@@ -85,7 +85,7 @@ See `Settings` object for details.
 ### Execute Commands
 
 Besides changing global setting you may also specify some commands including those that form visual representation
-of molecules. The commands are interpreted in a left-to-right order. Some commands have shorter aliases for convenience.
+of molecules. The commands operate in a left-to-right order. Some commands have shorter aliases for convenience.
 
 Data source:
 
@@ -95,12 +95,12 @@ Data source:
 
   - **t**, **type** = _typeId_  
     Specify explicit type of the loaded file: [`t=mmtf&l=http://mmtf.rcsb.org/v1.0/full/4xn6`].  
-    By default, the data type is determined automatically by the file name (extension) or the
+    By default, the application determines the data type automatically by the file name (extension) or the
     file source used.
 
   - **u**, **unit** = _unitIndex_  
     Specify a biological unit to view: [`l=3s95&u=2`].  
-    By default, the first unit is shown if exists. You may also specify `u=0` to show the asymmetric
+    By default, the application shows the first unit if it exists. You may also specify `u=0` to show the asymmetric
     unit stored in the file.
 
 Visual representation:
@@ -109,7 +109,7 @@ Visual representation:
     Choose one of the predefined visual configurations: [`p=wire`].  
     Unless you adjust representation details, the preset is chosen automatically (`autoPreset=1`)
     based on a data source and type. In case you change selector, mode, coloring, or material,
-    the `default` preset is used as a base.
+    the application will use the `default` preset as a base.
 
   - **s**, **select** = _selectorString_  
     Select a subset of atoms: [`s=residue+ALA,CYS`].  
@@ -165,7 +165,7 @@ theme=light](http://miew.opensource.epam.com/?l=mmtf:1rx1&s=not+hetatm&m=CA&c=SS
 ### Compressed Representations
 
 Instead of specifying representation indices explicitly ([`r=0&m=BS&r=1&m=TU`]) you may omit them
-([`m=BS&m=TU`]). In such a case the first index is `rep=0` and it is incremented each time a duplicate key
+([`m=BS&m=TU`]). In such a case the first index is `rep=0` and it increments each time a duplicate key
 is encountered. For example:
 
   - Mode: [`m=BS&m=QS&mt=TR`],  

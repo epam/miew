@@ -21,8 +21,8 @@ structures.
 It provides a full-featured set of tools for 3D visualization and editing of small molecules as
 well as large molecular complexes, including means to view, analyze, and modify the 3D structure
 of a molecule. It works as a standalone HTML5 web application or integrates as a component into
-your web pages. The [latest versions](https://browsehappy.com/) of WebGL-enabled desktop (Chrome,
-Firefox, Safari, Opera, Edge, IE11) and mobile (iOS, Android) browsers are supported.
+your web pages. We plan to support the [latest versions](https://browsehappy.com/) of WebGL-enabled desktop (Chrome,
+Firefox, Safari, Opera, Edge, IE11) and mobile (iOS, Android) browsers.
 
 ## Installation and Usage
 
@@ -50,7 +50,7 @@ You may also download the [minified library](dist/Miew.min.js) and access it fro
 `<SCRIPT>` tag, or asynchronously include it via [Require.js]. Refer to the [tutorials],
 [examples] and API docs for more details.
 
-There's also a [demo application] available in the git repository.
+There is also a [demo application] available in the git repository.
 
 [tutorials]: docs/tutorials/embed.md
 [examples]: examples/

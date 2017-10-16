@@ -1,32 +1,32 @@
 # Contributing to Miew
 
-Thank you for considering contributing to Miew! There are many ways you can do this, you don't even
+Thank you for considering contributing to Miew! There are many ways you can do this, you do not even
 have to do coding at all. We would be happy to know about your use cases, your experience with the
 viewer, your expectations.
 
 According to the CI principles all the development occurs inside
-the `master` branch, and the `latest` branch is used _for tagging_ released versions only.
+the `master` branch, use the `latest` branch _for tagging_ released versions only.
 
 We adhere to the [Semantic Versioning](http://semver.org/) scheme. The major version number changes
-when the external API is changed. While there's no external API specified yet it stays at zero for now.
+when the external API changes. While there is no external API specified yet it stays at zero for now.
 
 ## Reporting Issues
 
-> Please **don't report sensitive / security issues** via public channels, try to contact
+> Please **do not report sensitive / security issues** via public channels, try to contact
 > maintainers privately first (e.g. at [miew@epam.com](miew@epam.com)).
 
 We use [GitHub Issues](https://guides.github.com/features/issues/) to keep track of tasks,
-enhancements, and bugs. For your convenience there's [an issue template](.github/ISSUE_TEMPLATE.md)
+enhancements, and bugs. For your convenience there is [an issue template](.github/ISSUE_TEMPLATE.md)
 available.
 
 ## Making Changes
 
 > Please make sure maintainers are expecting your changes and will consider merging them into
 > master. If the changes do not fit the project roadmap, it might unfortunately happen that
-> you've wasted your time.
+> you have wasted your time.
 
-First, prepare your development environment. Ensure that [git] and [Node.js] are installed.
-You're also encouraged to use [Yarn] package manager to guarantee that package versions are
+First, prepare your development environment. Ensure that you installed [git] and [Node.js].
+You are also encouraged to use [Yarn] package manager to guarantee that package versions are
 consistent across all build machines. [Gulp.js] v3 is used as a task manager.
 
 ```sh
@@ -41,8 +41,8 @@ yarn global add gulp-cli
 
 ### Core developers: clone the origin
 
-We won't use pull requests in our everyday life. Clone the main repository and start working
-on `master` branch. Commit and push to the origin but make sure you don't ruin anything. Check
+We will not use pull requests in our everyday life. Clone the main repository and start working
+on `master` branch. Commit and push to the origin but make sure you do not ruin anything. Check
 the steps below and adopt them to your case.
 
 ### External developers: fork and branch
@@ -66,7 +66,7 @@ gulp
 gulp serve:demo
 ```
 
-For developing new features and bug fixes, the `master` branch should be pulled and built upon.
+For developing new features and bug fixes, you should pull the `master` branch.
 
 ```sh
 # create a branch
@@ -81,7 +81,7 @@ gulp serve
 The commit message should describe what changed and why. The first line should:
 
 - start from an uppercase verb in imperative mood,
-- don't end with a period,
+- do not end with a period,
 - be 50 characters or less.
 
 The second line should be empty.
