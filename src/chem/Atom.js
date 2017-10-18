@@ -128,6 +128,7 @@ Atom.prototype.forEachBond = function(process) {
   }
 };
 
+/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 Atom.prototype.isLabelVisible = function() {
   if (this.getName().getNode() !== null) {
     return true;

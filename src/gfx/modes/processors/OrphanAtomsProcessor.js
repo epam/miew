@@ -15,6 +15,7 @@ OrphanAtomsProcessor.prototype._checkAtom = function(atom, mask) {
     return false;
   }
 
+  /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
   if (this._mode.settings.now.labels !== 'no' && atom.isLabelVisible()) {
     return false;
   }

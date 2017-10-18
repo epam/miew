@@ -3,6 +3,7 @@
 /* eslint-disable no-magic-numbers */
 import Mode from './Mode';
 
+/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 function LabeledMode(opts) {
   Mode.call(this, opts);
   this.depGroups = this.depGroups.slice(0); // clone depGroups to prevent prototype edits

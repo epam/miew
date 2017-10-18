@@ -94,6 +94,7 @@ GroupsFactory.TextLabelsGeo = function(caps, settings) {
   return _bakeGroup(gfxTriplet, processors.Atoms, groups.AtomsTextGroup);
 };
 
+/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 GroupsFactory.SGroupsLabels = function(_caps, _settings) {
   return _bakeGroup(null, processors.SGroups, null);
 };

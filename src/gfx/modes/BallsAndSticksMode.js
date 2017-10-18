@@ -43,6 +43,7 @@ BallsAndSticksMode.prototype.drawMultiorderBonds = function() {
   return this.opts.multibond;
 };
 
+/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 BallsAndSticksMode.prototype.getLabelOpts = function() {
   return {
     fg: 'none',

@@ -42,6 +42,7 @@ LicoriceMode.prototype.drawMultiorderBonds = function() {
   return this.opts.multibond;
 };
 
+/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 LicoriceMode.prototype.getLabelOpts = function() {
   return {
     fg: 'none',

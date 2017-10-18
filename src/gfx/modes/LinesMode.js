@@ -48,6 +48,7 @@ LinesMode.prototype.showAromaticLoops = function() {
   return this.opts.showarom;
 };
 
+/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 LinesMode.prototype.getLabelOpts = function() {
   return {
     fg: 'none',

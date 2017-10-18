@@ -2063,20 +2063,6 @@ Menu.prototype._initRenderPanel = function() {
       ucSelector.find('img').css('background-color', ucColor);*/
   });
 
-  $(self._menuId + ' [data-toggle=labeling]').on('click', /** @this HTMLSelectElement */ function() {
-    var elements = $(self._menuId + ' [data-value=miew-menu-panel-labeling]');
-    var itemID = this.getAttribute('data-value');
-
-    var prevActive = settings.now.labels;
-    $(self._menuId + ' [data-value="' + prevActive + '"]').removeClass('active');
-
-    elements[0].firstElementChild.firstElementChild.textContent = this.textContent;
-    settings.set('labels', itemID);
-    $(self._menuId + ' [data-value="' + itemID + '"]').addClass('active');
-
-    $(self._menuId + ' button[data-value=miew-menu-panel-render]').click();
-  });
-
 };
 
 Menu.prototype._initToolsPanel = function() {
@@ -2503,12 +2489,6 @@ Menu.prototype.show = function(panelID, menuItem) {
     }
   });
 
-  //update labeling
-  const elements = $(self._menuId + ' [data-value=miew-menu-panel-labeling]');
-  var labelSelector = $(self._menuId + ' [data-toggle=labeling][data-value="' + settings.now.labels + '"]');
-  elements[0].firstElementChild.firstElementChild.textContent = labelSelector.text();
-  labelSelector.addClass('active');
-
   // renew currently opened mode-, colorer-, matpreset- combobox panel (need, when they were changed from toolbar)
   if (self._curPanelID.indexOf('mode') !== -1 ||
     self._curPanelID.indexOf('color') !== -1 ||
@@ -2540,10 +2520,6 @@ Menu.prototype.hide = function() {
   // Clear resolution setting display because it might be changed
   var resSelector = $(this._menuId + ' [data-toggle=resolution][data-value="' + settings.now.resolution + '"]');
   resSelector.removeClass('active');
-
-  // Clear labeling setting display because it might be changed
-  var labelSelector = $(this._menuId + ' [data-toggle=labeling][data-value="' + settings.now.labels + '"]');
-  labelSelector.removeClass('active');
 
   // Clear active items in currently opened mode- o colorer- combobox panel, because they might be changed
   if (this._curPanelID.indexOf('mode') !== -1) {
@@ -2607,8 +2583,8 @@ Menu.prototype._onMenuOff = function() {
   // Apply changed settings
   var changedKeys = settings.changed();
   var rebuild = this._reprListChanged ||  // TODO: list has changed, not rep!?
-      contain(changedKeys, ['resolution', 'palette', 'scale', 'isoValue', 'labels']);
-  var rebuildAll = contain(changedKeys, ['resolution', 'palette', 'labels']);
+      contain(changedKeys, ['resolution', 'palette', 'scale', 'isoValue']);
+  var rebuildAll = contain(changedKeys, ['resolution', 'palette']);
   var rerender = contain(changedKeys, ['theme', 'axes', 'fxaa', 'fog', 'ao']);
 
   if (rebuild) {

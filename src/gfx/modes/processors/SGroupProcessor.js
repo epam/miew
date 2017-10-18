@@ -9,6 +9,7 @@ import CSS2DObject from '../../CSS2DObject';
  * This file is a greeting from the past. Refactor it and/or destroy.
  */
 
+/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 function _buildLabel2D(pos, color, fieldTxt) {
   var text = document.createElement('div');
   text.className = 'label label-sgroup';
@@ -39,6 +40,7 @@ function _buildLabel2D(pos, color, fieldTxt) {
   return label;
 }
 
+/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 function SGroupProcessor(AtomsGroup, geoParams, complex, _colorer, _mode, _polyComplexity, _mask, _material) {
   var self = this;
   RCGroup.call(self);
