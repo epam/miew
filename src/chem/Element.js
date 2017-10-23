@@ -168,7 +168,7 @@ Element.ByName = {
 Element.getByName = function(element) {
   var type = Element.ByName[element];
   if (!type) {
-    type = Element.ByName[element] = new Element(0, element, 'Unknown', 0, 0.01, 0.01, [0]);
+    type = Element.ByName[element] = new Element(0, element, 'Unknown', 0, 1.0, 0.01, [0]);
   }
   return type;
 };
