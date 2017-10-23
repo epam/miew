@@ -49,7 +49,7 @@ export default {
       'test/e2e/mismatch/*.png',
       'test/e2e/mismatch/*.html',
     ],
-    show: 'test/e2e/mismatch/index.html',
+    show: 'test/e2e/mismatch/*.html',
   },
   roServer: Boolean(process.env.MIEW_READONLY_SERVER || yargs.argv.roServer),
 };

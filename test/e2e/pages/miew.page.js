@@ -1,6 +1,6 @@
 import {By, Key, until} from 'selenium-webdriver';
 
-const timeout = 5000;
+const timeout = 10000;
 
 const dom = {
   canvas: By.css('.miew-canvas canvas'),
@@ -39,7 +39,7 @@ export default class MiewPage {
     return terminal.isDisplayed().then((visible) => {
       if (!visible) {
         this.driver.findElement(dom.terminal.button).click();
-        return this.driver.wait(until.elementIsVisible(terminal));
+        return this.driver.wait(until.elementIsVisible(terminal), timeout);
       } else {
         return Promise.resolve();
       }
@@ -103,7 +103,7 @@ return miew && Miew && JSON.stringify(${expression});`)
     return this.driver.wait(() => this.driver.executeScript(`\
 var miew = window.miew;
 var rep = miew && miew.repGet(0);
-return rep && !miew._loader && !miew._building && !miew._needRebuild() && !miew._needRender;`));
+return rep && !miew._loader && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
   }
 
   /**
@@ -119,7 +119,7 @@ var miew = window && window.miew;
 var rep = miew && !miew._loader && miew.repGet(${index});
 var modeOk = rep && (rep.mode.id === '${mode.toUpperCase()}');
 var colorerOk = rep && (rep.colorer.id === '${colorer.toUpperCase()}');
-return modeOk && colorerOk && !miew._building && !miew._needRebuild() && !miew._needRender;`));
+return modeOk && colorerOk && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
   }
 
 }

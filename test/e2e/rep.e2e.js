@@ -1,6 +1,3 @@
-import path from 'path';
-import fs from 'fs';
-import express from 'express';
 import webdriver from 'selenium-webdriver';
 import chai, {expect} from 'chai';
 import dirtyChai from 'dirty-chai';
@@ -11,66 +8,28 @@ import golden from './golden';
 
 chai.use(dirtyChai);
 
-const cfg = {
-  url: null, // 'http://miew.opensource.epam.com/master/',
-  localPath: path.resolve(__dirname, '../../build'),
-  localPort: 8008,
-  window: {width: 1024, height: 768},
-  threshold: 1,
-};
+import goldenCfg from './golden.cfg';
 
-const driver = new webdriver.Builder()
-  .forBrowser('chrome')
-  .build();
+const cfg = Object.assign({}, goldenCfg, {
+  title: 'Representations Tests',
+  report: 'report-rep.html',
+});
 
-let localhost;
+let driver;
 let page;
 
-function prepareBrowser(width, height) {
-  const getPadding = 'return[window.outerWidth-window.innerWidth,window.outerHeight-window.innerHeight];';
-  return driver.executeScript(getPadding)
-    .then((pad) => driver.manage().window().setSize(width + pad[0], height + pad[1]))
-    .then(() => driver.getCapabilities())
-    .then((caps) => {
-      const browserName = caps.get('browserName').replace(/\b\w/g, c => c.toUpperCase());
-      const version = caps.get('version') || caps.get('browserVersion') || '(unknown version)';
-      const platform = caps.get('platform') || caps.get('platformName') || 'unspecified platform';
-      return `${browserName} ${version} for ${platform}`;
-    });
-}
-
-function prepareServer(url) {
-  if (url) {
-    return Promise.resolve(url);
-  }
-  if (!fs.existsSync(path.join(cfg.localPath, 'index.html'))) {
-    throw new URIError(`App is not found in ${cfg.localPath}, did you forget to build it?`);
-  }
-  const app = express();
-  app.use('/', express.static(cfg.localPath));
-  return new Promise((resolve) => {
-    localhost = app.listen(cfg.localPort, () => {
-      resolve(`http://localhost:${cfg.localPort}`);
-    });
-  });
-}
-
-describe('Miew demo application', function() {
+describe('As a power user, I want to', function() {
 
   this.timeout(0);
+  this.slow(1000);
 
   before(function() {
-    golden.use(driver);
-    golden.report.begin(this.test.parent.title);
-    golden.report.data.threshold = cfg.threshold;
+    driver = new webdriver.Builder()
+      .forBrowser('chrome')
+      .build();
 
-    return prepareBrowser(cfg.window.width, cfg.window.height)
-      .then((browser) => {
-        golden.report.data.browser = browser;
-        return prepareServer(cfg.url);
-      })
+    return golden.startup(driver, cfg)
       .then((url) => {
-        golden.report.data.url = url;
         page = new MiewPage(driver, url);
         return page.waitForMiew();
       })
@@ -80,19 +39,14 @@ describe('Miew demo application', function() {
   });
 
   after(function() {
-    return driver.quit().then(() => {
-      if (localhost) {
-        localhost.close();
-      }
-      golden.report.end();
-    });
+    return golden.shutdown();
   });
 
   beforeEach(function() {
     golden.report.context.desc = this.currentTest.title;
   });
 
-  it('shows 1CRN by default', function() {
+  it('see 1CRN by default', function() {
     return page.waitUntilTitleContains('1CRN')
       .then(() => page.waitUntilRebuildIsDone())
       .then(() => golden.shouldMatch('1crn', this));
@@ -104,7 +58,7 @@ describe('Miew demo application', function() {
     ['colorers', 'EL'],
     ['materials', 'SF'],
   ].forEach(([listName, sampleId]) => {
-    it(`provides a list of ${listName} including "${sampleId}"`, function() {
+    it(`retrieve a list of ${listName} including "${sampleId}"`, function() {
       retrieve[listName] = page.getValueFor(`miew.constructor.${listName}.descriptions`);
       return retrieve[listName].then((list) => {
         expect(list).to.be.an('Array');
@@ -117,7 +71,7 @@ describe('Miew demo application', function() {
     });
   });
 
-  it('loads 1AID with the default preset', function() {
+  it('load 1AID with an appropriate orientation and scale', function() {
     return page.openTerminal()
       .then(() => page.runScript(`\
 set interpolateViews false
@@ -128,9 +82,9 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
       .then(() => golden.shouldMatch('1aid', this));
   });
 
-  describe('displays all combinations of modes and colorers, i.e.', function() {
+  describe('assign all combinations of modes and colorers via terminal, i.e.', function() {
 
-    it('applies "small" preset', function() {
+    it('apply "small" preset', function() {
       return page.runScript('preset small')
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
@@ -142,7 +96,7 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
         _.each(modes, (mode) => {
           _.each(colorers, (colorer) => {
             const command = `clear\nrep 0 m=${mode.id} c=${colorer.id}`;
-            suite.addTest(it(`displays ${mode.name} with ${colorer.name} coloring`, function() {
+            suite.addTest(it(`set ${mode.name} mode with ${colorer.name} coloring`, function() {
               return page.runScript(command)
                 .then(() => page.waitUntilRepresentationIs(0, mode.id, colorer.id))
                 .then(() => golden.shouldMatch(`1aid_${mode.id}_${colorer.id}`, this));
@@ -154,15 +108,15 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
 
   });
 
-  describe('displays all materials, i.e.', function() {
+  describe('assign all materials via terminal, i.e.', function() {
 
-    it('applies "small" preset', function() {
+    it('apply "small" preset', function() {
       return page.runScript('preset small')
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
     });
 
-    it('adds a surface', function() {
+    it('add a surface', function() {
       return page.runScript('add m=QS')
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_QS_EL', this));
@@ -173,7 +127,7 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
       return retrieve.materials.then((materials) => {
         _.each(materials, (material) => {
           const command = `clear\nrep 1 m=QS mt=${material.id}`;
-          suite.addTest(it(`displays ${material.name} material`, function() {
+          suite.addTest(it(`set ${material.name} material`, function() {
             return page.runScript(command)
               .then(() => page.waitUntilRepresentationIs(1, 'QS', 'EL'))
               .then(() => golden.shouldMatch(`1aid_QS_EL_${material.id}`, this));

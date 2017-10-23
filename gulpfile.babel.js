@@ -11,6 +11,7 @@ import jsdoc    from 'gulp-jsdoc3';
 import open     from 'open';
 import webpack  from 'webpack';
 import {rollup} from 'rollup';
+import glob     from 'glob';
 import sassModuleImporter from 'sass-module-importer'; // eslint-disable-line import/no-unresolved, import/extensions
 import rollupPluginReplace from 'rollup-plugin-replace';
 
@@ -403,5 +404,17 @@ gulp.task('show:cover', () =>
 gulp.task('show:docs', () =>
   open(config.docs.show));
 
-gulp.task('show:e2e', () =>
-  open(config.e2e.show));
+gulp.task('show:e2e', (done) => {
+  glob(config.e2e.show, (e, files) => {
+    Promise.all(_.map(files, (filename) => new Promise((resolve, reject) => {
+      util.log('open', filename);
+      open(filename, (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    }))).then(() => done());
+  });
+});

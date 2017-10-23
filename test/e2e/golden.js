@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import express from 'express';
 import resemble from 'node-resemble-js';
 import Handlebars from 'handlebars';
 import {expect} from 'chai';
@@ -9,12 +10,9 @@ resemble.outputSettings({
 });
 
 let driver = null;
+let localhost = null;
 
-function use(drv) {
-  driver = drv;
-}
-
-function zeroes(num, len) {
+function _zeroes(num, len) {
   return ('000000' + num).slice(-len);
 }
 
@@ -33,8 +31,8 @@ const report = {
   },
 
   getExpectedPath: (id) => path.join(report.path.golden, `${id}.png`),
-  getActualPath: (id) => path.join(report.path.mismatch, `${zeroes(report.context.index, 3)}_${id}.png`),
-  getDifferencePath: (id) => path.join(report.path.mismatch, `${zeroes(report.context.index, 3)}_${id}.diff.png`),
+  getActualPath: (id) => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.png`),
+  getDifferencePath: (id) => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.diff.png`),
 
   getHtmlPath(filename) {
     if (!fs.existsSync(filename)) {
@@ -45,8 +43,6 @@ const report = {
   },
 
   begin(title) {
-    const source = fs.readFileSync(report.path.template, 'utf-8');
-    this.template = Handlebars.compile(source);
     this.data = {
       title,
       version: 'N/A',
@@ -78,12 +74,72 @@ const report = {
   },
 
   end() {
-    const result = this.template(this.data);
+    const source = fs.readFileSync(report.path.template, 'utf-8');
+    const template = Handlebars.compile(source);
+    const result = template(this.data);
     fs.writeFileSync(report.path.html, result);
   },
 };
 
-function matchAsPromised(first, second) {
+function _prepareBrowser(width = 1024, height = 768) {
+  const getPadding = 'return[window.outerWidth-window.innerWidth,window.outerHeight-window.innerHeight];';
+  return driver.executeScript(getPadding)
+    .then((pad) => driver.manage().window().setSize(width + pad[0], height + pad[1]))
+    .then(() => driver.getCapabilities())
+    .then((caps) => {
+      const browserName = caps.get('browserName').replace(/\b\w/g, c => c.toUpperCase());
+      const version = caps.get('version') || caps.get('browserVersion') || '(unknown version)';
+      const platform = caps.get('platform') || caps.get('platformName') || 'unspecified platform';
+      return `${browserName} ${version} for ${platform}`;
+    });
+}
+
+function _prepareServer(cfg) {
+  if (cfg.url) {
+    return Promise.resolve(cfg.url);
+  }
+  if (!fs.existsSync(path.join(cfg.localPath, 'index.html'))) {
+    throw new URIError(`App is not found in ${cfg.localPath}, did you forget to build it?`);
+  }
+  const app = express();
+  app.use('/', express.static(cfg.localPath));
+  return new Promise((resolve) => {
+    localhost = app.listen(cfg.localPort, () => {
+      resolve(`http://localhost:${cfg.localPort}`);
+    });
+  });
+}
+
+function startup(webDriver, cfg) {
+  driver = webDriver;
+  report.begin(cfg.title);
+  report.path.html = path.join(report.path.mismatch, cfg.report);
+  report.data.threshold = cfg.threshold;
+
+  return _prepareBrowser()
+    .then((browser) => {
+      report.data.browser = browser;
+      return _prepareServer(cfg);
+    })
+    .then((url) => {
+      report.data.url = url;
+      return url;
+    });
+}
+
+function shutdown() {
+  return driver.quit()
+    .then(() => {
+      driver = null;
+      if (localhost) {
+        localhost.close();
+        localhost = null;
+      }
+      report.end();
+    });
+}
+
+function _matchAsPromised(first, second) {
   return new Promise((resolve, reject) => {
     try {
       if (!fs.existsSync(second)) {
@@ -106,9 +162,9 @@ function shouldMatch(id, test) {
 
   return driver.executeScript(() => window.miew && window.miew.screenshot(128))
     .then((dataUrl) => {
-      expect(dataUrl.slice(0, prefixLength)).to.equal(prefix);
+      expect(dataUrl && dataUrl.slice(0, prefixLength)).to.equal(prefix);
       const shot = Buffer.from(dataUrl.slice(prefixLength), 'base64');
-      return matchAsPromised(shot, report.getExpectedPath(id))
+      return _matchAsPromised(shot, report.getExpectedPath(id))
         .then((diff) => {
           report.add(id, shot, diff);
           expect(diff.isSameDimensions).to.be.true();
@@ -128,6 +184,7 @@ function shouldMatch(id, test) {
 
 export default {
   report,
-  use,
+  startup,
+  shutdown,
   shouldMatch,
 };
