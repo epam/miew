@@ -31,6 +31,8 @@ palette.colors = [
 palette.elementColors = {
   /* eslint-disable no-magic-numbers */
   H : 0xFFFFFF,
+  D : 0xFFFFC0,
+  T : 0xFFFFA0,
   HE: 0xD9FFFF,
   LI: 0xCC80FF,
   BE: 0xC2FF00,

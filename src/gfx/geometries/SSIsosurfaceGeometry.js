@@ -451,7 +451,7 @@ SSIsosurfaceGeometry.prototype.getNumIntersectedCells = function(side, numCells,
 
 SSIsosurfaceGeometry.prototype.getType = function(letter) {
   /* eslint-disable no-magic-numbers */
-  var atomT = [1, 1, 2, 6, 3, 6, 4, 6, 5, 6, 6, 0, 7, 3, 8, 2, 9, 6, 10, 6, 11, 6, 12, 6, 13, 6, 14, 6, 15, 4, 16,
+  var atomT = [0, 0, 1, 1, 2, 6, 3, 6, 4, 6, 5, 6, 6, 0, 7, 3, 8, 2, 9, 6, 10, 6, 11, 6, 12, 6, 13, 6, 14, 6, 15, 4, 16,
     5, 17, 6, 18, 6, 19, 6, 20, 6, 21, 6, 22, 6, 23, 6, 24, 6, 25, 6, 26, 6, 27, 6, 28, 6, 29, 6, 30, 6, 31, 6, 32,
     6, 33, 6, 34, 6, 35, 6, 36, 6, 37, 6, 38, 6, 39, 6, 40, 6, 41, 6, 42, 6, 43, 6, 44, 6, 45, 6, 46, 6, 47, 6, 48,
     6, 49, 6, 50, 6, 51, 6, 52, 6, 53, 6, 54, 6, 55, 6, 56, 6, 57, 6, 58, 6, 59, 6, 60, 6, 61, 6, 62, 6, 63, 6, 64,
@@ -461,10 +461,10 @@ SSIsosurfaceGeometry.prototype.getType = function(letter) {
     /* eslint-enable no-magic-numbers */
 
   if (letter < 1 || letter > atomT.length / 2 ||
-      (Object.keys(Element.ByName).length * 2) !== atomT.length) {
-    throw new Error('atomT.length  should be equal Element.ByName.length * 2');
+      (Object.keys(Element.ByAtomicNumber).length * 2) !== atomT.length) {
+    throw new Error('atomT.length  should be equal Element.ByAtomicNumber.length * 2');
   }
-  return atomT[letter * 2 - 1];
+  return atomT[letter * 2];
 };
 
 

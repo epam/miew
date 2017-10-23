@@ -69,6 +69,7 @@ ResidueType.StandardTypes = {
   'WAT': new ResidueType('WAT', 'Water', ''),
   'H2O': new ResidueType('H2O', 'Water', ''),
   'HOH': new ResidueType('HOH', 'Water', ''),
+  'DOD': new ResidueType('DOD', 'Water', ''),
   'UNK': new ResidueType('UNK', 'Unknown', ''),
   'UNL': new ResidueType('UNL', 'Unknown Ligand', '')
   /* eslint-enable no-magic-numbers */
@@ -123,7 +124,7 @@ function _addFlag(flag, list) {
 }
 
 var Flags = ResidueType.Flags;
-_addFlag(Flags.WATER,      ['WAT', 'H2O', 'HOH']);
+_addFlag(Flags.WATER,      ['WAT', 'H2O', 'HOH', 'DOD']);
 
 _addFlag(Flags.PROTEIN, [
   'ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLY', 'GLU', 'GLN', 'HIS', 'ILE',

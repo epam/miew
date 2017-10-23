@@ -1,6 +1,8 @@
 name,fullName,number,weight,colorCPK,colorVmd,colorJmol,radiusBonds,radiusCovalent,radiusVDW,HValency
 H,Hydrogen,1,1.008,0xFFFFFF,0xFFFFFF,0xFFFFFF,0.23,0.32,1.2,[1]
-He,Helium,2,4.003,,,0xD9FFFF,0.93,0.46,1.4,[0] 
+D,Deuterium,1,2.014,,,0xFFFFC0,0.23,0.32,1.2,[1]
+T,Tritium,1,3.016,,,0xFFFFA0,0.23,0.32,1.2,[1]
+He,Helium,2,4.003,,,0xD9FFFF,0.93,0.46,1.4,[0]
 Li,Lithium,3,6.941,,,0xCC80FF,0.68,1.33,1.82,[1]
 Be,Beryllium,4,9.012,,,0xC2FF00,0.35,1.02,1.7,[2]
 B,Boron,5,10.81,,,0xFFB5B5,0.83,0.85,2.08,[3]

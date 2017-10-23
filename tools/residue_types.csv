@@ -42,5 +42,6 @@ DU,Uracil,U,nucleic,0x00FF00,0xFF8080
 WAT,Water,,solvent,0x40C0C0,
 H2O,Water,,solvent,0x40C0C0,
 HOH,Water,,solvent,0x40C0C0,
+DOD,Water,,solvent,,
 UNK,Unknown,,unknown,,
 UNL,Unknown Ligand,,unknown,,
