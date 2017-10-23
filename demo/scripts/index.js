@@ -82,15 +82,13 @@ window.onerror = function(err, url, line, col, obj) {
 // Uncomment this to profile parsing
 // Miew.profile('data/4TNW.pdb', 10, $('miew-container').first.firstChild.firstChild);
 
-// allow to access viewer objects from console
-if (DEBUG) {
-  window.MIEWS = [];
-}
+/** @deprecated */
+window.MIEWS = [];
 
 // create viewer (and run it) for each container element on the page
 $('.miew-container').each(function(i, container) {
 
-  var viewer = new Miew($.extend(
+  var viewer = window.miew = new Miew($.extend(
     true,
     {
       container: container,
@@ -114,9 +112,7 @@ $('.miew-container').each(function(i, container) {
     }
   });
 
-  if (DEBUG) {
-    window.MIEWS.push(viewer);
-  }
+  window.MIEWS.push(viewer);
 
   var menu = new Menu(viewer);
 

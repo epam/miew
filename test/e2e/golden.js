@@ -104,7 +104,7 @@ function shouldMatch(id, test) {
   const prefix = 'data:image/png;base64,';
   const prefixLength = prefix.length;
 
-  return driver.executeScript(() => window.MIEWS[0].screenshot(128))
+  return driver.executeScript(() => window.miew && window.miew.screenshot(128))
     .then((dataUrl) => {
       expect(dataUrl.slice(0, prefixLength)).to.equal(prefix);
       const shot = Buffer.from(dataUrl.slice(prefixLength), 'base64');

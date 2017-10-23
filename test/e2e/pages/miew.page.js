@@ -71,7 +71,7 @@ export default class MiewPage {
    */
   getValueFor(expression) {
     return this.driver.executeScript(`\
-var miew = window && window.MIEWS && window.MIEWS[0];
+var miew = window && window.miew;
 var Miew = miew && miew.constructor;
 return miew && Miew && JSON.stringify(${expression});`)
       .then((json) => JSON.parse(json));
@@ -101,9 +101,9 @@ return miew && Miew && JSON.stringify(${expression});`)
    */
   waitUntilRebuildIsDone() {
     return this.driver.wait(() => this.driver.executeScript(`\
-var miew = window.MIEWS && window.MIEWS[0];
+var miew = window.miew;
 var rep = miew && miew.repGet(0);
-return rep && !miew._needRebuild() && !miew._needRender;`));
+return rep && !miew._loader && !miew._building && !miew._needRebuild() && !miew._needRender;`));
   }
 
   /**
@@ -115,11 +115,11 @@ return rep && !miew._needRebuild() && !miew._needRender;`));
    */
   waitUntilRepresentationIs(index, mode, colorer) {
     return this.driver.wait(() => this.driver.executeScript(`\
-var miew = window && window.MIEWS && window.MIEWS[0];
-var rep = miew && miew.repGet(${index});
+var miew = window && window.miew;
+var rep = miew && !miew._loader && miew.repGet(${index});
 var modeOk = rep && (rep.mode.id === '${mode.toUpperCase()}');
 var colorerOk = rep && (rep.colorer.id === '${colorer.toUpperCase()}');
-return modeOk && colorerOk && !miew._needRebuild() && !miew._needRender;`));
+return modeOk && colorerOk && !miew._building && !miew._needRebuild() && !miew._needRender;`));
   }
 
 }
