@@ -129,7 +129,10 @@ function Miew(opts) {
   /** @type {?object} */
   this._gfx = null;
   /** @type {HTMLElement} */
-  this._container = (opts && opts.container) || document.body;
+  this._container = (opts && opts.container) ||
+    document.getElementById('miew-container') ||
+    _.head(document.getElementsByClassName('miew-container')) ||
+    document.body;
   /** @type {HTMLElement} */
   this._containerRoot = this._container;
 
