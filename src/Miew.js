@@ -1769,6 +1769,8 @@ Miew.prototype._onLoad = function(dataSource, opts) {
         this.resetReps('default');
         break;
       }
+    } else {
+      this.resetReps('default');
     }
   } else if (dataSource.id === 'Volume') {
     this.resetEd();
