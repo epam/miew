@@ -39,6 +39,46 @@ function _addPoints(centerPoints, topPoints, idx, residue) {
   topPoints[idx] = [tp.x, tp.y, tp.z];
 }
 
+function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
+  let posN, posC;
+  residue.forEachAtom((atom) => {
+    const name = atom.getVisualName();
+    if (!posN && name === 'N') {
+      posN = atom._position;
+    } else if (!posC && name === 'C') {
+      posC = atom._position;
+    }
+  });
+  if (posN && posC) {
+    const shift = posC.clone().sub(posN);
+
+    const wing = residue._wingVector;
+    const cp = residue._controlPoint;
+    const tp = cp.clone().add(wing);
+
+    const cpPrev = cp.clone().sub(shift);
+    const tpPrev = cpPrev.clone().add(wing);
+    centerPoints[idx] = [cpPrev.x, cpPrev.y, cpPrev.z];
+    topPoints[idx] = [tpPrev.x, tpPrev.y, tpPrev.z];
+    ++idx;
+    centerPoints[idx] = [cpPrev.x, cpPrev.y, cpPrev.z];
+    topPoints[idx] = [tpPrev.x, tpPrev.y, tpPrev.z];
+    ++idx;
+
+    centerPoints[idx] = [cp.x, cp.y, cp.z];
+    topPoints[idx] = [tp.x, tp.y, tp.z];
+    ++idx;
+
+    const cpNext = cp.clone().add(shift);
+    const tpNext = cpNext.clone().add(wing);
+    centerPoints[idx] = [cpNext.x, cpNext.y, cpNext.z];
+    topPoints[idx] = [tpNext.x, tpNext.y, tpNext.z];
+    ++idx;
+    centerPoints[idx] = [cpNext.x, cpNext.y, cpNext.z];
+    topPoints[idx] = [tpNext.x, tpNext.y, tpNext.z];
+  }
+}
+
 function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   var left = boundaries.start;
   var right = boundaries.end;
@@ -52,10 +92,8 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   var topPoints = new Array(lastIdx - firstIdx + 5);
   var centerPoints = new Array(lastIdx - firstIdx + 5);
   var arrIdx = 0;
-  function _extrapolate2(currIdx, nextFunc) {
-    // TODO kill me please
-    var theNext = nextFunc(currIdx);
-    var cp = residues[currIdx]._controlPoint.clone().lerp(residues[theNext]._controlPoint, -0.25);
+  function _extrapolate2(currIdx, otherIdx) {
+    var cp = residues[currIdx]._controlPoint.clone().lerp(residues[otherIdx]._controlPoint, -0.25);
     var tp = cp.clone().add(residues[currIdx]._wingVector);
     centerPoints[arrIdx] = [cp.x, cp.y, cp.z];
     topPoints[arrIdx++] = [tp.x, tp.y, tp.z];
@@ -63,14 +101,21 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
     topPoints[arrIdx++] = [tp.x, tp.y, tp.z];
   }
 
+  // a single disconnected residue
+  const prevIdx = _prevIdx(firstIdx);
+  const nextIdx = _nextIdx(lastIdx);
+  if (prevIdx === nextIdx) {
+    _addPointsForLoneResidue(centerPoints, topPoints, arrIdx, residues[firstIdx]);
+    return {centerPoints : centerPoints, topPoints : topPoints};
+  }
+
   // Two points (prev-prev and next-next) are added to support edge conditions for cubic splines, they are ignored
   // Another two (prev and next) were added to support the outside of the sub chain
 
   // prev and prev-prev
-  var prevIdx = _prevIdx(firstIdx);
   if (firstIdx === prevIdx) {
     // do the extrapolation
-    _extrapolate2(firstIdx, _nextIdx);
+    _extrapolate2(firstIdx, _nextIdx(firstIdx));
   } else {
     _addPoints(centerPoints, topPoints, arrIdx++, residues[_prevIdx(prevIdx)]);
     _addPoints(centerPoints, topPoints, arrIdx++, residues[prevIdx]);
@@ -80,11 +125,11 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   for (var idx = firstIdx; idx <= lastIdx; ++idx) {
     _addPoints(centerPoints, topPoints, arrIdx++, residues[idx]);
   }
+
   // next and next-next
-  var nextIdx = _nextIdx(lastIdx);
   if (nextIdx === _nextIdx(nextIdx)) {
     // do the extrapolation
-    _extrapolate2(lastIdx, _prevIdx);
+    _extrapolate2(lastIdx, _prevIdx(lastIdx));
   } else {
     _addPoints(centerPoints, topPoints, arrIdx++, residues[nextIdx]);
     _addPoints(centerPoints, topPoints, arrIdx, residues[_nextIdx(nextIdx)]);
