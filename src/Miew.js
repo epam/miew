@@ -916,8 +916,6 @@ Miew.prototype._updateFog = function() {
 Miew.prototype._onUpdate = function() {
   this._objectControls.update();
 
-  this._updateFog();
-
   if (settings.now.autobuild && !this._loader && !this._building && this._needRebuild()) {
     this.rebuild();
   }
@@ -934,6 +932,8 @@ Miew.prototype._onUpdate = function() {
   this._forEachComplexVisual(function(visual) {
     visual.getComplex().update();
   });
+
+  this._updateFog();
 };
 
 Miew.prototype._onRender = function() {
