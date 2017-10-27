@@ -3,6 +3,7 @@
 import utils from '../../utils';
 import Colorer from './Colorer';
 import chem from '../../chem';
+import logger from '../../utils/logger';
 
 /**
  * Create new colorer.
@@ -18,6 +19,10 @@ import chem from '../../chem';
  */
 function TemperatureColorer(opts) {
   Colorer.call(this, opts);
+  if (this.opts.min >= this.opts.max) {
+    this.opts.max = this.opts.min + 0.00000001;
+    logger.warn(`Max value should be greater than Min value. Max value is set to ${this.opts.max}`);
+  }
 }
 
 utils.deriveClass(TemperatureColorer, Colorer, {
@@ -27,9 +32,9 @@ utils.deriveClass(TemperatureColorer, Colorer, {
 });
 
 TemperatureColorer.prototype.getAtomColor = function(atom, _complex) {
-  var opts = this.opts;
+  const opts = this.opts;
   if (atom._temperature && opts) {
-    var factor = (atom._temperature - opts.min) / (opts.max - opts.min);
+    const factor = (atom._temperature - opts.min) / (opts.max - opts.min);
     return this.palette.getGradientColor(factor, opts.gradient);
   }
   return this.palette.defaultElementColor;
@@ -41,14 +46,14 @@ TemperatureColorer.prototype.getResidueColor = function(_residue, _complex) {
     return this.palette.defaultResidueColor;
   }
   // get temperature from CA atom for residue color definition
-  var temperatureCA = -1;
+  let temperatureCA = -1;
   _residue.forEachAtom(function(a) {
     if (a._temperature && a._role === chem.Element.Constants.Lead) {
       temperatureCA = a._temperature;
     }
   });
   if (temperatureCA > 0) {
-    var factor = (temperatureCA - opts.min) / (opts.max - opts.min);
+    const factor = (temperatureCA - opts.min) / (opts.max - opts.min);
     return this.palette.getGradientColor(factor, opts.gradient);
   }
   // no CA atom?
