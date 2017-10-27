@@ -418,7 +418,7 @@ function copySubArrays(src, dst, indices, itemSize) {
 function shallowCloneNode(node) {
   var newNode = node.cloneNode(true);
   newNode.worldPos = node.worldPos;
-  newNode.style = node.style;
+  // .style property is readonly, so "newNode.style = node.style;" won't work (and we don't need it, right?)
   return newNode;
 }
 
