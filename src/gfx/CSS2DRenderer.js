@@ -72,6 +72,7 @@ CSS2DRenderer.prototype._renderObject = function(object, camera, scene) {
 
     this._vector.applyMatrix4(this._viewMatrix);
 
+    const visibility = this._vector.z > -camera.near ? 'hidden' : 'visible';
     const zIndex = 10000 * (camera.far - (-this._vector.z)) / (camera.far - camera.near);
 
     const element = object.getElement();
@@ -93,7 +94,7 @@ CSS2DRenderer.prototype._renderObject = function(object, camera, scene) {
     const style = (object.userData !== {} ? object.userData.translation : 'translate(-50%, -50%) ') +
         'translate(' + (this._vector.x * this._widthHalf + this._widthHalf) + 'px,' +
         (-this._vector.y * this._heightHalf + this._heightHalf) + 'px)';
-    element.style.visibility = 'visible';
+    element.style.visibility = visibility;
     element.style.WebkitTransform = style;
     element.style.MozTransform = style;
     element.style.oTransform = style;
