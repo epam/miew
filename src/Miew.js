@@ -914,7 +914,16 @@ Miew.prototype._updateFog = function() {
 };
 
 Miew.prototype._onUpdate = function() {
+
+  if (this.isScriptingCommandAvailable !== undefined && this.isScriptingCommandAvailable() && !this._building) {
+    this.callNextCmd();
+  }
+
   this._objectControls.update();
+
+  this._forEachComplexVisual(function(visual) {
+    visual.getComplex().update();
+  });
 
   if (settings.now.autobuild && !this._loader && !this._building && this._needRebuild()) {
     this.rebuild();
@@ -923,15 +932,6 @@ Miew.prototype._onUpdate = function() {
   if (!this._loader && !this._building && !this._needRebuild()) {
     this.updateView();
   }
-
-  if (this.isScriptingCommandAvailable !== undefined && this.isScriptingCommandAvailable() && !this._building) {
-    this.callNextCmd();
-  }
-
-  // TODO: shouldn't it be executed before rebuild() takes place?
-  this._forEachComplexVisual(function(visual) {
-    visual.getComplex().update();
-  });
 
   this._updateFog();
 };
