@@ -7,6 +7,8 @@
 import CSS2DObject from './CSS2DObject';
 import * as THREE from 'three';
 
+const tempColor = new THREE.Color();
+
 function CSS2DRenderer() {
 
   this._width = 0;
@@ -48,37 +50,45 @@ CSS2DRenderer.prototype.setSize = function(width, height) {
 };
 
 CSS2DRenderer.prototype._renderObject = function(object, camera, scene) {
-  function lerpHexAndColorAsHex(a, b, t) {
-    var color = new THREE.Color();
-    color.setHex(a);
-    color.lerp(b, t);
 
-    return '#' + color.getHexString();
+  function lerpColorAsHex(a, b, t) {
+    tempColor.setHex(a);
+    tempColor.lerp(b, t);
+    return '#' + tempColor.getHexString();
+  }
+
+  function colorAsHex(a) {
+    tempColor.setHex(a);
+    return '#' + tempColor.getHexString();
   }
 
   if (object instanceof CSS2DObject) {
     this._vector.setFromMatrixPosition(object.matrixWorld);
 
     if (object.userData !== undefined && object.userData.offset !== undefined) {
-      var localOffset = new THREE.Vector3(object.userData.offset.x, object.userData.offset.y, 0);
+      const localOffset = new THREE.Vector3(object.userData.offset.x, object.userData.offset.y, 0);
       this._vector.add(localOffset.multiplyScalar(object.matrixWorld.getMaxScaleOnAxis()));
     }
 
     this._vector.applyMatrix4(this._viewMatrix);
 
-    var fogFactor = THREE.Math.smoothstep(-this._vector.z, scene.fog.near, scene.fog.far);
+    const element = object.getElement();
+    if (typeof scene.fog === 'undefined') {
+      element.style.color = colorAsHex(object.userData.color);
+      if (object.userData.background !== 'transparent') {
+        element.style.background = colorAsHex(object.userData.background);
+      }
+    } else {
+      const fogFactor = THREE.Math.smoothstep(-this._vector.z, scene.fog.near, scene.fog.far);
+      element.style.color = lerpColorAsHex(object.userData.color, scene.fog.color, fogFactor);
+      if (object.userData.background !== 'transparent') {
+        element.style.background = lerpColorAsHex(object.userData.background, scene.fog.color, fogFactor);
+      }
+    }
 
     this._vector.applyMatrix4(this._projectionMatrix);
 
-    var element = object.getElement();
-    element.style.color = lerpHexAndColorAsHex(object.userData.color, scene.fog.color, fogFactor);
-
-    element.style.background = object.userData.background;
-    if (object.userData.background !== 'transparent') {
-      element.style.background = lerpHexAndColorAsHex(object.userData.background, scene.fog.color, fogFactor);
-    }
-
-    var style = (object.userData !== {} ? object.userData.translation : 'translate(-50%, -50%) ') +
+    const style = (object.userData !== {} ? object.userData.translation : 'translate(-50%, -50%) ') +
         'translate(' + (this._vector.x * this._widthHalf + this._widthHalf) + 'px,' +
         (-this._vector.y * this._heightHalf + this._heightHalf) + 'px)';
     element.style.visibility = 'visible';
@@ -92,7 +102,7 @@ CSS2DRenderer.prototype._renderObject = function(object, camera, scene) {
     }
   }
 
-  for (var i = 0, l = object.children.length; i < l; i++) {
+  for (let i = 0, l = object.children.length; i < l; i++) {
     this._renderObject(object.children[i], camera, scene);
   }
 };
