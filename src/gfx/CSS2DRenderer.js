@@ -72,6 +72,8 @@ CSS2DRenderer.prototype._renderObject = function(object, camera, scene) {
 
     this._vector.applyMatrix4(this._viewMatrix);
 
+    const zIndex = 10000 * (camera.far - (-this._vector.z)) / (camera.far - camera.near);
+
     const element = object.getElement();
     if (typeof scene.fog === 'undefined') {
       element.style.color = colorAsHex(object.userData.color);
@@ -96,6 +98,7 @@ CSS2DRenderer.prototype._renderObject = function(object, camera, scene) {
     element.style.MozTransform = style;
     element.style.oTransform = style;
     element.style.transform = style;
+    element.style.zIndex = Number(zIndex).toFixed(0);
 
     if (element.parentNode !== this._domElement) {
       this._domElement.appendChild(element);
