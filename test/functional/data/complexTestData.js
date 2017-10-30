@@ -32,17 +32,16 @@ export default [{
   // lots of chains, models (+hydrogens)
   name: '2MPZ',
   formats: ['pdb', 'cif', 'mmtf'],
-  skip: {mmtf: true},
   num: {
     atoms: 10422,
-    bonds: 10449,
+    bonds: {mmtf: 10395, default: 10449},
     residues: 702,
     chains: 27,
     molecules: 1,
     structures: 2,
     symmetries: {pdb: 0},
     helices: 0,
-    sheets: 6,
+    sheets: {mmtf: 54, default: 6},
   },
 }, {
   // virus = biomolecule with lots of transformations, symmetry

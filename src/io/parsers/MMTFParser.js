@@ -205,20 +205,27 @@ MMTFParser.prototype._updateSecStructure = function(complex, residue, groupData)
   }
 };
 
-MMTFParser.prototype._updateMolecules = function(entities) {
+MMTFParser.prototype._updateMolecules = function(mmtfData) {
+  const entities = mmtfData.entityList;
   if (!entities) {
     return;
   }
 
-  for (var i = 0; i < entities.length; i++) {
-    var entity = entities[i];
-    var chains = entity.chainIndexList;
-    var residues = [];
-    for (var j = 0; j < chains.length; j++) {
-      var chain = this._complex._chains[chains[j]];
+  const chainsInModel0 = mmtfData.chainsPerModel[0];
+  for (let i = 0; i < entities.length; i++) {
+    const entity = entities[i];
+    const chains = entity.chainIndexList;
+    let residues = [];
+    for (let j = 0; j < chains.length; j++) {
+      const chainIndex = chains[j];
+      // skip chains in models other than the first one
+      if (chainIndex >= chainsInModel0) {
+        continue;
+      }
+      const chain = this._complex._chains[chainIndex];
       residues = residues.concat(chain._residues.slice());
     }
-    var molecule = new Molecule(this._complex, entity.description, i + 1);
+    const molecule = new Molecule(this._complex, entity.description, i + 1);
     molecule._residues = residues;
     this._complex._molecules[i] = molecule;
   }
@@ -246,7 +253,7 @@ MMTFParser.prototype._traverse = function(mmtfData) {
   MMTF.traverse(mmtfData, eventCallbacks);
 
   this._updateSecStructure(this._complex);
-  this._updateMolecules(mmtfData.entityList);
+  this._updateMolecules(mmtfData);
 };
 
 // During traversal atoms and residues don't come sequentially
