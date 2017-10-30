@@ -6,6 +6,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.5] - 2017-10-30
+### Added
+- Display a lone residue in Cartoon-like modes.
+- Add Deuterium (D), Tritium (T) atoms and heavy water (DOD) residue.
+- Add `miew` global variable in the demo app.
+- Add an automatic lookup for a container using `#miew-container` id or `.miew-container` class.
+- Add and index page for examples. It can be accessed at `/examples/` url.
+- Start adding e2e tests for API.
+
+### Fixed
+- Fix a crash in IE due to a read-only style assignment.
+- Fix a crash in Text Mode with the fog turned off.
+- Fix a crash in MMTF parser for NMR models.
+- Fix the fog update and reorder updating other visual attributes.
+- Fix Temperature coloring in the case when min equals max.
+- Sort labels in Text Mode by distance to the camera (only roughly, using z-index CSS property).
+- Hide text labels behind the camera.
+- Assign radius of 1 to unknown atoms.
+- Use the default preset when auto detection is off (`autoPreset=0`).
+- Fix the version number in a demo built by Travis CI: '-mod' suffix should not appear anymore.
+
+### Deprecated
+- Old-fashioned atom labels are hidden from the UI and should not be used Use Text Mode instead.
+- The `MIEWS[]` global array should not be used in the demo app, use a single `miew` variable. 
+
 ## [0.7.4] - 2017-10-16
 ### Added
 - Add e2e tests with golden images using Selenium WebDriver. Run `npm run e2e` or `gulp test:e2e`,
@@ -65,7 +90,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.4...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.5...HEAD
+[0.7.5]: https://github.com/epam/miew/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/epam/miew/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/epam/miew/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/epam/miew/compare/v0.7.1...v0.7.2
