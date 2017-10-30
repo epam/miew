@@ -538,6 +538,8 @@ Miew.prototype._initGfx = function() {
   this._gfx = gfx;
   this._showCanvas();
 
+  this._container.appendChild(gfx.renderer2d.getElement());
+
   // add FPS counter
   var stats = new Stats();
   stats.domElement.style.position = 'absolute';
@@ -546,8 +548,6 @@ Miew.prototype._initGfx = function() {
   this._container.appendChild(stats.domElement);
   this._fps = stats;
   this._fps.show(settings.now.fps);
-
-  this._container.appendChild(gfx.renderer2d.getElement());
 };
 
 /**

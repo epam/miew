@@ -24,6 +24,7 @@ function CSS2DRenderer() {
   this._domElement.style.overflow = 'hidden';
   this._domElement.style.position = 'absolute';
   this._domElement.style.top = '0';
+  this._domElement.style.zIndex = '0';  // start a new Stacking Context to enclose all z-ordered children
   this._domElement.style.pointerEvents = 'none';
 }
 
