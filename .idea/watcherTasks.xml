@@ -21,25 +21,6 @@
       <envs />
     </TaskOptions>
     <TaskOptions isEnabled="true">
-      <option name="arguments" value="tools:sass" />
-      <option name="checkSyntaxErrors" value="true" />
-      <option name="description" />
-      <option name="exitCodeBehavior" value="ERROR" />
-      <option name="fileExtension" value="scss" />
-      <option name="immediateSync" value="false" />
-      <option name="name" value="Gulp SCSS" />
-      <option name="output" value="$FileNameWithoutExtension$.css" />
-      <option name="outputFilters">
-        <array />
-      </option>
-      <option name="outputFromStdout" value="false" />
-      <option name="program" value="gulp.cmd" />
-      <option name="scopeName" value="Project Files" />
-      <option name="trackOnlyRoot" value="true" />
-      <option name="workingDir" value="$ProjectFileDir$" />
-      <envs />
-    </TaskOptions>
-    <TaskOptions isEnabled="true">
       <option name="arguments" value="tools:jison --file=$FilePath$" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />

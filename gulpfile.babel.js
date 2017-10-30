@@ -285,20 +285,6 @@ gulp.task('tools:jison', () => {
 
 //////////////////////////////////////////////////////////////////////////////
 
-gulp.task('tools:sass', () => {
-  const src = `${config.demo.src}styles/`;
-  const dst = `${config.demo.src}styles/`; // sic! dst == src
-  return gulp.src(['main.scss'], {cwd: src})
-    .pipe(plugins.sourcemaps.init())
-    .pipe(plugins.sass().on('error', plugins.sass.logError))
-    .pipe(plugins.autoprefixer())
-    .pipe(plugins.sourcemaps.write('.'))
-    .pipe(plugins.eol())
-    .pipe(gulp.dest(dst));
-});
-
-//////////////////////////////////////////////////////////////////////////////
-
 function refToPath(ref) {
   if (ref === 'develop') {
     ref = 'dev';
