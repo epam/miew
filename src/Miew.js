@@ -490,7 +490,7 @@ Miew.prototype._initGfx = function() {
       gfx.width * window.devicePixelRatio,
       gfx.height * window.devicePixelRatio,
       {
-        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, type: THREE.FloatType,
+        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, type: THREE.FloatType,
         depthBuffer: false
       }
     );
@@ -499,7 +499,7 @@ Miew.prototype._initGfx = function() {
       gfx.width * window.devicePixelRatio,
       gfx.height * window.devicePixelRatio,
       {
-        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, type: THREE.FloatType,
+        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, type: THREE.FloatType,
         depthBuffer: false
       }
     );
@@ -508,7 +508,7 @@ Miew.prototype._initGfx = function() {
       gfx.width * window.devicePixelRatio,
       gfx.height * window.devicePixelRatio,
       {
-        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, type: THREE.FloatType,
+        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, type: THREE.FloatType,
         depthBuffer: true
       }
     );
