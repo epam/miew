@@ -114,7 +114,7 @@ $('.miew-container').each(function(i, container) {
 
   window.MIEWS.push(viewer);
 
-  var menu = new Menu(viewer);
+  var menu = new Menu(container, viewer);
 
   if (viewer.init()) {
     viewer.benchmarkGfx().then(function() {

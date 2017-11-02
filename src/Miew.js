@@ -800,28 +800,6 @@ Miew.prototype.enableHotKeys = function(enabled) {
 };
 
 /**
- * Request the viewer to blur its container.
- * @param blur - new blur state.
- */
-Miew.prototype.setBlur = function(blur) {
-  if (this._container) {
-    if (blur) {
-      this._container.classList.add('blur');
-    } else {
-      this._container.classList.remove('blur');
-    }
-  }
-};
-
-/*
-   * Set Menu container into Miew container.
-   * @param menu - menu DOM element.
-   */
-Miew.prototype.setMenu = function(menu) {
-  this._container.parentNode.appendChild(menu);
-};
-
-/**
  * Callback which processes window resize.
  * @private
  */
@@ -2483,9 +2461,6 @@ Miew.prototype._onKeyUp = function(event) {
   switch (event.keyCode) {
   case 'X'.charCodeAt(0):
     this._extractRepresentation();
-    break;
-  case 192:
-    document.getElementById('miew-terminal-btn').click();
     break;
   default:
   }
