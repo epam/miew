@@ -516,8 +516,9 @@ Miew.prototype._initGfx = function() {
     gfx.volBFTex = gfx.offscreenBuf5;
     gfx.volFFTex = gfx.offscreenBuf6;
     gfx.volWFFTex = gfx.offscreenBuf7;
+  } else {
+    this.logger.warn('Device doesn\'t support OES_texture_float extension');
   }
-
 
   gfx.stereoBufL = new THREE.WebGLRenderTarget(
     gfx.width * window.devicePixelRatio,
@@ -1219,6 +1220,26 @@ Miew.prototype.renderSelection = (function() {
 
 })();
 
+Miew.prototype._checkVolumeRenderingSupport = function(renderTarget) {
+  if (!renderTarget) {
+    return false;
+  }
+  const gfx = this._gfx;
+  const oldRT = gfx.renderer.getCurrentRenderTarget();
+
+  gfx.renderer.setRenderTarget(renderTarget);
+  const context = gfx.renderer.getContext();
+  const result = context.checkFramebufferStatus(context.FRAMEBUFFER);
+  gfx.renderer.setRenderTarget(oldRT);
+  if (result !== context.FRAMEBUFFER_COMPLETE) {
+    //floatFrameBufferWarning = ;
+    this.logger.warn('Device doesn\'t support electron density rendering');
+    return false;
+  } else {
+    return true;
+  }
+};
+
 Miew.prototype.renderVolume = (function() {
 
   var volumeBFMat = new VolumeMaterial.BackFacePosMaterial();
@@ -1226,9 +1247,20 @@ Miew.prototype.renderVolume = (function() {
   var cubeOffsetMat = new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5);
   var world2colorMat = new THREE.Matrix4();
 
+  var volumeRenderingSupported;
+
   return function(volumeVisual, camera, dstBuf, tmpBuf1, tmpBuf2, tmpBuf3) {
-    var gfx = this._gfx;
-    var mesh = volumeVisual.getMesh();
+    const gfx = this._gfx;
+
+    if (typeof volumeRenderingSupported === 'undefined') {
+      volumeRenderingSupported = this._checkVolumeRenderingSupport(tmpBuf1);
+    }
+
+    if (!volumeRenderingSupported) {
+      return;
+    }
+
+    const mesh = volumeVisual.getMesh();
 
     mesh.rebuild(camera);
 
