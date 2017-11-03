@@ -439,7 +439,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
           'div', {'class' : 'pseudo-div'},
           createElement(
             'span', {'class': 'pull-right badge'},
-            String(this._viewer.hasComplex() ? this._viewer.moleculeNumAtomsBySelector(repr.selector) : '0')
+            String(hasComplex(this._viewer) ? getNumAtomsBySelector(self._viewer, repr.selector) : '0')
           )
         )])
     ),
@@ -2152,6 +2152,45 @@ Menu.prototype._onSelectorChanged = function(selectionPanel) {
   }
 };
 
+function hasComplex(viewer) {
+  let bHaveComplexes = false;
+  viewer._forEachComplexVisual(function() {
+    bHaveComplexes = true;
+  });
+  return bHaveComplexes;
+}
+
+function getNumAtomsBySelector(viewer, selector) {
+  const visual = viewer._getComplexVisual();
+  return visual ? visual.getComplex().getNumAtomsBySelector(selector) : -1;
+}
+
+function getAtomNames(viewer) {
+  const visual = viewer._getComplexVisual();
+  return visual ? visual.getComplex().getAtomNames() : 0;
+}
+
+function getElements(viewer) {
+  const visual = viewer._getComplexVisual();
+  return visual ? visual.getComplex().getElements() : 0;
+}
+
+function getResidueNames(viewer) {
+  const visual = viewer._getComplexVisual();
+  return visual ? visual.getComplex().getResidueNames() : 0;
+}
+
+function getChainNames(viewer) {
+  const visual = viewer._getComplexVisual();
+  return visual ? visual.getComplex().getChainNames() : 0;
+}
+
+function getAltLocNames(viewer) {
+  const visual = viewer._getComplexVisual();
+  return visual ? visual.getComplex().getAltLocNames() : 0;
+}
+
+
 Menu.prototype._initSelectionPanel = function() {
   var self = this;
   var selectionPanel = $(self._menuId + ' [data-panel-type=miew-menu-panel-selection]');
@@ -2264,23 +2303,23 @@ Menu.prototype._initSelectionPanel = function() {
     var key = e.target.getAttribute('data-value').slice(0, -1);
     var values = [];
 
-    if (self._viewer.hasComplex()) {
+    if (hasComplex(self._viewer)) {
       switch (key) {
       case 'name':
-        values = self._viewer.moleculeAtomNames();
+        values = getAtomNames(self._viewer);
         break;
       case 'type':
       case 'elem':
-        values = self._viewer.moleculeElements();
+        values = getElements(self._viewer);
         break;
       case 'residue':
-        values = self._viewer.moleculeResidueNames();
+        values = getResidueNames(self._viewer);
         break;
       case 'chain':
-        values = self._viewer.moleculeChainNames();
+        values = getChainNames(self._viewer);
         break;
       case 'altloc':
-        values = self._viewer.moleculeAltLocNames();
+        values = getAltLocNames(self._viewer);
         break;
       default:
         values = ['1', '2', '3', '4', '5']; // dummy values
@@ -2323,7 +2362,7 @@ Menu.prototype._initSelectionPanel = function() {
           '.panel.valid:eq(' + self._curReprIdx + ') .panel-heading .badge');
         // update number of atoms included by selector
       var parsed = selectors.parse(line);
-      var numAtoms = self._viewer.moleculeNumAtomsBySelector(parsed.selector);
+      var numAtoms = getNumAtomsBySelector(self._viewer, parsed.selector);
       badge[0].textContent = String(numAtoms);
 
       selectionPanel.get(0).firstElementChild.firstElementChild.click();

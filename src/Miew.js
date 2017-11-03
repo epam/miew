@@ -2932,44 +2932,6 @@ Miew.prototype.info = function(name) {
   };
 };
 
-Miew.prototype.hasComplex = function() {
-  var bHaveComplexes = false;
-  this._forEachComplexVisual(function() {
-    bHaveComplexes = true;
-  });
-  return bHaveComplexes;
-};
-
-Miew.prototype.moleculeNumAtomsBySelector = function(selector) {
-  var visual = this._getComplexVisual();
-  return visual ? visual.getComplex().getNumAtomsBySelector(selector) : -1;
-};
-
-Miew.prototype.moleculeAtomNames = function() {
-  var visual = this._getComplexVisual();
-  return visual ? visual.getComplex().getAtomNames() : 0;
-};
-
-Miew.prototype.moleculeElements = function() {
-  var visual = this._getComplexVisual();
-  return visual ? visual.getComplex().getElements() : 0;
-};
-
-Miew.prototype.moleculeResidueNames = function() {
-  var visual = this._getComplexVisual();
-  return visual ? visual.getComplex().getResidueNames() : 0;
-};
-
-Miew.prototype.moleculeChainNames = function() {
-  var visual = this._getComplexVisual();
-  return visual ? visual.getComplex().getChainNames() : 0;
-};
-
-Miew.prototype.moleculeAltLocNames = function() {
-  var visual = this._getComplexVisual();
-  return visual ? visual.getComplex().getAltLocNames() : 0;
-};
-
 /*
    * OBJECTS SEGMENT
    */
