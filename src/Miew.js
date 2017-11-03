@@ -2312,6 +2312,7 @@ Miew.prototype._discardFragmentEdit = function() {
   this._needRender = true;
 };
 
+/** @deprecated  Move object instead of panning the camera */
 Miew.prototype.resetPan = function() {
   this._gfx.camera.position.x = 0.0;
   this._gfx.camera.position.y = 0.0;
@@ -2380,17 +2381,14 @@ Miew.prototype._onPick = function(event) {
 Miew.prototype._onDblClick = function(event) {
   if ('atom' in event.obj) {
     this.setPivotAtom(event.obj.atom);
-    this.resetPan();
-    this._needRender = true;
   } else if ('residue' in event.obj) {
     this.setPivotResidue(event.obj.residue);
-    this.resetPan();
-    this._needRender = true;
-  } else if (!('residue' in event.obj)) {
+  } else {
     this.resetPivot();
-    this.resetPan();
-    this._needRender = true;
   }
+
+  this.resetPan();
+  this._needRender = true;
 };
 
 Miew.prototype._onKeyDown = function(event) {
@@ -3455,6 +3453,7 @@ Miew.prototype.scale = function(factor) {
    * Pan camera
    * @param {number} x - horizontal panning
    * @param {number} y - vertical panning
+   * @deprecated  Move object instead of panning the camera
    */
 Miew.prototype.pan = function(x, y) {
   this._gfx.camera.translateX(x);

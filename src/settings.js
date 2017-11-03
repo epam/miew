@@ -734,10 +734,11 @@ var defaults = {
    */
   zooming: true,
 
-  // enable camera panning with keyboard or pinch gesture
-  // NOW. disabled because of unclearness for user
-  //panning: true,
-  //inversePanning: false,
+  /** @deprecated  Move object instead of panning the camera */
+  panning: false,
+
+  /** @deprecated  Move object instead of panning the camera */
+  inversePanning: false,
 
   /**
    * Enable picking atoms & residues with left mouse button or touch.

@@ -566,6 +566,7 @@ ObjectControls.prototype.update = function() {
         }
       } else {
         // update camera panning
+        // @deprecated
         delta *= PAN_SPEED * (settings.now.inversePanning ? -1 : 1);
         this.camera.translateX(delta * speedX);
         this.camera.translateY(delta * speedY);
@@ -780,6 +781,7 @@ ObjectControls.prototype.touchmove = function(event) {
       this.dispatchEvent({type: 'change', action: 'zoom', factor: (oldScale === 0.0) ? 1.0 : newScale / oldScale});
     }
 
+    // @deprecated: Move object instead of panning the camera
     if (settings.now.panning) {
       // update camera panning
       var delta = new THREE.Vector2(
