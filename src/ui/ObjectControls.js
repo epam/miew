@@ -542,7 +542,7 @@ ObjectControls.prototype.update = function() {
   }
 
   // apply arrow keys
-  if (settings.now.panning) {
+  if (settings.now.panning || this._isKeysTranslatingObj) {
     var speedX = Number(this._pressedKeys[VK_RIGHT]) - Number(this._pressedKeys[VK_LEFT]);
     var speedY = Number(this._pressedKeys[VK_UP]) - Number(this._pressedKeys[VK_DOWN]);
     if (speedX !== 0.0 || speedY !== 0.0) {
