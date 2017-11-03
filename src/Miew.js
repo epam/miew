@@ -2618,15 +2618,6 @@ Miew.prototype.setPivotAtom = function(atom) {
   this.dispatchEvent({type: 'transform'});
 };
 
-Miew.prototype.profileGfx = function() {
-  var self = this;
-  var p = new GfxProfiler(this._gfx.renderer);
-
-  p.runOnTicks(100, 1000, 10000).then(function() {
-    self._showMessage('GFX profile: ' + (1000.0 / p.mean()).toPrecision(2));
-  });
-};
-
 Miew.prototype.benchmarkGfx = function(force) {
   var self = this;
   var prof = new GfxProfiler(this._gfx.renderer);
@@ -2728,72 +2719,6 @@ Miew.prototype.screenshot = function(width, height) {
 Miew.prototype.screenshotSave = function(filename, width, height) {
   var uri = this.screenshot(width, height);
   utils.shotDownload(uri, filename);
-};
-
-Miew.profile = function(file, count, element) {
-  var now = utils.Timer.now;
-  var opts = {};
-  var data = '';
-  var times = [];
-  var self = this;
-
-  function robustMean(values) {
-    var n = values.length - Math.round(values.length * 0.1);
-    values.sort();
-    var mean = 0;
-    for (var i = 0; i < n; ++i) {
-      mean += values[i];
-    }
-    return mean / n;
-  }
-
-  function robustDeviation(values, mean) {
-    var n = values.length;
-    var deltas = new Array(n);
-    for (var i = 0; i < n; ++i) {
-      deltas[i] = (values[i] - mean) * (values[i] - mean);
-    }
-    deltas.sort();
-    return Math.sqrt(robustMean(deltas));
-  }
-
-  var parseCallbacks = {
-    ready: function() {
-      var t = now();
-      var iLast = times.length - 1;
-      times[iLast] = t - times[iLast];
-      if (iLast < count - 1) {
-        parseWithTiming();
-      } else {
-        var mean = robustMean(times);
-        var sd = robustDeviation(times, mean);
-        var output = mean.toFixed(1) + ' ± ' + (2 * sd).toFixed(1) + ' (95%)';
-        self.logger.report(times);
-        self.logger.report(output);
-        element.textContent = output;
-      }
-    },
-    error: function(/* msg */) {
-      self.logger.error('Parse error: ' + opts.fileName);
-    },
-  };
-
-  function parseWithTiming() {
-    var parser = io.parsers.create(self, data, opts);
-    times.push(now());
-    parser.parse(parseCallbacks);
-  }
-
-  var loader = io.loaders.create(self, file, opts);
-  loader.load({
-    ready: function(data_) {
-      data = data_;
-      parseWithTiming();
-    },
-    error: function(/* msg */) {
-      self.logger.error('Load error: ' + opts.fileName);
-    },
-  });
 };
 
 Miew.prototype._tweakResolution = function() {
