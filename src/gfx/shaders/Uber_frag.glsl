@@ -12,7 +12,9 @@
 
 #ifdef ATTR_COLOR2
   varying vec3 vColor2;
-  varying vec2 vUv;
+  #ifndef CYLINDER_SPRITE
+    varying vec2 vUv;
+  #endif
 #endif
 
 uniform vec3 diffuse;
@@ -36,7 +38,10 @@ uniform float clipPlaneValue;
 
 varying vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)
 varying vec3 vViewPosition;
-varying vec3 vNormal;
+
+#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
+  varying vec3 vNormal;
+#endif
 
 /////////////////////////////////////////// ZSprites ////////////////////////////////////////////////
 #ifdef SPHERE_SPRITE

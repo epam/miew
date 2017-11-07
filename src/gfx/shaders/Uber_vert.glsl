@@ -1,7 +1,10 @@
 float INSTANCED_SPRITE_OVERSCALE = 1.3;
 
 attribute vec3 normal;
-varying vec3 vNormal;
+#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
+  varying vec3 vNormal;
+#endif
+
 #ifdef THICK_LINE
   attribute vec4 position; // W contains vert pos or neg offset
 #else
@@ -25,7 +28,9 @@ varying vec3 vViewPosition;
   attribute vec3 color2;
   varying vec3 vColor2;
   attribute vec2 uv;
-  varying vec2 vUv;
+  #ifndef CYLINDER_SPRITE
+    varying vec2 vUv;
+  #endif
 #endif
 
 #ifdef INSTANCED_POS
@@ -105,7 +110,10 @@ void main() {
 #else
   vec3 transformedNormal = normalMatrix * objectNormal;
 #endif
+
+#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
   vNormal = normalize(transformedNormal);
+#endif
 
   vec4 localPos = vec4(position.xyz, 1.0);
   vec4 worldPos = modelMatrix * localPos;
@@ -200,7 +208,9 @@ void main() {
 
 #ifdef ATTR_COLOR2
   vColor2 = color2;
-  vUv = uv;
+  #ifndef CYLINDER_SPRITE
+    vUv = uv;
+  #endif
 #endif
 
 #ifdef DASHED_LINE
