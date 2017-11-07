@@ -30,11 +30,10 @@ varying vec3 vViewPosition;
 
 #ifdef INSTANCED_POS
   attribute vec4 offset;
-  varying vec4 instOffset;
-#endif
-
-#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+  #ifdef SPHERE_SPRITE
+    varying vec4 instOffset;
   varying vec4 spritePosEye;
+  #endif
 #endif
 
 #ifdef INSTANCED_MATRIX
@@ -45,12 +44,14 @@ varying vec3 vViewPosition;
   attribute vec4 invmatVector2;
   attribute vec4 invmatVector3;
 
-  varying vec4 matVec1;
-  varying vec4 matVec2;
-  varying vec4 matVec3;
-  varying vec4 invmatVec1;
-  varying vec4 invmatVec2;
-  varying vec4 invmatVec3;
+  #ifdef CYLINDER_SPRITE
+    varying vec4 matVec1;
+    varying vec4 matVec2;
+    varying vec4 matVec3;
+    varying vec4 invmatVec1;
+    varying vec4 invmatVec2;
+    varying vec4 invmatVec3;
+  #endif
 #endif
 
 uniform mat4 modelViewMatrix; // optional
@@ -132,14 +133,16 @@ void main() {
 #endif // THICK_LINE
 
 #ifdef INSTANCED_POS
-  instOffset = offset;
+  #ifdef SPHERE_SPRITE
+    instOffset = offset;
 
-  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-    spritePosEye = modelViewMatrix * vec4( offset.xyz, 1.0 );
+    vec4 posEye = modelViewMatrix * vec4( offset.xyz, 1.0 );
     float scale = length(modelViewMatrix[0]);
-    mvPosition = spritePosEye + vec4( position.xyz * offset.w * scale * INSTANCED_SPRITE_OVERSCALE, 0.0 );
-    spritePosEye.w = offset.w * scale;
-  #else
+    mvPosition = posEye + vec4( position.xyz * offset.w * scale * INSTANCED_SPRITE_OVERSCALE, 0.0 );
+    posEye.w = offset.w * scale;
+
+    spritePosEye = posEye;
+ #else
     localPos = vec4( offset.xyz + position.xyz * offset.w, 1.0 );
     worldPos = modelMatrix * localPos;
     mvPosition = modelViewMatrix * localPos;
@@ -147,14 +150,14 @@ void main() {
 #endif
 
 #ifdef INSTANCED_MATRIX
-  matVec1 = matVector1;
-  matVec2 = matVector2;
-  matVec3 = matVector3;
-  invmatVec1 = invmatVector1;
-  invmatVec2 = invmatVector2;
-  invmatVec3 = invmatVector3;
+  #ifdef CYLINDER_SPRITE
+    matVec1 = matVector1;
+    matVec2 = matVector2;
+    matVec3 = matVector3;
+    invmatVec1 = invmatVector1;
+    invmatVec2 = invmatVector2;
+    invmatVec3 = invmatVector3;
 
-  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
     // calculate eye coords of cylinder endpoints
     vec4 v = vec4(0, -0.5, 0, 1);
     vec4 p1 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);
@@ -162,8 +165,9 @@ void main() {
     vec4 p2 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);
 
     // sprite is placed at the center of cylinder
-    spritePosEye.xyz = mix(p1.xyz, p2.xyz, 0.5);
-    spritePosEye.w = 1.0;
+    vec4 posEye;
+    posEye.xyz = mix(p1.xyz, p2.xyz, 0.5);
+    posEye.w = 1.0;
 
     // basic sprite size at screen plane (covers only cylinder axis)
     vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);
@@ -173,16 +177,17 @@ void main() {
 
     // full sprite size in eye coords
     float minZ = min(abs(p1.z), abs(p2.z));
-    vec2 spriteSize = INSTANCED_SPRITE_OVERSCALE  * abs(spritePosEye.z) *
+    vec2 spriteSize = INSTANCED_SPRITE_OVERSCALE  * abs(posEye.z) *
       (spriteSizeScreen + 2.0 * rad / minZ);
 
-    mvPosition = spritePosEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );
+    mvPosition = posEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );
   #else
     localPos = vec4(dot(localPos, matVector1), dot(localPos, matVector2), dot(localPos, matVector3), 1.0);
     worldPos = modelMatrix * localPos;
     mvPosition = modelViewMatrix * localPos;
   #endif
 #endif
+
 
   gl_Position = projectionMatrix * mvPosition;
 

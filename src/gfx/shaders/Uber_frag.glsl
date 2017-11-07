@@ -39,10 +39,13 @@ varying vec3 vViewPosition;
 varying vec3 vNormal;
 
 /////////////////////////////////////////// ZSprites ////////////////////////////////////////////////
+#ifdef SPHERE_SPRITE
+  varying vec4 spritePosEye;
+#endif
+
 #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
   uniform float zOffset;
   uniform mat4 projectionMatrix;
-  varying vec4 spritePosEye;
 
   float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {
     vec4 pixelPosScreen = projMatrix * pixelPosEye;
@@ -51,11 +54,11 @@ varying vec3 vNormal;
 #endif
 
 #ifdef SPHERE_SPRITE
+  varying vec4 instOffset;
   uniform mat4 modelMatrix;
   uniform mat4 modelViewMatrix;
   uniform mat4 invModelViewMatrix;
   uniform mat3 normalMatrix;
-  varying vec4 instOffset;
 
   float intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {
 
@@ -99,16 +102,17 @@ varying vec3 vNormal;
 #endif
 
 #ifdef CYLINDER_SPRITE
-  uniform mat4 modelMatrix;
-  uniform mat4 modelViewMatrix;
-  uniform mat4 invModelViewMatrix;
-  uniform mat3 normalMatrix;
   varying vec4 matVec1;
   varying vec4 matVec2;
   varying vec4 matVec3;
   varying vec4 invmatVec1;
   varying vec4 invmatVec2;
   varying vec4 invmatVec3;
+
+  uniform mat4 modelMatrix;
+  uniform mat4 modelViewMatrix;
+  uniform mat4 invModelViewMatrix;
+  uniform mat3 normalMatrix;
 
   float intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {
 
