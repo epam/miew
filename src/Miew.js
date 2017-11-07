@@ -218,7 +218,7 @@ Miew.prototype.getMaxRepresentationCount = function() {
 Miew.prototype.init = function() {
   var container = this._container;
   var elem = utils.createElement('div', {'class': 'miew-canvas'});
-  this._setContainerContents(elem);
+  _setContainerContents(container, elem);
   this._container = elem;
 
   var frag = document.createDocumentFragment();
@@ -329,16 +329,17 @@ Miew.prototype.term = function() {
 
 /**
  * Replace viewer container contents with a DOM element.
+ * @param {HTMLElement} container - parent container.
  * @param {HTMLElement} element - DOM element to show.
  * @private
  */
-Miew.prototype._setContainerContents = function(element) {
-  var parent = this._container;
+function _setContainerContents(container, element) {
+  const parent = container;
   while (parent.firstChild) {
     parent.removeChild(parent.firstChild);
   }
   parent.appendChild(element);
-};
+}
 
 /**
  * Display message inside the viewer container, hiding WebGL canvas.
@@ -346,10 +347,10 @@ Miew.prototype._setContainerContents = function(element) {
  * @private
  */
 Miew.prototype._showMessage = function(msg) {
-  var element = document.createElement('div');
+  const element = document.createElement('div');
   element.setAttribute('class', 'miew-message');
   element.appendChild(document.createElement('p')).appendChild(document.createTextNode(msg));
-  this._setContainerContents(element);
+  _setContainerContents(this._container, element);
 };
 
 /**
@@ -357,7 +358,7 @@ Miew.prototype._showMessage = function(msg) {
  * @private
  */
 Miew.prototype._showCanvas = function() {
-  this._setContainerContents(this._gfx.renderer.domElement);
+  _setContainerContents(this._container, this._gfx.renderer.domElement);
 };
 
 /**
@@ -883,12 +884,12 @@ Miew.prototype._updateFog = function() {
   if (settings.now.fog) {
     if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
       gfx.scene.fog = new THREE.Fog(settings.now.themes[settings.now.theme]);
-      this.setUberMaterialValues({fog: settings.now.fog});
+      this._setUberMaterialValues({fog: settings.now.fog});
     }
     updateFogRange(gfx.scene.fog, gfx.camera.position.z, this._getBSphereRadius());
   } else if (gfx.scene.fog) {
     gfx.scene.fog = undefined;
-    this.setUberMaterialValues({fog: settings.now.fog});
+    this._setUberMaterialValues({fog: settings.now.fog});
   }
 };
 
@@ -909,7 +910,7 @@ Miew.prototype._onUpdate = function() {
   }
 
   if (!this._loader && !this._building && !this._needRebuild()) {
-    this.updateView();
+    this._updateView();
   }
 
   this._updateFog();
@@ -1007,7 +1008,7 @@ Miew.prototype._onThemeChanged = (function() {
   };
 })();
 
-Miew.prototype.setUberMaterialValues = function(values) {
+Miew.prototype._setUberMaterialValues = function(values) {
   this._gfx.root.traverse(function(obj) {
     if ((obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments || obj instanceof THREE.Line) &&
         obj.material instanceof UberMaterial) {
@@ -1031,7 +1032,7 @@ Miew.prototype._renderScene = (function() {
     // FIXME clean up targets in render selection
 
     if (settings.now.transparency === 'prepass') {
-      this.renderWithPrepassTransparency(camera, gfx.offscreenBuf);
+      this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
       gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
     }
@@ -1047,21 +1048,21 @@ Miew.prototype._renderScene = (function() {
     var srcBuffer = gfx.offscreenBuf;
 
     if (bHaveComplexes && settings.now.ao) {
-      this.performAO(srcBuffer, gfx.offscreenBuf.depthTexture, dstBuffer, gfx.offscreenBuf3, gfx.offscreenBuf2);
+      this._performAO(srcBuffer, gfx.offscreenBuf.depthTexture, dstBuffer, gfx.offscreenBuf3, gfx.offscreenBuf2);
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
     }
 
     // render selected part with outline material
-    this.renderSelection(camera, srcBuffer, dstBuffer);
+    this._renderSelection(camera, srcBuffer, dstBuffer);
 
     if (volume) {
       // copy current picture to the buffer that retains depth-data of the original molecule render
       // so that volume renderer could use depth-test
       gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, gfx.offscreenBuf);
       dstBuffer = gfx.offscreenBuf;
-      this.renderVolume(volumeVisual, camera, dstBuffer, gfx.volBFTex, gfx.volFFTex, gfx.volWFFTex);
+      this._renderVolume(volumeVisual, camera, dstBuffer, gfx.volBFTex, gfx.volFFTex, gfx.volWFFTex);
 
       // if this is the last stage -- copy image to target
       if (!fxaa && !distortion) {
@@ -1073,11 +1074,9 @@ Miew.prototype._renderScene = (function() {
 
     if (fxaa) {
       dstBuffer = distortion ? gfx.offscreenBuf3 : target;
-      this.performFXAA(srcBuffer, dstBuffer);
+      this._performFXAA(srcBuffer, dstBuffer);
       srcBuffer = dstBuffer;
     }
-
-    //this._renderTestPattern(10, 10, srcBuffer);
 
     if (distortion) {
       dstBuffer = target;
@@ -1131,39 +1130,7 @@ Miew.prototype._performDistortion = (function() {
   };
 }());
 
-Miew.prototype._renderTestPattern = function(numCellsX, numCellsY, target) {
-  var gfx = this._gfx;
-
-  gfx.renderer.setClearColor(0xffffff, 1);
-  gfx.renderer.clearTarget(target);
-
-  var scene = new THREE.Scene();
-  var camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000);
-
-  var geometry = new THREE.Geometry();
-  var i;
-  for (i = 1; i < numCellsX; ++i) {
-    var x = i * 2.0 / numCellsX - 1.0;
-    geometry.vertices.push(new THREE.Vector3(x, -1, 1));
-    geometry.vertices.push(new THREE.Vector3(x, 1, 1));
-  }
-  for (i = 1; i < numCellsY; ++i) {
-    var y = i * 2.0 / numCellsY - 1.0;
-    geometry.vertices.push(new THREE.Vector3(-1, y, 1));
-    geometry.vertices.push(new THREE.Vector3(1, y, 1));
-  }
-
-  var material = new THREE.LineBasicMaterial({
-    color: 0, opacity: 1, linewidth: 3, vertexColors: THREE.NoColors
-  });
-
-  var line = new THREE.LineSegments(geometry, material);
-  scene.add(line);
-
-  gfx.renderer.render(scene, camera, target);
-};
-
-Miew.prototype.renderSelection = (function() {
+Miew.prototype._renderSelection = (function() {
 
   var _outlineMaterial = new OutlineMaterial();
 
@@ -1218,7 +1185,7 @@ Miew.prototype._checkVolumeRenderingSupport = function(renderTarget) {
   }
 };
 
-Miew.prototype.renderVolume = (function() {
+Miew.prototype._renderVolume = (function() {
 
   var volumeBFMat = new VolumeMaterial.BackFacePosMaterial();
   var volumeFFMat = new VolumeMaterial.FrontFacePosMaterial();
@@ -1267,9 +1234,9 @@ Miew.prototype.renderVolume = (function() {
     // prepare texture that contains molecule positions
     world2colorMat.getInverse(mesh.matrixWorld);
     UberMaterial.prototype.uberOptions.world2colorMatrix.multiplyMatrices(cubeOffsetMat, world2colorMat);
-    this.setUberMaterialValues({colorFromPos: true});
+    this._setUberMaterialValues({colorFromPos: true});
     gfx.renderer.render(gfx.scene, camera, tmpBuf3);
-    this.setUberMaterialValues({colorFromPos: false});
+    this._setUberMaterialValues({colorFromPos: false});
 
     // render volume
     var vm = mesh.material;
@@ -1291,7 +1258,7 @@ Miew.prototype.renderVolume = (function() {
    * 2. Realization doesn't use camera layers because scene traversing is used for material changes and
    * we can use it to select needed meshes and don't complicate meshes builders with layers
   */
-Miew.prototype.renderWithPrepassTransparency = (function() {
+Miew.prototype._renderWithPrepassTransparency = (function() {
 
   return function(camera, targetBuffer) {
     var gfx = this._gfx;
@@ -1315,7 +1282,7 @@ Miew.prototype.renderWithPrepassTransparency = (function() {
   };
 })();
 
-Miew.prototype.performFXAA = (function() {
+Miew.prototype._performFXAA = (function() {
 
   var _fxaaMaterial = new FXAAMaterial();
 
@@ -1341,7 +1308,7 @@ Miew.prototype.performFXAA = (function() {
 
 })();
 
-Miew.prototype.performAO = (function() {
+Miew.prototype._performAO = (function() {
 
   var _aoMaterial = new ao.AOMaterial();
   var _horBlurMaterial = new ao.HorBilateralBlurMaterial();
@@ -1474,7 +1441,7 @@ Miew.prototype.reset = function(/* keepReps */) {
 
   this._setEditMode(EDIT_MODE.COMPLEX);
 
-  this.resetObjects();
+  this._resetObjects();
 
   if (this._gfx) {
     gfxutils.clearTree(this._gfx.pivot);
@@ -1555,7 +1522,7 @@ Miew.prototype.load = function(file, opts) {
 
       return new Promise(function(resolve) {
         if (loadResult.opts.animation) {
-          self.refreshTitle();
+          self._refreshTitle();
           self._startAnimation(loadResult.data);
           resolve(null);
         } else {
@@ -1571,7 +1538,7 @@ Miew.prototype.load = function(file, opts) {
     function _onReject() {
       self._loader = null;
       self._spinner.stop();
-      self.refreshTitle();
+      self._refreshTitle();
     }
   );
 };
@@ -1693,8 +1660,8 @@ Miew.prototype._continueAnimation = function() {
     });
     if (self._frameInfo.frameIsReady) {
       pivot.updateToFrame(self._frameInfo);
-      self.updateObjsToFrame(self._frameInfo);
-      self.refreshTitle(' Frame ' + self._frameInfo._currFrame + ' of ' + self._frameInfo._framesCount +
+      self._updateObjsToFrame(self._frameInfo);
+      self._refreshTitle(' Frame ' + self._frameInfo._currFrame + ' of ' + self._frameInfo._framesCount +
           ' time interval - ' + self._frameInfo._timeStep);
       try {
         self._frameInfo.nextFrame();
@@ -1798,7 +1765,7 @@ Miew.prototype._onLoad = function(dataSource, opts) {
   // set scale to fit everything on the screen
   this._objectControls.setScale(settings.now.radiusToFit / this._getBSphereRadius());
 
-  this.resetObjects();
+  this._resetObjects();
 
   if (settings.now.autoResolution) {
     this._tweakResolution();
@@ -1815,7 +1782,7 @@ Miew.prototype._onLoad = function(dataSource, opts) {
     this.dispatchEvent({type: 'onParseDone'});
   }
 
-  this.refreshTitle();
+  this._refreshTitle();
 
   if (opts.convertedFile && opts.mdFile) {
     this._startMdAnimation(opts.mdFile, opts.convertedFile);
@@ -1882,7 +1849,7 @@ Miew.prototype._needRebuild = function() {
   return needsRebuild;
 };
 
-Miew.prototype.rebuildObjects = function() {
+Miew.prototype._rebuildObjects = function() {
   var self = this;
   var gfx = this._gfx;
   var i, n;
@@ -1942,7 +1909,7 @@ Miew.prototype.rebuild = function() {
 
   this.dispatchEvent({type: 'rebuild'});
 
-  this.rebuildObjects();
+  this._rebuildObjects();
 
   this._gfx.renderer2d.reset();
 
@@ -1968,7 +1935,7 @@ Miew.prototype.rebuild = function() {
     self._needRender = true;
 
     // TODO: Gather geometry stats?
-    self.refreshTitle();
+    self._refreshTitle();
     self._building = false;
   });
 };
@@ -1981,7 +1948,7 @@ Miew.prototype.rebuildAll = function() {
   // this.rebuild(); // TODO: isn't implicit rebuild enough?
 };
 
-Miew.prototype.refreshTitle = function(appendix) {
+Miew.prototype._refreshTitle = function(appendix) {
   var title;
   appendix = appendix === undefined ? '' : appendix;
   var visual = this._getComplexVisual();
@@ -2038,7 +2005,7 @@ Miew.prototype._extractRepresentation = function() {
  * Change current representation list.
  * @param {array} reps - Representation list.
  */
-Miew.prototype.setReps = function(reps) {
+Miew.prototype._setReps = function(reps) {
   reps = reps || (this._opts && this._opts.reps) || [];
   this._forEachComplexVisual(visual => visual.resetReps(reps));
 };
@@ -2062,7 +2029,7 @@ Miew.prototype.applyPreset = function(preset) {
       this.logger.warn('Unknown preset "' + settings.now.preset + '"');
     }
   }
-  this.setReps(reps);
+  this._setReps(reps);
 };
 
 /**
@@ -2072,7 +2039,7 @@ Miew.prototype.applyPreset = function(preset) {
 Miew.prototype.resetReps = function(preset) {
   let reps = this._opts && this._opts.reps;
   if (reps) {
-    this.setReps(reps);
+    this._setReps(reps);
   } else {
     this.applyPreset(preset);
   }
@@ -2809,7 +2776,7 @@ Miew.prototype.setOptions = function(opts) {
   }
 
   this._opts._objects = opts._objects;
-  this.resetObjects();
+  this._resetObjects();
 
   if (opts.load) {
     this.load(opts.load, {fileType: opts.type});
@@ -2875,7 +2842,7 @@ Miew.prototype.addObject = function(objData, bThrow) {
 
   try {
     var newObj = new Ctor(objData.params, objData.opts);
-    this.addSceneObject(newObj);
+    this._addSceneObject(newObj);
   } catch (error) {
     if (!bThrow) {
       this.logger.debug('Error during scene object creation: ' + error.message);
@@ -2886,7 +2853,7 @@ Miew.prototype.addObject = function(objData, bThrow) {
   this._needRender = true;
 };
 
-Miew.prototype.addSceneObject = function(sceneObject) {
+Miew.prototype._addSceneObject = function(sceneObject) {
   var visual = this._getComplexVisual();
   if (sceneObject.build && visual) {
     sceneObject.build(visual.getComplex());
@@ -2896,7 +2863,7 @@ Miew.prototype.addSceneObject = function(sceneObject) {
   objects[objects.length] = sceneObject;
 };
 
-Miew.prototype.updateObjsToFrame = function(frameData) {
+Miew.prototype._updateObjsToFrame = function(frameData) {
   var objs = this._objects;
   for (var i = 0, n = objs.length; i < n; ++i) {
     if (objs[i].updateToFrame) {
@@ -2905,7 +2872,7 @@ Miew.prototype.updateObjsToFrame = function(frameData) {
   }
 };
 
-Miew.prototype.resetObjects = function() {
+Miew.prototype._resetObjects = function() {
   var objs = this._opts._objects;
 
   this._objects = [];
@@ -3090,13 +3057,13 @@ Miew.prototype._clipPlaneUpdateValue = function(radius) {
       obj._line.material.setUberOptions(opts);
     }
   }
-  if (this._picker != null) {
+  if (this._picker !== null) {
     this._picker.clipPlaneValue = clipPlaneValue;
   }
 };
 
 Miew.prototype._fogFarUpdateValue = function() {
-  if (this._picker != null) {
+  if (this._picker !== null) {
     if (this._gfx.scene.fog) {
       this._picker.fogFarValue = this._gfx.scene.fog.far;
     } else {
@@ -3275,7 +3242,7 @@ Miew.prototype.view = function(expression) {
 /*
    * Update current view due to viewinterpolator state
    */
-Miew.prototype.updateView = function() {
+Miew.prototype._updateView = function() {
   var self = this;
   var pivot = this._gfx.pivot;
 
