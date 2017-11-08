@@ -1477,7 +1477,7 @@ Miew.prototype.resetView = function() {
 
 /**
  * Load molecule asynchronously.
- * @param {string|File} file - Molecule file to load (e.g. PDB ID, URL or File object).
+ * @param {string|File} source - Molecule source to load (e.g. PDB ID, URL or File object).
  * @param {object=} opts - Options.
  * @param {string=} opts.sourceType - Data source type (e.g. 'url', 'file').
  * @param {string=} opts.fileType - Data contents type (e.g. 'pdb', 'cml').
@@ -1485,7 +1485,7 @@ Miew.prototype.resetView = function() {
  * @param {boolean=} opts.keepRepsInfo - prevent reset of object and reps information.
  * @returns {Promise} name of the visual that was added to the viewer
  */
-Miew.prototype.load = function(file, opts) {
+Miew.prototype.load = function(source, opts) {
   var self = this;
 
   if (self._loader) {
@@ -1495,10 +1495,10 @@ Miew.prototype.load = function(file, opts) {
   self.dispatchEvent({type: 'load', options: opts});
 
   // remember file sources
-  if (file instanceof File && file.name.match(/.man$/i)) {
-    this._fileSourceAnim = normalizeSource(file);
+  if (source instanceof File && source.name.match(/.man$/i)) {
+    this._fileSourceAnim = normalizeSource(source);
   } else {
-    this._fileSource = normalizeSource(file);
+    this._fileSource = normalizeSource(source);
   }
   if (opts && opts.mdFile) {
     this._fileSourceAnim = opts.mdFile;
@@ -1515,32 +1515,24 @@ Miew.prototype.load = function(file, opts) {
 
   self._spinner.spin(this._container);
 
-  return load(file, opts, self._loader, self).then(
-    function _onResolve(loadResult) {
-      self._loader = null;
-      self._spinner.stop();
+  const onLoadEnd = (res) => {
+    self._loader = null;
+    self._spinner.stop();
+    self._refreshTitle();
+    return res;
+  };
 
-      return new Promise(function(resolve) {
-        if (loadResult.opts.animation) {
-          self._refreshTitle();
-          self._startAnimation(loadResult.data);
-          resolve(null);
-        } else {
-          self._stopAnimation();
-          if (!opts || !opts.keepRepsInfo) {
-            self._opts.reps = null;
-            self._opts._objects = null;
-          }
-          resolve(self._onLoad(loadResult.data, loadResult.opts));
-        }
-      });
-    },
-    function _onReject() {
-      self._loader = null;
-      self._spinner.stop();
-      self._refreshTitle();
-    }
-  );
+  return _fetchData(source, opts, self._loader, self)
+    .then(res => _convertData(res.data, res.opts, res.master))
+    .then(res => _parseData(res.data, res.opts, res.master, self))
+    .then(res => self._onLoad(res.data, res.opts))
+    .then(res => onLoadEnd(res))
+    .catch((err) => {
+      onLoadEnd();
+      self.logger.error('Could not load data');
+      self.logger.debug(err);
+      throw err;
+    });
 };
 
 /**
@@ -1699,6 +1691,18 @@ Miew.prototype._stopAnimation = function() {
 Miew.prototype._onLoad = function(dataSource, opts) {
   var gfx = this._gfx;
   var visualName = null;
+
+  if (opts.animation) {
+    this._refreshTitle();
+    this._startAnimation(dataSource);
+    return null;
+  } else {
+    this._stopAnimation();
+    if (!opts || !opts.keepRepsInfo) {
+      this._opts.reps = null;
+      this._opts._objects = null;
+    }
+  }
 
   if (dataSource.id === 'Complex') {
     var complex = dataSource;
@@ -3370,7 +3374,7 @@ Miew.prototype.projected = function(fullAtomName, complexName) {
 };
 
 // FIXME: rewrite the function, it looks a little bit ugly
-function loadData(file, opts, master, context) {
+function _fetchData(file, opts, master, context) {
   return new Promise(function(resolve, reject) {
     opts = opts || {}; // TODO: clone
     if (file instanceof File && file.name.match(/.man$/i)) {
@@ -3463,23 +3467,22 @@ function loadData(file, opts, master, context) {
     loader.load({
       ready: function(data) {
         console.timeEnd('load');
+        context.logger.info('Loading finished');
         resolve({data: data, opts: opts, master: master});
       },
       error: function(err) {
         console.timeEnd('load');
-        context.logger.debug(err);
         context.logger.error('Loading failed');
-        reject();
+        reject(err);
       },
       progress: function(percent) {
-        // TODO: Update progress bar
         reportProgress(loader.logger, 'Loading', percent);
       }
     });
   });
 }
 
-function convertData(data, opts, master) {
+function _convertData(data, opts, master) {
   return new Promise(function(resolve, reject) {
     if (master) {
       master.notify({type: 'convert'});
@@ -3514,7 +3517,7 @@ function convertData(data, opts, master) {
           if (master) {
             master.notify({type: 'convertingFinished', error: message});
           }
-          reject();
+          reject(new Error(message));
         }
       });
     } else {
@@ -3524,7 +3527,7 @@ function convertData(data, opts, master) {
   });
 }
 
-function parseData(data, opts, master, context) {
+function _parseData(data, opts, master, context) {
   return new Promise(function(resolve, reject) {
     if (master) {
       master.notify({type: 'parse'});
@@ -3564,31 +3567,13 @@ function parseData(data, opts, master, context) {
         if (master) {
           master.notify({type: 'parsingFinished', error: err});
         }
-        reject();
+        reject(err);
       },
       progress: function(percent) {
         // TODO: Update progress bar
         reportProgress(parser.logger, 'Parsing', percent);
       }
     });
-  });
-}
-
-function load(file, loadOptions, master, context) {
-  var PREVIEW_LENGTH = 5;
-
-  return loadData(file, loadOptions, master, context).then(function(loadResult) {
-    loadResult.opts.loaded = true;
-    if (!loadResult.opts.animation) {
-      var dataPreview = '<ArrayBuffer>';
-      if (!loadResult.opts.binary) {
-        dataPreview = '"' +  loadResult.data.substr(0, PREVIEW_LENGTH) + '..."';
-      }
-      (context ? context.logger : logger).info('Loaded ' + loadResult.opts.fileName + ', contents = ' + dataPreview);
-    }
-    return convertData(loadResult.data, loadResult.opts, loadResult.master);
-  }).then(function(convertResult) {
-    return parseData(convertResult.data, convertResult.opts, convertResult.master, context);
   });
 }
 
