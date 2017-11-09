@@ -41,7 +41,7 @@ Remark350.prototype.parse = function(stream) {
   if (assembly && stream.readString(12, 18) === '  BIOMT') {
     var matrixRow = stream.readCharCode(19) - 49; // convert '1', '2', or '3' -> 0, 1, or 2
     var matrixData = stream.readString(20, 80).trim().split(/\s+/);
-    var matrixIndex = matrixData[0];
+    var matrixIndex = parseInt(matrixData[0], 10);
     if (this._matrix === null || matrixIndex !== this._matrixIndex) {
       // TODO: assert(matrixIndex === assembly.matrices.length + 1);
       this._matrixIndex = matrixIndex;
@@ -50,10 +50,10 @@ Remark350.prototype.parse = function(stream) {
     }
 
     var elements = matrix.elements;
-    elements[matrixRow]      = matrixData[1];
-    elements[matrixRow + 4]  = matrixData[2];
-    elements[matrixRow + 8]  = matrixData[3];
-    elements[matrixRow + 12] = matrixData[4];
+    elements[matrixRow]      = parseFloat(matrixData[1]);
+    elements[matrixRow + 4]  = parseFloat(matrixData[2]);
+    elements[matrixRow + 8]  = parseFloat(matrixData[3]);
+    elements[matrixRow + 12] = parseFloat(matrixData[4]);
   } else if (assembly && stream.readString(35, 41) === 'CHAINS:') {
     var entries = stream.readString(42, 80).split(',');
     for (var i = 0, n = entries.length; i < n; ++i) {
