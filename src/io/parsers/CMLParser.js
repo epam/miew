@@ -645,7 +645,7 @@ CMLParser.prototype._parseSet = function(varData) {
   return complex;
 };
 
-CMLParser.prototype._parse = function(callback) {
+CMLParser.prototype.parseSync = function() {
   // console.time('CML parse');
 
   var complexes = [];
@@ -659,8 +659,7 @@ CMLParser.prototype._parse = function(callback) {
     for (var i = 0; i < molSet.count; i++) {
 
       if (self.hasOwnProperty('_abort')) {
-        callback.error(new Error('Aborted'));
-        return;
+        throw new Error('Aborted');
       }
 
       molSet.curr = (i + 1);
@@ -674,26 +673,22 @@ CMLParser.prototype._parse = function(callback) {
     totalAtomsParsed += c.getAtomCount();
   });
   if (totalAtomsParsed <= 0) {
-    callback.error(new Error('Loaded file does not contain valid atoms.<br> Loading as empty...'));
-    return;
+    throw new Error('The data does not contain valid atoms');
   }
 
   if (this.hasOwnProperty('_abort')) {
-    callback.error(new Error('Aborted'));
-    return;
+    throw new Error('Aborted');
   }
 
   if (complexes.length > 1) {
     var joinedComplex = new Complex();
     joinedComplex.joinComplexes(complexes);
     joinedComplex.originalCML = complexes[0].originalCML;
-    callback.ready(joinedComplex);
-  }
-  if (complexes.length === 1) {
-    callback.ready(complexes[0]);
-  }
-  if (complexes.length === 0) {
-    callback.ready(new Complex());
+    return joinedComplex;
+  } else if (complexes.length === 1) {
+    return complexes[0];
+  } else {
+    return new Complex();
   }
 };
 

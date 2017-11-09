@@ -457,15 +457,14 @@ var tagParsers = {
   'ATOM 9': PDBParser.prototype._parseATOM,
 };
 
-PDBParser.prototype._parse = function(callback) {
-  var stream = new PDBStream(this._data);
-  var result = this._complex = new Complex();
+PDBParser.prototype.parseSync = function() {
+  const stream = new PDBStream(this._data);
+  const result = this._complex = new Complex();
 
-  // console.time('PDB parse');
   // parse PDB line by line
   while (!stream.end()) {
-    var tag = stream.readString(1, TAG_LENGTH);
-    var func = tagParsers[tag];
+    const tag = stream.readString(1, TAG_LENGTH);
+    const func = tagParsers[tag];
     if (_.isFunction(func)) {
       func.call(this, stream);
     }
@@ -473,11 +472,9 @@ PDBParser.prototype._parse = function(callback) {
   }
 
   if (this.hasOwnProperty('_abort')) {
-    callback.error(new Error('Aborted'));
-    return;
+    throw new Error('Aborted');
   }
 
-  // console.timeEnd('PDB parse');
   // Resolve indices and serials to objects
   this._finalize();
 
@@ -489,16 +486,14 @@ PDBParser.prototype._parse = function(callback) {
   this._complex = null;
 
   if (result.getAtomCount() === 0) {
-    callback.error(new Error('Loaded file does not contain valid atoms.<br> Loading as empty...'));
-    return;
+    throw new Error('The data does not contain valid atoms');
   }
 
   if (this.hasOwnProperty('_abort')) {
-    callback.error(new Error('Aborted'));
-    return;
+    throw new Error('Aborted');
   }
 
-  callback.ready(result);
+  return result;
 };
 
 export default PDBParser;

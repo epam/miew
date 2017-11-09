@@ -13,15 +13,35 @@ function Parser(data, options) {
 
 ContextDependent(Parser.prototype);
 
-Parser.prototype.parse = function(callback) {
-  var self = this;
-  setTimeout(function _parse() {
-    try {
-      self._parse(callback);
-    } catch (err) {
-      callback.error(err);
-    }
-  }, 0);
+/** @deprecated */
+Parser.prototype.parseOLD = function(callback) {
+  return this.parse()
+    .then((result) => {
+      callback.ready(result);
+    })
+    .catch((error) => {
+      callback.error(error);
+    });
+};
+
+Parser.prototype.parse = function(/** @deprecated */ callbacks) {
+  if (callbacks) {
+    return this.parseOLD(callbacks);
+  }
+
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        return resolve(this.parseSync());
+      } catch (error) {
+        return reject(error);
+      }
+    });
+  });
+};
+
+Parser.prototype.parseSync = function() {
+  throw new Error('Parsing this type of data is not implemented');
 };
 
 Parser.prototype.abort = function() {

@@ -16,7 +16,7 @@ function MOLParser(data, options) {
 MOLParser.prototype = Object.create(Parser.prototype);
 MOLParser.prototype.constructor = MOLParser;
 
-MOLParser.prototype.parse = function(callback) {
+MOLParser.prototype.parseSync = function() {
   var result = this._complex = new Complex();
 
   // TODO: Make asynchronous
@@ -27,7 +27,7 @@ MOLParser.prototype.parse = function(callback) {
   // cleanup
   this._complex = null;
 
-  callback.ready(result);
+  return result;
 };
 
 MOLParser.canParse = function(data, options) {

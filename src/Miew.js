@@ -3531,53 +3531,45 @@ function _convertData(data, opts, master) {
 }
 
 function _parseData(data, opts, master, context) {
-  return new Promise(function(resolve, reject) {
-    if (master) {
-      master.notify({type: 'parse'});
-    }
+  if (master) {
+    master.notify({type: 'parse'});
+  }
 
-    opts = opts || {}; // TODO: clone
+  opts = opts || {}; // TODO: clone
 
-    var parser = io.parsers.create(context, data, opts);
+  const parser = io.parsers.create(context, data, opts);
 
-    if (master) {
-      master.addEventListener('cancel', function() {
-        parser.abort();
-      });
-      if (master.isCancellationRequested()) {
-        reject();
-        return;
-      }
-    }
-
-    console.time('parse');
-    parser.parse({
-      ready: function(dataSource) {
-        console.timeEnd('parse');
-        if (master) {
-          master.notify({type: 'parsingFinished', data: dataSource});
-        }
-        resolve({data: dataSource, opts: opts, master: master});
-      },
-      error: function(err) {
-        console.timeEnd('parse');
-        opts.error = err;
-        context.logger.debug(err.message);
-        if (err.stack) {
-          context.logger.debug(err.stack);
-        }
-        context.logger.error('Parsing failed');
-        if (master) {
-          master.notify({type: 'parsingFinished', error: err});
-        }
-        reject(err);
-      },
-      progress: function(percent) {
-        // TODO: Update progress bar
-        reportProgress(parser.logger, 'Parsing', percent);
-      }
+  if (master) {
+    master.addEventListener('cancel', function() {
+      parser.abort();
     });
-  });
+    if (master.isCancellationRequested()) {
+      return Promise.reject();
+    }
+  }
+
+  console.time('parse');
+  return parser.parse()
+    .then((dataSet) => {
+      console.timeEnd('parse');
+      if (master) {
+        master.notify({type: 'parsingFinished', data: dataSet});
+      }
+      return {data: dataSet, opts, master};
+    })
+    .catch((error) => {
+      console.timeEnd('parse');
+      opts.error = error;
+      context.logger.debug(error.message);
+      if (error.stack) {
+        context.logger.debug(error.stack);
+      }
+      context.logger.error('Parsing failed');
+      if (master) {
+        master.notify({type: 'parsingFinished', error});
+      }
+      throw error;
+    });
 }
 
 ////////////////////////////////////////////////////////////////////////////

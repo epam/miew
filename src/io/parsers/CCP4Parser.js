@@ -201,10 +201,10 @@ CCP4Parser.canParse = function(data, options) {
   return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'ccp4');
 };
 
-CCP4Parser.prototype._parse = function(callback) {
+CCP4Parser.prototype.parseSync = function() {
   const ccp4 = new Ccp4Model();
   ccp4.load(this._data);
-  callback.ready(new Volume(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData()));
+  return new Volume(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
 };
 
 export default CCP4Parser;

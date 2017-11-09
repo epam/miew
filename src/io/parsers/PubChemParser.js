@@ -34,9 +34,9 @@ PubChemParser.canParse = function(data, options) {
   );
 };
 
-PubChemParser.prototype._parse = function(callback) {
+PubChemParser.prototype.parseSync = function() {
   this.logger.info('Parsing PubChem JSON file...');
-  callback.ready(this._toComplex(JSON.parse(this._data)));
+  return this._toComplex(JSON.parse(this._data));
 };
 
 PubChemParser.prototype._toComplex = function(jsonData) {

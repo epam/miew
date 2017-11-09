@@ -86,14 +86,13 @@ CIFParser.canParse = function(data, options) {
   return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'cif');
 };
 
-CIFParser.prototype._parse = function(callback) {
+CIFParser.prototype.parseSync = function() {
   this.logger.info('Parsing CIF file..');
-  var ret = CIFParser._parseToObject(this._data);
+  const ret = CIFParser._parseToObject(this._data);
   if (ret.error) {
-    callback.error(ret.error.message);
-    return;
+    throw new Error(ret.error.message);
   }
-  callback.ready(this._toComplex(ret.data));
+  return this._toComplex(ret.data);
 };
 
 /**

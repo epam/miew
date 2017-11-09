@@ -419,8 +419,8 @@ MMTFParser.prototype._joinSynonymousChains = function() {
   this._complex._chains = primaryChainsArray;
 };
 
-MMTFParser.prototype._parse = function(callback) {
-  var mmtfData = MMTF.decode(this._data);
+MMTFParser.prototype.parseSync = function() {
+  const mmtfData = MMTF.decode(this._data);
 
   this._complex = new Complex();
   this._serialAtomMap = {}; // filled during traversal
@@ -440,11 +440,10 @@ MMTFParser.prototype._parse = function(callback) {
   });
 
   if (this.hasOwnProperty('_abort')) {
-    callback.error(new Error('Aborted'));
-    return;
+    throw new Error('Aborted');
   }
 
-  callback.ready(this._complex);
+  return this._complex;
 };
 
 export default MMTFParser;
