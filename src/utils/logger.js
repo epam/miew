@@ -135,6 +135,7 @@ Logger.prototype._message = function(levelVal, message) {
     return;
   }
   var level = _.findKey(logLevels, function(lvl) { return lvl === levelVal; });
+  message = String(message);
   if (this.console) {
     console.log(level + ': ' + message); // NOSONAR
   }
