@@ -137,7 +137,14 @@ Logger.prototype._message = function(levelVal, message) {
   var level = _.findKey(logLevels, function(lvl) { return lvl === levelVal; });
   message = String(message);
   if (this.console) {
-    console.log(level + ': ' + message); // NOSONAR
+    const output = `miew:${level}: ${message}`;
+    if (level === 'error') {
+      console.error(output); // NOSONAR
+    } else if (level === 'warning') {
+      console.warn(output); // NOSONAR
+    } else {
+      console.log(output); // NOSONAR
+    }
   }
   this.dispatchEvent({type: 'message', level: level, message: message});
 };
