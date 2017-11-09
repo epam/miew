@@ -253,6 +253,7 @@ FrameInfo.prototype.reset = function() {
   };
   for (var i = 0; i < n; ++i) {
     myResidues[i] = {
+      _type: compRes[i]._type,
       _isValid: compRes[i]._isValid,
       _controlPoint: null,
       _wingVector: null,
