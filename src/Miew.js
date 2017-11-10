@@ -1203,7 +1203,7 @@ Miew.prototype._checkVolumeRenderingSupport = function(renderTarget) {
     return false;
   }
   const gfx = this._gfx;
-  const oldRT = gfx.renderer.getCurrentRenderTarget();
+  const oldRT = gfx.renderer.getRenderTarget();
 
   gfx.renderer.setRenderTarget(renderTarget);
   const context = gfx.renderer.getContext();

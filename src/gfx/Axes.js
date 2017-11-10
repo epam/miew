@@ -27,13 +27,13 @@ Axes.prototype._update = function() {
 Axes.prototype.render = function(renderer) {
   this._update();
 
-  var full = renderer.getSize();
+  var full = renderer.getDrawingBufferSize();
   var width = full.width * 0.25;
   var height = full.height * 0.25;
 
   var autoClear = renderer.autoClear;
   renderer.autoClear = false;
-  renderer.setViewport(0, 0, width, height);
+  renderer.setViewport(0.0, full.height - height, width, height); // use left bottom corner
   renderer.clear(false, true, false);
   renderer.render(this._scene, this._camera);
   renderer.setViewport(0, 0, full.width, full.height);
