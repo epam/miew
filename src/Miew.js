@@ -630,6 +630,8 @@ Miew.prototype._removeVisual = function(visual) {
 
   delete this._visuals[name];
   obj.release(); // removes nodes from scene
+
+  this._needRender = true;
 };
 
 /**
@@ -1541,6 +1543,7 @@ Miew.prototype.load = function(source, opts) {
  */
 Miew.prototype.unload = function(name) {
   this._removeVisual(name || this.getCurrentVisual());
+  this.resetPivot();
 };
 
 Miew.prototype._startAnimation = function(fileData) {
