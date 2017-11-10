@@ -35,9 +35,6 @@ const report = {
   getDifferencePath: (id) => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.diff.png`),
 
   getHtmlPath(filename) {
-    if (!fs.existsSync(filename)) {
-      filename = report.path.missing;
-    }
     const relative = path.relative(path.dirname(report.path.html), filename);
     return relative.replace(/\\/g, '/');
   },
