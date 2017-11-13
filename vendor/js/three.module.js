@@ -22612,7 +22612,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( refreshMaterial ) {
+		if ( refreshMaterial || material.forceUniformsUpdate) {
 
 			p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 			p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );
