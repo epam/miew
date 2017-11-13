@@ -6,6 +6,29 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.6] - 2017-11-13
+### Changed
+- Upgrade three.js to r87.
+- Log errors as console errors instead of normal text.
+- Refactor and rename private methods. Make loading pipeline implementation easier to understand.
+  Public API should not be affected (yet).
+ 
+### Deprecated
+- Camera panning API should not be used.
+
+### Removed
+- Remove old profiling methods.
+
+### Fixed
+- Fix a 100% crash in animation.
+- Change float texture format to RGBA32F which should be available if `OES_texture_float` extension
+  is present. Firefox should be able to display volumetric data now. 
+- Check for floating point render target support, which is required for volumetric rendering. Note
+  that the support is not available on iOS devices.
+- Re-render and re-calculate the center after a file was unloaded.
+- Fix warnings during shader compilation on iOS.
+- Fix component movement during editing.
+
 ## [0.7.5] - 2017-10-30
 ### Added
 - Display a lone residue in Cartoon-like modes.
@@ -14,6 +37,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add an automatic lookup for a container using `#miew-container` id or `.miew-container` class.
 - Add and index page for examples. It can be accessed at `/examples/` url.
 - Start adding e2e tests for API.
+
+### Deprecated
+- Old-fashioned atom labels are hidden from the UI and should not be used Use Text Mode instead.
+- The `MIEWS[]` global array should not be used in the demo app, use a single `miew` variable. 
 
 ### Fixed
 - Fix a crash in IE due to a read-only style assignment.
@@ -26,10 +53,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Assign radius of 1 to unknown atoms.
 - Use the default preset when auto detection is off (`autoPreset=0`).
 - Fix the version number in a demo built by Travis CI: '-mod' suffix should not appear anymore.
-
-### Deprecated
-- Old-fashioned atom labels are hidden from the UI and should not be used Use Text Mode instead.
-- The `MIEWS[]` global array should not be used in the demo app, use a single `miew` variable. 
 
 ## [0.7.4] - 2017-10-16
 ### Added
@@ -90,7 +113,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.5...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.6...HEAD
+[0.7.6]: https://github.com/epam/miew/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/epam/miew/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/epam/miew/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/epam/miew/compare/v0.7.2...v0.7.3
