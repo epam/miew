@@ -366,6 +366,13 @@ function ObjectControls(object, objectPivot, camera, domElement, getAltObj) {
       handler: function() {
         self.resetKeys();
       }
+    },
+    {
+      obj: self.domElement,
+      type: 'contextmenu',
+      handler: function(e) {
+        self.contextmenu(e);
+      }
     }];
 
   for (var i = 0; i < this._listeners.length; i++) {
@@ -391,6 +398,11 @@ ObjectControls.prototype.resetKeys = function() {
   this._pressedKeys[VK_UP] = false;
   this._pressedKeys[VK_RIGHT] = false;
   this._pressedKeys[VK_DOWN] = false;
+};
+
+ObjectControls.prototype.contextmenu = function(e) {
+  e.stopPropagation();
+  e.preventDefault();
 };
 
 ObjectControls.prototype.handleResize = function() {
