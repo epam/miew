@@ -204,9 +204,10 @@ CLIUtils.prototype.checkArg = function(key, arg, modificate) {
 
 CLIUtils.prototype.propagateProp = function(path, arg) {
   if (path !== undefined) {
-    var adapter = options.adapters[typeof _.get(settings.defaults, path)];
+    let argExc = {};
+    const adapter = options.adapters[typeof _.get(settings.defaults, path)];
     if (adapter === undefined) {
-      var pathExc = {message: path + ' is not existed'};
+      const pathExc = {message: path + ' is not existed'};
       throw pathExc;
     }
 
@@ -217,7 +218,7 @@ CLIUtils.prototype.propagateProp = function(path, arg) {
 
     if (path.endsWith('.fg') || path.endsWith('.bg')) {
       if (typeof arg !== 'number') {
-        var val = palettes.get(settings.now.palette).getNamedColor(arg, true);
+        const val = palettes.get(settings.now.palette).getNamedColor(arg, true);
         if (val !== undefined) {
           arg = '0x' + val.toString(16);
         }
@@ -231,8 +232,23 @@ CLIUtils.prototype.propagateProp = function(path, arg) {
     }
 
     if (arg !== undefined && adapter(arg) !== arg && adapter(arg) !== (arg > 0)) {
-      var argExc = {message: path + ' must be a "' + (typeof _.get(settings.defaults, path)) + '"'};
+      argExc = {message: path + ' must be a "' + (typeof _.get(settings.defaults, path)) + '"'};
       throw argExc;
+    }
+
+    if (path === 'theme') {
+      const possibleThemes = Object.keys(settings.defaults.themes);
+      let isValid = false;
+      for (let i = 0; i < possibleThemes.length; i++) {
+        if (arg === possibleThemes[i]) {
+          isValid = true;
+          break;
+        }
+      }
+      if (!isValid) {
+        argExc = {message: `${path} must be one of [${possibleThemes}]`};
+        throw argExc;
+      }
     }
   }
   return arg;
