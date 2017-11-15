@@ -27,7 +27,7 @@ Axes.prototype._update = function() {
 Axes.prototype.render = function(renderer) {
   this._update();
 
-  var full = renderer.getDrawingBufferSize();
+  var full = renderer.getSize();
   var width = full.width * 0.25;
   var height = full.height * 0.25;
 
