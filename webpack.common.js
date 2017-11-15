@@ -91,6 +91,7 @@ export default {
       jQuery: 'jquery',
     }),
     new HtmlWebpackPlugin({
+      template: 'demo/index.ejs',
       title: 'Miew – 3D Molecular Viewer',
       favicon: 'demo/favicon.ico',
     }),
