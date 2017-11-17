@@ -58,10 +58,7 @@ function parse(entry, format) {
         reject(err);
       } else {
         const parser = new format.Parser(contents, {});
-        parser.parse({
-          error: reject,
-          ready: complex => resolve(complex),
-        });
+        resolve(parser.parse());
       }
     });
   });
