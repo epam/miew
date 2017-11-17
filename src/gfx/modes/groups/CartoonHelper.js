@@ -1,8 +1,10 @@
-
-
 import * as THREE from 'three';
 import {Smooth} from 'Smooth';
 import gfxutils from '../../gfxutils';
+import chem from '../../../chem';
+
+const ResidueType = chem.ResidueType;
+
 var calcMatrix = gfxutils.calcChunkMatrix;
 
 function _buildStructureInterpolator(points, tension) {
@@ -40,12 +42,16 @@ function _addPoints(centerPoints, topPoints, idx, residue) {
 }
 
 function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
+  const nucleic = (residue._type.flags & ResidueType.Flags.NUCLEIC) !== 0;
+  const nameFrom = nucleic ? 'C5\'' : 'N';
+  const nameTo = nucleic ? 'C3\'' : 'C';
+
   let posFrom, posTo;
   residue.forEachAtom((atom) => {
     const name = atom.getVisualName();
-    if (!posFrom && name === 'N') {
+    if (!posFrom && name === nameFrom) {
       posFrom = atom._position;
-    } else if (!posTo && name === 'C') {
+    } else if (!posTo && name === nameTo) {
       posTo = atom._position;
     }
   });
