@@ -40,17 +40,24 @@ function _addPoints(centerPoints, topPoints, idx, residue) {
 }
 
 function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
-  let posN, posC;
+  let posFrom, posTo;
   residue.forEachAtom((atom) => {
     const name = atom.getVisualName();
-    if (!posN && name === 'N') {
-      posN = atom._position;
-    } else if (!posC && name === 'C') {
-      posC = atom._position;
+    if (!posFrom && name === 'N') {
+      posFrom = atom._position;
+    } else if (!posTo && name === 'C') {
+      posTo = atom._position;
     }
   });
-  if (posN && posC) {
-    const shift = posC.clone().sub(posN);
+
+  // provide a fallback for unknown residues
+  if (!(posFrom && posTo)) {
+    posFrom = residue._firstAtom._position;
+    posTo = residue._lastAtom._position;
+  }
+
+  if (posFrom && posTo) {
+    const shift = posTo.clone().sub(posFrom);
 
     const wing = residue._wingVector;
     const cp = residue._controlPoint;
@@ -89,8 +96,8 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
     return idx < right && residues[idx + 1]._isValid ? idx + 1 : idx;
   }
 
-  var topPoints = new Array(lastIdx - firstIdx + 5);
-  var centerPoints = new Array(lastIdx - firstIdx + 5);
+  var topPoints = []; // new Array(lastIdx - firstIdx + 5);
+  var centerPoints = []; // new Array(lastIdx - firstIdx + 5);
   var arrIdx = 0;
   function _extrapolate2(currIdx, otherIdx) {
     var cp = residues[currIdx]._controlPoint.clone().lerp(residues[otherIdx]._controlPoint, -0.25);
