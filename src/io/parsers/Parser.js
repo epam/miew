@@ -43,10 +43,10 @@ export default class Parser {
 
   static checkDataTypeOptions(options, type, extension) {
     const fileType = options.fileType;
-    const name = options.fileName;
-    extension = extension || ('.' + type);
-    return (fileType && fileType === type) ||
-      (name && name.toLowerCase().lastIndexOf(extension) === name.length - extension.length);
+    const fileName = options.fileName;
+    extension = (extension || ('.' + type)).toLowerCase();
+    return Boolean((fileType && fileType.toLowerCase() === type.toLowerCase()) ||
+      (!fileType && fileName && fileName.toLowerCase().endsWith(extension)));
   }
 }
 
