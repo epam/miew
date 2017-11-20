@@ -1,18 +1,10 @@
-engines:
-  duplication:
-    enabled: true
-    config:
-      languages:
-      - javascript:
+version: "2"
+plugins:
   eslint:
     enabled: true
   fixme:
     enabled: true
-
-ratings:
-  paths:
-  - "src/**.js"
-exclude_paths:
+exclude_patterns:
 - ".github/"
 - ".idea/"
 - "dist/"
