@@ -1261,7 +1261,7 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function(self) {
     .get(0));
 
   var extractExtension = function(name) {
-    var parts = name.toUpperCase().split('/');
+    var parts = name.toLowerCase().split('/');
     var lastPart = parts[parts.length - 1];
     parts = lastPart.split('\\');
     lastPart = parts[parts.length - 1];
@@ -1362,16 +1362,19 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function(self) {
         mainExtension = extractExtension(self.presetsPanel.inputs.main);
       }
 
-      if (mainExtension === 'TOP' || mainExtension === 'PRMTOP') {
+      const extensions = ['pdb', 'ent', 'cif', 'mmcif', 'mmtf', 'cml', 'json', 'ccp4'].sort();
+      const extRegExp = new RegExp('^(' + extensions.join('|') + ')$');
+      const extString = extensions.map(ext => `.${ext}`).join(', ');
+
+      if (mainExtension.match(/^(top|prmtop)$/)) {
         self.presetsPanel.inputs.mainIsAMBER = true;
         self.presetsPanel.inputs.mainIsCorrect = true;
-      } else if (self.presetsPanel.inputs.main instanceof File &&
-          mainExtension !== 'PDB' && mainExtension !== 'MMTF') {
+      } else if (self.presetsPanel.inputs.main instanceof File && !mainExtension.match(extRegExp)) {
         self.presetsPanel.inputs.mainIsAMBER = false;
         self.presetsPanel.inputs.mainIsCorrect = false;
         self.presetsPanel.inputs.isCorrect = false;
         self.presetsPanel.inputs.sub = null;
-        mainAlertText = 'Only .pdb, .top and .prmtop files are supported.';
+        mainAlertText = `Only the following filename extensions are supported: ${extString}`;
       } else {
         self.presetsPanel.inputs.mainIsAMBER = false;
         self.presetsPanel.inputs.mainIsCorrect = true;
@@ -1396,7 +1399,7 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function(self) {
         subExtension = extractExtension(self.presetsPanel.inputs.sub);
       }
 
-      if (subExtension === 'NC') {
+      if (subExtension === 'nc') {
         self.presetsPanel.inputs.subIsCorrect = true;
         self.presetsPanel.inputs.isCorrect = true;
       } else {
