@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.7] - 2017-11-20
+### Added
+- `Parser#parseSync()` - a synchronous method for parsing.
+- Unit tests for the `Parser` class.
+
+### Changed
+- `Parser#parse()` now returns a promise.
+
+### Deprecated
+- Callbacks in parsing methods should be avoided, please use promises.
+
+### Fixed
+- Fix a crash at non-protein molecules which contain a lone residue.
+- Fix the context menu appearing when you move the molecule using right mouse button.
+- Fix UI scale on mobile devices.
+- Fix molecule offset on mobile devices.
+- Fix theme changes from the terminal.
+- Fix `Parser.checkDataTypeOptions()`, it shouldn't accept a file with a matching extension if the
+  explicitly given type is different.
+- Fix the incorrect error message about currently supported file types in the `Load` UI Panel.
+
 ## [0.7.6] - 2017-11-13
 ### Changed
 - Upgrade three.js to r87.
@@ -113,7 +134,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.6...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.7...HEAD
+[0.7.7]: https://github.com/epam/miew/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/epam/miew/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/epam/miew/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/epam/miew/compare/v0.7.3...v0.7.4

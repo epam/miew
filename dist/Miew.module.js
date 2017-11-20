@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.6 Copyright (c) 2015-2017 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.7 Copyright (c) 2015-2017 EPAM Systems, Inc. */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -76736,6 +76736,8 @@ Licensed under MIT license (see "Smooth.js MIT license.txt")
 
 var Smooth_1 = Smooth.Smooth;
 
+var ResidueType$2 = chem.ResidueType;
+
 var calcMatrix = gfxutils.calcChunkMatrix;
 
 function _buildStructureInterpolator(points, tension) {
@@ -76773,18 +76775,29 @@ function _addPoints(centerPoints, topPoints, idx, residue) {
 }
 
 function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
-  var posN = void 0,
-      posC = void 0;
+  var nucleic = (residue._type.flags & ResidueType$2.Flags.NUCLEIC) !== 0;
+  var nameFrom = nucleic ? 'C5\'' : 'N';
+  var nameTo = nucleic ? 'C3\'' : 'C';
+
+  var posFrom = void 0,
+      posTo = void 0;
   residue.forEachAtom(function (atom) {
     var name = atom.getVisualName();
-    if (!posN && name === 'N') {
-      posN = atom._position;
-    } else if (!posC && name === 'C') {
-      posC = atom._position;
+    if (!posFrom && name === nameFrom) {
+      posFrom = atom._position;
+    } else if (!posTo && name === nameTo) {
+      posTo = atom._position;
     }
   });
-  if (posN && posC) {
-    var shift = posC.clone().sub(posN);
+
+  // provide a fallback for unknown residues
+  if (!(posFrom && posTo)) {
+    posFrom = residue._firstAtom._position;
+    posTo = residue._lastAtom._position;
+  }
+
+  if (posFrom && posTo) {
+    var shift = posTo.clone().sub(posFrom);
 
     var wing = residue._wingVector;
     var cp = residue._controlPoint;
@@ -76823,8 +76836,8 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
     return idx < right && residues[idx + 1]._isValid ? idx + 1 : idx;
   }
 
-  var topPoints = new Array(lastIdx - firstIdx + 5);
-  var centerPoints = new Array(lastIdx - firstIdx + 5);
+  var topPoints = []; // new Array(lastIdx - firstIdx + 5);
+  var centerPoints = []; // new Array(lastIdx - firstIdx + 5);
   var arrIdx = 0;
   function _extrapolate2(currIdx, otherIdx) {
     var cp = residues[currIdx]._controlPoint.clone().lerp(residues[otherIdx]._controlPoint, -0.25);
@@ -81896,39 +81909,68 @@ var exports$3 = /** @alias module:io/loaders */{
   }
 };
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-function Parser(data, options) {
-  this._data = data;
-  this._options = options;
-}
+var Parser = function () {
+  function Parser(data, options) {
+    classCallCheck(this, Parser);
 
-////////////////////////////////////////////////////////////////////////////
-// Instance methods
+    this._data = data;
+    this._options = options;
+  }
+
+  createClass(Parser, [{
+    key: 'parseSync',
+    value: function parseSync() {
+      throw new Error('Parsing this type of data is not implemented');
+    }
+  }, {
+    key: 'parse',
+    value: function parse( /** @deprecated */callbacks) {
+      var _this = this;
+
+      if (callbacks) {
+        return this._parseOLD(callbacks);
+      }
+
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          try {
+            return resolve(_this.parseSync());
+          } catch (error) {
+            return reject(error);
+          }
+        });
+      });
+    }
+
+    /** @deprecated */
+
+  }, {
+    key: '_parseOLD',
+    value: function _parseOLD(callbacks) {
+      return this.parse().then(function (result) {
+        callbacks.ready(result);
+      }).catch(function (error) {
+        callbacks.error(error);
+      });
+    }
+  }, {
+    key: 'abort',
+    value: function abort() {
+      this._abort = true;
+    }
+  }], [{
+    key: 'checkDataTypeOptions',
+    value: function checkDataTypeOptions(options, type, extension) {
+      var fileType = options.fileType;
+      var fileName = options.fileName;
+      extension = (extension || '.' + type).toLowerCase();
+      return Boolean(fileType && fileType.toLowerCase() === type.toLowerCase() || !fileType && fileName && fileName.toLowerCase().endsWith(extension));
+    }
+  }]);
+  return Parser;
+}();
 
 makeContextDependent(Parser.prototype);
-
-Parser.prototype.parse = function (callback) {
-  var self = this;
-  setTimeout(function _parse() {
-    try {
-      self._parse(callback);
-    } catch (err) {
-      callback.error(err);
-    }
-  }, 0);
-};
-
-Parser.prototype.abort = function () {
-  this._abort = true;
-};
-
-Parser.checkDataTypeOptions = function (options, type, extension) {
-  var fileType = options.fileType;
-  var name = options.fileName;
-  extension = extension || '.' + type;
-  return fileType && fileType === type || name && name.toLowerCase().lastIndexOf(extension) === name.length - extension.length;
-};
 
 /**
  * Parser helper for PDB tag "REMARK 290".
@@ -82550,11 +82592,10 @@ var tagParsers = {
   'ATOM 9': PDBParser.prototype._parseATOM
 };
 
-PDBParser.prototype._parse = function (callback) {
+PDBParser.prototype.parseSync = function () {
   var stream = new PDBStream(this._data);
   var result = this._complex = new Complex$2();
 
-  // console.time('PDB parse');
   // parse PDB line by line
   while (!stream.end()) {
     var tag = stream.readString(1, TAG_LENGTH);
@@ -82566,11 +82607,9 @@ PDBParser.prototype._parse = function (callback) {
   }
 
   if (this.hasOwnProperty('_abort')) {
-    callback.error(new Error('Aborted'));
-    return;
+    throw new Error('Aborted');
   }
 
-  // console.timeEnd('PDB parse');
   // Resolve indices and serials to objects
   this._finalize();
 
@@ -82582,16 +82621,14 @@ PDBParser.prototype._parse = function (callback) {
   this._complex = null;
 
   if (result.getAtomCount() === 0) {
-    callback.error(new Error('Loaded file does not contain valid atoms.<br> Loading as empty...'));
-    return;
+    throw new Error('The data does not contain valid atoms');
   }
 
   if (this.hasOwnProperty('_abort')) {
-    callback.error(new Error('Aborted'));
-    return;
+    throw new Error('Aborted');
   }
 
-  callback.ready(result);
+  return result;
 };
 
 var Complex$3 = chem.Complex;
@@ -82607,7 +82644,7 @@ function MOLParser(data, options) {
 MOLParser.prototype = Object.create(Parser.prototype);
 MOLParser.prototype.constructor = MOLParser;
 
-MOLParser.prototype.parse = function (callback) {
+MOLParser.prototype.parseSync = function () {
   var result = this._complex = new Complex$3();
 
   // TODO: Make asynchronous
@@ -82618,7 +82655,7 @@ MOLParser.prototype.parse = function (callback) {
   // cleanup
   this._complex = null;
 
-  callback.ready(result);
+  return result;
 };
 
 MOLParser.canParse = function (data, options) {
@@ -83251,7 +83288,7 @@ CMLParser.prototype._parseSet = function (varData) {
   return complex;
 };
 
-CMLParser.prototype._parse = function (callback) {
+CMLParser.prototype.parseSync = function () {
   // console.time('CML parse');
 
   var complexes = [];
@@ -83265,8 +83302,7 @@ CMLParser.prototype._parse = function (callback) {
     for (var i = 0; i < molSet.count; i++) {
 
       if (self.hasOwnProperty('_abort')) {
-        callback.error(new Error('Aborted'));
-        return;
+        throw new Error('Aborted');
       }
 
       molSet.curr = i + 1;
@@ -83280,26 +83316,22 @@ CMLParser.prototype._parse = function (callback) {
     totalAtomsParsed += c.getAtomCount();
   });
   if (totalAtomsParsed <= 0) {
-    callback.error(new Error('Loaded file does not contain valid atoms.<br> Loading as empty...'));
-    return;
+    throw new Error('The data does not contain valid atoms');
   }
 
   if (this.hasOwnProperty('_abort')) {
-    callback.error(new Error('Aborted'));
-    return;
+    throw new Error('Aborted');
   }
 
   if (complexes.length > 1) {
     var joinedComplex = new Complex$4();
     joinedComplex.joinComplexes(complexes);
     joinedComplex.originalCML = complexes[0].originalCML;
-    callback.ready(joinedComplex);
-  }
-  if (complexes.length === 1) {
-    callback.ready(complexes[0]);
-  }
-  if (complexes.length === 0) {
-    callback.ready(new Complex$4());
+    return joinedComplex;
+  } else if (complexes.length === 1) {
+    return complexes[0];
+  } else {
+    return new Complex$4();
   }
 };
 
@@ -83712,7 +83744,7 @@ MMTFParser.prototype._joinSynonymousChains = function () {
   this._complex._chains = primaryChainsArray;
 };
 
-MMTFParser.prototype._parse = function (callback) {
+MMTFParser.prototype.parseSync = function () {
   var mmtfData = mmtf.decode(this._data);
 
   this._complex = new Complex$5();
@@ -83733,11 +83765,10 @@ MMTFParser.prototype._parse = function (callback) {
   });
 
   if (this.hasOwnProperty('_abort')) {
-    callback.error(new Error('Aborted'));
-    return;
+    throw new Error('Aborted');
   }
 
-  callback.ready(this._complex);
+  return this._complex;
 };
 
 var Complex$6 = chem.Complex;
@@ -83816,14 +83847,13 @@ CIFParser.canParse = function (data, options) {
   return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'cif');
 };
 
-CIFParser.prototype._parse = function (callback) {
+CIFParser.prototype.parseSync = function () {
   this.logger.info('Parsing CIF file..');
   var ret = CIFParser._parseToObject(this._data);
   if (ret.error) {
-    callback.error(ret.error.message);
-    return;
+    throw new Error(ret.error.message);
   }
-  callback.ready(this._toComplex(ret.data));
+  return this._toComplex(ret.data);
 };
 
 /**
@@ -84741,10 +84771,10 @@ CCP4Parser.canParse = function (data, options) {
   return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'ccp4');
 };
 
-CCP4Parser.prototype._parse = function (callback) {
+CCP4Parser.prototype.parseSync = function () {
   var ccp4 = new Ccp4Model();
   ccp4.load(this._data);
-  callback.ready(new Volume$4(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData()));
+  return new Volume$4(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
 };
 
 var Complex$7 = chem.Complex;
@@ -84772,9 +84802,9 @@ PubChemParser.canParse = function (data, options) {
   return lodash.isString(data) && (type === 'pubchem+json' || !type && data[0] === '{');
 };
 
-PubChemParser.prototype._parse = function (callback) {
+PubChemParser.prototype.parseSync = function () {
   this.logger.info('Parsing PubChem JSON file...');
-  callback.ready(this._toComplex(JSON.parse(this._data)));
+  return this._toComplex(JSON.parse(this._data));
 };
 
 PubChemParser.prototype._toComplex = function (jsonData) {
@@ -85362,6 +85392,12 @@ function ObjectControls(object, objectPivot, camera, domElement, getAltObj) {
     handler: function handler() {
       self.resetKeys();
     }
+  }, {
+    obj: self.domElement,
+    type: 'contextmenu',
+    handler: function handler(e) {
+      self.contextmenu(e);
+    }
   }];
 
   for (var i = 0; i < this._listeners.length; i++) {
@@ -85387,6 +85423,11 @@ ObjectControls.prototype.resetKeys = function () {
   this._pressedKeys[VK_UP] = false;
   this._pressedKeys[VK_RIGHT] = false;
   this._pressedKeys[VK_DOWN] = false;
+};
+
+ObjectControls.prototype.contextmenu = function (e) {
+  e.stopPropagation();
+  e.preventDefault();
 };
 
 ObjectControls.prototype.handleResize = function () {
@@ -86112,7 +86153,7 @@ Axes.prototype._update = function () {
 Axes.prototype.render = function (renderer) {
   this._update();
 
-  var full = renderer.getDrawingBufferSize();
+  var full = renderer.getSize();
   var width = full.width * 0.25;
   var height = full.height * 0.25;
 
@@ -87195,7 +87236,7 @@ Cookies.prototype._exists = function (key) {
   return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
 };
 
-/* global "0.7.6":false */
+/* global "0.7.7":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -90549,59 +90590,49 @@ function _convertData(data, opts, master) {
 }
 
 function _parseData(data, opts, master, context) {
-  return new Promise(function (resolve, reject) {
-    if (master) {
-      master.notify({ type: 'parse' });
-    }
+  if (master) {
+    master.notify({ type: 'parse' });
+  }
 
-    opts = opts || {}; // TODO: clone
+  opts = opts || {}; // TODO: clone
 
-    var parser = io.parsers.create(context, data, opts);
+  var parser = io.parsers.create(context, data, opts);
 
-    if (master) {
-      master.addEventListener('cancel', function () {
-        parser.abort();
-      });
-      if (master.isCancellationRequested()) {
-        reject();
-        return;
-      }
-    }
-
-    console.time('parse');
-    parser.parse({
-      ready: function ready(dataSource) {
-        console.timeEnd('parse');
-        if (master) {
-          master.notify({ type: 'parsingFinished', data: dataSource });
-        }
-        resolve({ data: dataSource, opts: opts, master: master });
-      },
-      error: function error(err) {
-        console.timeEnd('parse');
-        opts.error = err;
-        context.logger.debug(err.message);
-        if (err.stack) {
-          context.logger.debug(err.stack);
-        }
-        context.logger.error('Parsing failed');
-        if (master) {
-          master.notify({ type: 'parsingFinished', error: err });
-        }
-        reject(err);
-      },
-      progress: function progress(percent) {
-        // TODO: Update progress bar
-        reportProgress(parser.logger, 'Parsing', percent);
-      }
+  if (master) {
+    master.addEventListener('cancel', function () {
+      parser.abort();
     });
+    if (master.isCancellationRequested()) {
+      return Promise.reject();
+    }
+  }
+
+  console.time('parse');
+  return parser.parse().then(function (dataSet) {
+    console.timeEnd('parse');
+    if (master) {
+      master.notify({ type: 'parsingFinished', data: dataSet });
+    }
+    return { data: dataSet, opts: opts, master: master };
+  }).catch(function (error) {
+    console.timeEnd('parse');
+    opts.error = error;
+    context.logger.debug(error.message);
+    if (error.stack) {
+      context.logger.debug(error.stack);
+    }
+    context.logger.error('Parsing failed');
+    if (master) {
+      master.notify({ type: 'parsingFinished', error: error });
+    }
+    throw error;
   });
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew$1.prototype.VERSION = typeof "0.7.6" !== 'undefined' && "0.7.6" || '0.0.0-dev';
+Miew$1.prototype.VERSION = typeof "0.7.7" !== 'undefined' && "0.7.7" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew$1, /** @lends Miew */{
@@ -92231,6 +92262,7 @@ CLIUtils.prototype.checkArg = function (key, arg, modificate) {
 
 CLIUtils.prototype.propagateProp = function (path, arg) {
   if (path !== undefined) {
+    var argExc = {};
     var adapter = options$1.adapters[_typeof(lodash.get(settings$1.defaults, path))];
     if (adapter === undefined) {
       var pathExc = { message: path + ' is not existed' };
@@ -92257,8 +92289,23 @@ CLIUtils.prototype.propagateProp = function (path, arg) {
     }
 
     if (arg !== undefined && adapter(arg) !== arg && adapter(arg) !== arg > 0) {
-      var argExc = { message: path + ' must be a "' + _typeof(lodash.get(settings$1.defaults, path)) + '"' };
+      argExc = { message: path + ' must be a "' + _typeof(lodash.get(settings$1.defaults, path)) + '"' };
       throw argExc;
+    }
+
+    if (path === 'theme') {
+      var possibleThemes = Object.keys(settings$1.defaults.themes);
+      var isValid = false;
+      for (var i = 0; i < possibleThemes.length; i++) {
+        if (arg === possibleThemes[i]) {
+          isValid = true;
+          break;
+        }
+      }
+      if (!isValid) {
+        argExc = { message: path + ' must be one of [' + possibleThemes + ']' };
+        throw argExc;
+      }
     }
   }
   return arg;
