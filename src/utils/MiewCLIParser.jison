@@ -167,13 +167,13 @@ Command
     | LIST                                -> yy.echo(yy.utils.list(yy.miew, yy.representations))
     | LIST EXPAND_KEY                     -> yy.echo(yy.utils.list(yy.miew, yy.representations, $2))
     | LIST SELECTOR_KEY                   -> yy.echo(yy.utils.listSelector(yy.miew, yy.Context))
-    | SELECT STRING                       -> yy.miew.select(yy.utils.checkArg($1, $2, true))
-    | SELECT STRING AS WordAll            -> yy.Context[$4.toLowerCase()] = yy.utils.checkArg($1, $2, true); yy.miew.select(yy.Context[$4.toLowerCase()])
-    | SELECTOR STRING                     -> yy.miew.rep(yy.miew.repCurrent(), {selector : yy.utils.checkArg($1, $2)})
+    | SELECT STRING                       -> yy.miew.select(yy.utils.checkArg($1.toLowerCase(), $2, true))
+    | SELECT STRING AS WordAll            -> yy.Context[$4.toLowerCase()] = yy.utils.checkArg($1.toLowerCase(), $2, true); yy.miew.select(yy.Context[$4.toLowerCase()])
+    | SELECTOR STRING                     -> yy.miew.rep(yy.miew.repCurrent(), {selector : yy.utils.checkArg($1.toLowerCase(), $2)})
 
     | WITHIN NUMBER OF STRING AS WordAll  -> yy.Context[$6.toLowerCase()] = yy.miew.within(yy.utils.checkArg("select", $4, true), Number($2))
 
-    | MATERIAL IDENTIFIER                 -> yy.miew.rep(yy.miew.repCurrent(), {material : yy.utils.checkArg($1, $2.toUpperCase())})
+    | MATERIAL IDENTIFIER                 -> yy.miew.rep(yy.miew.repCurrent(), {material : yy.utils.checkArg($1.toLowerCase(), $2.toUpperCase())})
     | ModeCMD
     | ColorCMD
     | VIEW                                -> yy.echo(yy.miew.view())
@@ -290,13 +290,13 @@ EditRepresentation
     ;
 
 ModeCMD
-    : MODE IDENTIFIER            -> yy.miew.rep(yy.miew.repCurrent(), {mode : yy.utils.checkArg($1, $2.toUpperCase())})
-    | MODE IDENTIFIER  ArgList   -> yy.miew.rep(yy.miew.repCurrent(), {mode : new Array(yy.utils.checkArg($1, $2.toUpperCase()), $3.toJSO(yy.utils, $1, $2.toUpperCase()))})
+    : MODE IDENTIFIER            -> yy.miew.rep(yy.miew.repCurrent(), {mode : yy.utils.checkArg($1.toLowerCase(), $2.toUpperCase())})
+    | MODE IDENTIFIER  ArgList   -> yy.miew.rep(yy.miew.repCurrent(), {mode : new Array(yy.utils.checkArg($1.toLowerCase(), $2.toUpperCase()), $3.toJSO(yy.utils, $1, $2.toUpperCase()))})
     ;
 
 ColorCMD
-    : COLOR IDENTIFIER            -> yy.miew.rep(yy.miew.repCurrent(), {colorer : yy.utils.checkArg($1, $2.toUpperCase())})
-    | COLOR IDENTIFIER  ArgList   -> yy.miew.rep(yy.miew.repCurrent(), {colorer : new Array(yy.utils.checkArg($1, $2.toUpperCase()), $3.toJSO(yy.utils, $1, $2.toUpperCase()))})
+    : COLOR IDENTIFIER            -> yy.miew.rep(yy.miew.repCurrent(), {colorer : yy.utils.checkArg($1.toLowerCase(), $2.toUpperCase())})
+    | COLOR IDENTIFIER  ArgList   -> yy.miew.rep(yy.miew.repCurrent(), {colorer : new Array(yy.utils.checkArg($1.toLowerCase(), $2.toUpperCase()), $3.toJSO(yy.utils, $1, $2.toUpperCase()))})
     ;
 
 RepresentationReference

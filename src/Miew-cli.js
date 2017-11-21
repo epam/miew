@@ -169,10 +169,10 @@ CLIUtils.prototype.load = function(miew, arg) {
 CLIUtils.prototype.checkArg = function(key, arg, modificate) {
   if (key !== undefined && arg !== undefined) {
     if (keyRemap(key) === 'selector') {
-      var res = selectors.parse(arg);
+      const res = selectors.parse(arg);
 
       if (res.error !== undefined) {
-        var selExc = {message: res.error};
+        const selExc = {message: res.error};
         throw selExc;
       }
 
@@ -182,19 +182,20 @@ CLIUtils.prototype.checkArg = function(key, arg, modificate) {
       return arg;
     }
 
-    var modificators = {
+    const modificators = {
       'colorers' : colorers,
       'modes' : modes,
       'materials' : materials,
     };
 
-    var modificator = key;
-    while (modificator !== undefined && modificator[modificator.length - 1] !== 's') {
-      modificator = keyRemap(modificator);
+    let modificator = key, temp;
+    while (modificator !== temp) {
+      temp = modificator;
+      modificator = keyRemap(temp);
     }
 
     if (modificators[modificator].get(arg) === undefined) {
-      var exc = {message: arg + ' is not existed in ' + modificator};
+      const exc = {message: arg + ' is not existed in ' + modificator};
       throw exc;
     }
     return arg;

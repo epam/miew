@@ -146,19 +146,19 @@ case 26:
 this.$ = yy.echo(yy.utils.listSelector(yy.miew, yy.Context));
 break;
 case 27:
-this.$ = yy.miew.select(yy.utils.checkArg($$[$0-1], $$[$0], true));
+this.$ = yy.miew.select(yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0], true));
 break;
 case 28:
-this.$ = yy.Context[$$[$0].toLowerCase()] = yy.utils.checkArg($$[$0-3], $$[$0-2], true); yy.miew.select(yy.Context[$$[$0].toLowerCase()]);
+this.$ = yy.Context[$$[$0].toLowerCase()] = yy.utils.checkArg($$[$0-3].toLowerCase(), $$[$0-2], true); yy.miew.select(yy.Context[$$[$0].toLowerCase()]);
 break;
 case 29:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {selector : yy.utils.checkArg($$[$0-1], $$[$0])});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {selector : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0])});
 break;
 case 30:
 this.$ = yy.Context[$$[$0].toLowerCase()] = yy.miew.within(yy.utils.checkArg("select", $$[$0-2], true), Number($$[$0-4]));
 break;
 case 31:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {material : yy.utils.checkArg($$[$0-1], $$[$0].toUpperCase())});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {material : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0].toUpperCase())});
 break;
 case 34:
 this.$ = yy.echo(yy.miew.view());
@@ -332,16 +332,16 @@ case 114:
 this.$ = yy.miew.rep($$[$0-1], $$[$0]); yy.miew.repCurrent($$[$0-1]);
 break;
 case 115:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : yy.utils.checkArg($$[$0-1], $$[$0].toUpperCase())});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0].toUpperCase())});
 break;
 case 116:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : new Array(yy.utils.checkArg($$[$0-2], $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : new Array(yy.utils.checkArg($$[$0-2].toLowerCase(), $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
 break;
 case 117:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : yy.utils.checkArg($$[$0-1], $$[$0].toUpperCase())});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0].toUpperCase())});
 break;
 case 118:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : new Array(yy.utils.checkArg($$[$0-2], $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : new Array(yy.utils.checkArg($$[$0-2].toLowerCase(), $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
 break;
 case 119:
 this.$ = Number(yy.representations.get($$[$0]));
