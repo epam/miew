@@ -567,7 +567,13 @@ $selection-panel-row-height: 42px;
   left: 0;
   bottom: 0;
   width: 30%;
+  padding: 0;
   margin-top: 42px;
+
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 .miew-terminal-body {
