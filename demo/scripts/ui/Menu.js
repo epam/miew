@@ -1267,7 +1267,7 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function(self) {
     lastPart = parts[parts.length - 1];
     parts = lastPart.split('.');
     if (parts.length === 1) {
-      return null; // not "file.ext" format
+      return ''; // not "file.ext" format
     }
     return parts[parts.length - 1];
   };
