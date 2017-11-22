@@ -10,6 +10,7 @@ import open     from 'open';
 import webpack  from 'webpack';
 import {rollup} from 'rollup';
 import glob     from 'glob';
+import express  from 'express';
 import sassModuleImporter from 'sass-module-importer'; // eslint-disable-line import/no-unresolved, import/extensions
 import rollupPluginReplace from 'rollup-plugin-replace';
 
@@ -283,27 +284,25 @@ gulp.task('tools:jison', () => {
 
 //////////////////////////////////////////////////////////////////////////////
 
-gulp.task('build+serve', done => sequence('build', 'serve:demo', done));
+gulp.task('serve', ['serve:demo']);
 
-gulp.task('serve', ['serve:dev']);
+function serve(port = 80) {
+  const url = `http://localhost:${port}/`;
+  const app = express();
+  app.use('/', express.static('.'));
+  return new Promise((resolve) => {
+    app.listen(port, () => {
+      resolve(url);
+    });
+  });
+}
 
 gulp.task('serve:demo', () =>
-  gulp.src('.')
-    .pipe(plugins.webserver({
-      port: 8001,
-      open: config.demo.dst
-    })));
-
-gulp.task('serve:docs', () =>
-  gulp.src('.')
-    .pipe(plugins.webserver({
-      port: 8002,
-      open: config.docs.dst
-    })));
-
-const webpackPort = 8080;
+  serve(8001)
+    .then(url => open(url + config.demo.dst)));
 
 gulp.task('serve:webpack', () => {
+  const webpackPort = 8080;
   new WebpackDevServer(webpack(webpackDevConfig), webpackDevConfig.devServer)
     .listen(webpackPort, 'localhost', (err) => {
       if (err) {

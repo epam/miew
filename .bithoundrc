@@ -16,7 +16,6 @@
     "mute": [
       "gulp-mocha",
 
-      "gulp-webserver",
       "gulp-insert"
     ]
   }
