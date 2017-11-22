@@ -22,7 +22,6 @@ const plugins = {
   rename:       require('gulp-rename'),
   eslint:       require('gulp-eslint'),
   sass:         require('gulp-sass'),
-  webserver:    require('gulp-webserver'),
   autoprefixer: require('gulp-autoprefixer'),
   jison:        require('gulp-jison'),
   insert:       require('gulp-insert'),
