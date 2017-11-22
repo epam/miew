@@ -4087,9 +4087,9 @@ jpeg-js@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.2.0.tgz#53e448ec9d263e683266467e9442d2c5a2ef5482"
 
-jquery.terminal@^1.9.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/jquery.terminal/-/jquery.terminal-1.9.0.tgz#bb7ec5b5acee38ffb4c6c43e0be031969061fb2a"
+jquery.terminal@^1.10.1:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/jquery.terminal/-/jquery.terminal-1.10.1.tgz#ca217123b90fd399bfb05ac587ee07667d3788fa"
   dependencies:
     jquery "~3"
 
