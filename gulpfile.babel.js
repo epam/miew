@@ -4,8 +4,6 @@ import sequence from 'run-sequence';
 import yargs    from 'yargs';
 import path     from 'path';
 import util     from 'gulp-util';
-import ftp      from 'vinyl-ftp';
-import url      from 'url';
 import _        from 'lodash';
 import jsdoc    from 'gulp-jsdoc3';
 import open     from 'open';
@@ -281,71 +279,6 @@ gulp.task('tools:jison', () => {
     .pipe(plugins.insert.wrap('/* eslint-disable */\n// DO NOT EDIT! Automatically generated from .jison\n', '\n'))
     .pipe(plugins.eol())
     .pipe(gulp.dest(dst));
-});
-
-//////////////////////////////////////////////////////////////////////////////
-
-function refToPath(ref) {
-  if (ref === 'develop') {
-    ref = 'dev';
-  }
-  if (ref) {
-    return ref.split('/')
-      .filter((part) => part && part !== '.' && part !== '..')
-      .map(encodeURIComponent).join('/');
-  }
-  return 'default';
-}
-
-function remoteAccess() {
-  if (!yargs.argv.server) {
-    util.log('Skipping deployment,', util.colors.red('--server is not specified.'));
-    return null;
-  }
-
-  const uo = url.parse(yargs.argv.server);
-  const auth = (uo.auth || 'anonymous:anonymous@').split(':');
-
-  const ref = process.env.CI_COMMIT_REF_NAME || process.env.CI_BUILD_REF_NAME;
-  const subdir = refToPath(ref);
-  if (subdir) {
-    util.log('Job reference name is ' + util.colors.magenta(JSON.stringify(ref)) +
-      ', using ' + util.colors.magenta(JSON.stringify(subdir)) + ' subdirectory for deployment.');
-    uo.pathname = uo.pathname + '/' + subdir;
-  }
-
-  const conn = ftp.create({
-    host:     uo.host,
-    user:     auth[0],
-    password: auth[1],
-    log:      util.log,
-    timeOffset: yargs.argv.serverTime ? yargs.argv.serverTime : 0,
-  });
-  return {conn, path: uo.pathname};
-}
-
-gulp.task('deploy', () => {
-  const remote = remoteAccess();
-  if (!remote) {
-    return util.noop();
-  }
-
-  util.log('Will deploy to', util.colors.magenta(remote.path));
-  return gulp.src(['**/*'], {base: config.demo.dst, cwd: config.demo.dst, buffer: false})
-  // .pipe(conn.newer(uo.pathname)) // only upload newer files // FIXME: Doesn't work!
-    .pipe(remote.conn.dest(remote.path));
-});
-
-gulp.task('deploy:docs', () => {
-  const remote = remoteAccess();
-  if (!remote) {
-    return util.noop();
-  }
-
-  util.log('Will deploy to', util.colors.magenta(remote.path));
-  return gulp.src(['**/*'], {base: config.docs.dst, cwd: config.docs.dst, buffer: false})
-  // .pipe(conn.newer(uo.pathname)) // only upload newer files // FIXME: Doesn't work!
-    .pipe(remote.conn.dest(remote.path + '/docs/'));
 });
 
 //////////////////////////////////////////////////////////////////////////////
