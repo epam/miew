@@ -610,7 +610,7 @@ Miew.prototype._addVisual = function(visual) {
  */
 Miew.prototype._removeVisual = function(visual) {
   var name = '';
-  var obj = visual;
+  var obj = null;
   if (visual instanceof Visual) {
     name = visual.name;
     obj = visual;

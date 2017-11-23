@@ -103,14 +103,14 @@ VolumeMesh.prototype._updateVertices = (function() {
     var cornerMark = [0, 0, 0, 0, 0, 0, 0, 0];
     var edgeMark = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
-    var curEdgeIdx = 0;
-    var curEdge = new THREE.Vector3();
+    const curEdge = new THREE.Vector3();
+    let curEdgeInter = null;
 
     function CheckX() {
       if (norm.x === 0) return 0;
       var x = -(norm.dot(curEdge) + D) / norm.x;
       if (-size.x <= x && x <= size.x) {
-        edgeIntersections[curEdgeIdx].set(x, curEdge.y, curEdge.z);
+        curEdgeInter.set(x, curEdge.y, curEdge.z);
         if (x === size.x) return 2;
         if (x === -size.x) return -2;
         return 1;
@@ -122,7 +122,7 @@ VolumeMesh.prototype._updateVertices = (function() {
       if (norm.y === 0) return 0;
       var y = -(norm.dot(curEdge) + D) / norm.y;
       if (-size.y <= y && y <= size.y) {
-        edgeIntersections[curEdgeIdx].set(curEdge.x, y, curEdge.z);
+        curEdgeInter.set(curEdge.x, y, curEdge.z);
         if (y === size.y) return 2;
         if (y === -size.y) return -2;
         return 1;
@@ -134,7 +134,7 @@ VolumeMesh.prototype._updateVertices = (function() {
       if (norm.z === 0) return 0;
       var z = -(norm.dot(curEdge) + D) / norm.z;
       if (-size.z <= z && z <= size.z) {
-        edgeIntersections[curEdgeIdx].set(curEdge.x, curEdge.y, z);
+        curEdgeInter.set(curEdge.x, curEdge.y, z);
         if (z === size.z) return 2;
         if (z === -size.z) return -2;
         return 1;
@@ -143,21 +143,24 @@ VolumeMesh.prototype._updateVertices = (function() {
     }
 
     // for each edge
-    for (curEdgeIdx = 0; curEdgeIdx < 12; ++curEdgeIdx) {
-      curEdge.set(edges[curEdgeIdx][2], edges[curEdgeIdx][3], edges[curEdgeIdx][4]);
+    for (let curEdgeIdx = 0; curEdgeIdx < 12; ++curEdgeIdx) {
+      const curEdgeSource = edges[curEdgeIdx];
+      curEdgeInter = edgeIntersections[curEdgeIdx];
+
+      curEdge.set(curEdgeSource[2], curEdgeSource[3], curEdgeSource[4]);
       curEdge.multiply(size);
 
       // calculate intersection point
       var flag = 0;
-      if (edges[curEdgeIdx][2] === 0) flag = CheckX();
-      if (edges[curEdgeIdx][3] === 0) flag = CheckY();
-      if (edges[curEdgeIdx][4] === 0) flag = CheckZ();
+      if (curEdgeSource[2] === 0) flag = CheckX();
+      if (curEdgeSource[3] === 0) flag = CheckY();
+      if (curEdgeSource[4] === 0) flag = CheckZ();
 
       // mark corresponding corner (if plane cuts through one)
       if (flag === -2) {
-        cornerMark[edges[curEdgeIdx][0]] = 1;
+        cornerMark[curEdgeSource[0]] = 1;
       } else if (flag === 2) {
-        cornerMark[edges[curEdgeIdx][1]] = 1;
+        cornerMark[curEdgeSource[1]] = 1;
       } else if (flag === 0) {
         // edge is not intersected by the plane (doesn't produce a vertex)
         edgeMark[curEdgeIdx] = 0;

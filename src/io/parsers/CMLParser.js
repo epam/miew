@@ -303,9 +303,8 @@ CMLParser.prototype._selectComponents = function(text) {
     }
 
     var atom;
-    var i = 0;
     var count = atoms.length;
-    for (i = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
       atom = atoms[i];
       atom.edges = [];
     }
@@ -322,8 +321,8 @@ CMLParser.prototype._selectComponents = function(text) {
     count = localBond.length;
     self._rebuidBondIndexes(atoms, localBond);
 
-    function addCurrBond() {
-      bond = localBond[i];
+    function addCurrBond(index) {
+      bond = localBond[index];
       atom = atoms[bond.start];
       if (!atom) {
         return false;
@@ -337,8 +336,8 @@ CMLParser.prototype._selectComponents = function(text) {
       return true;
     }
 
-    for (i = 0; i < count; i++) {
-      if (!addCurrBond()) {
+    for (let i = 0; i < count; i++) {
+      if (!addCurrBond(i)) {
         //ignore invalid bond
         continue;
       }
@@ -363,7 +362,7 @@ CMLParser.prototype._selectComponents = function(text) {
     }
 
     count = atoms.length;
-    for (i = 0; i < count; i++) {
+    for (let i = 0; i < count; i++) {
       atom = atoms[i];
       atom.edges.sort();
     }

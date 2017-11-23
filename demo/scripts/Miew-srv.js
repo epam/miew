@@ -261,8 +261,6 @@ Miew.prototype.srvTopologyConvert = function(topologyFile, mdFile, done) {
     if (result.status && result.status === 'ERROR') {
       message = result.message;
       success = false;
-    } else {
-      data = result;
     }
     done(success, data, message);
   }).fail(function() {
