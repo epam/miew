@@ -734,32 +734,33 @@ Menu.prototype._fillSourceList = function() {
 };
 
 Menu.prototype._fillReprList = function() {
-  var self = this;
-  var reprList = $(self._menuId + ' .panel-menu[data-panel-type=miew-menu-panel-representation] .miew-repr-list');
+  const self = this;
+  const reprList = $(self._menuId + ' .panel-menu[data-panel-type=miew-menu-panel-representation] .miew-repr-list');
 
   reprList.empty();
-  var list = reprList.get(0);
-  for (var i = 0, n = self._viewer.repCount(); i < n; i++) {
-    var entry = self._viewer.repGet(i);
+  const list = reprList.get(0);
+  for (let i = 0, n = self._viewer.repCount(); i < n; i++) {
+    const entry = self._viewer.repGet(i);
     self._addReprListItem(list, i, entry);
   }
 
   $(self._menuId + ' [data-toggle=mode]').on('click', /** @this HTMLSelectElement */ function() {
-    var elements =  reprList.find('.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-mode]');
-    var itemID = this.getAttribute('data-value');
-    var Mode = modes.get(itemID);
+    const elements =  reprList.find('.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-mode]');
+    const itemID = this.getAttribute('data-value');
+    const Mode = modes.get(itemID);
     elements[0].firstElementChild.firstElementChild.textContent = Mode.prototype.shortName;
     elements[0].firstElementChild.firstElementChild.setAttribute('data-id', itemID);
 
-    var head = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-heading a');
-    var header = head.html();
+    const head = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-heading a');
+    const header = head.html();
     head.html(header.substring(0, header.indexOf(':') + 1) + ' ' + Mode.prototype.name);
 
-    var sParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=surf-params]');
-    var qsParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=qsurf-param]');
+    const sParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=surf-params]');
+    const qsParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=qsurf-param]');
     if (itemID === 'SA' || itemID === 'SE' || itemID === 'QS' || itemID === 'CS') {
       qsParam.show();
-      qsParam.find('[type=checkbox][data-toggle=surfZClip]').bootstrapSwitch('state', settings.defaults.modes[itemID].zClip);
+      const sClipSwitch = qsParam.find('[type=checkbox][data-toggle=surfZClip]');
+      sClipSwitch.bootstrapSwitch('state', settings.defaults.modes[itemID].zClip);
     } else {
       qsParam.hide();
     }
@@ -773,9 +774,9 @@ Menu.prototype._fillReprList = function() {
     }
   });
   $(self._menuId + ' [data-toggle=colorer]').on('click', /** @this HTMLSelectElement */ function() {
-    var elements = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-color]');
-    var itemID = this.getAttribute('data-value');
-    var Colorer = colorers.get(itemID);
+    const elements = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-color]');
+    const itemID = this.getAttribute('data-value');
+    const Colorer = colorers.get(itemID);
 
     elements[0].firstElementChild.firstElementChild.textContent = Colorer.prototype.shortName;
     elements[0].firstElementChild.firstElementChild.setAttribute('data-id', itemID);
@@ -788,9 +789,9 @@ Menu.prototype._fillReprList = function() {
   });
 
   $(self._menuId + ' [data-toggle=material]').on('click', /** @this HTMLSelectElement */ function() {
-    var elements = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-matpreset]');
-    var itemID = this.getAttribute('data-value');
-    var material = materials.get(itemID);
+    const elements = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-matpreset]');
+    const itemID = this.getAttribute('data-value');
+    const material = materials.get(itemID);
 
     elements[0].firstElementChild.firstElementChild.textContent = material.shortName;
     elements[0].firstElementChild.firstElementChild.setAttribute('data-id', itemID);
