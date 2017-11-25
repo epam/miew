@@ -586,7 +586,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
           )])])
     )]);
   panel.appendChild(newItem);
-  if (repr.mode.id === 'SA' || repr.mode.id === 'SE' || repr.mode.id === 'QS') {
+  if (repr.mode.id === 'SA' || repr.mode.id === 'SE' || repr.mode.id === 'QS' || repr.mode.id === 'CS') {
     reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=qsurf-param]').show();
   } else {
     reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=qsurf-param]').hide();
@@ -757,7 +757,7 @@ Menu.prototype._fillReprList = function() {
 
     var sParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=surf-params]');
     var qsParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=qsurf-param]');
-    if (itemID === 'SA' || itemID === 'SE' || itemID === 'QS') {
+    if (itemID === 'SA' || itemID === 'SE' || itemID === 'QS' || itemID === 'CS') {
       qsParam.show();
       qsParam.find('[type=checkbox][data-toggle=surfZClip]').bootstrapSwitch('state', settings.defaults.modes[itemID].zClip);
     } else {
