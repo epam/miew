@@ -767,12 +767,15 @@ Menu.prototype._fillReprList = function() {
     var qsParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=qsurf-param]');
     if (itemID === 'SA' || itemID === 'SE' || itemID === 'QS') {
       qsParam.show();
+      qsParam.find('[type=checkbox][data-toggle=surfZClip]').bootstrapSwitch('state', settings.defaults.modes[itemID].zClip);
     } else {
       qsParam.hide();
     }
 
     if (itemID === 'QS') {
       sParam.show();
+      sParam.find('[data-type=rad]').val(settings.defaults.modes[itemID].scale);
+      sParam.find('[data-type=iso]').val(settings.defaults.modes[itemID].isoValue);
     } else {
       sParam.hide();
     }
