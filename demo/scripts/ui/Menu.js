@@ -299,14 +299,6 @@ Menu.prototype._initReprListItemListeners = function(index) {
 
   reprList.find('.panel:eq(' + index + ') input[type=checkbox]').bootstrapSwitch();
 
-  reprList.find('.panel:eq(' + index + ') [data-type=rad]').on('change', function() {
-    settings.set('scale', parseFloat(reprList.find('.panel:eq(' + index + ') [data-type=rad]').val()));
-    settings.set('modes.QS.scale', parseFloat(reprList.find('.panel:eq(' + index + ') [data-type=rad]').val()));
-  });
-  reprList.find('.panel:eq(' + index + ') [data-type=iso]').on('change', function() {
-    settings.set('isoValue', parseFloat(reprList.find('.panel:eq(' + index + ') [data-type=iso]').val()));
-    settings.set('modes.QS.isoValue', parseFloat(reprList.find('.panel:eq(' + index + ') [data-type=iso]').val()));
-  });
 
   reprList.find('.panel:eq(' + index + ') .panel-heading .btn-visible').on('click', function() {
     reprList.find('.panel:eq(' + index + ') .panel-heading .btn-visible').hide();
@@ -2638,7 +2630,7 @@ Menu.prototype._onMenuOff = function() {
   // Apply changed settings
   var changedKeys = settings.changed();
   var rebuild = this._reprListChanged ||  // TODO: list has changed, not rep!?
-      contain(changedKeys, ['resolution', 'palette', 'scale', 'isoValue']);
+      contain(changedKeys, ['resolution', 'palette']);
   var rebuildAll = contain(changedKeys, ['resolution', 'palette']);
   var rerender = contain(changedKeys, ['theme', 'axes', 'fxaa', 'fog', 'ao']);
 
@@ -2856,7 +2848,7 @@ Menu.prototype._onResize = function() {
 Menu.prototype._updateReprList = function() {
   var self = this;
 
-  function _createParams(index, property, element, itemId) {
+  function _createOptionsFromMVData(index, property, element, itemId) {
     var curRep = self._viewer.repGet(index);
     if (curRep[property].id !== itemId) {
       $(element).removeData();
@@ -2886,8 +2878,30 @@ Menu.prototype._updateReprList = function() {
   var isAdded = null;
   var isVisible = null;
   var zClip = null;
+  var isoValue = null;
+  var radScale = null;
   var uniColor = null;
   var repr = null;
+
+  function _fillModeOptionsFromMenu() {
+    // change mode's zClip flag if applicable
+    if (('zClip' in repr.mode.opts) && repr.mode.opts.zClip !== zClip) {
+      repr.mode.opts.zClip = zClip;
+      repr.needsRebuild = true;
+    }
+
+    // change mode's radius scale flag if applicable
+    if (('scale' in repr.mode.opts) && repr.mode.opts.scale !== radScale) {
+      repr.mode.opts.scale = radScale;
+      repr.needsRebuild = true;
+    }
+
+    // change mode's isosurface value flag if applicable
+    if (('isoValue' in repr.mode.opts) && repr.mode.opts.isoValue !== isoValue) {
+      repr.mode.opts.isoValue = isoValue;
+      repr.needsRebuild = true;
+    }
+  }
 
   $(self._menuId + ' [data-panel-type=miew-menu-panel-representation] ' +
       '.miew-repr-list .panel').each(function(index, element) {
@@ -2906,6 +2920,8 @@ Menu.prototype._updateReprList = function() {
       matPresetId = matPresetItem.firstElementChild.firstElementChild.getAttribute('data-id');
       uniColor = stringColorToHex(uniColorItem.firstElementChild.firstElementChild.getAttribute('data-id'));
       zClip = $(element).find('[type=checkbox][data-toggle=surfZClip]')[0].checked;
+      radScale = $(element).find('[data-type=rad]').val();
+      isoValue = $(element).find('[data-type=iso]').val();
 
       if (isDeleted) {
         removeIdxList.push(index);
@@ -2918,11 +2934,7 @@ Menu.prototype._updateReprList = function() {
         if (idx >= 0) {
           repr = self._viewer.repGet(idx);
 
-          if (('zClip' in repr.mode.opts) &&
-                repr.mode.opts.zClip !== zClip) {
-            repr.mode.opts.zClip = zClip;
-            repr.needsRebuild = true;
-          }
+          _fillModeOptionsFromMenu();
 
           if (colorerId === 'UN') {
             repr.colorer.opts.color = uniColor;
@@ -2936,8 +2948,8 @@ Menu.prototype._updateReprList = function() {
         }
       } else {
 
-        var modeParams = _createParams(index, 'mode', modeItem, modeId);
-        var colorerParams = _createParams(index, 'colorer', colorerItem, colorerId);
+        var modeParams = _createOptionsFromMVData(index, 'mode', modeItem, modeId);
+        var colorerParams = _createOptionsFromMVData(index, 'colorer', colorerItem, colorerId);
         index = self._viewer.repCurrent(index);
         self._viewer.rep(index, {
           selector: selector, mode: modeParams, colorer: colorerParams, material: matPresetId
@@ -2953,12 +2965,7 @@ Menu.prototype._updateReprList = function() {
           }
         }
 
-        // change mode's zClip flag if applicable
-        if (('zClip' in repr.mode.opts) &&
-                repr.mode.opts.zClip !== zClip) {
-          repr.mode.opts.zClip = zClip;
-          repr.needsRebuild = true;
-        }
+        _fillModeOptionsFromMenu();
 
         //repr.setMode(repr.mode.id);
 
