@@ -47,7 +47,9 @@ import capabilities from './gfx/capabilities';
 var
   selectors = chem.selectors,
   Atom = chem.Atom,
-  Residue = chem.Residue;
+  Residue = chem.Residue,
+  Chain = chem.Chain,
+  Molecule = chem.Molecule;
 
 var EDIT_MODE = {COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2};
 
@@ -2494,6 +2496,10 @@ Miew.prototype._updateInfoPanel = function() {
     secondLine = residue._type._fullName + ': ' +
         residue._chain._name + '.' + residue._type._name +
         residue._sequence + residue._icode.trim();
+  } else if (this._lastPick instanceof Chain) {
+    secondLine = `chain ${this._lastPick._name}`;
+  } else if (this._lastPick instanceof Molecule) {
+    secondLine = `molecule ${this._lastPick._name}`;
   }
 
   info.appendChild(document.createTextNode(firstLine));
