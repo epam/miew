@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.7 Copyright (c) 2015-2017 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.8 Copyright (c) 2015-2017 EPAM Systems, Inc. */
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -64982,7 +64982,7 @@ Residue$1.prototype._finalize = function () {
  * @exports Chain
  * @constructor
  */
-function Chain(complex, name) {
+function Chain$1(complex, name) {
   this._complex = complex;
   this._name = name;
   this._mask = 1 | 0;
@@ -64994,15 +64994,15 @@ function Chain(complex, name) {
   this.maxSequence = Number.NEGATIVE_INFINITY;
 }
 
-Chain.prototype.getComplex = function () {
+Chain$1.prototype.getComplex = function () {
   return this._complex;
 };
 
-Chain.prototype.getName = function () {
+Chain$1.prototype.getName = function () {
   return this._name;
 };
 
-Chain.prototype.getResidues = function () {
+Chain$1.prototype.getResidues = function () {
   return this._residues;
 };
 
@@ -65012,7 +65012,7 @@ Chain.prototype.getResidues = function () {
  * @param {string} iCode insertion code
  * @returns {*} Residue or null if not found
  */
-Chain.prototype.findResidue = function (seqNum, iCode) {
+Chain$1.prototype.findResidue = function (seqNum, iCode) {
   var residues = this._residues;
 
   for (var i = 0, n = residues.length; i < n; ++i) {
@@ -65025,7 +65025,7 @@ Chain.prototype.findResidue = function (seqNum, iCode) {
   return null;
 };
 
-Chain.prototype._finalize = function () {
+Chain$1.prototype._finalize = function () {
   var residues = this._residues;
 
   var prev = null;
@@ -65049,7 +65049,7 @@ Chain.prototype._finalize = function () {
   }
 };
 
-Chain.prototype.updateToFrame = function (frameData) {
+Chain$1.prototype.updateToFrame = function (frameData) {
   var residues = this._residues;
   var prev = null;
   var prevData = null;
@@ -65078,7 +65078,7 @@ Chain.prototype.updateToFrame = function (frameData) {
  * @param {string} iCode - Insertion code.
  * @returns {Residue} - Newly created residue instance.
  */
-Chain.prototype.addResidue = function (name, sequence, iCode) {
+Chain$1.prototype.addResidue = function (name, sequence, iCode) {
   var type = this._complex.getResidueType(name);
   if (type === null) {
     type = this._complex.addResidueType(name);
@@ -65099,18 +65099,18 @@ Chain.prototype.addResidue = function (name, sequence, iCode) {
   return residue;
 };
 
-Chain.prototype.getResidueCount = function () {
+Chain$1.prototype.getResidueCount = function () {
   return this._residues.length;
 };
 
-Chain.prototype.forEachResidue = function (process) {
+Chain$1.prototype.forEachResidue = function (process) {
   var residues = this._residues;
   for (var i = 0, n = residues.length; i < n; ++i) {
     process(residues[i]);
   }
 };
 
-Chain.prototype.collectMask = function () {
+Chain$1.prototype.collectMask = function () {
   var mask = 0xffffffff;
   var residues = this._residues;
   for (var i = 0, n = residues.length; i < n; ++i) {
@@ -68184,7 +68184,7 @@ Complex.prototype.getAtomByFullname = function (fullName) {
  * @returns {Chain} - Newly created chain.
  */
 Complex.prototype.addChain = function (name) {
-  var result = new Chain(this, name);
+  var result = new Chain$1(this, name);
   this._chains.push(result); // TODO: keep chains in dictionary with an (ordered?) array of keys
   return result;
 };
@@ -69786,7 +69786,7 @@ VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function (forEachAtom, di
  * @exports Molecule
  * @constructor
  */
-function Molecule(complex, name, index) {
+function Molecule$1(complex, name, index) {
   this._complex = complex;
   this._name = name || '';
   this._residues = [];
@@ -69794,30 +69794,30 @@ function Molecule(complex, name, index) {
   this._index = index || -1; // start with 1
 }
 
-Molecule.prototype.getComplex = function () {
+Molecule$1.prototype.getComplex = function () {
   return this._complex;
 };
 
-Molecule.prototype.getName = function () {
+Molecule$1.prototype.getName = function () {
   return this._name;
 };
 
-Molecule.prototype.getResidues = function () {
+Molecule$1.prototype.getResidues = function () {
   return this._residues;
 };
 
-Molecule.prototype.getIndex = function () {
+Molecule$1.prototype.getIndex = function () {
   return this._index;
 };
 
-Molecule.prototype.forEachResidue = function (process) {
+Molecule$1.prototype.forEachResidue = function (process) {
   var residues = this._residues;
   for (var i = 0, n = residues.length; i < n; ++i) {
     process(residues[i]);
   }
 };
 
-Molecule.prototype.collectMask = function () {
+Molecule$1.prototype.collectMask = function () {
   var mask = 0xffffffff;
   var residues = this._residues;
   for (var i = 0, n = residues.length; i < n; ++i) {
@@ -69833,7 +69833,7 @@ var chem = {
   Bond: Bond,
   Residue: Residue$1,
   ResidueType: ResidueType,
-  Chain: Chain,
+  Chain: Chain$1,
   Helix: Helix,
   Strand: Strand,
   Sheet: Sheet,
@@ -69843,7 +69843,7 @@ var chem = {
   Volume: Volume,
   VoxelWorld: VoxelWorld,
   selectors: selectors$1,
-  Molecule: Molecule
+  Molecule: Molecule$1
 };
 
 /**
@@ -81157,14 +81157,14 @@ VolumeMesh.prototype._updateVertices = function () {
     var cornerMark = [0, 0, 0, 0, 0, 0, 0, 0];
     var edgeMark = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
-    var curEdgeIdx = 0;
     var curEdge = new Vector3();
+    var curEdgeInter = null;
 
     function CheckX() {
       if (norm.x === 0) return 0;
       var x = -(norm.dot(curEdge) + D) / norm.x;
       if (-size.x <= x && x <= size.x) {
-        edgeIntersections[curEdgeIdx].set(x, curEdge.y, curEdge.z);
+        curEdgeInter.set(x, curEdge.y, curEdge.z);
         if (x === size.x) return 2;
         if (x === -size.x) return -2;
         return 1;
@@ -81176,7 +81176,7 @@ VolumeMesh.prototype._updateVertices = function () {
       if (norm.y === 0) return 0;
       var y = -(norm.dot(curEdge) + D) / norm.y;
       if (-size.y <= y && y <= size.y) {
-        edgeIntersections[curEdgeIdx].set(curEdge.x, y, curEdge.z);
+        curEdgeInter.set(curEdge.x, y, curEdge.z);
         if (y === size.y) return 2;
         if (y === -size.y) return -2;
         return 1;
@@ -81188,7 +81188,7 @@ VolumeMesh.prototype._updateVertices = function () {
       if (norm.z === 0) return 0;
       var z = -(norm.dot(curEdge) + D) / norm.z;
       if (-size.z <= z && z <= size.z) {
-        edgeIntersections[curEdgeIdx].set(curEdge.x, curEdge.y, z);
+        curEdgeInter.set(curEdge.x, curEdge.y, z);
         if (z === size.z) return 2;
         if (z === -size.z) return -2;
         return 1;
@@ -81197,21 +81197,24 @@ VolumeMesh.prototype._updateVertices = function () {
     }
 
     // for each edge
-    for (curEdgeIdx = 0; curEdgeIdx < 12; ++curEdgeIdx) {
-      curEdge.set(edges[curEdgeIdx][2], edges[curEdgeIdx][3], edges[curEdgeIdx][4]);
+    for (var curEdgeIdx = 0; curEdgeIdx < 12; ++curEdgeIdx) {
+      var curEdgeSource = edges[curEdgeIdx];
+      curEdgeInter = edgeIntersections[curEdgeIdx];
+
+      curEdge.set(curEdgeSource[2], curEdgeSource[3], curEdgeSource[4]);
       curEdge.multiply(size);
 
       // calculate intersection point
       var flag = 0;
-      if (edges[curEdgeIdx][2] === 0) flag = CheckX();
-      if (edges[curEdgeIdx][3] === 0) flag = CheckY();
-      if (edges[curEdgeIdx][4] === 0) flag = CheckZ();
+      if (curEdgeSource[2] === 0) flag = CheckX();
+      if (curEdgeSource[3] === 0) flag = CheckY();
+      if (curEdgeSource[4] === 0) flag = CheckZ();
 
       // mark corresponding corner (if plane cuts through one)
       if (flag === -2) {
-        cornerMark[edges[curEdgeIdx][0]] = 1;
+        cornerMark[curEdgeSource[0]] = 1;
       } else if (flag === 2) {
-        cornerMark[edges[curEdgeIdx][1]] = 1;
+        cornerMark[curEdgeSource[1]] = 1;
       } else if (flag === 0) {
         // edge is not intersected by the plane (doesn't produce a vertex)
         edgeMark[curEdgeIdx] = 0;
@@ -82164,7 +82167,7 @@ var Helix$2 = chem.Helix;
 var Sheet$2 = chem.Sheet;
 var Strand$2 = chem.Strand;
 var Bond$2 = chem.Bond;
-var Molecule$2 = chem.Molecule;
+var Molecule$3 = chem.Molecule;
 
 var TAG_LENGTH = 6;
 
@@ -82272,7 +82275,7 @@ PDBParser.prototype._finalizeMolecules = function () {
       var chain = chainDict[name];
       residues = residues.concat(chain._residues.slice());
     }
-    var molecule = new Molecule$2(this._complex, m._name, i + 1);
+    var molecule = new Molecule$3(this._complex, m._name, i + 1);
     molecule._residues = residues;
     this._complex._molecules[i] = molecule;
   }
@@ -82959,9 +82962,8 @@ CMLParser.prototype._selectComponents = function (text) {
     }
 
     var atom;
-    var i = 0;
     var count = atoms.length;
-    for (i = 0; i < count; i++) {
+    for (var i = 0; i < count; i++) {
       atom = atoms[i];
       atom.edges = [];
     }
@@ -82978,8 +82980,8 @@ CMLParser.prototype._selectComponents = function (text) {
     count = localBond.length;
     self._rebuidBondIndexes(atoms, localBond);
 
-    function addCurrBond() {
-      bond = localBond[i];
+    function addCurrBond(index) {
+      bond = localBond[index];
       atom = atoms[bond.start];
       if (!atom) {
         return false;
@@ -82993,33 +82995,33 @@ CMLParser.prototype._selectComponents = function (text) {
       return true;
     }
 
-    for (i = 0; i < count; i++) {
-      if (!addCurrBond()) {
+    for (var _i = 0; _i < count; _i++) {
+      if (!addCurrBond(_i)) {
         //ignore invalid bond
         continue;
       }
       var orderAttr = bond.xmlNode.getAttribute('order');
       var tc = parseInt(orderAttr, 10);
       // the default bond order is unknown
-      localBond[i].order = 0;
-      localBond[i].type = Bond$3.BondType.UNKNOWN;
+      localBond[_i].order = 0;
+      localBond[_i].type = Bond$3.BondType.UNKNOWN;
       if (tc > 1) {
-        localBond[i].order = tc;
+        localBond[_i].order = tc;
       } else {
         // another option - bond order is a string
         var order = cOrderCharCodes[orderAttr];
         if (order !== undefined) {
-          localBond[i].order = order;
+          localBond[_i].order = order;
           if (orderAttr === 'A') {
-            localBond[i].type = Bond$3.BondType.AROMATIC;
+            localBond[_i].type = Bond$3.BondType.AROMATIC;
           }
         }
       }
     }
 
     count = atoms.length;
-    for (i = 0; i < count; i++) {
-      atom = atoms[i];
+    for (var _i2 = 0; _i2 < count; _i2++) {
+      atom = atoms[_i2];
       atom.edges.sort();
     }
 
@@ -83346,7 +83348,7 @@ var mmtf = createCommonjsModule(function (module, exports) {
 });
 
 var Complex$5 = chem.Complex;
-var Chain$2 = chem.Chain;
+var Chain$3 = chem.Chain;
 var Atom$3 = chem.Atom;
 var AtomName$3 = chem.AtomName;
 var Element$5 = chem.Element;
@@ -83355,7 +83357,7 @@ var Sheet$3 = chem.Sheet;
 var Strand$3 = chem.Strand;
 var Bond$4 = chem.Bond;
 var Assembly$3 = chem.Assembly;
-var Molecule$3 = chem.Molecule;
+var Molecule$4 = chem.Molecule;
 
 function ArrayComparator(original) {
   this._original = Array.from(original);
@@ -83427,7 +83429,7 @@ MMTFParser.prototype._onChain = function (chainData) {
     return;
   }
 
-  var chain = new Chain$2(this._complex, chainData.chainName);
+  var chain = new Chain$3(this._complex, chainData.chainName);
   this._complex._chains[chainData.chainIndex] = chain;
   chain._index = chainData.chainIndex;
 };
@@ -83546,7 +83548,7 @@ MMTFParser.prototype._updateMolecules = function (mmtfData) {
       var chain = this._complex._chains[chainIndex];
       residues = residues.concat(chain._residues.slice());
     }
-    var molecule = new Molecule$3(this._complex, entity.description, i + 1);
+    var molecule = new Molecule$4(this._complex, entity.description, i + 1);
     molecule._residues = residues;
     this._complex._molecules[i] = molecule;
   }
@@ -83783,7 +83785,7 @@ var Helix$4 = chem.Helix;
 var Sheet$4 = chem.Sheet;
 var Strand$4 = chem.Strand;
 var Assembly$4 = chem.Assembly;
-var Molecule$4 = chem.Molecule;
+var Molecule$5 = chem.Molecule;
 
 var cRequiredAtomFields = ['auth_seq_id', 'Cartn_x', 'Cartn_y', 'Cartn_z', 'label_atom_id'];
 
@@ -83912,7 +83914,7 @@ CIFParser.prototype._extractMolecules = function (complex, complexData) {
   var molecules = complex.getMolecules();
   for (i = 0; i < count; i++) {
     var molecule = this.molecules[i];
-    molecules[i] = new Molecule$4(complex, molecule.name, i + 1);
+    molecules[i] = new Molecule$5(complex, molecule.name, i + 1);
     molecules[i]._residues = molecule.residues;
   }
 };
@@ -87242,7 +87244,7 @@ Cookies.prototype._exists = function (key) {
   return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
 };
 
-/* global "0.7.7":false */
+/* global "0.7.8":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -87251,6 +87253,8 @@ Cookies.prototype._exists = function (key) {
 var selectors = chem.selectors;
 var Atom = chem.Atom;
 var Residue = chem.Residue;
+var Chain = chem.Chain;
+var Molecule = chem.Molecule;
 
 var EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 
@@ -87759,7 +87763,7 @@ Miew$1.prototype._addVisual = function (visual) {
  */
 Miew$1.prototype._removeVisual = function (visual) {
   var name = '';
-  var obj = visual;
+  var obj = null;
   if (visual instanceof Visual) {
     name = visual.name;
     obj = visual;
@@ -87768,7 +87772,7 @@ Miew$1.prototype._removeVisual = function (visual) {
     obj = this._visuals[name];
   }
 
-  if (!this._visuals.hasOwnProperty(name) || this._visuals[name] !== obj) {
+  if (!obj || !this._visuals.hasOwnProperty(name) || this._visuals[name] !== obj) {
     return;
   }
 
@@ -89560,17 +89564,21 @@ Miew$1.prototype._updateInfoPanel = function () {
       aName = an.getString();
     }
     var location = atom._location !== 32 ? String.fromCharCode(atom._location) : ''; // 32 is code of white-space
-    secondLine = atom.element.fullName + ' #' + atom._serial + location + ': ' + residue._chain._name + '.' + residue._type._name + residue._sequence + residue._icode.trim() + '.';
+    secondLine = atom.element.fullName + ' #' + atom._serial + location + ':       ' + residue._chain._name + '.' + residue._type._name + residue._sequence + residue._icode.trim() + '.';
     if (typeof aName === 'string') {
       // add atom name to second line in plain text form
       secondLine += aName;
     }
 
-    coordLine = 'Coord: (' + atom._position.x.toFixed(2).toString() + ', ' + atom._position.y.toFixed(2).toString() + ', ' + atom._position.z.toFixed(2).toString() + ')';
+    coordLine = 'Coord: (' + atom._position.x.toFixed(2).toString() + ',     ' + atom._position.y.toFixed(2).toString() + ',     ' + atom._position.z.toFixed(2).toString() + ')';
   } else if (this._lastPick instanceof Residue) {
     residue = this._lastPick;
 
-    secondLine = residue._type._fullName + ': ' + residue._chain._name + '.' + residue._type._name + residue._sequence + residue._icode.trim();
+    secondLine = residue._type._fullName + ':       ' + residue._chain._name + '.' + residue._type._name + residue._sequence + residue._icode.trim();
+  } else if (this._lastPick instanceof Chain) {
+    secondLine = 'chain ' + this._lastPick._name;
+  } else if (this._lastPick instanceof Molecule) {
+    secondLine = 'molecule ' + this._lastPick._name;
   }
 
   info.appendChild(document.createTextNode(firstLine));
@@ -90638,7 +90646,7 @@ function _parseData(data, opts, master, context) {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew$1.prototype.VERSION = typeof "0.7.7" !== 'undefined' && "0.7.7" || '0.0.0-dev';
+Miew$1.prototype.VERSION = typeof "0.7.8" !== 'undefined' && "0.7.8" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew$1, /** @lends Miew */{
@@ -90827,19 +90835,19 @@ case 26:
 this.$ = yy.echo(yy.utils.listSelector(yy.miew, yy.Context));
 break;
 case 27:
-this.$ = yy.miew.select(yy.utils.checkArg($$[$0-1], $$[$0], true));
+this.$ = yy.miew.select(yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0], true));
 break;
 case 28:
-this.$ = yy.Context[$$[$0].toLowerCase()] = yy.utils.checkArg($$[$0-3], $$[$0-2], true); yy.miew.select(yy.Context[$$[$0].toLowerCase()]);
+this.$ = yy.Context[$$[$0].toLowerCase()] = yy.utils.checkArg($$[$0-3].toLowerCase(), $$[$0-2], true); yy.miew.select(yy.Context[$$[$0].toLowerCase()]);
 break;
 case 29:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {selector : yy.utils.checkArg($$[$0-1], $$[$0])});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {selector : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0])});
 break;
 case 30:
 this.$ = yy.Context[$$[$0].toLowerCase()] = yy.miew.within(yy.utils.checkArg("select", $$[$0-2], true), Number($$[$0-4]));
 break;
 case 31:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {material : yy.utils.checkArg($$[$0-1], $$[$0].toUpperCase())});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {material : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0].toUpperCase())});
 break;
 case 34:
 this.$ = yy.echo(yy.miew.view());
@@ -91013,16 +91021,16 @@ case 114:
 this.$ = yy.miew.rep($$[$0-1], $$[$0]); yy.miew.repCurrent($$[$0-1]);
 break;
 case 115:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : yy.utils.checkArg($$[$0-1], $$[$0].toUpperCase())});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0].toUpperCase())});
 break;
 case 116:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : new Array(yy.utils.checkArg($$[$0-2], $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : new Array(yy.utils.checkArg($$[$0-2].toLowerCase(), $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
 break;
 case 117:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : yy.utils.checkArg($$[$0-1], $$[$0].toUpperCase())});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0].toUpperCase())});
 break;
 case 118:
-this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : new Array(yy.utils.checkArg($$[$0-2], $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
+this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : new Array(yy.utils.checkArg($$[$0-2].toLowerCase(), $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
 break;
 case 119:
 this.$ = Number(yy.representations.get($$[$0]));
@@ -92252,9 +92260,11 @@ CLIUtils.prototype.checkArg = function (key, arg, modificate) {
       'materials': materials$1
     };
 
-    var modificator = key;
-    while (modificator !== undefined && modificator[modificator.length - 1] !== 's') {
-      modificator = keyRemap(modificator);
+    var modificator = key,
+        temp = void 0;
+    while (modificator !== temp) {
+      temp = modificator;
+      modificator = keyRemap(temp);
     }
 
     if (modificators[modificator].get(arg) === undefined) {

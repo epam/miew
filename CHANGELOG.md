@@ -6,7 +6,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.8] - 2017-11-27
+### Added
+- Show the chain/molecule information when pick mode is set to chain/molecule. 
+
+### Fixed
+- Fix a crash during typing in the Load panel introduced with the previous release. 
+- Fix a hangup caused by uppercase letters in terminal commands.
+- Fix a picking near the terminal window border. 
+- Fix incorrect formatting in terminal (upgraded jquery.terminal to v1.10.1).
+- Fix surface parameter values in UI. Now they are not global and belong to a mode instance as they
+  should be.
+- Fix useless assignments in the code.
+
 ## [0.7.7] - 2017-11-20
+
+Demo application was accidentally broken in this release. Hotfix is available
+in [0.7.7+hotfix] and later releases.
+
 ### Added
 - `Parser#parseSync()` - a synchronous method for parsing.
 - Unit tests for the `Parser` class.
@@ -134,7 +151,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.7...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.8...HEAD
+[0.7.8]: https://github.com/epam/miew/compare/v0.7.7...v0.7.8
+[0.7.7+hotfix]: https://github.com/epam/miew/tree/v0.7.7+hotfix
 [0.7.7]: https://github.com/epam/miew/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/epam/miew/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/epam/miew/compare/v0.7.4...v0.7.5
