@@ -621,8 +621,7 @@ Miew.prototype._removeVisual = function(visual) {
     obj = this._visuals[name];
   }
 
-  if (!this._visuals.hasOwnProperty(name) ||
-         this._visuals[name] !== obj) {
+  if (!obj || !this._visuals.hasOwnProperty(name) || this._visuals[name] !== obj) {
     return;
   }
 
