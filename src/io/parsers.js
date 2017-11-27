@@ -1,37 +1,37 @@
+import ParserList from './parsers/ParserList';
 
+import PDBParser from './parsers/PDBParser';
+import CMLParser from './parsers/CMLParser';
+import MMTFParser from './parsers/MMTFParser';
+import CIFParser from './parsers/CIFParser';
+import CCP4Parser from './parsers/CCP4Parser';
+import PubChemParser from './parsers/PubChemParser';
 
-/**
- * Parsers list.
- * @module io/parsers
- */
 import Parser from './parsers/Parser';
-import _PDB from './parsers/PDBParser';
-import _MOL from './parsers/MOLParser';
-import _CML from './parsers/CMLParser';
-import _MMTF from './parsers/MMTFParser';
-import _CIF from './parsers/CIFParser';
-import _CCP4 from './parsers/CCP4Parser';
-import _PBC from './parsers/PubChemParser';
-// FIXME: deps for amdclean
 
-var parserList = [];
-var ag = [_PDB, _MOL, _CML, _MMTF, _CIF, _CCP4, _PBC];
+export const parsers = new ParserList([
+  // note: order might be important
+  PDBParser,
+  CIFParser,
+  MMTFParser,
+  CMLParser,
+  PubChemParser,
+  CCP4Parser,
+]);
 
-(function(plugins) {
-  for (var i = 0, n = plugins.length; i < n; ++i) {
-    var currParser = plugins[i];
-    parserList.push(currParser);
-  }
-})(ag);
+/** @deprecated */
+const parserList = parsers.all;
 
-// NOTE: workaround for https://github.com/gfranko/amdclean/issues/115
-var exports = /** @alias module:io/parsers */ {
+/** @deprecated */
+const exports = {
   /**
    *  The list of parser constructor functions available.
    *  @type {Array<function(new:Parser)>}
+   *  @deprecated
    */
   list: parserList,
 
+  /** @deprecated */
   Parser: Parser,
 
   /**
@@ -60,4 +60,3 @@ var exports = /** @alias module:io/parsers */ {
 };
 
 export default exports;
-

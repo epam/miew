@@ -68,12 +68,20 @@ PDBParser.prototype.constructor = PDBParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 PDBParser.canParse = function(data, options) {
   if (!data) {
     return false;
   }
   return (typeof data === 'string') &&
     (Parser.checkDataTypeOptions(options, 'pdb') || Parser.checkDataTypeOptions(options, 'pdb', '.ent'));
+};
+
+// the most frequently used beginnings; although HEADER is mandatory, it is often missing in handmade files
+const pdbStartRegexp = /^(HEADER\s|COMPND\s|REMARK\s|ATOM {2}|HETATM|MODEL )/i;
+
+PDBParser.canProbablyParse = function(data) {
+  return _.isString(data) && pdbStartRegexp.test(data);
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -496,5 +504,7 @@ PDBParser.prototype.parseSync = function() {
   return result;
 };
 
-export default PDBParser;
+PDBParser.formats = ['pdb'];
+PDBParser.extensions = ['.pdb', '.ent'];
 
+export default PDBParser;

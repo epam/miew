@@ -1,5 +1,4 @@
-
-
+import _ from 'lodash';
 import Parser from './Parser';
 import chem from '../../chem';
 import * as THREE from 'three';
@@ -41,6 +40,7 @@ CMLParser.prototype.constructor = CMLParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 CMLParser.canParse = function(data, options) {
   if (!data) {
     return false;
@@ -54,6 +54,11 @@ CMLParser.canParse = function(data, options) {
   );
 };
 
+const cmlStartRegexp = /\s*<\?xml\b[^?>]*\?>\s*<(?:cml|molecule)\b/i;
+
+CMLParser.canProbablyParse = function(data) {
+  return _.isString(data) && cmlStartRegexp.test(data);
+};
 
 ////////////////////////////////////////////////////////////////////////////
 // Instance methods
@@ -692,5 +697,7 @@ CMLParser.prototype.parseSync = function() {
   }
 };
 
-export default CMLParser;
+CMLParser.formats = ['cml'];
+CMLParser.extensions = ['.cml'];
 
+export default CMLParser;

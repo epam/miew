@@ -74,12 +74,24 @@ MMTFParser.prototype.constructor = MMTFParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 MMTFParser.canParse = function(data, options) {
   if (!data) {
     return false;
   }
 
   return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'mmtf');
+};
+
+function getFirstByte(buf) {
+  const bytes = new Uint8Array(buf, 0, 1);
+  return bytes[0];
+}
+
+MMTFParser.canProbablyParse = function(data) {
+  // check if it's binary MessagePack format containing a map (dictionary)
+  // see https://github.com/msgpack/msgpack/blob/master/spec.md
+  return _.isArrayBuffer(data) && ((getFirstByte(data) | 1) === 0xDF);
 };
 
 MMTFParser.prototype._onModel = function(_modelData) {
@@ -446,5 +458,7 @@ MMTFParser.prototype.parseSync = function() {
   return this._complex;
 };
 
-export default MMTFParser;
+MMTFParser.formats = ['mmtf'];
+MMTFParser.extensions = ['.mmtf'];
 
+export default MMTFParser;

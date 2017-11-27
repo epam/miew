@@ -79,11 +79,16 @@ CIFParser.prototype.constructor = CIFParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 CIFParser.canParse = function(data, options) {
   if (!data) {
     return false;
   }
   return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'cif');
+};
+
+CIFParser.canProbablyParse = function(data) {
+  return _.isString(data) && /^\s*data_/i.test(data);
 };
 
 CIFParser.prototype.parseSync = function() {
@@ -780,5 +785,7 @@ CIFParser._parseToObject = function(source) {
   return ret;
 };
 
-export default CIFParser;
+CIFParser.formats = ['cif', 'mmcif'];
+CIFParser.extensions = ['.cif', '.mmcif'];
 
+export default CIFParser;

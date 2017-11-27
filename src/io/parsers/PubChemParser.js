@@ -23,6 +23,7 @@ PubChemParser.prototype.constructor = PubChemParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 PubChemParser.canParse = function(data, options) {
   if (!data) {
     return false;
@@ -32,6 +33,10 @@ PubChemParser.canParse = function(data, options) {
     _.isString(data) &&
       (type === 'pubchem+json' || (!type && data[0] === '{'))
   );
+};
+
+PubChemParser.canProbablyParse = function(data) {
+  return _.isString(data) && data[0] === '{';
 };
 
 PubChemParser.prototype.parseSync = function() {
@@ -94,5 +99,7 @@ PubChemParser.prototype._extractAtoms = function(complex, complexData) {
   }
 };
 
-export default PubChemParser;
+PubChemParser.formats = ['pubchem', 'pubchem+json', 'pc'];
+PubChemParser.extensions = ['.json'];
 
+export default PubChemParser;

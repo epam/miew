@@ -194,11 +194,16 @@ utils.deriveClass(CCP4Parser, Parser);
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 CCP4Parser.canParse = function(data, options) {
   if (!data) {
     return false;
   }
   return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'ccp4');
+};
+
+CCP4Parser.canProbablyParse = function(_data) {
+  return false; // Autodetection is not implemented yet
 };
 
 CCP4Parser.prototype.parseSync = function() {
@@ -207,5 +212,7 @@ CCP4Parser.prototype.parseSync = function() {
   return new Volume(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
 };
 
-export default CCP4Parser;
+CCP4Parser.formats = ['ccp4'];
+CCP4Parser.extensions = ['.ccp4'];
 
+export default CCP4Parser;

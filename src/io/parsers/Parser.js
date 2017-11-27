@@ -41,6 +41,7 @@ export default class Parser {
     this._abort = true;
   }
 
+  /** @deprecated */
   static checkDataTypeOptions(options, type, extension) {
     const fileType = options.fileType;
     const fileName = options.fileName;
