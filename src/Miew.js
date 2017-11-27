@@ -2476,21 +2476,21 @@ Miew.prototype._updateInfoPanel = function() {
       aName = an.getString();
     }
     var location = (atom._location !== 32) ? String.fromCharCode(atom._location) : ''; // 32 is code of white-space
-    secondLine = `${atom.element.fullName} #${atom._serial}${location}: 
-        ${residue._chain._name}.${residue._type._name}${residue._sequence}${residue._icode.trim()}.`;
+    secondLine = `${atom.element.fullName} #${atom._serial}${location}: \
+      ${residue._chain._name}.${residue._type._name}${residue._sequence}${residue._icode.trim()}.`;
     if (typeof aName === 'string') {
       // add atom name to second line in plain text form
       secondLine += aName;
     }
 
-    coordLine = `Coord: (${atom._position.x.toFixed(2).toString()},
-     ${atom._position.y.toFixed(2).toString()},
+    coordLine = `Coord: (${atom._position.x.toFixed(2).toString()},\
+     ${atom._position.y.toFixed(2).toString()},\
      ${atom._position.z.toFixed(2).toString()})`;
 
   } else if (this._lastPick instanceof Residue) {
     residue = this._lastPick;
 
-    secondLine = `${residue._type._fullName}: 
+    secondLine = `${residue._type._fullName}: \
       ${residue._chain._name}.${residue._type._name}${residue._sequence}${residue._icode.trim()}`;
   } else if (this._lastPick instanceof Chain) {
     secondLine = `chain ${this._lastPick._name}`;
