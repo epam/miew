@@ -552,7 +552,8 @@ CMLParser.prototype._parseSet = function(varData) {
 
       if (atom.x3 || atom.x2) {
         var currAtomComp = this._unpackLabel(lLabel).compId;
-        var chainID = String.fromCharCode('A'.charCodeAt(0) + currAtomComp);
+        // use ' ' by default instead of synthetic creation of chain names
+        var chainID = ' '; //= String.fromCharCode('A'.charCodeAt(0) + currAtomComp);
         var resSeq = currAtomComp;
         var iCode = ' ';
         var strLabel = currAtomComp.toString();
@@ -590,7 +591,7 @@ CMLParser.prototype._parseSet = function(varData) {
         var atomSerial = parseInt(atom.id.replace(/[^0-9]/, ''), 10);
         var added = residue.addAtom(
           atomFullNameStruct, element, xyz, Element.Role.SG,
-          true, atomSerial, ' ', 1.0, 32.0, atomCharge
+          true, atomSerial, ' ', 1.0, 0.0, atomCharge
         );
         if (atom.hydrogenCount) {
           added._hydrogenCount = parseInt(atom.hydrogenCount, 10);
