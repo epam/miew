@@ -568,7 +568,7 @@ $selection-panel-row-height: 42px;
   bottom: 0;
   width: 30%;
   padding: 0;
-  margin-top: 42px;
+  margin-top: #{$titlebar-height};
 
   .row {
     margin-left: 0;
@@ -578,9 +578,8 @@ $selection-panel-row-height: 42px;
 
 .miew-terminal-body {
   display:block;
-  margin: 5px;
+  height: 100%;
   border: 1px solid #444444;
-  border-radius: 5px;
   background:rgba(0,0,0,0.75);
 }
 
