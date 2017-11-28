@@ -19,9 +19,12 @@ SequenceColorer.prototype.getAtomColor = function(atom, complex) {
 };
 
 SequenceColorer.prototype.getResidueColor = function(residue, _complex) {
-  var chain = residue._chain;
-  var min = chain.minSequence;
-  var max = chain.maxSequence > min ? chain.maxSequence : min + 1;
+  const chain = residue._chain;
+  if (chain.minSequence === Number.POSITIVE_INFINITY && chain.maxSequence === Number.NEGATIVE_INFINITY) {
+    return this.palette.defaultNamedColor;
+  }
+  const min = chain.minSequence;
+  const max = chain.maxSequence > min ? chain.maxSequence : min + 1;
   return this.palette.getGradientColor((residue._sequence - min) / (max - min), this.opts.gradient);
 };
 
