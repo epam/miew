@@ -121,3 +121,29 @@ describe('utils.deriveDeep()', function() {
   });
 
 });
+
+describe('utils.getFileExtension()', () => {
+
+  const getFileExtension = utils.getFileExtension;
+
+  it('returns filename extension', () => {
+    expect(getFileExtension('name.ext')).to.equal('.ext');
+  });
+
+  it('accepts filenames with multiple dots', () => {
+    expect(getFileExtension('name.with.many.dots.and.ext')).to.equal('.ext');
+  });
+
+  it('accepts filenames w/o extension', () => {
+    expect(getFileExtension('name')).to.equal('');
+  });
+
+  it('accepts filenames starting with a dot', () => {
+    expect(getFileExtension('.name')).to.equal('');
+  });
+
+  it('accepts empty string', () => {
+    expect(getFileExtension('')).to.equal('');
+  });
+
+});

@@ -22,7 +22,7 @@ describe('Parser', () => {
 
   });
 
-  describe('#parseSync', () => {
+  describe('#parseSync()', () => {
 
     it('throws an error', () => {
       const parser = new Parser();
@@ -134,7 +134,7 @@ describe('Parser', () => {
 
   });
 
-  describe('.checkDataTypeOptions()', () => {
+  describe('.checkDataTypeOptions() - @deprecated', () => {
 
     const check = Parser.checkDataTypeOptions;
 

@@ -40,6 +40,7 @@ const exports = {
    * @param {string} data    - Data to be parsed.
    * @param {object} options - Parser options object overriding defaults.
    * @returns {Parser} New parser object.
+   * @deprecated
    */
   create: function(context, data, options) {
     var parser = new Parser(data, options);// this behaviour was copied from the previous version

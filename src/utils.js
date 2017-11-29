@@ -372,6 +372,10 @@ function enquoteString(value) {
   return value;
 }
 
+function getFileExtension(fileName) {
+  return fileName.slice((Math.max(0, fileName.lastIndexOf('.')) || Infinity));
+}
+
 function dataUrlToBlob(url) {
   var parts = url.split(/[:;,]/);
   var partsCount = parts.length;
@@ -465,5 +469,6 @@ export default {
   copySubArrays: copySubArrays,
   shallowCloneNode: shallowCloneNode,
   correctSelectorIdentifier: correctSelectorIdentifier,
+  getFileExtension,
 };
 

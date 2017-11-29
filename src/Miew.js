@@ -3539,7 +3539,18 @@ function _parseData(data, opts, master, context) {
 
   opts = opts || {}; // TODO: clone
 
-  const parser = io.parsers.create(context, data, opts);
+  const TheParser = _.head(io.parsers.find({
+    format: opts.fileType,
+    ext: utils.getFileExtension(opts.fileName || ''),
+    data,
+  }));
+
+  if (!TheParser) {
+    return Promise.reject(new Error('Could not find suitable parser'));
+  }
+
+  const parser = new TheParser(data, opts);
+  parser.context = context;
 
   if (master) {
     master.addEventListener('cancel', function() {
