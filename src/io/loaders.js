@@ -6,12 +6,15 @@
  */
 import Loader from './loaders/Loader';
 import _fl from './loaders/FileLoader';
-import _ml from './loaders/XHRLoader';
-import _xhr from './loaders/MessageLoader';
+import _xhr from './loaders/XHRLoader';
+import _imm from './loaders/ImmediateLoader';
+import _ml from './loaders/MessageLoader';
+
+
 // FIXME: deps for amdclean
 
 var loaderList = [];
-var ag = [_fl, _ml, _xhr];
+var ag = [_fl, _xhr, _imm, _ml];
 
 (function(plugins) {
   for (var i = 0, n = plugins.length; i < n; ++i) {
