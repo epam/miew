@@ -3,6 +3,11 @@ import webdriver from 'selenium-webdriver';
 import EmptyPage from './pages/empty.page';
 import golden from './golden';
 import goldenCfg from './golden.cfg';
+import _ from 'lodash';
+import chai, {expect} from 'chai';
+import dirtyChai from 'dirty-chai';
+
+chai.use(dirtyChai);
 
 const cfg = Object.assign({}, goldenCfg, {
   title: 'API Tests',
@@ -40,7 +45,7 @@ describe('As a third-party developer, I want to', function() {
 
   before(function() {
     driver = new webdriver.Builder()
-      .forBrowser('chrome')
+      .forBrowser('firefox')
       .build();
 
     return golden.startup(driver, cfg)
@@ -75,6 +80,36 @@ describe('As a third-party developer, I want to', function() {
     });
 
     describeGroup('(load a data set)', function() {
+		
+	/*let retrieveModes = ['SE', 'SA', 'TX'];//'BS', 'LN', 'LC', 'VW', 'CA', 'TU', 'TR', 'QS', 'CS',
+	let retrieveColours = ['CH', 'SS', 'UN'];//'EL', 'RT', 'SQ', 'TM', 'CO', 'OC', 'CF', 'HY', 'MO', 
+	const suite = this;
+	before(function() {
+      return Promise.resolve([retrieveModes, retrieveColours]).then(([modes, colorers]) => {
+		  //console.log (colorers);
+        _.each(modes, (modeId) => {
+			//console.log(modeID);
+		  _.each(colorers, (colorerId) => {
+			  //console.log(colorerID);
+            suite.addTest(it(`set ${modeId} mode with ${colorerId} coloring`, api((modeId, colorerId) => {
+			  //console.log(modeId, colorerId);
+              window.miew = new window.Miew({
+				settings: {interpolateViews: false},
+				load: '../data/1CRN.pdb',
+				view: '1+n4pwTVeI8Erh8LAZHS5PcVcM70wyDlAXe38Pw==',
+				reps: [{
+				  mode: modeId,
+				  colorer: colorerId
+				}]
+			  });
+			  if (miew.init()) {
+				  miew.run();
+        	  }
+    		}, '1crn_view')));
+            });
+          });
+        });
+      });*/
 
       it('load a data set with the default appearance so that I save my time and effort on a proper setup', api(() => {
         window.miew = new window.Miew({load: '../data/1CRN.pdb'});
@@ -98,11 +133,13 @@ describe('As a third-party developer, I want to', function() {
           miew.run();
         }
       }, '1crn_TU_SQ_LN_UN'));
-
+	  
+	  
       it('specify initial position and orientation so that exactly the same picture is reproduced', api(() => {
         window.miew = new window.Miew({
-          load: '../data/1CRN.pdb',
-          view: '1+n4pwTVeI8Erh8LAZHS5PcVcM70wyDlAXe38Pw==',
+		  settings: {interpolateViews: false}, //make the molecule appear in the view determined position
+          load: 'https://files.rcsb.org/view/1CRN.pdb',	//'../data/1CRN.pdb',
+          view: '1+n4pwTVeI8Erh8LAZHS5PcVcM70wyDlAXe38Pw=='
         });
         if (miew.init()) {
           miew.run();
@@ -119,9 +156,9 @@ describe('As a third-party developer, I want to', function() {
           });
         }
       }, '1crn_TU_SQ_LN_UN'));
-
-    });
-
+	});
+		 
+  
     describeGroup('(multiple data sets)', function() {
 
       it('load a data set in place of an existing one so that I don\'t unload it explicitly', api(() => {
