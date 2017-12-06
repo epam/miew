@@ -1,54 +1,54 @@
-
-
 import Loader from './Loader';
 
-function XHRLoader(source, options) {
-  if (!options.fileName) {
-    let last = source.indexOf('?');
-    if (last === -1) {
-      last = source.length;
-    }
-    options.fileName = source.slice(source.lastIndexOf('/') + 1, last);
-  }
-  this._binary = (options.binary === true);
-  Loader.call(this, source, options);
-}
+export default class XHRLoader extends Loader {
+  constructor(source, options) {
+    super(source, options);
 
-XHRLoader.prototype = Object.create(Loader.prototype);
-XHRLoader.prototype.constructor = XHRLoader;
-
-XHRLoader.prototype.load = function(callback) {
-  var url = this._source;
-  var request = new XMLHttpRequest();
-  this._agent = request;
-
-  if (callback.ready) {
-    request.addEventListener('load', function _onLoad() {
-      if (request.status === 200) {
-        callback.ready(request.response);
-      } else if (callback.error) {
-        callback.error('HTTP ' + request.status + ' while fetching ' + url);
+    options = this._options;
+    if (!options.fileName) {
+      let last = source.indexOf('?');
+      if (last === -1) {
+        last = source.length;
       }
+      options.fileName = source.slice(source.lastIndexOf('/') + 1, last);
+    }
+    this._binary = (options.binary === true);
+  }
+
+  loadAsync() {
+    return new Promise((resolve, reject) => {
+      const url = this._source;
+      const request = this._agent = new XMLHttpRequest();
+
+      request.addEventListener('load', () => {
+        if (request.status === 200) {
+          resolve(request.response);
+        } else {
+          reject(new Error(`HTTP ${request.status} while fetching ${url}`));
+        }
+      });
+      request.addEventListener('error', () => {
+        reject(new Error('HTTP request failed'));
+      });
+      request.addEventListener('abort', () => {
+        reject(new Error('Loading aborted'));
+      });
+      request.addEventListener('progress', (event) => {
+        this.dispatchEvent(event);
+      });
+
+      request.open('GET', url);
+      if (this._binary) {
+        request.responseType = 'arraybuffer';
+      } else {
+        request.responseType = 'text';
+      }
+      request.send();
     });
   }
-  Loader.addCommonHandlers(request, callback);
 
-  request.open('GET', url);
-  if (this._binary) {
-    request.responseType = 'arraybuffer';
-  } else {
-    request.responseType = 'text';
+  static canLoad(source, options) {
+    const sourceType = options.sourceType;
+    return (typeof source === 'string') && (!sourceType || sourceType === 'url');
   }
-  request.send();
-};
-
-XHRLoader.canLoad = function(source, options) {
-  var type = options.sourceType;
-  return (
-    (typeof source === 'string') &&
-      (!type || type === 'url')
-  );
-};
-
-export default XHRLoader;
-
+}

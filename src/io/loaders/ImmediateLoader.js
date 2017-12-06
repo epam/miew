@@ -7,15 +7,8 @@ export default class ImmediateLoader extends Loader {
     super(source, options);
   }
 
-  load(callback) {
-    const self = this;
-    setTimeout(()=>{
-      try {
-        callback.ready(self._source);
-      } catch (err) {
-        callback.error(err);
-      }
-    }, 0);
+  loadAsync() {
+    return Promise.resolve(this._source);
   }
 
   static canLoad(source, options) {

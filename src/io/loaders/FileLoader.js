@@ -1,43 +1,44 @@
-
-
 import Loader from './Loader';
 
-function FileLoader(source, options) {
-  if (!options.fileName) {
-    options.fileName = source.name;
+export default class FileLoader extends Loader {
+  constructor(source, options) {
+    super(source, options);
+
+    options = this._options;
+    if (!options.fileName) {
+      options.fileName = source.name;
+    }
+    this._binary = options.binary === true;
   }
-  this._binary = options.binary === true;
-  Loader.call(this, source, options);
-}
 
-FileLoader.prototype = Object.create(Loader.prototype);
-FileLoader.prototype.constructor = FileLoader;
+  loadAsync() {
+    return new Promise((resolve, reject) => {
+      const blob = this._source;
+      const reader = this._agent = new FileReader();
 
-FileLoader.prototype.load = function(callback) {
-  var reader = new FileReader();
-  this._agent = reader;
+      reader.addEventListener('load', () => {
+        resolve(reader.result);
+      });
+      reader.addEventListener('error', () => {
+        reject(reader.error);
+      });
+      reader.addEventListener('abort', () => {
+        reject(new Error('Loading aborted'));
+      });
+      reader.addEventListener('progress', (event) => {
+        this.dispatchEvent(event);
+      });
 
-  if (callback.ready) {
-    reader.addEventListener('load', function _onLoad(event) {
-      callback.ready(event.target.result);
+      if (this._binary) {
+        reader.readAsArrayBuffer(blob);
+      } else {
+        reader.readAsText(blob);
+      }
     });
   }
-  Loader.addCommonHandlers(reader, callback);
 
-  if (this._binary) {
-    reader.readAsArrayBuffer(this._source);
-  } else {
-    reader.readAsText(this._source);
+  static canLoad(source, options) {
+    const sourceType = options.sourceType;
+    return source instanceof File && (!sourceType || sourceType === 'file');
   }
-};
-
-FileLoader.canLoad = function(source, options) {
-  var type = options.sourceType;
-  return (
-    (source instanceof File) &&
-      (!type || type === 'file')
-  );
-};
-
-export default FileLoader;
-
+}
