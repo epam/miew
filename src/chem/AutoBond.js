@@ -215,6 +215,9 @@ function _waterBondingHack(complex) {
       var a0 = atoms[0];
       var a1 = atoms[1];
       var a2 = atoms[2];
+      if (!a1 || !a2) {
+        continue;
+      }
       var b1 = complex.addBond(a0, a1, 0, t, true);
       var b2 = complex.addBond(a0, a2, 0, t, true);
       a0._bonds[0] = b1;
