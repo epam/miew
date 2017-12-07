@@ -14,14 +14,6 @@ describe('Parser', () => {
 
   const fakeResult = {foo: 'bar'};
 
-  describe('constructor', () => {
-
-    it('instantiates a Parser', () => {
-      expect(new Parser()).to.be.an.instanceOf(Parser);
-    });
-
-  });
-
   describe('#parseSync()', () => {
 
     it('throws an error', () => {
@@ -37,59 +29,51 @@ describe('Parser', () => {
 
     beforeEach(() => {
       parser = new Parser();
+      sinon.stub(parser, 'parseSync').returns(fakeResult);
       callbacks = {};
       callbacks.ready = sinon.spy();
       callbacks.error = sinon.spy();
     });
 
     it('calls parseSync() eventually', () => {
-      sinon.spy(parser, 'parseSync');
       const fulfill = parser.parse(callbacks);
-      expect(parser.parseSync).to.not.be.called();
+      expect(parser.parseSync).to.not.have.been.called();
       return fulfill.then(() => {
         expect(parser.parseSync).to.be.calledOnce();
       });
     });
 
     it('calls an error callback eventually', () => {
+      parser.parseSync.restore();
       const fulfill = parser.parse(callbacks);
-      expect(callbacks.ready).to.not.be.called();
-      expect(callbacks.error).to.not.be.called();
+      expect(callbacks.ready).to.not.have.been.called();
+      expect(callbacks.error).to.not.have.been.called();
       return fulfill.then(() => {
-        expect(callbacks.ready).to.not.be.called();
+        expect(callbacks.ready).to.not.have.been.called();
         expect(callbacks.error).to.be.calledOnce();
         expect(callbacks.error).to.be.calledWith(sinon.match.instanceOf(Error));
       });
     });
 
-    it('calls a ready callback eventually if parseSync() doesn\'t throw', () => {
-      parser.parseSync = () => fakeResult;
+    it('calls a ready callback eventually if parseSync() does not throw', () => {
       const fulfill = parser.parse(callbacks);
-      expect(callbacks.ready).to.not.be.called();
-      expect(callbacks.error).to.not.be.called();
+      expect(callbacks.ready).to.not.have.been.called();
+      expect(callbacks.error).to.not.have.been.called();
       return fulfill.then(() => {
         expect(callbacks.ready).to.be.calledOnce();
         expect(callbacks.ready).to.be.calledWith(fakeResult);
-        expect(callbacks.error).to.not.be.called();
+        expect(callbacks.error).to.not.have.been.called();
       });
     });
 
-    it('fails if aborted before the call', () => {
+    it('fails without calling parseSync if aborted', () => {
+      const fulfill = parser.parse(callbacks);
       parser.abort();
-      return parser.parse(callbacks).then(() => {
-        expect(callbacks.ready).to.not.be.called();
+      return expect(fulfill).to.be.fulfilled().then(() => {
+        expect(callbacks.ready).to.not.have.been.called();
         expect(callbacks.error).to.be.calledOnce();
         expect(callbacks.error).to.be.calledWith(sinon.match.instanceOf(Error));
-      });
-    });
-
-    it('fails if aborted after the call', () => {
-      const promise = parser.parse(callbacks);
-      parser.abort();
-      return promise.then(() => {
-        expect(callbacks.ready).to.not.be.called();
-        expect(callbacks.error).to.be.calledOnce();
-        expect(callbacks.error).to.be.calledWith(sinon.match.instanceOf(Error));
+        expect(parser.parseSync).to.not.have.been.called();
       });
     });
 
@@ -101,35 +85,32 @@ describe('Parser', () => {
 
     beforeEach(() => {
       parser = new Parser();
+      sinon.stub(parser, 'parseSync').returns(fakeResult);
     });
 
     it('calls parseSync() eventually', () => {
-      sinon.spy(parser, 'parseSync');
       const promise = parser.parse();
-      expect(parser.parseSync).to.not.be.called();
-      return promise.catch(() => {}).then(() => {
+      expect(parser.parseSync).to.not.have.been.called();
+      return promise.then(() => {
         expect(parser.parseSync).to.be.calledOnce();
       });
     });
 
     it('rejects the promise eventually', () => {
+      parser.parseSync.restore();
       return expect(parser.parse()).to.be.rejected();
     });
 
-    it('resolves the promise eventually if parseSync() doesn\'t throw', () => {
-      parser.parseSync = () => fakeResult;
+    it('resolves the promise eventually if parseSync() does not throw', () => {
       return expect(parser.parse()).to.eventually.deep.equal(fakeResult);
     });
 
-    it('fails if aborted before the call', () => {
-      parser.abort();
-      return expect(parser.parse()).to.be.rejected();
-    });
-
-    it('fails if aborted after the call', () => {
+    it('fails and does not call parseSync if aborted', () => {
       const promise = parser.parse();
       parser.abort();
-      return expect(promise).to.be.rejected();
+      return expect(promise).to.be.rejected().then(() => {
+        expect(parser.parseSync).to.not.have.been.called();
+      });
     });
 
   });
