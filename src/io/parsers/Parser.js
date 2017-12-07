@@ -4,6 +4,7 @@ export default class Parser {
   constructor(data, options) {
     this._data = data;
     this._options = options;
+    this._abort = false;
   }
 
   parseSync() {
@@ -18,6 +19,9 @@ export default class Parser {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         try {
+          if (this._abort) {
+            return reject(new Error('Parsing aborted'));
+          }
           return resolve(this.parseSync());
         } catch (error) {
           return reject(error);

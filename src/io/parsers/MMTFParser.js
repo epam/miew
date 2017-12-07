@@ -451,10 +451,6 @@ MMTFParser.prototype.parseSync = function() {
     serialAtomMap: this._serialAtomMap
   });
 
-  if (this.hasOwnProperty('_abort')) {
-    throw new Error('Aborted');
-  }
-
   return this._complex;
 };
 

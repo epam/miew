@@ -662,11 +662,6 @@ CMLParser.prototype.parseSync = function() {
       molSet.count = 1;
     }
     for (var i = 0; i < molSet.count; i++) {
-
-      if (self.hasOwnProperty('_abort')) {
-        throw new Error('Aborted');
-      }
-
       molSet.curr = (i + 1);
       complexes.push(self._parseSet(molSet, false));
     }
@@ -679,10 +674,6 @@ CMLParser.prototype.parseSync = function() {
   });
   if (totalAtomsParsed <= 0) {
     throw new Error('The data does not contain valid atoms');
-  }
-
-  if (this.hasOwnProperty('_abort')) {
-    throw new Error('Aborted');
   }
 
   if (complexes.length > 1) {

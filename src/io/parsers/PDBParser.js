@@ -479,10 +479,6 @@ PDBParser.prototype.parseSync = function() {
     stream.next();
   }
 
-  if (this.hasOwnProperty('_abort')) {
-    throw new Error('Aborted');
-  }
-
   // Resolve indices and serials to objects
   this._finalize();
 
@@ -495,10 +491,6 @@ PDBParser.prototype.parseSync = function() {
 
   if (result.getAtomCount() === 0) {
     throw new Error('The data does not contain valid atoms');
-  }
-
-  if (this.hasOwnProperty('_abort')) {
-    throw new Error('Aborted');
   }
 
   return result;
