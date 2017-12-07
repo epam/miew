@@ -1,11 +1,10 @@
-const CRLF = '\n';
-const CRLF_LENGTH = CRLF.length; // FIXME: It is always 1, isn't it?
-
 export default class PDBStream {
   constructor(data) {
     this._data = data;
     this._start = 0;
-    this._next = -CRLF_LENGTH;
+    this._nextCR = -1;
+    this._nextLF = -1;
+    this._next = -1;
     this._end = data.length;
 
     this.next();
@@ -44,9 +43,18 @@ export default class PDBStream {
   }
 
   next() {
-    const start = this._next + CRLF_LENGTH;
+    const start = this._next + 1;
     this._start = start < this._end ? start : this._end;
-    const next = this._data.indexOf(CRLF, this._start);
-    this._next = next > 0 ? next : this._end;
+
+    // support CR, LF, CR+LF line endings
+    // do not support LF+CR, CR+CR+LF, and other strange combinations
+
+    if (this._start > this._nextCR) {
+      this._nextCR = (this._data.indexOf('\r', this._start) + 1 || this._end + 1) - 1;
+    }
+    if (this._start > this._nextLF) {
+      this._nextLF = (this._data.indexOf('\n', this._start) + 1 || this._end + 1) - 1;
+    }
+    this._next = this._nextCR + 1 < this._nextLF ? this._nextCR : this._nextLF;
   }
 }
