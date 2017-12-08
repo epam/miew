@@ -6,12 +6,16 @@ export default class Loader extends EventDispatcher {
     super();
     this._source = source;
     this._options = options || {};
+    this._abort = false;
     this._agent = null;
   }
 
   load(/** @deprecated */ callbacks) {
     if (callbacks) {
       return this._loadOLD(callbacks);
+    }
+    if (this._abort) {
+      return Promise.reject(new Error('Loading aborted'));
     }
     return this.loadAsync();
   }
@@ -42,6 +46,7 @@ export default class Loader extends EventDispatcher {
   }
 
   abort() {
+    this._abort = true;
     if (this._agent) {
       this._agent.abort();
     }

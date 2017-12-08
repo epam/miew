@@ -1,20 +1,14 @@
 import ImmediateLoader from './ImmediateLoader';
 
 import chai, {expect} from 'chai';
+import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
+chai.use(dirtyChai);
 chai.use(sinonChai);
 
 describe('ImmediateLoader', () => {
-
-  describe('constructor', () => {
-
-    it('instantiates a ImmediateLoader', () => {
-      expect(new ImmediateLoader()).to.be.an.instanceOf(ImmediateLoader);
-    });
-
-  });
 
   describe('#load(callbacks)', () => {
 
@@ -59,7 +53,7 @@ describe('ImmediateLoader', () => {
 
   });
 
-  describe('#canLoad()', () => {
+  describe('.canLoad()', () => {
     const correctOpts = {sourceType: 'immediate'};
 
     it('can\'t load undefined source', () => {

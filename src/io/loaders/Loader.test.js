@@ -132,7 +132,7 @@ describe('Loader', () => {
 
   });
 
-  describe('#abort', () => {
+  describe('#abort()', () => {
 
     it('is immediately forwarded to a loading agent', () => {
       const loader = new Loader();
