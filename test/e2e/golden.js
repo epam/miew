@@ -81,7 +81,8 @@ const report = {
 function _prepareBrowser(width = 1024, height = 768) {
   const getPadding = 'return[window.outerWidth-window.innerWidth,window.outerHeight-window.innerHeight];';
   return driver.executeScript(getPadding)
-    .then((pad) => driver.manage().window().setSize(width + pad[0], height + pad[1]))	//need to be commented, when using Opera browser//use this.merge()???
+    //need to comment the string below, when using Opera browser
+    .then((pad) => driver.manage().window().setSize(width + pad[0], height + pad[1]))
     .then(() => driver.getCapabilities())
     .then((caps) => {
       const browserName = caps.get('browserName').replace(/\b\w/g, c => c.toUpperCase());
@@ -156,7 +157,7 @@ function _matchAsPromised(first, second) {
 function shouldMatch(id, test) {
   const prefix = 'data:image/png;base64,';
   const prefixLength = prefix.length;
-  driver.sleep(50);	//add sleep(100) for experiment to prevent picture shifting and double screenshots
+  //driver.sleep(50);  //added to prevent picture shifting and double screenshots; need to find better way
 
   return driver.executeScript(() => window.miew && window.miew.screenshot(128))
     .then((dataUrl) => {
