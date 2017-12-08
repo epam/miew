@@ -4,6 +4,11 @@ plugins:
     enabled: true
   fixme:
     enabled: true
+engines:
+  duplication:
+    exclude_paths:
+    - "**/*.test.js"
+    - "**/*.e2e.js"
 exclude_patterns:
 - ".github/"
 - ".idea/"
