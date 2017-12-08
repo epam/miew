@@ -208,7 +208,7 @@ Miew.prototype = Object.create(EventDispatcher.prototype);
 Miew.prototype.constructor = Miew;
 
 Miew.prototype.getMaxRepresentationCount = function() {
-  return ComplexVisual.prototype.getMaxRepresentationCount();
+  return ComplexVisual.NUM_REPRESENTATION_BITS;
 };
 
 /**
@@ -1992,8 +1992,8 @@ Miew.prototype._extractRepresentation = function() {
       material: defPreset[0].material.id
     });
     if (idx < 0) {
-      if (visual.repCount() === visual.getMaxRepresentationCount()) {
-        this.logger.warn(`Number of representations is limited to ${visual.getMaxRepresentationCount()}`);
+      if (visual.repCount() === ComplexVisual.NUM_REPRESENTATION_BITS) {
+        this.logger.warn(`Number of representations is limited to ${ComplexVisual.NUM_REPRESENTATION_BITS}`);
       }
       return;
     }

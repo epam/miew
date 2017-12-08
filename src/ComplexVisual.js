@@ -15,7 +15,6 @@ import Representation from './gfx/Representation';
 import Visual from './Visual';
 import ComplexVisualEdit from './ComplexVisualEdit';
 
-var NUM_REPRESENTATION_BITS = 32;
 var VOXEL_SIZE = 5.0;
 
 var selectors = chem.selectors;
@@ -36,7 +35,11 @@ function ComplexVisual(name, dataSource) {
   this._selectionCount = 0;
 
   this._selectionGeometry = new THREE.Group();
+
 }
+
+// 32 bits = 30 bits for reps + 1 for selection + 1 for selection expansion
+ComplexVisual.NUM_REPRESENTATION_BITS = 30;
 
 utils.deriveClass(ComplexVisual, Visual);
 
@@ -50,10 +53,6 @@ ComplexVisual.prototype.release = function() {
   }
 
   Visual.prototype.release.call(this);
-};
-
-ComplexVisual.prototype.getMaxRepresentationCount = function() {
-  return (NUM_REPRESENTATION_BITS - 1);
 };
 
 ComplexVisual.prototype.getComplex = function() {
@@ -271,7 +270,7 @@ ComplexVisual.prototype.repGet = function(index) {
 
 ComplexVisual.prototype._getFreeReprIdx = function() {
   var bits = this._reprUsedBits;
-  for (var i = 0; i < NUM_REPRESENTATION_BITS; ++i, bits >>= 1) {
+  for (var i = 0; i <= ComplexVisual.NUM_REPRESENTATION_BITS; ++i, bits >>= 1) {
     if ((bits & 1) === 0) {
       return i;
     }
@@ -285,7 +284,7 @@ ComplexVisual.prototype._getFreeReprIdx = function() {
  * @returns {number} Index of the new representation.
  */
 ComplexVisual.prototype.repAdd = function(rep) {
-  if (this._reprList.length >= this.getMaxRepresentationCount()) {
+  if (this._reprList.length >= ComplexVisual.NUM_REPRESENTATION_BITS) {
     return -1;
   }
 
