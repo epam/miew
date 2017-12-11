@@ -5,8 +5,30 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.7.9] - 2017-12-11
 ### Added
-- Add an `ImmediateLoader` for passing prepared data 
+- Add an `ImmediateLoader` for loading structures from pre-fetched data.
+- Add loader unit tests.
+
+### Changed
+- Sequence colorer uses white color as default for files where "sequence" is not applicable.
+- CML files are parsed with default temperature of 0 and default chain id `' '` (space).
+- Support different line endings in PDB format: LF, CR+LF, CR.
+- Refactor parsers API and switch to the new way of parser auto detection.
+- `Loader#load()` now returns a promise.
+- Process a request to abort the parsing stage in a base class.
+- Changed appearance of the terminal window to make it conform to the overall style and to avoid
+  attempts to click on transparent areas.
+
+### Deprecated
+- Deprecated old `io.parsers` methods and `Parser.canParse()`, replaced them with alternatives.
+- Callbacks in loading methods should be avoided, please use promises.
+
+### Fixed
+- Fix a crash in water bonding hack.
+- Limit the number of representations correctly.
+- Fix parser unit tests.
 
 ## [0.7.8] - 2017-11-27
 ### Added
@@ -153,7 +175,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.8...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.9...HEAD
+[0.7.9]: https://github.com/epam/miew/compare/v0.7.8...v0.7.9
 [0.7.8]: https://github.com/epam/miew/compare/v0.7.7...v0.7.8
 [0.7.7+hotfix]: https://github.com/epam/miew/tree/v0.7.7+hotfix
 [0.7.7]: https://github.com/epam/miew/compare/v0.7.6...v0.7.7

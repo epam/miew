@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.8 Copyright (c) 2015-2017 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.9 Copyright (c) 2015-2017 EPAM Systems, Inc. */
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -62303,6 +62303,10 @@ function enquoteString(value) {
   return value;
 }
 
+function getFileExtension(fileName) {
+  return fileName.slice(Math.max(0, fileName.lastIndexOf('.')) || Infinity);
+}
+
 function dataUrlToBlob(url) {
   var parts = url.split(/[:;,]/);
   var partsCount = parts.length;
@@ -62395,7 +62399,8 @@ var utils = {
   shotDownload: shotDownload,
   copySubArrays: copySubArrays,
   shallowCloneNode: shallowCloneNode,
-  correctSelectorIdentifier: correctSelectorIdentifier
+  correctSelectorIdentifier: correctSelectorIdentifier,
+  getFileExtension: getFileExtension
 };
 
 var now = utils.Timer.now;
@@ -63453,6 +63458,34 @@ var possibleConstructorReturn = function (self, call) {
   }
 
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
 };
 
 var repIndex = 0;
@@ -67679,6 +67712,9 @@ function _waterBondingHack(complex) {
       var a0 = atoms[0];
       var a1 = atoms[1];
       var a2 = atoms[2];
+      if (!a1 || !a2) {
+        continue;
+      }
       var b1 = complex.addBond(a0, a1, 0, t, true);
       var b2 = complex.addBond(a0, a2, 0, t, true);
       a0._bonds[0] = b1;
@@ -79162,6 +79198,9 @@ SequenceColorer.prototype.getAtomColor = function (atom, complex) {
 
 SequenceColorer.prototype.getResidueColor = function (residue, _complex) {
   var chain = residue._chain;
+  if (chain.minSequence === Number.POSITIVE_INFINITY && chain.maxSequence === Number.NEGATIVE_INFINITY) {
+    return this.palette.defaultNamedColor;
+  }
   var min = chain.minSequence;
   var max = chain.maxSequence > min ? chain.maxSequence : min + 1;
   return this.palette.getGradientColor((residue._sequence - min) / (max - min), this.opts.gradient);
@@ -80122,7 +80161,6 @@ var ComplexVisualEdit = {
   FragmentEditor: ComplexFragmentEditor
 };
 
-var NUM_REPRESENTATION_BITS = 32;
 var VOXEL_SIZE = 5.0;
 
 var selectors$3 = chem.selectors;
@@ -80145,6 +80183,9 @@ function ComplexVisual(name, dataSource) {
   this._selectionGeometry = new Group();
 }
 
+// 32 bits = 30 bits for reps + 1 for selection + 1 for selection expansion
+ComplexVisual.NUM_REPRESENTATION_BITS = 30;
+
 utils.deriveClass(ComplexVisual, Visual);
 
 ComplexVisual.prototype.getBoundaries = function () {
@@ -80157,10 +80198,6 @@ ComplexVisual.prototype.release = function () {
   }
 
   Visual.prototype.release.call(this);
-};
-
-ComplexVisual.prototype.getMaxRepresentationCount = function () {
-  return NUM_REPRESENTATION_BITS - 1;
 };
 
 ComplexVisual.prototype.getComplex = function () {
@@ -80377,7 +80414,7 @@ ComplexVisual.prototype.repGet = function (index) {
 
 ComplexVisual.prototype._getFreeReprIdx = function () {
   var bits = this._reprUsedBits;
-  for (var i = 0; i < NUM_REPRESENTATION_BITS; ++i, bits >>= 1) {
+  for (var i = 0; i <= ComplexVisual.NUM_REPRESENTATION_BITS; ++i, bits >>= 1) {
     if ((bits & 1) === 0) {
       return i;
     }
@@ -80391,7 +80428,7 @@ ComplexVisual.prototype._getFreeReprIdx = function () {
  * @returns {number} Index of the new representation.
  */
 ComplexVisual.prototype.repAdd = function (rep) {
-  if (this._reprList.length >= this.getMaxRepresentationCount()) {
+  if (this._reprList.length >= ComplexVisual.NUM_REPRESENTATION_BITS) {
     return -1;
   }
 
@@ -81697,174 +81734,211 @@ GfxProfiler.prototype.min = function () {
   return this._prof ? this._prof.min() : 0.0;
 };
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+var Loader$1 = function (_EventDispatcher) {
+  inherits(Loader, _EventDispatcher);
 
-function Loader$1(source, options) {
-  this._source = source;
-  this._options = options;
-  this._agent = null;
-}
+  function Loader(source, options) {
+    classCallCheck(this, Loader);
 
-Loader$1.prototype.abort = function () {
-  this._agent.abort();
-};
+    var _this = possibleConstructorReturn(this, (Loader.__proto__ || Object.getPrototypeOf(Loader)).call(this));
+
+    _this._source = source;
+    _this._options = options || {};
+    _this._agent = null;
+    return _this;
+  }
+
+  createClass(Loader, [{
+    key: 'load',
+    value: function load( /** @deprecated */callbacks) {
+      if (callbacks) {
+        return this._loadOLD(callbacks);
+      }
+      return this.loadAsync();
+    }
+
+    /** @deprecated Rename to `load` when transition from callbacks to promises is done */
+
+  }, {
+    key: 'loadAsync',
+    value: function loadAsync() {
+      return Promise.reject(new Error('Loading from this source is not implemented'));
+    }
+
+    /** @deprecated */
+
+  }, {
+    key: '_loadOLD',
+    value: function _loadOLD(callbacks) {
+      if (callbacks.progress) {
+        this.addEventListener('progress', function (event) {
+          if (event.lengthComputable && event.total > 0) {
+            callbacks.progress(event.loaded / event.total);
+          } else {
+            callbacks.progress();
+          }
+        });
+      }
+      return this.load().then(function (result) {
+        callbacks.ready(result);
+      }).catch(function (error) {
+        callbacks.error(error);
+      });
+    }
+  }, {
+    key: 'abort',
+    value: function abort() {
+      if (this._agent) {
+        this._agent.abort();
+      }
+    }
+  }]);
+  return Loader;
+}(EventDispatcher$1);
 
 makeContextDependent(Loader$1.prototype);
 
-////////////////////////////////////////////////////////////////////////////
+var FileLoader$1 = function (_Loader) {
+  inherits(FileLoader, _Loader);
 
-Loader$1.addCommonHandlers = function (obj, callback) {
-  if (callback.error) {
-    obj.addEventListener('error', function _onError() {
-      callback.error('OnError() event fired while loading');
-    });
-    obj.addEventListener('abort', function _onAbort() {
-      callback.error('OnAbort() event fired while loading');
-    });
+  function FileLoader(source, options) {
+    classCallCheck(this, FileLoader);
+
+    var _this = possibleConstructorReturn(this, (FileLoader.__proto__ || Object.getPrototypeOf(FileLoader)).call(this, source, options));
+
+    options = _this._options;
+    if (!options.fileName) {
+      options.fileName = source.name;
+    }
+    _this._binary = options.binary === true;
+    return _this;
   }
-  if (callback.progress) {
-    obj.addEventListener('progress', function _onProgress(event) {
-      if (event.lengthComputable) {
-        callback.progress(event.loaded / event.total);
-      } else {
-        callback.progress();
+
+  createClass(FileLoader, [{
+    key: 'loadAsync',
+    value: function loadAsync() {
+      var _this2 = this;
+
+      return new Promise(function (resolve, reject) {
+        var blob = _this2._source;
+        var reader = _this2._agent = new FileReader();
+
+        reader.addEventListener('load', function () {
+          resolve(reader.result);
+        });
+        reader.addEventListener('error', function () {
+          reject(reader.error);
+        });
+        reader.addEventListener('abort', function () {
+          reject(new Error('Loading aborted'));
+        });
+        reader.addEventListener('progress', function (event) {
+          _this2.dispatchEvent(event);
+        });
+
+        if (_this2._binary) {
+          reader.readAsArrayBuffer(blob);
+        } else {
+          reader.readAsText(blob);
+        }
+      });
+    }
+  }], [{
+    key: 'canLoad',
+    value: function canLoad(source, options) {
+      var sourceType = options.sourceType;
+      return source instanceof File && (!sourceType || sourceType === 'file');
+    }
+  }]);
+  return FileLoader;
+}(Loader$1);
+
+var XHRLoader$1 = function (_Loader) {
+  inherits(XHRLoader, _Loader);
+
+  function XHRLoader(source, options) {
+    classCallCheck(this, XHRLoader);
+
+    var _this = possibleConstructorReturn(this, (XHRLoader.__proto__ || Object.getPrototypeOf(XHRLoader)).call(this, source, options));
+
+    options = _this._options;
+    if (!options.fileName) {
+      var last = source.indexOf('?');
+      if (last === -1) {
+        last = source.length;
       }
-    });
-  }
-};
-
-function FileLoader$1(source, options) {
-  if (!options.fileName) {
-    options.fileName = source.name;
-  }
-  this._binary = options.binary === true;
-  Loader$1.call(this, source, options);
-}
-
-FileLoader$1.prototype = Object.create(Loader$1.prototype);
-FileLoader$1.prototype.constructor = FileLoader$1;
-
-FileLoader$1.prototype.load = function (callback) {
-  var reader = new FileReader();
-  this._agent = reader;
-
-  if (callback.ready) {
-    reader.addEventListener('load', function _onLoad(event) {
-      callback.ready(event.target.result);
-    });
-  }
-  Loader$1.addCommonHandlers(reader, callback);
-
-  if (this._binary) {
-    reader.readAsArrayBuffer(this._source);
-  } else {
-    reader.readAsText(this._source);
-  }
-};
-
-FileLoader$1.canLoad = function (source, options) {
-  var type = options.sourceType;
-  return source instanceof File && (!type || type === 'file');
-};
-
-function XHRLoader$1(source, options) {
-  if (!options.fileName) {
-    var last = source.indexOf('?');
-    if (last === -1) {
-      last = source.length;
+      options.fileName = source.slice(source.lastIndexOf('/') + 1, last);
     }
-    options.fileName = source.slice(source.lastIndexOf('/') + 1, last);
+    _this._binary = options.binary === true;
+    return _this;
   }
-  this._binary = options.binary === true;
-  Loader$1.call(this, source, options);
-}
 
-XHRLoader$1.prototype = Object.create(Loader$1.prototype);
-XHRLoader$1.prototype.constructor = XHRLoader$1;
+  createClass(XHRLoader, [{
+    key: 'loadAsync',
+    value: function loadAsync() {
+      var _this2 = this;
 
-XHRLoader$1.prototype.load = function (callback) {
-  var url = this._source;
-  var request = new XMLHttpRequest();
-  this._agent = request;
+      return new Promise(function (resolve, reject) {
+        var url = _this2._source;
+        var request = _this2._agent = new XMLHttpRequest();
 
-  if (callback.ready) {
-    request.addEventListener('load', function _onLoad() {
-      if (request.status === 200) {
-        callback.ready(request.response);
-      } else if (callback.error) {
-        callback.error('HTTP ' + request.status + ' while fetching ' + url);
-      }
-    });
-  }
-  Loader$1.addCommonHandlers(request, callback);
+        request.addEventListener('load', function () {
+          if (request.status === 200) {
+            resolve(request.response);
+          } else {
+            reject(new Error('HTTP ' + request.status + ' while fetching ' + url));
+          }
+        });
+        request.addEventListener('error', function () {
+          reject(new Error('HTTP request failed'));
+        });
+        request.addEventListener('abort', function () {
+          reject(new Error('Loading aborted'));
+        });
+        request.addEventListener('progress', function (event) {
+          _this2.dispatchEvent(event);
+        });
 
-  request.open('GET', url);
-  if (this._binary) {
-    request.responseType = 'arraybuffer';
-  } else {
-    request.responseType = 'text';
-  }
-  request.send();
-};
-
-XHRLoader$1.canLoad = function (source, options) {
-  var type = options.sourceType;
-  return typeof source === 'string' && (!type || type === 'url');
-};
-
-function MessageLoader(source, options) {
-  if (!options.data) {
-    var idx = source.indexOf(':', 0);
-    if (idx > 0) {
-      options.data = window.atob(source.substring(idx + 1));
-      options.fileType = source.substring(0, idx).toLowerCase();
+        request.open('GET', url);
+        if (_this2._binary) {
+          request.responseType = 'arraybuffer';
+        } else {
+          request.responseType = 'text';
+        }
+        request.send();
+      });
     }
-  }
-  Loader$1.call(this, source, options);
-}
-
-MessageLoader.prototype = Object.create(Loader$1.prototype);
-MessageLoader.prototype.constructor = MessageLoader;
-
-MessageLoader.prototype.load = function (callback) {
-  if (callback.progress) {
-    callback.progress(0);
-  }
-
-  if (!this._options.data || this._options.data === null || this._options.data === '') {
-    if (callback.error) {
-      callback.error('No data found!');
+  }], [{
+    key: 'canLoad',
+    value: function canLoad(source, options) {
+      var sourceType = options.sourceType;
+      return typeof source === 'string' && (!sourceType || sourceType === 'url');
     }
+  }]);
+  return XHRLoader;
+}(Loader$1);
+
+var ImmediateLoader = function (_Loader) {
+  inherits(ImmediateLoader, _Loader);
+
+  function ImmediateLoader(source, options) {
+    classCallCheck(this, ImmediateLoader);
+    return possibleConstructorReturn(this, (ImmediateLoader.__proto__ || Object.getPrototypeOf(ImmediateLoader)).call(this, source, options));
   }
 
-  if (callback.progress) {
-    callback.progress(0.5);
-  }
-
-  if (!this._options.dataType || this._options.dataType === null || this._options.dataType === '') {
-    if (callback.error) {
-      callback.error('No dataType found!');
+  createClass(ImmediateLoader, [{
+    key: 'loadAsync',
+    value: function loadAsync() {
+      return Promise.resolve(this._source);
     }
-  }
-
-  if (callback.progress) {
-    callback.progress(1);
-  }
-
-  if (callback.ready) {
-    callback.ready(this._options.data);
-  }
-};
-
-MessageLoader.canLoad = function (source, options) {
-  var type = options.sourceType;
-  if (typeof source !== 'string') {
-    return false;
-  }
-  var semiIdx = source.indexOf(':', 0);
-  return semiIdx === 3 || type === 'message';
-};
+  }], [{
+    key: 'canLoad',
+    value: function canLoad(source, options) {
+      return typeof source !== 'undefined' && typeof options !== 'undefined' && options.sourceType === 'immediate';
+    }
+  }]);
+  return ImmediateLoader;
+}(Loader$1);
 
 /**
  * Loaders list.
@@ -81873,7 +81947,7 @@ MessageLoader.canLoad = function (source, options) {
 // FIXME: deps for amdclean
 
 var loaderList = [];
-var ag$3 = [FileLoader$1, XHRLoader$1, MessageLoader];
+var ag$3 = [FileLoader$1, XHRLoader$1, ImmediateLoader];
 
 (function (plugins) {
   for (var i = 0, n = plugins.length; i < n; ++i) {
@@ -81918,12 +81992,129 @@ var exports$3 = /** @alias module:io/loaders */{
   }
 };
 
+function registerIn(dict, keys, value) {
+  keys.forEach(function (key) {
+    key = key.toLowerCase();
+    var list = dict[key] = dict[key] || [];
+    if (!list.includes(value)) {
+      list.push(value);
+    }
+  });
+}
+
+function unregisterFrom(dict, keys, value) {
+  keys.forEach(function (key) {
+    key = key.toLowerCase();
+    var list = dict[key];
+    if (list) {
+      var pos = list.indexOf(value);
+      if (pos !== -1) {
+        list.splice(pos, 1);
+      }
+      if (list.length === 0) {
+        delete dict[key];
+      }
+    }
+  });
+}
+
+var ParserList = function () {
+  function ParserList() {
+    var _this = this;
+
+    var someParsers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    classCallCheck(this, ParserList);
+
+    this._list = [];
+    this._byFormat = {};
+    this._byExt = {};
+
+    someParsers.forEach(function (SomeParser) {
+      return _this.register(SomeParser);
+    });
+  }
+
+  /**
+   * Register a parser for a specific data format.
+   *
+   * @param {function} SomeParser - a Parser subclass to register
+   * @param {string[]} SomeParser.formats - supported data formats
+   * @param {string[]} SomeParser.extensions - supported file extensions
+   */
+
+
+  createClass(ParserList, [{
+    key: "register",
+    value: function register(SomeParser) {
+      if (!this._list.includes(SomeParser)) {
+        this._list.push(SomeParser);
+      }
+      registerIn(this._byFormat, SomeParser.formats, SomeParser);
+      registerIn(this._byExt, SomeParser.extensions, SomeParser);
+    }
+  }, {
+    key: "unregister",
+    value: function unregister(SomeParser) {
+      var pos = this._list.indexOf(SomeParser);
+      if (pos !== -1) {
+        this._list.splice(pos, 1);
+      }
+      unregisterFrom(this._byFormat, SomeParser.formats, SomeParser);
+      unregisterFrom(this._byExt, SomeParser.extensions, SomeParser);
+    }
+  }, {
+    key: "find",
+
+
+    /**
+     * Find a suitable parser for data
+     *
+     * @param {object} specs - parser specifications
+     * @param {string=} specs.format - supported data format
+     * @param {string=} specs.ext - supported filename extension
+     * @param {data=} specs.data - data to parse
+     */
+    value: function find(specs) {
+      var list = [];
+      if (specs.format) {
+        list = this._byFormat[specs.format.toLowerCase()] || [];
+      } else if (specs.ext) {
+        list = this._byExt[specs.ext.toLowerCase()] || [];
+      }
+      // autodetect only if no format is forced
+      if (list.length === 0 && !specs.format && specs.data) {
+        return this._list.filter(function (SomeParser) {
+          return SomeParser.canProbablyParse && SomeParser.canProbablyParse(specs.data);
+        });
+      }
+      return [].concat(toConsumableArray(list));
+    }
+  }, {
+    key: "all",
+    get: function get$$1() {
+      return [].concat(toConsumableArray(this._list));
+    }
+  }, {
+    key: "formats",
+    get: function get$$1() {
+      return Object.keys(this._byFormat);
+    }
+  }, {
+    key: "extensions",
+    get: function get$$1() {
+      return Object.keys(this._byExt);
+    }
+  }]);
+  return ParserList;
+}();
+
 var Parser = function () {
   function Parser(data, options) {
     classCallCheck(this, Parser);
 
     this._data = data;
     this._options = options;
+    this._abort = false;
   }
 
   createClass(Parser, [{
@@ -81943,6 +82134,9 @@ var Parser = function () {
       return new Promise(function (resolve, reject) {
         setTimeout(function () {
           try {
+            if (_this._abort) {
+              return reject(new Error('Parsing aborted'));
+            }
             return resolve(_this.parseSync());
           } catch (error) {
             return reject(error);
@@ -81967,6 +82161,9 @@ var Parser = function () {
     value: function abort() {
       this._abort = true;
     }
+
+    /** @deprecated */
+
   }], [{
     key: 'checkDataTypeOptions',
     value: function checkDataTypeOptions(options, type, extension) {
@@ -82095,16 +82292,15 @@ Remark350.prototype.parse = function (stream) {
   }
 };
 
-var CRLF = '\n';
-var CRLF_LENGTH = CRLF.length; // FIXME: It is always 1, isn't it?
-
 var PDBStream = function () {
   function PDBStream(data) {
     classCallCheck(this, PDBStream);
 
     this._data = data;
     this._start = 0;
-    this._next = -CRLF_LENGTH;
+    this._nextCR = -1;
+    this._nextLF = -1;
+    this._next = -1;
     this._end = data.length;
 
     this.next();
@@ -82152,10 +82348,19 @@ var PDBStream = function () {
   }, {
     key: 'next',
     value: function next() {
-      var start = this._next + CRLF_LENGTH;
+      var start = this._next + 1;
       this._start = start < this._end ? start : this._end;
-      var next = this._data.indexOf(CRLF, this._start);
-      this._next = next > 0 ? next : this._end;
+
+      // support CR, LF, CR+LF line endings
+      // do not support LF+CR, CR+CR+LF, and other strange combinations
+
+      if (this._start > this._nextCR) {
+        this._nextCR = (this._data.indexOf('\r', this._start) + 1 || this._end + 1) - 1;
+      }
+      if (this._start > this._nextLF) {
+        this._nextLF = (this._data.indexOf('\n', this._start) + 1 || this._end + 1) - 1;
+      }
+      this._next = this._nextCR + 1 < this._nextLF ? this._nextCR : this._nextLF;
     }
   }]);
   return PDBStream;
@@ -82220,11 +82425,19 @@ PDBParser.prototype.constructor = PDBParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 PDBParser.canParse = function (data, options) {
   if (!data) {
     return false;
   }
   return typeof data === 'string' && (Parser.checkDataTypeOptions(options, 'pdb') || Parser.checkDataTypeOptions(options, 'pdb', '.ent'));
+};
+
+// the most frequently used beginnings; although HEADER is mandatory, it is often missing in handmade files
+var pdbStartRegexp = /^(HEADER\s|COMPND\s|REMARK\s|ATOM {2}|HETATM|MODEL )/i;
+
+PDBParser.canProbablyParse = function (data) {
+  return lodash.isString(data) && pdbStartRegexp.test(data);
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -82615,10 +82828,6 @@ PDBParser.prototype.parseSync = function () {
     stream.next();
   }
 
-  if (this.hasOwnProperty('_abort')) {
-    throw new Error('Aborted');
-  }
-
   // Resolve indices and serials to objects
   this._finalize();
 
@@ -82633,48 +82842,13 @@ PDBParser.prototype.parseSync = function () {
     throw new Error('The data does not contain valid atoms');
   }
 
-  if (this.hasOwnProperty('_abort')) {
-    throw new Error('Aborted');
-  }
-
   return result;
 };
+
+PDBParser.formats = ['pdb'];
+PDBParser.extensions = ['.pdb', '.ent'];
 
 var Complex$3 = chem.Complex;
-
-function MOLParser(data, options) {
-  Parser.call(this, data, options);
-
-  this._complex = null;
-
-  options.fileType = 'mol';
-}
-
-MOLParser.prototype = Object.create(Parser.prototype);
-MOLParser.prototype.constructor = MOLParser;
-
-MOLParser.prototype.parseSync = function () {
-  var result = this._complex = new Complex$3();
-
-  // TODO: Make asynchronous
-
-  // parse MOL
-  // ...
-
-  // cleanup
-  this._complex = null;
-
-  return result;
-};
-
-MOLParser.canParse = function (data, options) {
-  if (!data) {
-    return false;
-  }
-  return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'mol');
-};
-
-var Complex$4 = chem.Complex;
 var Element$4 = chem.Element;
 var AtomName$2 = chem.AtomName;
 var SGroup$2 = chem.SGroup;
@@ -82710,6 +82884,7 @@ CMLParser.prototype.constructor = CMLParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 CMLParser.canParse = function (data, options) {
   if (!data) {
     return false;
@@ -82718,6 +82893,12 @@ CMLParser.canParse = function (data, options) {
   var re1 = new RegExp('^\\s*?\\<cml');
   var dataHasXML = (typeof data === 'string' || data instanceof String) && (data.match(re) || data.match(re1));
   return dataHasXML && Parser.checkDataTypeOptions(options, 'cml');
+};
+
+var cmlStartRegexp = /\s*<\?xml\b[^?>]*\?>\s*<(?:cml|molecule)\b/i;
+
+CMLParser.canProbablyParse = function (data) {
+  return lodash.isString(data) && cmlStartRegexp.test(data);
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -83156,7 +83337,7 @@ CMLParser.prototype._fixBondsArray = function () {
 };
 
 CMLParser.prototype._parseSet = function (varData) {
-  var complex = this._complex = new Complex$4();
+  var complex = this._complex = new Complex$3();
   var data = varData;
   var currentLabel = data.curr;
   var atoms = data.atoms;
@@ -83212,7 +83393,8 @@ CMLParser.prototype._parseSet = function (varData) {
 
       if (atom.x3 || atom.x2) {
         var currAtomComp = this._unpackLabel(lLabel).compId;
-        var chainID = String.fromCharCode('A'.charCodeAt(0) + currAtomComp);
+        // use ' ' by default instead of synthetic creation of chain names
+        var chainID = ' '; //= String.fromCharCode('A'.charCodeAt(0) + currAtomComp);
         var resSeq = currAtomComp;
         var iCode = ' ';
         var strLabel = currAtomComp.toString();
@@ -83247,7 +83429,7 @@ CMLParser.prototype._parseSet = function (varData) {
           Element$4.ByName[atom.elementType.toUpperCase()] = element;
         }
         var atomSerial = parseInt(atom.id.replace(/[^0-9]/, ''), 10);
-        var added = residue.addAtom(atomFullNameStruct, element, xyz, Element$4.Role.SG, true, atomSerial, ' ', 1.0, 32.0, atomCharge);
+        var added = residue.addAtom(atomFullNameStruct, element, xyz, Element$4.Role.SG, true, atomSerial, ' ', 1.0, 0.0, atomCharge);
         if (atom.hydrogenCount) {
           added._hydrogenCount = parseInt(atom.hydrogenCount, 10);
         }
@@ -83308,11 +83490,6 @@ CMLParser.prototype.parseSync = function () {
       molSet.count = 1;
     }
     for (var i = 0; i < molSet.count; i++) {
-
-      if (self.hasOwnProperty('_abort')) {
-        throw new Error('Aborted');
-      }
-
       molSet.curr = i + 1;
       complexes.push(self._parseSet(molSet, false));
     }
@@ -83327,27 +83504,26 @@ CMLParser.prototype.parseSync = function () {
     throw new Error('The data does not contain valid atoms');
   }
 
-  if (this.hasOwnProperty('_abort')) {
-    throw new Error('Aborted');
-  }
-
   if (complexes.length > 1) {
-    var joinedComplex = new Complex$4();
+    var joinedComplex = new Complex$3();
     joinedComplex.joinComplexes(complexes);
     joinedComplex.originalCML = complexes[0].originalCML;
     return joinedComplex;
   } else if (complexes.length === 1) {
     return complexes[0];
   } else {
-    return new Complex$4();
+    return new Complex$3();
   }
 };
+
+CMLParser.formats = ['cml'];
+CMLParser.extensions = ['.cml'];
 
 var mmtf = createCommonjsModule(function (module, exports) {
 !function(r,t){if("function"==typeof undefined&&undefined.amd)undefined(["exports"],t);else t(exports);}(commonjsGlobal,function(r){function t(r,t,n){for(var e=(r.byteLength, 0),i=n.length;i>e;e++){var o=n.charCodeAt(e);if(128>o)r.setUint8(t++,o>>>0&127|0);else if(2048>o)r.setUint8(t++,o>>>6&31|192), r.setUint8(t++,o>>>0&63|128);else if(65536>o)r.setUint8(t++,o>>>12&15|224), r.setUint8(t++,o>>>6&63|128), r.setUint8(t++,o>>>0&63|128);else{if(!(1114112>o))throw new Error("bad codepoint "+o);r.setUint8(t++,o>>>18&7|240), r.setUint8(t++,o>>>12&63|128), r.setUint8(t++,o>>>6&63|128), r.setUint8(t++,o>>>0&63|128);}}}function n(r){for(var t=0,n=0,e=r.length;e>n;n++){var i=r.charCodeAt(n);if(128>i)t+=1;else if(2048>i)t+=2;else if(65536>i)t+=3;else{if(!(1114112>i))throw new Error("bad codepoint "+i);t+=4;}}return t}function e(r,i,o){var a=typeof r;if("string"===a){var u=n(r);if(32>u)return i.setUint8(o,160|u), t(i,o+1,r), 1+u;if(256>u)return i.setUint8(o,217), i.setUint8(o+1,u), t(i,o+2,r), 2+u;if(65536>u)return i.setUint8(o,218), i.setUint16(o+1,u), t(i,o+3,r), 3+u;if(4294967296>u)return i.setUint8(o,219), i.setUint32(o+1,u), t(i,o+5,r), 5+u}if(r instanceof Uint8Array){var u=r.byteLength,s=new Uint8Array(i.buffer);if(256>u)return i.setUint8(o,196), i.setUint8(o+1,u), s.set(r,o+2), 2+u;if(65536>u)return i.setUint8(o,197), i.setUint16(o+1,u), s.set(r,o+3), 3+u;if(4294967296>u)return i.setUint8(o,198), i.setUint32(o+1,u), s.set(r,o+5), 5+u}if("number"===a){if(!isFinite(r))throw new Error("Number not finite: "+r);if(Math.floor(r)!==r)return i.setUint8(o,203), i.setFloat64(o+1,r), 9;if(r>=0){if(128>r)return i.setUint8(o,r), 1;if(256>r)return i.setUint8(o,204), i.setUint8(o+1,r), 2;if(65536>r)return i.setUint8(o,205), i.setUint16(o+1,r), 3;if(4294967296>r)return i.setUint8(o,206), i.setUint32(o+1,r), 5;throw new Error("Number too big 0x"+r.toString(16))}if(r>=-32)return i.setInt8(o,r), 1;if(r>=-128)return i.setUint8(o,208), i.setInt8(o+1,r), 2;if(r>=-32768)return i.setUint8(o,209), i.setInt16(o+1,r), 3;if(r>=-2147483648)return i.setUint8(o,210), i.setInt32(o+1,r), 5;throw new Error("Number too small -0x"+(-r).toString(16).substr(1))}if(null===r)return i.setUint8(o,192), 1;if("boolean"===a)return i.setUint8(o,r?195:194), 1;if("object"===a){var u,f=0,c=Array.isArray(r);if(c)u=r.length;else{var d=Object.keys(r);u=d.length;}var f;if(16>u?(i.setUint8(o,u|(c?144:128)), f=1):65536>u?(i.setUint8(o,c?220:222), i.setUint16(o+1,u), f=3):4294967296>u&&(i.setUint8(o,c?221:223), i.setUint32(o+1,u), f=5), c)for(var l=0;u>l;l++)f+=e(r[l],i,o+f);else for(var l=0;u>l;l++){var v=d[l];f+=e(v,i,o+f), f+=e(r[v],i,o+f);}return f}throw new Error("Unknown type "+a)}function i(r){var t=typeof r;if("string"===t){var e=n(r);if(32>e)return 1+e;if(256>e)return 2+e;if(65536>e)return 3+e;if(4294967296>e)return 5+e}if(r instanceof Uint8Array){var e=r.byteLength;if(256>e)return 2+e;if(65536>e)return 3+e;if(4294967296>e)return 5+e}if("number"===t){if(Math.floor(r)!==r)return 9;if(r>=0){if(128>r)return 1;if(256>r)return 2;if(65536>r)return 3;if(4294967296>r)return 5;throw new Error("Number too big 0x"+r.toString(16))}if(r>=-32)return 1;if(r>=-128)return 2;if(r>=-32768)return 3;if(r>=-2147483648)return 5;throw new Error("Number too small -0x"+r.toString(16).substr(1))}if("boolean"===t||null===r)return 1;if("object"===t){var e,o=0;if(Array.isArray(r)){e=r.length;for(var a=0;e>a;a++)o+=i(r[a]);}else{var u=Object.keys(r);e=u.length;for(var a=0;e>a;a++){var s=u[a];o+=i(s)+i(r[s]);}}if(16>e)return 1+o;if(65536>e)return 3+o;if(4294967296>e)return 5+o;throw new Error("Array or object too long 0x"+e.toString(16))}throw new Error("Unknown type "+t)}function o(r){var t=new ArrayBuffer(i(r)),n=new DataView(t);return e(r,n,0), new Uint8Array(t)}function a(r,t,n){return t?new r(t.buffer,t.byteOffset,t.byteLength/(n||1)):void 0}function u(r){return a(DataView,r)}function s(r){return a(Uint8Array,r)}function f(r){return a(Int8Array,r)}function c(r){return a(Int32Array,r,4)}function d(r){return a(Float32Array,r,4)}function l(r,t){var n=r.length/2;t||(t=new Int16Array(n));for(var e=0,i=0;n>e;++e, i+=2)t[e]=r[i]<<8^r[i+1]<<0;return t}function v(r,t){var n=r.length;t||(t=new Uint8Array(2*n));for(var e=u(t),i=0;n>i;++i)e.setInt16(2*i,r[i]);return s(t)}function g(r,t){var n=r.length/4;t||(t=new Int32Array(n));for(var e=0,i=0;n>e;++e, i+=4)t[e]=r[i]<<24^r[i+1]<<16^r[i+2]<<8^r[i+3]<<0;return t}function L(r,t){var n=r.length;t||(t=new Uint8Array(4*n));for(var e=u(t),i=0;n>i;++i)e.setInt32(4*i,r[i]);return s(t)}function h(r,t){var n=r.length;t||(t=new Float32Array(n/4));for(var e=u(t),i=u(r),o=0,a=0,s=n/4;s>o;++o, a+=4)e.setFloat32(a,i.getFloat32(a),!0);return t}function y(r,t,n){var e=r.length,i=1/t;n||(n=new Float32Array(e));for(var o=0;e>o;++o)n[o]=r[o]*i;return n}function m(r,t,n){var e=r.length;n||(n=new Int32Array(e));for(var i=0;e>i;++i)n[i]=Math.round(r[i]*t);return n}function p(r,t){var n,e;if(!t){var i=0;for(n=0, e=r.length;e>n;n+=2)i+=r[n+1];t=new r.constructor(i);}var o=0;for(n=0, e=r.length;e>n;n+=2)for(var a=r[n],u=r[n+1],s=0;u>s;++s)t[o]=a, ++o;return t}function U(r){if(0===r.length)return new Int32Array;var t,n,e=2;for(t=1, n=r.length;n>t;++t)r[t-1]!==r[t]&&(e+=2);var i=new Int32Array(e),o=0,a=1;for(t=1, n=r.length;n>t;++t)r[t-1]!==r[t]?(i[o]=r[t-1], i[o+1]=a, a=1, o+=2):++a;return i[o]=r[r.length-1], i[o+1]=a, i}function b(r,t){var n=r.length;t||(t=new r.constructor(n)), n&&(t[0]=r[0]);for(var e=1;n>e;++e)t[e]=r[e]+t[e-1];return t}function I(r,t){var n=r.length;t||(t=new r.constructor(n)), t[0]=r[0];for(var e=1;n>e;++e)t[e]=r[e]-r[e-1];return t}function w(r,t){var n,e,i=r instanceof Int8Array?127:32767,o=-i-1,a=r.length;if(!t){var u=0;for(n=0;a>n;++n)r[n]<i&&r[n]>o&&++u;t=new Int32Array(u);}for(n=0, e=0;a>n;){for(var s=0;r[n]===i||r[n]===o;)s+=r[n], ++n;s+=r[n], ++n, t[e]=s, ++e;}return t}function C(r,t){var n,e=t?127:32767,i=-e-1,o=r.length,a=0;for(n=0;o>n;++n){var u=r[n];0===u?++a:a+=u===e||u===i?2:u>0?Math.ceil(u/e):Math.ceil(u/i);}var s=t?new Int8Array(a):new Int16Array(a),f=0;for(n=0;o>n;++n){var u=r[n];if(u>=0)for(;u>=e;)s[f]=e, ++f, u-=e;else for(;i>=u;)s[f]=i, ++f, u-=i;s[f]=u, ++f;}return s}function A(r,t){return b(p(r),t)}function x(r){return U(I(r))}function M(r,t,n){return y(p(r,c(n)),t,n)}function F(r,t){return U(m(r,t))}function S(r,t,n){return y(b(r,c(n)),t,n)}function E(r,t,n){return I(m(r,t),n)}function N(r,t,n){return y(w(r,c(n)),t,n)}function O(r,t,n){var e=w(r,c(n));return S(e,t,d(e))}function T(r,t,n){return C(E(r,t),n)}function k(r){var t=u(r),n=t.getInt32(0),e=t.getInt32(4),i=r.subarray(8,12),r=r.subarray(12);return[n,r,e,i]}function j(r,t,n,e){var i=new ArrayBuffer(12+e.byteLength),o=new Uint8Array(i),a=new DataView(i);return a.setInt32(0,r), a.setInt32(4,t), n&&o.set(n,8), o.set(e,12), o}function q(r){var t=r.length,n=s(r);return j(2,t,void 0,n)}function D(r){var t=r.length,n=L(r);return j(4,t,void 0,n)}function P(r,t){var n=r.length/t,e=L([t]),i=s(r);return j(5,n,e,i)}function z(r){var t=r.length,n=L(U(r));return j(6,t,void 0,n)}function B(r){var t=r.length,n=L(x(r));return j(8,t,void 0,n)}function V(r,t){var n=r.length,e=L([t]),i=L(F(r,t));return j(9,n,e,i)}function G(r,t){var n=r.length,e=L([t]),i=v(T(r,t));return j(10,n,e,i)}function R(r){var t={};return rr.forEach(function(n){void 0!==r[n]&&(t[n]=r[n]);}), r.bondAtomList&&(t.bondAtomList=D(r.bondAtomList)), r.bondOrderList&&(t.bondOrderList=q(r.bondOrderList)), t.xCoordList=G(r.xCoordList,1e3), t.yCoordList=G(r.yCoordList,1e3), t.zCoordList=G(r.zCoordList,1e3), r.bFactorList&&(t.bFactorList=G(r.bFactorList,100)), r.atomIdList&&(t.atomIdList=B(r.atomIdList)), r.altLocList&&(t.altLocList=z(r.altLocList)), r.occupancyList&&(t.occupancyList=V(r.occupancyList,100)), t.groupIdList=B(r.groupIdList), t.groupTypeList=D(r.groupTypeList), r.secStructList&&(t.secStructList=q(r.secStructList,1)), r.insCodeList&&(t.insCodeList=z(r.insCodeList)), r.sequenceIndexList&&(t.sequenceIndexList=B(r.sequenceIndexList)), t.chainIdList=P(r.chainIdList,4), r.chainNameList&&(t.chainNameList=P(r.chainNameList,4)), t}function H(r){function t(r){for(var t={},n=0;r>n;n++){var e=o();t[e]=o();}return t}function n(t){var n=r.subarray(a,a+t);return a+=t, n}function e(t){var n=r.subarray(a,a+t);a+=t;var e=65535;if(t>e){for(var i=[],o=0;o<n.length;o+=e)i.push(String.fromCharCode.apply(null,n.subarray(o,o+e)));return i.join("")}return String.fromCharCode.apply(null,n)}function i(r){for(var t=new Array(r),n=0;r>n;n++)t[n]=o();return t}function o(){var o,s,f=r[a];if(0===(128&f))return a++, f;if(128===(240&f))return s=15&f, a++, t(s);if(144===(240&f))return s=15&f, a++, i(s);if(160===(224&f))return s=31&f, a++, e(s);if(224===(224&f))return o=u.getInt8(a), a++, o;switch(f){case 192:return a++, null;case 194:return a++, !1;case 195:return a++, !0;case 196:return s=u.getUint8(a+1), a+=2, n(s);case 197:return s=u.getUint16(a+1), a+=3, n(s);case 198:return s=u.getUint32(a+1), a+=5, n(s);case 202:return o=u.getFloat32(a+1), a+=5, o;case 203:return o=u.getFloat64(a+1), a+=9, o;case 204:return o=r[a+1], a+=2, o;case 205:return o=u.getUint16(a+1), a+=3, o;case 206:return o=u.getUint32(a+1), a+=5, o;case 208:return o=u.getInt8(a+1), a+=2, o;case 209:return o=u.getInt16(a+1), a+=3, o;case 210:return o=u.getInt32(a+1), a+=5, o;case 217:return s=u.getUint8(a+1), a+=2, e(s);case 218:return s=u.getUint16(a+1), a+=3, e(s);case 219:return s=u.getUint32(a+1), a+=5, e(s);case 220:return s=u.getUint16(a+1), a+=3, i(s);case 221:return s=u.getUint32(a+1), a+=5, i(s);case 222:return s=u.getUint16(a+1), a+=3, t(s);case 223:return s=u.getUint32(a+1), a+=5, t(s)}throw new Error("Unknown type 0x"+f.toString(16))}var a=0,u=new DataView(r.buffer);return o()}function W(r,t,n,e){switch(r){case 1:return h(t);case 2:return f(t);case 3:return l(t);case 4:return g(t);case 5:return s(t);case 6:return p(g(t),new Uint8Array(n));case 7:return p(g(t));case 8:return A(g(t));case 9:return M(g(t),g(e)[0]);case 10:return O(l(t),g(e)[0]);case 11:return y(l(t),g(e)[0]);case 12:return N(l(t),g(e)[0]);case 13:return N(f(t),g(e)[0]);case 14:return w(l(t));case 15:return w(f(t))}}function X(r,t){t=t||{};var n=t.ignoreFields,e={};return nr.forEach(function(t){var i=n?-1!==n.indexOf(t):!1,o=r[t];i||void 0===o||(o instanceof Uint8Array?e[t]=W.apply(null,k(o)):e[t]=o);}), e}function J(r){return String.fromCharCode.apply(null,r).replace(/\0/g,"")}function K(r,t,n){n=n||{};var e,i,o,a,u,s,f=n.firstModelOnly,c=t.onModel,d=t.onChain,l=t.onGroup,v=t.onAtom,g=t.onBond,L=0,h=0,y=0,m=0,p=0,U=-1,b=r.chainNameList,I=r.secStructList,w=r.insCodeList,C=r.sequenceIndexList,A=r.atomIdList,x=r.bFactorList,M=r.altLocList,F=r.occupancyList,S=r.bondAtomList,E=r.bondOrderList;for(e=0, i=r.chainsPerModel.length;i>e&&!(f&&L>0);++e){var N=r.chainsPerModel[L];for(c&&c({chainCount:N,modelIndex:L}), o=0;N>o;++o){var O=r.groupsPerChain[h];if(d){var T=J(r.chainIdList.subarray(4*h,4*h+4)),k=null;b&&(k=J(b.subarray(4*h,4*h+4))), d({groupCount:O,chainIndex:h,modelIndex:L,chainId:T,chainName:k});}for(a=0;O>a;++a){var j=r.groupList[r.groupTypeList[y]],q=j.atomNameList.length;if(l){var D=null;I&&(D=I[y]);var P=null;r.insCodeList&&(P=String.fromCharCode(w[y]));var z=null;C&&(z=C[y]), l({atomCount:q,groupIndex:y,chainIndex:h,modelIndex:L,groupId:r.groupIdList[y],groupType:r.groupTypeList[y],groupName:j.groupName,singleLetterCode:j.singleLetterCode,chemCompType:j.chemCompType,secStruct:D,insCode:P,sequenceIndex:z});}for(u=0;q>u;++u){if(v){var B=null;A&&(B=A[m]);var V=null;x&&(V=x[m]);var G=null;M&&(G=String.fromCharCode(M[m]));var R=null;F&&(R=F[m]), v({atomIndex:m,groupIndex:y,chainIndex:h,modelIndex:L,atomId:B,element:j.elementList[u],atomName:j.atomNameList[u],formalCharge:j.formalChargeList[u],xCoord:r.xCoordList[m],yCoord:r.yCoordList[m],zCoord:r.zCoordList[m],bFactor:V,altLoc:G,occupancy:R});}m+=1;}if(g){var H=j.bondAtomList;for(u=0, s=j.bondOrderList.length;s>u;++u)g({atomIndex1:m-q+H[2*u],atomIndex2:m-q+H[2*u+1],bondOrder:j.bondOrderList[u]});}y+=1;}h+=1;}if(p=U+1, U=m-1, g&&S)for(u=0, s=S.length;s>u;u+=2){var W=S[u],X=S[u+1];(W>=p&&U>=W||X>=p&&U>=X)&&g({atomIndex1:W,atomIndex2:X,bondOrder:E?E[u/2]:null});}L+=1;}}function Q(r){return o(R(r))}function Y(r,t){r instanceof ArrayBuffer&&(r=new Uint8Array(r));var n;return n=r instanceof Uint8Array?H(r):r, X(n,t)}function Z(r,t,n,e){function i(){try{var r=Y(o.response);n(r);}catch(t){e(t);}}var o=new XMLHttpRequest;o.addEventListener("load",i,!0), o.addEventListener("error",e,!0), o.responseType="arraybuffer", o.open("GET",t+r.toUpperCase()), o.send();}function $(r,t,n){Z(r,or,t,n);}function _(r,t,n){Z(r,ar,t,n);}var rr=["mmtfVersion","mmtfProducer","unitCell","spaceGroup","structureId","title","depositionDate","releaseDate","experimentalMethods","resolution","rFree","rWork","bioAssemblyList","ncsOperatorList","entityList","groupList","numBonds","numAtoms","numGroups","numChains","numModels","groupsPerChain","chainsPerModel"],tr=["xCoordList","yCoordList","zCoordList","groupIdList","groupTypeList","chainIdList","bFactorList","atomIdList","altLocList","occupancyList","secStructList","insCodeList","sequenceIndexList","chainNameList","bondAtomList","bondOrderList"],nr=rr.concat(tr),er="v1.1.0dev",ir="//mmtf.rcsb.org/v1.0/",or=ir+"full/",ar=ir+"reduced/";r.encode=Q, r.decode=Y, r.traverse=K, r.fetch=$, r.fetchReduced=_, r.version=er, r.fetchUrl=or, r.fetchReducedUrl=ar, r.encodeMsgpack=o, r.encodeMmtf=R, r.decodeMsgpack=H, r.decodeMmtf=X;});
 });
 
-var Complex$5 = chem.Complex;
+var Complex$4 = chem.Complex;
 var Chain$3 = chem.Chain;
 var Atom$3 = chem.Atom;
 var AtomName$3 = chem.AtomName;
@@ -83414,12 +83590,24 @@ MMTFParser.prototype.constructor = MMTFParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 MMTFParser.canParse = function (data, options) {
   if (!data) {
     return false;
   }
 
   return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'mmtf');
+};
+
+function getFirstByte(buf) {
+  var bytes = new Uint8Array(buf, 0, 1);
+  return bytes[0];
+}
+
+MMTFParser.canProbablyParse = function (data) {
+  // check if it's binary MessagePack format containing a map (dictionary)
+  // see https://github.com/msgpack/msgpack/blob/master/spec.md
+  return lodash.isArrayBuffer(data) && (getFirstByte(data) | 1) === 0xDF;
 };
 
 MMTFParser.prototype._onModel = function (_modelData) {};
@@ -83755,7 +83943,7 @@ MMTFParser.prototype._joinSynonymousChains = function () {
 MMTFParser.prototype.parseSync = function () {
   var mmtfData = mmtf.decode(this._data);
 
-  this._complex = new Complex$5();
+  this._complex = new Complex$4();
   this._serialAtomMap = {}; // filled during traversal
 
   this._traverse(mmtfData);
@@ -83772,14 +83960,13 @@ MMTFParser.prototype.parseSync = function () {
     serialAtomMap: this._serialAtomMap
   });
 
-  if (this.hasOwnProperty('_abort')) {
-    throw new Error('Aborted');
-  }
-
   return this._complex;
 };
 
-var Complex$6 = chem.Complex;
+MMTFParser.formats = ['mmtf'];
+MMTFParser.extensions = ['.mmtf'];
+
+var Complex$5 = chem.Complex;
 var Element$6 = chem.Element;
 var Helix$4 = chem.Helix;
 var Sheet$4 = chem.Sheet;
@@ -83848,11 +84035,16 @@ CIFParser.prototype.constructor = CIFParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 CIFParser.canParse = function (data, options) {
   if (!data) {
     return false;
   }
   return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'cif');
+};
+
+CIFParser.canProbablyParse = function (data) {
+  return lodash.isString(data) && /^\s*data_/i.test(data);
 };
 
 CIFParser.prototype.parseSync = function () {
@@ -83871,7 +84063,7 @@ CIFParser.prototype.parseSync = function () {
  * @private
  */
 CIFParser.prototype._toComplex = function (cifData) {
-  var complex = new Complex$6();
+  var complex = new Complex$5();
   var complexData = cifData[Object.keys(cifData)[0]];
   this._extractAtoms(complex, complexData);
   this._extractSecondary(complex, complexData);
@@ -84583,6 +84775,9 @@ CIFParser._parseToObject = function (source) {
   return ret;
 };
 
+CIFParser.formats = ['cif', 'mmcif'];
+CIFParser.extensions = ['.cif', '.mmcif'];
+
 var Volume$4 = chem.Volume;
 
 function Ccp4Model() {}
@@ -84772,11 +84967,16 @@ utils.deriveClass(CCP4Parser, Parser);
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 CCP4Parser.canParse = function (data, options) {
   if (!data) {
     return false;
   }
   return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'ccp4');
+};
+
+CCP4Parser.canProbablyParse = function (_data) {
+  return false; // Autodetection is not implemented yet
 };
 
 CCP4Parser.prototype.parseSync = function () {
@@ -84785,7 +84985,10 @@ CCP4Parser.prototype.parseSync = function () {
   return new Volume$4(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
 };
 
-var Complex$7 = chem.Complex;
+CCP4Parser.formats = ['ccp4'];
+CCP4Parser.extensions = ['.ccp4'];
+
+var Complex$6 = chem.Complex;
 var Element$7 = chem.Element;
 
 function PubChemParser(data, options) {
@@ -84802,6 +85005,7 @@ PubChemParser.prototype.constructor = PubChemParser;
 ////////////////////////////////////////////////////////////////////////////
 // Class methods
 
+/** @deprecated */
 PubChemParser.canParse = function (data, options) {
   if (!data) {
     return false;
@@ -84810,13 +85014,17 @@ PubChemParser.canParse = function (data, options) {
   return lodash.isString(data) && (type === 'pubchem+json' || !type && data[0] === '{');
 };
 
+PubChemParser.canProbablyParse = function (data) {
+  return lodash.isString(data) && data[0] === '{';
+};
+
 PubChemParser.prototype.parseSync = function () {
   this.logger.info('Parsing PubChem JSON file...');
   return this._toComplex(JSON.parse(this._data));
 };
 
 PubChemParser.prototype._toComplex = function (jsonData) {
-  var complex = new Complex$7();
+  var complex = new Complex$6();
   var complexData = jsonData.PC_Compounds && jsonData.PC_Compounds[0];
   if (complexData) {
     this._extractAtoms(complex, complexData);
@@ -84870,61 +85078,16 @@ PubChemParser.prototype._extractAtoms = function (complex, complexData) {
   }
 };
 
-/**
- * Parsers list.
- * @module io/parsers
- */
-// FIXME: deps for amdclean
+PubChemParser.formats = ['pubchem', 'pubchem+json', 'pc'];
+PubChemParser.extensions = ['.json'];
 
-var parserList = [];
-var ag$4 = [PDBParser, MOLParser, CMLParser, MMTFParser, CIFParser, CCP4Parser, PubChemParser];
-
-(function (plugins) {
-  for (var i = 0, n = plugins.length; i < n; ++i) {
-    var currParser = plugins[i];
-    parserList.push(currParser);
-  }
-})(ag$4);
-
-// NOTE: workaround for https://github.com/gfranko/amdclean/issues/115
-var exports$4 = /** @alias module:io/parsers */{
-  /**
-   *  The list of parser constructor functions available.
-   *  @type {Array<function(new:Parser)>}
-   */
-  list: parserList,
-
-  Parser: Parser,
-
-  /**
-   * Create a parser instance.
-   * @param {object} context - Current context.
-   * @param {string} data    - Data to be parsed.
-   * @param {object} options - Parser options object overriding defaults.
-   * @returns {Parser} New parser object.
-   */
-  create: function create(context, data, options) {
-    var parser = new Parser(data, options); // this behaviour was copied from the previous version
-    var i = 0,
-        n = parserList.length;
-    for (; i < n; ++i) {
-      var SomeParser = parserList[i];
-      if (SomeParser.canParse && SomeParser.canParse(data, options)) {
-        parser = new SomeParser(data, options);
-        break;
-      }
-    }
-    parser.context = context;
-    if (i === n) {
-      parser.logger.error('Could not parse data. Format unknown.');
-    }
-    return parser;
-  }
-};
+var parsers = new ParserList([
+// note: order might be important
+PDBParser, CIFParser, MMTFParser, CMLParser, PubChemParser, CCP4Parser]);
 
 var io = {
   loaders: exports$3,
-  parsers: exports$4
+  parsers: parsers
 };
 
 /**
@@ -87244,7 +87407,7 @@ Cookies.prototype._exists = function (key) {
   return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
 };
 
-/* global "0.7.8":false */
+/* global "0.7.9":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -87410,7 +87573,7 @@ Miew$1.prototype = Object.create(EventDispatcher$1.prototype);
 Miew$1.prototype.constructor = Miew$1;
 
 Miew$1.prototype.getMaxRepresentationCount = function () {
-  return ComplexVisual.prototype.getMaxRepresentationCount();
+  return ComplexVisual.NUM_REPRESENTATION_BITS;
 };
 
 /**
@@ -89077,8 +89240,8 @@ Miew$1.prototype._extractRepresentation = function () {
       material: defPreset[0].material.id
     });
     if (idx < 0) {
-      if (visual.repCount() === visual.getMaxRepresentationCount()) {
-        _this.logger.warn('Number of representations is limited to ' + visual.getMaxRepresentationCount());
+      if (visual.repCount() === ComplexVisual.NUM_REPRESENTATION_BITS) {
+        _this.logger.warn('Number of representations is limited to ' + ComplexVisual.NUM_REPRESENTATION_BITS);
       }
       return;
     }
@@ -90610,7 +90773,18 @@ function _parseData(data, opts, master, context) {
 
   opts = opts || {}; // TODO: clone
 
-  var parser = io.parsers.create(context, data, opts);
+  var TheParser = lodash.head(io.parsers.find({
+    format: opts.fileType,
+    ext: utils.getFileExtension(opts.fileName || ''),
+    data: data
+  }));
+
+  if (!TheParser) {
+    return Promise.reject(new Error('Could not find suitable parser'));
+  }
+
+  var parser = new TheParser(data, opts);
+  parser.context = context;
 
   if (master) {
     master.addEventListener('cancel', function () {
@@ -90646,7 +90820,7 @@ function _parseData(data, opts, master, context) {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew$1.prototype.VERSION = typeof "0.7.8" !== 'undefined' && "0.7.8" || '0.0.0-dev';
+Miew$1.prototype.VERSION = typeof "0.7.9" !== 'undefined' && "0.7.9" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew$1, /** @lends Miew */{
