@@ -1,35 +1,31 @@
+import LoaderList from './loaders/LoaderList';
 
+import FileLoader from './loaders/FileLoader';
+import XHRLoader from './loaders/XHRLoader';
+import ImmediateLoader from './loaders/ImmediateLoader';
 
-/**
- * Loaders list.
- * @module io/loaders
- */
 import Loader from './loaders/Loader';
-import _fl from './loaders/FileLoader';
-import _xhr from './loaders/XHRLoader';
-import _imm from './loaders/ImmediateLoader';
 
+export const loaders = new LoaderList([
+  // note: order might be important
+  FileLoader,
+  XHRLoader,
+  ImmediateLoader,
+]);
 
-// FIXME: deps for amdclean
+/** @deprecated */
+const loaderList = loaders.all;
 
-var loaderList = [];
-var ag = [_fl, _xhr, _imm];
-
-(function(plugins) {
-  for (var i = 0, n = plugins.length; i < n; ++i) {
-    var currLoader = plugins[i];
-    loaderList.push(currLoader);
-  }
-})(ag);
-
-// NOTE: workaround for https://github.com/gfranko/amdclean/issues/115
-var exports = /** @alias module:io/loaders */ {
+/** @deprecated */
+const exports = {
   /**
    *  The list of loader constructor functions available.
    *  @type {Array<function(new:Loader)>}
+   *  @deprecated
    */
   list: loaderList,
 
+  /** @deprecated */
   Loader: Loader,
 
   /**

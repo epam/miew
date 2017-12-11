@@ -37,8 +37,15 @@ export default class FileLoader extends Loader {
     });
   }
 
+  /** @deprecated */
   static canLoad(source, options) {
     const sourceType = options.sourceType;
     return source instanceof File && (!sourceType || sourceType === 'file');
   }
+
+  static canProbablyLoad(source) {
+    return File && source instanceof File || Blob && source instanceof Blob;
+  }
 }
+
+FileLoader.types = ['file', 'blob'];

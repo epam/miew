@@ -1,28 +1,9 @@
-function registerIn(dict, keys, value) {
-  keys.forEach((key) => {
-    key = key.toLowerCase();
-    const list = dict[key] = dict[key] || [];
-    if (!list.includes(value)) {
-      list.push(value);
-    }
-  });
-}
-
-function unregisterFrom(dict, keys, value) {
-  keys.forEach((key) => {
-    key = key.toLowerCase();
-    const list = dict[key];
-    if (list) {
-      const pos = list.indexOf(value);
-      if (pos !== -1) {
-        list.splice(pos, 1);
-      }
-      if (list.length === 0) {
-        delete dict[key];
-      }
-    }
-  });
-}
+import {
+  registerInList,
+  unregisterFromList,
+  registerInDict,
+  unregisterFromDict,
+} from '../../utils';
 
 export default class ParserList {
   constructor(someParsers = []) {
@@ -41,20 +22,15 @@ export default class ParserList {
    * @param {string[]} SomeParser.extensions - supported file extensions
    */
   register(SomeParser) {
-    if (!this._list.includes(SomeParser)) {
-      this._list.push(SomeParser);
-    }
-    registerIn(this._byFormat, SomeParser.formats, SomeParser);
-    registerIn(this._byExt, SomeParser.extensions, SomeParser);
+    registerInList(this._list, SomeParser);
+    registerInDict(this._byFormat, SomeParser.formats, SomeParser);
+    registerInDict(this._byExt, SomeParser.extensions, SomeParser);
   }
 
   unregister(SomeParser) {
-    const pos = this._list.indexOf(SomeParser);
-    if (pos !== -1) {
-      this._list.splice(pos, 1);
-    }
-    unregisterFrom(this._byFormat, SomeParser.formats, SomeParser);
-    unregisterFrom(this._byExt, SomeParser.extensions, SomeParser);
+    unregisterFromList(this._list, SomeParser);
+    unregisterFromDict(this._byFormat, SomeParser.formats, SomeParser);
+    unregisterFromDict(this._byExt, SomeParser.extensions, SomeParser);
   }
 
   get all() {

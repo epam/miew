@@ -1,4 +1,8 @@
+import _ from 'lodash';
 import Loader from './Loader';
+
+// we don't need to detect all kinds of URLs, just the evident ones
+const urlStartRegexp = /^(https?|ftp):\/\//i;
 
 export default class XHRLoader extends Loader {
   constructor(source, options) {
@@ -47,8 +51,15 @@ export default class XHRLoader extends Loader {
     });
   }
 
+  /** @deprecated */
   static canLoad(source, options) {
     const sourceType = options.sourceType;
     return (typeof source === 'string') && (!sourceType || sourceType === 'url');
   }
+
+  static canProbablyLoad(source) {
+    return _.isString(source) && urlStartRegexp.test(source);
+  }
 }
+
+XHRLoader.types = ['url'];
