@@ -274,79 +274,68 @@ selector "chain B"`)
     });
   });
 
-  describe('assign all combinations of seltors and modes via terminal, i. e.', function() {
-    describe('charged, nonpolar, polar, basic, acidic, aromatic, protein, none, water, hetatm, name, elem, residue, altloc, polarh, nonpolarh', function() {
+  describe('assign combinations of seltors and modes via terminal, i. e.', function() {
+    describe('', function() {
     //a molecule with DNA, many chains, H atoms, probably full set of aminoacids,
     //less heavy than 4TNW, idealy one to connect above test with
-      it('load 5VHG with an appropriate orientation and scale', function() {
+      it('load 4V4F with an appropriate orientation and scale', function() {
         return page.openTerminal()
           .then(() => page.runScript(`\
 clear\n
 set interpolateViews false
-load 5vhg
+load "mmtf:4V4F"
 remove 1
-view "1S4GJwX0/TcFCYCLBwi4aPQAAAAAAAACAAAAAgA=="`))
-          .then(() => page.waitUntilTitleContains('5VHG'))
+view "1INMtwelGW7+MH5TCNB+nPPgFibut+Q0/vYEbwA=="`))
+          .then(() => page.waitUntilTitleContains('4V4F'))
           .then(() => page.waitUntilRebuildIsDone())
-          .then(() => golden.shouldMatch('5vhg', this));
+          .then(() => golden.shouldMatch('4v4f', this));
       });
 
-      const selectorList = ['charged', 'nonpolar', 'polar', 'basic', 'acidic', 'aromatic',
-        'protein', 'none', 'water', 'hetatm',
-        'name OG1', 'elem N', 'residue pro',
-        'altloc B', 'polarh', 'nonpolarh'];
+      it('build selectors pattern', function() {
+        return page.runScript(`\
+set autobuild false
+rep 0 s="sequence -1:71 and chain AA" c=SQ
+rep 1 s="serial 1079:1629" c=SQ
+rep 2 s="chain A3,A2 and nucleic" m=CA c=RT mt=SF
+rep 3 s="chain A5 and pyrimidine" m=CA c=RT mt=SF
+rep 4 s="chain A6,A7 and purine" m=BS c=RT mt=SF
+rep 5 s="chain AG and charged" m=BS c=RT mt=SF
+rep 6 s="chain AG and polar" m=BS c=RT mt=SF
+rep 7 s="chain AI and nonpolar" m=BS c=RT mt=SF
+rep 8 s="chain AD and water" m=BS c=EL mt=SF
+rep 9 s="chain AD and elem N" m=BS c=EL mt=SF
+rep 10 s="chain AD and name CA" m=BS c=EL mt=SF
+rep 11 s="chain AC and residue ALA" m=BS c=RT mt=SF
+rep 12 s="chain AE and aromatic" m=BS c=RT mt=SF
+rep 13 s="chain AE and basic" m=BS c=RT mt=SF
+rep 14 s="chain AE and acidic" m=BS c=RT mt=SF
+rep 15 s="chain AJ and protein or hetatm and not water" m=TU c=SS mt=SF
+rep 16 s="chain AF and none" m=BS c=EL mt=SF
+rep 17 s='chain AK and altloc " "' m=BS c=CH mt=SF
+rep 18 s="chain AH and polarh" m=BS c=EL mt=SF
+rep 19 s="chain AH and nonpolarh" m=BS c=EL mt=SF`)
+          .then(() => page.runScript(`build all`))
+          .then(() => page.waitUntilTitleContains('4V4F'))
+          .then(() => page.waitUntilRebuildIsDone())
+          .then(() => golden.shouldMatch('4v4f_selectors', this));
+      });
+
+      let repNumbers = Array.from(Array(20).keys());
       const suite = this;
       before(function() {
-        return Promise.all([retrieve.modes, selectorList]).then(([modes, selectors]) => {
+        return Promise.all([retrieve.modes, repNumbers]).then(([modes, repNumber]) => {
           _.each(modes, (mode) => {
-            _.each(selectors, (selector) => {
-              const command = `clear\nrep 0 m=${mode.id} s="${selector}" c=RT`;
-              suite.addTest(it(`set ${mode.name} mode with ${selector} selection`, function() {
-                return page.runScript(command)
-                  .then(() => page.waitUntilTitleContains('5VHG'))
-                  .then(() => page.waitUntilRepresentationIs(0, mode.id, 'RT'))
-                  .then(() => golden.shouldMatch(`5vhg_${mode.id}_${selector.split(/\s\w+/)[0]}`, this));
-              }));
+            let command = 'clear\n';
+            _.each(repNumber, (number) => {
+              command += `rep ${number}\nmode ${mode.id}\n`;
             });
-          });
-        });
-      });
-    });
-
-    describe('serial, sequence, chain, nucleic, purine, pyrimidine', function() {
-      //a molecule with DNA, many chains, H atoms, probably full set of aminoacids,
-      //less heavy than 4TNW, idealy one to connect above test with
-      it('load 1UTF with an appropriate orientation and scale', function() {
-        return page.openTerminal()
-          .then(() => page.runScript(`\
-clear\n
-set interpolateViews false
-load 1utf
-remove 1
-view "1g9IOwe1yGb6xlIzCvSyiPOsKW7y4hzU/3MgGvg=="`))
-          .then(() => page.waitUntilTitleContains('1UTF'))
-          .then(() => page.waitUntilRebuildIsDone())
-          .then(() => golden.shouldMatch('1utf', this));
-      });
-
-      const suite = this;
-      const colomnSelectors = [{name: 'serial', colorId: 'SQ', val: ' 1097:1640, 5450:5984'},
-        {name: 'sequence', colorId: 'CH', val: ' 101:106'}, {name: 'chain', colorId: 'CH', val: ' A, C, F, 2, 5, 9'},
-        {name: 'nucleic', colorId: 'SS', val: ''}, {name: 'purine', colorId: 'RT', val: ''},
-        {name: 'pyrimidine', colorId: 'RT', val: ''}
-      ];
-      before(function() {
-        return Promise.all([retrieve.modes, colomnSelectors]).then(([modes, selectors]) => {
-          _.each(modes, (mode) => {
-            _.each(selectors, (selector) => {
-              const command = `clear\nrep 0 m=${mode.id} s="${selector.name}${selector.val}" c=${selector.colorId}`;
-              suite.addTest(it(`set ${mode.name} mode with ${selector.name} selection`, function() {
-                return page.runScript(command)
-                  .then(() => page.waitUntilTitleContains('1UTF'))
-                  .then(() => page.waitUntilRepresentationIs(0, mode.id, selector.colorId))
-                  .then(() => golden.shouldMatch(`1utf_${mode.id}_${selector.name}`, this));
-              }));
-            });
+            command += 'build all\n';
+            suite.addTest(it(`set ${mode.name} mode with all selectors`, function() {
+              return page.runScript(command)
+                .then(() => page.waitUntilTitleContains('4V4F'))
+                .then(() => page.waitUntilRepresentationIs(19, mode.id, 'EL'))
+                .then(() => golden.shouldMatch(`4v4f_${mode.id}`, this));
+            }));
           });
         });
       });
