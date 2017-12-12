@@ -1,5 +1,9 @@
 import webdriver from 'selenium-webdriver';
-
+import firefoxDriver from 'selenium-webdriver/firefox';
+import operaDriver from 'selenium-webdriver/opera';
+import ieDriver from 'selenium-webdriver/ie';
+import chromeDriver from 'selenium-webdriver/chrome';
+import edgeDriver from 'selenium-webdriver/edge';
 import EmptyPage from './pages/empty.page';
 import golden from './golden';
 import goldenCfg from './golden.cfg';
@@ -38,9 +42,16 @@ describe('As a third-party developer, I want to', function() {
   this.timeout(0);
   this.slow(1000);
 
+  //be aware to use 'MicrosoftEdge' instead of 'edge' to use it
   before(function() {
     driver = new webdriver.Builder()
-      .forBrowser('firefox')
+      .forBrowser('chrome')
+      .setFirefoxOptions(new firefoxDriver.Options())
+      .setChromeOptions(new chromeDriver.Options())
+      .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
+      .setEdgeOptions(new edgeDriver.Options())
+      .setOperaOptions(new operaDriver.Options()
+        .setOperaBinaryPath('C:\\...\\opera.exe'))
       .build();
 
     return golden.startup(driver, cfg)

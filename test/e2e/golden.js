@@ -157,8 +157,6 @@ function _matchAsPromised(first, second) {
 function shouldMatch(id, test) {
   const prefix = 'data:image/png;base64,';
   const prefixLength = prefix.length;
-  //driver.sleep(50);  //added to prevent picture shifting and double screenshots; need to find better way
-
   return driver.executeScript(() => window.miew && window.miew.screenshot(128))
     .then((dataUrl) => {
       expect(dataUrl && dataUrl.slice(0, prefixLength)).to.equal(prefix);

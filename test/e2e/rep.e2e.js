@@ -3,6 +3,7 @@ import firefoxDriver from 'selenium-webdriver/firefox';
 import operaDriver from 'selenium-webdriver/opera';
 import ieDriver from 'selenium-webdriver/ie';
 import chromeDriver from 'selenium-webdriver/chrome';
+import edgeDriver from 'selenium-webdriver/edge';
 import chai, {expect} from 'chai';
 import dirtyChai from 'dirty-chai';
 import _ from 'lodash';
@@ -27,12 +28,14 @@ describe('As a power user, I want to', function() {
   this.timeout(0);
   this.slow(1000);
 
+  //be aware to call 'MicrosoftEdge' instead of 'edge' to use it
   before(function() {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setFirefoxOptions(new firefoxDriver.Options())
       .setChromeOptions(new chromeDriver.Options())
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
+      .setEdgeOptions(new edgeDriver.Options())
       .setOperaOptions(new operaDriver.Options()
         .setOperaBinaryPath('C:\\...\\opera.exe'))
       .build();
@@ -83,9 +86,9 @@ describe('As a power user, I want to', function() {
   it('load 1AID with an appropriate orientation and scale', function() {
     return page.openTerminal()
       .then(() => page.runScript(`\
-  set interpolateViews false
-  load 1AID
-  view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
+set interpolateViews false
+load 1AID
+view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
       .then(() => page.waitUntilTitleContains('1AID'))
       .then(() => page.waitUntilRebuildIsDone())
       .then(() => golden.shouldMatch('1aid', this));
@@ -95,6 +98,7 @@ describe('As a power user, I want to', function() {
 
     it('apply "small" preset', function() {
       return page.runScript('preset small')
+        .then(() => page.waitUntilTitleContains('1AID'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
     });
@@ -107,6 +111,7 @@ describe('As a power user, I want to', function() {
             const command = `clear\nrep 0 m=${mode.id} c=${colorer.id}`;
             suite.addTest(it(`set ${mode.name} mode with ${colorer.name} coloring`, function() {
               return page.runScript(command)
+                .then(() => page.waitUntilTitleContains('1AID'))
                 .then(() => page.waitUntilRepresentationIs(0, mode.id, colorer.id))
                 .then(() => golden.shouldMatch(`1aid_${mode.id}_${colorer.id}`, this));
             }));
@@ -120,6 +125,7 @@ describe('As a power user, I want to', function() {
 
     it('apply "small" preset', function() {
       return page.runScript('preset small')
+        .then(() => page.waitUntilTitleContains('1AID'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
     });
@@ -158,6 +164,7 @@ describe('As a power user, I want to', function() {
           const command = `clear\nmode BS\ncolor ${colour.colorId} ${setCommand}`;
           suite.addTest(it(`set ${setCommand} for ${colour.colorId}`, function() {
             return page.runScript(command)
+              .then(() => page.waitUntilTitleContains('1AID'))
               .then(() => page.waitUntilRepresentationIs(0, 'BS', colour.colorId))
               .then(() => golden.shouldMatch(`1aid_${colour.colorId}_${setCommand.split(/\W+/)[1]}`, this));
           }));
@@ -170,12 +177,14 @@ describe('As a power user, I want to', function() {
 
     it('apply "small" preset', function() {
       return page.runScript('preset small')
+        .then(() => page.waitUntilTitleContains('1AID'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
     });
 
     it('add a surface', function() {
       return page.runScript('add m=QS')
+        .then(() => page.waitUntilTitleContains('1AID'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_QS_EL', this));
     });
@@ -187,6 +196,7 @@ describe('As a power user, I want to', function() {
           const command = `clear\nrep 1 m=QS mt=${material.id}`;
           suite.addTest(it(`set ${material.name} material`, function() {
             return page.runScript(command)
+              .then(() => page.waitUntilTitleContains('1AID'))
               .then(() => page.waitUntilRepresentationIs(1, 'QS', 'EL'))
               .then(() => golden.shouldMatch(`1aid_QS_EL_${material.id}`, this));
           }));
@@ -255,6 +265,7 @@ selector "chain B"`)
           const command = `clear\ncolor ${mode.colorId}\nmode ${mode.modeId} ${setCommand}`;
           suite.addTest(it(`set ${setCommand} for ${mode.modeId}`, function() {
             return page.runScript(command)
+              .then(() => page.waitUntilTitleContains('1AID'))
               .then(() => page.waitUntilRepresentationIs(0, mode.modeId, mode.colorId))
               .then(() => golden.shouldMatch(`1aid_${mode.modeId}_${setCommand.split(/\s\W+/)[0]}`, this));
           }));
@@ -292,8 +303,9 @@ view "1S4GJwX0/TcFCYCLBwi4aPQAAAAAAAACAAAAAgA=="`))
               const command = `clear\nrep 0 m=${mode.id} s="${selector}" c=RT`;
               suite.addTest(it(`set ${mode.name} mode with ${selector} selection`, function() {
                 return page.runScript(command)
+                  .then(() => page.waitUntilTitleContains('5VHG'))
                   .then(() => page.waitUntilRepresentationIs(0, mode.id, 'RT'))
-                  .then(() => golden.shouldMatch(`5vhg_${mode.id}_${selector}`, this));
+                  .then(() => golden.shouldMatch(`5vhg_${mode.id}_${selector.split(/\s\w+/)[0]}`, this));
               }));
             });
           });
@@ -330,6 +342,7 @@ view "1g9IOwe1yGb6xlIzCvSyiPOsKW7y4hzU/3MgGvg=="`))
               const command = `clear\nrep 0 m=${mode.id} s="${selector.name}${selector.val}" c=${selector.colorId}`;
               suite.addTest(it(`set ${mode.name} mode with ${selector.name} selection`, function() {
                 return page.runScript(command)
+                  .then(() => page.waitUntilTitleContains('1UTF'))
                   .then(() => page.waitUntilRepresentationIs(0, mode.id, selector.colorId))
                   .then(() => golden.shouldMatch(`1utf_${mode.id}_${selector.name}`, this));
               }));
