@@ -68,7 +68,7 @@ function removeExtension(fileName) {
   return fileName;
 }
 
-function normalizeSource(source) {
+function srvNormalizeSource(source) {
   // special translation for local data files
   if (typeof source === 'string') {
     if (source.match(/^[0-9A-Z]{4}$/i)) {
@@ -189,8 +189,8 @@ function Miew(opts) {
 
   // TODO make this being not so ugly
 
-  this._fileSource = null;
-  this._fileSourceAnim = null;
+  this._srvTopoSource = null;
+  this._srvAnimSource = null;
 
   this.reset();
 
@@ -1489,52 +1489,58 @@ Miew.prototype.resetView = function() {
  * @returns {Promise} name of the visual that was added to the viewer
  */
 Miew.prototype.load = function(source, opts) {
-  var self = this;
+  opts = _.merge({}, opts, {
+    context: this,
+  });
 
-  if (self._loader) {
-    self._loader.cancel();
+  if (this._loader) {
+    this._loader.cancel();
+    this._loader = null;
   }
 
-  self.dispatchEvent({type: 'load', options: opts});
+  this.dispatchEvent({type: 'load', options: opts});
 
-  // remember file sources
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  // remember file sources - NOT A GOOD PLACE AND THING TO DO!
   if (source instanceof File && source.name.match(/.man$/i)) {
-    this._fileSourceAnim = normalizeSource(source);
+    this._srvAnimSource = srvNormalizeSource(source);
   } else {
-    this._fileSource = normalizeSource(source);
+    this._srvTopoSource = srvNormalizeSource(source);
   }
-  if (opts && opts.mdFile) {
-    this._fileSourceAnim = opts.mdFile;
+  if (opts.mdFile) {
+    this._srvAnimSource = opts.mdFile;
   }
+  /////////////////////////////////////////////////////////////////////////////////////////////////
 
-  if (!this.settings.now.use.multiFile && !(opts && opts.animation)) {
+  if (!this.settings.now.use.multiFile && !opts.animation) {
     this.reset(true);
   }
 
-  self._loader = new JobHandle();
-  self._loader.addEventListener('notification', function(e) {
-    self.dispatchEvent(e.slaveEvent);
+  const job = this._loader = new JobHandle();
+  job.addEventListener('notification', (e) => {
+    this.dispatchEvent(e.slaveEvent);
   });
 
-  self._spinner.spin(this._container);
+  this._spinner.spin(this._container);
 
-  const onLoadEnd = (res) => {
-    self._loader = null;
-    self._spinner.stop();
-    self._refreshTitle();
-    return res;
+  const onLoadEnd = (anything) => {
+    this._loader = null;
+    this._spinner.stop();
+    this._refreshTitle();
+    return anything;
   };
 
-  return _fetchData(source, opts, self._loader, self)
-    .then(res => _convertData(res.data, res.opts, res.master))
-    .then(res => _parseData(res.data, res.opts, res.master, self))
-    .then(res => self._onLoad(res.data, res.opts))
-    .then(res => onLoadEnd(res))
+  return _fetchData(source, opts, job)
+    .then(data => _convertData(data, opts, job))
+    .then(data => _parseData(data, opts, job))
+    .then((object) => {
+      const name = this._onLoad(object, opts);
+      return onLoadEnd(name);
+    })
     .catch((err) => {
-      onLoadEnd();
-      self.logger.error('Could not load data');
-      self.logger.debug(err);
-      throw err;
+      this.logger.error('Could not load data');
+      this.logger.debug(err);
+      throw onLoadEnd(err);
     });
 };
 
@@ -1679,7 +1685,7 @@ Miew.prototype._stopAnimation = function() {
   this._frameInfo.disableEvents();
   this._frameInfo = null;
   this._animInterval = null;
-  this._fileSourceAnim = null;
+  this._srvAnimSource = null;
   this.dispatchEvent({
     type: 'mdPlayerStateChanged',
     state: null
@@ -3379,24 +3385,27 @@ Miew.prototype.projected = function(fullAtomName, complexName) {
 };
 
 // FIXME: rewrite the function, it looks a little bit ugly
-function _fetchData(file, opts, master, context) {
+function _fetchData(source, opts, job) {
   return new Promise(function(resolve, reject) {
-    opts = opts || {}; // TODO: clone
-    if (file instanceof File && file.name.match(/.man$/i)) {
+    if (job.shouldCancel()) {
+      throw new Error('Operation cancelled');
+    }
+
+    if (source instanceof File && source.name.match(/.man$/i)) {
       opts.binary = true;
       opts.animation = true;
     }
 
-    if (file instanceof File && (file.name.match(/.mmtf$/i) || file.name.match(/.ccp4$/i))) {
+    if (source instanceof File && (source.name.match(/.mmtf$/i) || source.name.match(/.ccp4$/i))) {
       opts.binary = true;
-    } else if (_.isString(file) && file.match(/.mmtf$/i)) {
+    } else if (_.isString(source) && source.match(/.mmtf$/i)) {
       opts.binary = true;
     }
 
     // convert PDB ID to URL
-    if (!opts.mdFile && !opts.fileType && typeof file === 'string') {
+    if (!opts.mdFile && !opts.fileType && typeof source === 'string') {
 
-      var matched = file.match(/^(?:\s*([+\w]+)\s*:)?\s*(.*)$/);
+      var matched = source.match(/^(?:\s*([+\w]+)\s*:)?\s*(.*)$/);
       if (matched) {
         var id = matched[2].trim();
         var type = matched[1];
@@ -3404,7 +3413,7 @@ function _fetchData(file, opts, master, context) {
         case 'pubchem':
         case 'pubchem+json':
           type = 'pubchem+json';
-          file = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/' + encodeURIComponent(id) +
+          source = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/' + encodeURIComponent(id) +
                    '/JSON?record_type=3d';
           opts.sourceType = 'url';
           opts.fileName = id + '.json';
@@ -3414,12 +3423,12 @@ function _fetchData(file, opts, master, context) {
             type = type || 'pdb';
             switch (type) {
             case 'mmtf':
-              file = 'http://mmtf.rcsb.org/v1.0/full/' + id;
+              source = 'http://mmtf.rcsb.org/v1.0/full/' + id;
               opts.sourceType = 'url';
               break;
             case 'cif':
             case 'pdb':
-              file = 'http://files.rcsb.org/view/' + id + '.' + type;
+              source = 'http://files.rcsb.org/view/' + id + '.' + type;
               opts.sourceType = 'url';
               break;
             default:
@@ -3439,7 +3448,8 @@ function _fetchData(file, opts, master, context) {
       opts.binary = true;
     }
 
-    var loader = io.loaders.create(context, file, opts);
+    var loader = io.loaders.create(opts.context, source, opts);
+    job.addEventListener('cancel', () => loader.abort());
 
     // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
     // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
@@ -3459,25 +3469,16 @@ function _fetchData(file, opts, master, context) {
       }
     }
 
-    if (master) {
-      master.addEventListener('cancel', function() {
-        loader.abort();
-      });
-      if (master.isCancellationRequested()) {
-        loader.abort();
-      }
-    }
-
     console.time('load');
     loader.load({
       ready: function(data) {
         console.timeEnd('load');
-        context.logger.info('Loading finished');
-        resolve({data: data, opts: opts, master: master});
+        opts.context.logger.info('Loading finished');
+        resolve(data);
       },
       error: function(err) {
         console.timeEnd('load');
-        context.logger.error('Loading failed');
+        opts.context.logger.error('Loading failed');
         reject(err);
       },
       progress: function(percent) {
@@ -3487,13 +3488,12 @@ function _fetchData(file, opts, master, context) {
   });
 }
 
-function _convertData(data, opts, master) {
+function _convertData(data, opts, job) {
   return new Promise(function(resolve, reject) {
-    if (master) {
-      master.notify({type: 'convert'});
+    if (job.shouldCancel()) {
+      throw new Error('Operation cancelled');
     }
-
-    opts = opts || {};
+    job.notify({type: 'convert'});
 
     if (opts.mdFile) {
       var byteNumbers = new Array(data.length);
@@ -3511,33 +3511,28 @@ function _convertData(data, opts, master) {
           opts.convertedFile = new File([bytes], opts.fileName);
           opts.fileName = null;
           opts.fileType = 'pdb';
-          if (master) {
-            master.notify({type: 'convertingFinished'});
-          }
-          resolve({data: newData, opts: opts, master: master});
+          job.notify({type: 'convertingFinished'});
+          resolve(newData);
         } else {
           opts.converted = false;
           logger.error(message);
           opts.error = message;
-          if (master) {
-            master.notify({type: 'convertingFinished', error: message});
-          }
+          job.notify({type: 'convertingFinished', error: message});
           reject(new Error(message));
         }
       });
     } else {
       opts.converted = true;
-      resolve({data: data, opts: opts, master: master});
+      resolve(data);
     }
   });
 }
 
-function _parseData(data, opts, master, context) {
-  if (master) {
-    master.notify({type: 'parse'});
+function _parseData(data, opts, job) {
+  if (job.shouldCancel()) {
+    return Promise.reject(new Error('Operation cancelled'));
   }
-
-  opts = opts || {}; // TODO: clone
+  job.notify({type: 'parse'});
 
   const TheParser = _.head(io.parsers.find({
     format: opts.fileType,
@@ -3550,37 +3545,25 @@ function _parseData(data, opts, master, context) {
   }
 
   const parser = new TheParser(data, opts);
-  parser.context = context;
-
-  if (master) {
-    master.addEventListener('cancel', function() {
-      parser.abort();
-    });
-    if (master.isCancellationRequested()) {
-      return Promise.reject();
-    }
-  }
+  parser.context = opts.context;
+  job.addEventListener('cancel', () => parser.abort());
 
   console.time('parse');
   return parser.parse()
     .then((dataSet) => {
       console.timeEnd('parse');
-      if (master) {
-        master.notify({type: 'parsingFinished', data: dataSet});
-      }
-      return {data: dataSet, opts, master};
+      job.notify({type: 'parsingFinished', data: dataSet});
+      return dataSet;
     })
     .catch((error) => {
       console.timeEnd('parse');
       opts.error = error;
-      context.logger.debug(error.message);
+      opts.context.logger.debug(error.message);
       if (error.stack) {
-        context.logger.debug(error.stack);
+        opts.context.logger.debug(error.stack);
       }
-      context.logger.error('Parsing failed');
-      if (master) {
-        master.notify({type: 'parsingFinished', error});
-      }
+      opts.context.logger.error('Parsing failed');
+      job.notify({type: 'parsingFinished', error});
       throw error;
     });
 }

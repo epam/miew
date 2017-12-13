@@ -129,7 +129,7 @@ Miew.prototype.srvTopologyGetById = function(id, done, fail) {
 };
 
 Miew.prototype.srvCurrentTopologyIsRegistered = function(registered, notRegistered, onFail) {
-  if (this._fileSource && !this._srvTopologyFile) {
+  if (this._srvTopoSource && !this._srvTopologyFile) {
     var extractFileNameWithExtension = function(name) {
       var parts = name.toUpperCase().split('/');
       var lastPart = parts[parts.length - 1];
@@ -141,8 +141,8 @@ Miew.prototype.srvCurrentTopologyIsRegistered = function(registered, notRegister
       }
       return parts[parts.length - 2] + '.' + parts[parts.length - 1];
     };
-    var fName = extractFileNameWithExtension(this._fileSource instanceof File ?
-      this._fileSource.name : this._fileSource);
+    var fName = extractFileNameWithExtension(this._srvTopoSource instanceof File ?
+      this._srvTopoSource.name : this._srvTopoSource);
     this.srvTopologyFind(fName, function(findResult) {
       if (findResult && findResult.length > 0) {
         registered(fName, findResult[0]);
@@ -164,8 +164,8 @@ Miew.prototype.srvTopologyRegister = function(done, fail) {
 
   var self = this;
 
-  var source = self._fileSource;
-  var animationSource = self._fileSourceAnim;
+  var topoSource = self._srvTopoSource;
+  var animSource = self._srvAnimSource;
 
   var onDone = function(success, state, message) {
     if (LOCAL_DEBUG) {
@@ -182,16 +182,16 @@ Miew.prototype.srvTopologyRegister = function(done, fail) {
 
   var notRegisteredFn = function() {
     var request;
-    if (source instanceof File) {
+    if (topoSource instanceof File) {
       // upload file contents via FormData
       request = $.ajax({
         type: 'POST',
         url: getBaseUrl() + 'file/upload',
         data: (function() {
           var form = new FormData();
-          form.append('topologyFile', source);
-          if (animationSource) {
-            form.append('mdFile', animationSource);
+          form.append('topologyFile', topoSource);
+          if (animSource) {
+            form.append('mdFile', animSource);
           }
           return form;
         }()),
@@ -202,7 +202,7 @@ Miew.prototype.srvTopologyRegister = function(done, fail) {
     } else {
       // send just a file reference
       request = $.post(getBaseUrl() + 'file/upload', {
-        topologyFile: source
+        topologyFile: topoSource
       });
     }
     return request.done(function(result) {
