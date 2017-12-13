@@ -121,58 +121,6 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
     });
   });
 
-  describe('check correct colour parameters work', function() {
-
-    it('apply "small" preset', function() {
-      return page.runScript('preset small')
-        .then(() => page.waitUntilTitleContains('1AID'))
-        .then(() => page.waitUntilRebuildIsDone())
-        .then(() => golden.shouldMatch('1aid_BS_EL', this));
-    });
-
-    const colourSettings = [{
-      colorId: 'EL', settingNames: ['carbon = "purple"', 'carbon = 0x00FF00', 'carbon = -1',
-        'carbon = 7394559']
-    },
-    {
-      colorId: 'SQ', settingNames: ['gradient = "blue-red"']
-    },
-    {
-      colorId: 'UN', settingNames: ['color = 0xaa00cc', 'color = 65535', 'color = "orange"']
-    },
-    {
-      colorId: 'MO', settingNames: ['gradient = "reds"']
-    },
-    {
-      colorId: 'CO', settingNames: ['subset = "elem N"', 'color = 16776960', 'color = 0x1299e0', 'baseColor = "gray"',
-        'baseColor = 783995', 'baseColor = 0x674529']
-    },
-    {
-      colorId: 'TM', settingNames: ['min = -30', 'max = 80']
-    },
-    {
-      colorId: 'OC', settingNames: ['gradient = "blues"']
-    },
-    {
-      colorId: 'HY', settingNames: ['gradient = "hot"']
-    }
-    ];
-    const suite = this;
-    before(function() {
-      _.each(colourSettings, (colour) => {
-        _.each(colour.settingNames, (setCommand) => {
-          const command = `clear\nmode BS\ncolor ${colour.colorId} ${setCommand}`;
-          suite.addTest(it(`set ${setCommand} for ${colour.colorId}`, function() {
-            return page.runScript(command)
-              .then(() => page.waitUntilTitleContains('1AID'))
-              .then(() => page.waitUntilRepresentationIs(0, 'BS', colour.colorId))
-              .then(() => golden.shouldMatch(`1aid_${colour.colorId}_${setCommand.split(/\W+/)[1]}`, this));
-          }));
-        });
-      });
-    });
-  });
-
   describe('assign all materials via terminal, i.e.', function() {
 
     it('apply "small" preset', function() {
@@ -205,7 +153,7 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
     });
   });
 
-  describe('check correct mode parameters work', function() {
+  describe('check correct colour parameters work', function() {
 
     it('load 4V4F with an appropriate orientation and scale', function() {
       return page.runScript(`\
@@ -221,17 +169,62 @@ view "1INMtwelGW7+MH5TCNB+nPPgFibut+Q0/vYEbwA=="`)
     it('prepare the molecule', function() {
       return page.runScript(`\
 set autobuild false
-rep 0 s = "chain AA"
-rep 1 s = "chain AB"
-rep 2 s = "chain AC"
-rep 3 s = "chain AD" c = "SS"
-rep 4 s = "chain AE"
-rep 5 s = "chain AF"
-rep 6 s = "chain AG" c = "UN"
-rep 7 s = "chain AH" c = "UN"
-rep 8 s = "chain AI"
-rep 9 s = "chain AJ"
-rep 10 s = "chain A5" c = "RT"`)
+rep 0 s = "chain AA" m = "CA" c = "HY" mt = "SF"
+rep 1 s = "chain AB" m = "BS" c = "OC" mt = "SF"
+rep 2 s = "chain AD" m = "LC" c = "TM" mt = "SF"
+rep 3 s = "chain AC" m = "TU" c = "CO" mt = "SF"
+rep 4 s = "chain AF" m = "CA" c = "MO" mt = "SF"
+rep 5 s = "chain AH" m = "CA" c = "UN" mt = "SF"
+rep 6 s = "chain AI" m = "CA" c = "SQ" mt = "SF"
+rep 7 s = "chain AJ" m = "BS" c = "EL" mt = "SF"`)
+        .then(() => page.runScript('build all'))
+        .then(() => page.waitUntilTitleContains('4V4F'))
+        .then(() => page.waitUntilRebuildIsDone())
+        .then(() => golden.shouldMatch('4v4f_preColours', this));
+    });
+
+    const command = `\
+rep 0
+color HY gradient = "hot"
+rep 1
+color OC gradient = "blues"
+rep 2
+color TM min = -5 max = 15
+rep 3
+color CO color = 16776960 baseColor = "pink" subset = "nonpolar"
+rep 4
+color MO gradient = "reds"
+rep 5
+color UN color = "green"
+rep 6
+color SQ gradient = "blue-red"
+rep 7
+color EL carbon = "purple"`;
+
+    it('change colour parameters', function() {
+      return page.runScript(command)
+        .then(() => page.runScript('build all'))
+        .then(() => page.waitUntilTitleContains('4V4F'))
+        .then(() => page.waitUntilRepresentationIs(7, 'BS', 'EL'))
+        .then(() => golden.shouldMatch('4v4f_colours', this));
+    });
+  });
+
+  describe('check correct mode parameters work', function() {
+
+    it('prepare the molecule', function() {
+      return page.runScript(`\
+rep 0 s = "chain AA" m = "BS" c = "EL"
+rep 1 s = "chain AB" m = "BS" c = "EL"
+rep 2 s = "chain AC" m = "BS" c = "EL"
+rep 3 s = "chain AD" m = "BS" c = "SS"
+rep 4 s = "chain AE" m = "BS" c = "EL"
+rep 5 s = "chain AF" m = "BS" c = "EL"
+rep 6 s = "chain AG" m = "BS" c = "UN"
+rep 7 s = "chain AH" m = "BS" c = "UN"
+rep 8 s = "chain AI" m = "BS" c = "EL"
+rep 9 s = "chain AJ" m = "BS" c = "EL"
+rep 10 s = "chain A5" m = "BS" c = "RT"`)
         .then(() => page.runScript('build all'))
         .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRebuildIsDone())
