@@ -207,95 +207,76 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
 
   describe('check correct mode parameters work', function() {
 
-    it('let us take a smaller part of the molecule for tests', function() {
+    it('load 4V4F with an appropriate orientation and scale', function() {
       return page.runScript(`\
-clear\nload "mmtf:1aid"
+clear\n
+load "mmtf:4v4f"
 preset small
-view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="
-selector "chain B"`)
-        .then(() => page.waitUntilTitleContains('1AID'))
+view "1INMtwelGW7+MH5TCNB+nPPgFibut+Q0/vYEbwA=="`)
+        .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRebuildIsDone())
-        .then(() => golden.shouldMatch('1aid_B_small', this));
+        .then(() => golden.shouldMatch('4v4f', this));
     });
 
-    //think about aromatic rings, whether they are needed
-    const modeSettings = [{
-      modeId: 'BS', colorId: 'EL', settingNames: ['atom = 0.15', 'bond = 0.4', 'space = 0.8', 'multibond = false']
-    },
-    {
-      modeId: 'LC', colorId: 'EL', settingNames: ['bond = 0.5', 'space = 0.6', 'multibond = false']
-    },
-    {
-      modeId: 'LN', colorId: 'EL', settingNames: ['lineWidth = 4', 'atom = 0.5', 'multibond = false']
-    },
-    {
-      modeId: 'CA', colorId: 'SS', settingNames: ['radius = 0.1', 'depth = 0.5', 'tension = 0.5', 'ss.helix.width = 2',
-        'ss.strand.width = 0.5', 'ss.helix.arrow = 3', 'ss.strand.arrow = 1']
-    },
-    {
-      modeId: 'TU', colorId: 'SS', settingNames: ['radius = 1', 'tension = 2']
-    },
-    {
-      modeId: 'TR', colorId: 'SS', settingNames: ['radius = 1']
-    },
-    {
-      modeId: 'QS', colorId: 'SQ', settingNames: ['isoValue = 2.5', 'scale = 0.5', 'zClip = true', 'wireframe = true',
-        "subset = 'elem N'"]
-    },
-    {
-      modeId: 'SA', colorId: 'SQ', settingNames: ['probeRadius = 0.5', 'zClip = true', 'wireframe = true',
-        "subset = 'elem N'"]
-    },
-    {
-      modeId: 'SE', colorId: 'SQ', settingNames: ['probeRadius = 3', 'zClip = true', 'wireframe = true',
-        "subset = 'elem N'"]
-    },
-    {
-      modeId: 'TX', colorId: 'EL',
-      settingNames: ["template = '{{chain}}:{{S equence}}.{{serial}}>{{name}}///{{residue}}///water?{{water}}///het?{{hetatm}}'",
-        "verticalAlign = 'top'", 'horizontalAlign = "left"', 'dx = -10',
-        'dy = 10', 'bg = "adjust"', 'fg = "inverse"', 'showBg = false']
-    }];
+    it('prepare the molecule', function() {
+      return page.runScript(`\
+set autobuild false
+rep 0 s = "chain AA"
+rep 1 s = "chain AB"
+rep 2 s = "chain AC"
+rep 3 s = "chain AD" c = "SS"
+rep 4 s = "chain AE"
+rep 5 s = "chain AF"
+rep 6 s = "chain AG" c = "UN"
+rep 7 s = "chain AH" c = "UN"
+rep 8 s = "chain AI"
+rep 9 s = "chain AJ"
+rep 10 s = "chain A5" c = "RT"`)
+        .then(() => page.runScript('build all'))
+        .then(() => page.waitUntilTitleContains('4V4F'))
+        .then(() => page.waitUntilRebuildIsDone())
+        .then(() => golden.shouldMatch('4v4f_prepare', this));
+    });
 
-    const suite = this;
-    //check every single setting from the settingNames list
-    before(function() {
-      _.each(modeSettings, (mode) => {
-        _.each(mode.settingNames, (setCommand) => {
-          const command = `clear\ncolor ${mode.colorId}\nmode ${mode.modeId} ${setCommand}`;
-          suite.addTest(it(`set ${setCommand} for ${mode.modeId}`, function() {
-            return page.runScript(command)
-              .then(() => page.waitUntilTitleContains('1AID'))
-              .then(() => page.waitUntilRepresentationIs(0, mode.modeId, mode.colorId))
-              .then(() => golden.shouldMatch(`1aid_${mode.modeId}_${setCommand.split(/\s\W+/)[0]}`, this));
-          }));
-        });
-      });
+    it('change mode parameters', function() {
+      //think about aromatic rings, whether they are needed
+      const command = `\
+rep 0
+mode BS atom = 0.15 bond = 0.4 space = 0.8 multibond = false
+rep 1
+mode LC bond = 0.5 space = 0.6 multibond = false
+rep 2
+mode LN lineWidth = 2 atom = 0.5 multibond = false
+rep 3
+mode CA radius = 0.1 depth = 0.5 tension = 0.5 ss.helix.width = 2 ss.strand.width = 0.5 ss.helix.arrow = 3 ss.strand.arrow = 1
+rep 4
+mode TU radius = 1 tension = 2
+rep 5
+mode TR radius = 1
+rep 6
+mode QS isoValue = 2.5 scale = 0.8 zClip = true wireframe = true
+rep 7
+mode SA probeRadius = 0.5 wireframe = true subset = "elem N"
+rep 8
+mode SE probeRadius = 3 zClip = true wireframe = true subset = "elem N"
+rep 10
+mode TX template = 'test atom {{name}}' bg = "adjust" fg = "inverse" horizontalAlign = "right"`;
+      return page.runScript(command)
+        .then(() => page.runScript('build all'))
+        .then(() => page.waitUntilTitleContains('4V4F'))
+        .then(() => page.waitUntilRepresentationIs(10, 'TX', 'RT'))
+        .then(() => golden.shouldMatch('4v4f_params', this));
     });
   });
 
   describe('assign combinations of seltors and modes via terminal, i. e.', function() {
-    describe('', function() {
     //a molecule with DNA, many chains, H atoms, probably full set of aminoacids,
     //less heavy than 4TNW, idealy one to connect above test with
-      it('load 4V4F with an appropriate orientation and scale', function() {
-        return page.openTerminal()
-          .then(() => page.runScript(`\
-clear\n
-set interpolateViews false
-load "mmtf:4V4F"
-remove 1
-view "1INMtwelGW7+MH5TCNB+nPPgFibut+Q0/vYEbwA=="`))
-          .then(() => page.waitUntilTitleContains('4V4F'))
-          .then(() => page.waitUntilRebuildIsDone())
-          .then(() => golden.shouldMatch('4v4f', this));
-      });
-
-      it('build selectors pattern', function() {
-        return page.runScript(`\
+    it('build selectors pattern', function() {
+      return page.runScript(`\
 set autobuild false
-rep 0 s="sequence -1:71 and chain AA" c=SQ
-rep 1 s="serial 1079:1629" c=SQ
+rep 0 s="sequence -1:71 and chain AA" m=CA c=SQ mt=SF
+rep 1 s="serial 1079:1629" m=BS c=SQ mt=SF
 rep 2 s="chain A3,A2 and nucleic" m=CA c=RT mt=SF
 rep 3 s="chain A5 and pyrimidine" m=CA c=RT mt=SF
 rep 4 s="chain A6,A7 and purine" m=BS c=RT mt=SF
@@ -314,29 +295,28 @@ rep 16 s="chain AF and none" m=BS c=EL mt=SF
 rep 17 s='chain AK and altloc " "' m=BS c=CH mt=SF
 rep 18 s="chain AH and polarh" m=BS c=EL mt=SF
 rep 19 s="chain AH and nonpolarh" m=BS c=EL mt=SF`)
-          .then(() => page.runScript(`build all`))
-          .then(() => page.waitUntilTitleContains('4V4F'))
-          .then(() => page.waitUntilRebuildIsDone())
-          .then(() => golden.shouldMatch('4v4f_selectors', this));
-      });
+        .then(() => page.runScript('build all'))
+        .then(() => page.waitUntilTitleContains('4V4F'))
+        .then(() => page.waitUntilRebuildIsDone())
+        .then(() => golden.shouldMatch('4v4f_selectors', this));
+    });
 
-      let repNumbers = Array.from(Array(20).keys());
-      const suite = this;
-      before(function() {
-        return Promise.all([retrieve.modes, repNumbers]).then(([modes, repNumber]) => {
-          _.each(modes, (mode) => {
-            let command = 'clear\n';
-            _.each(repNumber, (number) => {
-              command += `rep ${number}\nmode ${mode.id}\n`;
-            });
-            command += 'build all\n';
-            suite.addTest(it(`set ${mode.name} mode with all selectors`, function() {
-              return page.runScript(command)
-                .then(() => page.waitUntilTitleContains('4V4F'))
-                .then(() => page.waitUntilRepresentationIs(19, mode.id, 'EL'))
-                .then(() => golden.shouldMatch(`4v4f_${mode.id}`, this));
-            }));
+    let repNumbers = Array.from(Array(20).keys());
+    const suite = this;
+    before(function() {
+      return Promise.all([retrieve.modes, repNumbers]).then(([modes, repNumber]) => {
+        _.each(modes, (mode) => {
+          let command = 'clear\n';
+          _.each(repNumber, (number) => {
+            command += `rep ${number}\nmode ${mode.id}\n`;
           });
+          command += 'build all\n';
+          suite.addTest(it(`set ${mode.name} mode with all selectors`, function() {
+            return page.runScript(command)
+              .then(() => page.waitUntilTitleContains('4V4F'))
+              .then(() => page.waitUntilRepresentationIs(19, mode.id, 'EL'))
+              .then(() => golden.shouldMatch(`4v4f_${mode.id}`, this));
+          }));
         });
       });
     });
