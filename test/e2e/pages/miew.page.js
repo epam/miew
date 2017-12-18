@@ -103,7 +103,7 @@ return miew && Miew && JSON.stringify(${expression});`)
     return this.driver.wait(() => this.driver.executeScript(`\
 var miew = window.miew;
 var rep = miew && miew.repGet(0);
-return rep && !miew._loader && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
+return rep && !miew._loading.length && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
   }
 
   /**
@@ -116,7 +116,7 @@ return rep && !miew._loader && !miew._building && !miew._needRebuild() && !miew.
   waitUntilRepresentationIs(index, mode, colorer) {
     return this.driver.wait(() => this.driver.executeScript(`\
 var miew = window && window.miew;
-var rep = miew && !miew._loader && miew.repGet(${index});
+var rep = miew && !miew._loading.length && miew.repGet(${index});
 var modeOk = rep && (rep.mode.id === '${mode.toUpperCase()}');
 var colorerOk = rep && (rep.colorer.id === '${colorer.toUpperCase()}');
 return modeOk && colorerOk && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);

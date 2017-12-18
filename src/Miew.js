@@ -171,8 +171,8 @@ function Miew(opts) {
 
   /** @type {?Spinner} */
   this._spinner = null;
-  /** @type {?Loader} */
-  this._loader = null;
+  /** @type {JobHandle[]} */
+  this._loading = [];
   /** @type {?number} */
   this._animInterval = null;
 
@@ -321,10 +321,10 @@ Miew.prototype.init = function() {
  */
 Miew.prototype.term = function() {
   this._showMessage('Viewer has been terminated.');
-  if (this._loader) {
-    this._loader.cancel();
-    this._loader = null;
-  }
+  this._loading.forEach((job) => {
+    job.cancel();
+  });
+  this._loading.length = 0;
   this.halt();
   this._gfx = null;
 };
@@ -908,11 +908,11 @@ Miew.prototype._onUpdate = function() {
     visual.getComplex().update();
   });
 
-  if (settings.now.autobuild && !this._loader && !this._building && this._needRebuild()) {
+  if (settings.now.autobuild && !this._loading.length && !this._building && this._needRebuild()) {
     this.rebuild();
   }
 
-  if (!this._loader && !this._building && !this._needRebuild()) {
+  if (!this._loading.length && !this._building && !this._needRebuild()) {
     this._updateView();
   }
 
@@ -1493,9 +1493,21 @@ Miew.prototype.load = function(source, opts) {
     context: this,
   });
 
-  if (this._loader) {
-    this._loader.cancel();
-    this._loader = null;
+  // for a single-file scenario
+  if (!this.settings.now.use.multiFile) {
+
+    // abort all loaders in progress
+    if (this._loading.length) {
+      this._loading.forEach((job) => {
+        job.cancel();
+      });
+      this._loading.length = 0;
+    }
+
+    // reset
+    if (!opts.animation) {
+      this.reset(true);
+    }
   }
 
   this.dispatchEvent({type: 'load', options: opts});
@@ -1512,11 +1524,8 @@ Miew.prototype.load = function(source, opts) {
   }
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
-  if (!this.settings.now.use.multiFile && !opts.animation) {
-    this.reset(true);
-  }
-
-  const job = this._loader = new JobHandle();
+  const job = new JobHandle();
+  this._loading.push(job);
   job.addEventListener('notification', (e) => {
     this.dispatchEvent(e.slaveEvent);
   });
@@ -1524,7 +1533,10 @@ Miew.prototype.load = function(source, opts) {
   this._spinner.spin(this._container);
 
   const onLoadEnd = (anything) => {
-    this._loader = null;
+    const jobIndex = this._loading.indexOf(job);
+    if (jobIndex !== -1) {
+      this._loading.splice(jobIndex, 1);
+    }
     this._spinner.stop();
     this._refreshTitle();
     return anything;

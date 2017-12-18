@@ -36,6 +36,6 @@ return Miew && JSON.stringify(${expression});`)
   waitUntilRebuildIsDone() {
     return this.driver.wait(() => this.driver.executeScript(`\
 var miew = window.miew;
-return miew && !miew._loader && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
+return miew && !miew._loading.length && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
   }
 }
