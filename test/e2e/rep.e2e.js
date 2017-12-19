@@ -108,9 +108,8 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
       return Promise.all([retrieve.modes, retrieve.colorers]).then(([modes, colorers]) => {
         _.each(modes, (mode) => {
           _.each(colorers, (colorer) => {
-            const command = `clear\nrep 0 m=${mode.id} c=${colorer.id}`;
             suite.addTest(it(`set ${mode.name} mode with ${colorer.name} coloring`, function() {
-              return page.runScript(command)
+              return page.runScript(`clear\nrep 0 m=${mode.id} c=${colorer.id}`)
                 .then(() => page.waitUntilTitleContains('1AID'))
                 .then(() => page.waitUntilRepresentationIs(0, mode.id, colorer.id))
                 .then(() => golden.shouldMatch(`1aid_${mode.id}_${colorer.id}`, this));
@@ -141,9 +140,8 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
     before(function() {
       return retrieve.materials.then((materials) => {
         _.each(materials, (material) => {
-          const command = `clear\nrep 1 m=QS mt=${material.id}`;
           suite.addTest(it(`set ${material.name} material`, function() {
-            return page.runScript(command)
+            return page.runScript(`clear\nrep 1 m=QS mt=${material.id}`)
               .then(() => page.waitUntilTitleContains('1AID'))
               .then(() => page.waitUntilRepresentationIs(1, 'QS', 'EL'))
               .then(() => golden.shouldMatch(`1aid_QS_EL_${material.id}`, this));
@@ -157,7 +155,7 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
 
     it('load 4V4F with an appropriate orientation and scale', function() {
       return page.runScript(`\
-clear\n
+clear
 load "mmtf:4v4f"
 preset small
 view "1INMtwelGW7+MH5TCNB+nPPgFibut+Q0/vYEbwA=="`)
@@ -183,7 +181,8 @@ rep 7 s = "chain AJ" m = "BS" c = "EL" mt = "SF"`)
         .then(() => golden.shouldMatch('4v4f_preColours', this));
     });
 
-    const command = `\
+    it('change colour parameters', function() {
+      return page.runScript(`\
 rep 0
 color HY gradient = "hot"
 rep 1
@@ -199,10 +198,7 @@ color UN color = "green"
 rep 6
 color SQ gradient = "blue-red"
 rep 7
-color EL carbon = "purple"`;
-
-    it('change colour parameters', function() {
-      return page.runScript(command)
+color EL carbon = "purple"`)
         .then(() => page.runScript('build all'))
         .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRepresentationIs(7, 'BS', 'EL'))
@@ -232,8 +228,7 @@ rep 10 s = "chain A5" m = "BS" c = "RT"`)
     });
 
     it('change mode parameters', function() {
-      //think about aromatic rings, whether they are needed
-      const command = `\
+      return page.runScript(`\
 rep 0
 mode BS atom = 0.15 bond = 0.4 space = 0.8 multibond = false
 rep 1
@@ -253,8 +248,7 @@ mode SA probeRadius = 0.5 wireframe = true subset = "elem N"
 rep 8
 mode SE probeRadius = 3 zClip = true wireframe = true subset = "elem N"
 rep 10
-mode TX template = 'test atom {{name}}' bg = "adjust" fg = "inverse" horizontalAlign = "right"`;
-      return page.runScript(command)
+mode TX template = 'test atom {{name}}' bg = "adjust" fg = "inverse" horizontalAlign = "right"`)
         .then(() => page.runScript('build all'))
         .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRepresentationIs(10, 'TX', 'RT'))
@@ -263,8 +257,6 @@ mode TX template = 'test atom {{name}}' bg = "adjust" fg = "inverse" horizontalA
   });
 
   describe('assign combinations of seltors and modes via terminal, i. e.', function() {
-    //a molecule with DNA, many chains, H atoms, probably full set of aminoacids,
-    //less heavy than 4TNW, idealy one to connect above test with
     it('build selectors pattern', function() {
       return page.runScript(`\
 set autobuild false
@@ -303,9 +295,9 @@ rep 19 s="chain AH and nonpolarh" m=BS c=EL mt=SF`)
           _.each(repNumber, (number) => {
             command += `rep ${number}\nmode ${mode.id}\n`;
           });
-          command += 'build all\n';
           suite.addTest(it(`set ${mode.name} mode with all selectors`, function() {
             return page.runScript(command)
+              .then(() => page.runScript('build all'))
               .then(() => page.waitUntilTitleContains('4V4F'))
               .then(() => page.waitUntilRepresentationIs(19, mode.id, 'EL'))
               .then(() => golden.shouldMatch(`4v4f_${mode.id}`, this));

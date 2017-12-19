@@ -46,10 +46,7 @@ describe('As a third-party developer, I want to', function() {
   before(function() {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
-      .setFirefoxOptions(new firefoxDriver.Options())
-      .setChromeOptions(new chromeDriver.Options())
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
-      .setEdgeOptions(new edgeDriver.Options())
       .setOperaOptions(new operaDriver.Options()
         .setOperaBinaryPath('C:\\...\\opera.exe'))
       .build();
