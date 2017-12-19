@@ -120,6 +120,21 @@ function getUrlParametersAsDict(url) {
   return result;
 }
 
+function resolveURL(str) {
+  if (typeof URL !== 'undefined') {
+    if (typeof window !== 'undefined') {
+      return new URL(str, window.location).href;
+    } else {
+      return new URL(str).href;
+    }
+  } else if (typeof document !== 'undefined') {
+    const anchor = document.createElement('a');
+    anchor.href = str;
+    return anchor.href;
+  }
+  return str;
+}
+
 /**
  * Generates regular expression object that includes all symbols
  * listed in the argument
@@ -376,6 +391,12 @@ function getFileExtension(fileName) {
   return fileName.slice((Math.max(0, fileName.lastIndexOf('.')) || Infinity));
 }
 
+function splitFileName(fileName) {
+  const ext = getFileExtension(fileName);
+  const name = fileName.slice(0, fileName.length - ext.length);
+  return [name, ext];
+}
+
 function dataUrlToBlob(url) {
   var parts = url.split(/[:;,]/);
   var partsCount = parts.length;
@@ -487,6 +508,7 @@ export default {
   decodeQueryComponent: decodeQueryComponent,
   getUrlParameters: getUrlParameters,
   getUrlParametersAsDict: getUrlParametersAsDict,
+  resolveURL,
   generateRegExp: generateRegExp,
   createElement: createElement,
   deriveClass: deriveClass,
@@ -509,5 +531,5 @@ export default {
   shallowCloneNode: shallowCloneNode,
   correctSelectorIdentifier: correctSelectorIdentifier,
   getFileExtension,
+  splitFileName,
 };
-

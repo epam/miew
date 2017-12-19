@@ -214,5 +214,6 @@ CCP4Parser.prototype.parseSync = function() {
 
 CCP4Parser.formats = ['ccp4'];
 CCP4Parser.extensions = ['.ccp4'];
+CCP4Parser.binary = true;
 
 export default CCP4Parser;

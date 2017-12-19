@@ -51,6 +51,10 @@ export default class Loader extends EventDispatcher {
       this._agent.abort();
     }
   }
+
+  static extractName(_source) {
+    return undefined;
+  }
 }
 
 ContextDependent(Loader.prototype);

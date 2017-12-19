@@ -26,22 +26,6 @@ describe('FileLoader', () => {
     delete global.File;
   });
 
-  describe('constructor', () => {
-    /* eslint-disable no-new */
-    it('fills opts.fileName if it is not yet set', () => {
-      const opts = {};
-      new FileLoader(fakeSource, opts);
-      expect(opts).to.have.property('fileName', 'foo');
-    });
-
-    it('leaves opts.fileName intact if present', () => {
-      const opts = {fileName: 'bar'};
-      new FileLoader(fakeSource, opts);
-      expect(opts).to.have.property('fileName', 'bar');
-    });
-    /* eslint-enable no-new */
-  });
-
   describe('#load()', () => {
 
     const fakeProgress = {

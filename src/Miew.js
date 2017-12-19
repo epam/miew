@@ -101,7 +101,7 @@ function hasValidResidues(complex) {
 
 function reportProgress(log, action, percent) {
   var TOTAL_PERCENT = 100;
-  if (percent) {
+  if (percent !== undefined) {
     log.debug(action + '... ' + Math.floor(percent * TOTAL_PERCENT) + '%');
   } else {
     log.debug(action + '...');
@@ -1505,7 +1505,7 @@ Miew.prototype.load = function(source, opts) {
     }
 
     // reset
-    if (!opts.animation) {
+    if (!opts.animation) { // FIXME: sometimes it is set AFTERWARDS!
       this.reset(true);
     }
   }
@@ -3396,72 +3396,131 @@ Miew.prototype.projected = function(fullAtomName, complexName) {
   };
 };
 
-// FIXME: rewrite the function, it looks a little bit ugly
+const rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
+const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
+const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
+
+function resolveSourceShortcut(source, opts) {
+  if (!_.isString(source)) {
+    return source;
+  }
+
+  // e.g. "mmtf:1CRN"
+  const matchesPdbId = rePdbId.exec(source);
+  if (matchesPdbId) {
+    let [, format = 'pdb', id] = matchesPdbId;
+
+    format = format.toLowerCase();
+    id = id.toUpperCase();
+
+    switch (format) {
+    case 'pdb':
+      source = `http://files.rcsb.org/download/${id}.pdb`;
+      break;
+    case 'cif':
+      source = `http://files.rcsb.org/download/${id}.cif`;
+      break;
+    case 'mmtf':
+      source = `http://mmtf.rcsb.org/v1.0/full/${id}`;
+      break;
+    case 'ccp4':
+      source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
+      break;
+    default:
+      throw new Error('Unexpected data format shortcut');
+    }
+
+    opts.fileType = format;
+    opts.fileName = `${id}.${format}`;
+    opts.sourceType = 'url';
+    return source;
+  }
+
+  // e.g. "pc:aspirin"
+  const matchesPubchem = rePubchem.exec(source);
+  if (matchesPubchem) {
+    let compound = matchesPubchem[1].toLowerCase();
+    source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
+    opts.fileType = 'pubchem';
+    opts.fileName = `${compound}.json`;
+    opts.sourceType = 'url';
+    return source;
+  }
+
+  // otherwise is should be an URL
+  if (opts.sourceType === 'url' || opts.sourceType === undefined) {
+    opts.sourceType = 'url';
+
+    // e.g. "./data/1CRN.pdb"
+    if (!reUrlScheme.test(source)) {
+      source = utils.resolveURL(source);
+    }
+  }
+
+  return source;
+}
+
+function updateBinaryMode(opts) {
+  let binary = opts.binary;
+
+  // detect by format
+  if (opts.fileType !== undefined) {
+    const TheParser = _.head(io.parsers.find({format: opts.fileType}));
+    if (TheParser) {
+      binary = TheParser.binary || false;
+    } else {
+      throw new Error('Could not find suitable parser for this format');
+    }
+  }
+
+  // detect by file extension
+  if (binary === undefined && opts.fileExt !== undefined) {
+    const TheParser = _.head(io.parsers.find({ext: opts.fileExt}));
+    if (TheParser) {
+      binary = TheParser.binary || false;
+    }
+  }
+
+  // temporary workaround for animation
+  if (opts.fileExt !== undefined && opts.fileExt.toLowerCase() === '.man') {
+    opts.binary = true;
+    opts.animation = true; // who cares?
+  }
+
+  // update if detected
+  if (binary !== undefined) {
+    if (opts.binary !== undefined && opts.binary !== binary) {
+      opts.context.logger.warn('Overriding incorrect binary mode');
+    }
+  }
+
+  opts.binary = binary || false;
+}
+
 function _fetchData(source, opts, job) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function(resolve) {
     if (job.shouldCancel()) {
       throw new Error('Operation cancelled');
     }
 
-    if (source instanceof File && source.name.match(/.man$/i)) {
-      opts.binary = true;
-      opts.animation = true;
+    // allow for source shortcuts
+    source = resolveSourceShortcut(source, opts);
+
+    // detect a proper loader
+    const TheLoader = _.head(io.loaders.find({type: opts.sourceType, source}));
+    if (!TheLoader) {
+      throw new Error('Could not find suitable loader for this source');
     }
 
-    if (source instanceof File && (source.name.match(/.mmtf$/i) || source.name.match(/.ccp4$/i))) {
-      opts.binary = true;
-    } else if (_.isString(source) && source.match(/.mmtf$/i)) {
-      opts.binary = true;
+    // split file name
+    const fileName = opts.fileName || TheLoader.extractName(source);
+    if (fileName) {
+      const [name, fileExt] = utils.splitFileName(fileName);
+      _.defaults(opts, {name, fileExt, fileName});
     }
 
-    // convert PDB ID to URL
-    if (!opts.mdFile && !opts.fileType && typeof source === 'string') {
-
-      var matched = source.match(/^(?:\s*([+\w]+)\s*:)?\s*(.*)$/);
-      if (matched) {
-        var id = matched[2].trim();
-        var type = matched[1];
-        switch (type) {
-        case 'pubchem':
-        case 'pubchem+json':
-          type = 'pubchem+json';
-          source = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/' + encodeURIComponent(id) +
-                   '/JSON?record_type=3d';
-          opts.sourceType = 'url';
-          opts.fileName = id + '.json';
-          break;
-        default:
-          if (id.match(/^\w{4}$/i)) {
-            type = type || 'pdb';
-            switch (type) {
-            case 'mmtf':
-              source = 'http://mmtf.rcsb.org/v1.0/full/' + id;
-              opts.sourceType = 'url';
-              break;
-            case 'cif':
-            case 'pdb':
-              source = 'http://files.rcsb.org/view/' + id + '.' + type;
-              opts.sourceType = 'url';
-              break;
-            default:
-            }
-          } else {
-            type = undefined;
-          }
-        }
-
-        if (type) {
-          opts.fileType = type;
-        }
-      }
-    }
-
-    if (opts.fileType === 'mmtf') {
-      opts.binary = true;
-    }
-
-    var loader = io.loaders.create(opts.context, source, opts);
-    job.addEventListener('cancel', () => loader.abort());
+    // should it be text or binary?
+    updateBinaryMode(opts);
 
     // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
     // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
@@ -3481,22 +3540,38 @@ function _fetchData(source, opts, job) {
       }
     }
 
-    console.time('load');
-    loader.load({
-      ready: function(data) {
-        console.timeEnd('load');
-        opts.context.logger.info('Loading finished');
-        resolve(data);
-      },
-      error: function(err) {
-        console.timeEnd('load');
-        opts.context.logger.error('Loading failed');
-        reject(err);
-      },
-      progress: function(percent) {
-        reportProgress(loader.logger, 'Loading', percent);
+    // create a loader
+    const loader = new TheLoader(source, opts);
+    loader.context = opts.context;
+    job.addEventListener('cancel', () => loader.abort());
+
+    loader.addEventListener('progress', (event) => {
+      if (event.lengthComputable && event.total > 0) {
+        reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
+      } else {
+        reportProgress(loader.logger, 'Fetching');
       }
     });
+
+    console.time('fetch');
+    const promise = loader.load()
+      .then((data) => {
+        console.timeEnd('fetch');
+        opts.context.logger.info('Fetching finished');
+        job.notify({type: 'fetchingFinished', data});
+        return data;
+      })
+      .catch((error) => {
+        console.timeEnd('fetch');
+        opts.context.logger.debug(error.message);
+        if (error.stack) {
+          opts.context.logger.debug(error.stack);
+        }
+        opts.context.logger.error('Fetching failed');
+        job.notify({type: 'fetchingFinished', error});
+        throw error;
+      });
+    resolve(promise);
   });
 }
 
@@ -3546,12 +3621,7 @@ function _parseData(data, opts, job) {
   }
   job.notify({type: 'parse'});
 
-  const TheParser = _.head(io.parsers.find({
-    format: opts.fileType,
-    ext: utils.getFileExtension(opts.fileName || ''),
-    data,
-  }));
-
+  const TheParser = _.head(io.parsers.find({format: opts.fileType, ext: opts.fileExt, data}));
   if (!TheParser) {
     return Promise.reject(new Error('Could not find suitable parser'));
   }

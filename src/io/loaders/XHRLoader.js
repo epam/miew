@@ -9,13 +9,6 @@ export default class XHRLoader extends Loader {
     super(source, options);
 
     options = this._options;
-    if (!options.fileName) {
-      let last = source.indexOf('?');
-      if (last === -1) {
-        last = source.length;
-      }
-      options.fileName = source.slice(source.lastIndexOf('/') + 1, last);
-    }
     this._binary = (options.binary === true);
   }
 
@@ -59,6 +52,14 @@ export default class XHRLoader extends Loader {
 
   static canProbablyLoad(source) {
     return _.isString(source) && urlStartRegexp.test(source);
+  }
+
+  static extractName(source) {
+    if (source) {
+      const last = (source.indexOf('?') + 1 || source.lastIndexOf('#') + 1 || source.length + 1) - 1;
+      return source.slice(source.lastIndexOf('/', last) + 1, last);
+    }
+    return undefined;
   }
 }
 

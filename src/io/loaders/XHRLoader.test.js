@@ -12,28 +12,6 @@ describe('XHRLoader', () => {
 
   const fakeSource = 'http://localhost/foo';
 
-  describe('constructor', () => {
-    /* eslint-disable no-new */
-    it('fills opts.fileName if it is not yet set', () => {
-      const opts = {};
-      new XHRLoader(fakeSource, opts);
-      expect(opts).to.have.property('fileName', 'foo');
-    });
-
-    it('leaves opts.fileName intact if present', () => {
-      const opts = {fileName: 'bar'};
-      new XHRLoader(fakeSource, opts);
-      expect(opts).to.have.property('fileName', 'bar');
-    });
-
-    it('extracts file name even if query string is present', () => {
-      const opts = {};
-      new XHRLoader(`${fakeSource}?type=bar&baz=quux`, opts);
-      expect(opts).to.have.property('fileName', 'foo');
-    });
-    /* eslint-enable no-new */
-  });
-
   describe('#load()', () => {
 
     const fakeProgress = {

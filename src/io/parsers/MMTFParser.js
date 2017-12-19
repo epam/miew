@@ -456,5 +456,6 @@ MMTFParser.prototype.parseSync = function() {
 
 MMTFParser.formats = ['mmtf'];
 MMTFParser.extensions = ['.mmtf'];
+MMTFParser.binary = true;
 
 export default MMTFParser;

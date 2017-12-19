@@ -5,9 +5,6 @@ export default class FileLoader extends Loader {
     super(source, options);
 
     options = this._options;
-    if (!options.fileName) {
-      options.fileName = source.name;
-    }
     this._binary = options.binary === true;
   }
 
@@ -45,6 +42,10 @@ export default class FileLoader extends Loader {
 
   static canProbablyLoad(source) {
     return File && source instanceof File || Blob && source instanceof Blob;
+  }
+
+  static extractName(source) {
+    return source && source.name;
   }
 }
 
