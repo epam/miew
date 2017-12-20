@@ -8,8 +8,10 @@ import sinonChai from 'sinon-chai';
 chai.use(dirtyChai);
 chai.use(sinonChai);
 
-class FileStub {
+class BlobStub {}
+class FileStub extends BlobStub {
   constructor() {
+    super();
     this.name = 'foo';
   }
 }
@@ -20,9 +22,11 @@ describe('FileLoader', () => {
 
   before(() => {
     global.File = FileStub;
+    global.Blob = BlobStub;
   });
 
   after(() => {
+    delete global.Blob;
     delete global.File;
   });
 
@@ -162,6 +166,33 @@ describe('FileLoader', () => {
     it('requires the source type to be "file"', () => {
       expect(FileLoader.canLoad(fakeSource, {sourceType: 'url'})).to.equal(false);
       expect(FileLoader.canLoad(fakeSource, {sourceType: 'file'})).to.equal(true);
+    });
+
+  });
+
+  describe('.canProbablyLoad()', () => {
+
+    it('accepts a File or Blob', () => {
+      expect(FileLoader.canProbablyLoad(new File())).to.equal(true);
+      expect(FileLoader.canProbablyLoad(new Blob())).to.equal(true);
+    });
+
+    it('rejects a string or a plain object', () => {
+      expect(FileLoader.canProbablyLoad('foo')).to.equal(false);
+      expect(FileLoader.canProbablyLoad({name: 'foo'})).to.equal(false);
+    });
+
+  });
+
+  describe('.extractName()', () => {
+
+    it('returns .name field if present', () => {
+      expect(FileLoader.extractName({name: 'foo'})).to.equal('foo');
+      expect(FileLoader.extractName({})).to.equal(undefined);
+    });
+
+    it('returns undefined for undefined sources', () => {
+      expect(FileLoader.extractName(undefined)).to.equal(undefined);
     });
 
   });

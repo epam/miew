@@ -144,4 +144,12 @@ describe('Loader', () => {
 
   });
 
+  describe('.extractName()', () => {
+
+    it('returns undefined', () => {
+      expect(Loader.extractName('anything')).to.equal(undefined);
+    });
+
+  });
+
 });

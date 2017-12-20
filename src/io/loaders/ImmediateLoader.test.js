@@ -73,4 +73,12 @@ describe('ImmediateLoader', () => {
     });
   });
 
+  describe('.canProbablyLoad()', () => {
+
+    it('rejects everything', () => {
+      return expect(ImmediateLoader.canProbablyLoad('anything')).to.equal(false);
+    });
+
+  });
+
 });

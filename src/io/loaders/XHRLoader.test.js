@@ -168,4 +168,56 @@ describe('XHRLoader', () => {
 
   });
 
+  describe('.canProbablyLoad()', () => {
+
+    it('rejects a non-string object', () => {
+      expect(XHRLoader.canProbablyLoad(42)).to.equal(false);
+      expect(XHRLoader.canProbablyLoad({name: 'foo'})).to.equal(false);
+    });
+
+    it('accepts a string starting from http/https/ftp schemes', () => {
+      ['http', 'https', 'ftp'].forEach((scheme) => {
+        expect(XHRLoader.canProbablyLoad(`${scheme}://localhost/`)).to.equal(true);
+      });
+    });
+
+    it('rejects other URIs and URI-like strings', () => {
+      [
+        'mailto:surname@example.com',
+        'javascript:void(0)', // eslint-disable-line no-script-url
+        'git@github.com:epam/miew.git',
+        'www.example.com/file.ext',
+        './data/file.ext',
+        'http:true',
+        '#foo',
+      ].forEach((str) => {
+        expect(XHRLoader.canProbablyLoad(str)).to.equal(false);
+      });
+    });
+
+  });
+
+  describe('.extractName()', () => {
+
+    [
+      ['http://www.example.com/path/and/foo', 'foo'],
+      ['foo.bar', 'foo.bar'],
+      ['./path/and/foo.bar', 'foo.bar'],
+      ['./path/and/foo/', ''],
+      ['./path/and/foo#anchor', 'foo'],
+      ['./path/and/foo?q=1&bar=2', 'foo'],
+      ['./path/and/foo?q=1&bar=2#anchor', 'foo'],
+      ['./path/and/foo?q=a?b:c&bar=a/b+c#anchor/or/not?...', 'foo'],
+    ].forEach(([url, name]) => {
+      it(`returns "${name}" for "${url}"`, () => {
+        expect(XHRLoader.extractName(url)).to.equal(name);
+      });
+    });
+
+    it('returns undefined for undefined sources', () => {
+      expect(XHRLoader.extractName(undefined)).to.equal(undefined);
+    });
+
+  });
+
 });
