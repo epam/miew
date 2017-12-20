@@ -42,6 +42,7 @@ import EventDispatcher from './utils/EventDispatcher';
 import logger from './utils/logger';
 import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
+import webvr from './gfx/vr/WebVR';
 //////////////////////////////////////////////////////////////////////////////
 
 var
@@ -397,6 +398,10 @@ Miew.prototype._initGfx = function() {
   gfx.renderer.setClearColor(settings.now.themes[settings.now.theme]);
   gfx.renderer.clearColor();
 
+  if (settings.now.stereo === 'WEBVR') {
+    gfx.renderer.vr.enabled = true;
+    document.body.appendChild(webvr.createButton(gfx.renderer));
+  }
   gfx.renderer2d.setSize(gfx.width, gfx.height);
 
   gfx.camera = new THREE.PerspectiveCamera(
@@ -772,10 +777,9 @@ Miew.prototype.run = function() {
 
     this._objectControls.enable(true);
 
-    var self = this;
-    requestAnimationFrame(function _onAnimationFrame() {
-      self._onTick();
-    });
+    const device = this._getWebVRDevice();
+    const requestFunc = device ? device.requestAnimationFrame : window.requestAnimationFrame;
+    requestFunc(() => this._onTick());
   }
 };
 
@@ -860,16 +864,20 @@ Miew.prototype._onTick = function() {
 
   this._fps.update();
 
-  var self = this;
-  requestAnimationFrame(function _onAnimationFrame() {
-    self._onTick();
-  });
+  const device = this._getWebVRDevice();
+  const requestFunc = device ? device.requestAnimationFrame : window.requestAnimationFrame;
+  requestFunc(() => this._onTick());
 
   this._onUpdate();
   if (this._needRender) {
     this._onRender();
-    this._needRender = !settings.now.suspendRender;
+    this._needRender = !settings.now.suspendRender || device;
   }
+};
+
+Miew.prototype._getWebVRDevice = function() {
+  const vr = this._gfx.renderer.vr;
+  return (vr && vr.enabled) ? vr.getDevice() : null;
 };
 
 Miew.prototype._getBSphereRadius = function() {
@@ -957,6 +965,7 @@ Miew.prototype._renderFrame = (function() {
     this._resizeOffscreenBuffers(size.width * window.devicePixelRatio, size.height * window.devicePixelRatio, stereo);
 
     switch (stereo) {
+    case 'WEBVR':
     case 'NONE':
       this._renderScene(gfx.camera, false);
       break;
@@ -986,7 +995,7 @@ Miew.prototype._renderFrame = (function() {
 
     gfx.renderer2d.render(gfx.scene, gfx.camera);
 
-    if (settings.now.axes && gfx.axes) {
+    if (settings.now.axes && gfx.axes && !gfx.renderer.vr.enabled) {
       gfx.axes.render(renderer);
     }
   };
@@ -1031,6 +1040,10 @@ Miew.prototype._renderScene = (function() {
     // render to offscreen buffer
     gfx.renderer.setClearColor(settings.now.themes[settings.now.theme], 1);
     gfx.renderer.clearTarget(target);
+    if (gfx.renderer.vr.enabled) {
+      gfx.renderer.render(gfx.scene, camera);
+      return;
+    }
     gfx.renderer.clearTarget(gfx.offscreenBuf);
     // FIXME clean up targets in render selection
 
@@ -3146,6 +3159,9 @@ Miew.prototype._onSettingsChanged = function(changes) {
   if (changes.autoResolution && !this._gfxScore) {
     this.logger.warn('Benchmarks are missed, autoresolution will not work! ' +
       'Autoresolution should be set during miew startup.');
+  }
+  if (changes.stereo) {
+    this.logger.warn('Change stereo mode');
   }
   this._needRender = true;
 };
