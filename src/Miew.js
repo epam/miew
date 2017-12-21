@@ -778,8 +778,7 @@ Miew.prototype.run = function() {
     this._objectControls.enable(true);
 
     const device = this._getWebVRDevice();
-    const requestFunc = device ? device.requestAnimationFrame : window.requestAnimationFrame;
-    requestFunc(() => this._onTick());
+    (device || window).requestAnimationFrame(() => this._onTick());
   }
 };
 
@@ -865,8 +864,7 @@ Miew.prototype._onTick = function() {
   this._fps.update();
 
   const device = this._getWebVRDevice();
-  const requestFunc = device ? device.requestAnimationFrame : window.requestAnimationFrame;
-  requestFunc(() => this._onTick());
+  (device || window).requestAnimationFrame(() => this._onTick());
 
   this._onUpdate();
   if (this._needRender) {
