@@ -1809,30 +1809,30 @@ Miew.prototype.resetEd = function() {
   this._needRender = true;
 };
 
-Miew.prototype.loadEd = function(file) {
-  var self = this;
-
+Miew.prototype.loadEd = function(source) {
   this.resetEd();
 
-  var loader = this._edLoader = io.loaders.create(self, file, {binary: true});
+  const TheLoader = _.head(io.loaders.find({source}));
+  if (!TheLoader) {
+    this.logger.error('Could not find suitable loader for this source');
+    return Promise.reject(new Error('Could not find suitable loader for this source'));
+  }
 
-  loader.load({
-    ready: function(data) {
-      var parser = io.parsers.create(self, data, {fileType: 'ccp4'});
-      parser.parse({
-        ready: function(dataSource) {
-          self._onLoadEd(dataSource);
-        },
-        progress: function(percent) {
-          // TODO: Update progress bar
-          reportProgress(self.logger, 'Parsing ED', percent);
-        }
-      });
-    },
-    progress: function(percent) {
-      // TODO: Update progress bar
-      reportProgress(self.logger, 'Loading ED', percent);
+  const loader = this._edLoader = new TheLoader(source, {binary: true});
+  loader.context = this;
+  return loader.load().then((data) => {
+    const TheParser = _.head(io.parsers.find({format: 'ccp4'}));
+    if (!TheParser) {
+      throw new Error('Could not find suitable parser for this source');
     }
+    const parser = new TheParser(data);
+    parser.context = this;
+    return parser.parse().then((dataSource) => {
+      this._onLoadEd(dataSource);
+    });
+  }).catch((error) => {
+    this.logger.error('Could not load ED data');
+    this.logger.debug(error);
   });
 };
 
