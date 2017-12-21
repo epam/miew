@@ -69,25 +69,6 @@ function removeExtension(fileName) {
   return fileName;
 }
 
-function srvNormalizeSource(source) {
-  // special translation for local data files
-  if (typeof source === 'string') {
-    if (source.match(/^[0-9A-Z]{4}$/i)) {
-      // normalize if PDBID
-      source = source.toUpperCase();
-    } else if (source.match(/^data\/[0-9A-Z]{4}\.pdb$/i)) {
-      // extract PDBID for cached files
-      source = source.substr(5, 4).toUpperCase();
-    } else {
-      // otherwise use neat hack to restore the full url (https://gist.github.com/jlong/2428561)
-      var ref = document.createElement('a');
-      ref.href = source;
-      source = ref.href;
-    }
-  }
-  return source;
-}
-
 function hasValidResidues(complex) {
   var hasValidRes = false;
   complex.forEachComponent(function(component) {
@@ -1521,19 +1502,7 @@ Miew.prototype.load = function(source, opts) {
     }
   }
 
-  this.dispatchEvent({type: 'load', options: opts});
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////
-  // remember file sources - NOT A GOOD PLACE AND THING TO DO!
-  if (source instanceof File && source.name.match(/.man$/i)) {
-    this._srvAnimSource = srvNormalizeSource(source);
-  } else {
-    this._srvTopoSource = srvNormalizeSource(source);
-  }
-  if (opts.mdFile) {
-    this._srvAnimSource = opts.mdFile;
-  }
-  /////////////////////////////////////////////////////////////////////////////////////////////////
+  this.dispatchEvent({type: 'load', options: opts, source});
 
   const job = new JobHandle();
   this._loading.push(job);

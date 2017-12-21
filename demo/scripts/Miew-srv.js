@@ -31,13 +31,41 @@ function getBaseUrl() {
 }
 var LOCAL_DEBUG = true;
 
+function srvNormalizeSource(source) {
+  // special translation for local data files
+  if (typeof source === 'string') {
+    if (source.match(/^[0-9A-Z]{4}$/i)) {
+      // normalize if PDBID
+      source = source.toUpperCase();
+    } else if (source.match(/^data\/[0-9A-Z]{4}\.pdb$/i)) {
+      // extract PDBID for cached files
+      source = source.substr(5, 4).toUpperCase();
+    } else {
+      // otherwise use neat hack to restore the full url (https://gist.github.com/jlong/2428561)
+      var ref = document.createElement('a');
+      ref.href = source;
+      source = ref.href;
+    }
+  }
+  return source;
+}
+
 Miew.prototype.srvPluginRegister = function() {
-  var self = this;
-  this.addEventListener('load', function(event) {
-    self._srvTopologyFile = event && event.options && event.options.topologyFile ? event.options.topologyFile : null;
-    self._srvAnimationFile = event && event.options &&
-      event.options.animationFile ? event.options.animationFile : null;
-    self._srvPreset = event && event.options && event.options.preset ? event.options.preset : null;
+  this.addEventListener('load', (event) => {
+    const opts = event && event.options;
+    this._srvTopologyFile = opts && opts.topologyFile ? opts.topologyFile : null;
+    this._srvAnimationFile = opts && opts.animationFile ? opts.animationFile : null;
+    this._srvPreset = opts && opts.preset ? opts.preset : null;
+
+    const source = event.source;
+    if (source instanceof File && source.name.match(/.man$/i)) {
+      this._srvAnimSource = srvNormalizeSource(source);
+    } else {
+      this._srvTopoSource = srvNormalizeSource(source);
+    }
+    if (opts && opts.mdFile) {
+      this._srvAnimSource = opts.mdFile;
+    }
   });
 };
 
