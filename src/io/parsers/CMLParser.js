@@ -28,7 +28,7 @@ function CMLParser(data, options) {
   this._lastMolId = -1;
   this._readOnlyOneMolecule = false;
 
-  options.fileType = 'cml';
+  this._options.fileType = 'cml';
 }
 
 ////////////////////////////////////////////////////////////////////////////

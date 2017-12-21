@@ -56,7 +56,7 @@ function PDBParser(data, options) {
   this._molecule = null;
   this._compndCurrToken = '';
 
-  options.fileType = 'pdb';
+  this._options.fileType = 'pdb';
 }
 
 ////////////////////////////////////////////////////////////////////////////

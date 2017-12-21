@@ -67,7 +67,7 @@ function CIFParser(data, options) {
   Parser.call(this, data, options);
   this.asymDict = {};
   this.molecules = [];
-  options.fileType = 'cif';
+  this._options.fileType = 'cif';
 }
 
 ////////////////////////////////////////////////////////////////////////////

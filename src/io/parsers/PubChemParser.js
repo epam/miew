@@ -11,7 +11,7 @@ var
 
 function PubChemParser(data, options) {
   Parser.call(this, data, options);
-  options.fileType = 'pubchem+json';
+  this._options.fileType = 'pubchem+json';
 }
 
 ////////////////////////////////////////////////////////////////////////////

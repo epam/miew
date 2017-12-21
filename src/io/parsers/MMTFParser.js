@@ -62,7 +62,7 @@ ArrayComparator.prototype.compare = function(candidate) {
 function MMTFParser(data, options) {
   Parser.call(this, data, options);
 
-  options.fileType = 'mmtf';
+  this._options.fileType = 'mmtf';
 }
 
 ////////////////////////////////////////////////////////////////////////////

@@ -183,7 +183,7 @@ Ccp4Model.prototype.toXYZData = function() {
 function CCP4Parser(data, options) {
   Parser.call(this, data, options);
 
-  options.fileType = 'ccp4';
+  this._options.fileType = 'ccp4';
 }
 
 ////////////////////////////////////////////////////////////////////////////

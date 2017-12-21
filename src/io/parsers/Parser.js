@@ -3,7 +3,7 @@ import ContextDependent from '../../utils/ContextDependent';
 export default class Parser {
   constructor(data, options) {
     this._data = data;
-    this._options = options;
+    this._options = options || {};
     this._abort = false;
   }
 
