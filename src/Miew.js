@@ -379,10 +379,6 @@ Miew.prototype._initGfx = function() {
   gfx.renderer.setClearColor(settings.now.themes[settings.now.theme]);
   gfx.renderer.clearColor();
 
-  if (settings.now.stereo === 'WEBVR') {
-    gfx.renderer.vr.enabled = true;
-    document.body.appendChild(webvr.createButton(gfx.renderer));
-  }
   gfx.renderer2d.setSize(gfx.width, gfx.height);
 
   gfx.camera = new THREE.PerspectiveCamera(
@@ -524,6 +520,8 @@ Miew.prototype._initGfx = function() {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false
     }
   );
+
+  this._toggleWebVR(settings.now.stereo === 'WEBVR', gfx);
 
   this._gfx = gfx;
   this._showCanvas();
@@ -853,6 +851,51 @@ Miew.prototype._onTick = function() {
     this._needRender = !settings.now.suspendRender || device;
   }
 };
+
+/**
+ * Turn the WebVR when it is supported
+ * NOTE: we toggle using button.click, because VRDisplay.requestPresent should be called from user gesture
+ */
+Miew.prototype._toggleWebVR = (function() {
+
+  const _mainCamera = new THREE.PerspectiveCamera();
+  let _cameraWasStored = false;
+  let _webVRButton = null;
+
+  return function(enable, gfx) {
+    const  renderer = gfx ? gfx.renderer : null;
+    if (!renderer) {
+      throw new Error('No renderer is available to toggle WebVR');
+    } else if (!gfx.camera) {
+      throw new Error('No camera is available to toggle WebVR');
+    }
+
+    if (enable) {
+      // store common camera
+      _mainCamera.copy(gfx.camera);
+      _cameraWasStored = true;
+      // enable vr in renderer
+      renderer.vr.enabled = true;
+      if (!_webVRButton) {
+        _webVRButton = webvr.createButton(renderer);
+        document.body.appendChild(_webVRButton);
+      } else {
+        _webVRButton.style.display = 'block';
+      }
+      this._needRender = true;
+    } else {
+      //disable vr
+      renderer.vr.enabled = false;
+      if (_webVRButton) {
+        _webVRButton.style.display = 'none';
+      }
+      // restore common camera
+      if (_cameraWasStored) {
+        gfx.camera.copy(_mainCamera);
+      }
+    }
+  };
+}());
 
 Miew.prototype._getWebVRDevice = function() {
   const vr = this._gfx.renderer.vr;
@@ -3128,7 +3171,7 @@ Miew.prototype._onSettingsChanged = function(changes) {
       'Autoresolution should be set during miew startup.');
   }
   if (changes.stereo) {
-    this.logger.warn('Change stereo mode');
+    this._toggleWebVR(changes.stereo === 'WEBVR', this._gfx);
   }
   this._needRender = true;
 };
