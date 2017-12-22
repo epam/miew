@@ -848,7 +848,7 @@ Miew.prototype._onTick = function() {
   this._onUpdate();
   if (this._needRender) {
     this._onRender();
-    this._needRender = !settings.now.suspendRender || device;
+    this._needRender = !settings.now.suspendRender || settings.now.stereo === 'WEBVR' || !!device;
   }
 };
 
@@ -863,6 +863,7 @@ Miew.prototype._toggleWebVR = (function() {
   let _webVRButton = null;
 
   return function(enable, gfx) {
+    const self = this;
     const  renderer = gfx ? gfx.renderer : null;
     if (!renderer) {
       throw new Error('No renderer is available to toggle WebVR');
@@ -882,7 +883,6 @@ Miew.prototype._toggleWebVR = (function() {
       } else {
         _webVRButton.style.display = 'block';
       }
-      this._needRender = true;
     } else {
       //disable vr
       renderer.vr.enabled = false;
@@ -892,8 +892,10 @@ Miew.prototype._toggleWebVR = (function() {
       // restore common camera
       if (_cameraWasStored) {
         gfx.camera.copy(_mainCamera);
+        self._onResize();
       }
     }
+    self._needRender = true;
   };
 }());
 
