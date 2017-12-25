@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.9 Copyright (c) 2015-2017 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.10 Copyright (c) 2015-2017 EPAM Systems, Inc. */
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -62051,6 +62051,21 @@ function getUrlParametersAsDict(url) {
   return result;
 }
 
+function resolveURL(str) {
+  if (typeof URL !== 'undefined') {
+    if (typeof window !== 'undefined') {
+      return new URL(str, window.location).href;
+    } else {
+      return new URL(str).href;
+    }
+  } else if (typeof document !== 'undefined') {
+    var anchor = document.createElement('a');
+    anchor.href = str;
+    return anchor.href;
+  }
+  return str;
+}
+
 /**
  * Generates regular expression object that includes all symbols
  * listed in the argument
@@ -62307,6 +62322,12 @@ function getFileExtension(fileName) {
   return fileName.slice(Math.max(0, fileName.lastIndexOf('.')) || Infinity);
 }
 
+function splitFileName(fileName) {
+  var ext = getFileExtension(fileName);
+  var name = fileName.slice(0, fileName.length - ext.length);
+  return [name, ext];
+}
+
 function dataUrlToBlob(url) {
   var parts = url.split(/[:;,]/);
   var partsCount = parts.length;
@@ -62370,6 +62391,45 @@ function correctSelectorIdentifier(value) {
   return enquoteHelper.join('');
 }
 
+function registerInList(list, value) {
+  if (!list.includes(value)) {
+    list.push(value);
+  }
+}
+
+function unregisterFromList(list, value) {
+  var pos = list.indexOf(value);
+  if (pos !== -1) {
+    list.splice(pos, 1);
+  }
+}
+
+function registerInDict(dict, keys, value) {
+  keys.forEach(function (key) {
+    key = key.toLowerCase();
+    var list = dict[key] = dict[key] || [];
+    if (!list.includes(value)) {
+      list.push(value);
+    }
+  });
+}
+
+function unregisterFromDict(dict, keys, value) {
+  keys.forEach(function (key) {
+    key = key.toLowerCase();
+    var list = dict[key];
+    if (list) {
+      var pos = list.indexOf(value);
+      if (pos !== -1) {
+        list.splice(pos, 1);
+      }
+      if (list.length === 0) {
+        delete dict[key];
+      }
+    }
+  });
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // Exports
 
@@ -62379,6 +62439,7 @@ var utils = {
   decodeQueryComponent: decodeQueryComponent,
   getUrlParameters: getUrlParameters,
   getUrlParametersAsDict: getUrlParametersAsDict,
+  resolveURL: resolveURL,
   generateRegExp: generateRegExp,
   createElement: createElement$2,
   deriveClass: deriveClass,
@@ -62400,7 +62461,8 @@ var utils = {
   copySubArrays: copySubArrays,
   shallowCloneNode: shallowCloneNode,
   correctSelectorIdentifier: correctSelectorIdentifier,
-  getFileExtension: getFileExtension
+  getFileExtension: getFileExtension,
+  splitFileName: splitFileName
 };
 
 var now = utils.Timer.now;
@@ -62470,28 +62532,187 @@ Stats.prototype = {
 
 };
 
-function JobHandle() {
-  EventDispatcher$1.call(this);
-
-  this._cancellationRequested = false;
-}
-
-utils.deriveClass(JobHandle, EventDispatcher$1);
-
-JobHandle.prototype.cancel = function () {
-  this._cancellationRequested = true;
-  this.dispatchEvent('cancel');
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
-JobHandle.prototype.isCancellationRequested = function () {
-  return this._cancellationRequested;
+
+
+
+
+
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
 };
 
-// slaves use this to notify master about their events
-// master routes these notifications to a single event slot
-JobHandle.prototype.notify = function (event) {
-  this.dispatchEvent({ type: 'notification', slaveEvent: event });
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+
+
+
+
+var inherits = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 };
+
+
+
+
+
+
+
+
+
+
+
+var possibleConstructorReturn = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+};
+
+
+
+
+
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
+var JobHandle = function (_EventDispatcher) {
+  inherits(JobHandle, _EventDispatcher);
+
+  function JobHandle() {
+    classCallCheck(this, JobHandle);
+
+    var _this = possibleConstructorReturn(this, (JobHandle.__proto__ || Object.getPrototypeOf(JobHandle)).call(this));
+
+    _this._shouldCancel = false;
+    return _this;
+  }
+
+  createClass(JobHandle, [{
+    key: 'cancel',
+    value: function cancel() {
+      this._shouldCancel = true;
+      this.dispatchEvent({ type: 'cancel' });
+    }
+  }, {
+    key: 'shouldCancel',
+    value: function shouldCancel() {
+      return this._shouldCancel;
+    }
+
+    // slaves use this to notify master about their events
+    // master routes these notifications to a single event slot
+
+  }, {
+    key: 'notify',
+    value: function notify(event) {
+      this.dispatchEvent({ type: 'notification', slaveEvent: event });
+    }
+  }]);
+  return JobHandle;
+}(EventDispatcher$1);
 
 var VERSION = 0;
 
@@ -62514,7 +62735,7 @@ var VERSION = 0;
  * @alias SettingsObject
  * @namespace
  */
-var defaults = {
+var defaults$1 = {
   /**
    * Default options for all available modes.
    * Use {@link Mode.id} as a dictionary key to access mode options.
@@ -63310,7 +63531,7 @@ function Settings() {
 Settings.prototype = {
   constructor: Settings,
 
-  defaults: defaults,
+  defaults: defaults$1,
 
   set: function set(path, value) {
     lodash.set(this.now, path, value);
@@ -63322,7 +63543,7 @@ Settings.prototype = {
   },
 
   reset: function reset() {
-    this.now = lodash.cloneDeep(defaults);
+    this.now = lodash.cloneDeep(defaults$1);
     this.old = null;
     this._changed = {};
   },
@@ -63363,7 +63584,7 @@ Settings.prototype = {
   },
 
   getDiffs: function getDiffs(versioned) {
-    var diffs = utils.objectsDiff(this.now, defaults);
+    var diffs = utils.objectsDiff(this.now, defaults$1);
     if (versioned) {
       diffs.VERSION = VERSION;
     }
@@ -63371,122 +63592,12 @@ Settings.prototype = {
   },
 
   setPluginOpts: function setPluginOpts(plugin, opts) {
-    defaults.plugins[plugin] = lodash.cloneDeep(opts);
+    defaults$1.plugins[plugin] = lodash.cloneDeep(opts);
     this.now.plugins[plugin] = lodash.cloneDeep(opts);
   }
 };
 
 var settings = new Settings();
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-
-
-
-
-var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-};
-
-
-
-
-
-
-
-
-
-
-
-var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var toConsumableArray = function (arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  } else {
-    return Array.from(arr);
-  }
-};
 
 var repIndex = 0;
 
@@ -63607,13 +63718,13 @@ function extractArgs(input, defaultsDict, params) {
       var args = input.substr(bang + 1).split(cLSep);
       input = inputVal;
       if (defaultsDict) {
-        var defaults = defaultsDict[input];
-        var opts = utils.deriveDeep(defaults, true);
+        var defaults$$1 = defaultsDict[input];
+        var opts = utils.deriveDeep(defaults$$1, true);
         args.forEach(function (arg) {
           var pair = arg.split(cL2Ass, 2);
           var key = decodeURIComponent(pair[0]),
               value = decodeURIComponent(pair[1]);
-          var adapter = adapters[_typeof(lodash.get(defaults, key))];
+          var adapter = adapters[_typeof(lodash.get(defaults$$1, key))];
           if (adapter) {
             lodash.set(opts, key, adapter(value));
           } else {
@@ -75344,7 +75455,7 @@ var geometries = {
   LabelsGeometry: LabelsGeometry
 };
 
-var UberObject = function (SuperClass) {
+function UberObject (SuperClass) {
   function NewObjectType() {
     SuperClass.apply(this, arguments);
     this.onBeforeRender = NewObjectType.prototype.onBeforeRender;
@@ -75372,7 +75483,7 @@ var UberObject = function (SuperClass) {
   };
 
   return NewObjectType;
-};
+}
 
 var Mesh$1 = UberObject(Mesh);
 
@@ -81734,6 +81845,77 @@ GfxProfiler.prototype.min = function () {
   return this._prof ? this._prof.min() : 0.0;
 };
 
+var LoaderList = function () {
+  function LoaderList() {
+    var _this = this;
+
+    var someLoaders = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    classCallCheck(this, LoaderList);
+
+    this._list = [];
+    this._byType = {};
+
+    someLoaders.forEach(function (SomeLoader) {
+      return _this.register(SomeLoader);
+    });
+  }
+
+  /**
+   * Register a parser for a specific data format.
+   *
+   * @param {function} SomeLoader - a Parser subclass to register
+   * @param {string[]} SomeLoader.types - supported data formats
+   */
+
+
+  createClass(LoaderList, [{
+    key: 'register',
+    value: function register(SomeLoader) {
+      registerInList(this._list, SomeLoader);
+      registerInDict(this._byType, SomeLoader.types, SomeLoader);
+    }
+  }, {
+    key: 'unregister',
+    value: function unregister(SomeLoader) {
+      unregisterFromList(this._list, SomeLoader);
+      unregisterFromDict(this._byType, SomeLoader.types, SomeLoader);
+    }
+  }, {
+    key: 'find',
+
+
+    /**
+     * Find a suitable loader for the data source
+     *
+     * @param {object} specs - parser specifications
+     * @param {string=} specs.type - supported source type
+     * @param {data=} specs.source - source to load from
+     */
+    value: function find(specs) {
+      var list = [];
+      if (specs.type) {
+        list = this._byType[specs.type.toLowerCase()] || [];
+      } else if (specs.source) {
+        return this._list.filter(function (SomeLoader) {
+          return SomeLoader.canProbablyLoad && SomeLoader.canProbablyLoad(specs.source);
+        });
+      }
+      return [].concat(toConsumableArray(list));
+    }
+  }, {
+    key: 'all',
+    get: function get$$1() {
+      return [].concat(toConsumableArray(this._list));
+    }
+  }, {
+    key: 'types',
+    get: function get$$1() {
+      return Object.keys(this._byType);
+    }
+  }]);
+  return LoaderList;
+}();
+
 var Loader$1 = function (_EventDispatcher) {
   inherits(Loader, _EventDispatcher);
 
@@ -81744,6 +81926,7 @@ var Loader$1 = function (_EventDispatcher) {
 
     _this._source = source;
     _this._options = options || {};
+    _this._abort = false;
     _this._agent = null;
     return _this;
   }
@@ -81753,6 +81936,9 @@ var Loader$1 = function (_EventDispatcher) {
     value: function load( /** @deprecated */callbacks) {
       if (callbacks) {
         return this._loadOLD(callbacks);
+      }
+      if (this._abort) {
+        return Promise.reject(new Error('Loading aborted'));
       }
       return this.loadAsync();
     }
@@ -81788,9 +81974,15 @@ var Loader$1 = function (_EventDispatcher) {
   }, {
     key: 'abort',
     value: function abort() {
+      this._abort = true;
       if (this._agent) {
         this._agent.abort();
       }
+    }
+  }], [{
+    key: 'extractName',
+    value: function extractName(_source) {
+      return undefined;
     }
   }]);
   return Loader;
@@ -81807,9 +81999,6 @@ var FileLoader$1 = function (_Loader) {
     var _this = possibleConstructorReturn(this, (FileLoader.__proto__ || Object.getPrototypeOf(FileLoader)).call(this, source, options));
 
     options = _this._options;
-    if (!options.fileName) {
-      options.fileName = source.name;
-    }
     _this._binary = options.binary === true;
     return _this;
   }
@@ -81843,15 +82032,33 @@ var FileLoader$1 = function (_Loader) {
         }
       });
     }
+
+    /** @deprecated */
+
   }], [{
     key: 'canLoad',
     value: function canLoad(source, options) {
       var sourceType = options.sourceType;
       return source instanceof File && (!sourceType || sourceType === 'file');
     }
+  }, {
+    key: 'canProbablyLoad',
+    value: function canProbablyLoad(source) {
+      return File && source instanceof File || Blob && source instanceof Blob;
+    }
+  }, {
+    key: 'extractName',
+    value: function extractName(source) {
+      return source && source.name;
+    }
   }]);
   return FileLoader;
 }(Loader$1);
+
+FileLoader$1.types = ['file', 'blob'];
+
+// we don't need to detect all kinds of URLs, just the evident ones
+var urlStartRegexp = /^(https?|ftp):\/\//i;
 
 var XHRLoader$1 = function (_Loader) {
   inherits(XHRLoader, _Loader);
@@ -81862,13 +82069,6 @@ var XHRLoader$1 = function (_Loader) {
     var _this = possibleConstructorReturn(this, (XHRLoader.__proto__ || Object.getPrototypeOf(XHRLoader)).call(this, source, options));
 
     options = _this._options;
-    if (!options.fileName) {
-      var last = source.indexOf('?');
-      if (last === -1) {
-        last = source.length;
-      }
-      options.fileName = source.slice(source.lastIndexOf('/') + 1, last);
-    }
     _this._binary = options.binary === true;
     return _this;
   }
@@ -81908,15 +82108,34 @@ var XHRLoader$1 = function (_Loader) {
         request.send();
       });
     }
+
+    /** @deprecated */
+
   }], [{
     key: 'canLoad',
     value: function canLoad(source, options) {
       var sourceType = options.sourceType;
       return typeof source === 'string' && (!sourceType || sourceType === 'url');
     }
+  }, {
+    key: 'canProbablyLoad',
+    value: function canProbablyLoad(source) {
+      return lodash.isString(source) && urlStartRegexp.test(source);
+    }
+  }, {
+    key: 'extractName',
+    value: function extractName(source) {
+      if (source) {
+        var last = (source.indexOf('?') + 1 || source.lastIndexOf('#') + 1 || source.length + 1) - 1;
+        return source.slice(source.lastIndexOf('/', last) + 1, last);
+      }
+      return undefined;
+    }
   }]);
   return XHRLoader;
 }(Loader$1);
+
+XHRLoader$1.types = ['url'];
 
 var ImmediateLoader = function (_Loader) {
   inherits(ImmediateLoader, _Loader);
@@ -81931,92 +82150,28 @@ var ImmediateLoader = function (_Loader) {
     value: function loadAsync() {
       return Promise.resolve(this._source);
     }
+
+    /** @deprecated */
+
   }], [{
     key: 'canLoad',
     value: function canLoad(source, options) {
       return typeof source !== 'undefined' && typeof options !== 'undefined' && options.sourceType === 'immediate';
     }
+  }, {
+    key: 'canProbablyLoad',
+    value: function canProbablyLoad(_source) {
+      return false;
+    }
   }]);
   return ImmediateLoader;
 }(Loader$1);
 
-/**
- * Loaders list.
- * @module io/loaders
- */
-// FIXME: deps for amdclean
+ImmediateLoader.types = ['immediate'];
 
-var loaderList = [];
-var ag$3 = [FileLoader$1, XHRLoader$1, ImmediateLoader];
-
-(function (plugins) {
-  for (var i = 0, n = plugins.length; i < n; ++i) {
-    var currLoader = plugins[i];
-    loaderList.push(currLoader);
-  }
-})(ag$3);
-
-// NOTE: workaround for https://github.com/gfranko/amdclean/issues/115
-var exports$3 = /** @alias module:io/loaders */{
-  /**
-   *  The list of loader constructor functions available.
-   *  @type {Array<function(new:Loader)>}
-   */
-  list: loaderList,
-
-  Loader: Loader$1,
-
-  /**
-   * Create a loader instance.
-   * @param {object} context - Current context.
-   * @param {object} source  - Data to be loaded.
-   * @param {object} options - Loader options object overriding defaults.
-   * @returns {Loader} New loader object.
-   */
-  create: function create(context, source, options) {
-    var loader = new Loader$1(source, options); // this behaviour was copied from the previous version
-    var i = 0,
-        n = loaderList.length;
-    for (; i < n; ++i) {
-      var SomeLoader = loaderList[i];
-      if (SomeLoader.canLoad && SomeLoader.canLoad(source, options)) {
-        loader = new SomeLoader(source, options);
-        break;
-      }
-    }
-    loader.context = context;
-    if (i === n) {
-      loader.logger.error('Could not select a suitable Loader.');
-    }
-    return loader;
-  }
-};
-
-function registerIn(dict, keys, value) {
-  keys.forEach(function (key) {
-    key = key.toLowerCase();
-    var list = dict[key] = dict[key] || [];
-    if (!list.includes(value)) {
-      list.push(value);
-    }
-  });
-}
-
-function unregisterFrom(dict, keys, value) {
-  keys.forEach(function (key) {
-    key = key.toLowerCase();
-    var list = dict[key];
-    if (list) {
-      var pos = list.indexOf(value);
-      if (pos !== -1) {
-        list.splice(pos, 1);
-      }
-      if (list.length === 0) {
-        delete dict[key];
-      }
-    }
-  });
-}
+var loaders = new LoaderList([
+// note: order might be important
+FileLoader$1, XHRLoader$1, ImmediateLoader]);
 
 var ParserList = function () {
   function ParserList() {
@@ -82044,26 +82199,21 @@ var ParserList = function () {
 
 
   createClass(ParserList, [{
-    key: "register",
+    key: 'register',
     value: function register(SomeParser) {
-      if (!this._list.includes(SomeParser)) {
-        this._list.push(SomeParser);
-      }
-      registerIn(this._byFormat, SomeParser.formats, SomeParser);
-      registerIn(this._byExt, SomeParser.extensions, SomeParser);
+      registerInList(this._list, SomeParser);
+      registerInDict(this._byFormat, SomeParser.formats, SomeParser);
+      registerInDict(this._byExt, SomeParser.extensions, SomeParser);
     }
   }, {
-    key: "unregister",
+    key: 'unregister',
     value: function unregister(SomeParser) {
-      var pos = this._list.indexOf(SomeParser);
-      if (pos !== -1) {
-        this._list.splice(pos, 1);
-      }
-      unregisterFrom(this._byFormat, SomeParser.formats, SomeParser);
-      unregisterFrom(this._byExt, SomeParser.extensions, SomeParser);
+      unregisterFromList(this._list, SomeParser);
+      unregisterFromDict(this._byFormat, SomeParser.formats, SomeParser);
+      unregisterFromDict(this._byExt, SomeParser.extensions, SomeParser);
     }
   }, {
-    key: "find",
+    key: 'find',
 
 
     /**
@@ -82090,17 +82240,17 @@ var ParserList = function () {
       return [].concat(toConsumableArray(list));
     }
   }, {
-    key: "all",
+    key: 'all',
     get: function get$$1() {
       return [].concat(toConsumableArray(this._list));
     }
   }, {
-    key: "formats",
+    key: 'formats',
     get: function get$$1() {
       return Object.keys(this._byFormat);
     }
   }, {
-    key: "extensions",
+    key: 'extensions',
     get: function get$$1() {
       return Object.keys(this._byExt);
     }
@@ -82113,7 +82263,7 @@ var Parser = function () {
     classCallCheck(this, Parser);
 
     this._data = data;
-    this._options = options;
+    this._options = options || {};
     this._abort = false;
   }
 
@@ -82413,7 +82563,7 @@ function PDBParser(data, options) {
   this._molecule = null;
   this._compndCurrToken = '';
 
-  options.fileType = 'pdb';
+  this._options.fileType = 'pdb';
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -82872,7 +83022,7 @@ function CMLParser(data, options) {
   this._lastMolId = -1;
   this._readOnlyOneMolecule = false;
 
-  options.fileType = 'cml';
+  this._options.fileType = 'cml';
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -83578,7 +83728,7 @@ ArrayComparator.prototype.compare = function (candidate) {
 function MMTFParser(data, options) {
   Parser.call(this, data, options);
 
-  options.fileType = 'mmtf';
+  this._options.fileType = 'mmtf';
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -83965,6 +84115,7 @@ MMTFParser.prototype.parseSync = function () {
 
 MMTFParser.formats = ['mmtf'];
 MMTFParser.extensions = ['.mmtf'];
+MMTFParser.binary = true;
 
 var Complex$5 = chem.Complex;
 var Element$6 = chem.Element;
@@ -84023,7 +84174,7 @@ function CIFParser(data, options) {
   Parser.call(this, data, options);
   this.asymDict = {};
   this.molecules = [];
-  options.fileType = 'cif';
+  this._options.fileType = 'cif';
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -84956,7 +85107,7 @@ Ccp4Model.prototype.toXYZData = function () {
 function CCP4Parser(data, options) {
   Parser.call(this, data, options);
 
-  options.fileType = 'ccp4';
+  this._options.fileType = 'ccp4';
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -84987,13 +85138,14 @@ CCP4Parser.prototype.parseSync = function () {
 
 CCP4Parser.formats = ['ccp4'];
 CCP4Parser.extensions = ['.ccp4'];
+CCP4Parser.binary = true;
 
 var Complex$6 = chem.Complex;
 var Element$7 = chem.Element;
 
 function PubChemParser(data, options) {
   Parser.call(this, data, options);
-  options.fileType = 'pubchem+json';
+  this._options.fileType = 'pubchem+json';
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -85086,7 +85238,7 @@ var parsers = new ParserList([
 PDBParser, CIFParser, MMTFParser, CMLParser, PubChemParser, CCP4Parser]);
 
 var io = {
-  loaders: exports$3,
+  loaders: loaders,
   parsers: parsers
 };
 
@@ -87407,7 +87559,111 @@ Cookies.prototype._exists = function (key) {
   return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
 };
 
-/* global "0.7.9":false */
+/*******
+ * Toggling WebVR is done through button.click because of limitations on calling requestPresent in webVR:
+ * VRDisplay::requestPresent should be called from user gesture:
+ * https://developer.mozilla.org/en-US/docs/Web/API/VRDisplay/requestPresent
+ */
+var WEBVR = function () {
+  function WEBVR() {
+    classCallCheck(this, WEBVR);
+  }
+
+  createClass(WEBVR, null, [{
+    key: 'createButton',
+    value: function createButton(renderer) {
+      function showEnterVR(display, button) {
+
+        button.style.display = '';
+        button.style.cursor = 'pointer';
+        button.style.left = 'calc(50% - 50px)';
+        button.style.width = '100px';
+
+        button.textContent = 'ENTER VR';
+
+        button.onmouseenter = function () {
+          button.style.opacity = '1.0';
+        };
+        button.onmouseleave = function () {
+          button.style.opacity = '0.5';
+        };
+
+        button.onclick = function () {
+          if (display.isPresenting) {
+            display.exitPresent();
+          } else {
+            display.requestPresent([{ source: renderer.domElement }]);
+          }
+        };
+        renderer.vr.setDevice(display);
+      }
+
+      function showVRNotFound(button) {
+
+        button.style.display = '';
+        button.style.cursor = 'auto';
+        button.style.left = 'calc(50% - 75px)';
+        button.style.width = '150px';
+        button.textContent = 'VR NOT FOUND';
+        button.onmouseenter = null;
+        button.onmouseleave = null;
+        button.onclick = null;
+
+        renderer.vr.setDevice(null);
+      }
+
+      function stylizeElement(element) {
+        element.style.position = 'absolute';
+        element.style.bottom = '20px';
+        element.style.padding = '12px 6px';
+        element.style.border = '1px solid #fff';
+        element.style.borderRadius = '4px';
+        element.style.background = 'transparent';
+        element.style.color = '#fff';
+        element.style.font = 'normal 13px sans-serif';
+        element.style.textAlign = 'center';
+        element.style.opacity = '0.5';
+        element.style.outline = 'none';
+        element.style.zIndex = '999';
+      }
+
+      if ('getVRDisplays' in navigator) {
+        var button = document.createElement('button');
+        button.style.display = 'none';
+        stylizeElement(button);
+        window.addEventListener('vrdisplayconnect', function (event) {
+          showEnterVR(event.display, button);
+        }, false);
+        window.addEventListener('vrdisplaydisconnect', function (_event) {
+          showVRNotFound(button);
+        }, false);
+        window.addEventListener('vrdisplaypresentchange', function (event) {
+          button.textContent = event.display.isPresenting ? 'EXIT VR' : 'ENTER VR';
+        }, false);
+        navigator.getVRDisplays().then(function (displays) {
+          if (displays.length > 0) {
+            showEnterVR(displays[0], button);
+          } else {
+            showVRNotFound(button);
+          }
+        });
+        return button;
+      } else {
+        var message = document.createElement('a');
+        message.href = 'https://webvr.info';
+        message.innerHTML = 'WEBVR NOT SUPPORTED';
+        message.style.left = 'calc(50% - 90px)';
+        message.style.width = '180px';
+        message.style.textDecoration = 'none';
+        stylizeElement(message);
+        return message;
+      }
+    }
+  }]);
+  return WEBVR;
+}();
+
+/* global "0.7.10":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -87436,25 +87692,6 @@ function removeExtension(fileName) {
   return fileName;
 }
 
-function normalizeSource(source) {
-  // special translation for local data files
-  if (typeof source === 'string') {
-    if (source.match(/^[0-9A-Z]{4}$/i)) {
-      // normalize if PDBID
-      source = source.toUpperCase();
-    } else if (source.match(/^data\/[0-9A-Z]{4}\.pdb$/i)) {
-      // extract PDBID for cached files
-      source = source.substr(5, 4).toUpperCase();
-    } else {
-      // otherwise use neat hack to restore the full url (https://gist.github.com/jlong/2428561)
-      var ref = document.createElement('a');
-      ref.href = source;
-      source = ref.href;
-    }
-  }
-  return source;
-}
-
 function hasValidResidues(complex) {
   var hasValidRes = false;
   complex.forEachComponent(function (component) {
@@ -87469,7 +87706,7 @@ function hasValidResidues(complex) {
 
 function reportProgress(log, action, percent) {
   var TOTAL_PERCENT = 100;
-  if (percent) {
+  if (percent !== undefined) {
     log.debug(action + '... ' + Math.floor(percent * TOTAL_PERCENT) + '%');
   } else {
     log.debug(action + '...');
@@ -87536,8 +87773,8 @@ function Miew$1(opts) {
 
   /** @type {?Spinner} */
   this._spinner = null;
-  /** @type {?Loader} */
-  this._loader = null;
+  /** @type {JobHandle[]} */
+  this._loading = [];
   /** @type {?number} */
   this._animInterval = null;
 
@@ -87554,8 +87791,8 @@ function Miew$1(opts) {
 
   // TODO make this being not so ugly
 
-  this._fileSource = null;
-  this._fileSourceAnim = null;
+  this._srvTopoSource = null;
+  this._srvAnimSource = null;
 
   this.reset();
 
@@ -87677,10 +87914,10 @@ Miew$1.prototype.init = function () {
  */
 Miew$1.prototype.term = function () {
   this._showMessage('Viewer has been terminated.');
-  if (this._loader) {
-    this._loader.cancel();
-    this._loader = null;
-  }
+  this._loading.forEach(function (job) {
+    job.cancel();
+  });
+  this._loading.length = 0;
   this.halt();
   this._gfx = null;
 };
@@ -87852,6 +88089,8 @@ Miew$1.prototype._initGfx = function () {
   gfx.stereoBufR = new WebGLRenderTarget(gfx.width * window.devicePixelRatio, gfx.height * window.devicePixelRatio, {
     minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, depthBuffer: false
   });
+
+  this._toggleWebVR(settings.now.stereo === 'WEBVR', gfx);
 
   this._gfx = gfx;
   this._showCanvas();
@@ -88076,6 +88315,8 @@ Miew$1.prototype.setCurrentVisual = function (name) {
  * @see Miew#halt
  */
 Miew$1.prototype.run = function () {
+  var _this = this;
+
   if (!this._running) {
     this._running = true;
     if (this._halting) {
@@ -88085,9 +88326,9 @@ Miew$1.prototype.run = function () {
 
     this._objectControls.enable(true);
 
-    var self = this;
-    requestAnimationFrame(function _onAnimationFrame() {
-      self._onTick();
+    var device = this._getWebVRDevice();
+    (device || window).requestAnimationFrame(function () {
+      return _this._onTick();
     });
   }
 };
@@ -88165,6 +88406,8 @@ Miew$1.prototype._resizeOffscreenBuffers = function (width, height, stereo) {
  * @private
  */
 Miew$1.prototype._onTick = function () {
+  var _this2 = this;
+
   if (this._halting) {
     this._running = false;
     this._halting = false;
@@ -88173,16 +88416,68 @@ Miew$1.prototype._onTick = function () {
 
   this._fps.update();
 
-  var self = this;
-  requestAnimationFrame(function _onAnimationFrame() {
-    self._onTick();
+  var device = this._getWebVRDevice();
+  (device || window).requestAnimationFrame(function () {
+    return _this2._onTick();
   });
 
   this._onUpdate();
   if (this._needRender) {
     this._onRender();
-    this._needRender = !settings.now.suspendRender;
+    this._needRender = !settings.now.suspendRender || settings.now.stereo === 'WEBVR' || !!device;
   }
+};
+
+/**
+ * Turn the WebVR when it is supported
+ * NOTE: we toggle using button.click, because VRDisplay.requestPresent should be called from user gesture
+ */
+Miew$1.prototype._toggleWebVR = function () {
+
+  var _mainCamera = new PerspectiveCamera();
+  var _cameraWasStored = false;
+  var _webVRButton = null;
+
+  return function (enable, gfx) {
+    var self = this;
+    var renderer = gfx ? gfx.renderer : null;
+    if (!renderer) {
+      throw new Error('No renderer is available to toggle WebVR');
+    } else if (!gfx.camera) {
+      throw new Error('No camera is available to toggle WebVR');
+    }
+
+    if (enable) {
+      // store common camera
+      _mainCamera.copy(gfx.camera);
+      _cameraWasStored = true;
+      // enable vr in renderer
+      renderer.vr.enabled = true;
+      if (!_webVRButton) {
+        _webVRButton = WEBVR.createButton(renderer);
+        document.body.appendChild(_webVRButton);
+      } else {
+        _webVRButton.style.display = 'block';
+      }
+    } else {
+      //disable vr
+      renderer.vr.enabled = false;
+      if (_webVRButton) {
+        _webVRButton.style.display = 'none';
+      }
+      // restore common camera
+      if (_cameraWasStored) {
+        gfx.camera.copy(_mainCamera);
+        self._onResize();
+      }
+    }
+    self._needRender = true;
+  };
+}();
+
+Miew$1.prototype._getWebVRDevice = function () {
+  var vr = this._gfx.renderer.vr;
+  return vr && vr.enabled ? vr.getDevice() : null;
 };
 
 Miew$1.prototype._getBSphereRadius = function () {
@@ -88221,11 +88516,11 @@ Miew$1.prototype._onUpdate = function () {
     visual.getComplex().update();
   });
 
-  if (settings.now.autobuild && !this._loader && !this._building && this._needRebuild()) {
+  if (settings.now.autobuild && !this._loading.length && !this._building && this._needRebuild()) {
     this.rebuild();
   }
 
-  if (!this._loader && !this._building && !this._needRebuild()) {
+  if (!this._loading.length && !this._building && !this._needRebuild()) {
     this._updateView();
   }
 
@@ -88270,6 +88565,7 @@ Miew$1.prototype._renderFrame = function () {
     this._resizeOffscreenBuffers(size.width * window.devicePixelRatio, size.height * window.devicePixelRatio, stereo);
 
     switch (stereo) {
+      case 'WEBVR':
       case 'NONE':
         this._renderScene(gfx.camera, false);
         break;
@@ -88299,7 +88595,7 @@ Miew$1.prototype._renderFrame = function () {
 
     gfx.renderer2d.render(gfx.scene, gfx.camera);
 
-    if (settings.now.axes && gfx.axes) {
+    if (settings.now.axes && gfx.axes && !gfx.renderer.vr.enabled) {
       gfx.axes.render(renderer);
     }
   };
@@ -88342,6 +88638,10 @@ Miew$1.prototype._renderScene = function () {
     // render to offscreen buffer
     gfx.renderer.setClearColor(settings.now.themes[settings.now.theme], 1);
     gfx.renderer.clearTarget(target);
+    if (gfx.renderer.vr.enabled) {
+      gfx.renderer.render(gfx.scene, camera);
+      return;
+    }
     gfx.renderer.clearTarget(gfx.offscreenBuf);
     // FIXME clean up targets in render selection
 
@@ -88744,55 +89044,61 @@ Miew$1.prototype.resetView = function () {
  * @returns {Promise} name of the visual that was added to the viewer
  */
 Miew$1.prototype.load = function (source, opts) {
-  var self = this;
+  var _this3 = this;
 
-  if (self._loader) {
-    self._loader.cancel();
-  }
-
-  self.dispatchEvent({ type: 'load', options: opts });
-
-  // remember file sources
-  if (source instanceof File && source.name.match(/.man$/i)) {
-    this._fileSourceAnim = normalizeSource(source);
-  } else {
-    this._fileSource = normalizeSource(source);
-  }
-  if (opts && opts.mdFile) {
-    this._fileSourceAnim = opts.mdFile;
-  }
-
-  if (!this.settings.now.use.multiFile && !(opts && opts.animation)) {
-    this.reset(true);
-  }
-
-  self._loader = new JobHandle();
-  self._loader.addEventListener('notification', function (e) {
-    self.dispatchEvent(e.slaveEvent);
+  opts = lodash.merge({}, opts, {
+    context: this
   });
 
-  self._spinner.spin(this._container);
+  // for a single-file scenario
+  if (!this.settings.now.use.multiFile) {
 
-  var onLoadEnd = function onLoadEnd(res) {
-    self._loader = null;
-    self._spinner.stop();
-    self._refreshTitle();
-    return res;
+    // abort all loaders in progress
+    if (this._loading.length) {
+      this._loading.forEach(function (job) {
+        job.cancel();
+      });
+      this._loading.length = 0;
+    }
+
+    // reset
+    if (!opts.animation) {
+      // FIXME: sometimes it is set AFTERWARDS!
+      this.reset(true);
+    }
+  }
+
+  this.dispatchEvent({ type: 'load', options: opts, source: source });
+
+  var job = new JobHandle();
+  this._loading.push(job);
+  job.addEventListener('notification', function (e) {
+    _this3.dispatchEvent(e.slaveEvent);
+  });
+
+  this._spinner.spin(this._container);
+
+  var onLoadEnd = function onLoadEnd(anything) {
+    var jobIndex = _this3._loading.indexOf(job);
+    if (jobIndex !== -1) {
+      _this3._loading.splice(jobIndex, 1);
+    }
+    _this3._spinner.stop();
+    _this3._refreshTitle();
+    return anything;
   };
 
-  return _fetchData(source, opts, self._loader, self).then(function (res) {
-    return _convertData(res.data, res.opts, res.master);
-  }).then(function (res) {
-    return _parseData(res.data, res.opts, res.master, self);
-  }).then(function (res) {
-    return self._onLoad(res.data, res.opts);
-  }).then(function (res) {
-    return onLoadEnd(res);
+  return _fetchData(source, opts, job).then(function (data) {
+    return _convertData(data, opts, job);
+  }).then(function (data) {
+    return _parseData(data, opts, job);
+  }).then(function (object) {
+    var name = _this3._onLoad(object, opts);
+    return onLoadEnd(name);
   }).catch(function (err) {
-    onLoadEnd();
-    self.logger.error('Could not load data');
-    self.logger.debug(err);
-    throw err;
+    _this3.logger.error('Could not load data');
+    _this3.logger.debug(err);
+    throw onLoadEnd(err);
   });
 };
 
@@ -88930,7 +89236,7 @@ Miew$1.prototype._stopAnimation = function () {
   this._frameInfo.disableEvents();
   this._frameInfo = null;
   this._animInterval = null;
-  this._fileSourceAnim = null;
+  this._srvAnimSource = null;
   this.dispatchEvent({
     type: 'mdPlayerStateChanged',
     state: null
@@ -89058,30 +89364,32 @@ Miew$1.prototype.resetEd = function () {
   this._needRender = true;
 };
 
-Miew$1.prototype.loadEd = function (file) {
-  var self = this;
+Miew$1.prototype.loadEd = function (source) {
+  var _this4 = this;
 
   this.resetEd();
 
-  var loader = this._edLoader = io.loaders.create(self, file, { binary: true });
+  var TheLoader = lodash.head(io.loaders.find({ source: source }));
+  if (!TheLoader) {
+    this.logger.error('Could not find suitable loader for this source');
+    return Promise.reject(new Error('Could not find suitable loader for this source'));
+  }
 
-  loader.load({
-    ready: function ready(data) {
-      var parser = io.parsers.create(self, data, { fileType: 'ccp4' });
-      parser.parse({
-        ready: function ready(dataSource) {
-          self._onLoadEd(dataSource);
-        },
-        progress: function progress(percent) {
-          // TODO: Update progress bar
-          reportProgress(self.logger, 'Parsing ED', percent);
-        }
-      });
-    },
-    progress: function progress(percent) {
-      // TODO: Update progress bar
-      reportProgress(self.logger, 'Loading ED', percent);
+  var loader = this._edLoader = new TheLoader(source, { binary: true });
+  loader.context = this;
+  return loader.load().then(function (data) {
+    var TheParser = lodash.head(io.parsers.find({ format: 'ccp4' }));
+    if (!TheParser) {
+      throw new Error('Could not find suitable parser for this source');
     }
+    var parser = new TheParser(data);
+    parser.context = _this4;
+    return parser.parse().then(function (dataSource) {
+      _this4._onLoadEd(dataSource);
+    });
+  }).catch(function (error) {
+    _this4.logger.error('Could not load ED data');
+    _this4.logger.debug(error);
   });
 };
 
@@ -89223,7 +89531,7 @@ Miew$1.prototype.setNeedRender = function () {
 };
 
 Miew$1.prototype._extractRepresentation = function () {
-  var _this = this;
+  var _this5 = this;
 
   var changed = [];
 
@@ -89241,7 +89549,7 @@ Miew$1.prototype._extractRepresentation = function () {
     });
     if (idx < 0) {
       if (visual.repCount() === ComplexVisual.NUM_REPRESENTATION_BITS) {
-        _this.logger.warn('Number of representations is limited to ' + ComplexVisual.NUM_REPRESENTATION_BITS);
+        _this5.logger.warn('Number of representations is limited to ' + ComplexVisual.NUM_REPRESENTATION_BITS);
       }
       return;
     }
@@ -90366,6 +90674,9 @@ Miew$1.prototype._onSettingsChanged = function (changes) {
   if (changes.autoResolution && !this._gfxScore) {
     this.logger.warn('Benchmarks are missed, autoresolution will not work! ' + 'Autoresolution should be set during miew startup.');
   }
+  if (changes.stereo) {
+    this._toggleWebVR(changes.stereo === 'WEBVR', this._gfx);
+  }
   this._needRender = true;
 };
 
@@ -90613,67 +90924,138 @@ Miew$1.prototype.projected = function (fullAtomName, complexName) {
   };
 };
 
-// FIXME: rewrite the function, it looks a little bit ugly
-function _fetchData(file, opts, master, context) {
-  return new Promise(function (resolve, reject) {
-    opts = opts || {}; // TODO: clone
-    if (file instanceof File && file.name.match(/.man$/i)) {
-      opts.binary = true;
-      opts.animation = true;
+var rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
+var rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
+var reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
+
+function resolveSourceShortcut(source, opts) {
+  if (!lodash.isString(source)) {
+    return source;
+  }
+
+  // e.g. "mmtf:1CRN"
+  var matchesPdbId = rePdbId.exec(source);
+  if (matchesPdbId) {
+    var _matchesPdbId = slicedToArray(matchesPdbId, 3),
+        _matchesPdbId$ = _matchesPdbId[1],
+        format = _matchesPdbId$ === undefined ? 'pdb' : _matchesPdbId$,
+        id = _matchesPdbId[2];
+
+    format = format.toLowerCase();
+    id = id.toUpperCase();
+
+    switch (format) {
+      case 'pdb':
+        source = 'http://files.rcsb.org/download/' + id + '.pdb';
+        break;
+      case 'cif':
+        source = 'http://files.rcsb.org/download/' + id + '.cif';
+        break;
+      case 'mmtf':
+        source = 'http://mmtf.rcsb.org/v1.0/full/' + id;
+        break;
+      case 'ccp4':
+        source = 'https://www.ebi.ac.uk/pdbe/coordinates/files/' + id.toLowerCase() + '.ccp4';
+        break;
+      default:
+        throw new Error('Unexpected data format shortcut');
     }
 
-    if (file instanceof File && (file.name.match(/.mmtf$/i) || file.name.match(/.ccp4$/i))) {
-      opts.binary = true;
-    } else if (lodash.isString(file) && file.match(/.mmtf$/i)) {
-      opts.binary = true;
+    opts.fileType = format;
+    opts.fileName = id + '.' + format;
+    opts.sourceType = 'url';
+    return source;
+  }
+
+  // e.g. "pc:aspirin"
+  var matchesPubchem = rePubchem.exec(source);
+  if (matchesPubchem) {
+    var compound = matchesPubchem[1].toLowerCase();
+    source = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/' + compound + '/JSON?record_type=3d';
+    opts.fileType = 'pubchem';
+    opts.fileName = compound + '.json';
+    opts.sourceType = 'url';
+    return source;
+  }
+
+  // otherwise is should be an URL
+  if (opts.sourceType === 'url' || opts.sourceType === undefined) {
+    opts.sourceType = 'url';
+
+    // e.g. "./data/1CRN.pdb"
+    if (!reUrlScheme.test(source)) {
+      source = utils.resolveURL(source);
+    }
+  }
+
+  return source;
+}
+
+function updateBinaryMode(opts) {
+  var binary = opts.binary;
+
+  // detect by format
+  if (opts.fileType !== undefined) {
+    var TheParser = lodash.head(io.parsers.find({ format: opts.fileType }));
+    if (TheParser) {
+      binary = TheParser.binary || false;
+    } else {
+      throw new Error('Could not find suitable parser for this format');
+    }
+  }
+
+  // detect by file extension
+  if (binary === undefined && opts.fileExt !== undefined) {
+    var _TheParser = lodash.head(io.parsers.find({ ext: opts.fileExt }));
+    if (_TheParser) {
+      binary = _TheParser.binary || false;
+    }
+  }
+
+  // temporary workaround for animation
+  if (opts.fileExt !== undefined && opts.fileExt.toLowerCase() === '.man') {
+    opts.binary = true;
+    opts.animation = true; // who cares?
+  }
+
+  // update if detected
+  if (binary !== undefined) {
+    if (opts.binary !== undefined && opts.binary !== binary) {
+      opts.context.logger.warn('Overriding incorrect binary mode');
+    }
+  }
+
+  opts.binary = binary || false;
+}
+
+function _fetchData(source, opts, job) {
+  return new Promise(function (resolve) {
+    if (job.shouldCancel()) {
+      throw new Error('Operation cancelled');
     }
 
-    // convert PDB ID to URL
-    if (!opts.mdFile && !opts.fileType && typeof file === 'string') {
+    // allow for source shortcuts
+    source = resolveSourceShortcut(source, opts);
 
-      var matched = file.match(/^(?:\s*([+\w]+)\s*:)?\s*(.*)$/);
-      if (matched) {
-        var id = matched[2].trim();
-        var type = matched[1];
-        switch (type) {
-          case 'pubchem':
-          case 'pubchem+json':
-            type = 'pubchem+json';
-            file = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/' + encodeURIComponent(id) + '/JSON?record_type=3d';
-            opts.sourceType = 'url';
-            opts.fileName = id + '.json';
-            break;
-          default:
-            if (id.match(/^\w{4}$/i)) {
-              type = type || 'pdb';
-              switch (type) {
-                case 'mmtf':
-                  file = 'http://mmtf.rcsb.org/v1.0/full/' + id;
-                  opts.sourceType = 'url';
-                  break;
-                case 'cif':
-                case 'pdb':
-                  file = 'http://files.rcsb.org/view/' + id + '.' + type;
-                  opts.sourceType = 'url';
-                  break;
-                default:
-              }
-            } else {
-              type = undefined;
-            }
-        }
-
-        if (type) {
-          opts.fileType = type;
-        }
-      }
+    // detect a proper loader
+    var TheLoader = lodash.head(io.loaders.find({ type: opts.sourceType, source: source }));
+    if (!TheLoader) {
+      throw new Error('Could not find suitable loader for this source');
     }
 
-    if (opts.fileType === 'mmtf') {
-      opts.binary = true;
+    // split file name
+    var fileName = opts.fileName || TheLoader.extractName(source);
+    if (fileName) {
+      var _utils$splitFileName = utils.splitFileName(fileName),
+          _utils$splitFileName2 = slicedToArray(_utils$splitFileName, 2),
+          name = _utils$splitFileName2[0],
+          fileExt = _utils$splitFileName2[1];
+
+      lodash.defaults(opts, { name: name, fileExt: fileExt, fileName: fileName });
     }
 
-    var loader = io.loaders.create(context, file, opts);
+    // should it be text or binary?
+    updateBinaryMode(opts);
 
     // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
     // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
@@ -90693,41 +91075,47 @@ function _fetchData(file, opts, master, context) {
       }
     }
 
-    if (master) {
-      master.addEventListener('cancel', function () {
-        loader.abort();
-      });
-      if (master.isCancellationRequested()) {
-        loader.abort();
-      }
-    }
+    // create a loader
+    var loader = new TheLoader(source, opts);
+    loader.context = opts.context;
+    job.addEventListener('cancel', function () {
+      return loader.abort();
+    });
 
-    console.time('load');
-    loader.load({
-      ready: function ready(data) {
-        console.timeEnd('load');
-        context.logger.info('Loading finished');
-        resolve({ data: data, opts: opts, master: master });
-      },
-      error: function error(err) {
-        console.timeEnd('load');
-        context.logger.error('Loading failed');
-        reject(err);
-      },
-      progress: function progress(percent) {
-        reportProgress(loader.logger, 'Loading', percent);
+    loader.addEventListener('progress', function (event) {
+      if (event.lengthComputable && event.total > 0) {
+        reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
+      } else {
+        reportProgress(loader.logger, 'Fetching');
       }
     });
+
+    console.time('fetch');
+    var promise = loader.load().then(function (data) {
+      console.timeEnd('fetch');
+      opts.context.logger.info('Fetching finished');
+      job.notify({ type: 'fetchingFinished', data: data });
+      return data;
+    }).catch(function (error) {
+      console.timeEnd('fetch');
+      opts.context.logger.debug(error.message);
+      if (error.stack) {
+        opts.context.logger.debug(error.stack);
+      }
+      opts.context.logger.error('Fetching failed');
+      job.notify({ type: 'fetchingFinished', error: error });
+      throw error;
+    });
+    resolve(promise);
   });
 }
 
-function _convertData(data, opts, master) {
+function _convertData(data, opts, job) {
   return new Promise(function (resolve, reject) {
-    if (master) {
-      master.notify({ type: 'convert' });
+    if (job.shouldCancel()) {
+      throw new Error('Operation cancelled');
     }
-
-    opts = opts || {};
+    job.notify({ type: 'convert' });
 
     if (opts.mdFile) {
       var byteNumbers = new Array(data.length);
@@ -90745,74 +91133,54 @@ function _convertData(data, opts, master) {
           opts.convertedFile = new File([bytes], opts.fileName);
           opts.fileName = null;
           opts.fileType = 'pdb';
-          if (master) {
-            master.notify({ type: 'convertingFinished' });
-          }
-          resolve({ data: newData, opts: opts, master: master });
+          job.notify({ type: 'convertingFinished' });
+          resolve(newData);
         } else {
           opts.converted = false;
           logger.error(message);
           opts.error = message;
-          if (master) {
-            master.notify({ type: 'convertingFinished', error: message });
-          }
+          job.notify({ type: 'convertingFinished', error: message });
           reject(new Error(message));
         }
       });
     } else {
       opts.converted = true;
-      resolve({ data: data, opts: opts, master: master });
+      resolve(data);
     }
   });
 }
 
-function _parseData(data, opts, master, context) {
-  if (master) {
-    master.notify({ type: 'parse' });
+function _parseData(data, opts, job) {
+  if (job.shouldCancel()) {
+    return Promise.reject(new Error('Operation cancelled'));
   }
+  job.notify({ type: 'parse' });
 
-  opts = opts || {}; // TODO: clone
-
-  var TheParser = lodash.head(io.parsers.find({
-    format: opts.fileType,
-    ext: utils.getFileExtension(opts.fileName || ''),
-    data: data
-  }));
-
+  var TheParser = lodash.head(io.parsers.find({ format: opts.fileType, ext: opts.fileExt, data: data }));
   if (!TheParser) {
     return Promise.reject(new Error('Could not find suitable parser'));
   }
 
   var parser = new TheParser(data, opts);
-  parser.context = context;
-
-  if (master) {
-    master.addEventListener('cancel', function () {
-      parser.abort();
-    });
-    if (master.isCancellationRequested()) {
-      return Promise.reject();
-    }
-  }
+  parser.context = opts.context;
+  job.addEventListener('cancel', function () {
+    return parser.abort();
+  });
 
   console.time('parse');
   return parser.parse().then(function (dataSet) {
     console.timeEnd('parse');
-    if (master) {
-      master.notify({ type: 'parsingFinished', data: dataSet });
-    }
-    return { data: dataSet, opts: opts, master: master };
+    job.notify({ type: 'parsingFinished', data: dataSet });
+    return dataSet;
   }).catch(function (error) {
     console.timeEnd('parse');
     opts.error = error;
-    context.logger.debug(error.message);
+    opts.context.logger.debug(error.message);
     if (error.stack) {
-      context.logger.debug(error.stack);
+      opts.context.logger.debug(error.stack);
     }
-    context.logger.error('Parsing failed');
-    if (master) {
-      master.notify({ type: 'parsingFinished', error: error });
-    }
+    opts.context.logger.error('Parsing failed');
+    job.notify({ type: 'parsingFinished', error: error });
     throw error;
   });
 }
@@ -90820,7 +91188,7 @@ function _parseData(data, opts, master, context) {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew$1.prototype.VERSION = typeof "0.7.9" !== 'undefined' && "0.7.9" || '0.0.0-dev';
+Miew$1.prototype.VERSION = typeof "0.7.10" !== 'undefined' && "0.7.10" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew$1, /** @lends Miew */{

@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.10] - 2017-12-25
+### Added
+- Add more unit tests for loaders.
+- Add WebVR stereo mode (still in PoC stage).
+
+### Changed
+- Refactor loaders API and switch to the new way of loader auto detection.
+    - You may load electron density data by PDB ID using prefixed notation, e.g. "ccp4:3C9L"
+      (the full list of prefixes is pdb, cif, mmtf, ccp4). In the case the prefix is omitted,
+      it is a "pdb".
+    - Another prefix is "pc" (or "pubchem") which allows loading a compound from PubChem database,
+      e.g. "pc:serotonin".
+    - Otherwise, the source string is assumed to contain a URL, either absolute or relative to
+      the current page location.
+
+### Fixed
+- Fix loading electron density presets from a server.
+
 ## [0.7.9] - 2017-12-11
 ### Added
 - Add an `ImmediateLoader` for loading structures from pre-fetched data.
@@ -175,7 +193,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.9...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.10...HEAD
+[0.7.10]: https://github.com/epam/miew/compare/v0.7.9...v0.7.10
 [0.7.9]: https://github.com/epam/miew/compare/v0.7.8...v0.7.9
 [0.7.8]: https://github.com/epam/miew/compare/v0.7.7...v0.7.8
 [0.7.7+hotfix]: https://github.com/epam/miew/tree/v0.7.7+hotfix
