@@ -122,12 +122,17 @@ function getUrlParametersAsDict(url) {
 
 function resolveURL(str) {
   if (typeof URL !== 'undefined') {
-    if (typeof window !== 'undefined') {
-      return new URL(str, window.location).href;
-    } else {
-      return new URL(str).href;
+    try {
+      if (typeof window !== 'undefined') {
+        return new URL(str, window.location).href;
+      } else {
+        return new URL(str).href;
+      }
+    } catch (error) {
+      // IE 11 has a URL object with no constructor available so just try a different approach instead
     }
-  } else if (typeof document !== 'undefined') {
+  }
+  if (typeof document !== 'undefined') {
     const anchor = document.createElement('a');
     anchor.href = str;
     return anchor.href;
