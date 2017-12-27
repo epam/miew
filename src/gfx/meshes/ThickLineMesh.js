@@ -4,14 +4,14 @@ import * as THREE from 'three';
 import UberObject from './UberObject';
 var Mesh = UberObject(THREE.Mesh);
 
-function ThickLineSegments(geometry, material) {
+function ThickLineMesh(geometry, material) {
   Mesh.call(this, geometry, material);
 }
 
-ThickLineSegments.prototype = Object.create(Mesh.prototype);
-ThickLineSegments.prototype.constructor = ThickLineSegments;
+ThickLineMesh.prototype = Object.create(Mesh.prototype);
+ThickLineMesh.prototype.constructor = ThickLineMesh;
 
-ThickLineSegments.prototype._onBeforeRender = function(renderer, scene, camera) {
+ThickLineMesh.prototype._onBeforeRender = function(renderer, scene, camera) {
   var material = this.material;
   if (!material.uberOptions) {
     return;
@@ -22,5 +22,5 @@ ThickLineSegments.prototype._onBeforeRender = function(renderer, scene, camera) 
   material.uberOptions.viewport.set(viewport.width, viewport.height);
 };
 
-export default ThickLineSegments;
+export default ThickLineMesh;
 

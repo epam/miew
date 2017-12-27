@@ -14,7 +14,7 @@ function setMatParams(params, uniforms) {
 function _createInstancedCylinders(useZSprites, openEnded) {
   return {
     Geometry: function(a, b) {
-      return new geometries.Instanced2CCylinderGeometry(a, b, useZSprites, openEnded);
+      return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
     },
     Object: meshes.ZSprite,
     initMaterial: setMatParams({

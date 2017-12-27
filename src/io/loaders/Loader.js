@@ -1,5 +1,5 @@
 import EventDispatcher from '../../utils/EventDispatcher';
-import ContextDependent from '../../utils/ContextDependent';
+import makeContextDependent from '../../utils/makeContextDependent';
 
 export default class Loader extends EventDispatcher {
   constructor(source, options) {
@@ -57,4 +57,4 @@ export default class Loader extends EventDispatcher {
   }
 }
 
-ContextDependent(Loader.prototype);
+makeContextDependent(Loader.prototype);

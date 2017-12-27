@@ -85,7 +85,7 @@ GroupsFactory.ContactSurfaceGeo = function(caps, settings, renderParams) {
 GroupsFactory.SASSESSurfaceGeo = function(caps, settings, renderParams) {
   var gfxTriplet = MeshCreator.createSASSES(caps, settings, renderParams);
 
-  return _bakeGroup(gfxTriplet, processors.Atoms, groups.AtomsSASSESGroup_stub);
+  return _bakeGroup(gfxTriplet, processors.Atoms, groups.AtomsSASSESGroupStub);
 };
 
 GroupsFactory.TextLabelsGeo = function(caps, settings) {

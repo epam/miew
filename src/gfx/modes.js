@@ -14,7 +14,7 @@ import _VW from './modes/VanDerWaalsMode';
 import _TR from './modes/TraceMode';
 import _TU from './modes/TubeMode';
 import _CA from './modes/CartoonMode';
-import _QS from './modes/QuickSufrMode';
+import _QS from './modes/QuickSurfaceMode';
 import _SA from './modes/IsoSurfaceSASMode';
 import _SE from './modes/IsoSurfaceSESMode';
 import _CS from './modes/ContactSurfaceMode';

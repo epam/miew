@@ -12,7 +12,7 @@ import ResidueType from './ResidueType';
 import Bond from './Bond';
 import AutoBond from './AutoBond';
 import SGroup from './SGroup';
-import AromaticMarker from './AromaticMarker';
+import AromaticLoopsMarker from './AromaticLoopsMarker';
 import BioStructure from './BioStructure';
 import selectors from './selectors';
 //////////////////////////////////////////////////////////////////////////////
@@ -864,7 +864,7 @@ Complex.prototype.finalize = function(opts) {
   this._finalizeBonds();
   this._fillComponents(opts.enableEditing);
 
-  var marker = new AromaticMarker(this);
+  var marker = new AromaticLoopsMarker(this);
   marker.markCycles();
   if (opts.detectAromaticLoops) { // TODO remove this condition clause, it is for debug purposes only!
     marker.detectCycles(); // TODO add conditional detection

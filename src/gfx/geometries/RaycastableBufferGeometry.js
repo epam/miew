@@ -7,14 +7,14 @@ import * as THREE from 'three';
  * THREE.BufferGeometry.
  * @constructor
  */
-function RaycastableObjectsGeometry() {
+function RaycastableBufferGeometry() {
   THREE.BufferGeometry.call(this);
 }
 
-RaycastableObjectsGeometry.prototype = Object.create(THREE.BufferGeometry.prototype);
-RaycastableObjectsGeometry.prototype.constructor = RaycastableObjectsGeometry;
+RaycastableBufferGeometry.prototype = Object.create(THREE.BufferGeometry.prototype);
+RaycastableBufferGeometry.prototype.constructor = RaycastableBufferGeometry;
 
-RaycastableObjectsGeometry.prototype.raycast = (function() {
+RaycastableBufferGeometry.prototype.raycast = (function() {
   // This method was copied from three.js
   var vA = new THREE.Vector3();
   var vB = new THREE.Vector3();
@@ -113,5 +113,5 @@ RaycastableObjectsGeometry.prototype.raycast = (function() {
   };
 }());
 
-export default RaycastableObjectsGeometry;
+export default RaycastableBufferGeometry;
 

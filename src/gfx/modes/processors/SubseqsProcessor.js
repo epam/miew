@@ -2,7 +2,7 @@
 
 import RCGroup from '../../RCGroup';
 
-function ComponentsSubseqsProcessor(ResidueGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+function SubseqsProcessor(ResidueGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
   var self = this;
   RCGroup.call(self);
   this._complex = complex;
@@ -37,10 +37,10 @@ function ComponentsSubseqsProcessor(ResidueGroup, geoParams, complex, colorer, m
   });
 }
 
-ComponentsSubseqsProcessor.prototype = Object.create(RCGroup.prototype);
-ComponentsSubseqsProcessor.prototype.constructor = ComponentsSubseqsProcessor;
+SubseqsProcessor.prototype = Object.create(RCGroup.prototype);
+SubseqsProcessor.prototype.constructor = SubseqsProcessor;
 
-ComponentsSubseqsProcessor.prototype.getSubset = function(mask, innerOnly) {
+SubseqsProcessor.prototype.getSubset = function(mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -57,5 +57,5 @@ ComponentsSubseqsProcessor.prototype.getSubset = function(mask, innerOnly) {
   return totalSubset;
 };
 
-export default ComponentsSubseqsProcessor;
+export default SubseqsProcessor;
 

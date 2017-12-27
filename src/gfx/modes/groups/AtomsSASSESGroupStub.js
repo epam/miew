@@ -4,14 +4,14 @@
 
 import AtomsSphereGroup from './AtomsSphereGroup';
 
-function AtomsSurfaceGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
+function AtomsSASSESGroupStub(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
   AtomsSphereGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
 }
 
-AtomsSurfaceGroup.prototype = Object.create(AtomsSphereGroup.prototype);
-AtomsSurfaceGroup.prototype.constructor = AtomsSurfaceGroup;
+AtomsSASSESGroupStub.prototype = Object.create(AtomsSphereGroup.prototype);
+AtomsSASSESGroupStub.prototype.constructor = AtomsSASSESGroupStub;
 
-AtomsSurfaceGroup.prototype._makeGeoArgs = function(selection, mode, colorer, _polyComplexity) {
+AtomsSASSESGroupStub.prototype._makeGeoArgs = function(selection, mode, colorer, _polyComplexity) {
   var selectedAtoms = [];
   var atoms = selection.atoms;
   var chunks = selection.chunks;
@@ -26,5 +26,5 @@ AtomsSurfaceGroup.prototype._makeGeoArgs = function(selection, mode, colorer, _p
   return [n, opts];
 };
 
-export default AtomsSurfaceGroup;
+export default AtomsSASSESGroupStub;
 

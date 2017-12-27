@@ -2,7 +2,7 @@
 
 import RCGroup from '../../RCGroup';
 
-function ComponentsResiduesProcessor(
+function ResiduesProcessor(
   ResidueGroup,
   geoParams,
   complex,
@@ -40,14 +40,14 @@ function ComponentsResiduesProcessor(
   });
 }
 
-ComponentsResiduesProcessor.prototype = Object.create(RCGroup.prototype);
-ComponentsResiduesProcessor.prototype.constructor = ComponentsResiduesProcessor;
+ResiduesProcessor.prototype = Object.create(RCGroup.prototype);
+ResiduesProcessor.prototype.constructor = ResiduesProcessor;
 
-ComponentsResiduesProcessor.prototype._checkResidue = function(residue, mask) {
+ResiduesProcessor.prototype._checkResidue = function(residue, mask) {
   return residue._mask & mask;
 };
 
-ComponentsResiduesProcessor.prototype.getSubset = function(mask, innerOnly) {
+ResiduesProcessor.prototype.getSubset = function(mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -64,5 +64,5 @@ ComponentsResiduesProcessor.prototype.getSubset = function(mask, innerOnly) {
   return totalSubset;
 };
 
-export default ComponentsResiduesProcessor;
+export default ResiduesProcessor;
 

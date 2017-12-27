@@ -150,7 +150,7 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   return {centerPoints : centerPoints, topPoints : topPoints};
 }
 
-function MatrixHelper(residues, startIdx, endIdx, segmentsCount, tension, boundaries) {
+function CartoonHelper(residues, startIdx, endIdx, segmentsCount, tension, boundaries) {
   var pointsArrays = _calcPoints(residues, startIdx, endIdx, boundaries);
   this._topInterp = _buildStructureInterpolator(pointsArrays.topPoints, tension);
   this._centerInterp = _buildStructureInterpolator(pointsArrays.centerPoints, tension);
@@ -160,7 +160,7 @@ function MatrixHelper(residues, startIdx, endIdx, segmentsCount, tension, bounda
   this._segmentsCount = segmentsCount;
 }
 
-MatrixHelper.prototype.prepareMatrices = function(idx, firstRad, secondRad) {
+CartoonHelper.prototype.prepareMatrices = function(idx, firstRad, secondRad) {
   var mtcCount = this._segmentsCount;
   var outMtc = new Array(mtcCount);
   var currRad  = new THREE.Vector2(0, 0);
@@ -185,5 +185,5 @@ MatrixHelper.prototype.prepareMatrices = function(idx, firstRad, secondRad) {
   return outMtc;
 };
 
-export default MatrixHelper;
+export default CartoonHelper;
 

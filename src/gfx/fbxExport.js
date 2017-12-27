@@ -500,7 +500,7 @@ function exportBonds(queue, complex, bondsFileName) {
   queue.add(bondsFileName, 'TED', false, true);
 }
 
-function exportAll(complex, reprList, fullReport) {
+function fbxExport(complex, reprList, fullReport) {
   prec = settings.now.fbxprec;
   window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
   function onInitFS(fs) {
@@ -515,5 +515,5 @@ function exportAll(complex, reprList, fullReport) {
   window.requestFileSystem(window.TEMPORARY, 1024 * 1024 * 1024, onInitFS, _errorHandler);
 }
 
-export default exportAll;
+export default fbxExport;
 

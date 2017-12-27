@@ -3,11 +3,11 @@
 import utils from '../../utils';
 import SurfaceMode from './SurfaceMode';
 
-function ContactSurfMode(opts) {
+function ContactSurfaceMode(opts) {
   SurfaceMode.call(this, opts);
 }
 
-utils.deriveClass(ContactSurfMode, SurfaceMode, {
+utils.deriveClass(ContactSurfaceMode, SurfaceMode, {
   id: 'CS',
   name: 'Contact Surface',
   shortName: 'Contact Surf',
@@ -15,7 +15,7 @@ utils.deriveClass(ContactSurfMode, SurfaceMode, {
   surfaceNames: ['ContactSurfaceGeo'],
 });
 
-ContactSurfMode.prototype.getSurfaceOpts = function() {
+ContactSurfaceMode.prototype.getSurfaceOpts = function() {
   return {
     probeRadius: this.opts.probeRadius,
     radScale: this.opts.polyComplexity[this.settings.now.resolution],
@@ -28,5 +28,5 @@ ContactSurfMode.prototype.getSurfaceOpts = function() {
   };
 };
 
-export default ContactSurfMode;
+export default ContactSurfaceMode;
 

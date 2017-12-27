@@ -4,13 +4,12 @@
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
 import vertexShader from './ScreenQuad_vert.glsl';
-import fragmentShader from './Outline_frag.glsl';
+import fragmentShader from './Anaglyph_frag.glsl';
 
 var defaultUniforms = THREE.UniformsUtils.merge([
   {
-    srcTex:     {type: 't', value: null},
-    srcTexSize: {type: 'v2', value: new THREE.Vector2(512, 512)},
-    opacity:    {type: 'f', value: 1.0}
+    srcL:     {type: 't', value: null},
+    srcR:     {type: 't', value: null},
   }
 ]);
 
@@ -24,17 +23,17 @@ function overrideUniforms(params) {
   return uniforms;
 }
 
-function createOutlineMaterial(params) {
+function AnaglyphMaterial(params) {
   var settings = {
     uniforms : overrideUniforms(params),
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
-    transparent: true,
+    transparent: false,
     depthTest: false,
     depthWrite: false
   };
   return new THREE.ShaderMaterial(settings);
 }
 
-export default createOutlineMaterial;
+export default AnaglyphMaterial;
 

@@ -30,19 +30,19 @@ CollisionSphere.prototype.raycast = (function() {
 
 //////////////////////////////////////////////////////////////////////////////
 
-function CollisionSpheresGeo(count) {
+function SphereCollisionGeo(count) {
   this._objects = new Array(count);
   this.boundingSphere = null;
   this.boundingBox = null;
 }
 
-CollisionSpheresGeo.constructor = CollisionSpheresGeo;
+SphereCollisionGeo.constructor = SphereCollisionGeo;
 
-CollisionSpheresGeo.prototype.setSphere = function(idx, position, radius) {
+SphereCollisionGeo.prototype.setSphere = function(idx, position, radius) {
   this._objects[idx] = new CollisionSphere(position, radius);
 };
 
-CollisionSpheresGeo.prototype.raycast = function(raycaster, intersects) {
+SphereCollisionGeo.prototype.raycast = function(raycaster, intersects) {
   // TODO raycast with bounding sphere? How to deal with updates?
   for (var i = 0, n = this._objects.length; i < n; ++i) {
     var inters = this._objects[i].raycast(raycaster);
@@ -53,7 +53,7 @@ CollisionSpheresGeo.prototype.raycast = function(raycaster, intersects) {
   }
 };
 
-CollisionSpheresGeo.prototype.computeBoundingBox = function() {
+SphereCollisionGeo.prototype.computeBoundingBox = function() {
   var objects = this._objects;
   var boundingBox = this.boundingBox;
   if (boundingBox === null) {
@@ -65,7 +65,7 @@ CollisionSpheresGeo.prototype.computeBoundingBox = function() {
   }
 };
 
-CollisionSpheresGeo.prototype.computeBoundingSphere = function() {
+SphereCollisionGeo.prototype.computeBoundingSphere = function() {
   this.computeBoundingBox();
   var objects = this._objects;
   var boundingBox = this.boundingBox;
@@ -85,5 +85,4 @@ CollisionSpheresGeo.prototype.computeBoundingSphere = function() {
   this.boundingSphere.set(center, Math.sqrt(radiusSquared));
 };
 
-export default CollisionSpheresGeo;
-
+export default SphereCollisionGeo;

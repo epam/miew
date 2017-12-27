@@ -4,12 +4,13 @@
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
 import vertexShader from './ScreenQuad_vert.glsl';
-import fragmentShader from './FXAA_frag.glsl';
+import fragmentShader from './Outline_frag.glsl';
 
 var defaultUniforms = THREE.UniformsUtils.merge([
   {
     srcTex:     {type: 't', value: null},
-    srcTexelSize: {type: 'v2', value: new THREE.Vector2(1.0 / 512.0, 1.0 / 512.0)},
+    srcTexSize: {type: 'v2', value: new THREE.Vector2(512, 512)},
+    opacity:    {type: 'f', value: 1.0}
   }
 ]);
 
@@ -23,7 +24,7 @@ function overrideUniforms(params) {
   return uniforms;
 }
 
-function createFXAAMaterial(params) {
+function OutlineMaterial(params) {
   var settings = {
     uniforms : overrideUniforms(params),
     vertexShader: vertexShader,
@@ -35,5 +36,5 @@ function createFXAAMaterial(params) {
   return new THREE.ShaderMaterial(settings);
 }
 
-export default createFXAAMaterial;
+export default OutlineMaterial;
 

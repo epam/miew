@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import IsoSurfaceGeometry from './IsoSurfaceGeometry';
 import IsoSurfaceAtomColored from './IsoSurfaceAtomColored';
-import IsoSurfaceNormal from './IsoSurfaceNormal';
+import IsosurfaceBuildNormals from './IsosurfaceBuildNormals';
 import IsoSurfaceCluster from './IsoSurfaceCluster';
 import IsoSurfaceMarchCube from './IsoSurfaceMarchCube';
 import IsoSurfaceGeo from './IsoSurfaceGeo';
@@ -869,12 +869,12 @@ SSIsosurfaceGeometry.prototype._innerBuild = function() {
   }
   this.voxelWorld = null;
   if (this.clusterizationType > 0) {
-    this.voxelWorld = new IsoSurfaceNormal(
+    this.voxelWorld = new IsosurfaceBuildNormals(
       atomsClustered.length, atomsClustered, //NOSONAR
       vBoxMin, vBoxMax, probeRadForNormalsColors
     );
   } else {
-    this.voxelWorld = new IsoSurfaceNormal(
+    this.voxelWorld = new IsosurfaceBuildNormals(
       atomsColored.length, atomsColored,
       vBoxMin, vBoxMax, probeRadForNormalsColors
     );

@@ -2,7 +2,7 @@
 
 import RCGroup from '../../RCGroup';
 
-function ComponentsAromaticProcessor(
+function AromaticProcessor(
   AromaticGroup,
   geoParams,
   complex,
@@ -52,10 +52,10 @@ function ComponentsAromaticProcessor(
   });
 }
 
-ComponentsAromaticProcessor.prototype = Object.create(RCGroup.prototype);
-ComponentsAromaticProcessor.prototype.constructor = ComponentsAromaticProcessor;
+AromaticProcessor.prototype = Object.create(RCGroup.prototype);
+AromaticProcessor.prototype.constructor = AromaticProcessor;
 
-ComponentsAromaticProcessor.prototype.getSubset = function(mask, innerOnly) {
+AromaticProcessor.prototype.getSubset = function(mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -72,5 +72,5 @@ ComponentsAromaticProcessor.prototype.getSubset = function(mask, innerOnly) {
   return totalSubset;
 };
 
-export default ComponentsAromaticProcessor;
+export default AromaticProcessor;
 

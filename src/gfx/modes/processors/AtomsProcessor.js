@@ -2,7 +2,7 @@
 
 import RCGroup from '../../RCGroup';
 
-function ComponentsAtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+function AtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
   var self = this;
   RCGroup.call(self);
   this._complex = complex;
@@ -31,14 +31,14 @@ function ComponentsAtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode,
   });
 }
 
-ComponentsAtomsProcessor.prototype = Object.create(RCGroup.prototype);
-ComponentsAtomsProcessor.prototype.constructor = ComponentsAtomsProcessor;
+AtomsProcessor.prototype = Object.create(RCGroup.prototype);
+AtomsProcessor.prototype.constructor = AtomsProcessor;
 
-ComponentsAtomsProcessor.prototype._checkAtom = function(atom, mask) {
+AtomsProcessor.prototype._checkAtom = function(atom, mask) {
   return atom._mask & mask;
 };
 
-ComponentsAtomsProcessor.prototype.getSubset = function(mask, innerOnly) {
+AtomsProcessor.prototype.getSubset = function(mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -55,5 +55,5 @@ ComponentsAtomsProcessor.prototype.getSubset = function(mask, innerOnly) {
   return totalSubset;
 };
 
-export default ComponentsAtomsProcessor;
+export default AtomsProcessor;
 

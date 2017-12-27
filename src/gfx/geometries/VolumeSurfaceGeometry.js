@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import IsoSurfaceGeometry from './IsoSurfaceGeometry';
-import IsoSurface from './IsoSurfaceWMD';
+import IsoSurface from './IsoSurface';
 
 
 /**

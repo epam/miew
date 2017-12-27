@@ -3,18 +3,18 @@
 import utils from '../../utils';
 import SurfaceMode from './SurfaceMode';
 
-function QuickSurfMode(opts) {
+function QuickSurfaceMode(opts) {
   SurfaceMode.call(this, opts);
 }
 
-utils.deriveClass(QuickSurfMode, SurfaceMode, {
+utils.deriveClass(QuickSurfaceMode, SurfaceMode, {
   id: 'QS',
   name: 'Quick Surface',
   shortName: 'Quick Surf',
   surfaceNames: ['QuickSurfGeo'],
 });
 
-QuickSurfMode.prototype.getSurfaceOpts = function() {
+QuickSurfaceMode.prototype.getSurfaceOpts = function() {
   return {
     useBeads: false,
     isoValue: this.opts.isoValue,
@@ -26,5 +26,5 @@ QuickSurfMode.prototype.getSurfaceOpts = function() {
   };
 };
 
-export default QuickSurfMode;
+export default QuickSurfaceMode;
 

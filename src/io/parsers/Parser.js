@@ -1,4 +1,4 @@
-import ContextDependent from '../../utils/ContextDependent';
+import makeContextDependent from '../../utils/makeContextDependent';
 
 export default class Parser {
   constructor(data, options) {
@@ -55,4 +55,4 @@ export default class Parser {
   }
 }
 
-ContextDependent(Parser.prototype);
+makeContextDependent(Parser.prototype);

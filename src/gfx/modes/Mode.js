@@ -1,7 +1,7 @@
 
 
 import _ from 'lodash';
-import ContextDependent from '../../utils/ContextDependent';
+import makeContextDependent from '../../utils/makeContextDependent';
 import utils from '../../utils';
 import gfxutils from '../gfxutils';
 import factory from './groups/GroupsFactory';
@@ -31,7 +31,7 @@ function Mode(opts) {
   this.opts = _.merge(utils.deriveDeep(this.settings.now.modes[this.id], true), opts);
 }
 
-ContextDependent(Mode.prototype);
+makeContextDependent(Mode.prototype);
 /**
  * Mode identifier.
  * @type {string}

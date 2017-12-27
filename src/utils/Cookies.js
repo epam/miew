@@ -1,7 +1,7 @@
 
 
 import _ from 'lodash';
-import ContextDependent from './ContextDependent';
+import makeContextDependent from './makeContextDependent';
 var MAX_COOKIE_LEN = 4000;
 var COUNT_SUFFIX = 'Cnt';
 
@@ -27,7 +27,7 @@ function Cookies(context, opts) {
   }, opts);
 }
 
-ContextDependent(Cookies.prototype);
+makeContextDependent(Cookies.prototype);
 
 /**
  * Remove cookie by the name.

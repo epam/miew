@@ -11,7 +11,7 @@ var cInvalidVal = -1;
 // 89237 is a large simple number, can be used for pseudo random hash code create
 var cBigPrime = 89237;
 
-function PairCollection(maxPairsEstimate) {
+function AtomPairs(maxPairsEstimate) {
   var i = 0;
 
   this.numPairs = 0;
@@ -29,7 +29,7 @@ function PairCollection(maxPairsEstimate) {
 /**
  * Destroy all pairs memory
  */
-PairCollection.prototype.destroy = function() {
+AtomPairs.prototype.destroy = function() {
   this.intBuffer = null;
   this.hashBuffer = null;
 };
@@ -39,7 +39,7 @@ PairCollection.prototype.destroy = function() {
  * @param {number} indexA - Index of the 1st vertex.
  * @param {number} indexB - Index of the 2nd vertex.
  */
-PairCollection.prototype.addPair = function(indexA, indexB) {
+AtomPairs.prototype.addPair = function(indexA, indexB) {
   var ia = (indexA < indexB) ? indexA : indexB;
   var ib = (indexA > indexB) ? indexA : indexB;
   var codeToAdd = ia + (ib << cMaxNeighbours);
@@ -73,5 +73,4 @@ PairCollection.prototype.addPair = function(indexA, indexB) {
   this.numPairs++;
 };
 
-export default PairCollection;
-
+export default AtomPairs;

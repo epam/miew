@@ -1,7 +1,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////////
-import PairCollection from './AtomPairs';
+import AtomPairs from './AtomPairs';
 import Bond from './Bond';
 import settings from '../settings';
 //////////////////////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ AutoBond.prototype._buildInner = function() {
 
   this._calcBoundingBox();
   var volMap = this._buildGridMap();
-  this._pairCollection = new PairCollection(atoms.length * cEstBondsMultiplier);
+  this._pairCollection = new AtomPairs(atoms.length * cEstBondsMultiplier);
   this._addExistingPairs();
   this._findPairs(volMap);
   this._addPairs();

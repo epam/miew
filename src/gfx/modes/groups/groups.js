@@ -2,7 +2,7 @@
 
 import AtomsSphereGroup from './AtomsSphereGroup';
 import AtomsSurfaceGroup from './AtomsSurfaceGroup';
-import AtomsSASSESGroupStub from './AtomsSASSESGroup_stub';
+import AtomsSASSESGroupStub from './AtomsSASSESGroupStub';
 import AtomsTextGroup from './AtomsTextGroup';
 import AromaticTorusGroup from './AromaticTorusGroup';
 import AromaticLinesGroup from './AromaticLinesGroup';
@@ -15,7 +15,7 @@ import BondsLinesGroup from './BondsLinesGroup';
 export default {
   AtomsSphereGroup: AtomsSphereGroup,
   AtomsSurfaceGroup: AtomsSurfaceGroup,
-  AtomsSASSESGroup_stub: AtomsSASSESGroupStub,
+  AtomsSASSESGroupStub: AtomsSASSESGroupStub,
   AtomsTextGroup: AtomsTextGroup,
   AromaticTorusGroup: AromaticTorusGroup,
   AromaticLinesGroup: AromaticLinesGroup,

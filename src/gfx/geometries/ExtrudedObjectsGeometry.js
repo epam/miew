@@ -47,7 +47,7 @@ function _createExtrudedChunkGeometry(shape, ringsCount) {
   return geo;
 }
 
-function ExtrudedObjectsGroup(shape, ringsCount, chunksCount) {
+function ExtrudedObjectsGeometry(shape, ringsCount, chunksCount) {
   var chunkGeo = _createExtrudedChunkGeometry(shape, ringsCount);
   ChunkedObjectsGeometry.call(this, chunkGeo, chunksCount);
   this._ringsCount = ringsCount;
@@ -58,10 +58,10 @@ function ExtrudedObjectsGroup(shape, ringsCount, chunksCount) {
   }
 }
 
-ExtrudedObjectsGroup.prototype = Object.create(ChunkedObjectsGeometry.prototype);
-ExtrudedObjectsGroup.prototype.constructor = ExtrudedObjectsGroup;
+ExtrudedObjectsGeometry.prototype = Object.create(ChunkedObjectsGeometry.prototype);
+ExtrudedObjectsGeometry.prototype.constructor = ExtrudedObjectsGeometry;
 
-ExtrudedObjectsGroup.prototype.setItem = function(itemIdx, matrices) {
+ExtrudedObjectsGeometry.prototype.setItem = function(itemIdx, matrices) {
   var shape = this._chunkGeo._positions;
   var ptsCount = shape.length;
   var innerPtIdx = 0;
@@ -102,5 +102,5 @@ ExtrudedObjectsGroup.prototype.setItem = function(itemIdx, matrices) {
   }
 };
 
-export default ExtrudedObjectsGroup;
+export default ExtrudedObjectsGeometry;
 
