@@ -2474,11 +2474,8 @@ Miew.prototype._onKeyUp = function(event) {
     return;
   }
 
-  switch (event.keyCode) {
-  case 'X'.charCodeAt(0):
+  if (event.keyCode === 'X'.charCodeAt(0)) {
     this._extractRepresentation();
-    break;
-  default:
   }
 };
 

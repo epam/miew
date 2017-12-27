@@ -372,13 +372,11 @@ CIFParser.prototype._extractConfs = function(complex, helicesData) {
     var helClass = helClasses[i] || ' ';
     var struct;
     // TODO Add turns and strands(!)?
-    switch (type) {
-    case 'helix':
-      var idx = complex._helices.length;
+    if (type === 'helix') {
+      const idx = complex._helices.length;
       struct = new Helix(idx, name, start[0], end[0], helClass, comment, length);
       complex.addHelix(struct);
-      break;
-    default:
+    } else {
       struct = null;
     }
     if (!struct) {
@@ -746,7 +744,7 @@ CIFParser._parseToObject = function(source) {
         } else if (Number.isNaN(code)) { // <eof> ....................................................................
           state = 0;
         } else { // ..................................................................................................
-          if (!Number.isNaN(code) && _storeValue(_parseValue()) !== null) {
+          if (_storeValue(_parseValue()) !== null) {
             continue;
           }
           state = 666;

@@ -123,11 +123,9 @@ Ccp4Model.prototype.load = function(buffer) {
   yaxis.multiplyScalar(header.extent[yIndex] - 1);
   zaxis.multiplyScalar(header.extent[zIndex] - 1);
 
-  switch (header.type) {
-  case 2:
+  if (header.type === 2) {
     this._data = new Float32Array(buffer, 1024 + header.nsymbt, header.extent[0] * header.extent[1] * header.extent[2]);
-    break;
-  default:
+  } else {
     throw new Error('CCP4: Unsupported format ' + header.type);
   }
 

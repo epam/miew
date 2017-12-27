@@ -542,7 +542,7 @@ Complex.prototype.buildChemicalFormula = function() {
   //now join the same parts
   var i = formulaParts.length - 1;
   var j = formulaParts.length - 2;
-  for (; i >= 0 && j >= 0;) {
+  while (i >= 0 && j >= 0) {
     var pi = formulaParts[i];
     var pj = formulaParts[j];
     if (!((pi.owner instanceof Complex) || (pi.owner instanceof Component))) {
