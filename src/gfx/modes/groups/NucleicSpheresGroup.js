@@ -2,16 +2,16 @@
 
 import NucleicItemGroup from './NucleicItemGroup';
 
-function NucleicCylindersItemGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
+function NucleicSpheresGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
   this._stickRad = mode.calcStickRadius();
   this._geoArgs = [selection.chunks.length * 2, polyComplexity];
   NucleicItemGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
 }
 
-NucleicCylindersItemGroup.prototype = Object.create(NucleicItemGroup.prototype);
-NucleicCylindersItemGroup.prototype.constructor = NucleicCylindersItemGroup;
+NucleicSpheresGroup.prototype = Object.create(NucleicItemGroup.prototype);
+NucleicSpheresGroup.prototype.constructor = NucleicSpheresGroup;
 
-NucleicCylindersItemGroup.prototype._processItem = function(chunkIdx, cyl1, cyl2, color) {
+NucleicSpheresGroup.prototype._processItem = function(chunkIdx, cyl1, cyl2, color) {
   var geo = this._geo;
   var stickRad = this._stickRad;
   var idx = chunkIdx * 2;
@@ -22,5 +22,5 @@ NucleicCylindersItemGroup.prototype._processItem = function(chunkIdx, cyl1, cyl2
   geo.setColor(idx, color);
 };
 
-export default NucleicCylindersItemGroup;
+export default NucleicSpheresGroup;
 
