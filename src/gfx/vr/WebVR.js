@@ -4,7 +4,7 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/VRDisplay/requestPresent
  */
 export default class WEBVR {
-  static createButton(renderer) {
+  static createButton(viewer) {
     function showEnterVR(display, button) {
 
       button.style.display = '';
@@ -21,10 +21,11 @@ export default class WEBVR {
         if (display.isPresenting) {
           display.exitPresent();
         } else {
-          display.requestPresent([{source: renderer.domElement}]);
+          display.requestPresent([{source: viewer._gfx.renderer.domElement}]);
+          viewer._repositionMoleculeForWebVR();
         }
       };
-      renderer.vr.setDevice(display);
+      viewer._gfx.renderer.vr.setDevice(display);
     }
 
     function showVRNotFound(button) {
@@ -38,7 +39,7 @@ export default class WEBVR {
       button.onmouseleave = null;
       button.onclick = null;
 
-      renderer.vr.setDevice(null);
+      viewer._gfx.renderer.vr.setDevice(null);
     }
 
     function stylizeElement(element) {

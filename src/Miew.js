@@ -43,6 +43,7 @@ import logger from './utils/logger';
 import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
 import webvr from './gfx/vr/WebVR';
+import ViveController from './gfx/vr/ViveController';
 //////////////////////////////////////////////////////////////////////////////
 
 var
@@ -400,6 +401,7 @@ Miew.prototype._initGfx = function() {
     settings.now.camNear, settings.now.camFar
   );
 
+  this._webVRWorld = new gfxutils.RCGroup();
   gfx.root = new gfxutils.RCGroup();
   gfx.scene.add(gfx.root);
 
@@ -521,10 +523,10 @@ Miew.prototype._initGfx = function() {
     }
   );
 
-  this._toggleWebVR(settings.now.stereo === 'WEBVR', gfx);
-
   this._gfx = gfx;
   this._showCanvas();
+  this._toggleWebVR(settings.now.stereo === 'WEBVR');
+  //this._addControllers();
 
   this._container.appendChild(gfx.renderer2d.getElement());
 
@@ -862,8 +864,26 @@ Miew.prototype._toggleWebVR = (function() {
   let _cameraWasStored = false;
   let _webVRButton = null;
 
-  return function(enable, gfx) {
+  let _webVRUser = new gfxutils.RCGroup();
+
+  const _controller1 = new ViveController(0);
+  const _controller2 = new ViveController(1);
+
+  // visualize controllers with cylinders
+  var geometry = new THREE.CylinderGeometry(0.05, 0.05, 0.4);
+  var material = new UberMaterial({lights: false, overrideColor: true});
+  material.setUberOptions({fixedColor: new THREE.Color(0x4444ff)});
+  material.updateUniforms();
+  var cylinder1 = new THREE.Mesh(geometry, material);
+  cylinder1.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  _controller1.add(cylinder1);
+  var cylinder2 = new THREE.Mesh(geometry, material);
+  cylinder2.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+  _controller2.add(cylinder2);
+
+  return function(enable) {
     const self = this;
+    const gfx = self._gfx;
     const  renderer = gfx ? gfx.renderer : null;
     if (!renderer) {
       throw new Error('No renderer is available to toggle WebVR');
@@ -878,11 +898,27 @@ Miew.prototype._toggleWebVR = (function() {
       // enable vr in renderer
       renderer.vr.enabled = true;
       if (!_webVRButton) {
-        _webVRButton = webvr.createButton(renderer);
+        _webVRButton = webvr.createButton(this);
         document.body.appendChild(_webVRButton);
       } else {
         _webVRButton.style.display = 'block';
       }
+      // add hierarchical structure for webVR into scene
+      if (_webVRUser) {
+        gfx.scene.add(_webVRUser);
+        _webVRUser.add(gfx.camera);
+        if (_controller1) _webVRUser.add(_controller1);
+        if (_controller2) _webVRUser.add(_controller2);
+        self._controller1 = _controller1; // TODO rewrite
+        self._controller2 = _controller2;
+      }
+
+      self.settings.now.fog = false;
+      // self._repositionMoleculeForWebVR(gfx, _webVRWorld);
+      //turn on webvr transformation
+      gfx.scene.add(self._webVRWorld);
+      self._webVRWorld.add(gfx.root);
+
     } else {
       //disable vr
       renderer.vr.enabled = false;
@@ -894,14 +930,65 @@ Miew.prototype._toggleWebVR = (function() {
         gfx.camera.copy(_mainCamera);
         self._onResize();
       }
+      self.settings.now.fog = true;
+      //turn off webvr transformation
+      const root = self._webVRWorld.children[0];
+      if (root) gfx.scene.add(root);
+      self._webVRWorld.parent = null;
+      if (_webVRUser) {
+        gfx.scene.remove(_webVRUser);
+        _webVRUser.parent = null;
+        _webVRUser.remove(gfx.camera);
+      }
     }
     self._needRender = true;
   };
 }());
 
-Miew.prototype._getWebVRDevice = function() {
-  const vr = this._gfx.renderer.vr;
+Miew.prototype._repositionMoleculeForWebVR = function(gfx, _matWorld) {
+  gfx = gfx || this._gfx;
+  const device = this._getWebVRDevice(gfx.renderer);
+  let camDir = new THREE.Vector3(0, 0, -1);
+  let pose;
+
+  if (device.pose) {  // WebVR emulation
+    pose = device.pose;
+  } else if (device.getFrameData) {  // WebVR
+    let frameData = new VRFrameData();
+    device.getFrameData(frameData);
+    pose = frameData.pose;
+  } else {
+    return;
+  }
+  const orient = pose.orientation;
+  const quaternion = new THREE.Quaternion(orient[0], orient[1], orient[2], orient[3]);
+  camDir.applyQuaternion(quaternion);
+  if (pose.position === null) {
+    this.logger.warn('VRDisplay cannot provide its position. Be sure VRDisplay is detected by sensors');
+  }
+  const pos = pose.position || [0, 0, 0];
+  this._webVRWorld.position.fromArray(pos);
+  this._webVRWorld.position.addScaledVector(camDir, 2.5);
+};
+
+Miew.prototype._getWebVRDevice = function(renderer) {
+  const vr = this._gfx.renderer.vr || renderer.vr;
   return (vr && vr.enabled) ? vr.getDevice() : null;
+};
+
+Miew.prototype._addControllers = function() {
+
+  this._controller1 = new ViveController(0);
+  //this._gfx.scene.add(this._controller1);
+  this._controller2 = new ViveController(1);
+  //this._gfx.scene.add(this._controller1);
+
+  // visualize controllers with cylinders
+  var geometry = new THREE.CylinderGeometry(5, 5, 20, 4);
+  var material = new THREE.MeshBasicMaterial({color: 0xffff00});
+  var cylinder = new THREE.Mesh(geometry, material);
+  this._controller1.add(cylinder);
+  this._controller2.add(cylinder);
 };
 
 Miew.prototype._getBSphereRadius = function() {
@@ -949,6 +1036,11 @@ Miew.prototype._onUpdate = function() {
   }
 
   this._updateFog();
+
+  if (this._controller1 && this._controller2 && this._gfx.renderer.vr.enabled) {
+    this._controller1.update();
+    this._controller2.update();
+  }
 };
 
 Miew.prototype._onRender = function() {
@@ -3170,7 +3262,7 @@ Miew.prototype._onSettingsChanged = function(changes) {
       'Autoresolution should be set during miew startup.');
   }
   if (changes.stereo) {
-    this._toggleWebVR(changes.stereo === 'WEBVR', this._gfx);
+    this._toggleWebVR(changes.stereo === 'WEBVR');
   }
   this._needRender = true;
 };
