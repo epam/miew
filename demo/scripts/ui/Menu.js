@@ -2087,7 +2087,8 @@ Menu.prototype._initToolsPanel = function() {
   });
 
   $(self._menuId + ' [data-toggle=miew-menu-tools]').on('click', function() {
-    var type = this.getAttribute('data-value');
+    const type = this.getAttribute('data-value');
+    let visual;
     switch (type) {
     case 'reset-view':
       self._viewer.resetView();
@@ -2113,7 +2114,8 @@ Menu.prototype._initToolsPanel = function() {
       }, 'show');
       break;
     case 'fbx-export':
-      fbxExport(self._viewer._complex, self._viewer._reprList, false);
+      visual = self._viewer._getComplexVisual();
+      fbxExport(visual._complex, visual._reprList, false);
       self._onMenuOff();
       break;
     case 'save-settings':
