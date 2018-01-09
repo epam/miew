@@ -1,0 +1,203 @@
+import ResidueType from './ResidueType';
+
+/**
+ * Created by anton.zherzdev on 25.12.2017.
+ */
+
+const kMinimalDistance = 0.5,
+  kMinHBondEnergy = -9.9,
+  kMaxHBondEnergy = -0.5,
+  kCouplingConstant = -27.888; // = -332 * 0.42 * 0.2
+
+export default class HBondInfo {
+  constructor(complex) {
+    this._complex = complex;
+    this._hbonds = []; // array of bond info for each residue
+    this._build();
+  }
+
+  isBond(from, to) {
+    if (this._hbonds[from]) {
+      let acc = this._hbonds[from].acceptor[0];
+      if (acc && acc.residue === to && acc.energy < kMaxHBondEnergy) {
+        return true;
+      }
+      acc = this._hbonds[from].acceptor[1];
+      if (acc && acc.residue === to && acc.energy < kMaxHBondEnergy) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  _build() {
+    const self = this;
+
+    // TODO Replace quadratic algorithm with something better (use voxel grid?)
+    for (let i = 0; i < this._complex._residues.length - 1; ++i) {
+      let ri = this._complex._residues[i];
+      if ((ri.getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+        continue;
+      }
+
+      // get predecessor in chain
+      let preri = null;
+      if (i > 0 && (this._complex._residues[i - 1].getType().flags & ResidueType.Flags.PROTEIN) &&
+        ri._sequence === this._complex._residues[i - 1]._sequence + 1) {
+        preri = this._complex._residues[i - 1];
+      }
+
+      for (let j = i + 1; j < this._complex._residues.length; ++j) {
+        let rj = this._complex._residues[j];
+        if ((rj.getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+          continue;
+        }
+
+        // get predecessor in chain
+        let prerj = null;
+        if ((this._complex._residues[j - 1].getType().flags & ResidueType.Flags.PROTEIN) &&
+          rj._sequence === this._complex._residues[j - 1]._sequence + 1) {
+          prerj = this._complex._residues[j - 1];
+        }
+
+        self._calcHBondEnergy(preri, ri, rj);
+        if (j !== i + 1) {
+          self._calcHBondEnergy(prerj, rj, ri);
+        }
+      }
+    }
+  }
+
+  _residueGetCO(res) {
+    let c = null, o = null;
+
+    res.forEachAtom(function(a) {
+      if (a.getName().getString() === 'C') {
+        c = a.getPosition();
+      } else if (a.getName().getString() === 'O') {
+        o = a.getPosition();
+      }
+    });
+
+    return [c, o];
+  }
+
+  // TODO Support hydrogen defined in complex
+  _residueGetNH(prev, res) {
+    let [c, o] = this._residueGetCO(prev);
+
+    let n;
+    res.forEachAtom(function(a) {
+      if (a.getName().getString() === 'N') {
+        n = a.getPosition();
+      }
+    });
+
+    if (c && o && n) {
+      // calculate hydrogen position
+      let h = c.clone();
+      h.sub(o);
+      h.multiplyScalar(1.0 / h.length());
+      h.add(n);
+
+      return [n, h];
+    }
+
+    return [null, null];
+  }
+
+  _calcHBondEnergy(predonor, donor, acceptor) {
+    let result = 0;
+
+    if (predonor === null) {
+      return result;
+    }
+
+    if (donor.getType().getName() !== 'PRO') {
+      let [n, h] = this._residueGetNH(predonor, donor);
+      let [c, o] = this._residueGetCO(acceptor);
+
+      if (n === null || h === null || c === null || o === null) {
+        return result;
+      }
+
+      let distanceHO = h.distanceTo(o);
+      let distanceHC = h.distanceTo(c);
+      let distanceNC = n.distanceTo(c);
+      let distanceNO = n.distanceTo(o);
+
+      if (distanceHO < kMinimalDistance || distanceHC < kMinimalDistance ||
+          distanceNC < kMinimalDistance || distanceNO < kMinimalDistance) {
+        result = kMinHBondEnergy;
+      } else {
+        result = kCouplingConstant / distanceHO - kCouplingConstant / distanceHC +
+                 kCouplingConstant / distanceNC - kCouplingConstant / distanceNO;
+      }
+
+      // DSSP compatibility mode:
+      result = Math.round(result * 1000) / 1000;
+
+      if (result < kMinHBondEnergy) {
+        result = kMinHBondEnergy;
+      }
+    }
+
+    // update donor
+    if (typeof this._hbonds[donor._index] === 'undefined') {
+      this._hbonds[donor._index] = {
+        donor: [],
+        acceptor: []
+      };
+    }
+    let donorInfo = this._hbonds[donor._index];
+
+    if (donorInfo.acceptor.length < 2) {
+      donorInfo.acceptor.push({
+        residue: acceptor._index,
+        energy: result
+      });
+    }
+
+    if (donorInfo.acceptor.length > 1) {
+      if (result <  donorInfo.acceptor[0].energy) {
+        donorInfo.acceptor[1].residue = donorInfo.acceptor[0].residue;
+        donorInfo.acceptor[1].energy  = donorInfo.acceptor[0].energy;
+        donorInfo.acceptor[0].residue = acceptor._index;
+        donorInfo.acceptor[0].energy  = result;
+      } else if (result <  donorInfo.acceptor[1].energy) {
+        donorInfo.acceptor[1].residue = acceptor._index;
+        donorInfo.acceptor[1].energy  = result;
+      }
+    }
+
+    // update acceptor
+    if (typeof this._hbonds[acceptor._index] === 'undefined') {
+      this._hbonds[acceptor._index] = {
+        donor: [],
+        acceptor: []
+      };
+    }
+    let accInfo = this._hbonds[acceptor._index];
+
+    if (accInfo.donor.length < 2) {
+      accInfo.donor.push({
+        residue: donor._index,
+        energy: result
+      });
+    }
+
+    if (accInfo.donor.length > 1) {
+      if (result < accInfo.donor[0].energy) {
+        accInfo.donor[1].residue = accInfo.donor[0].residue;
+        accInfo.donor[1].energy = accInfo.donor[0].energy;
+        accInfo.donor[0].residue = donor._index;
+        accInfo.donor[0].energy = result;
+      } else if (result < accInfo.donor[1].energy) {
+        accInfo.donor[1].residue = donor._index;
+        accInfo.donor[1].energy = result;
+      }
+    }
+
+    return result;
+  }
+}
