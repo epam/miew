@@ -12,7 +12,6 @@ import {rollup} from 'rollup';
 import glob     from 'glob';
 import express  from 'express';
 import sassModuleImporter from 'sass-module-importer'; // eslint-disable-line import/no-unresolved, import/extensions
-import rollupPluginReplace from 'rollup-plugin-replace';
 
 import WebpackDevServer from 'webpack-dev-server';
 
@@ -140,22 +139,13 @@ const uglifyConfig = {
 
 
 gulp.task('build:js', () => {
-  const rollupCfg = _.merge(rollupConfig, {
-    plugins: [
-      rollupPluginReplace({
-        PACKAGE_VERSION: JSON.stringify(version.combined),
-        DEBUG: false,
-      }),
-    ]
-  });
-  return rollup(rollupCfg).then((bundle) => {
-    if (Array.isArray(rollupCfg.output)) {
-      const multi = _.map(rollupCfg.output, function(target) {
-        return bundle.write(_.assign({}, rollupCfg, target));
-      });
-      return Promise.all(multi);
+  return rollup(rollupConfig).then((bundle) => {
+    if (!Array.isArray(rollupConfig.output)) {
+      throw new Error('Oops!');
     }
-    throw new Error('Oops!');
+    return Promise.all(_.map(rollupConfig.output, function(target) {
+      return bundle.write(target);
+    }));
   }).then(function() {
     return gulp.src('build/' + packageJson.main)
       .pipe(plugins.sourcemaps.init({loadMaps: true}))

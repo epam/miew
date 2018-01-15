@@ -11,14 +11,16 @@ import rollupPluginNodeBuiltins from 'rollup-plugin-node-builtins';
 import rollupPluginString from 'rollup-plugin-string';
 
 import version from './tools/version';
-import packageJson from './package';
+import packageJson from './package.json';
+
+const banner = '/** ' + version.copyright + ' */\n';
 
 export default {
   input: './src/index.js',
-  banner: '/** ' + version.copyright + ' */\n',
   plugins: [
     rollupPluginReplace({
       PACKAGE_VERSION: JSON.stringify(version.combined),
+      DEBUG: false,
     }),
     rollupPluginNodeBuiltins(),
     rollupPluginString({
@@ -63,10 +65,12 @@ export default {
     format: 'umd',
     name: 'Miew',
     file: 'build/' + packageJson.main,
+    banner,
     sourcemap: true,
   }, {
     format: 'es',
     file: 'build/' + packageJson.module,
+    banner,
     sourcemap: true,
   }],
 };
