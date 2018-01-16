@@ -60,7 +60,7 @@ describe('utils/logger', function() {
       for (let i = 0, n = levels.length; i < n; ++i) {
         log.level = levels[i];
         for (let j = 0; j < n; ++j) {
-          callback.reset();
+          callback.resetHistory();
           log.message(levels[j], levels[j]);
           if (j >= i) {
             expect(callback).to.be.calledOnce();
