@@ -23,6 +23,20 @@ THREE.Object3D.prototype.updateMatrixWorldRecursive = function() {
   }
   this.updateMatrixWorld();
 };
+// add object to parent, saving objects' world transform
+THREE.Object3D.prototype.addSavingWorldTransform = (function() {
+  const _worldMatrixInverse = new THREE.Matrix4();
+
+  return function(object) {
+    if (object instanceof THREE.Object3D) {
+      _worldMatrixInverse.getInverse(this.matrixWorld);
+      _worldMatrixInverse.multiply(object.matrixWorld);
+      object.matrix.copy(_worldMatrixInverse);
+      object.matrix.decompose(object.position, object.quaternion, object.scale);
+      this.add(object);
+    }
+  };
+}());
 
 // render a tiny transparent quad in the center of the screen
 THREE.WebGLRenderer.prototype.renderDummyQuad = (function() {
@@ -393,6 +407,17 @@ function applySelectionMaterial(geo) {
   });
 }
 
+function getMiddlePoint(point1, point2, optionalTarget) {
+  const result = optionalTarget || new THREE.Vector3();
+
+  result.set(0, 0, 0);
+  result.addScaledVector(point1, 0.5);
+  result.addScaledVector(point2, 0.5);
+
+  return result;
+}
+
+
 export default {
   calcCylinderMatrix : _calcCylinderMatrix,
   calcChunkMatrix : _calcChunkMatrix,
@@ -408,6 +433,7 @@ export default {
   processTransparentMaterial: processTransparentMaterial,
   makeVisibleMeshes: makeVisibleMeshes,
   applySelectionMaterial: applySelectionMaterial,
+  getMiddlePoint: getMiddlePoint,
   LAYERS: LAYERS,
 };
 

@@ -526,7 +526,6 @@ Miew.prototype._initGfx = function() {
   this._gfx = gfx;
   this._showCanvas();
   this._toggleWebVR(settings.now.stereo === 'WEBVR');
-  //this._addControllers();
 
   this._container.appendChild(gfx.renderer2d.getElement());
 
@@ -870,26 +869,77 @@ Miew.prototype._toggleWebVR = (function() {
   const _controller2 = new ViveController(1);
 
   // visualize controllers with cylinders
-  var geometry = new THREE.CylinderGeometry(0.05, 0.05, 0.4);
-  var material = new UberMaterial({lights: false, overrideColor: true});
+  const geometry = new THREE.CylinderGeometry(0.05, 0.05, 0.4);
+  const material = new UberMaterial({lights: false, overrideColor: true});
   material.setUberOptions({fixedColor: new THREE.Color(0x4444ff)});
   material.updateUniforms();
-  var cylinder1 = new THREE.Mesh(geometry, material);
+  const cylinder1 = new THREE.Mesh(geometry, material);
   cylinder1.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   _controller1.add(cylinder1);
-  var cylinder2 = new THREE.Mesh(geometry, material);
+  const cylinder2 = new THREE.Mesh(geometry, material);
   cylinder2.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
   _controller2.add(cylinder2);
 
   return function(enable) {
     const self = this;
     const gfx = self._gfx;
+    this._pressedGripsCounter = 0;
     const  renderer = gfx ? gfx.renderer : null;
     if (!renderer) {
       throw new Error('No renderer is available to toggle WebVR');
     } else if (!gfx.camera) {
       throw new Error('No camera is available to toggle WebVR');
     }
+
+    self._distance = 0;
+    self._scalingPivot = new THREE.Object3D();
+
+    function startScalingByControllers() {
+
+      self._distance = self._controller1.position.distanceTo(self._controller2.position);
+      gfxutils.getMiddlePoint(self._controller1.position, self._controller2.position, self._scalingPivot.position);
+      // reset scale
+      self._scalingPivot.scale.set(1, 1, 1);
+      self._scalingPivot.updateMatrix();
+      self._scalingPivot.updateMatrixWorld();
+      // link pivot to user
+      self._controller1.parent.add(self._scalingPivot);
+      // link molecule to pivot
+      self._scalingPivot.addSavingWorldTransform(self._webVRWorld);
+    }
+
+    function stopScalingByControllers() {
+      gfx.scene.addSavingWorldTransform(self._webVRWorld);
+    }
+
+    function handleGripsDown(event) {
+      self._pressedGripsCounter++;
+      console.log(`grips count ${self._pressedGripsCounter}`);
+      if (self._pressedGripsCounter === 2) {
+        gfx.scene.addSavingWorldTransform(self._webVRWorld);
+        startScalingByControllers();
+      } else if (self._pressedGripsCounter === 1) {
+        event.target.addSavingWorldTransform(self._webVRWorld);
+      }
+    }
+
+    function handleGripsUp(event) {
+      self._pressedGripsCounter--;
+      console.log(`grips count ${self._pressedGripsCounter}`);
+      if (self._pressedGripsCounter === 1) {
+        stopScalingByControllers();
+        // reattach molecule to other controller
+        const anotherController = event.target === self._controller1 ? self._controller2 : self._controller1;
+        anotherController.addSavingWorldTransform(self._webVRWorld);
+      } else if (self._pressedGripsCounter === 0) {
+        gfx.scene.addSavingWorldTransform(self._webVRWorld);
+      }
+    }
+
+    _controller1.addEventListener('gripsdown', handleGripsDown);
+    _controller1.addEventListener('gripsup', handleGripsUp);
+    _controller2.addEventListener('gripsdown', handleGripsDown);
+    _controller2.addEventListener('gripsup', handleGripsUp);
 
     if (enable) {
       // store common camera
@@ -914,7 +964,6 @@ Miew.prototype._toggleWebVR = (function() {
       }
 
       self.settings.now.fog = false;
-      // self._repositionMoleculeForWebVR(gfx, _webVRWorld);
       //turn on webvr transformation
       gfx.scene.add(self._webVRWorld);
       self._webVRWorld.add(gfx.root);
@@ -945,10 +994,35 @@ Miew.prototype._toggleWebVR = (function() {
   };
 }());
 
+Miew.prototype._updateMoleculeScaleWebVR = function() {
+  if (!this._controller1 || !this._controller2) {
+    return;
+  }
+  this._controller1.update();
+  this._controller2.update();
+
+  const self = this;
+
+  function updateScalingByControllers() {
+    // recalc scaling pivot
+    gfxutils.getMiddlePoint(self._controller1.position, self._controller2.position, self._scalingPivot.position);
+    // recalc scaler
+    const dist = self._controller1.position.distanceTo(self._controller2.position);
+    const scaler = dist / self._distance;
+    self._scalingPivot.scale.multiplyScalar(scaler);
+    // save cur distance for next frame
+    self._distance = dist;
+  }
+
+  if (self._pressedGripsCounter === 2) {
+    updateScalingByControllers();
+  }
+};
+
 Miew.prototype._repositionMoleculeForWebVR = function(gfx, _matWorld) {
   gfx = gfx || this._gfx;
   const device = this._getWebVRDevice(gfx.renderer);
-  let camDir = new THREE.Vector3(0, 0, -1);
+  let camDir = new THREE.Vector3(0, 0, -1); //FIXME get from camera
   let pose;
 
   if (device.pose) {  // WebVR emulation
@@ -968,27 +1042,12 @@ Miew.prototype._repositionMoleculeForWebVR = function(gfx, _matWorld) {
   }
   const pos = pose.position || [0, 0, 0];
   this._webVRWorld.position.fromArray(pos);
-  this._webVRWorld.position.addScaledVector(camDir, 2.5);
+  this._webVRWorld.position.addScaledVector(camDir, 1.3);
 };
 
 Miew.prototype._getWebVRDevice = function(renderer) {
   const vr = this._gfx.renderer.vr || renderer.vr;
   return (vr && vr.enabled) ? vr.getDevice() : null;
-};
-
-Miew.prototype._addControllers = function() {
-
-  this._controller1 = new ViveController(0);
-  //this._gfx.scene.add(this._controller1);
-  this._controller2 = new ViveController(1);
-  //this._gfx.scene.add(this._controller1);
-
-  // visualize controllers with cylinders
-  var geometry = new THREE.CylinderGeometry(5, 5, 20, 4);
-  var material = new THREE.MeshBasicMaterial({color: 0xffff00});
-  var cylinder = new THREE.Mesh(geometry, material);
-  this._controller1.add(cylinder);
-  this._controller2.add(cylinder);
 };
 
 Miew.prototype._getBSphereRadius = function() {
@@ -1037,9 +1096,8 @@ Miew.prototype._onUpdate = function() {
 
   this._updateFog();
 
-  if (this._controller1 && this._controller2 && this._gfx.renderer.vr.enabled) {
-    this._controller1.update();
-    this._controller2.update();
+  if (this._gfx.renderer.vr.enabled) {
+    this._updateMoleculeScaleWebVR();
   }
 };
 
@@ -3912,4 +3970,3 @@ _.assign(Miew, /** @lends Miew */ {
 });
 
 export default Miew;
-
