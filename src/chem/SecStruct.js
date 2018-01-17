@@ -14,7 +14,7 @@ const HelixFlag = Object.freeze({
   StartAndEnd: 4
 });
 
-const DSSP = Object.freeze({
+export const DSSP = Object.freeze({
   loop: ' ',
   alphahelix: 'H',
   betabridge: 'B',
