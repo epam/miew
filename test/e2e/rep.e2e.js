@@ -139,14 +139,14 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
 
   });
 
-  describe('check correct colour parameters work', function() {
+  describe('check correct color parameters work', function() {
 
     it('load 4V4F with an appropriate orientation and scale', function() {
       return page.runScript(`\
 clear
 load "mmtf:4v4f"
 preset small
-view "1INMtwelGW7+MH5TCNB+nPPgFibut+Q0/vYEbwA=="`)
+view "1HM0iwbqdTz5fQpPCZaEBPfgFibut+Q0/vYEbwA=="`)
         .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('4v4f', this));
@@ -165,10 +165,10 @@ rep 6 s = "chain AI" m = "CA" c = "SQ" mt = "SF"
 rep 7 s = "chain AJ" m = "BS" c = "EL" mt = "SF"`)
         .then(() => page.runScript('build all'))
         .then(() => page.waitUntilRebuildIsDone())
-        .then(() => golden.shouldMatch('4v4f_preColours', this));
+        .then(() => golden.shouldMatch('4v4f_precolors', this));
     });
 
-    it('change colour parameters', function() {
+    it('change color parameters', function() {
       return page.runScript(`\
 rep 0
 color HY gradient = "hot"
@@ -188,7 +188,7 @@ rep 7
 color EL carbon = "purple"`)
         .then(() => page.runScript('build all'))
         .then(() => page.waitUntilRepresentationIs(7, 'BS', 'EL'))
-        .then(() => golden.shouldMatch('4v4f_colours', this));
+        .then(() => golden.shouldMatch('4v4f_colors', this));
     });
 
   });
@@ -242,7 +242,7 @@ mode TX template = 'test atom {{name}}' bg = "adjust" fg = "inverse" horizontalA
 
   });
 
-  describe('assign combinations of seltors and modes via terminal, i. e.', function() {
+  describe('assign combinations of selectors and modes via terminal, i. e.', function() {
     it('build selectors pattern', function() {
       return page.runScript(`\
 set autobuild false
