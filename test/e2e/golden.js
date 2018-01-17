@@ -81,7 +81,6 @@ const report = {
 function _prepareBrowser(width = 1024, height = 768) {
   const getPadding = 'return[window.outerWidth-window.innerWidth,window.outerHeight-window.innerHeight];';
   return driver.executeScript(getPadding)
-    //need to comment the string below, when using Opera browser
     .then((pad) => driver.manage().window().setSize(width + pad[0], height + pad[1]))
     .then(() => driver.getCapabilities())
     .then((caps) => {
@@ -157,6 +156,7 @@ function _matchAsPromised(first, second) {
 function shouldMatch(id, test) {
   const prefix = 'data:image/png;base64,';
   const prefixLength = prefix.length;
+
   return driver.executeScript(() => window.miew && window.miew.screenshot(128))
     .then((dataUrl) => {
       expect(dataUrl && dataUrl.slice(0, prefixLength)).to.equal(prefix);

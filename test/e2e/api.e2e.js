@@ -1,9 +1,6 @@
 import webdriver from 'selenium-webdriver';
-import firefoxDriver from 'selenium-webdriver/firefox';
-import operaDriver from 'selenium-webdriver/opera';
 import ieDriver from 'selenium-webdriver/ie';
-import chromeDriver from 'selenium-webdriver/chrome';
-import edgeDriver from 'selenium-webdriver/edge';
+
 import EmptyPage from './pages/empty.page';
 import golden from './golden';
 import goldenCfg from './golden.cfg';
@@ -42,13 +39,10 @@ describe('As a third-party developer, I want to', function() {
   this.timeout(0);
   this.slow(1000);
 
-  //be aware to use 'MicrosoftEdge' instead of 'edge' to use it
   before(function() {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
-      .setOperaOptions(new operaDriver.Options()
-        .setOperaBinaryPath('C:\\...\\opera.exe'))
       .build();
 
     return golden.startup(driver, cfg)
@@ -107,12 +101,11 @@ describe('As a third-party developer, I want to', function() {
         }
       }, '1crn_TU_SQ_LN_UN'));
 
-
       it('specify initial position and orientation so that exactly the same picture is reproduced', api(() => {
         window.miew = new window.Miew({
           settings: {interpolateViews: false},
           load: '../data/1CRN.pdb',
-          view: '1+n4pwTVeI8Erh8LAZHS5PcVcM70wyDlAXe38Pw=='
+          view: '1+n4pwTVeI8Erh8LAZHS5PcVcM70wyDlAXe38Pw==',
         });
         if (miew.init()) {
           miew.run();
@@ -129,6 +122,7 @@ describe('As a third-party developer, I want to', function() {
           });
         }
       }, '1crn_TU_SQ_LN_UN'));
+
     });
 
     describeGroup('(multiple data sets)', function() {

@@ -1,9 +1,6 @@
 import webdriver from 'selenium-webdriver';
-import firefoxDriver from 'selenium-webdriver/firefox';
-import operaDriver from 'selenium-webdriver/opera';
 import ieDriver from 'selenium-webdriver/ie';
-import chromeDriver from 'selenium-webdriver/chrome';
-import edgeDriver from 'selenium-webdriver/edge';
+
 import chai, {expect} from 'chai';
 import dirtyChai from 'dirty-chai';
 import _ from 'lodash';
@@ -28,16 +25,10 @@ describe('As a power user, I want to', function() {
   this.timeout(0);
   this.slow(1000);
 
-  //be aware to call 'MicrosoftEdge' instead of 'edge' to use it
   before(function() {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
-      .setFirefoxOptions(new firefoxDriver.Options())
-      .setChromeOptions(new chromeDriver.Options())
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
-      .setEdgeOptions(new edgeDriver.Options())
-      .setOperaOptions(new operaDriver.Options()
-        .setOperaBinaryPath('C:\\...\\opera.exe'))
       .build();
 
     return golden.startup(driver, cfg)
@@ -98,7 +89,6 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
 
     it('apply "small" preset', function() {
       return page.runScript('preset small')
-        .then(() => page.waitUntilTitleContains('1AID'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
     });
@@ -110,7 +100,6 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
           _.each(colorers, (colorer) => {
             suite.addTest(it(`set ${mode.name} mode with ${colorer.name} coloring`, function() {
               return page.runScript(`clear\nrep 0 m=${mode.id} c=${colorer.id}`)
-                .then(() => page.waitUntilTitleContains('1AID'))
                 .then(() => page.waitUntilRepresentationIs(0, mode.id, colorer.id))
                 .then(() => golden.shouldMatch(`1aid_${mode.id}_${colorer.id}`, this));
             }));
@@ -118,20 +107,19 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
         });
       });
     });
+
   });
 
   describe('assign all materials via terminal, i.e.', function() {
 
     it('apply "small" preset', function() {
       return page.runScript('preset small')
-        .then(() => page.waitUntilTitleContains('1AID'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
     });
 
     it('add a surface', function() {
       return page.runScript('add m=QS')
-        .then(() => page.waitUntilTitleContains('1AID'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_QS_EL', this));
     });
@@ -142,13 +130,13 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
         _.each(materials, (material) => {
           suite.addTest(it(`set ${material.name} material`, function() {
             return page.runScript(`clear\nrep 1 m=QS mt=${material.id}`)
-              .then(() => page.waitUntilTitleContains('1AID'))
               .then(() => page.waitUntilRepresentationIs(1, 'QS', 'EL'))
               .then(() => golden.shouldMatch(`1aid_QS_EL_${material.id}`, this));
           }));
         });
       });
     });
+
   });
 
   describe('check correct colour parameters work', function() {
@@ -176,7 +164,6 @@ rep 5 s = "chain AH" m = "CA" c = "UN" mt = "SF"
 rep 6 s = "chain AI" m = "CA" c = "SQ" mt = "SF"
 rep 7 s = "chain AJ" m = "BS" c = "EL" mt = "SF"`)
         .then(() => page.runScript('build all'))
-        .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('4v4f_preColours', this));
     });
@@ -200,10 +187,10 @@ color SQ gradient = "blue-red"
 rep 7
 color EL carbon = "purple"`)
         .then(() => page.runScript('build all'))
-        .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRepresentationIs(7, 'BS', 'EL'))
         .then(() => golden.shouldMatch('4v4f_colours', this));
     });
+
   });
 
   describe('check correct mode parameters work', function() {
@@ -222,7 +209,6 @@ rep 8 s = "chain AI" m = "BS" c = "EL"
 rep 9 s = "chain AJ" m = "BS" c = "EL"
 rep 10 s = "chain A5" m = "BS" c = "RT"`)
         .then(() => page.runScript('build all'))
-        .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('4v4f_prepare', this));
     });
@@ -250,10 +236,10 @@ mode SE probeRadius = 3 zClip = true wireframe = true subset = "elem N"
 rep 10
 mode TX template = 'test atom {{name}}' bg = "adjust" fg = "inverse" horizontalAlign = "right"`)
         .then(() => page.runScript('build all'))
-        .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRepresentationIs(10, 'TX', 'RT'))
         .then(() => golden.shouldMatch('4v4f_params', this));
     });
+
   });
 
   describe('assign combinations of seltors and modes via terminal, i. e.', function() {
@@ -281,7 +267,6 @@ rep 17 s='chain AK and altloc " "' m=BS c=CH mt=SF
 rep 18 s="chain AH and polarh" m=BS c=EL mt=SF
 rep 19 s="chain AH and nonpolarh" m=BS c=EL mt=SF`)
         .then(() => page.runScript('build all'))
-        .then(() => page.waitUntilTitleContains('4V4F'))
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('4v4f_selectors', this));
     });
@@ -298,12 +283,13 @@ rep 19 s="chain AH and nonpolarh" m=BS c=EL mt=SF`)
           suite.addTest(it(`set ${mode.name} mode with all selectors`, function() {
             return page.runScript(command)
               .then(() => page.runScript('build all'))
-              .then(() => page.waitUntilTitleContains('4V4F'))
               .then(() => page.waitUntilRepresentationIs(19, mode.id, 'EL'))
               .then(() => golden.shouldMatch(`4v4f_${mode.id}`, this));
           }));
         });
       });
     });
+
   });
+
 });
