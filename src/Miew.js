@@ -12,6 +12,7 @@ import JobHandle from './utils/JobHandle';
 import options from './options';
 import settings from './settings';
 import chem from './chem';
+import SecondaryStructureMap, {DSSP} from './chem/SecStruct';
 import Visual from './Visual';
 import ComplexVisual from './ComplexVisual';
 import VolumeVisual from './VolumeVisual';
@@ -50,7 +51,10 @@ var
   Atom = chem.Atom,
   Residue = chem.Residue,
   Chain = chem.Chain,
-  Molecule = chem.Molecule;
+  Molecule = chem.Molecule,
+  Strand = chem.Strand,
+  Sheet = chem.Sheet,
+  Helix = chem.Helix;
 
 var EDIT_MODE = {COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2};
 
@@ -3419,6 +3423,82 @@ Miew.prototype.projected = function(fullAtomName, complexName) {
     x: (pos.x + 1.0) * 0.5 * this._gfx.width,
     y: (1.0 - pos.y) * 0.5 * this._gfx.height
   };
+};
+
+/**
+ * Replace secondary structure with calculated one
+ * @param {string} complexName - complex name
+ * @returns {boolean}
+ */
+Miew.prototype.secondary = function(complexName) {
+  let visual = this._getComplexVisual(complexName);
+  if (!visual) {
+    return false;
+  }
+
+  let complex = visual.getComplex();
+  let ssm = new SecondaryStructureMap(complex);
+  if (ssm === null) {
+    return false;
+  }
+
+  let helixTypes = {};
+  helixTypes[DSSP.alphahelix] = 1;
+  helixTypes[DSSP.helix_3] = 3;
+  helixTypes[DSSP.helix_5] = 5;
+
+  let helices = [];
+  let sheets = [];
+  let curHelix = null;
+  let curStrand = null;
+  for (let i = 0; i < complex.getResidues().length; ++i) {
+    let r = complex.getResidues()[i];
+    r._secondary = null;
+
+    let htype = helixTypes[ssm._ss[i]];
+    if (htype) {
+      if (curHelix === null) {
+        curHelix = new Helix(helices.length + 1, '', r, r, htype, '', 0);
+        helices.push(curHelix);
+      }
+      r._secondary = curHelix;
+      curHelix._residues.push(r);
+      curHelix._end = r;
+      curHelix._length++;
+    } else if (curHelix) {
+      curHelix = null;
+    }
+
+    if (ssm._ss[i] === DSSP.strand) {
+      if (curStrand === null) {
+        let curSheet = sheets[ssm._sheet[i]];
+        if (typeof curSheet === 'undefined') {
+          curSheet = sheets[ssm._sheet[i]] = new Sheet('', 0);
+        }
+        curStrand = new Strand(curSheet, r, r, 0, null, null);
+        curSheet.addStrand(curStrand);
+        curSheet._width++;
+      }
+      r._secondary = curStrand;
+      curStrand._residues.push(r);
+      curStrand._end = r;
+    } else if (curStrand) {
+      curStrand = null;
+    }
+  }
+
+  complex._helices = helices;
+  complex._sheets = sheets.filter(_s => true); // squeeze sheets array
+
+  // rebuild dependent representations (cartoon or ss-colored)
+  for (let r of visual._reprList) {
+    if (r.mode.id === 'CA' ||
+        r.colorer.id === 'SS') {
+      r.needsRebuild = true;
+    }
+  }
+
+  return true;
 };
 
 const rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
