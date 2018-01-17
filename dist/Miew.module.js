@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.10 Copyright (c) 2015-2017 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.11 Copyright (c) 2015-2018 EPAM Systems, Inc. */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -62047,12 +62047,17 @@ function getUrlParametersAsDict(url) {
 
 function resolveURL(str) {
   if (typeof URL !== 'undefined') {
-    if (typeof window !== 'undefined') {
-      return new URL(str, window.location).href;
-    } else {
-      return new URL(str).href;
+    try {
+      if (typeof window !== 'undefined') {
+        return new URL(str, window.location).href;
+      } else {
+        return new URL(str).href;
+      }
+    } catch (error) {
+      // IE 11 has a URL object with no constructor available so just try a different approach instead
     }
-  } else if (typeof document !== 'undefined') {
+  }
+  if (typeof document !== 'undefined') {
     var anchor = document.createElement('a');
     anchor.href = str;
     return anchor.href;
@@ -62081,7 +62086,7 @@ function generateRegExp(symbolStr) {
 ////////////////////////////////////////////////////////////////////////////
 // Create HTML element
 
-function createElement$2(tag, attrs, content) {
+function createElement(tag, attrs, content) {
   var element = document.createElement(tag);
   var i, n;
   if (attrs) {
@@ -62435,7 +62440,7 @@ var utils = {
   getUrlParametersAsDict: getUrlParametersAsDict,
   resolveURL: resolveURL,
   generateRegExp: generateRegExp,
-  createElement: createElement$2,
+  createElement: createElement,
   deriveClass: deriveClass,
   deriveDeep: deriveDeep,
   hexColor: hexColor,
@@ -64182,7 +64187,7 @@ Element.getByName = function (element) {
  * @exports Atom
  * @constructor
  */
-function Atom$1(residue, name, type, position, role, het, serial, location, occupancy, temperature, charge) {
+function Atom(residue, name, type, position, role, het, serial, location, occupancy, temperature, charge) {
   this._index = -1;
   this._residue = residue;
   if (name instanceof AtomName) {
@@ -64212,9 +64217,9 @@ function Atom$1(residue, name, type, position, role, het, serial, location, occu
 
   this.flags = 0x0000;
   if (type.name === 'H') {
-    this.flags |= Atom$1.Flags.HYDROGEN;
+    this.flags |= Atom.Flags.HYDROGEN;
   } else if (type.name === 'C') {
-    this.flags |= Atom$1.Flags.CARBON;
+    this.flags |= Atom.Flags.CARBON;
   }
 }
 
@@ -64224,7 +64229,7 @@ function Atom$1(residue, name, type, position, role, het, serial, location, occu
  * @enum {number}
  * @readonly
  */
-Atom$1.Flags = {
+Atom.Flags = {
   CARBON: 0x0001,
   // OXYGEN: 0x0002,
   // NITROGEN: 0x0004,
@@ -64237,39 +64242,39 @@ Atom$1.Flags = {
  * Get atom full name.
  * @returns {AtomName} Atom full name.
  */
-Atom$1.prototype.getName = function () {
+Atom.prototype.getName = function () {
   return this._name;
 };
 
-Atom$1.prototype.getPosition = function () {
+Atom.prototype.getPosition = function () {
   return this._position;
 };
 
-Atom$1.prototype.getResidue = function () {
+Atom.prototype.getResidue = function () {
   return this._residue;
 };
 
-Atom$1.prototype.getSerial = function () {
+Atom.prototype.getSerial = function () {
   return this._serial;
 };
 
-Atom$1.prototype.getBonds = function () {
+Atom.prototype.getBonds = function () {
   return this._bonds;
 };
 
-Atom$1.prototype.isHet = function () {
+Atom.prototype.isHet = function () {
   return this._het;
 };
 
-Atom$1.prototype.isHydrogen = function () {
+Atom.prototype.isHydrogen = function () {
   return this.element.number === 1;
 };
 
-Atom$1.prototype.getValence = function () {
+Atom.prototype.getValence = function () {
   return this._valence === -1 ? 0 : this._valence;
 };
 
-Atom$1.prototype.getVisualName = function () {
+Atom.prototype.getVisualName = function () {
   var name = this.getName();
   if (name.getString().length > 0) {
     return name.getString();
@@ -64278,7 +64283,7 @@ Atom$1.prototype.getVisualName = function () {
   }
 };
 
-Atom$1.prototype.forEachBond = function (process) {
+Atom.prototype.forEachBond = function (process) {
   var bonds = this._bonds;
   for (var i = 0, n = bonds.length; i < n; ++i) {
     process(bonds[i]);
@@ -64286,7 +64291,7 @@ Atom$1.prototype.forEachBond = function (process) {
 };
 
 /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-Atom$1.prototype.isLabelVisible = function () {
+Atom.prototype.isLabelVisible = function () {
   if (this.getName().getNode() !== null) {
     return true;
   }
@@ -64306,7 +64311,7 @@ Atom$1.prototype.isLabelVisible = function () {
   return true;
 };
 
-Atom$1.prototype.getHydrogenCountBoron = function () {
+Atom.prototype.getHydrogenCountBoron = function () {
   //examples
   //BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
   var valence = 3; //hardcoded as 3
@@ -64314,7 +64319,7 @@ Atom$1.prototype.getHydrogenCountBoron = function () {
   return Math.max(0, hc);
 };
 
-Atom$1.prototype.getHydrogenCountTin = function () {
+Atom.prototype.getHydrogenCountTin = function () {
   var valence = this._valence;
   if (valence === -1) {
     valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this._radicalCount;
@@ -64328,11 +64333,11 @@ Atom$1.prototype.getHydrogenCountTin = function () {
   return Math.max(0, defVal - valence);
 };
 
-Atom$1.prototype.getHydrogenCountMetal = function () {
+Atom.prototype.getHydrogenCountMetal = function () {
   return 0;
 };
 
-Atom$1.prototype.getHydrogenCountGroup14 = function () {
+Atom.prototype.getHydrogenCountGroup14 = function () {
   var valence = this._valence;
   if (valence === -1) {
     valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this._radicalCount;
@@ -64343,7 +64348,7 @@ Atom$1.prototype.getHydrogenCountGroup14 = function () {
   return Math.max(0, defVal - valence);
 };
 
-Atom$1.prototype.getHydrogenCountNonMetal = function () {
+Atom.prototype.getHydrogenCountNonMetal = function () {
   // apply from Reaxys Drawing Guidelines (Version 2.04
   // January 2012) Standard Valence – (Valence + Charge + Number of Radical(s))
   var valence = this._valence;
@@ -64356,7 +64361,7 @@ Atom$1.prototype.getHydrogenCountNonMetal = function () {
   return Math.max(0, defVal - valence);
 };
 
-Atom$1.prototype.getHydrogenCountHydrogen = function () {
+Atom.prototype.getHydrogenCountHydrogen = function () {
   if (this.getAtomBondsCount() === 0 && this.getCharge() === 0 && this.getValence() === 0 && this._radicalCount === 0) {
     return 1;
   }
@@ -64364,7 +64369,7 @@ Atom$1.prototype.getHydrogenCountHydrogen = function () {
   return 0;
 };
 
-Atom$1.prototype.getHydrogenCount = function () {
+Atom.prototype.getHydrogenCount = function () {
   if (this._hydrogenCount >= 0) {
     return this._hydrogenCount;
   }
@@ -64431,7 +64436,7 @@ function getCylinderCount(bondOrder) {
   return bondOrder < 2 ? 1 : bondOrder;
 }
 
-Atom$1.prototype.getAtomBondsCount = function () {
+Atom.prototype.getAtomBondsCount = function () {
   var explicitBonds = this.getBonds();
   var ebCount = 0;
   for (var i = 0; i < explicitBonds.length; i++) {
@@ -64440,7 +64445,7 @@ Atom$1.prototype.getAtomBondsCount = function () {
   return ebCount;
 };
 
-Atom$1.prototype.findSuitableValence = function (valence) {
+Atom.prototype.findSuitableValence = function (valence) {
   var val = this.element.hydrogenValency;
   var defVal = val[val.length - 1];
   for (var i = 0; i < val.length; i++) {
@@ -64452,15 +64457,15 @@ Atom$1.prototype.findSuitableValence = function (valence) {
   return defVal;
 };
 
-Atom$1.prototype.getCharge = function () {
+Atom.prototype.getCharge = function () {
   return this._charge;
 };
 
-Atom$1.prototype.getLocation = function () {
+Atom.prototype.getLocation = function () {
   return this._location;
 };
 
-Atom$1.prototype.getFullName = function () {
+Atom.prototype.getFullName = function () {
   var name = '';
   if (this._residue !== null) {
     if (this._residue._chain !== null) {
@@ -64865,7 +64870,7 @@ var cCylinderTarget = [{
  * @exports Residue
  * @constructor
  */
-function Residue$1(chain, type, sequence, icode) {
+function Residue(chain, type, sequence, icode) {
   this._chain = chain;
   this._component = null;
   this._type = type;
@@ -64890,34 +64895,34 @@ function Residue$1(chain, type, sequence, icode) {
 }
 
 // Getters and setters
-Residue$1.prototype.getChain = function () {
+Residue.prototype.getChain = function () {
   return this._chain;
 };
 
-Residue$1.prototype.getMolecule = function () {
+Residue.prototype.getMolecule = function () {
   return this._molecule;
 };
 
-Residue$1.prototype.getType = function () {
+Residue.prototype.getType = function () {
   return this._type;
 };
 
-Residue$1.prototype.getSequence = function () {
+Residue.prototype.getSequence = function () {
   return this._sequence;
 };
 
-Residue$1.prototype.getSecondary = function () {
+Residue.prototype.getSecondary = function () {
   return this._secondary;
 };
 
-Residue$1.prototype.getICode = function () {
+Residue.prototype.getICode = function () {
   return this._icode;
 };
 
 // Other methods
 
-Residue$1.prototype.addAtom = function (name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge) {
-  var atom = new Atom$1(this, name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
+Residue.prototype.addAtom = function (name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge) {
+  var atom = new Atom(this, name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
   var complex = this._chain.getComplex();
   complex.addAtom(atom);
   this._atoms.push(atom); // TODO: change to range
@@ -64925,11 +64930,11 @@ Residue$1.prototype.addAtom = function (name, type, xyz, role, het, serial, altL
   return atom;
 };
 
-Residue$1.prototype.getAtomCount = function () {
+Residue.prototype.getAtomCount = function () {
   return this._atoms.length;
 };
 
-Residue$1.prototype.forEachAtom = function (process) {
+Residue.prototype.forEachAtom = function (process) {
   var atoms = this._atoms;
   for (var i = 0, n = atoms.length; i < n; ++i) {
     if (process(atoms[i])) {
@@ -64938,7 +64943,7 @@ Residue$1.prototype.forEachAtom = function (process) {
   }
 };
 
-Residue$1.prototype._findAtomByName = function (name) {
+Residue.prototype._findAtomByName = function (name) {
   var res = null;
   this.forEachAtom(function (atom) {
     if (atom._name._name === name) {
@@ -64950,7 +64955,7 @@ Residue$1.prototype._findAtomByName = function (name) {
   return res;
 };
 
-Residue$1.prototype._findFirstAtomInList = function (names) {
+Residue.prototype._findFirstAtomInList = function (names) {
   var res = null;
   for (var i = 0; i < names.length; ++i) {
     res = this._findAtomByName(names[i]);
@@ -64961,7 +64966,7 @@ Residue$1.prototype._findFirstAtomInList = function (names) {
   return res;
 };
 
-Residue$1.prototype.collectMask = function () {
+Residue.prototype.collectMask = function () {
   var mask = 0xffffffff;
   var atoms = this._atoms;
   for (var i = 0, n = atoms.length; i < n; ++i) {
@@ -64970,7 +64975,7 @@ Residue$1.prototype.collectMask = function () {
   this._mask = mask;
 };
 
-Residue$1.prototype.getCylinderTargetList = function () {
+Residue.prototype.getCylinderTargetList = function () {
   var type = this._type._name;
   for (var i = 0, n = cCylinderTarget.length; i < n; ++i) {
     for (var j = 0, m = cCylinderTarget[i].types.length; j < m; ++j) {
@@ -64982,7 +64987,7 @@ Residue$1.prototype.getCylinderTargetList = function () {
   return null;
 };
 
-Residue$1.prototype._detectLeadWing = function (dst, next, getAtomPosition) {
+Residue.prototype._detectLeadWing = function (dst, next, getAtomPosition) {
   var leadAtom = this._findFirstAtomInList(cNucleicControlNames);
   var wingStart = this._findFirstAtomInList(cNucleicWing1Names);
   var wingEnd = this._findFirstAtomInList(cNucleicWing2Names);
@@ -65013,7 +65018,7 @@ Residue$1.prototype._detectLeadWing = function (dst, next, getAtomPosition) {
   dst._cylinders = [getAtomPosition(cylSource), getAtomPosition(cylTarget)];
 };
 
-Residue$1.prototype.calcWing = function (prevLeadPos, currLeadPos, prevWingPos, prevWing) {
+Residue.prototype.calcWing = function (prevLeadPos, currLeadPos, prevWingPos, prevWing) {
   var vectorA = currLeadPos.clone().sub(prevLeadPos);
   var vectorB = prevLeadPos.clone().sub(prevWingPos);
   vectorB.crossVectors(vectorA, vectorB);
@@ -65024,7 +65029,7 @@ Residue$1.prototype.calcWing = function (prevLeadPos, currLeadPos, prevWingPos, 
   return vectorB;
 };
 
-Residue$1.prototype._innerFinalize = function (prevRes, prev, nextRes, dst, getAtomPosition) {
+Residue.prototype._innerFinalize = function (prevRes, prev, nextRes, dst, getAtomPosition) {
   var bFirstInChain = prev === null;
 
   var lp = getAtomPosition(this._leadAtom);
@@ -65044,14 +65049,14 @@ Residue$1.prototype._innerFinalize = function (prevRes, prev, nextRes, dst, getA
   dst._controlPoint = currLeadPos;
 };
 
-Residue$1.prototype._finalize2 = function (prev, next) {
+Residue.prototype._finalize2 = function (prev, next) {
   //Should be called AFTER first finalize
   this._innerFinalize(prev, prev, next, this, function (atom) {
     return atom._position;
   });
 };
 
-Residue$1.prototype.isConnected = function (anotherResidue) {
+Residue.prototype.isConnected = function (anotherResidue) {
   if (this._chain !== anotherResidue._chain) {
     return false;
   }
@@ -65073,7 +65078,7 @@ Residue$1.prototype.isConnected = function (anotherResidue) {
   return res;
 };
 
-Residue$1.prototype._finalize = function () {
+Residue.prototype._finalize = function () {
   var self = this;
   this._firstAtom = this._atoms[0];
   this._lastAtom = this._atoms[this._atoms.length - 1];
@@ -65120,7 +65125,7 @@ Residue$1.prototype._finalize = function () {
  * @exports Chain
  * @constructor
  */
-function Chain$1(complex, name) {
+function Chain(complex, name) {
   this._complex = complex;
   this._name = name;
   this._mask = 1 | 0;
@@ -65132,15 +65137,15 @@ function Chain$1(complex, name) {
   this.maxSequence = Number.NEGATIVE_INFINITY;
 }
 
-Chain$1.prototype.getComplex = function () {
+Chain.prototype.getComplex = function () {
   return this._complex;
 };
 
-Chain$1.prototype.getName = function () {
+Chain.prototype.getName = function () {
   return this._name;
 };
 
-Chain$1.prototype.getResidues = function () {
+Chain.prototype.getResidues = function () {
   return this._residues;
 };
 
@@ -65150,7 +65155,7 @@ Chain$1.prototype.getResidues = function () {
  * @param {string} iCode insertion code
  * @returns {*} Residue or null if not found
  */
-Chain$1.prototype.findResidue = function (seqNum, iCode) {
+Chain.prototype.findResidue = function (seqNum, iCode) {
   var residues = this._residues;
 
   for (var i = 0, n = residues.length; i < n; ++i) {
@@ -65163,7 +65168,7 @@ Chain$1.prototype.findResidue = function (seqNum, iCode) {
   return null;
 };
 
-Chain$1.prototype._finalize = function () {
+Chain.prototype._finalize = function () {
   var residues = this._residues;
 
   var prev = null;
@@ -65187,7 +65192,7 @@ Chain$1.prototype._finalize = function () {
   }
 };
 
-Chain$1.prototype.updateToFrame = function (frameData) {
+Chain.prototype.updateToFrame = function (frameData) {
   var residues = this._residues;
   var prev = null;
   var prevData = null;
@@ -65216,12 +65221,12 @@ Chain$1.prototype.updateToFrame = function (frameData) {
  * @param {string} iCode - Insertion code.
  * @returns {Residue} - Newly created residue instance.
  */
-Chain$1.prototype.addResidue = function (name, sequence, iCode) {
+Chain.prototype.addResidue = function (name, sequence, iCode) {
   var type = this._complex.getResidueType(name);
   if (type === null) {
     type = this._complex.addResidueType(name);
   }
-  var residue = new Residue$1(this, type, sequence, iCode);
+  var residue = new Residue(this, type, sequence, iCode);
   this._complex.addResidue(residue);
   this._residues.push(residue); // TODO: change to range
 
@@ -65237,18 +65242,18 @@ Chain$1.prototype.addResidue = function (name, sequence, iCode) {
   return residue;
 };
 
-Chain$1.prototype.getResidueCount = function () {
+Chain.prototype.getResidueCount = function () {
   return this._residues.length;
 };
 
-Chain$1.prototype.forEachResidue = function (process) {
+Chain.prototype.forEachResidue = function (process) {
   var residues = this._residues;
   for (var i = 0, n = residues.length; i < n; ++i) {
     process(residues[i]);
   }
 };
 
-Chain$1.prototype.collectMask = function () {
+Chain.prototype.collectMask = function () {
   var mask = 0xffffffff;
   var residues = this._residues;
   for (var i = 0, n = residues.length; i < n; ++i) {
@@ -65293,7 +65298,7 @@ Helix.prototype.getName = function () {
 };
 
 Helix.prototype._finalize = function (residueHash, complex) {
-  if (this._start instanceof Residue$1 && this._end instanceof Residue$1) {
+  if (this._start instanceof Residue && this._end instanceof Residue) {
     // no need to convert unified serial numbers to actual references
     return;
   }
@@ -65360,7 +65365,7 @@ Strand.prototype.getStart = function () {
 };
 
 Strand.prototype._finalize = function (serialAtomMap, residueHash, complex) {
-  if (this._start instanceof Residue$1 && this._end instanceof Residue$1) {
+  if (this._start instanceof Residue && this._end instanceof Residue) {
     // no need to convert unified serial numbers to actual references
     return;
   }
@@ -66955,7 +66960,7 @@ defineSelector('PolarH', function (_Selector3) {
   createClass(PolarHSelector, [{
     key: 'includesAtom',
     value: function includesAtom(atom) {
-      return (atom.flags & Atom$1.Flags.NONPOLARH) === Atom$1.Flags.HYDROGEN;
+      return (atom.flags & Atom.Flags.NONPOLARH) === Atom.Flags.HYDROGEN;
     }
   }]);
   return PolarHSelector;
@@ -66972,7 +66977,7 @@ defineSelector('NonPolarH', function (_Selector4) {
   createClass(NonPolarHSelector, [{
     key: 'includesAtom',
     value: function includesAtom(atom) {
-      return (atom.flags & Atom$1.Flags.NONPOLARH) === Atom$1.Flags.NONPOLARH;
+      return (atom.flags & Atom.Flags.NONPOLARH) === Atom.Flags.NONPOLARH;
     }
   }]);
   return NonPolarHSelector;
@@ -67169,38 +67174,38 @@ defineOperator('Or', 3, function (_InfixOperator2) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-var selectors$1 = Object.create(keywords);
+var selectors = Object.create(keywords);
 
 // TODO: Provide consistent module exports
-selectors$1.Selector = Selector;
-selectors$1.RangeListSelector = RangeListSelector;
-selectors$1.ValueListSelector = ValueListSelector;
-selectors$1.Range = Range;
-selectors$1.RangeList = RangeList;
-selectors$1.ValueList = ValueList;
-selectors$1.PrefixOperator = PrefixOperator;
-selectors$1.InfixOperator = InfixOperator;
-selectors$1.Context = Object.create({});
+selectors.Selector = Selector;
+selectors.RangeListSelector = RangeListSelector;
+selectors.ValueListSelector = ValueListSelector;
+selectors.Range = Range;
+selectors.RangeList = RangeList;
+selectors.ValueList = ValueList;
+selectors.PrefixOperator = PrefixOperator;
+selectors.InfixOperator = InfixOperator;
+selectors.Context = Object.create({});
 
-selectors$1.GetSelector = function (key) {
-  if (!selectors$1.Context.hasOwnProperty(key)) {
+selectors.GetSelector = function (key) {
+  if (!selectors.Context.hasOwnProperty(key)) {
     var exc = { message: 'selector ' + key + ' is not registered' };
     throw exc;
   }
-  return selectors$1.Context[key] || NULL_SELECTOR;
+  return selectors.Context[key] || NULL_SELECTOR;
 };
 
-selectors$1.ClearContext = function () {
-  Object.keys(selectors$1.Context).forEach(function (k) {
-    delete selectors$1.Context[k];
+selectors.ClearContext = function () {
+  Object.keys(selectors.Context).forEach(function (k) {
+    delete selectors.Context[k];
   });
 };
 
-selectors$1.keyword = function (key) {
+selectors.keyword = function (key) {
   return keywords[key.toLowerCase()] || keywords.none;
 };
 
-selectors$1.parse = function (str) {
+selectors.parse = function (str) {
   var res = {};
   try {
     res.selector = SelectionParser_1.parse(str);
@@ -67211,7 +67216,7 @@ selectors$1.parse = function (str) {
   return res;
 };
 
-SelectionParser_1.yy = selectors$1;
+SelectionParser_1.yy = selectors;
 SelectionParser_1.yy.parseError = SelectionParser_1.parseError; // FIXME: workaround for incorrect JISON parser generator for AMD module
 
 //////////////////////////////////////////////////////////////////////////////
@@ -67225,7 +67230,7 @@ SelectionParser_1.yy.parseError = SelectionParser_1.parseError; // FIXME: workar
  */
 function BioStructure(complex) {
   this._complex = complex;
-  this._selector = selectors$1.keyword('All')();
+  this._selector = selectors.keyword('All')();
   this._boundaries = {
     boundingBox: new Box3(),
     boundingSphere: new Sphere()
@@ -67348,9 +67353,9 @@ Assembly.prototype.getTransforms = function () {
 
 Assembly.prototype.finalize = function () {
   if (this.chains.length > 0) {
-    this._selector = selectors$1.keyword('Chain')(this.chains);
+    this._selector = selectors.keyword('Chain')(this.chains);
   } else {
-    this._selector = selectors$1.keyword('None')();
+    this._selector = selectors.keyword('None')();
   }
 };
 
@@ -67545,7 +67550,7 @@ var cInvalidVal = -1;
 // 89237 is a large simple number, can be used for pseudo random hash code create
 var cBigPrime = 89237;
 
-function PairCollection(maxPairsEstimate) {
+function AtomPairs(maxPairsEstimate) {
   var i = 0;
 
   this.numPairs = 0;
@@ -67563,7 +67568,7 @@ function PairCollection(maxPairsEstimate) {
 /**
  * Destroy all pairs memory
  */
-PairCollection.prototype.destroy = function () {
+AtomPairs.prototype.destroy = function () {
   this.intBuffer = null;
   this.hashBuffer = null;
 };
@@ -67573,7 +67578,7 @@ PairCollection.prototype.destroy = function () {
  * @param {number} indexA - Index of the 1st vertex.
  * @param {number} indexB - Index of the 2nd vertex.
  */
-PairCollection.prototype.addPair = function (indexA, indexB) {
+AtomPairs.prototype.addPair = function (indexA, indexB) {
   var ia = indexA < indexB ? indexA : indexB;
   var ib = indexA > indexB ? indexA : indexB;
   var codeToAdd = ia + (ib << cMaxNeighbours);
@@ -67860,7 +67865,7 @@ AutoBond.prototype._buildInner = function () {
 
   this._calcBoundingBox();
   var volMap = this._buildGridMap();
-  this._pairCollection = new PairCollection(atoms.length * cEstBondsMultiplier);
+  this._pairCollection = new AtomPairs(atoms.length * cEstBondsMultiplier);
   this._addExistingPairs();
   this._findPairs(volMap);
   this._addPairs();
@@ -68325,7 +68330,7 @@ Complex.prototype.getAtomByFullname = function (fullName) {
  * @returns {Chain} - Newly created chain.
  */
 Complex.prototype.addChain = function (name) {
-  var result = new Chain$1(this, name);
+  var result = new Chain(this, name);
   this._chains.push(result); // TODO: keep chains in dictionary with an (ordered?) array of keys
   return result;
 };
@@ -68704,7 +68709,7 @@ Complex.prototype.buildChemicalFormula = function () {
   //now join the same parts
   var i = formulaParts.length - 1;
   var j = formulaParts.length - 2;
-  for (; i >= 0 && j >= 0;) {
+  while (i >= 0 && j >= 0) {
     var pi = formulaParts[i];
     var pj = formulaParts[j];
     if (!(pi.owner instanceof Complex || pi.owner instanceof Component)) {
@@ -69005,11 +69010,11 @@ Complex.prototype.finalize = function (opts) {
   // mark non-polar hydrogens
   for (i = 0, n = atoms.length; i < n; ++i) {
     var atom = atoms[i];
-    if (atom.flags & Atom$1.Flags.HYDROGEN && atom._bonds.length === 1) {
+    if (atom.flags & Atom.Flags.HYDROGEN && atom._bonds.length === 1) {
       var _bond = atom._bonds[0];
       var other = _bond._left !== atom && _bond._left || _bond._right;
-      if (other.flags & Atom$1.Flags.CARBON) {
-        atom.flags |= Atom$1.Flags.NONPOLARH;
+      if (other.flags & Atom.Flags.CARBON) {
+        atom.flags |= Atom.Flags.NONPOLARH;
       }
     }
   }
@@ -69082,7 +69087,7 @@ Complex.prototype.markAtoms = function (selector, mask) {
   var setMask = mask;
   var clearMask = ~setMask;
   var count = 0;
-  var totalSelector = selectors$1.keyword('And')(selector, this.getSelector());
+  var totalSelector = selectors.keyword('And')(selector, this.getSelector());
 
   this.forEachAtom(function (atom) {
     if (totalSelector.includesAtom(atom)) {
@@ -69927,7 +69932,7 @@ VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function (forEachAtom, di
  * @exports Molecule
  * @constructor
  */
-function Molecule$1(complex, name, index) {
+function Molecule(complex, name, index) {
   this._complex = complex;
   this._name = name || '';
   this._residues = [];
@@ -69935,30 +69940,30 @@ function Molecule$1(complex, name, index) {
   this._index = index || -1; // start with 1
 }
 
-Molecule$1.prototype.getComplex = function () {
+Molecule.prototype.getComplex = function () {
   return this._complex;
 };
 
-Molecule$1.prototype.getName = function () {
+Molecule.prototype.getName = function () {
   return this._name;
 };
 
-Molecule$1.prototype.getResidues = function () {
+Molecule.prototype.getResidues = function () {
   return this._residues;
 };
 
-Molecule$1.prototype.getIndex = function () {
+Molecule.prototype.getIndex = function () {
   return this._index;
 };
 
-Molecule$1.prototype.forEachResidue = function (process) {
+Molecule.prototype.forEachResidue = function (process) {
   var residues = this._residues;
   for (var i = 0, n = residues.length; i < n; ++i) {
     process(residues[i]);
   }
 };
 
-Molecule$1.prototype.collectMask = function () {
+Molecule.prototype.collectMask = function () {
   var mask = 0xffffffff;
   var residues = this._residues;
   for (var i = 0, n = residues.length; i < n; ++i) {
@@ -69968,13 +69973,13 @@ Molecule$1.prototype.collectMask = function () {
 };
 
 var chem = {
-  Atom: Atom$1,
+  Atom: Atom,
   Element: Element,
   AtomName: AtomName,
   Bond: Bond,
-  Residue: Residue$1,
+  Residue: Residue,
   ResidueType: ResidueType,
-  Chain: Chain$1,
+  Chain: Chain,
   Helix: Helix,
   Strand: Strand,
   Sheet: Sheet,
@@ -69983,8 +69988,8 @@ var chem = {
   Complex: Complex,
   Volume: Volume,
   VoxelWorld: VoxelWorld,
-  selectors: selectors$1,
-  Molecule: Molecule$1
+  selectors: selectors,
+  Molecule: Molecule
 };
 
 /**
@@ -70837,19 +70842,19 @@ CollisionSphere.prototype.raycast = function () {
 
 //////////////////////////////////////////////////////////////////////////////
 
-function CollisionSpheresGeo(count) {
+function SphereCollisionGeo(count) {
   this._objects = new Array(count);
   this.boundingSphere = null;
   this.boundingBox = null;
 }
 
-CollisionSpheresGeo.constructor = CollisionSpheresGeo;
+SphereCollisionGeo.constructor = SphereCollisionGeo;
 
-CollisionSpheresGeo.prototype.setSphere = function (idx, position, radius) {
+SphereCollisionGeo.prototype.setSphere = function (idx, position, radius) {
   this._objects[idx] = new CollisionSphere(position, radius);
 };
 
-CollisionSpheresGeo.prototype.raycast = function (raycaster, intersects) {
+SphereCollisionGeo.prototype.raycast = function (raycaster, intersects) {
   // TODO raycast with bounding sphere? How to deal with updates?
   for (var i = 0, n = this._objects.length; i < n; ++i) {
     var inters = this._objects[i].raycast(raycaster);
@@ -70860,7 +70865,7 @@ CollisionSpheresGeo.prototype.raycast = function (raycaster, intersects) {
   }
 };
 
-CollisionSpheresGeo.prototype.computeBoundingBox = function () {
+SphereCollisionGeo.prototype.computeBoundingBox = function () {
   var objects = this._objects;
   var boundingBox = this.boundingBox;
   if (boundingBox === null) {
@@ -70872,7 +70877,7 @@ CollisionSpheresGeo.prototype.computeBoundingBox = function () {
   }
 };
 
-CollisionSpheresGeo.prototype.computeBoundingSphere = function () {
+SphereCollisionGeo.prototype.computeBoundingSphere = function () {
   this.computeBoundingBox();
   var objects = this._objects;
   var boundingBox = this.boundingBox;
@@ -70913,13 +70918,13 @@ function setArrayXYZW(arr, idx, x, y, z, w) {
 
 function InstancedSpheresGeometry(spheresCount, sphereComplexity, useZSprites) {
   InstancedBufferGeometry.call(this);
-  CollisionSpheresGeo.call(this, spheresCount);
+  SphereCollisionGeo.call(this, spheresCount);
   this._sphGeometry = useZSprites ? new PlaneBufferGeometry(2, 2, 1, 1) : new SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
   this._init(spheresCount, this._sphGeometry);
 }
 
 InstancedSpheresGeometry.prototype = Object.create(InstancedBufferGeometry.prototype);
-lodash.mixin(InstancedSpheresGeometry.prototype, CollisionSpheresGeo.prototype);
+lodash.mixin(InstancedSpheresGeometry.prototype, SphereCollisionGeo.prototype);
 InstancedSpheresGeometry.prototype.constructor = InstancedSpheresGeometry;
 
 InstancedSpheresGeometry.prototype.setItem = function (itemIdx, itemPos, itemRad) {
@@ -70985,14 +70990,14 @@ InstancedSpheresGeometry.prototype._init = function (spheresCount, sphereGeo) {
  * THREE.BufferGeometry.
  * @constructor
  */
-function RaycastableObjectsGeometry() {
+function RaycastableBufferGeometry() {
   BufferGeometry.call(this);
 }
 
-RaycastableObjectsGeometry.prototype = Object.create(BufferGeometry.prototype);
-RaycastableObjectsGeometry.prototype.constructor = RaycastableObjectsGeometry;
+RaycastableBufferGeometry.prototype = Object.create(BufferGeometry.prototype);
+RaycastableBufferGeometry.prototype.constructor = RaycastableBufferGeometry;
 
-RaycastableObjectsGeometry.prototype.raycast = function () {
+RaycastableBufferGeometry.prototype.raycast = function () {
   // This method was copied from three.js
   var vA = new Vector3();
   var vB = new Vector3();
@@ -71092,7 +71097,7 @@ RaycastableObjectsGeometry.prototype.raycast = function () {
 }();
 
 var MAX_IDC_16BIT = 65535;
-var VEC_SIZE$1 = 3;
+var VEC_SIZE = 3;
 var tmpColor$1 = new Color();
 
 /**
@@ -71102,7 +71107,7 @@ var tmpColor$1 = new Color();
  * @constructor
  */
 function ChunkedObjectsGeometry(chunkGeo, chunksCount) {
-  RaycastableObjectsGeometry.call(this);
+  RaycastableBufferGeometry.call(this);
 
   if (this.constructor === ChunkedObjectsGeometry) {
     throw new Error('Can not instantiate abstract class!');
@@ -71113,7 +71118,7 @@ function ChunkedObjectsGeometry(chunkGeo, chunksCount) {
   this._init(chunkGeo, chunksCount);
 }
 
-ChunkedObjectsGeometry.prototype = Object.create(RaycastableObjectsGeometry.prototype);
+ChunkedObjectsGeometry.prototype = Object.create(RaycastableBufferGeometry.prototype);
 ChunkedObjectsGeometry.prototype.constructor = ChunkedObjectsGeometry;
 
 ChunkedObjectsGeometry.prototype.startUpdate = function () {
@@ -71131,7 +71136,7 @@ ChunkedObjectsGeometry.prototype.setColor = function (chunkIdx, colorVal) {
   var colors = this._colors;
   var chunkSize = this._chunkSize;
   for (var i = chunkIdx * chunkSize, end = i + chunkSize; i < end; ++i) {
-    var idx = i * VEC_SIZE$1;
+    var idx = i * VEC_SIZE;
     colors[idx] = tmpColor$1.r;
     colors[idx + 1] = tmpColor$1.g;
     colors[idx + 2] = tmpColor$1.b;
@@ -71156,7 +71161,7 @@ ChunkedObjectsGeometry.prototype.setOpacity = function (chunkIndices, value) {
 
 ChunkedObjectsGeometry.prototype.raycast = function (raycaster, intersects) {
   var inters = [];
-  RaycastableObjectsGeometry.prototype.raycast.call(this, raycaster, inters);
+  RaycastableBufferGeometry.prototype.raycast.call(this, raycaster, inters);
   // TODO faceIdx to chunkIdx
   var facesPerChunk = this._chunkGeo.index.count / 3;
   for (var i = 0, n = inters.length; i < n; ++i) {
@@ -71181,7 +71186,7 @@ ChunkedObjectsGeometry.prototype.getSubset = function (chunkIndices) {
   var dstNorm = geom._normals;
   var dstColor = geom._colors;
 
-  var chunkSize = this._chunkSize * VEC_SIZE$1;
+  var chunkSize = this._chunkSize * VEC_SIZE;
 
   for (var i = 0, n = chunkIndices.length; i < n; ++i) {
     var dstPtOffset = i * chunkSize;
@@ -71205,9 +71210,9 @@ ChunkedObjectsGeometry.prototype._init = function (chunkGeo, chunksCount) {
   var use32bitIndex = pointsCount > MAX_IDC_16BIT;
   var indexSize = chunkIndexSize * chunksCount;
   var index = this._index = utils.allocateTyped(use32bitIndex ? Uint32Array : Uint16Array, indexSize);
-  this._positions = utils.allocateTyped(Float32Array, pointsCount * VEC_SIZE$1);
-  this._normals = utils.allocateTyped(Float32Array, pointsCount * VEC_SIZE$1);
-  this._colors = utils.allocateTyped(Float32Array, pointsCount * VEC_SIZE$1);
+  this._positions = utils.allocateTyped(Float32Array, pointsCount * VEC_SIZE);
+  this._normals = utils.allocateTyped(Float32Array, pointsCount * VEC_SIZE);
+  this._colors = utils.allocateTyped(Float32Array, pointsCount * VEC_SIZE);
   var alpha = this._alpha = utils.allocateTyped(Float32Array, pointsCount);
   lodash.fill(alpha, 1.0);
 
@@ -71221,31 +71226,31 @@ ChunkedObjectsGeometry.prototype._init = function (chunkGeo, chunksCount) {
   }
 
   this.setIndex(new BufferAttribute(this._index, 1));
-  this.addAttribute('position', new BufferAttribute(this._positions, VEC_SIZE$1));
-  this.addAttribute('normal', new BufferAttribute(this._normals, VEC_SIZE$1));
-  this.addAttribute('color', new BufferAttribute(this._colors, VEC_SIZE$1));
+  this.addAttribute('position', new BufferAttribute(this._positions, VEC_SIZE));
+  this.addAttribute('normal', new BufferAttribute(this._normals, VEC_SIZE));
+  this.addAttribute('color', new BufferAttribute(this._colors, VEC_SIZE));
   this.addAttribute('alphaColor', new BufferAttribute(alpha, 1));
 };
 
-var VEC_SIZE = 3;
+var VEC_SIZE$1 = 3;
 
 function SimpleSpheresGeometry(spheresCount, sphereComplexity) {
   var sphGeometry = new SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
   ChunkedObjectsGeometry.call(this, sphGeometry, spheresCount);
-  CollisionSpheresGeo.call(this, spheresCount);
+  SphereCollisionGeo.call(this, spheresCount);
 
   var normals = this._normals;
   var geoNormals = sphGeometry.attributes.normal.array;
   var chunkSize = this._chunkSize;
   this._chunkPos = this._chunkGeo.attributes.position.array;
-  this._tmpPositions = utils.allocateTyped(Float32Array, chunkSize * VEC_SIZE);
+  this._tmpPositions = utils.allocateTyped(Float32Array, chunkSize * VEC_SIZE$1);
   for (var i = 0; i < spheresCount; ++i) {
-    normals.set(geoNormals, chunkSize * VEC_SIZE * i);
+    normals.set(geoNormals, chunkSize * VEC_SIZE$1 * i);
   }
 }
 
 SimpleSpheresGeometry.prototype = Object.create(ChunkedObjectsGeometry.prototype);
-lodash.mixin(SimpleSpheresGeometry.prototype, CollisionSpheresGeo.prototype);
+lodash.mixin(SimpleSpheresGeometry.prototype, SphereCollisionGeo.prototype);
 SimpleSpheresGeometry.prototype.constructor = SimpleSpheresGeometry;
 
 SimpleSpheresGeometry.prototype.setItem = function (itemIdx, itemPos, itemRad) {
@@ -71260,7 +71265,7 @@ SimpleSpheresGeometry.prototype.setItem = function (itemIdx, itemPos, itemRad) {
     tmpPos[idx + 2] = itemPos.z + geoPos[idx + 2] * itemRad;
   }
 
-  this._positions.set(tmpPos, chunkSize * itemIdx * VEC_SIZE);
+  this._positions.set(tmpPos, chunkSize * itemIdx * VEC_SIZE$1);
   this.setSphere(itemIdx, itemPos, itemRad);
 };
 
@@ -71270,7 +71275,7 @@ var centerPos = new Vector3();
 var tmpVector = new Vector3();
 var normMtx = new Matrix3();
 
-function Simple2CCylinderGeometry(instanceCount, polyComplexity) {
+function Simple2CCylindersGeometry(instanceCount, polyComplexity) {
   var cylGeometry = new CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, true);
   ChunkedObjectsGeometry.call(this, cylGeometry, 2 * instanceCount);
 
@@ -71280,10 +71285,10 @@ function Simple2CCylinderGeometry(instanceCount, polyComplexity) {
   this._tmpVector = utils.allocateTyped(Float32Array, chunkSize * VEC_SIZE$2);
 }
 
-Simple2CCylinderGeometry.prototype = Object.create(ChunkedObjectsGeometry.prototype);
-Simple2CCylinderGeometry.prototype.constructor = Simple2CCylinderGeometry;
+Simple2CCylindersGeometry.prototype = Object.create(ChunkedObjectsGeometry.prototype);
+Simple2CCylindersGeometry.prototype.constructor = Simple2CCylindersGeometry;
 
-Simple2CCylinderGeometry.prototype.setItem = function (itemIdx, botPos, topPos, itemRad) {
+Simple2CCylindersGeometry.prototype.setItem = function (itemIdx, botPos, topPos, itemRad) {
   var chunkSize = this._chunkSize;
   var firstOffset = chunkSize * 2 * itemIdx * VEC_SIZE$2;
   var secondOffset = firstOffset + chunkSize * VEC_SIZE$2;
@@ -71326,7 +71331,7 @@ Simple2CCylinderGeometry.prototype.setItem = function (itemIdx, botPos, topPos, 
   this._normals.set(tmpArray, secondOffset);
 };
 
-Simple2CCylinderGeometry.prototype.setColor = function (itemIdx, colorVal1, colorVal2) {
+Simple2CCylindersGeometry.prototype.setColor = function (itemIdx, colorVal1, colorVal2) {
   var first = 2 * itemIdx;
   parentSetColor.call(this, first, colorVal1);
 
@@ -71540,7 +71545,7 @@ function Instanced2CCylindersGeometry(instanceCount, polyComplexity, useZSprites
   this._cylGeometry = useZSprites ? new PlaneBufferGeometry(2, 2, 1, 1) : new CylinderBufferGeometry$1(1, 1, 1.0, Math.max(3, polyComplexity), 2, openEnded);
   this._init(instanceCount, this._cylGeometry, this._useZSprites);
 
-  this._collisionGeo = new Simple2CCylinderGeometry(instanceCount, 3);
+  this._collisionGeo = new Simple2CCylindersGeometry(instanceCount, 3);
 }
 
 Instanced2CCylindersGeometry.prototype = Object.create(InstancedBufferGeometry.prototype);
@@ -71718,7 +71723,7 @@ function _createExtrudedChunkGeometry(shape, ringsCount) {
   return geo;
 }
 
-function ExtrudedObjectsGroup(shape, ringsCount, chunksCount) {
+function ExtrudedObjectsGeometry(shape, ringsCount, chunksCount) {
   var chunkGeo = _createExtrudedChunkGeometry(shape, ringsCount);
   ChunkedObjectsGeometry.call(this, chunkGeo, chunksCount);
   this._ringsCount = ringsCount;
@@ -71729,10 +71734,10 @@ function ExtrudedObjectsGroup(shape, ringsCount, chunksCount) {
   }
 }
 
-ExtrudedObjectsGroup.prototype = Object.create(ChunkedObjectsGeometry.prototype);
-ExtrudedObjectsGroup.prototype.constructor = ExtrudedObjectsGroup;
+ExtrudedObjectsGeometry.prototype = Object.create(ChunkedObjectsGeometry.prototype);
+ExtrudedObjectsGeometry.prototype.constructor = ExtrudedObjectsGeometry;
 
-ExtrudedObjectsGroup.prototype.setItem = function (itemIdx, matrices) {
+ExtrudedObjectsGeometry.prototype.setItem = function (itemIdx, matrices) {
   var shape = this._chunkGeo._positions;
   var ptsCount = shape.length;
   var innerPtIdx = 0;
@@ -72159,7 +72164,7 @@ var tmpVector$2 = new Vector3();
 function TwoColorLinesGeometry(segmentsCount) {
   LinesGeometry.call(this, segmentsCount * 2);
   this._init(segmentsCount);
-  this._collisionGeo = new Simple2CCylinderGeometry(segmentsCount, 3);
+  this._collisionGeo = new Simple2CCylindersGeometry(segmentsCount, 3);
 }
 
 TwoColorLinesGeometry.prototype = Object.create(LinesGeometry.prototype);
@@ -72219,7 +72224,7 @@ var tempPos2 = new Vector3();
 function CrossGeometry(chunksCount) {
   ChunkedLinesGeometry.call(this, chunksCount, vecCount / 2 | 0, false);
 
-  this._collisionGeo = new CollisionSpheresGeo(chunksCount);
+  this._collisionGeo = new SphereCollisionGeo(chunksCount);
 }
 
 CrossGeometry.prototype = Object.create(ChunkedLinesGeometry.prototype);
@@ -72269,7 +72274,7 @@ var tmpColor$4 = new Color();
  * @constructor
  */
 function IsoSurfaceGeometry(spheresCount, opts) {
-  RaycastableObjectsGeometry.call(this);
+  RaycastableBufferGeometry.call(this);
 
   this._opts = opts;
   this.zClip = this._opts.zClip;
@@ -72277,7 +72282,7 @@ function IsoSurfaceGeometry(spheresCount, opts) {
   this._colors = utils.allocateTyped(Float32Array, spheresCount * COLOR_SIZE$2);
 }
 
-IsoSurfaceGeometry.prototype = Object.create(RaycastableObjectsGeometry.prototype);
+IsoSurfaceGeometry.prototype = Object.create(RaycastableBufferGeometry.prototype);
 IsoSurfaceGeometry.prototype.constructor = IsoSurfaceGeometry;
 
 IsoSurfaceGeometry.prototype.setItem = function (chunkIdx, pos, radius) {
@@ -75437,9 +75442,9 @@ LabelsGeometry.prototype.getSubset = function () {
 var geometries = {
   InstancedSpheresGeometry: InstancedSpheresGeometry,
   SimpleSpheresGeometry: SimpleSpheresGeometry,
-  Simple2CCylindersGeometry: Simple2CCylinderGeometry,
-  Instanced2CCylinderGeometry: Instanced2CCylindersGeometry,
-  ExtrudedObjectsGeometry: ExtrudedObjectsGroup,
+  Simple2CCylindersGeometry: Simple2CCylindersGeometry,
+  Instanced2CCylindersGeometry: Instanced2CCylindersGeometry,
+  ExtrudedObjectsGeometry: ExtrudedObjectsGeometry,
   ChunkedLinesGeometry: ChunkedLinesGeometry,
   TwoColorLinesGeometry: TwoColorLinesGeometry,
   CrossGeometry: CrossGeometry,
@@ -75591,14 +75596,14 @@ TextMesh.prototype.update = function () {
 
 var Mesh$3 = UberObject(Mesh);
 
-function ThickLineSegments(geometry, material) {
+function ThickLineMesh(geometry, material) {
   Mesh$3.call(this, geometry, material);
 }
 
-ThickLineSegments.prototype = Object.create(Mesh$3.prototype);
-ThickLineSegments.prototype.constructor = ThickLineSegments;
+ThickLineMesh.prototype = Object.create(Mesh$3.prototype);
+ThickLineMesh.prototype.constructor = ThickLineMesh;
 
-ThickLineSegments.prototype._onBeforeRender = function (renderer, scene, camera) {
+ThickLineMesh.prototype._onBeforeRender = function (renderer, scene, camera) {
   var material = this.material;
   if (!material.uberOptions) {
     return;
@@ -75616,7 +75621,7 @@ var meshes = {
   Line: UberObject(Line),
   LineSegments: UberObject(LineSegments),
   Mesh: UberObject(Mesh),
-  ThickLineMesh: ThickLineSegments
+  ThickLineMesh: ThickLineMesh
 };
 
 function setMatParams(params, uniforms) {
@@ -75629,7 +75634,7 @@ function setMatParams(params, uniforms) {
 function _createInstancedCylinders(useZSprites, openEnded) {
   return {
     Geometry: function Geometry(a, b) {
-      return new geometries.Instanced2CCylinderGeometry(a, b, useZSprites, openEnded);
+      return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
     },
     Object: meshes.ZSprite,
     initMaterial: setMatParams({
@@ -75996,14 +76001,14 @@ AtomsSurfaceGroup.prototype._makeGeoArgs = function (selection, mode, _colorer, 
 
 /* This is a stub class keep it until SAS/SES is refactored */
 
-function AtomsSurfaceGroup$2(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
+function AtomsSASSESGroupStub(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
   AtomsSphereGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
 }
 
-AtomsSurfaceGroup$2.prototype = Object.create(AtomsSphereGroup.prototype);
-AtomsSurfaceGroup$2.prototype.constructor = AtomsSurfaceGroup$2;
+AtomsSASSESGroupStub.prototype = Object.create(AtomsSphereGroup.prototype);
+AtomsSASSESGroupStub.prototype.constructor = AtomsSASSESGroupStub;
 
-AtomsSurfaceGroup$2.prototype._makeGeoArgs = function (selection, mode, colorer, _polyComplexity) {
+AtomsSASSESGroupStub.prototype._makeGeoArgs = function (selection, mode, colorer, _polyComplexity) {
   var selectedAtoms = [];
   var atoms = selection.atoms;
   var chunks = selection.chunks;
@@ -76432,32 +76437,32 @@ NucleicItemGroup.prototype.updateToFrame = function (frameData) {
   geo.finishUpdate();
 };
 
-function NucleicCylindersItemGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
+function NucleicCylindersGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
   this._stickRad = mode.calcStickRadius();
   this._geoArgs = [selection.chunks.length, polyComplexity];
 
   NucleicItemGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
 }
 
-NucleicCylindersItemGroup.prototype = Object.create(NucleicItemGroup.prototype);
-NucleicCylindersItemGroup.prototype.constructor = NucleicCylindersItemGroup;
+NucleicCylindersGroup.prototype = Object.create(NucleicItemGroup.prototype);
+NucleicCylindersGroup.prototype.constructor = NucleicCylindersGroup;
 
-NucleicCylindersItemGroup.prototype._processItem = function (chunkIdx, cyl1, cyl2, color) {
+NucleicCylindersGroup.prototype._processItem = function (chunkIdx, cyl1, cyl2, color) {
   var geo = this._geo;
   geo.setItem(chunkIdx, cyl1, cyl2, this._stickRad);
   geo.setColor(chunkIdx, color, color);
 };
 
-function NucleicCylindersItemGroup$1(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
+function NucleicSpheresGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
   this._stickRad = mode.calcStickRadius();
   this._geoArgs = [selection.chunks.length * 2, polyComplexity];
   NucleicItemGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
 }
 
-NucleicCylindersItemGroup$1.prototype = Object.create(NucleicItemGroup.prototype);
-NucleicCylindersItemGroup$1.prototype.constructor = NucleicCylindersItemGroup$1;
+NucleicSpheresGroup.prototype = Object.create(NucleicItemGroup.prototype);
+NucleicSpheresGroup.prototype.constructor = NucleicSpheresGroup;
 
-NucleicCylindersItemGroup$1.prototype._processItem = function (chunkIdx, cyl1, cyl2, color) {
+NucleicSpheresGroup.prototype._processItem = function (chunkIdx, cyl1, cyl2, color) {
   var geo = this._geo;
   var stickRad = this._stickRad;
   var idx = chunkIdx * 2;
@@ -77031,7 +77036,7 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   return { centerPoints: centerPoints, topPoints: topPoints };
 }
 
-function MatrixHelper(residues, startIdx, endIdx, segmentsCount, tension, boundaries) {
+function CartoonHelper(residues, startIdx, endIdx, segmentsCount, tension, boundaries) {
   var pointsArrays = _calcPoints(residues, startIdx, endIdx, boundaries);
   this._topInterp = _buildStructureInterpolator(pointsArrays.topPoints, tension);
   this._centerInterp = _buildStructureInterpolator(pointsArrays.centerPoints, tension);
@@ -77041,7 +77046,7 @@ function MatrixHelper(residues, startIdx, endIdx, segmentsCount, tension, bounda
   this._segmentsCount = segmentsCount;
 }
 
-MatrixHelper.prototype.prepareMatrices = function (idx, firstRad, secondRad) {
+CartoonHelper.prototype.prepareMatrices = function (idx, firstRad, secondRad) {
   var mtcCount = this._segmentsCount;
   var outMtc = new Array(mtcCount);
   var currRad = new Vector2(0, 0);
@@ -77084,7 +77089,7 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
     var boundaries = subDiv[subDivI].boundaries;
     for (var i = 0, n = subs.length; i < n; ++i) {
       var idc = [subs[i].start, subs[i].end];
-      var matrixHelper = new MatrixHelper(residues, idc[0], idc[1], segmentsHeight, tension, boundaries);
+      var matrixHelper = new CartoonHelper(residues, idc[0], idc[1], segmentsHeight, tension, boundaries);
       var prevLast = null;
       var startIdx = subs[i].start * 2;
       var endIdx = subs[i].end * 2 + 1;
@@ -77560,19 +77565,19 @@ BondsLinesGroup.prototype.updateToFrame = function (frameData) {
 var groups = {
   AtomsSphereGroup: AtomsSphereGroup,
   AtomsSurfaceGroup: AtomsSurfaceGroup,
-  AtomsSASSESGroup_stub: AtomsSurfaceGroup$2,
+  AtomsSASSESGroupStub: AtomsSASSESGroupStub,
   AtomsTextGroup: AtomsTextGroup,
   AromaticTorusGroup: AromaticTorusGroup,
   AromaticLinesGroup: AromaticLinesGroup,
-  NucleicCylindersGroup: NucleicCylindersItemGroup,
-  NucleicSpheresGroup: NucleicCylindersItemGroup$1,
+  NucleicCylindersGroup: NucleicCylindersGroup,
+  NucleicSpheresGroup: NucleicSpheresGroup,
   ResiduesSubseqGroup: ResiduesSubseqGroup,
   ResiduesTraceGroup: ResiduesTraceGroup,
   BondsCylinderGroup: BondsCylinderGroup,
   BondsLinesGroup: BondsLinesGroup
 };
 
-function ComponentsAtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+function AtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
   var self = this;
   RCGroup.call(self);
   this._complex = complex;
@@ -77601,14 +77606,14 @@ function ComponentsAtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode,
   });
 }
 
-ComponentsAtomsProcessor.prototype = Object.create(RCGroup.prototype);
-ComponentsAtomsProcessor.prototype.constructor = ComponentsAtomsProcessor;
+AtomsProcessor.prototype = Object.create(RCGroup.prototype);
+AtomsProcessor.prototype.constructor = AtomsProcessor;
 
-ComponentsAtomsProcessor.prototype._checkAtom = function (atom, mask) {
+AtomsProcessor.prototype._checkAtom = function (atom, mask) {
   return atom._mask & mask;
 };
 
-ComponentsAtomsProcessor.prototype.getSubset = function (mask, innerOnly) {
+AtomsProcessor.prototype.getSubset = function (mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -77627,10 +77632,10 @@ ComponentsAtomsProcessor.prototype.getSubset = function (mask, innerOnly) {
 
 function OrphanAtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
   this._mode = mode;
-  ComponentsAtomsProcessor.call(this, AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material);
+  AtomsProcessor.call(this, AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material);
 }
 
-OrphanAtomsProcessor.prototype = Object.create(ComponentsAtomsProcessor.prototype);
+OrphanAtomsProcessor.prototype = Object.create(AtomsProcessor.prototype);
 OrphanAtomsProcessor.prototype.constructor = OrphanAtomsProcessor;
 
 OrphanAtomsProcessor.prototype._checkAtom = function (atom, mask) {
@@ -77651,7 +77656,7 @@ OrphanAtomsProcessor.prototype._checkAtom = function (atom, mask) {
   return true;
 };
 
-function ComponentsResiduesProcessor(ResidueGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+function ResiduesProcessor(ResidueGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
   var self = this;
   RCGroup.call(self);
   this._complex = complex;
@@ -77680,14 +77685,14 @@ function ComponentsResiduesProcessor(ResidueGroup, geoParams, complex, colorer, 
   });
 }
 
-ComponentsResiduesProcessor.prototype = Object.create(RCGroup.prototype);
-ComponentsResiduesProcessor.prototype.constructor = ComponentsResiduesProcessor;
+ResiduesProcessor.prototype = Object.create(RCGroup.prototype);
+ResiduesProcessor.prototype.constructor = ResiduesProcessor;
 
-ComponentsResiduesProcessor.prototype._checkResidue = function (residue, mask) {
+ResiduesProcessor.prototype._checkResidue = function (residue, mask) {
   return residue._mask & mask;
 };
 
-ComponentsResiduesProcessor.prototype.getSubset = function (mask, innerOnly) {
+ResiduesProcessor.prototype.getSubset = function (mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -77704,18 +77709,18 @@ ComponentsResiduesProcessor.prototype.getSubset = function (mask, innerOnly) {
   return totalSubset;
 };
 
-function ComponentNucleicProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
-  ComponentsResiduesProcessor.call(this, AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material);
+function NucleicProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+  ResiduesProcessor.call(this, AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material);
 }
 
-ComponentNucleicProcessor.prototype = Object.create(ComponentsResiduesProcessor.prototype);
-ComponentNucleicProcessor.prototype.constructor = ComponentNucleicProcessor;
+NucleicProcessor.prototype = Object.create(ResiduesProcessor.prototype);
+NucleicProcessor.prototype.constructor = NucleicProcessor;
 
-ComponentNucleicProcessor.prototype._checkResidue = function (residue, mask) {
+NucleicProcessor.prototype._checkResidue = function (residue, mask) {
   return mask & residue._mask && residue._cylinders !== null;
 };
 
-function ComponentsSubseqsProcessor(ResidueGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+function SubseqsProcessor(ResidueGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
   var self = this;
   RCGroup.call(self);
   this._complex = complex;
@@ -77750,10 +77755,10 @@ function ComponentsSubseqsProcessor(ResidueGroup, geoParams, complex, colorer, m
   });
 }
 
-ComponentsSubseqsProcessor.prototype = Object.create(RCGroup.prototype);
-ComponentsSubseqsProcessor.prototype.constructor = ComponentsSubseqsProcessor;
+SubseqsProcessor.prototype = Object.create(RCGroup.prototype);
+SubseqsProcessor.prototype.constructor = SubseqsProcessor;
 
-ComponentsSubseqsProcessor.prototype.getSubset = function (mask, innerOnly) {
+SubseqsProcessor.prototype.getSubset = function (mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -77770,7 +77775,7 @@ ComponentsSubseqsProcessor.prototype.getSubset = function (mask, innerOnly) {
   return totalSubset;
 };
 
-function ComponentsAtomsProcessor$1(BondsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+function BondsProcessor(BondsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
   var self = this;
   RCGroup.call(self);
   this._complex = complex;
@@ -77801,10 +77806,10 @@ function ComponentsAtomsProcessor$1(BondsGroup, geoParams, complex, colorer, mod
   });
 }
 
-ComponentsAtomsProcessor$1.prototype = Object.create(RCGroup.prototype);
-ComponentsAtomsProcessor$1.prototype.constructor = ComponentsAtomsProcessor$1;
+BondsProcessor.prototype = Object.create(RCGroup.prototype);
+BondsProcessor.prototype.constructor = BondsProcessor;
 
-ComponentsAtomsProcessor$1.prototype.getSubset = function (mask, innerOnly) {
+BondsProcessor.prototype.getSubset = function (mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -77821,7 +77826,7 @@ ComponentsAtomsProcessor$1.prototype.getSubset = function (mask, innerOnly) {
   return totalSubset;
 };
 
-function ComponentsAromaticProcessor(AromaticGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+function AromaticProcessor(AromaticGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
 
   var self = this;
   RCGroup.call(self);
@@ -77862,10 +77867,10 @@ function ComponentsAromaticProcessor(AromaticGroup, geoParams, complex, colorer,
   });
 }
 
-ComponentsAromaticProcessor.prototype = Object.create(RCGroup.prototype);
-ComponentsAromaticProcessor.prototype.constructor = ComponentsAromaticProcessor;
+AromaticProcessor.prototype = Object.create(RCGroup.prototype);
+AromaticProcessor.prototype.constructor = AromaticProcessor;
 
-ComponentsAromaticProcessor.prototype.getSubset = function (mask, innerOnly) {
+AromaticProcessor.prototype.getSubset = function (mask, innerOnly) {
   var totalSubset = [];
   var children = this.children;
   var meshIdx = 0;
@@ -77943,13 +77948,13 @@ function SGroupProcessor(AtomsGroup, geoParams, complex, _colorer, _mode, _polyC
 SGroupProcessor.prototype = Object.create(RCGroup.prototype);
 
 var processors = {
-  Atoms: ComponentsAtomsProcessor,
+  Atoms: AtomsProcessor,
   OrphanAtoms: OrphanAtomsProcessor,
-  Residues: ComponentsResiduesProcessor,
-  Nucleic: ComponentNucleicProcessor,
-  Subseqs: ComponentsSubseqsProcessor,
-  Bonds: ComponentsAtomsProcessor$1,
-  Aromatic: ComponentsAromaticProcessor,
+  Residues: ResiduesProcessor,
+  Nucleic: NucleicProcessor,
+  Subseqs: SubseqsProcessor,
+  Bonds: BondsProcessor,
+  Aromatic: AromaticProcessor,
   SGroups: SGroupProcessor
 };
 
@@ -78033,7 +78038,7 @@ GroupsFactory.ContactSurfaceGeo = function (caps, settings, renderParams) {
 GroupsFactory.SASSESSurfaceGeo = function (caps, settings, renderParams) {
   var gfxTriplet = MeshCreator.createSASSES(caps, settings, renderParams);
 
-  return _bakeGroup(gfxTriplet, processors.Atoms, groups.AtomsSASSESGroup_stub);
+  return _bakeGroup(gfxTriplet, processors.Atoms, groups.AtomsSASSESGroupStub);
 };
 
 GroupsFactory.TextLabelsGeo = function (caps, settings) {
@@ -78450,7 +78455,7 @@ CartoonMode.prototype.buildGeometry = function (complex, colorer, mask, material
   return Mode.prototype.buildGeometry.call(this, complex, colorer, mask, material);
 };
 
-var selectors$4 = chem.selectors;
+var selectors$2 = chem.selectors;
 
 function getRenderParams$1() {
   return {
@@ -78481,7 +78486,7 @@ SurfaceMode.prototype.calcAtomRadius = function (atom) {
 SurfaceMode.prototype.getVisibilitySelector = function () {
   var visibilitySelector = null;
   if (this.opts.subset !== '') {
-    var res = selectors$4.parse(this.opts.subset);
+    var res = selectors$2.parse(this.opts.subset);
     if (!res.error) {
       visibilitySelector = res.selector;
     }
@@ -78489,18 +78494,18 @@ SurfaceMode.prototype.getVisibilitySelector = function () {
   return visibilitySelector;
 };
 
-function QuickSurfMode(opts) {
+function QuickSurfaceMode(opts) {
   SurfaceMode.call(this, opts);
 }
 
-utils.deriveClass(QuickSurfMode, SurfaceMode, {
+utils.deriveClass(QuickSurfaceMode, SurfaceMode, {
   id: 'QS',
   name: 'Quick Surface',
   shortName: 'Quick Surf',
   surfaceNames: ['QuickSurfGeo']
 });
 
-QuickSurfMode.prototype.getSurfaceOpts = function () {
+QuickSurfaceMode.prototype.getSurfaceOpts = function () {
   return {
     useBeads: false,
     isoValue: this.opts.isoValue,
@@ -78568,11 +78573,11 @@ utils.deriveClass(IsoSurfaceSESMode, IsoSurfaceMode, {
   shortName: 'SES'
 });
 
-function ContactSurfMode(opts) {
+function ContactSurfaceMode(opts) {
   SurfaceMode.call(this, opts);
 }
 
-utils.deriveClass(ContactSurfMode, SurfaceMode, {
+utils.deriveClass(ContactSurfaceMode, SurfaceMode, {
   id: 'CS',
   name: 'Contact Surface',
   shortName: 'Contact Surf',
@@ -78580,7 +78585,7 @@ utils.deriveClass(ContactSurfMode, SurfaceMode, {
   surfaceNames: ['ContactSurfaceGeo']
 });
 
-ContactSurfMode.prototype.getSurfaceOpts = function () {
+ContactSurfaceMode.prototype.getSurfaceOpts = function () {
   return {
     probeRadius: this.opts.probeRadius,
     radScale: this.opts.polyComplexity[this.settings.now.resolution],
@@ -78627,7 +78632,7 @@ TextMode.prototype.getLabelOpts = function () {
 
 var modeList = [];
 var modeDict = {};
-var ag = [LinesMode, LicoriceMode, BallsAndSticksMode, VanDerWaalsMode, TraceMode, TubeMode, CartoonMode, QuickSurfMode, IsoSurfaceSASMode, IsoSurfaceSESMode, ContactSurfMode, TextMode];
+var ag = [LinesMode, LicoriceMode, BallsAndSticksMode, VanDerWaalsMode, TraceMode, TubeMode, CartoonMode, QuickSurfaceMode, IsoSurfaceSASMode, IsoSurfaceSESMode, ContactSurfaceMode, TextMode];
 
 (function (plugins) {
   for (var i = 0, n = plugins.length; i < n; ++i) {
@@ -78827,14 +78832,14 @@ Palette.prototype = {
 var namedColorsArray = Palette.prototype.namedColorsArray;
 var namedColors = Palette.prototype.namedColors;
 
-for (var i$1 = 0, length = namedColorsArray.length; i$1 < length; ++i$1) {
-  var namedColor = namedColorsArray[i$1];
+for (var i = 0, length = namedColorsArray.length; i < length; ++i) {
+  var namedColor = namedColorsArray[i];
   namedColors[namedColor[0]] = namedColor[1];
 }
 
-var palette$1 = new Palette('Jmol', 'JM');
+var palette = new Palette('Jmol', 'JM');
 
-palette$1.colors = [
+palette.colors = [
 /* eslint-disable no-magic-numbers */
 0x0000FF, // blue
 0x0055FF, //
@@ -78856,7 +78861,7 @@ palette$1.colors = [
 0x5500FF];
 
 // DO NOT EDIT MANUALLY! Autogenerated from atom_types.csv by atom_types.py.
-palette$1.elementColors = {
+palette.elementColors = {
   /* eslint-disable no-magic-numbers */
   H: 0xFFFFFF,
   D: 0xFFFFC0,
@@ -78972,10 +78977,10 @@ palette$1.elementColors = {
   /* eslint-enable no-magic-numbers */
 };
 
-palette$1.defaultResidueColor = 0xBEA06E;
+palette.defaultResidueColor = 0xBEA06E;
 
 // DO NOT EDIT MANUALLY! Autogenerated from residue_types.csv by residue_types.py.
-palette$1.residueColors = {
+palette.residueColors = {
   /* eslint-disable no-magic-numbers */
   'ALA': 0xC8C8C8,
   'ARG': 0x145AFF,
@@ -79018,7 +79023,7 @@ palette$1.residueColors = {
   /* eslint-enable no-magic-numbers */
 };
 
-palette$1.chainColors = [
+palette.chainColors = [
 // ' '->0 'A'->1, 'B'->2
 0xFFffffff, // ' ' & '0' white
 //
@@ -79051,7 +79056,7 @@ palette$1.chainColors = [
 0xFFB8860B, // darkgoldenrod
 0xFFB22222];
 
-palette$1.secondaryColors = {
+palette.secondaryColors = {
   'helix': {
     1: 0xFF0080, // RH alpha
     3: 0x600080, // RH pi
@@ -79063,9 +79068,9 @@ palette$1.secondaryColors = {
   'rna': 0xFD0162
 };
 
-var palette$2 = new Palette('VMD', 'VM');
+var palette$1 = new Palette('VMD', 'VM');
 
-palette$2.colors = [
+palette$1.colors = [
 /* eslint-disable no-magic-numbers */
 0x0000FF, // blue
 0xFF0000, // red
@@ -79086,10 +79091,10 @@ palette$2.colors = [
 /* eslint-enable no-magic-numbers */
 ];
 
-palette$2.defaultElementColor = 0x804D00;
+palette$1.defaultElementColor = 0x804D00;
 
 // DO NOT EDIT MANUALLY! Autogenerated from atom_types.csv by atom_types.py.
-palette$2.elementColors = {
+palette$1.elementColors = {
   /* eslint-disable no-magic-numbers */
   H: 0xFFFFFF,
   C: 0x40BFBF,
@@ -79100,10 +79105,10 @@ palette$2.elementColors = {
   /* eslint-enable no-magic-numbers */
 };
 
-palette$2.defaultResidueColor = 0x40C0C0;
+palette$1.defaultResidueColor = 0x40C0C0;
 
 // DO NOT EDIT MANUALLY! Autogenerated from residue_types.csv by residue_types.py.
-palette$2.residueColors = {
+palette$1.residueColors = {
   /* eslint-disable no-magic-numbers */
   'ALA': 0x0000FF,
   'ARG': 0xFFFFFF,
@@ -79146,22 +79151,22 @@ palette$2.residueColors = {
   /* eslint-enable no-magic-numbers */
 };
 
-palette$2.chainColors = [0xFFFFFF].concat(palette$2.colors);
+palette$1.chainColors = [0xFFFFFF].concat(palette$1.colors);
 
-palette$2.secondaryColors = {
+palette$1.secondaryColors = {
   'helix': { 1: 0xA600A6, 5: 0x0000FF },
   'strand': 0xFFFF00
 };
 
 var paletteList = [];
 var paletteDict = {};
-var ag$2 = [palette$1, palette$2];
+var ag$1 = [palette, palette$1];
 
-for (var i = 0, n = ag$2.length; i < n; ++i) {
-  var palette = ag$2[i];
-  paletteList.push(palette);
-  if (palette.id) {
-    paletteDict[palette.id] = palette;
+for (var i$1 = 0, n = ag$1.length; i$1 < n; ++i$1) {
+  var palette$2 = ag$1[i$1];
+  paletteList.push(palette$2);
+  if (palette$2.id) {
+    paletteDict[palette$2.id] = palette$2;
   }
 }
 
@@ -79386,8 +79391,8 @@ UniformColorer.prototype.getResidueColor = function (_residue, _complex) {
  */
 function ConditionalColorer(opts) {
   Colorer.call(this, opts);
-  var parsed = selectors$1.parse(this.opts.subset);
-  this._subsetCached = parsed.error ? selectors$1.none() : parsed.selector;
+  var parsed = selectors.parse(this.opts.subset);
+  this._subsetCached = parsed.error ? selectors.none() : parsed.selector;
 }
 
 utils.deriveClass(ConditionalColorer, Colorer, {
@@ -79595,7 +79600,7 @@ MoleculeColorer.prototype.getResidueColor = function (residue, _complex) {
  */
 var colorerList = [];
 var colorerDict = {};
-var ag$1 = [ElementColorer, ResidueTypeColorer, SequenceColorer, ChainColorer, SecondaryStructureColorer, UniformColorer, ConditionalColorer, ConformationColorer, TemperatureColorer, OccupancyColorer, HydrophobicityColorer, MoleculeColorer];
+var ag$2 = [ElementColorer, ResidueTypeColorer, SequenceColorer, ChainColorer, SecondaryStructureColorer, UniformColorer, ConditionalColorer, ConformationColorer, TemperatureColorer, OccupancyColorer, HydrophobicityColorer, MoleculeColorer];
 
 (function (plugins) {
   for (var i = 0, n = plugins.length; i < n; ++i) {
@@ -79611,7 +79616,7 @@ var ag$1 = [ElementColorer, ResidueTypeColorer, SequenceColorer, ChainColorer, S
       }
     }
   }
-})(ag$1);
+})(ag$2);
 
 // NOTE: workaround for https://github.com/gfranko/amdclean/issues/115
 var exports$2 = /** @alias module:gfx/colorers */{
@@ -82516,7 +82521,7 @@ var Helix$2 = chem.Helix;
 var Sheet$2 = chem.Sheet;
 var Strand$2 = chem.Strand;
 var Bond$2 = chem.Bond;
-var Molecule$3 = chem.Molecule;
+var Molecule$2 = chem.Molecule;
 
 var TAG_LENGTH = 6;
 
@@ -82632,7 +82637,7 @@ PDBParser.prototype._finalizeMolecules = function () {
       var chain = chainDict[name];
       residues = residues.concat(chain._residues.slice());
     }
-    var molecule = new Molecule$3(this._complex, m._name, i + 1);
+    var molecule = new Molecule$2(this._complex, m._name, i + 1);
     molecule._residues = residues;
     this._complex._molecules[i] = molecule;
   }
@@ -83668,8 +83673,8 @@ var mmtf = createCommonjsModule(function (module, exports) {
 });
 
 var Complex$4 = chem.Complex;
-var Chain$3 = chem.Chain;
-var Atom$3 = chem.Atom;
+var Chain$2 = chem.Chain;
+var Atom$2 = chem.Atom;
 var AtomName$3 = chem.AtomName;
 var Element$5 = chem.Element;
 var Helix$3 = chem.Helix;
@@ -83677,7 +83682,7 @@ var Sheet$3 = chem.Sheet;
 var Strand$3 = chem.Strand;
 var Bond$4 = chem.Bond;
 var Assembly$3 = chem.Assembly;
-var Molecule$4 = chem.Molecule;
+var Molecule$3 = chem.Molecule;
 
 function ArrayComparator(original) {
   this._original = Array.from(original);
@@ -83761,7 +83766,7 @@ MMTFParser.prototype._onChain = function (chainData) {
     return;
   }
 
-  var chain = new Chain$3(this._complex, chainData.chainName);
+  var chain = new Chain$2(this._complex, chainData.chainName);
   this._complex._chains[chainData.chainIndex] = chain;
   chain._index = chainData.chainIndex;
 };
@@ -83792,7 +83797,7 @@ MMTFParser.prototype._onAtom = function (atomData) {
   }
 
   var altLoc = !atomData.altLoc.charCodeAt(0) ? '' : atomData.altLoc;
-  var atom = new Atom$3(atomData.groupIndex, // we store residue index here to replace it later with actual reference
+  var atom = new Atom$2(atomData.groupIndex, // we store residue index here to replace it later with actual reference
   new AtomName$3(atomData.atomName), Element$5.getByName(atomData.element.toUpperCase()), new Vector3(atomData.xCoord, atomData.yCoord, atomData.zCoord), Element$5.Role[atomData.atomName], false, // hetero atoms will be marked later
   atomData.atomId, altLoc, atomData.occupancy, atomData.bFactor, atomData.formalCharge);
 
@@ -83880,7 +83885,7 @@ MMTFParser.prototype._updateMolecules = function (mmtfData) {
       var chain = this._complex._chains[chainIndex];
       residues = residues.concat(chain._residues.slice());
     }
-    var molecule = new Molecule$4(this._complex, entity.description, i + 1);
+    var molecule = new Molecule$3(this._complex, entity.description, i + 1);
     molecule._residues = residues;
     this._complex._molecules[i] = molecule;
   }
@@ -84117,7 +84122,7 @@ var Helix$4 = chem.Helix;
 var Sheet$4 = chem.Sheet;
 var Strand$4 = chem.Strand;
 var Assembly$4 = chem.Assembly;
-var Molecule$5 = chem.Molecule;
+var Molecule$4 = chem.Molecule;
 
 var cRequiredAtomFields = ['auth_seq_id', 'Cartn_x', 'Cartn_y', 'Cartn_z', 'label_atom_id'];
 
@@ -84251,7 +84256,7 @@ CIFParser.prototype._extractMolecules = function (complex, complexData) {
   var molecules = complex.getMolecules();
   for (i = 0; i < count; i++) {
     var molecule = this.molecules[i];
-    molecules[i] = new Molecule$5(complex, molecule.name, i + 1);
+    molecules[i] = new Molecule$4(complex, molecule.name, i + 1);
     molecules[i]._residues = molecule.residues;
   }
 };
@@ -84468,14 +84473,12 @@ CIFParser.prototype._extractConfs = function (complex, helicesData) {
     var helClass = helClasses[i] || ' ';
     var struct;
     // TODO Add turns and strands(!)?
-    switch (type) {
-      case 'helix':
-        var idx = complex._helices.length;
-        struct = new Helix$4(idx, name, start[0], end[0], helClass, comment, length);
-        complex.addHelix(struct);
-        break;
-      default:
-        struct = null;
+    if (type === 'helix') {
+      var idx = complex._helices.length;
+      struct = new Helix$4(idx, name, start[0], end[0], helClass, comment, length);
+      complex.addHelix(struct);
+    } else {
+      struct = null;
     }
     if (!struct) {
       continue;
@@ -84878,7 +84881,7 @@ CIFParser._parseToObject = function (source) {
           state = 0;
         } else {
           // ..................................................................................................
-          if (!Number.isNaN(code) && _storeValue(_parseValue()) !== null) {
+          if (_storeValue(_parseValue()) !== null) {
             continue;
           }
           state = 666;
@@ -85040,12 +85043,10 @@ Ccp4Model.prototype.load = function (buffer) {
   yaxis.multiplyScalar(header.extent[yIndex] - 1);
   zaxis.multiplyScalar(header.extent[zIndex] - 1);
 
-  switch (header.type) {
-    case 2:
-      this._data = new Float32Array(buffer, 1024 + header.nsymbt, header.extent[0] * header.extent[1] * header.extent[2]);
-      break;
-    default:
-      throw new Error('CCP4: Unsupported format ' + header.type);
+  if (header.type === 2) {
+    this._data = new Float32Array(buffer, 1024 + header.nsymbt, header.extent[0] * header.extent[1] * header.extent[2]);
+  } else {
+    throw new Error('CCP4: Unsupported format ' + header.type);
   }
 
   this._bboxSize = new Vector3(xaxis.length(), yaxis.length(), zaxis.length());
@@ -86952,7 +86953,7 @@ function overrideUniforms$1(params) {
   return uniforms;
 }
 
-function createOutlineMaterial(params) {
+function OutlineMaterial(params) {
   var settings = {
     uniforms: overrideUniforms$1(params),
     vertexShader: vertexShader$1,
@@ -86983,7 +86984,7 @@ function overrideUniforms$2(params) {
   return uniforms;
 }
 
-function createFXAAMaterial(params) {
+function FXAAMaterial(params) {
   var settings = {
     uniforms: overrideUniforms$2(params),
     vertexShader: vertexShader$1,
@@ -87103,7 +87104,7 @@ function overrideUniforms$4(params) {
   return uniforms;
 }
 
-function createAnaglyphMaterial(params) {
+function AnaglyphMaterial(params) {
   var settings = {
     uniforms: overrideUniforms$4(params),
     vertexShader: vertexShader$1,
@@ -87424,7 +87425,7 @@ function exportBonds(queue, complex, bondsFileName) {
   queue.add(bondsFileName, 'TED', false, true);
 }
 
-function exportAll(complex, reprList, fullReport) {
+function fbxExport(complex, reprList, fullReport) {
   prec = settings.now.fbxprec;
   window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
   function onInitFS(fs) {
@@ -87657,21 +87658,21 @@ var WEBVR = function () {
   return WEBVR;
 }();
 
-/* global "0.7.10":false */
+/* global "0.7.11":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
 
-var selectors = chem.selectors;
-var Atom = chem.Atom;
-var Residue = chem.Residue;
-var Chain = chem.Chain;
-var Molecule = chem.Molecule;
+var selectors$4 = chem.selectors;
+var Atom$3 = chem.Atom;
+var Residue$2 = chem.Residue;
+var Chain$3 = chem.Chain;
+var Molecule$5 = chem.Molecule;
 
 var EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 
-var createElement = utils.createElement;
+var createElement$2 = utils.createElement;
 
 function updateFogRange(fog, center, radius) {
   fog.near = center - radius * settings.now.fogNearFactor;
@@ -87721,7 +87722,7 @@ function reportProgress(log, action, percent) {
  * @exports Miew
  * @constructor
  */
-function Miew$1(opts) {
+function Miew(opts) {
   EventDispatcher$1.call(this);
   this._opts = lodash.merge({
     settingsCookie: 'settings',
@@ -87795,15 +87796,15 @@ function Miew$1(opts) {
   }
 
   var self = this;
-  Miew$1.registeredPlugins.forEach(function (plugin) {
+  Miew.registeredPlugins.forEach(function (plugin) {
     plugin.call(self);
   });
 }
 
-Miew$1.prototype = Object.create(EventDispatcher$1.prototype);
-Miew$1.prototype.constructor = Miew$1;
+Miew.prototype = Object.create(EventDispatcher$1.prototype);
+Miew.prototype.constructor = Miew;
 
-Miew$1.prototype.getMaxRepresentationCount = function () {
+Miew.prototype.getMaxRepresentationCount = function () {
   return ComplexVisual.NUM_REPRESENTATION_BITS;
 };
 
@@ -87813,15 +87814,15 @@ Miew$1.prototype.getMaxRepresentationCount = function () {
  * @throws Forwards exception raised during initialization.
  * @see Miew#term
  */
-Miew$1.prototype.init = function () {
+Miew.prototype.init = function () {
   var container = this._container;
   var elem = utils.createElement('div', { 'class': 'miew-canvas' });
   _setContainerContents(container, elem);
   this._container = elem;
 
   var frag = document.createDocumentFragment();
-  frag.appendChild(this._msgMode = createElement('div', { 'class': 'mode-message overlay' }, createElement('p', {}, 'COMPONENT EDIT MODE')));
-  frag.appendChild(this._msgAtomInfo = createElement('div', { 'class': 'atom-info overlay' }, createElement('p', {}, '')));
+  frag.appendChild(this._msgMode = createElement$2('div', { 'class': 'mode-message overlay' }, createElement$2('p', {}, 'COMPONENT EDIT MODE')));
+  frag.appendChild(this._msgAtomInfo = createElement$2('div', { 'class': 'atom-info overlay' }, createElement$2('p', {}, '')));
   container.appendChild(frag);
 
   if (this._gfx !== null) {
@@ -87906,7 +87907,7 @@ Miew$1.prototype.init = function () {
  * Terminate the viewer completely.
  * @see Miew#init
  */
-Miew$1.prototype.term = function () {
+Miew.prototype.term = function () {
   this._showMessage('Viewer has been terminated.');
   this._loading.forEach(function (job) {
     job.cancel();
@@ -87935,7 +87936,7 @@ function _setContainerContents(container, element) {
  * @param {string} msg - Message to show.
  * @private
  */
-Miew$1.prototype._showMessage = function (msg) {
+Miew.prototype._showMessage = function (msg) {
   var element = document.createElement('div');
   element.setAttribute('class', 'miew-message');
   element.appendChild(document.createElement('p')).appendChild(document.createTextNode(msg));
@@ -87946,7 +87947,7 @@ Miew$1.prototype._showMessage = function (msg) {
  * Display WebGL canvas inside the viewer container, hiding any message shown.
  * @private
  */
-Miew$1.prototype._showCanvas = function () {
+Miew.prototype._showCanvas = function () {
   _setContainerContents(this._container, this._gfx.renderer.domElement);
 };
 
@@ -87954,7 +87955,7 @@ Miew$1.prototype._showCanvas = function () {
  * Initialize WebGL and set 3D scene up.
  * @private
  */
-Miew$1.prototype._initGfx = function () {
+Miew.prototype._initGfx = function () {
   var gfx = {
     width: this._container.clientWidth,
     height: this._container.clientHeight
@@ -88105,7 +88106,7 @@ Miew$1.prototype._initGfx = function () {
  * Setup event listeners.
  * @private
  */
-Miew$1.prototype._initListeners = function () {
+Miew.prototype._initListeners = function () {
   var self = this;
   window.addEventListener('resize', function _onResize() {
     self._onResize();
@@ -88116,7 +88117,7 @@ Miew$1.prototype._initListeners = function () {
  * Try to add numbers to the base name to make it unique among visuals
  * @private
  */
-Miew$1.prototype._makeUniqueVisualName = function (baseName) {
+Miew.prototype._makeUniqueVisualName = function (baseName) {
   if (!baseName) {
     return Math.random().toString();
   }
@@ -88135,7 +88136,7 @@ Miew$1.prototype._makeUniqueVisualName = function (baseName) {
  * Add visual to the viewer
  * @private
  */
-Miew$1.prototype._addVisual = function (visual) {
+Miew.prototype._addVisual = function (visual) {
   if (!visual) {
     return null;
   }
@@ -88157,7 +88158,7 @@ Miew$1.prototype._addVisual = function (visual) {
  * Remove visual from the viewer
  * @private
  */
-Miew$1.prototype._removeVisual = function (visual) {
+Miew.prototype._removeVisual = function (visual) {
   var name = '';
   var obj = null;
   if (visual instanceof Visual) {
@@ -88186,7 +88187,7 @@ Miew$1.prototype._removeVisual = function (visual) {
  * Call specified function for each Visual
  * @private
  */
-Miew$1.prototype._forEachVisual = function (callback) {
+Miew.prototype._forEachVisual = function (callback) {
   for (var name in this._visuals) {
     if (this._visuals.hasOwnProperty(name)) {
       callback(this._visuals[name]);
@@ -88198,7 +88199,7 @@ Miew$1.prototype._forEachVisual = function (callback) {
  * Release (destroy) all visuals in the scene
  * @private
  */
-Miew$1.prototype._releaseAllVisuals = function () {
+Miew.prototype._releaseAllVisuals = function () {
   if (!this._gfx || !this._gfx.pivot) {
     return;
   }
@@ -88216,7 +88217,7 @@ Miew$1.prototype._releaseAllVisuals = function () {
  * Call specified function for each ComplexVisual
  * @private
  */
-Miew$1.prototype._forEachComplexVisual = function (callback) {
+Miew.prototype._forEachComplexVisual = function (callback) {
   if (!this._gfx || !this._gfx.pivot) {
     return;
   }
@@ -88232,7 +88233,7 @@ Miew$1.prototype._forEachComplexVisual = function (callback) {
  * Returns ComplexVisual with specified name, or current (if not found), or any, or null
  * @private
  */
-Miew$1.prototype._getComplexVisual = function (name) {
+Miew.prototype._getComplexVisual = function (name) {
   name = name || this._curVisualName;
   var any = null;
   var named = null;
@@ -88249,7 +88250,7 @@ Miew$1.prototype._getComplexVisual = function (name) {
  * Returns first found VolumeVisual (no more than one should be present actually)
  * @private
  */
-Miew$1.prototype._getVolumeVisual = function () {
+Miew.prototype._getVolumeVisual = function () {
   var any = null;
   this._forEachVisual(function (visual) {
     if (visual instanceof VolumeVisual) {
@@ -88263,7 +88264,7 @@ Miew$1.prototype._getVolumeVisual = function () {
  * Returns ComplexVisual corresponding to specified complex
  * @private
  */
-Miew$1.prototype._getVisualForComplex = function (complex) {
+Miew.prototype._getVisualForComplex = function (complex) {
   if (!complex) {
     return null;
   }
@@ -88280,14 +88281,14 @@ Miew$1.prototype._getVisualForComplex = function (complex) {
 /*
    * Get a list of names of visuals currently shown by the viewer
    */
-Miew$1.prototype.getVisuals = function () {
+Miew.prototype.getVisuals = function () {
   return Object.keys(this._visuals);
 };
 
 /*
    * Get current visual
    */
-Miew$1.prototype.getCurrentVisual = function () {
+Miew.prototype.getCurrentVisual = function () {
   return this._curVisualName;
 };
 
@@ -88295,7 +88296,7 @@ Miew$1.prototype.getCurrentVisual = function () {
    * Set current visual.
    * All further operations will be performed on this visual (complex) if not stated otherwise.
    */
-Miew$1.prototype.setCurrentVisual = function (name) {
+Miew.prototype.setCurrentVisual = function (name) {
   if (!this._visuals[name]) {
     return;
   }
@@ -88308,7 +88309,7 @@ Miew$1.prototype.setCurrentVisual = function (name) {
  * Has no effect if already running.
  * @see Miew#halt
  */
-Miew$1.prototype.run = function () {
+Miew.prototype.run = function () {
   var _this = this;
 
   if (!this._running) {
@@ -88332,7 +88333,7 @@ Miew$1.prototype.run = function () {
  * Will be processed during the next frame.
  * @see Miew#run
  */
-Miew$1.prototype.halt = function () {
+Miew.prototype.halt = function () {
   if (this._running) {
     this._discardComponentEdit();
     this._discardFragmentEdit();
@@ -88346,7 +88347,7 @@ Miew$1.prototype.halt = function () {
  * on hot keys.
  * @param enabled - start (true) or stop (false) response on hot keys.
  */
-Miew$1.prototype.enableHotKeys = function (enabled) {
+Miew.prototype.enableHotKeys = function (enabled) {
   this._hotKeysEnabled = enabled;
   this._objectControls.enableHotkeys(enabled);
 };
@@ -88355,7 +88356,7 @@ Miew$1.prototype.enableHotKeys = function (enabled) {
  * Callback which processes window resize.
  * @private
  */
-Miew$1.prototype._onResize = function () {
+Miew.prototype._onResize = function () {
   this._needRender = true;
 
   var gfx = this._gfx;
@@ -88372,7 +88373,7 @@ Miew$1.prototype._onResize = function () {
   this.dispatchEvent({ type: 'resize' });
 };
 
-Miew$1.prototype._resizeOffscreenBuffers = function (width, height, stereo) {
+Miew.prototype._resizeOffscreenBuffers = function (width, height, stereo) {
   var gfx = this._gfx;
   stereo = stereo || 'NONE';
   var isAnaglyph = stereo === 'NONE' || stereo === 'ANAGLYPH';
@@ -88399,7 +88400,7 @@ Miew$1.prototype._resizeOffscreenBuffers = function (width, height, stereo) {
  * Callback which processes update/render frames.
  * @private
  */
-Miew$1.prototype._onTick = function () {
+Miew.prototype._onTick = function () {
   var _this2 = this;
 
   if (this._halting) {
@@ -88426,7 +88427,7 @@ Miew$1.prototype._onTick = function () {
  * Turn the WebVR when it is supported
  * NOTE: we toggle using button.click, because VRDisplay.requestPresent should be called from user gesture
  */
-Miew$1.prototype._toggleWebVR = function () {
+Miew.prototype._toggleWebVR = function () {
 
   var _mainCamera = new PerspectiveCamera();
   var _cameraWasStored = false;
@@ -88469,12 +88470,12 @@ Miew$1.prototype._toggleWebVR = function () {
   };
 }();
 
-Miew$1.prototype._getWebVRDevice = function () {
+Miew.prototype._getWebVRDevice = function () {
   var vr = this._gfx.renderer.vr;
   return vr && vr.enabled ? vr.getDevice() : null;
 };
 
-Miew$1.prototype._getBSphereRadius = function () {
+Miew.prototype._getBSphereRadius = function () {
   // calculate radius that would include all visuals
   var radius = 0;
   this._forEachVisual(function (visual) {
@@ -88483,7 +88484,7 @@ Miew$1.prototype._getBSphereRadius = function () {
   return radius * this._objectControls.getScale();
 };
 
-Miew$1.prototype._updateFog = function () {
+Miew.prototype._updateFog = function () {
   var gfx = this._gfx;
 
   if (settings.now.fog) {
@@ -88498,7 +88499,7 @@ Miew$1.prototype._updateFog = function () {
   }
 };
 
-Miew$1.prototype._onUpdate = function () {
+Miew.prototype._onUpdate = function () {
 
   if (this.isScriptingCommandAvailable !== undefined && this.isScriptingCommandAvailable() && !this._building) {
     this.callNextCmd();
@@ -88521,7 +88522,7 @@ Miew$1.prototype._onUpdate = function () {
   this._updateFog();
 };
 
-Miew$1.prototype._onRender = function () {
+Miew.prototype._onRender = function () {
   var gfx = this._gfx;
 
   // update all matrices
@@ -88536,9 +88537,9 @@ Miew$1.prototype._onRender = function () {
   this._renderFrame(settings.now.stereo);
 };
 
-Miew$1.prototype._renderFrame = function () {
+Miew.prototype._renderFrame = function () {
 
-  var _anaglyphMat = new createAnaglyphMaterial();
+  var _anaglyphMat = new AnaglyphMaterial();
 
   return function (stereo) {
     var gfx = this._gfx;
@@ -88595,7 +88596,7 @@ Miew$1.prototype._renderFrame = function () {
   };
 }();
 
-Miew$1.prototype._onThemeChanged = function () {
+Miew.prototype._onThemeChanged = function () {
   var themeRE = /\s*theme-\w+\b/g;
   return function () {
     var theme = settings.now.theme;
@@ -88613,7 +88614,7 @@ Miew$1.prototype._onThemeChanged = function () {
   };
 }();
 
-Miew$1.prototype._setUberMaterialValues = function (values) {
+Miew.prototype._setUberMaterialValues = function (values) {
   this._gfx.root.traverse(function (obj) {
     if ((obj instanceof Mesh || obj instanceof LineSegments || obj instanceof Line) && obj.material instanceof UberMaterial) {
       obj.material.setValues(values);
@@ -88622,7 +88623,7 @@ Miew$1.prototype._setUberMaterialValues = function (values) {
   });
 };
 
-Miew$1.prototype._renderScene = function () {
+Miew.prototype._renderScene = function () {
   return function (camera, distortion, target) {
     distortion = distortion || false;
     target = target || null;
@@ -88693,7 +88694,7 @@ Miew$1.prototype._renderScene = function () {
   };
 }();
 
-Miew$1.prototype._performDistortion = function () {
+Miew.prototype._performDistortion = function () {
 
   var _scene = new Scene();
   var _camera = new OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000);
@@ -88727,9 +88728,9 @@ Miew$1.prototype._performDistortion = function () {
   };
 }();
 
-Miew$1.prototype._renderSelection = function () {
+Miew.prototype._renderSelection = function () {
 
-  var _outlineMaterial = new createOutlineMaterial();
+  var _outlineMaterial = new OutlineMaterial();
 
   return function (camera, srcBuffer, targetBuffer) {
 
@@ -88760,7 +88761,7 @@ Miew$1.prototype._renderSelection = function () {
   };
 }();
 
-Miew$1.prototype._checkVolumeRenderingSupport = function (renderTarget) {
+Miew.prototype._checkVolumeRenderingSupport = function (renderTarget) {
   if (!renderTarget) {
     return false;
   }
@@ -88780,7 +88781,7 @@ Miew$1.prototype._checkVolumeRenderingSupport = function (renderTarget) {
   }
 };
 
-Miew$1.prototype._renderVolume = function () {
+Miew.prototype._renderVolume = function () {
 
   var volumeBFMat = new VolumeMaterial$1.BackFacePosMaterial();
   var volumeFFMat = new VolumeMaterial$1.FrontFacePosMaterial();
@@ -88853,7 +88854,7 @@ Miew$1.prototype._renderVolume = function () {
    * 2. Realization doesn't use camera layers because scene traversing is used for material changes and
    * we can use it to select needed meshes and don't complicate meshes builders with layers
   */
-Miew$1.prototype._renderWithPrepassTransparency = function () {
+Miew.prototype._renderWithPrepassTransparency = function () {
 
   return function (camera, targetBuffer) {
     var gfx = this._gfx;
@@ -88877,9 +88878,9 @@ Miew$1.prototype._renderWithPrepassTransparency = function () {
   };
 }();
 
-Miew$1.prototype._performFXAA = function () {
+Miew.prototype._performFXAA = function () {
 
-  var _fxaaMaterial = new createFXAAMaterial();
+  var _fxaaMaterial = new FXAAMaterial();
 
   return function (srcBuffer, targetBuffer) {
 
@@ -88902,7 +88903,7 @@ Miew$1.prototype._performFXAA = function () {
   };
 }();
 
-Miew$1.prototype._performAO = function () {
+Miew.prototype._performAO = function () {
 
   var _aoMaterial = new ao.AOMaterial();
   var _horBlurMaterial = new ao.HorBilateralBlurMaterial();
@@ -88983,7 +88984,7 @@ Miew$1.prototype._performAO = function () {
  * Reset the viewer, unload molecules.
  * @param {boolean=} keepReps - Keep representations while resetting viewer state.
  */
-Miew$1.prototype.reset = function () /* keepReps */{
+Miew.prototype.reset = function () /* keepReps */{
   if (this._picker) {
     this._picker.reset();
   }
@@ -89003,7 +89004,7 @@ Miew$1.prototype.reset = function () /* keepReps */{
   this.setNeedRender();
 };
 
-Miew$1.prototype._resetScene = function () {
+Miew.prototype._resetScene = function () {
   this._objectControls.reset();
   this._objectControls.allowTranslation(true);
   this._objectControls.allowAltObjFreeRotation(true);
@@ -89012,7 +89013,7 @@ Miew$1.prototype._resetScene = function () {
   this.rebuildAll();
 };
 
-Miew$1.prototype.resetView = function () {
+Miew.prototype.resetView = function () {
   // reset controls
   if (this._picker) {
     this._picker.reset();
@@ -89037,7 +89038,7 @@ Miew$1.prototype.resetView = function () {
  * @param {boolean=} opts.keepRepsInfo - prevent reset of object and reps information.
  * @returns {Promise} name of the visual that was added to the viewer
  */
-Miew$1.prototype.load = function (source, opts) {
+Miew.prototype.load = function (source, opts) {
   var _this3 = this;
 
   opts = lodash.merge({}, opts, {
@@ -89100,12 +89101,12 @@ Miew$1.prototype.load = function (source, opts) {
  * Unload molecule (delete corresponding visual).
  * @param {string=} name - name of the visual
  */
-Miew$1.prototype.unload = function (name) {
+Miew.prototype.unload = function (name) {
   this._removeVisual(name || this.getCurrentVisual());
   this.resetPivot();
 };
 
-Miew$1.prototype._startAnimation = function (fileData) {
+Miew.prototype._startAnimation = function (fileData) {
   this._stopAnimation();
   var self = this;
   var visual = this._getComplexVisual();
@@ -89136,7 +89137,7 @@ Miew$1.prototype._startAnimation = function (fileData) {
   this._continueAnimation();
 };
 
-Miew$1.prototype._startMdAnimation = function (mdFile, pdbFile) {
+Miew.prototype._startMdAnimation = function (mdFile, pdbFile) {
   this._stopAnimation();
   var self = this;
   var visual = this._getComplexVisual();
@@ -89167,7 +89168,7 @@ Miew$1.prototype._startMdAnimation = function (mdFile, pdbFile) {
   this._continueAnimation();
 };
 
-Miew$1.prototype._pauseAnimation = function () {
+Miew.prototype._pauseAnimation = function () {
   if (this._animInterval === null) {
     return;
   }
@@ -89185,7 +89186,7 @@ Miew$1.prototype._pauseAnimation = function () {
   }
 };
 
-Miew$1.prototype._continueAnimation = function () {
+Miew.prototype._continueAnimation = function () {
   this._isAnimating = true;
   var minFrameTime = 1000 / settings.now.maxfps;
   minFrameTime = Number.isNaN(minFrameTime) ? 0 : minFrameTime;
@@ -89222,7 +89223,7 @@ Miew$1.prototype._continueAnimation = function () {
   }, minFrameTime);
 };
 
-Miew$1.prototype._stopAnimation = function () {
+Miew.prototype._stopAnimation = function () {
   if (this._animInterval === null) {
     return;
   }
@@ -89243,7 +89244,7 @@ Miew$1.prototype._stopAnimation = function () {
  * @param {object} opts - TODO: Options.
  * @private
  */
-Miew$1.prototype._onLoad = function (dataSource, opts) {
+Miew.prototype._onLoad = function (dataSource, opts) {
   var gfx = this._gfx;
   var visualName = null;
 
@@ -89346,7 +89347,7 @@ Miew$1.prototype._onLoad = function (dataSource, opts) {
   return visualName;
 };
 
-Miew$1.prototype.resetEd = function () {
+Miew.prototype.resetEd = function () {
   if (this._edLoader) {
     this._edLoader.abort();
     this._edLoader = null;
@@ -89358,7 +89359,7 @@ Miew$1.prototype.resetEd = function () {
   this._needRender = true;
 };
 
-Miew$1.prototype.loadEd = function (source) {
+Miew.prototype.loadEd = function (source) {
   var _this4 = this;
 
   this.resetEd();
@@ -89387,7 +89388,7 @@ Miew$1.prototype.loadEd = function (source) {
   });
 };
 
-Miew$1.prototype._onLoadEd = function (dataSource) {
+Miew.prototype._onLoadEd = function (dataSource) {
   dataSource.normalize();
 
   var volumeVisual = new VolumeVisual('volume', dataSource);
@@ -89398,7 +89399,7 @@ Miew$1.prototype._onLoadEd = function (dataSource) {
   return visualName;
 };
 
-Miew$1.prototype._needRebuild = function () {
+Miew.prototype._needRebuild = function () {
   var needsRebuild = false;
   this._forEachComplexVisual(function (visual) {
     needsRebuild = needsRebuild || visual.needsRebuild();
@@ -89406,7 +89407,7 @@ Miew$1.prototype._needRebuild = function () {
   return needsRebuild;
 };
 
-Miew$1.prototype._rebuildObjects = function () {
+Miew.prototype._rebuildObjects = function () {
   var self = this;
   var gfx = this._gfx;
   var i, n;
@@ -89437,7 +89438,7 @@ Miew$1.prototype._rebuildObjects = function () {
   }, 10);
 };
 
-Miew$1.prototype.changeUnit = function (unitIdx, name) {
+Miew.prototype.changeUnit = function (unitIdx, name) {
   var visual = this._getComplexVisual(name);
   if (unitIdx === undefined) {
     var unit = visual ? visual.getComplex().getCurrentStructure() : 0;
@@ -89457,7 +89458,7 @@ Miew$1.prototype.changeUnit = function (unitIdx, name) {
 /**
  * Start to rebuild geometry asynchronously.
  */
-Miew$1.prototype.rebuild = function () {
+Miew.prototype.rebuild = function () {
   if (this._building) {
     this.logger.warn('Miew.rebuild(): already building!');
     return;
@@ -89497,14 +89498,14 @@ Miew$1.prototype.rebuild = function () {
 };
 
 /** Mark all representations for rebuilding */
-Miew$1.prototype.rebuildAll = function () {
+Miew.prototype.rebuildAll = function () {
   this._forEachComplexVisual(function (visual) {
     visual.setNeedsRebuild();
   });
   // this.rebuild(); // TODO: isn't implicit rebuild enough?
 };
 
-Miew$1.prototype._refreshTitle = function (appendix) {
+Miew.prototype._refreshTitle = function (appendix) {
   var title;
   appendix = appendix === undefined ? '' : appendix;
   var visual = this._getComplexVisual();
@@ -89520,11 +89521,11 @@ Miew$1.prototype._refreshTitle = function (appendix) {
   this.dispatchEvent({ type: 'titleChanged', data: title });
 };
 
-Miew$1.prototype.setNeedRender = function () {
+Miew.prototype.setNeedRender = function () {
   this._needRender = true;
 };
 
-Miew$1.prototype._extractRepresentation = function () {
+Miew.prototype._extractRepresentation = function () {
   var _this5 = this;
 
   var changed = [];
@@ -89563,7 +89564,7 @@ Miew$1.prototype._extractRepresentation = function () {
  * Change current representation list.
  * @param {array} reps - Representation list.
  */
-Miew$1.prototype._setReps = function (reps) {
+Miew.prototype._setReps = function (reps) {
   reps = reps || this._opts && this._opts.reps || [];
   this._forEachComplexVisual(function (visual) {
     return visual.resetReps(reps);
@@ -89574,7 +89575,7 @@ Miew$1.prototype._setReps = function (reps) {
  * Apply existing preset to current scene.
  * @param preset
  */
-Miew$1.prototype.applyPreset = function (preset) {
+Miew.prototype.applyPreset = function (preset) {
   var presets = settings.now.presets;
   var presList = [preset || settings.defaults.preset, settings.defaults.preset, Object.keys(presets)[0]];
   var reps = null;
@@ -89592,7 +89593,7 @@ Miew$1.prototype.applyPreset = function (preset) {
  * Reset current representation list to initial values.
  * @param {string} [preset] - The source preset in case of uninitialized representation list.
  */
-Miew$1.prototype.resetReps = function (preset) {
+Miew.prototype.resetReps = function (preset) {
   var reps = this._opts && this._opts.reps;
   if (reps) {
     this._setReps(reps);
@@ -89605,7 +89606,7 @@ Miew$1.prototype.resetReps = function (preset) {
  * Get number of representations created so far.
  * @returns {number} Number of reps.
  */
-Miew$1.prototype.repCount = function (name) {
+Miew.prototype.repCount = function (name) {
   var visual = this._getComplexVisual(name);
   return visual ? visual.repCount() : 0;
 };
@@ -89616,7 +89617,7 @@ Miew$1.prototype.repCount = function (name) {
  * @param {string=} [name] - Complex name. Defaults to the current one.
  * @returns {number} The current index.
  */
-Miew$1.prototype.repCurrent = function (index, name) {
+Miew.prototype.repCurrent = function (index, name) {
   var visual = this._getComplexVisual(name);
   var newIdx = visual ? visual.repCurrent(index) : -1;
   if (index && newIdx !== index) {
@@ -89635,7 +89636,7 @@ Miew$1.prototype.repCurrent = function (index, name) {
  * @param {string=} rep.material - Material id.
  * @returns {?object} Representation description.
  */
-Miew$1.prototype.rep = function (index, rep) {
+Miew.prototype.rep = function (index, rep) {
   // FIXME support targeting visual by name
   var visual = this._getComplexVisual('');
   return visual ? visual.rep(index, rep) : null;
@@ -89646,7 +89647,7 @@ Miew$1.prototype.rep = function (index, rep) {
  * @param {number=} index - Zero-based index, up to {@link Miew#repCount}(). Defaults to the current one.
  * @returns {?object} Representation.
  */
-Miew$1.prototype.repGet = function (index, name) {
+Miew.prototype.repGet = function (index, name) {
   var visual = this._getComplexVisual(name);
   return visual ? visual.repGet(index) : null;
 };
@@ -89656,7 +89657,7 @@ Miew$1.prototype.repGet = function (index, name) {
  * @param {object=} rep - Representation description.
  * @returns {number} Index of the new representation.
  */
-Miew$1.prototype.repAdd = function (rep, name) {
+Miew.prototype.repAdd = function (rep, name) {
   var visual = this._getComplexVisual(name);
   return visual ? visual.repAdd(rep) : -1;
 };
@@ -89665,7 +89666,7 @@ Miew$1.prototype.repAdd = function (rep, name) {
  * Remove representation.
  * @param {number=} index - Zero-based representation index.
  */
-Miew$1.prototype.repRemove = function (index, name) {
+Miew.prototype.repRemove = function (index, name) {
   var visual = this._getComplexVisual(name);
   return visual ? visual.repRemove(index) : null;
 };
@@ -89675,13 +89676,13 @@ Miew$1.prototype.repRemove = function (index, name) {
  * @param {number} index - Zero-based representation index.
  * @param {boolean=} hide - Specify false to make rep visible, true to hide (by default).
  */
-Miew$1.prototype.repHide = function (index, hide, name) {
+Miew.prototype.repHide = function (index, hide, name) {
   this._needRender = true;
   var visual = this._getComplexVisual(name);
   return visual ? visual.repHide(index, hide) : null;
 };
 
-Miew$1.prototype._setEditMode = function (mode) {
+Miew.prototype._setEditMode = function (mode) {
 
   this._editMode = mode;
 
@@ -89698,7 +89699,7 @@ Miew$1.prototype._setEditMode = function (mode) {
   this.dispatchEvent({ type: 'editModeChanged', data: mode === EDIT_MODE.COMPLEX });
 };
 
-Miew$1.prototype._enterComponentEditMode = function () {
+Miew.prototype._enterComponentEditMode = function () {
 
   if (this._editMode !== EDIT_MODE.COMPLEX) {
     return;
@@ -89723,7 +89724,7 @@ Miew$1.prototype._enterComponentEditMode = function () {
   this._objectControls.keysTranslateObj(true);
 };
 
-Miew$1.prototype._applyComponentEdit = function () {
+Miew.prototype._applyComponentEdit = function () {
   if (this._editMode !== EDIT_MODE.COMPONENT) {
     return;
   }
@@ -89742,7 +89743,7 @@ Miew$1.prototype._applyComponentEdit = function () {
   this.rebuildAll();
 };
 
-Miew$1.prototype._discardComponentEdit = function () {
+Miew.prototype._discardComponentEdit = function () {
   if (this._editMode !== EDIT_MODE.COMPONENT) {
     return;
   }
@@ -89761,7 +89762,7 @@ Miew$1.prototype._discardComponentEdit = function () {
   this._needRender = true;
 };
 
-Miew$1.prototype._enterFragmentEditMode = function () {
+Miew.prototype._enterFragmentEditMode = function () {
 
   if (this._editMode !== EDIT_MODE.COMPLEX) {
     return;
@@ -89794,7 +89795,7 @@ Miew$1.prototype._enterFragmentEditMode = function () {
   this._needRender = true;
 };
 
-Miew$1.prototype._applyFragmentEdit = function () {
+Miew.prototype._applyFragmentEdit = function () {
   if (this._editMode !== EDIT_MODE.FRAGMENT) {
     return;
   }
@@ -89814,7 +89815,7 @@ Miew$1.prototype._applyFragmentEdit = function () {
   this.rebuildAll();
 };
 
-Miew$1.prototype._discardFragmentEdit = function () {
+Miew.prototype._discardFragmentEdit = function () {
   if (this._editMode !== EDIT_MODE.FRAGMENT) {
     return;
   }
@@ -89835,13 +89836,13 @@ Miew$1.prototype._discardFragmentEdit = function () {
 };
 
 /** @deprecated  Move object instead of panning the camera */
-Miew$1.prototype.resetPan = function () {
+Miew.prototype.resetPan = function () {
   this._gfx.camera.position.x = 0.0;
   this._gfx.camera.position.y = 0.0;
   this.dispatchEvent({ type: 'transform' });
 };
 
-Miew$1.prototype._onPick = function (event) {
+Miew.prototype._onPick = function (event) {
   if (!settings.now.picking) {
     // picking is disabled
     return;
@@ -89900,7 +89901,7 @@ Miew$1.prototype._onPick = function (event) {
   this._updateInfoPanel();
 };
 
-Miew$1.prototype._onDblClick = function (event) {
+Miew.prototype._onDblClick = function (event) {
   if ('atom' in event.obj) {
     this.setPivotAtom(event.obj.atom);
   } else if ('residue' in event.obj) {
@@ -89913,7 +89914,7 @@ Miew$1.prototype._onDblClick = function (event) {
   this._needRender = true;
 };
 
-Miew$1.prototype._onKeyDown = function (event) {
+Miew.prototype._onKeyDown = function (event) {
   if (!this._running || !this._hotKeysEnabled) {
     return;
   }
@@ -89979,20 +89980,17 @@ Miew$1.prototype._onKeyDown = function (event) {
   }
 };
 
-Miew$1.prototype._onKeyUp = function (event) {
+Miew.prototype._onKeyUp = function (event) {
   if (!this._running || !this._hotKeysEnabled) {
     return;
   }
 
-  switch (event.keyCode) {
-    case 'X'.charCodeAt(0):
-      this._extractRepresentation();
-      break;
-    default:
+  if (event.keyCode === 'X'.charCodeAt(0)) {
+    this._extractRepresentation();
   }
 };
 
-Miew$1.prototype._updateInfoPanel = function () {
+Miew.prototype._updateInfoPanel = function () {
   var info = this._msgAtomInfo.getElementsByTagName('p')[0];
   var atom, residue;
 
@@ -90018,7 +90016,7 @@ Miew$1.prototype._updateInfoPanel = function () {
   var aName = '';
   var coordLine = '';
 
-  if (this._lastPick instanceof Atom) {
+  if (this._lastPick instanceof Atom$3) {
     atom = this._lastPick;
     residue = atom._residue;
 
@@ -90036,13 +90034,13 @@ Miew$1.prototype._updateInfoPanel = function () {
     }
 
     coordLine = 'Coord: (' + atom._position.x.toFixed(2).toString() + ',     ' + atom._position.y.toFixed(2).toString() + ',     ' + atom._position.z.toFixed(2).toString() + ')';
-  } else if (this._lastPick instanceof Residue) {
+  } else if (this._lastPick instanceof Residue$2) {
     residue = this._lastPick;
 
     secondLine = residue._type._fullName + ':       ' + residue._chain._name + '.' + residue._type._name + residue._sequence + residue._icode.trim();
-  } else if (this._lastPick instanceof Chain) {
+  } else if (this._lastPick instanceof Chain$3) {
     secondLine = 'chain ' + this._lastPick._name;
-  } else if (this._lastPick instanceof Molecule) {
+  } else if (this._lastPick instanceof Molecule$5) {
     secondLine = 'molecule ' + this._lastPick._name;
   }
 
@@ -90068,7 +90066,7 @@ Miew$1.prototype._updateInfoPanel = function () {
   this._msgAtomInfo.style.opacity = 1.0;
 };
 
-Miew$1.prototype._getAltObj = function () {
+Miew.prototype._getAltObj = function () {
   if (this._editors) {
     var altObj = null;
     for (var i = 0; i < this._editors.length; ++i) {
@@ -90093,7 +90091,7 @@ Miew$1.prototype._getAltObj = function () {
   };
 };
 
-Miew$1.prototype.resetPivot = function () {
+Miew.prototype.resetPivot = function () {
   var boundingBox = new Box3();
   this._forEachVisual(function (visual) {
     boundingBox.union(visual.getBoundaries().boundingBox);
@@ -90104,7 +90102,7 @@ Miew$1.prototype.resetPivot = function () {
   this.dispatchEvent({ type: 'transform' });
 };
 
-Miew$1.prototype.setPivotResidue = function (residue) {
+Miew.prototype.setPivotResidue = function (residue) {
   var visual = this._getVisualForComplex(residue.getChain().getComplex());
   if (!visual) {
     return;
@@ -90131,7 +90129,7 @@ Miew$1.prototype.setPivotResidue = function (residue) {
   this.dispatchEvent({ type: 'transform' });
 };
 
-Miew$1.prototype.setPivotAtom = function (atom) {
+Miew.prototype.setPivotAtom = function (atom) {
   var visual = this._getVisualForComplex(atom.getResidue().getChain().getComplex());
   if (!visual) {
     return;
@@ -90144,7 +90142,7 @@ Miew$1.prototype.setPivotAtom = function (atom) {
   this.dispatchEvent({ type: 'transform' });
 };
 
-Miew$1.prototype.benchmarkGfx = function (force) {
+Miew.prototype.benchmarkGfx = function (force) {
   var self = this;
   var prof = new GfxProfiler(this._gfx.renderer);
 
@@ -90180,7 +90178,7 @@ Miew$1.prototype.benchmarkGfx = function (force) {
  *        if width is omitted too.
  * @returns {string} Data URL representing the image contents.
  */
-Miew$1.prototype.screenshot = function (width, height) {
+Miew.prototype.screenshot = function (width, height) {
   var gfx = this._gfx;
 
   function Fov2Tan(fov) {
@@ -90242,12 +90240,12 @@ Miew$1.prototype.screenshot = function (width, height) {
  * @param {number} [height] - Height of an image. Defaults to the width (square) or canvas height,
  *        if width is omitted too.
  */
-Miew$1.prototype.screenshotSave = function (filename, width, height) {
+Miew.prototype.screenshotSave = function (filename, width, height) {
   var uri = this.screenshot(width, height);
   utils.shotDownload(uri, filename);
 };
 
-Miew$1.prototype._tweakResolution = function () {
+Miew.prototype._tweakResolution = function () {
   var maxPerf = [['poor', 100], ['low', 500], ['medium', 1000], ['high', 5000], ['ultra', Number.MAX_VALUE]];
 
   var atomCount = 0;
@@ -90267,7 +90265,7 @@ Miew$1.prototype._tweakResolution = function () {
   }
 };
 
-Miew$1.prototype._autoChangeResolution = function (resolution) {
+Miew.prototype._autoChangeResolution = function (resolution) {
   if (resolution !== settings.now.resolution) {
     this.logger.report('Your rendering resolution was changed to "' + resolution + '" for best performance.');
   }
@@ -90277,11 +90275,11 @@ Miew$1.prototype._autoChangeResolution = function (resolution) {
 /**
  * Save current settings to cookies.
  */
-Miew$1.prototype.saveSettings = function () {
+Miew.prototype.saveSettings = function () {
   this._cookies.setCookie(this._opts.settingsCookie, JSON.stringify(this.settings.getDiffs(true)));
 };
 
-Miew$1.prototype._loadSettings = function () {
+Miew.prototype._loadSettings = function () {
   try {
     var cookie = this._cookies.getCookie(this._opts.settingsCookie);
     var diffs = cookie ? JSON.parse(cookie) : {};
@@ -90294,7 +90292,7 @@ Miew$1.prototype._loadSettings = function () {
 /**
  * Load settings from cookies.
  */
-Miew$1.prototype.restoreSettings = function () {
+Miew.prototype.restoreSettings = function () {
   var oldSettings = lodash.cloneDeep(this.settings.now);
   this._loadSettings();
   var changes = utils.objectsDiff(this.settings.now, oldSettings);
@@ -90304,7 +90302,7 @@ Miew$1.prototype.restoreSettings = function () {
 /**
  * Reset current settings to the defaults.
  */
-Miew$1.prototype.resetSettings = function () {
+Miew.prototype.resetSettings = function () {
   var oldSettings = lodash.cloneDeep(this.settings.now);
   this.settings.reset();
   var changes = utils.objectsDiff(this.settings.now, oldSettings);
@@ -90316,9 +90314,9 @@ Miew$1.prototype.resetSettings = function () {
    * @param {string|object} opts - See {@link Miew} constructor.
    * @see {@link Miew#set}, {@link Miew#repAdd}, {@link Miew#rep}.
    */
-Miew$1.prototype.setOptions = function (opts) {
+Miew.prototype.setOptions = function (opts) {
   if (typeof opts === 'string') {
-    opts = Miew$1.options.fromAttr(opts);
+    opts = Miew.options.fromAttr(opts);
   }
   if (opts.reps) {
     this._opts.reps = null;
@@ -90360,7 +90358,7 @@ Miew$1.prototype.setOptions = function (opts) {
   }
 };
 
-Miew$1.prototype.info = function (name) {
+Miew.prototype.info = function (name) {
   var visual = this._getComplexVisual(name);
   if (!visual) {
     return {};
@@ -90381,7 +90379,7 @@ Miew$1.prototype.info = function (name) {
    * OBJECTS SEGMENT
    */
 
-Miew$1.prototype.addObject = function (objData, bThrow) {
+Miew.prototype.addObject = function (objData, bThrow) {
   var Ctor = null;
 
   // TODO change this to factory when better times come.
@@ -90406,7 +90404,7 @@ Miew$1.prototype.addObject = function (objData, bThrow) {
   this._needRender = true;
 };
 
-Miew$1.prototype._addSceneObject = function (sceneObject) {
+Miew.prototype._addSceneObject = function (sceneObject) {
   var visual = this._getComplexVisual();
   if (sceneObject.build && visual) {
     sceneObject.build(visual.getComplex());
@@ -90416,7 +90414,7 @@ Miew$1.prototype._addSceneObject = function (sceneObject) {
   objects[objects.length] = sceneObject;
 };
 
-Miew$1.prototype._updateObjsToFrame = function (frameData) {
+Miew.prototype._updateObjsToFrame = function (frameData) {
   var objs = this._objects;
   for (var i = 0, n = objs.length; i < n; ++i) {
     if (objs[i].updateToFrame) {
@@ -90425,7 +90423,7 @@ Miew$1.prototype._updateObjsToFrame = function (frameData) {
   }
 };
 
-Miew$1.prototype._resetObjects = function () {
+Miew.prototype._resetObjects = function () {
   var objs = this._opts._objects;
 
   this._objects = [];
@@ -90436,7 +90434,7 @@ Miew$1.prototype._resetObjects = function () {
   }
 };
 
-Miew$1.prototype.removeObject = function (index) {
+Miew.prototype.removeObject = function (index) {
   var obj = this._objects[index];
   if (!obj) {
     throw new Error('Scene object with index ' + index + ' does not exist');
@@ -90455,7 +90453,7 @@ Miew$1.prototype.removeObject = function (index) {
  * @param {boolean} [opts.view=false] - when this flag is true, a view information is included
  * @returns {string} URL
  */
-Miew$1.prototype.getURL = function (opts) {
+Miew.prototype.getURL = function (opts) {
   return options.toURL(this.getState(lodash.defaults(opts, {
     compact: true,
     settings: false,
@@ -90472,7 +90470,7 @@ Miew$1.prototype.getURL = function (opts) {
  * @param {boolean} [opts.view=true] - when this flag is true, a view information is included
  * @returns {string} script
  */
-Miew$1.prototype.getScript = function (opts) {
+Miew.prototype.getScript = function (opts) {
   return options.toScript(this.getState(lodash.defaults(opts, {
     compact: true,
     settings: true,
@@ -90485,7 +90483,7 @@ Miew$1.prototype.getScript = function (opts) {
    * @param {boolean} compareWithDefaults - when this flag is true, reps list is compared (if possible)
    * to preset's defaults and only diffs are generated
    */
-Miew$1.prototype._compareReps = function (complexVisual, compareWithDefaults) {
+Miew.prototype._compareReps = function (complexVisual, compareWithDefaults) {
   var ans = {};
   var repCount = 0;
 
@@ -90524,7 +90522,7 @@ Miew$1.prototype._compareReps = function (complexVisual, compareWithDefaults) {
    * @param {boolean} [opts.view=false] - when this flag is true, a view information is included
    * @returns {Object} State object.
    */
-Miew$1.prototype.getState = function (opts) {
+Miew.prototype.getState = function (opts) {
   var state = {};
 
   opts = lodash.defaults(opts, {
@@ -90590,11 +90588,11 @@ Miew$1.prototype.getState = function (opts) {
  * @param {*=} value - Default value.
  * @returns {*} Parameter value.
  */
-Miew$1.prototype.get = function (param, value) {
+Miew.prototype.get = function (param, value) {
   return settings.get(param, value);
 };
 
-Miew$1.prototype._clipPlaneUpdateValue = function (radius) {
+Miew.prototype._clipPlaneUpdateValue = function (radius) {
   var clipPlaneValue = Math.max(this._gfx.camera.position.z - radius * settings.now.draft.clipPlaneFactor, settings.now.camNear);
 
   var opts = { clipPlaneValue: clipPlaneValue };
@@ -90612,7 +90610,7 @@ Miew$1.prototype._clipPlaneUpdateValue = function (radius) {
   }
 };
 
-Miew$1.prototype._fogFarUpdateValue = function () {
+Miew.prototype._fogFarUpdateValue = function () {
   if (this._picker !== null) {
     if (this._gfx.scene.fog) {
       this._picker.fogFarValue = this._gfx.scene.fog.far;
@@ -90627,7 +90625,7 @@ Miew$1.prototype._fogFarUpdateValue = function () {
  * @param changes - differences with previous settings
  * @private
  */
-Miew$1.prototype._onSettingsChanged = function (changes) {
+Miew.prototype._onSettingsChanged = function (changes) {
   if (!(changes instanceof Object)) {
     return;
   }
@@ -90679,7 +90677,7 @@ Miew$1.prototype._onSettingsChanged = function (changes) {
  * @param {string|object} params - Parameter name or path (e.g. 'modes.BS.atom') or even settings object.
  * @param {*=} value - Value.
  */
-Miew$1.prototype.set = function (params, value) {
+Miew.prototype.set = function (params, value) {
   if (typeof params === 'string' && value !== undefined) {
     // slow but avoids code duplication
     var key = params;
@@ -90698,7 +90696,7 @@ Miew$1.prototype.set = function (params, value) {
  * @param {string} expression - string expression of selection
  * @param {boolean=} append - true to append selection atoms to current selection, false to rewrite selection
  */
-Miew$1.prototype.select = function (expression, append) {
+Miew.prototype.select = function (expression, append) {
   var visual = this._getComplexVisual();
   if (!visual) {
     return;
@@ -90706,7 +90704,7 @@ Miew$1.prototype.select = function (expression, append) {
 
   var sel = expression;
   if (lodash.isString(expression)) {
-    sel = selectors.parse(expression).selector;
+    sel = selectors$4.parse(expression).selector;
   }
 
   visual.select(sel, append);
@@ -90723,7 +90721,7 @@ var VIEW_VERSION = '1';
  *
  * @param {string=} expression - Optional string encoded the view
  */
-Miew$1.prototype.view = function (expression) {
+Miew.prototype.view = function (expression) {
   var self = this;
   var pivot = this._gfx.pivot;
   var transform = [];
@@ -90791,7 +90789,7 @@ Miew$1.prototype.view = function (expression) {
 /*
    * Update current view due to viewinterpolator state
    */
-Miew$1.prototype._updateView = function () {
+Miew.prototype._updateView = function () {
   var self = this;
   var pivot = this._gfx.pivot;
 
@@ -90821,7 +90819,7 @@ Miew$1.prototype._updateView = function () {
  * @param {number} y - translation value (Ang) along model's Y axis
  * @param {number} z - translation value (Ang) along model's Z axis
  */
-Miew$1.prototype.translate = function (x, y, z) {
+Miew.prototype.translate = function (x, y, z) {
   this._objectControls.translatePivot(x, y, z);
   this.dispatchEvent({ type: 'transform' });
   this._needRender = true;
@@ -90833,7 +90831,7 @@ Miew$1.prototype.translate = function (x, y, z) {
  * @param {number} y - rotation angle around Y axis in radians
  * @param {number} z - rotation angle around Z axis in radians
  */
-Miew$1.prototype.rotate = function (x, y, z) {
+Miew.prototype.rotate = function (x, y, z) {
   this._objectControls.rotate(new Quaternion().setFromEuler(new Euler(x, y, z, 'XYZ')));
   this.dispatchEvent({ type: 'transform' });
   this._needRender = true;
@@ -90843,7 +90841,7 @@ Miew$1.prototype.rotate = function (x, y, z) {
  * Scale object by factor
  * @param {number} factor - scale multiplier
  */
-Miew$1.prototype.scale = function (factor) {
+Miew.prototype.scale = function (factor) {
   if (factor <= 0) {
     throw new RangeError('Scale should be greater than zero');
   }
@@ -90858,7 +90856,7 @@ Miew$1.prototype.scale = function (factor) {
    * @param {number} y - vertical panning
    * @deprecated  Move object instead of panning the camera
    */
-Miew$1.prototype.pan = function (x, y) {
+Miew.prototype.pan = function (x, y) {
   this._gfx.camera.translateX(x);
   this._gfx.camera.translateY(y);
   this._needRender = true;
@@ -90870,14 +90868,14 @@ Miew$1.prototype.pan = function (x, y) {
  * @param {number} radius - distance
  * @returns {Selector} selector describing result group of atoms
  */
-Miew$1.prototype.within = function (selector, radius) {
+Miew.prototype.within = function (selector, radius) {
   var visual = this._getComplexVisual();
   if (!visual) {
-    return selectors.None();
+    return selectors$4.None();
   }
 
   if (selector instanceof String) {
-    selector = selectors.parse(selector);
+    selector = selectors$4.parse(selector);
   }
 
   var res = visual.within(selector, radius);
@@ -90893,7 +90891,7 @@ Miew$1.prototype.within = function (selector, radius) {
  * @param {string} fullAtomName - full atom name, like A.38.CG
  * @returns {Object} {x, y} or false if atom not found
  */
-Miew$1.prototype.projected = function (fullAtomName, complexName) {
+Miew.prototype.projected = function (fullAtomName, complexName) {
   var visual = this._getComplexVisual(complexName);
   if (!visual) {
     return false;
@@ -91119,7 +91117,7 @@ function _convertData(data, opts, job) {
       var bytes = new Uint8Array(byteNumbers);
       var blob = new File([bytes], opts.fileName);
       console.time('convert');
-      Miew$1.prototype.srvTopologyConvert(blob, opts.mdFile, function (success, newData, message) {
+      Miew.prototype.srvTopologyConvert(blob, opts.mdFile, function (success, newData, message) {
         console.timeEnd('convert');
         if (success) {
           opts.converted = true;
@@ -91182,11 +91180,11 @@ function _parseData(data, opts, job) {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew$1.prototype.VERSION = typeof "0.7.10" !== 'undefined' && "0.7.10" || '0.0.0-dev';
+Miew.prototype.VERSION = typeof "0.7.11" !== 'undefined' && "0.7.11" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
-lodash.assign(Miew$1, /** @lends Miew */{
-  VERSION: Miew$1.prototype.VERSION,
+lodash.assign(Miew, /** @lends Miew */{
+  VERSION: Miew.prototype.VERSION,
 
   registeredPlugins: [],
 
@@ -91201,7 +91199,7 @@ lodash.assign(Miew$1, /** @lends Miew */{
   utils: utils,
   gfx: {
     Representation: Representation,
-    fbxExport: exportAll
+    fbxExport: fbxExport
   },
 
   /**
@@ -92556,9 +92554,9 @@ var help = {
 
 function parseRange(node) {
   if (node instanceof Array) {
-    return new selectors$1.Range(node[0], node[1]);
+    return new selectors.Range(node[0], node[1]);
   } else {
-    return new selectors$1.Range(node, node);
+    return new selectors.Range(node, node);
   }
 }
 
@@ -92567,7 +92565,7 @@ function parseRangeList(node) {
   for (var i = 0; i < node.length; ++i) {
     args.push(parseRange(node[i]));
   }
-  return new selectors$1.RangeList(args);
+  return new selectors.RangeList(args);
 }
 
 function parseValueList(node) {
@@ -92575,26 +92573,26 @@ function parseValueList(node) {
   for (var i = 0; i < node.length; ++i) {
     args.push(node[i]);
   }
-  return new selectors$1.ValueList(args);
+  return new selectors.ValueList(args);
 }
 
 function _createSelectorFromNode(node) {
-  var factory = selectors$1.keyword(node[0]);
+  var factory = selectors.keyword(node[0]);
   if (!factory || !factory.SelectorClass) {
     return null;
   }
 
   var selector = null;
   var proto = factory.SelectorClass.prototype;
-  if (proto instanceof selectors$1.PrefixOperator && node.length === 2) {
+  if (proto instanceof selectors.PrefixOperator && node.length === 2) {
     selector = factory(_createSelectorFromNode(node[1]));
-  } else if (proto instanceof selectors$1.InfixOperator && node.length === 3) {
+  } else if (proto instanceof selectors.InfixOperator && node.length === 3) {
     selector = factory(_createSelectorFromNode(node[1]), _createSelectorFromNode(node[2]));
-  } else if (proto instanceof selectors$1.RangeListSelector && node.length === 2) {
+  } else if (proto instanceof selectors.RangeListSelector && node.length === 2) {
     selector = factory(parseRangeList(node[1]));
-  } else if (proto instanceof selectors$1.ValueListSelector && node.length === 2) {
+  } else if (proto instanceof selectors.ValueListSelector && node.length === 2) {
     selector = factory(parseValueList(node[1]));
-  } else if (proto instanceof selectors$1.Selector && node.length === 1) {
+  } else if (proto instanceof selectors.Selector && node.length === 1) {
     selector = factory();
   }
 
@@ -92615,13 +92613,13 @@ var JSONtoSelectorConverter = function () {
   return JSONtoSelectorConverter;
 }();
 
-var selectors$5 = Miew$1.chem.selectors;
-var modes$1 = Miew$1.modes;
-var colorers$1 = Miew$1.colorers;
-var materials$1 = Miew$1.materials;
-var palettes$1 = Miew$1.palettes;
-var options$1 = Miew$1.options;
-var settings$1 = Miew$1.settings;
+var selectors$5 = Miew.chem.selectors;
+var modes$1 = Miew.modes;
+var colorers$1 = Miew.colorers;
+var materials$1 = Miew.materials;
+var palettes$1 = Miew.palettes;
+var options$1 = Miew.options;
+var settings$1 = Miew.settings;
 
 function None() {}
 
@@ -93539,7 +93537,7 @@ cliutils.notimplemented = function () {
   return this.NULL;
 };
 
-Miew$1.prototype.script = function (script, _printCallback, _errorCallback) {
+Miew.prototype.script = function (script, _printCallback, _errorCallback) {
   MiewCLIParser_1.yy.miew = this;
   MiewCLIParser_1.yy.echo = _printCallback;
   MiewCLIParser_1.yy.error = _errorCallback;
@@ -93554,19 +93552,19 @@ Miew$1.prototype.script = function (script, _printCallback, _errorCallback) {
   this.cmdQueue = this.cmdQueue.concat(script.split('\n'));
 };
 
-Miew$1.prototype.awaitWhileCMDisInProcess = function () {
+Miew.prototype.awaitWhileCMDisInProcess = function () {
   this.commandInAction = true;
 };
 
-Miew$1.prototype.finishAwaitingCMDInProcess = function () {
+Miew.prototype.finishAwaitingCMDInProcess = function () {
   this.commandInAction = false;
 };
 
-Miew$1.prototype.isScriptingCommandAvailable = function () {
+Miew.prototype.isScriptingCommandAvailable = function () {
   return this.commandInAction !== undefined && !this.commandInAction && this.cmdQueue !== undefined && this.cmdQueue.length > 0;
 };
 
-Miew$1.prototype.callNextCmd = function () {
+Miew.prototype.callNextCmd = function () {
   if (this.isScriptingCommandAvailable()) {
     var cmd = this.cmdQueue.shift();
 
@@ -93585,11 +93583,11 @@ Miew$1.prototype.callNextCmd = function () {
   return '';
 };
 
-Miew$1.JSONConverter = JSONtoSelectorConverter;
+Miew.JSONConverter = JSONtoSelectorConverter;
 
 MiewCLIParser_1.yy = cliutils;
 // FIXME: workaround for incorrect JISON parser generator for AMD module
 MiewCLIParser_1.yy.parseError = MiewCLIParser_1.parseError;
 
-export default Miew$1;
+export default Miew;
 //# sourceMappingURL=Miew.module.js.map

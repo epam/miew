@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.11] - 2018-01-17
+### Fixed
+- Fixed a loading error in IE11 when a relative URL is used.
+- Fixed an FBX export.
+- Renamed files and classes to match and fixed other code smells found by SonarCloud.
+
 ## [0.7.10] - 2017-12-25
 ### Added
 - Add more unit tests for loaders.
@@ -193,7 +199,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.10...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.11...HEAD
+[0.7.11]: https://github.com/epam/miew/compare/v0.7.10...v0.7.11
 [0.7.10]: https://github.com/epam/miew/compare/v0.7.9...v0.7.10
 [0.7.9]: https://github.com/epam/miew/compare/v0.7.8...v0.7.9
 [0.7.8]: https://github.com/epam/miew/compare/v0.7.7...v0.7.8
