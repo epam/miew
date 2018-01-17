@@ -3,7 +3,7 @@ import del      from 'del';
 import sequence from 'run-sequence';
 import yargs    from 'yargs';
 import path     from 'path';
-import util     from 'gulp-util';
+import log      from 'fancy-log';
 import _        from 'lodash';
 import jsdoc    from 'gulp-jsdoc3';
 import open     from 'open';
@@ -33,7 +33,7 @@ const plugins = {
 };
 
 import version from './tools/version';
-util.log(version.copyright);
+log(version.copyright);
 
 import webpackConfig from './webpack.config.babel';
 import webpackDevConfig from './webpack.dev.babel';
@@ -74,7 +74,7 @@ gulp.task('lint:js', () =>
     .pipe(plugins.eslint())
     .pipe(plugins.eslint.format('visualstudio', function(msg) {
       if (msg !== 'no problems') {
-        util.log(util.colors.red('Lint errors found:\n\n') + msg);
+        log('Lint errors found\n\n' + msg + '\n');
       }
     }))
     .pipe(plugins.eslint.failAfterError()));
@@ -178,9 +178,9 @@ gulp.task('build:css', () =>
 gulp.task('build:demo', done =>
   webpack(webpackConfig, function(err, stats) {
     if (err) {
-      throw new util.PluginError('webpack', err);
+      throw new Error(err);
     }
-    util.log('[webpack]', stats.toString({
+    log('[webpack]', stats.toString({
       colors: true,
       assets: false,
       chunks: true,
@@ -295,10 +295,10 @@ gulp.task('serve:webpack', () => {
   new WebpackDevServer(webpack(webpackDevConfig), webpackDevConfig.devServer)
     .listen(webpackPort, 'localhost', (err) => {
       if (err) {
-        throw new util.PluginError('[WDS]', err);
+        throw new Error(err);
       }
       const uri = 'http://localhost:' + webpackPort + '/webpack-dev-server/';
-      util.log('[WDS]', uri);
+      log('[WDS]', uri);
       open(uri);
     });
 });
@@ -314,7 +314,7 @@ gulp.task('show:docs', () =>
 gulp.task('show:e2e', (done) => {
   glob(config.e2e.show, (e, files) => {
     Promise.all(_.map(files, (filename) => new Promise((resolve, reject) => {
-      util.log('open', filename);
+      log('open', filename);
       open(filename, (error) => {
         if (error) {
           reject(error);
