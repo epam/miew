@@ -162,31 +162,24 @@ rep 3 s = "chain AC" m = "TU" c = "CO" mt = "SF"
 rep 4 s = "chain AF" m = "CA" c = "MO" mt = "SF"
 rep 5 s = "chain AH" m = "CA" c = "UN" mt = "SF"
 rep 6 s = "chain AI" m = "CA" c = "SQ" mt = "SF"
-rep 7 s = "chain AJ" m = "BS" c = "EL" mt = "SF"`)
-        .then(() => page.runScript('build all'))
+rep 7 s = "chain AJ" m = "BS" c = "EL" mt = "SF"
+build all`)
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('4v4f_precolors', this));
     });
 
     it('change color parameters', function() {
       return page.runScript(`\
-rep 0
-color HY gradient = "hot"
-rep 1
-color OC gradient = "blues"
-rep 2
-color TM min = -5 max = 15
-rep 3
-color CO color = 16776960 baseColor = "pink" subset = "nonpolar"
-rep 4
-color MO gradient = "reds"
-rep 5
-color UN color = "green"
-rep 6
-color SQ gradient = "blue-red"
-rep 7
-color EL carbon = "purple"`)
-        .then(() => page.runScript('build all'))
+set autobuild false
+rep 0 c=HY gradient = "hot"
+rep 1 c=OC gradient = "blues"
+rep 2 c=TM min = -5 max = 15
+rep 3 c=CO color = 16776960 baseColor = "pink" subset = "nonpolar"
+rep 4 c=MO gradient = "reds"
+rep 5 c=UN color = "green"
+rep 6 c=SQ gradient = "blue-red"
+rep 7 c=EL carbon = "purple"
+build all`)
         .then(() => page.waitUntilRepresentationIs(7, 'BS', 'EL'))
         .then(() => golden.shouldMatch('4v4f_colors', this));
     });
@@ -197,6 +190,7 @@ color EL carbon = "purple"`)
 
     it('prepare the molecule', function() {
       return page.runScript(`\
+set autobuild false
 rep 0 s = "chain AA" m = "BS" c = "EL"
 rep 1 s = "chain AB" m = "BS" c = "EL"
 rep 2 s = "chain AC" m = "BS" c = "EL"
@@ -207,35 +201,27 @@ rep 6 s = "chain AG" m = "BS" c = "UN"
 rep 7 s = "chain AH" m = "BS" c = "UN"
 rep 8 s = "chain AI" m = "BS" c = "EL"
 rep 9 s = "chain AJ" m = "BS" c = "EL"
-rep 10 s = "chain A5" m = "BS" c = "RT"`)
-        .then(() => page.runScript('build all'))
+rep 10 s = "chain A5" m = "BS" c = "RT"
+build all`)
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('4v4f_prepare', this));
     });
 
     it('change mode parameters', function() {
       return page.runScript(`\
-rep 0
-mode BS atom = 0.15 bond = 0.4 space = 0.8 multibond = false
-rep 1
-mode LC bond = 0.5 space = 0.6 multibond = false
-rep 2
-mode LN lineWidth = 2 atom = 0.5 multibond = false
-rep 3
-mode CA radius = 0.1 depth = 0.5 tension = 0.5 ss.helix.width = 2 ss.strand.width = 0.5 ss.helix.arrow = 3 ss.strand.arrow = 1
-rep 4
-mode TU radius = 1 tension = 2
-rep 5
-mode TR radius = 1
-rep 6
-mode QS isoValue = 2.5 scale = 0.8 zClip = true wireframe = true
-rep 7
-mode SA probeRadius = 0.5 wireframe = true subset = "elem N"
-rep 8
-mode SE probeRadius = 3 zClip = true wireframe = true subset = "elem N"
-rep 10
-mode TX template = 'test atom {{name}}' bg = "adjust" fg = "inverse" horizontalAlign = "right"`)
-        .then(() => page.runScript('build all'))
+set autobuild false
+rep 0 m=BS atom = 0.15 bond = 0.4 space = 0.8 multibond = false
+rep 1 m=LC bond = 0.5 space = 0.6 multibond = false
+rep 2 m=LN lineWidth = 2 atom = 0.5 multibond = false
+rep 3 m=CA radius = 0.1 depth = 0.5 tension = 0.5 ss.helix.width = 2 \
+ss.strand.width = 0.5 ss.helix.arrow = 3 ss.strand.arrow = 1
+rep 4 m=TU radius = 1 tension = 2
+rep 5 m=TR radius = 1
+rep 6 m=QS isoValue = 2.5 scale = 0.8 zClip = true wireframe = true
+rep 7 m=SA probeRadius = 0.5 wireframe = true subset = "elem N"
+rep 8 m=SE probeRadius = 3 zClip = true wireframe = true subset = "elem N"
+rep 10 m=TX template = 'test atom {{name}}' bg = "adjust" fg = "inverse" horizontalAlign = "right"
+build all`)
         .then(() => page.waitUntilRepresentationIs(10, 'TX', 'RT'))
         .then(() => golden.shouldMatch('4v4f_params', this));
     });
@@ -265,8 +251,8 @@ rep 15 s="chain AJ and protein or hetatm and not water" m=TU c=SS mt=SF
 rep 16 s="chain AF and none" m=BS c=EL mt=SF
 rep 17 s='chain AK and altloc " "' m=BS c=CH mt=SF
 rep 18 s="chain AH and polarh" m=BS c=EL mt=SF
-rep 19 s="chain AH and nonpolarh" m=BS c=EL mt=SF`)
-        .then(() => page.runScript('build all'))
+rep 19 s="chain AH and nonpolarh" m=BS c=EL mt=SF
+build all`)
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('4v4f_selectors', this));
     });
@@ -274,15 +260,15 @@ rep 19 s="chain AH and nonpolarh" m=BS c=EL mt=SF`)
     let repNumbers = Array.from(Array(20).keys());
     const suite = this;
     before(function() {
-      return Promise.all([retrieve.modes, repNumbers]).then(([modes, repNumber]) => {
+      return Promise.all([retrieve.modes]).then(([modes]) => {
         _.each(modes, (mode) => {
-          let command = 'clear\n';
-          _.each(repNumber, (number) => {
-            command += `rep ${number}\nmode ${mode.id}\n`;
-          });
+          const command = repNumbers.map(number => `rep ${number} m=${mode.id}`).join('\n');
           suite.addTest(it(`set ${mode.name} mode with all selectors`, function() {
-            return page.runScript(command)
-              .then(() => page.runScript('build all'))
+            return page.runScript(`\
+clear
+set autobuild false
+${command}
+build all`)
               .then(() => page.waitUntilRepresentationIs(19, mode.id, 'EL'))
               .then(() => golden.shouldMatch(`4v4f_${mode.id}`, this));
           }));
