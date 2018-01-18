@@ -76,7 +76,7 @@
     "gulp-babel-istanbul": "^1.6.0",
     "gulp-clean-css": "^3.9.2",
     "gulp-coveralls": "^0.1.4",
-    "gulp-eol": "^0.1.2",
+    "gulp-eol": "^0.2.0",
     "gulp-eslint": "^4.0.1",
     "gulp-ignore": "^2.0.2",
     "gulp-insert": "^0.5.0",
