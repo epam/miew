@@ -1,4 +1,5 @@
 import webdriver from 'selenium-webdriver';
+import ieDriver from 'selenium-webdriver/ie';
 
 import EmptyPage from './pages/empty.page';
 import golden from './golden';
@@ -41,6 +42,7 @@ describe('As a third-party developer, I want to', function() {
   before(function() {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
+      .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
       .build();
 
     return golden.startup(driver, cfg)
@@ -101,6 +103,7 @@ describe('As a third-party developer, I want to', function() {
 
       it('specify initial position and orientation so that exactly the same picture is reproduced', api(() => {
         window.miew = new window.Miew({
+          settings: {interpolateViews: false},
           load: '../data/1CRN.pdb',
           view: '1+n4pwTVeI8Erh8LAZHS5PcVcM70wyDlAXe38Pw==',
         });
