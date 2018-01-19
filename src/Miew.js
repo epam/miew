@@ -3675,6 +3675,82 @@ function _parseData(data, opts, job) {
     });
 }
 
+Miew.prototype.exportCML = function() {
+  const self = this;
+
+  function extractRotation(m) {
+    const xAxis = new THREE.Vector3();
+    const yAxis = new THREE.Vector3();
+    const zAxis = new THREE.Vector3();
+    m.extractBasis(xAxis, yAxis, zAxis);
+    xAxis.normalize();
+    yAxis.normalize();
+    zAxis.normalize();
+    const retMat = new THREE.Matrix4();
+    retMat.identity();
+    retMat.makeBasis(xAxis, yAxis, zAxis);
+    return retMat;
+  }
+
+  function updateCMLData(complex) {
+    const root = self._gfx.root;
+    const mat = extractRotation(root.matrixWorld);
+    const v4 = new THREE.Vector4(0, 0, 0, 0);
+    const vCenter = new THREE.Vector4(0, 0, 0, 0);
+    let xml = null;
+    let ap = null;
+
+    // update atoms in cml
+    complex.forEachAtom(function(atom) {
+      if (atom.xmlNodeRef && atom.xmlNodeRef.xmlNode) {
+        xml = atom.xmlNodeRef.xmlNode;
+        ap = atom.getPosition();
+        v4.set(ap.x, ap.y, ap.z, 1.0);
+        v4.applyMatrix4(mat);
+        xml.setAttribute('x3', v4.x.toString());
+        xml.setAttribute('y3', v4.y.toString());
+        xml.setAttribute('z3', v4.z.toString());
+        xml.removeAttribute('x2');
+        xml.removeAttribute('y2');
+      }
+    });
+    // update stereo groups in cml
+    complex.forEachSGroup(function(sGroup) {
+      if (sGroup.xmlNodeRef && sGroup.xmlNodeRef.xmlNode) {
+        xml = sGroup.xmlNodeRef.xmlNode;
+        ap = sGroup.getPosition();
+        v4.set(ap.x, ap.y, ap.z, 1.0);
+        const cp = sGroup.getCentralPoint();
+        if (cp === null) {
+          v4.applyMatrix4(mat);
+        } else {
+          vCenter.set(cp.x, cp.y, cp.z, 0.0);
+          v4.add(vCenter);
+          v4.applyMatrix4(mat); // pos in global space
+          vCenter.set(cp.x, cp.y, cp.z, 1.0);
+          vCenter.applyMatrix4(mat);
+          v4.sub(vCenter);
+        }
+        xml.setAttribute('x', v4.x.toString());
+        xml.setAttribute('y', v4.y.toString());
+        xml.setAttribute('z', v4.z.toString());
+      }
+    });
+  }
+
+  // FIXME save data for all complexes (not only current)
+  const visual = self._getComplexVisual();
+  const complex = visual ? visual.getComplex() : null;
+  if (complex && complex.originalCML) {
+    updateCMLData(complex);
+
+    // serialize xml structure to string
+    const oSerializer = new XMLSerializer();
+    return oSerializer.serializeToString(complex.originalCML);
+  }
+
+  return null;
+};
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
