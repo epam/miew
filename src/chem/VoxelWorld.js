@@ -76,6 +76,8 @@ function VoxelWorld(box, vCellSizeHint) {
   this._count = box.size().divide(vCellSizeHint).floor();
   this._last = this._count.clone().subScalar(1);
   this._cellSize = box.size().divide(this._count);
+  this._cellInnerR = 0.5 * Math.min(Math.min(this._cellSize.x, this._cellSize.y), this._cellSize.z);
+  this._cellOuterR = 0.5 * Math.sqrt(this._cellSize.dot(this._cellSize));
 
   // array of voxels, each element contains index of first atom in voxel
   var numVoxels = this._count.x * this._count.y * this._count.z;
@@ -155,58 +157,136 @@ VoxelWorld.prototype._forEachAtomInVoxel = function(voxel, process) {
  * @param {number} radius  - sphere radius
  * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
  */
-VoxelWorld.prototype._forEachVoxelWithinRadius = function(center, radius, process) {
+VoxelWorld.prototype._forEachVoxelWithinRadius = (function() {
+  let xRange = new THREE.Vector2();
+  let yRange = new THREE.Vector2();
+  let zRange = new THREE.Vector2();
 
-  var rRangeXY, rRangeX, xVal, yVal, zVal, isInsideX, isInsideY, isInsideZ;
-  var xRange = new THREE.Vector2();
-  var yRange = new THREE.Vector2();
-  var zRange = new THREE.Vector2();
+  return function(center, radius, process) {
+    // switch to a faster method unless cell size is much smaller than sphere radius
+    if (radius / this._cellInnerR < 10) {
+      this._forEachVoxelWithinRadiusSimple(center, radius, process);
+      return;
+    }
 
+    let rRangeXY, rRangeX, xVal, yVal, zVal, isInsideX, isInsideY, isInsideZ;
 
-  zRange.set(center.z - radius, center.z + radius);
-  zRange.subScalar(this._box.min.z)
-    .divideScalar(this._cellSize.z)
-    .floor()
-    .clampScalar(0, this._count.z - 1);
-
-  for (var z = zRange.x; z <= zRange.y; ++z) {
-    zVal = [this._box.min.z + z * this._cellSize.z,
-      this._box.min.z + (z + 1) * this._cellSize.z];
-
-    isInsideZ = (center.z - radius <= zVal[0]) && (zVal[1] <= center.z + radius);
-
-    rRangeXY = _getSphereSliceRadiusRange(center, radius, zVal[0], zVal[1]);
-
-    yRange.set(center.y - rRangeXY[1], center.y + rRangeXY[1]);
-    yRange.subScalar(this._box.min.y)
-      .divideScalar(this._cellSize.y)
+    zRange.set(center.z - radius, center.z + radius);
+    zRange.subScalar(this._box.min.z)
+      .divideScalar(this._cellSize.z)
       .floor()
-      .clampScalar(0, this._count.y - 1);
+      .clampScalar(0, this._count.z - 1);
 
-    for (var y = yRange.x; y <= yRange.y; ++y) {
-      yVal = [this._box.min.y + y * this._cellSize.y,
-        this._box.min.y + (y + 1) * this._cellSize.y];
+    for (let z = zRange.x; z <= zRange.y; ++z) {
+      zVal = [this._box.min.z + z * this._cellSize.z,
+        this._box.min.z + (z + 1) * this._cellSize.z];
 
-      isInsideY = (center.y - rRangeXY[0] <= yVal[0]) && (yVal[1] <= center.y + rRangeXY[0]);
+      isInsideZ = (center.z - radius <= zVal[0]) && (zVal[1] <= center.z + radius);
 
-      rRangeX = _getCircleSliceRadiusRange(center, rRangeXY[1], yVal[0], yVal[1]);
+      rRangeXY = _getSphereSliceRadiusRange(center, radius, zVal[0], zVal[1]);
 
-      xRange.set(center.x - rRangeX[1], center.x + rRangeX[1]);
-      xRange.subScalar(this._box.min.x)
-        .divideScalar(this._cellSize.x)
+      yRange.set(center.y - rRangeXY[1], center.y + rRangeXY[1]);
+      yRange.subScalar(this._box.min.y)
+        .divideScalar(this._cellSize.y)
         .floor()
-        .clampScalar(0, this._count.x - 1);
+        .clampScalar(0, this._count.y - 1);
 
-      for (var x = xRange.x; x <= xRange.y; ++x) {
-        xVal = [this._box.min.x + x * this._cellSize.x,
-          this._box.min.x + (x + 1) * this._cellSize.x];
-        isInsideX = (center.x - rRangeX[0] <= xVal[0]) && (xVal[1] <= center.x + rRangeX[0]);
+      for (let y = yRange.x; y <= yRange.y; ++y) {
+        yVal = [this._box.min.y + y * this._cellSize.y,
+          this._box.min.y + (y + 1) * this._cellSize.y];
 
-        process(x + this._count.x * (y + this._count.y * z), isInsideX && isInsideY && isInsideZ);
+        isInsideY = (center.y - rRangeXY[0] <= yVal[0]) && (yVal[1] <= center.y + rRangeXY[0]);
+
+        rRangeX = _getCircleSliceRadiusRange(center, rRangeXY[1], yVal[0], yVal[1]);
+
+        xRange.set(center.x - rRangeX[1], center.x + rRangeX[1]);
+        xRange.subScalar(this._box.min.x)
+          .divideScalar(this._cellSize.x)
+          .floor()
+          .clampScalar(0, this._count.x - 1);
+
+        for (let x = xRange.x; x <= xRange.y; ++x) {
+          xVal = [this._box.min.x + x * this._cellSize.x,
+            this._box.min.x + (x + 1) * this._cellSize.x];
+          isInsideX = (center.x - rRangeX[0] <= xVal[0]) && (xVal[1] <= center.x + rRangeX[0]);
+
+          process(x + this._count.x * (y + this._count.y * z), isInsideX && isInsideY && isInsideZ);
+        }
       }
     }
-  }
-};
+  };
+}());
+
+/**
+ * Call a function for each voxel that is touched by given sphere. Callback also takes flag
+ * isInside specifying whether voxel lies inside the sphere entirely.
+ * This is a version of method that doesn't try to "calculate" what voxels fall inside radius
+ * but instead just checks all voxels inside sphere's bounding box. This should be faster
+ * unless cell size is much smaller than sphere radius.
+ *
+ * @param {Vector3} center - center of the sphere
+ * @param {number} radius  - sphere radius
+ * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
+ */
+VoxelWorld.prototype._forEachVoxelWithinRadiusSimple = (function() {
+  let xRange = new THREE.Vector2();
+  let yRange = new THREE.Vector2();
+  let zRange = new THREE.Vector2();
+  let vCenter = new THREE.Vector3();
+
+  return function(center, radius, process) {
+    let distTouch2 = (radius + this._cellOuterR) * (radius + this._cellOuterR);
+    let distInside2 = -1.0;
+    if (radius > this._cellOuterR) {
+      distInside2 = (radius - this._cellOuterR) * (radius - this._cellOuterR);
+    }
+
+    // calculate bounding box for the sphere
+    xRange.set(center.x - radius, center.x + radius);
+    xRange.subScalar(this._box.min.x)
+      .divideScalar(this._cellSize.x)
+      .floor();
+    xRange.x = Math.min(Math.max(xRange.x, 0), this._count.x - 1);
+    xRange.y = Math.min(Math.max(xRange.y, 0), this._count.x - 1);
+
+    yRange.set(center.y - radius, center.y + radius);
+    yRange.subScalar(this._box.min.y)
+      .divideScalar(this._cellSize.y)
+      .floor();
+    yRange.x = Math.min(Math.max(yRange.x, 0), this._count.y - 1);
+    yRange.y = Math.min(Math.max(yRange.y, 0), this._count.y - 1);
+
+    zRange.set(center.z - radius, center.z + radius);
+    zRange.subScalar(this._box.min.z)
+      .divideScalar(this._cellSize.z)
+      .floor();
+    zRange.x = Math.min(Math.max(zRange.x, 0), this._count.z - 1);
+    zRange.y = Math.min(Math.max(zRange.y, 0), this._count.z - 1);
+
+    for (let z = zRange.x; z <= zRange.y; ++z) {
+      let zVal = [this._box.min.z + z * this._cellSize.z,
+        this._box.min.z + (z + 1) * this._cellSize.z];
+      vCenter.z = 0.5 * (zVal[0] + zVal[1]);
+
+      for (let y = yRange.x; y <= yRange.y; ++y) {
+        let yVal = [this._box.min.y + y * this._cellSize.y,
+          this._box.min.y + (y + 1) * this._cellSize.y];
+        vCenter.y = 0.5 * (yVal[0] + yVal[1]);
+
+        for (let x = xRange.x; x <= xRange.y; ++x) {
+          let xVal = [this._box.min.x + x * this._cellSize.x,
+            this._box.min.x + (x + 1) * this._cellSize.x];
+          vCenter.x = 0.5 * (xVal[0] + xVal[1]);
+
+          let d2 = center.distanceToSquared(vCenter);
+          if (d2 <= distTouch2) {
+            process(x + this._count.x * (y + this._count.y * z), d2 <= distInside2);
+          }
+        }
+      }
+    }
+  };
+}());
 
 /**
  * Call a function for each atom within given sphere
@@ -224,7 +304,7 @@ VoxelWorld.prototype.forEachAtomWithinRadius = function(center, radius, process)
       self._forEachAtomInVoxel(voxel, process);
     } else {
       self._forEachAtomInVoxel(voxel, function(atom) {
-        if (center.distanceToSquared(atom._position) < r2) {
+        if (center.distanceToSquared(atom._position) <= r2) {
           process(atom);
         }
       });
