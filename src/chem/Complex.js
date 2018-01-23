@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 import utils from '../utils';
 import logger from '../utils/logger';
+import * as THREE from 'three';
 import DataSource from './DataSource';
 import Atom from './Atom';
 import Chain from './Chain';
@@ -15,7 +16,10 @@ import SGroup from './SGroup';
 import AromaticLoopsMarker from './AromaticLoopsMarker';
 import BioStructure from './BioStructure';
 import selectors from './selectors';
+import chem from '../chem';
 //////////////////////////////////////////////////////////////////////////////
+
+const VOXEL_SIZE = 5.0;
 
 /**
  * The entire complex of the molecules under study.
@@ -1034,6 +1038,23 @@ Complex.prototype.getAltLocNames = function() {
   this._altlocNames = Object.keys(dict);
 
   return this._altlocNames;
+};
+
+Complex.prototype.getVoxelWorld = function() {
+  if (!this.hasOwnProperty('_voxelWorld')) {
+    try {
+      this._voxelWorld = new chem.VoxelWorld(
+        this.getDefaultBoundaries().boundingBox,
+        new THREE.Vector3(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE)
+      );
+      this._voxelWorld.addAtoms(this);
+    } catch (e) {
+      logger.warn('Unable to create voxel world');
+      this._voxelWorld = null;
+    }
+  }
+
+  return this._voxelWorld;
 };
 
 // this function joins multiple complexes into one (this)

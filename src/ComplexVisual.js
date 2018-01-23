@@ -15,8 +15,6 @@ import Representation from './gfx/Representation';
 import Visual from './Visual';
 import ComplexVisualEdit from './ComplexVisualEdit';
 
-var VOXEL_SIZE = 5.0;
-
 var selectors = chem.selectors;
 
 function ComplexVisual(name, dataSource) {
@@ -863,19 +861,9 @@ ComplexVisual.prototype.setUberOptions = function(values) {
  * @returns {Selector} selector describing result group of atoms
  */
 ComplexVisual.prototype.within = function(selector, radius) {
-  // build voxel world
-  if (!this._voxelWorld) {
-    try {
-      this._voxelWorld = new chem.VoxelWorld(
-        this._complex.getDefaultBoundaries().boundingBox,
-        new THREE.Vector3(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE)
-      );
-      this._voxelWorld.addAtoms(this._complex);
-    } catch (e) {
-      logger.warn('Unable to create voxel world');
-      this._voxelWorld = null;
-      return selectors.none();
-    }
+  let vw = this._complex.getVoxelWorld();
+  if (vw === null) {
+    return false;
   }
 
   // mark atoms of the group as selected
@@ -883,9 +871,11 @@ ComplexVisual.prototype.within = function(selector, radius) {
   this._complex.markAtoms(selector, selectionMask);
 
   // mark all atoms within distance as selected
-  this._voxelWorld.forEachAtomWithinDistFromMasked(this._complex, selectionMask, Number(radius), function(atom) {
-    atom._mask |= selectionMask;
-  });
+  if (vw) {
+    vw.forEachAtomWithinDistFromMasked(this._complex, selectionMask, Number(radius), function(atom) {
+      atom._mask |= selectionMask;
+    });
+  }
 
   // update selection count
   this._selectionCount = this._complex.countAtomsByMask(selectionMask);
