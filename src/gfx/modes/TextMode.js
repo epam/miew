@@ -1,5 +1,4 @@
-
-
+import _ from 'lodash';
 import utils from '../../utils';
 import Mode from './Mode';
 
@@ -19,7 +18,6 @@ TextMode.prototype.getTemplateOptions = function() {
 };
 
 TextMode.prototype.getLabelOpts = function() {
-
   return _.merge(this.opts, {
     labels: this.settings.now.labels,
     colors: true,
