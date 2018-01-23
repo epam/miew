@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Miew labels</title>
+
+  <link rel="stylesheet" href="../dist/Miew.min.css">
+  <script src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
+  <script src="../dist/Miew.min.js"></script>
+</head>
+<body>
+  <div class="miew-container" style="width:640px; height:480px"></div>
+
+  <script>
+    (function() {
+      var viewer = new Miew({
+        load: 'pc:serotonin',
+        reps: [{
+          mode: 'LN',
+        }, {
+          selector: 'not elem C',
+          mode: ['TX', {
+            template: '{{elem}}',
+          }],
+        }]
+      });
+
+      if (viewer.init()) {
+        viewer.run();
+      }
+    })();
+  </script>
+</body>
+</html>
