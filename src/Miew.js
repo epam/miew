@@ -5,7 +5,7 @@
 
 import _ from 'lodash';
 import * as THREE from 'three';
-import Spinner from 'spin.js';
+import {Spinner} from 'spin.js';
 import Stats from './gfx/Stats';
 import utils from './utils';
 import JobHandle from './utils/JobHandle';
