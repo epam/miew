@@ -1,4 +1,5 @@
 import ResidueType from './ResidueType';
+import PairCollection from './AtomPairs';
 
 /**
  * Created by anton.zherzdev on 25.12.2017.
@@ -7,13 +8,18 @@ import ResidueType from './ResidueType';
 const kMinimalDistance = 0.5,
   kMinHBondEnergy = -9.9,
   kMaxHBondEnergy = -0.5,
-  kCouplingConstant = -27.888; // = -332 * 0.42 * 0.2
+  kCouplingConstant = -27.888, // = -332 * 0.42 * 0.2
+  kMaxCouplingDistance = 5.0; // how far is the closest atom of a potential partner residue from CA atom
 
 export default class HBondInfo {
   constructor(complex) {
     this._complex = complex;
     this._hbonds = []; // array of bond info for each residue
-    this._build();
+    if (this._complex._residues.length > 1000) {
+      this._buildVW(); // optimized version using voxel grid
+    } else {
+      this._build(); // test all pairs of residues
+    }
   }
 
   isBond(from, to) {
@@ -66,6 +72,76 @@ export default class HBondInfo {
         }
       }
     }
+  }
+
+  _buildVW() {
+    const self = this;
+    let residues = this._complex._residues;
+    let ri, preri;
+
+    let vw = this._complex.getVoxelWorld();
+    if (vw === null) {
+      return;
+    }
+
+    let pairs = new PairCollection(this._complex._residues.length * this._complex._residues.length / 2);
+
+    function processAtom(atom) {
+      let rj = atom._residue;
+
+      if (rj._index === ri._index) {
+        return;
+      }
+
+      if ((rj.getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+        return;
+      }
+
+      if (!pairs.addPair(ri._index, rj._index)) {
+        // we've seen this pair
+        return;
+      }
+
+      // get predecessor in chain
+      let prerj = rj._index > 0 ? residues[rj._index - 1] : null;
+      if (prerj &&
+        ((prerj.getType().flags & ResidueType.Flags.PROTEIN) === 0 || rj._sequence !== prerj._sequence + 1)) {
+        prerj = null;
+      }
+
+      self._calcHBondEnergy(preri, ri, rj);
+      if (rj._index !== ri._index + 1) {
+        self._calcHBondEnergy(prerj, rj, ri);
+      }
+    }
+
+    for (let i = 0; i < residues.length - 1; ++i) {
+      ri = residues[i];
+      if ((ri.getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+        continue;
+      }
+
+      // get predecessor in chain
+      preri = i > 0 ? residues[i - 1] : null;
+      if (preri &&
+        ((preri.getType().flags & ResidueType.Flags.PROTEIN) === 0 || ri._sequence !== preri._sequence + 1)) {
+        preri = null;
+      }
+
+      vw.forEachAtomWithinRadius(this._residueGetCAlpha(ri), kMaxCouplingDistance, processAtom);
+    }
+  }
+
+  _residueGetCAlpha(res) {
+    for (let i = 0; i < res._atoms.length; ++i) {
+      let name = res._atoms[i].getName().getString();
+      if (name === 'CA' ||
+        name === 'C1') {
+        return res._atoms[i].getPosition();
+      }
+    }
+
+    return null;
   }
 
   _residueGetCO(res) {
