@@ -4,7 +4,7 @@
 import utils from '../utils';
 //////////////////////////////////////////////////////////////////////////////
 var cMaxPairsForHashCode = 32;
-var cHashTableSize = 16384;
+var cHashTableSize = 1024 * 1024;
 var cNumbersPerPair = 4;
 var cMaxNeighbours = 14;
 var cInvalidVal = -1;
@@ -53,7 +53,7 @@ AtomPairs.prototype.addPair = function(indexA, indexB) {
       break;
     }
     if (code === codeToAdd) {
-      return;
+      return false;
     }
   }
   // add this new hash code
@@ -71,6 +71,7 @@ AtomPairs.prototype.addPair = function(indexA, indexB) {
   this.intBuffer[j + 1] = ib;
   this.intBuffer[j + 2] = codeToAdd;
   this.numPairs++;
+  return true;
 };
 
 export default AtomPairs;
