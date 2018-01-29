@@ -2,29 +2,28 @@ import HBondInfo from './HBondInfo';
 import ResidueType from './ResidueType';
 
 const BridgeType = Object.freeze({
-  NoBridge: 0,
-  Parallel: 1,
-  AntiParallel: 2
+  NO_BRIDGE: 0,
+  PARALLEL: 1,
+  ANTI_PARALLEL: 2,
 });
 
 const HelixFlag = Object.freeze({
-  Start: 1,
-  Middle: 2,
-  End: 3,
-  StartAndEnd: 4
+  START: 1,
+  MIDDLE: 2,
+  END: 3,
+  START_AND_END: 4,
 });
 
-export const DSSP = Object.freeze({
-  loop: ' ',
-  alphahelix: 'H',
-  betabridge: 'B',
-  strand: 'E',
-  helix_3: 'G',
-  helix_5: 'I',
-  turn: 'T',
-  bend: 'S'
+const StructureType = Object.freeze({
+  LOOP: ' ',
+  ALPHA_HELIX: 'H',
+  BETA_BRIDGE: 'B',
+  STRAND: 'E',
+  HELIX_3_10: 'G',
+  PI_HELIX: 'I',
+  TURN: 'T',
+  BEND: 'S',
 });
-
 
 export default class SecondaryStructureMap {
   constructor(complex) {
@@ -79,17 +78,17 @@ export default class SecondaryStructureMap {
       for (let i = 0; i + stride < chainLength; ++i) {
         if (this._hbonds.isBond(inResidues[i + stride]._index, inResidues[i]._index)
         /*&& NoChainBreak(res[i], res[i + stride])*/) {
-          this._helixFlags[stride][inResidues[i + stride]._index] = HelixFlag.End;
+          this._helixFlags[stride][inResidues[i + stride]._index] = HelixFlag.END;
           for (let j = i + 1; j < i + stride; ++j) {
             if (typeof  this._helixFlags[stride][inResidues[j]._index] === 'undefined') {
-              this._helixFlags[stride][inResidues[j]._index] = HelixFlag.Middle;
+              this._helixFlags[stride][inResidues[j]._index] = HelixFlag.MIDDLE;
             }
           }
 
-          if (this._helixFlags[stride][inResidues[i]._index] === HelixFlag.End) {
-            this._helixFlags[stride][inResidues[i]._index] = HelixFlag.StartAndEnd;
+          if (this._helixFlags[stride][inResidues[i]._index] === HelixFlag.END) {
+            this._helixFlags[stride][inResidues[i]._index] = HelixFlag.START_AND_END;
           } else {
-            this._helixFlags[stride][inResidues[i]._index] = HelixFlag.Start;
+            this._helixFlags[stride][inResidues[i]._index] = HelixFlag.START;
           }
         }
       }
@@ -103,7 +102,7 @@ export default class SecondaryStructureMap {
     for (let i = 1; i + 4 < chainLength; ++i) {
       if (this._isHelixStart(inResidues[i]._index, 4) && this._isHelixStart(inResidues[i - 1]._index, 4)) {
         for (let j = i; j <= i + 3; ++j) {
-          this._ss[inResidues[j]._index] = DSSP.alphahelix;
+          this._ss[inResidues[j]._index] = StructureType.ALPHA_HELIX;
         }
       }
     }
@@ -113,11 +112,11 @@ export default class SecondaryStructureMap {
         let empty = true;
         for (let j = i; empty && j <= i + 2; ++j) {
           empty = typeof this._ss[inResidues[j]._index] === 'undefined' ||
-                  this._ss[inResidues[j]._index] === DSSP.helix_3;
+                  this._ss[inResidues[j]._index] === StructureType.HELIX_3_10;
         }
         if (empty) {
           for (let j = i; j <= i + 2; ++j) {
-            this._ss[inResidues[j]._index] = DSSP.helix_3;
+            this._ss[inResidues[j]._index] = StructureType.HELIX_3_10;
           }
         }
       }
@@ -128,12 +127,12 @@ export default class SecondaryStructureMap {
         let empty = true;
         for (let j = i; empty && j <= i + 4; ++j) {
           empty = typeof this._ss[inResidues[j]._index] === 'undefined' ||
-                  this._ss[inResidues[j]._index] === DSSP.helix_5 ||
-                  (inPreferPiHelices && this._ss[inResidues[j]._index] === DSSP.alphahelix);
+                  this._ss[inResidues[j]._index] === StructureType.PI_HELIX ||
+                  (inPreferPiHelices && this._ss[inResidues[j]._index] === StructureType.ALPHA_HELIX);
         }
         if (empty) {
           for (let j = i; j <= i + 4; ++j) {
-            this._ss[inResidues[j]._index] = DSSP.helix_5;
+            this._ss[inResidues[j]._index] = StructureType.PI_HELIX;
           }
         }
       }
@@ -149,9 +148,9 @@ export default class SecondaryStructureMap {
         }
 
         if (isTurn) {
-          this._ss[inResidues[i]._index] = DSSP.turn;
+          this._ss[inResidues[i]._index] = StructureType.TURN;
         } else if (this._bend[inResidues[i]._index]) {
-          this._ss[inResidues[i]._index] = DSSP.bend;
+          this._ss[inResidues[i]._index] = StructureType.BEND;
         }
       }
     }
@@ -197,8 +196,8 @@ export default class SecondaryStructureMap {
   }
 
   _isHelixStart(res, stride) {
-    return (this._helixFlags[stride][res] === HelixFlag.Start ||
-      this._helixFlags[stride][res] === HelixFlag.StartAndEnd);
+    return (this._helixFlags[stride][res] === HelixFlag.START ||
+      this._helixFlags[stride][res] === HelixFlag.START_AND_END);
   }
 
   _buildBetaSheets() {
@@ -233,7 +232,7 @@ export default class SecondaryStructureMap {
             let rj = chainB[j];
 
             let type = this._testBridge(chainA, i, chainB, j);
-            if (type === BridgeType.NoBridge) {
+            if (type === BridgeType.NO_BRIDGE) {
               continue;
             }
 
@@ -244,14 +243,14 @@ export default class SecondaryStructureMap {
                 continue;
               }
 
-              if (type === BridgeType.Parallel && bridge.j[bridge.j.length - 1] + 1 === rj._index) {
+              if (type === BridgeType.PARALLEL && bridge.j[bridge.j.length - 1] + 1 === rj._index) {
                 bridge.i.push(ri._index);
                 bridge.j.push(rj._index);
                 found = true;
                 break;
               }
 
-              if (type === BridgeType.AntiParallel && bridge.j[0] - 1 === rj._index) {
+              if (type === BridgeType.ANTI_PARALLEL && bridge.j[0] - 1 === rj._index) {
                 bridge.i.push(ri._index);
                 bridge.j.unshift(rj._index);
                 found = true;
@@ -301,7 +300,7 @@ export default class SecondaryStructureMap {
         }
 
         let bulge = false;
-        if (bridges[i].type === BridgeType.Parallel) {
+        if (bridges[i].type === BridgeType.PARALLEL) {
           bulge = ((jbj - jei < 6 && ibj - iei < 3) || (jbj - jei < 3));
         } else {
           bulge = ((jbi - jej < 6 && ibj - iei < 3) || (jbi - jej < 3));
@@ -309,7 +308,7 @@ export default class SecondaryStructureMap {
 
         if (bulge) {
           bridges[i].i = bridges[i].i.concat(bridges[j].i);
-          if (bridges[i].type === BridgeType.Parallel) {
+          if (bridges[i].type === BridgeType.PARALLEL) {
             bridges[i].j = bridges[i].j.concat(bridges[j].j);
           } else {
             bridges[i].j = bridges[j].j.concat(bridges[i].j);
@@ -381,12 +380,12 @@ export default class SecondaryStructureMap {
         }
       }
 
-      let ss = DSSP.betabridge;
+      let ss = StructureType.BETA_BRIDGE;
       if (bridge.i.length > 1) {
-        ss = DSSP.strand;
+        ss = StructureType.STRAND;
       }
 
-      if (bridge.type === BridgeType.Parallel) {
+      if (bridge.type === BridgeType.PARALLEL) {
         let j = 0;
         for (let k = 0; k < bridge.i.length; ++k) {
           this._betaPartners[bridge.i[k]][betai] = {
@@ -425,14 +424,14 @@ export default class SecondaryStructureMap {
       }
 
       for (let k = bridge.i[0]; k <= bridge.i[bridge.i.length - 1]; ++k) {
-        if (this._ss[k] !== DSSP.strand) {
+        if (this._ss[k] !== StructureType.STRAND) {
           this._ss[k] = ss;
           this._sheet[k] = bridge.sheet;
         }
       }
 
       for (let k = bridge.j[0]; k <= bridge.j[bridge.j.length - 1]; ++k) {
-        if (this._ss[k] !== DSSP.strand) {
+        if (this._ss[k] !== StructureType.STRAND) {
           this._ss[k] = ss;
           this._sheet[k] = bridge.sheet;
         }
@@ -441,7 +440,7 @@ export default class SecondaryStructureMap {
   }
 
   _testBridge(chainA, from, chainB, to) {
-    let result = BridgeType.NoBridge;
+    let result = BridgeType.NO_BRIDGE;
 
     let a = chainA[from - 1]._index;
     let b = chainA[from]._index;
@@ -452,9 +451,9 @@ export default class SecondaryStructureMap {
 
     let isBond = this._hbonds.isBond.bind(this._hbonds);
     if ((isBond(c, e) && isBond(e, a)) || (isBond(f, b) && isBond(b, d))) {
-      result = BridgeType.Parallel;
+      result = BridgeType.PARALLEL;
     } else if ((isBond(c, d) && isBond(f, a)) || (isBond(e, b) && isBond(b, e))) {
-      result = BridgeType.AntiParallel;
+      result = BridgeType.ANTI_PARALLEL;
     }
     return result;
   }
@@ -489,3 +488,5 @@ export default class SecondaryStructureMap {
     return false;
   }
 }
+
+SecondaryStructureMap.StructureType = StructureType;
