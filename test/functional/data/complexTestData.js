@@ -19,7 +19,7 @@ export default [{
   formats: ['pdb', 'cif', 'mmtf'],
   num: {
     atoms: 11306,
-    bonds: {pdb: 11090, cif: 11083, mmtf: 11066},  // = 11093 in VMD!!!
+    bonds: {pdb: 11093, cif: 11083, mmtf: 11066},  // = 11093 in VMD, but they are not all valid
     residues: 1063,  // =  1068 in VMD!!!
     chains: 1,
     molecules: {pdb: 1, default: 7},
