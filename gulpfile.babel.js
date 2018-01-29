@@ -96,16 +96,19 @@ gulp.task('test', () =>
   gulp.src(config.test.src, {read: false})
     .pipe(plugins.mocha()));
 
-gulp.task('test:cover', ['test:cover-hook'], () =>
+gulp.task('test:cover', ['test:cover-hook'], (done) => {
   gulp.src(config.test.src, {read: false})
     .pipe(plugins.mocha({
       reporter: 'dot',
     }))
+    .on('error', done) // otherwise, an error in tests is silently ignored ("pipes do not propagate errors")
     .pipe(plugins.istanbul.writeReports({
       dir: config.cover.dst,
       reporters: ['lcov', 'json', 'text-summary'],
       reportOpts: {dir: config.cover.dst},
-    })));
+    }))
+    .on('end', done);
+});
 
 gulp.task('test:cover-hook', () =>
   gulp.src(config.cover.src)
