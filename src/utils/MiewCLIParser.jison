@@ -75,6 +75,8 @@ scale                 return 'SCALE'
 url                   return 'URL'
 screenshot            return 'SCREENSHOT';
 
+dssp                  return 'DSSP'
+
 file_list             return 'FILE_LIST'
 file_register         return 'FILE_REGISTER'
 file_delete           return 'FILE_DELETE'
@@ -181,6 +183,7 @@ Command
     | VIEW BASE_64                        -> yy.miew.view($2)
     | UNIT                                -> yy.echo(yy.miew.changeUnit())
     | UNIT NUMBER                         -> yy.miew.changeUnit($2)
+    | DSSP                                -> yy.miew.dssp()
     | SCALE NUMBER                        -> yy.miew.scale($2)
     | ROTATE AxesList                     { for (var i = 0, n = $2.length; i < n; i++) {yy.miew.rotate($2[i]['x'] * Math.PI / 180.0, $2[i]['y'] * Math.PI / 180.0, $2[i]['z'] * Math.PI / 180.0)} }
     | TRANSLATE AxesList                  { for (var i = 0, n = $2.length; i < n; i++) {yy.miew.translate($2[i]['x'] || 0, $2[i]['y'] || 0, $2[i]['z'] || 0)} }

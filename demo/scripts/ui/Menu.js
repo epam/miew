@@ -2090,6 +2090,10 @@ Menu.prototype._initToolsPanel = function() {
     const type = this.getAttribute('data-value');
     let visual;
     switch (type) {
+    case 'dssp':
+      self._viewer.dssp();
+      self._onMenuOff();
+      break;
     case 'reset-view':
       self._viewer.resetView();
       self._initReprList();
