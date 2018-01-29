@@ -1,21 +1,18 @@
 import ResidueType from './ResidueType';
 import PairCollection from './AtomPairs';
 
-/**
- * Created by anton.zherzdev on 25.12.2017.
- */
-
-const kMinimalDistance = 0.5,
-  kMinHBondEnergy = -9.9,
-  kMaxHBondEnergy = -0.5,
-  kCouplingConstant = -27.888, // = -332 * 0.42 * 0.2
-  kMaxCouplingDistance = 5.0; // how far is the closest atom of a potential partner residue from CA atom
+const MINIMAL_DISTANCE = 0.5;
+const MIN_HBOND_ENERGY = -9.9;
+const MAX_HBOND_ENERGY = -0.5;
+const COUPLING_CONSTANT = -27.888; // = -332 * 0.42 * 0.2
+const MAX_COUPLING_DISTANCE = 5.0; // how far is the closest atom of a potential partner residue from CA atom
+const MAX_RESIDUES_THRESHOLD = 1000;
 
 export default class HBondInfo {
   constructor(complex) {
     this._complex = complex;
     this._hbonds = []; // array of bond info for each residue
-    if (this._complex._residues.length > 1000) {
+    if (this._complex._residues.length > MAX_RESIDUES_THRESHOLD) {
       this._buildVW(); // optimized version using voxel grid
     } else {
       this._build(); // test all pairs of residues
@@ -25,11 +22,11 @@ export default class HBondInfo {
   isBond(from, to) {
     if (this._hbonds[from]) {
       let acc = this._hbonds[from].acceptor[0];
-      if (acc && acc.residue === to && acc.energy < kMaxHBondEnergy) {
+      if (acc && acc.residue === to && acc.energy < MAX_HBOND_ENERGY) {
         return true;
       }
       acc = this._hbonds[from].acceptor[1];
-      if (acc && acc.residue === to && acc.energy < kMaxHBondEnergy) {
+      if (acc && acc.residue === to && acc.energy < MAX_HBOND_ENERGY) {
         return true;
       }
     }
@@ -128,7 +125,7 @@ export default class HBondInfo {
         preri = null;
       }
 
-      vw.forEachAtomWithinRadius(this._residueGetCAlpha(ri), kMaxCouplingDistance, processAtom);
+      vw.forEachAtomWithinRadius(this._residueGetCAlpha(ri), MAX_COUPLING_DISTANCE, processAtom);
     }
   }
 
@@ -202,19 +199,19 @@ export default class HBondInfo {
       let distanceNC = n.distanceTo(c);
       let distanceNO = n.distanceTo(o);
 
-      if (distanceHO < kMinimalDistance || distanceHC < kMinimalDistance ||
-          distanceNC < kMinimalDistance || distanceNO < kMinimalDistance) {
-        result = kMinHBondEnergy;
+      if (distanceHO < MINIMAL_DISTANCE || distanceHC < MINIMAL_DISTANCE ||
+          distanceNC < MINIMAL_DISTANCE || distanceNO < MINIMAL_DISTANCE) {
+        result = MIN_HBOND_ENERGY;
       } else {
-        result = kCouplingConstant / distanceHO - kCouplingConstant / distanceHC +
-                 kCouplingConstant / distanceNC - kCouplingConstant / distanceNO;
+        result = COUPLING_CONSTANT / distanceHO - COUPLING_CONSTANT / distanceHC +
+                 COUPLING_CONSTANT / distanceNC - COUPLING_CONSTANT / distanceNO;
       }
 
       // DSSP compatibility mode:
       result = Math.round(result * 1000) / 1000;
 
-      if (result < kMinHBondEnergy) {
-        result = kMinHBondEnergy;
+      if (result < MIN_HBOND_ENERGY) {
+        result = MIN_HBOND_ENERGY;
       }
     }
 

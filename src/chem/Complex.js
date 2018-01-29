@@ -1,4 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////
 import utils from '../utils';
 import logger from '../utils/logger';
 import * as THREE from 'three';
@@ -17,9 +16,8 @@ import SGroup from './SGroup';
 import AromaticLoopsMarker from './AromaticLoopsMarker';
 import BioStructure from './BioStructure';
 import selectors from './selectors';
-import chem from '../chem';
-import SecondaryStructureMap, {DSSP} from './SecStruct';
-//////////////////////////////////////////////////////////////////////////////
+import VoxelWorld from './VoxelWorld';
+import SecondaryStructureMap from './SecondaryStructureMap';
 
 const VOXEL_SIZE = 5.0;
 
@@ -1045,7 +1043,7 @@ Complex.prototype.getAltLocNames = function() {
 Complex.prototype.getVoxelWorld = function() {
   if (!this.hasOwnProperty('_voxelWorld')) {
     try {
-      this._voxelWorld = new chem.VoxelWorld(
+      this._voxelWorld = new VoxelWorld(
         this.getDefaultBoundaries().boundingBox,
         new THREE.Vector3(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE)
       );
@@ -1168,10 +1166,11 @@ Complex.prototype.dssp = function() {
     return false;
   }
 
+  const StructureType = SecondaryStructureMap.StructureType;
   const helixTypes = {
-    [DSSP.alphahelix]: 1,
-    [DSSP.helix_3]: 3,
-    [DSSP.helix_5]: 5,
+    [StructureType.ALPHA_HELIX]: 1,
+    [StructureType.HELIX_3_10]: 3,
+    [StructureType.PI_HELIX]: 5,
   };
 
   const helices = [];
@@ -1197,7 +1196,7 @@ Complex.prototype.dssp = function() {
       curHelix = null;
     }
 
-    if (ssCode === DSSP.strand) {
+    if (ssCode === StructureType.STRAND) {
       if (curStrand === null) {
         let curSheet = sheets[ssMap._sheet[i]];
         if (curSheet === undefined) {
