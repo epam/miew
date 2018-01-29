@@ -1,5 +1,3 @@
-
-
 //////////////////////////////////////////////////////////////////////////////
 import utils from '../utils';
 import logger from '../utils/logger';
@@ -8,6 +6,9 @@ import DataSource from './DataSource';
 import Atom from './Atom';
 import Chain from './Chain';
 import Element from './Element';
+import Helix from './Helix';
+import Strand from './Strand';
+import Sheet from './Sheet';
 import Component from './Component';
 import ResidueType from './ResidueType';
 import Bond from './Bond';
@@ -17,6 +18,7 @@ import AromaticLoopsMarker from './AromaticLoopsMarker';
 import BioStructure from './BioStructure';
 import selectors from './selectors';
 import chem from '../chem';
+import SecondaryStructureMap, {DSSP} from './SecStruct';
 //////////////////////////////////////////////////////////////////////////////
 
 const VOXEL_SIZE = 5.0;
@@ -1148,6 +1150,75 @@ Complex.prototype.joinComplexes = function(complexes) {
   }
 
   this._computeBounds();
+};
+
+/**
+ * Replace secondary structure with calculated one.
+ *
+ * DSSP algorithm implementation is used.
+ *
+ * Kabsch W, Sander C. 1983. Dictionary of protein secondary structure: pattern recognition of hydrogen-bonded and
+ * geometrical features. Biopolymers. 22(12):2577-2637. doi:10.1002/bip.360221211.
+ *
+ * @returns {boolean}
+ */
+Complex.prototype.dssp = function() {
+  const ssMap = new SecondaryStructureMap(this);
+  if (ssMap === null) {
+    return false;
+  }
+
+  const helixTypes = {
+    [DSSP.alphahelix]: 1,
+    [DSSP.helix_3]: 3,
+    [DSSP.helix_5]: 5,
+  };
+
+  const helices = [];
+  const sheets = [];
+  let curHelix = null;
+  let curStrand = null;
+  for (let i = 0, n = this._residues.length; i < n; ++i) {
+    const ssCode = ssMap._ss[i];
+    const residue = this._residues[i];
+    residue._secondary = null;
+
+    const helixType = helixTypes[ssCode];
+    if (helixType) {
+      if (curHelix === null) {
+        curHelix = new Helix(helices.length + 1, '', residue, residue, helixType, '', 0);
+        helices.push(curHelix);
+      }
+      residue._secondary = curHelix;
+      curHelix._residues.push(residue);
+      curHelix._end = residue;
+      curHelix._length++;
+    } else if (curHelix) {
+      curHelix = null;
+    }
+
+    if (ssCode === DSSP.strand) {
+      if (curStrand === null) {
+        let curSheet = sheets[ssMap._sheet[i]];
+        if (curSheet === undefined) {
+          curSheet = sheets[ssMap._sheet[i]] = new Sheet('', 0);
+        }
+        curStrand = new Strand(curSheet, residue, residue, 0, null, null);
+        curSheet.addStrand(curStrand);
+        curSheet._width++;
+      }
+      residue._secondary = curStrand;
+      curStrand._residues.push(residue);
+      curStrand._end = residue;
+    } else if (curStrand) {
+      curStrand = null;
+    }
+  }
+
+  this._helices = helices;
+  this._sheets = sheets.filter(_sheet => true); // squeeze sheets array
+
+  return true;
 };
 
 export default Complex;
