@@ -1157,15 +1157,9 @@ Complex.prototype.joinComplexes = function(complexes) {
  *
  * Kabsch W, Sander C. 1983. Dictionary of protein secondary structure: pattern recognition of hydrogen-bonded and
  * geometrical features. Biopolymers. 22(12):2577-2637. doi:10.1002/bip.360221211.
- *
- * @returns {boolean}
  */
 Complex.prototype.dssp = function() {
   const ssMap = new SecondaryStructureMap(this);
-  if (ssMap === null) {
-    return false;
-  }
-
   const StructureType = SecondaryStructureMap.StructureType;
   const helixTypes = {
     [StructureType.ALPHA_HELIX]: 1,
@@ -1216,8 +1210,6 @@ Complex.prototype.dssp = function() {
 
   this._helices = helices;
   this._sheets = sheets.filter(_sheet => true); // squeeze sheets array
-
-  return true;
 };
 
 export default Complex;

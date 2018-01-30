@@ -3430,23 +3430,20 @@ Miew.prototype.projected = function(fullAtomName, complexName) {
  * geometrical features. Biopolymers. 22(12):2577-2637. doi:10.1002/bip.360221211.
  *
  * @param {string=} complexName - complex name
- * @returns {boolean}
  */
 Miew.prototype.dssp = function(complexName) {
   const visual = this._getComplexVisual(complexName);
-  if (visual) {
-    const complex = visual.getComplex();
-    if (complex.dssp()) {
-      // rebuild dependent representations (cartoon or ss-colored)
-      visual._reprList.forEach((rep) => {
-        if (rep.mode.id === 'CA' || rep.colorer.id === 'SS') {
-          rep.needsRebuild = true;
-        }
-      });
-      return true;
-    }
+  if (!visual) {
+    return;
   }
-  return false;
+  visual.getComplex().dssp();
+
+  // rebuild dependent representations (cartoon or ss-colored)
+  visual._reprList.forEach((rep) => {
+    if (rep.mode.id === 'CA' || rep.colorer.id === 'SS') {
+      rep.needsRebuild = true;
+    }
+  });
 };
 
 const rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
