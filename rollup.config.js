@@ -15,8 +15,20 @@ import packageJson from './package.json';
 
 const banner = '/** ' + version.copyright + ' */\n';
 
+const warnExceptions = {
+  THIS_IS_UNDEFINED: [
+    'spin.js', // https://github.com/fgnass/spin.js/issues/351
+  ],
+};
+
 export default {
   input: './src/index.js',
+  onwarn: function(warning, warn) {
+    const exceptions = warning.loc && warnExceptions[warning.code] || [];
+    if (!exceptions.some(name => warning.loc.file.endsWith(name))) {
+      warn(warning);
+    }
+  },
   plugins: [
     rollupPluginReplace({
       PACKAGE_VERSION: JSON.stringify(version.combined),
