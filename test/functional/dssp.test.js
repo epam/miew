@@ -49,7 +49,8 @@ describe('The secondary structure in 1CRN', () => {
       });
   });
 
-  it('parsed correctly', () => {
+  it('parsed correctly', function() {
+    this.timeout(0);
     const ss = extract(complex);
     expect(ss.helices).to.deep.equal([
       {begin: 7, end: 19, type: 1},
@@ -64,7 +65,8 @@ describe('The secondary structure in 1CRN', () => {
     }]);
   });
 
-  it('calculated correctly', () => {
+  it('calculated correctly', function() {
+    this.timeout(0);
     complex.dssp();
     const ss = extract(complex);
     expect(ss.helices).to.deep.equal([
