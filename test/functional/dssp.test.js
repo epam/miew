@@ -42,7 +42,8 @@ describe('The secondary structure in 1CRN', () => {
 
   let complex = null;
 
-  before(() => {
+  before(function() {
+    this.timeout(0);
     return load(path.join(__dirname, './data/1CRN.pdb'))
       .then((parsed) => {
         complex = parsed;
@@ -50,7 +51,6 @@ describe('The secondary structure in 1CRN', () => {
   });
 
   it('parsed correctly', function() {
-    this.timeout(0);
     const ss = extract(complex);
     expect(ss.helices).to.deep.equal([
       {begin: 7, end: 19, type: 1},
