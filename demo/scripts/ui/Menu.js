@@ -509,7 +509,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
             createElement('span', {'class' : 'glyphicon glyphicon-menu-right'})])]),
         createElement('li', {
           'class' : 'list-group-item col-xs-12 col-sm-12',
-          'data-type' : 'surf-params'
+          'data-type' : 'surf-param-rad'
         }, [
           'Radius scale',
           createElement('span', {'class' : 'input-group pull-right'}, [
@@ -540,7 +540,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
             )])]),
         createElement('li', {
           'class' : 'list-group-item col-xs-12 col-sm-12',
-          'data-type' : 'surf-params'
+          'data-type' : 'surf-param-iso'
         }, [
           'Isosurface threshold',
           createElement('span', {'class' : 'input-group pull-right'}, [
@@ -571,7 +571,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
             )])]),
         createElement('li', {
           'class': 'list-group-item col-xs-12 col-sm-12',
-          'data-type': 'qsurf-param'
+          'data-type': 'surf-param-zclip'
         }, [
           createElement('label', {}, 'Z clipping'),
           createElement(
@@ -579,7 +579,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
             createElement('input', {
               'type': 'checkbox',
               'data-dir': 'representation',
-              'data-toggle': 'surfZClip',
+              'data-toggle': 'zClip',
               'data-size': 'mini',
               'title': 'Z clipping'
             })
@@ -587,16 +587,23 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
     )]);
   panel.appendChild(newItem);
   if (repr.mode.id === 'SA' || repr.mode.id === 'SE' || repr.mode.id === 'QS' || repr.mode.id === 'CS') {
-    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=qsurf-param]').show();
+    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-param-zclip]').show();
   } else {
-    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=qsurf-param]').hide();
+    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-param-zclip]').hide();
   }
 
   if (repr.mode.id === 'QS') {
-    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-params]').show();
+    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-param-rad]').show();
   } else {
-    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-params]').hide();
+    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-param-rad]').hide();
   }
+
+  if (repr.mode.id === 'QS' || repr.mode.id === 'CS') {
+    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-param-iso]').show();
+  } else {
+    reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-param-iso]').hide();
+  }
+
   if (repr.colorer.id === 'UN') {
     var ucSelector = reprList.find('.panel:eq(' + index + ') [data-value=miew-menu-panel-uniform-color]');
     var ucColor = hexColor(repr.colorer.opts.color);
@@ -675,8 +682,8 @@ Menu.prototype._copyCurReprListItem = function(index) {
   var validReprN = reprList.find('.panel.valid').length;
   selector.html('#' + String(validReprN) + header.substring(header.indexOf(':')));
 
-  var zClipState = curSelector.find('[type=checkbox][data-toggle=surfZClip]')[0].checked;
-  var qSurfParamSelector = reprList.find('.panel:eq(' + index + ') [data-type=qsurf-param]');
+  var zClipState = curSelector.find('[type=checkbox][data-toggle=zClip]')[0].checked;
+  var qSurfParamSelector = reprList.find('.panel:eq(' + index + ') [data-type=surf-param-zclip]');
   qSurfParamSelector.empty();
   selector.find('[type=checkbox]').bootstrapSwitch('state', zClipState);
   qSurfParamSelector[0].appendChild(createElement('label', {}, 'Z clipping'));
@@ -685,7 +692,7 @@ Menu.prototype._copyCurReprListItem = function(index) {
     createElement('input', {
       'type': 'checkbox',
       'data-dir': 'representation',
-      'data-toggle': 'surfZClip',
+      'data-toggle': 'zClip',
       'data-size': 'mini',
       'title': 'Z clipping'
     })
@@ -755,23 +762,32 @@ Menu.prototype._fillReprList = function() {
     const header = head.html();
     head.html(header.substring(0, header.indexOf(':') + 1) + ' ' + Mode.prototype.name);
 
-    const sParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=surf-params]');
-    const qsParam = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') .panel-collapse [data-type=qsurf-param]');
+    const zClipParam = reprList.find('.panel.valid:eq(' +
+      self._curReprIdx + ') .panel-collapse [data-type=surf-param-zclip]');
     if (itemID === 'SA' || itemID === 'SE' || itemID === 'QS' || itemID === 'CS') {
-      qsParam.show();
-      const sClipSwitch = qsParam.find('[type=checkbox][data-toggle=surfZClip]');
+      zClipParam.show();
+      const sClipSwitch = zClipParam.find('[type=checkbox][data-toggle=zClip]');
       sClipSwitch.bootstrapSwitch('state', settings.defaults.modes[itemID].zClip);
     } else {
-      qsParam.hide();
+      zClipParam.hide();
     }
 
-    if (itemID === 'QS') {
-      sParam.show();
-      sParam.find('[data-type=rad]').val(settings.defaults.modes[itemID].scale);
-      sParam.find('[data-type=iso]').val(settings.defaults.modes[itemID].isoValue);
+    const isoParam = reprList.find(`.panel.valid:eq(${self._curReprIdx}) .panel-collapse [data-type=surf-param-iso]`);
+    if (itemID === 'QS' || itemID === 'CS') {
+      isoParam.show();
+      isoParam.find('[data-type=iso]').val(settings.defaults.modes[itemID].isoValue);
     } else {
-      sParam.hide();
+      isoParam.hide();
     }
+
+    const radParam = reprList.find(`.panel.valid:eq(${self._curReprIdx}) .panel-collapse [data-type=surf-param-rad]`);
+    if (itemID === 'QS') {
+      radParam.show();
+      radParam.find('[data-type=rad]').val(settings.defaults.modes[itemID].scale);
+    } else {
+      radParam.hide();
+    }
+
   });
   $(self._menuId + ' [data-toggle=colorer]').on('click', /** @this HTMLSelectElement */ function() {
     const elements = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-color]');
@@ -2926,7 +2942,7 @@ Menu.prototype._updateReprList = function() {
       colorerId = colorerItem.firstElementChild.firstElementChild.getAttribute('data-id');
       matPresetId = matPresetItem.firstElementChild.firstElementChild.getAttribute('data-id');
       uniColor = stringColorToHex(uniColorItem.firstElementChild.firstElementChild.getAttribute('data-id'));
-      zClip = $(element).find('[type=checkbox][data-toggle=surfZClip]')[0].checked;
+      zClip = $(element).find('[type=checkbox][data-toggle=zClip]')[0].checked;
       radScale = $(element).find('[data-type=rad]').val();
       isoValue = $(element).find('[data-type=iso]').val();
 
