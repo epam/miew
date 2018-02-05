@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.11 Copyright (c) 2015-2018 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.12 Copyright (c) 2015-2018 EPAM Systems, Inc. */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -27,7 +27,7 @@ var lodash = createCommonjsModule(function (module, exports) {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.4';
+  var VERSION = '4.17.5';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -158,7 +158,6 @@ var lodash = createCommonjsModule(function (module, exports) {
   /** Used to match property names within property paths. */
   var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
       reIsPlainProp = /^\w*$/,
-      reLeadingDot = /^\./,
       rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
 
   /**
@@ -258,8 +257,8 @@ var lodash = createCommonjsModule(function (module, exports) {
       reOptMod = rsModifier + '?',
       rsOptVar = '[' + rsVarRange + ']?',
       rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
-      rsOrdLower = '\\d*(?:(?:1st|2nd|3rd|(?![123])\\dth)\\b)',
-      rsOrdUpper = '\\d*(?:(?:1ST|2ND|3RD|(?![123])\\dTH)\\b)',
+      rsOrdLower = '\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])',
+      rsOrdUpper = '\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])',
       rsSeq = rsOptVar + reOptMod + rsOptJoin,
       rsEmoji = '(?:' + [rsDingbat, rsRegional, rsSurrPair].join('|') + ')' + rsSeq,
       rsSymbol = '(?:' + [rsNonAstral + rsCombo + '?', rsCombo, rsRegional, rsSurrPair, rsAstral].join('|') + ')';
@@ -465,34 +464,6 @@ var lodash = createCommonjsModule(function (module, exports) {
       nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
 
   /*--------------------------------------------------------------------------*/
-
-  /**
-   * Adds the key-value `pair` to `map`.
-   *
-   * @private
-   * @param {Object} map The map to modify.
-   * @param {Array} pair The key-value pair to add.
-   * @returns {Object} Returns `map`.
-   */
-  function addMapEntry(map, pair) {
-    // Don't return `map.set` because it's not chainable in IE 11.
-    map.set(pair[0], pair[1]);
-    return map;
-  }
-
-  /**
-   * Adds `value` to `set`.
-   *
-   * @private
-   * @param {Object} set The set to modify.
-   * @param {*} value The value to add.
-   * @returns {Object} Returns `set`.
-   */
-  function addSetEntry(set, value) {
-    // Don't return `set.add` because it's not chainable in IE 11.
-    set.add(value);
-    return set;
-  }
 
   /**
    * A faster alternative to `Function#apply`, this function invokes `func`
@@ -1258,6 +1229,20 @@ var lodash = createCommonjsModule(function (module, exports) {
       }
     }
     return result;
+  }
+
+  /**
+   * Gets the value at `key`, unless `key` is "__proto__".
+   *
+   * @private
+   * @param {Object} object The object to query.
+   * @param {string} key The key of the property to get.
+   * @returns {*} Returns the property value.
+   */
+  function safeGet(object, key) {
+    return key == '__proto__'
+      ? undefined
+      : object[key];
   }
 
   /**
@@ -2692,7 +2677,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           if (!cloneableTags[tag]) {
             return object ? value : {};
           }
-          result = initCloneByTag(value, tag, baseClone, isDeep);
+          result = initCloneByTag(value, tag, isDeep);
         }
       }
       // Check for circular references and return its corresponding clone.
@@ -2702,6 +2687,22 @@ var lodash = createCommonjsModule(function (module, exports) {
         return stacked;
       }
       stack.set(value, result);
+
+      if (isSet(value)) {
+        value.forEach(function(subValue) {
+          result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
+        });
+
+        return result;
+      }
+
+      if (isMap(value)) {
+        value.forEach(function(subValue, key) {
+          result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
+        });
+
+        return result;
+      }
 
       var keysFunc = isFull
         ? (isFlat ? getAllKeysIn : getAllKeys)
@@ -3630,7 +3631,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         }
         else {
           var newValue = customizer
-            ? customizer(object[key], srcValue, (key + ''), object, source, stack)
+            ? customizer(safeGet(object, key), srcValue, (key + ''), object, source, stack)
             : undefined;
 
           if (newValue === undefined) {
@@ -3657,8 +3658,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      *  counterparts.
      */
     function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, stack) {
-      var objValue = object[key],
-          srcValue = source[key],
+      var objValue = safeGet(object, key),
+          srcValue = safeGet(source, key),
           stacked = stack.get(srcValue);
 
       if (stacked) {
@@ -4567,20 +4568,6 @@ var lodash = createCommonjsModule(function (module, exports) {
     }
 
     /**
-     * Creates a clone of `map`.
-     *
-     * @private
-     * @param {Object} map The map to clone.
-     * @param {Function} cloneFunc The function to clone values.
-     * @param {boolean} [isDeep] Specify a deep clone.
-     * @returns {Object} Returns the cloned map.
-     */
-    function cloneMap(map, isDeep, cloneFunc) {
-      var array = isDeep ? cloneFunc(mapToArray(map), CLONE_DEEP_FLAG) : mapToArray(map);
-      return arrayReduce(array, addMapEntry, new map.constructor);
-    }
-
-    /**
      * Creates a clone of `regexp`.
      *
      * @private
@@ -4591,20 +4578,6 @@ var lodash = createCommonjsModule(function (module, exports) {
       var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
       result.lastIndex = regexp.lastIndex;
       return result;
-    }
-
-    /**
-     * Creates a clone of `set`.
-     *
-     * @private
-     * @param {Object} set The set to clone.
-     * @param {Function} cloneFunc The function to clone values.
-     * @param {boolean} [isDeep] Specify a deep clone.
-     * @returns {Object} Returns the cloned set.
-     */
-    function cloneSet(set, isDeep, cloneFunc) {
-      var array = isDeep ? cloneFunc(setToArray(set), CLONE_DEEP_FLAG) : setToArray(set);
-      return arrayReduce(array, addSetEntry, new set.constructor);
     }
 
     /**
@@ -6201,7 +6174,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function initCloneArray(array) {
       var length = array.length,
-          result = array.constructor(length);
+          result = new array.constructor(length);
 
       // Add properties assigned by `RegExp#exec`.
       if (length && typeof array[0] == 'string' && hasOwnProperty.call(array, 'index')) {
@@ -6228,16 +6201,15 @@ var lodash = createCommonjsModule(function (module, exports) {
      * Initializes an object clone based on its `toStringTag`.
      *
      * **Note:** This function only supports cloning values with tags of
-     * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
+     * `Boolean`, `Date`, `Error`, `Map`, `Number`, `RegExp`, `Set`, or `String`.
      *
      * @private
      * @param {Object} object The object to clone.
      * @param {string} tag The `toStringTag` of the object to clone.
-     * @param {Function} cloneFunc The function to clone values.
      * @param {boolean} [isDeep] Specify a deep clone.
      * @returns {Object} Returns the initialized clone.
      */
-    function initCloneByTag(object, tag, cloneFunc, isDeep) {
+    function initCloneByTag(object, tag, isDeep) {
       var Ctor = object.constructor;
       switch (tag) {
         case arrayBufferTag:
@@ -6256,7 +6228,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           return cloneTypedArray(object, isDeep);
 
         case mapTag:
-          return cloneMap(object, isDeep, cloneFunc);
+          return new Ctor;
 
         case numberTag:
         case stringTag:
@@ -6266,7 +6238,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           return cloneRegExp(object);
 
         case setTag:
-          return cloneSet(object, isDeep, cloneFunc);
+          return new Ctor;
 
         case symbolTag:
           return cloneSymbol(object);
@@ -6313,10 +6285,13 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
      */
     function isIndex(value, length) {
+      var type = typeof value;
       length = length == null ? MAX_SAFE_INTEGER : length;
+
       return !!length &&
-        (typeof value == 'number' || reIsUint.test(value)) &&
-        (value > -1 && value % 1 == 0 && value < length);
+        (type == 'number' ||
+          (type != 'symbol' && reIsUint.test(value))) &&
+            (value > -1 && value % 1 == 0 && value < length);
     }
 
     /**
@@ -6766,11 +6741,11 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     var stringToPath = memoizeCapped(function(string) {
       var result = [];
-      if (reLeadingDot.test(string)) {
+      if (string.charCodeAt(0) === 46 /* . */) {
         result.push('');
       }
-      string.replace(rePropName, function(match, number, quote, string) {
-        result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
+      string.replace(rePropName, function(match, number, quote, subString) {
+        result.push(quote ? subString.replace(reEscapeChar, '$1') : (number || match));
       });
       return result;
     });
@@ -10378,9 +10353,11 @@ var lodash = createCommonjsModule(function (module, exports) {
       function remainingWait(time) {
         var timeSinceLastCall = time - lastCallTime,
             timeSinceLastInvoke = time - lastInvokeTime,
-            result = wait - timeSinceLastCall;
+            timeWaiting = wait - timeSinceLastCall;
 
-        return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+        return maxing
+          ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke)
+          : timeWaiting;
       }
 
       function shouldInvoke(time) {
@@ -12812,9 +12789,35 @@ var lodash = createCommonjsModule(function (module, exports) {
      * _.defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
      * // => { 'a': 1, 'b': 2 }
      */
-    var defaults = baseRest(function(args) {
-      args.push(undefined, customDefaultsAssignIn);
-      return apply(assignInWith, undefined, args);
+    var defaults = baseRest(function(object, sources) {
+      object = Object(object);
+
+      var index = -1;
+      var length = sources.length;
+      var guard = length > 2 ? sources[2] : undefined;
+
+      if (guard && isIterateeCall(sources[0], sources[1], guard)) {
+        length = 1;
+      }
+
+      while (++index < length) {
+        var source = sources[index];
+        var props = keysIn(source);
+        var propsIndex = -1;
+        var propsLength = props.length;
+
+        while (++propsIndex < propsLength) {
+          var key = props[propsIndex];
+          var value = object[key];
+
+          if (value === undefined ||
+              (eq(value, objectProto[key]) && !hasOwnProperty.call(object, key))) {
+            object[key] = source[key];
+          }
+        }
+      }
+
+      return object;
     });
 
     /**
@@ -13211,6 +13214,11 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => { '1': 'c', '2': 'b' }
      */
     var invert = createInverter(function(result, value, key) {
+      if (value != null &&
+          typeof value.toString != 'function') {
+        value = nativeObjectToString.call(value);
+      }
+
       result[value] = key;
     }, constant(identity));
 
@@ -13241,6 +13249,11 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => { 'group1': ['a', 'c'], 'group2': ['b'] }
      */
     var invertBy = createInverter(function(result, value, key) {
+      if (value != null &&
+          typeof value.toString != 'function') {
+        value = nativeObjectToString.call(value);
+      }
+
       if (hasOwnProperty.call(result, value)) {
         result[value].push(key);
       } else {
@@ -61320,381 +61333,257 @@ var THREE = Object.freeze({
 	CanvasRenderer: CanvasRenderer
 });
 
-var spin = createCommonjsModule(function (module) {
-/**
- * Copyright (c) 2011-2014 Felix Gnass
- * Licensed under the MIT license
- * http://spin.js.org/
- *
- * Example:
-    var opts = {
-      lines: 12             // The number of lines to draw
-    , length: 7             // The length of each line
-    , width: 5              // The line thickness
-    , radius: 10            // The radius of the inner circle
-    , scale: 1.0            // Scales overall size of the spinner
-    , corners: 1            // Roundness (0..1)
-    , color: '#000'         // #rgb or #rrggbb
-    , opacity: 1/4          // Opacity of the lines
-    , rotate: 0             // Rotation offset
-    , direction: 1          // 1: clockwise, -1: counterclockwise
-    , speed: 1              // Rounds per second
-    , trail: 100            // Afterglow percentage
-    , fps: 20               // Frames per second when using setTimeout()
-    , zIndex: 2e9           // Use a high z-index by default
-    , className: 'spinner'  // CSS class to assign to the element
-    , top: '50%'            // center vertically
-    , left: '50%'           // center horizontally
-    , shadow: false         // Whether to render a shadow
-    , hwaccel: false        // Whether to use hardware acceleration (might be buggy)
-    , position: 'absolute'  // Element positioning
+var __assign = (undefined && undefined.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
     }
-    var target = document.getElementById('foo')
-    var spinner = new Spinner(opts).spin(target)
- */
-(function (root, factory) {
-
-  /* CommonJS */
-  if ('object' == 'object' && module.exports) module.exports = factory();
-
-  /* AMD module */
-  else if (typeof undefined == 'function' && undefined.amd) undefined(factory);
-
-  /* Browser global */
-  else root.Spinner = factory();
-}(commonjsGlobal, function () {
-  var prefixes = ['webkit', 'Moz', 'ms', 'O'] /* Vendor prefixes */
-    , animations = {} /* Animation rules keyed by their name */
-    , useCssAnimations /* Whether to use CSS animations or setTimeout */
-    , sheet; /* A stylesheet to hold the @keyframe or VML rules. */
-
-  /**
-   * Utility function to create elements. If no tag name is given,
-   * a DIV is created. Optionally properties can be passed.
-   */
-  function createEl (tag, prop) {
-    var el = document.createElement(tag || 'div')
-      , n;
-
-    for (n in prop) el[n] = prop[n];
-    return el
-  }
-
-  /**
-   * Appends children and returns the parent.
-   */
-  function ins (parent /* child1, child2, ...*/) {
-    for (var i = 1, n = arguments.length; i < n; i++) {
-      parent.appendChild(arguments[i]);
+    return t;
+};
+var defaults = {
+    lines: 12,
+    length: 7,
+    width: 5,
+    radius: 10,
+    scale: 1.0,
+    corners: 1,
+    color: '#000',
+    fadeColor: 'transparent',
+    opacity: 0.25,
+    rotate: 0,
+    direction: 1,
+    speed: 1,
+    trail: 100,
+    fps: 20,
+    zIndex: 2e9,
+    className: 'spinner',
+    top: '50%',
+    left: '50%',
+    shadow: 'none',
+    position: 'absolute',
+};
+var Spinner = /** @class */ (function () {
+    function Spinner(opts) {
+        if (opts === void 0) { opts = {}; }
+        this.opts = __assign({}, defaults, opts);
     }
-
-    return parent
-  }
-
-  /**
-   * Creates an opacity keyframe animation rule and returns its name.
-   * Since most mobile Webkits have timing issues with animation-delay,
-   * we create separate rules for each line/segment.
-   */
-  function addAnimation (alpha, trail, i, lines) {
-    var name = ['opacity', trail, ~~(alpha * 100), i, lines].join('-')
-      , start = 0.01 + i/lines * 100
-      , z = Math.max(1 - (1-alpha) / trail * (100-start), alpha)
-      , prefix = useCssAnimations.substring(0, useCssAnimations.indexOf('Animation')).toLowerCase()
-      , pre = prefix && '-' + prefix + '-' || '';
-
-    if (!animations[name]) {
-      sheet.insertRule(
-        '@' + pre + 'keyframes ' + name + '{' +
-        '0%{opacity:' + z + '}' +
-        start + '%{opacity:' + alpha + '}' +
-        (start+0.01) + '%{opacity:1}' +
-        (start+trail) % 100 + '%{opacity:' + alpha + '}' +
-        '100%{opacity:' + z + '}' +
-        '}', sheet.cssRules.length);
-
-      animations[name] = 1;
-    }
-
-    return name
-  }
-
-  /**
-   * Tries various vendor prefixes and returns the first supported property.
-   */
-  function vendor (el, prop) {
-    var s = el.style
-      , pp
-      , i;
-
-    prop = prop.charAt(0).toUpperCase() + prop.slice(1);
-    if (s[prop] !== undefined) return prop
-    for (i = 0; i < prefixes.length; i++) {
-      pp = prefixes[i]+prop;
-      if (s[pp] !== undefined) return pp
-    }
-  }
-
-  /**
-   * Sets multiple style properties at once.
-   */
-  function css (el, prop) {
-    for (var n in prop) {
-      el.style[vendor(el, n) || n] = prop[n];
-    }
-
-    return el
-  }
-
-  /**
-   * Fills in default values.
-   */
-  function merge (obj) {
-    for (var i = 1; i < arguments.length; i++) {
-      var def = arguments[i];
-      for (var n in def) {
-        if (obj[n] === undefined) obj[n] = def[n];
-      }
-    }
-    return obj
-  }
-
-  /**
-   * Returns the line color from the given string or array.
-   */
-  function getColor (color, idx) {
-    return typeof color == 'string' ? color : color[idx % color.length]
-  }
-
-  // Built-in defaults
-
-  var defaults = {
-    lines: 12             // The number of lines to draw
-  , length: 7             // The length of each line
-  , width: 5              // The line thickness
-  , radius: 10            // The radius of the inner circle
-  , scale: 1.0            // Scales overall size of the spinner
-  , corners: 1            // Roundness (0..1)
-  , color: '#000'         // #rgb or #rrggbb
-  , opacity: 1/4          // Opacity of the lines
-  , rotate: 0             // Rotation offset
-  , direction: 1          // 1: clockwise, -1: counterclockwise
-  , speed: 1              // Rounds per second
-  , trail: 100            // Afterglow percentage
-  , fps: 20               // Frames per second when using setTimeout()
-  , zIndex: 2e9           // Use a high z-index by default
-  , className: 'spinner'  // CSS class to assign to the element
-  , top: '50%'            // center vertically
-  , left: '50%'           // center horizontally
-  , shadow: false         // Whether to render a shadow
-  , hwaccel: false        // Whether to use hardware acceleration (might be buggy)
-  , position: 'absolute'  // Element positioning
-  };
-
-  /** The constructor */
-  function Spinner (o) {
-    this.opts = merge(o || {}, Spinner.defaults, defaults);
-  }
-
-  // Global defaults that override the built-ins:
-  Spinner.defaults = {};
-
-  merge(Spinner.prototype, {
     /**
      * Adds the spinner to the given target element. If this instance is already
-     * spinning, it is automatically removed from its previous target b calling
+     * spinning, it is automatically removed from its previous target by calling
      * stop() internally.
      */
-    spin: function (target) {
-      this.stop();
-
-      var self = this
-        , o = self.opts
-        , el = self.el = createEl(null, {className: o.className});
-
-      css(el, {
-        position: o.position
-      , width: 0
-      , zIndex: o.zIndex
-      , left: o.left
-      , top: o.top
-      });
-
-      if (target) {
-        target.insertBefore(el, target.firstChild || null);
-      }
-
-      el.setAttribute('role', 'progressbar');
-      self.lines(el, self.opts);
-
-      if (!useCssAnimations) {
-        // No CSS animation support, use setTimeout() instead
-        var i = 0
-          , start = (o.lines - 1) * (1 - o.direction) / 2
-          , alpha
-          , fps = o.fps
-          , f = fps / o.speed
-          , ostep = (1 - o.opacity) / (f * o.trail / 100)
-          , astep = f / o.lines;(function anim () {
-          i++;
-          for (var j = 0; j < o.lines; j++) {
-            alpha = Math.max(1 - (i + (o.lines - j) * astep) % f * ostep, o.opacity);
-
-            self.opacity(el, j * o.direction + start, alpha, o);
-          }
-          self.timeout = self.el && setTimeout(anim, ~~(1000 / fps));
-        })();
-      }
-      return self
-    }
-
+    Spinner.prototype.spin = function (target) {
+        var _this = this;
+        this.stop();
+        this.el = document.createElement('div');
+        this.el.className = this.opts.className;
+        this.el.setAttribute('role', 'progressbar');
+        css(this.el, {
+            position: this.opts.position,
+            width: 0,
+            zIndex: this.opts.zIndex,
+            left: this.opts.left,
+            top: this.opts.top,
+            transform: "scale(" + this.opts.scale + ")",
+        });
+        if (target) {
+            target.insertBefore(this.el, target.firstChild || null);
+        }
+        var animator;
+        var getNow;
+        if (typeof requestAnimationFrame !== 'undefined') {
+            animator = requestAnimationFrame;
+            getNow = function () { return performance.now(); };
+        }
+        else {
+            // fallback for IE 9
+            animator = function (callback) { return setTimeout(callback, 1000 / _this.opts.fps); };
+            getNow = function () { return Date.now(); };
+        }
+        var lastFrameTime;
+        var state = 0; // state is rotation percentage (between 0 and 1)
+        var animate = function () {
+            var time = getNow();
+            if (lastFrameTime === undefined) {
+                lastFrameTime = time - 1;
+            }
+            state += getAdvancePercentage(time - lastFrameTime, _this.opts.speed);
+            lastFrameTime = time;
+            if (state > 1) {
+                state -= Math.floor(state);
+            }
+            if (_this.el.childNodes.length === _this.opts.lines) {
+                for (var line = 0; line < _this.opts.lines; line++) {
+                    var opacity = getLineOpacity(line, state, _this.opts);
+                    _this.el.childNodes[line].childNodes[0].style.opacity = opacity.toString();
+                }
+            }
+            _this.animateId = _this.el ? animator(animate) : undefined;
+        };
+        drawLines(this.el, this.opts);
+        animate();
+        return this;
+    };
     /**
      * Stops and removes the Spinner.
+     * Stopped spinners may be reused by calling spin() again.
      */
-  , stop: function () {
-      var el = this.el;
-      if (el) {
-        clearTimeout(this.timeout);
-        if (el.parentNode) el.parentNode.removeChild(el);
-        this.el = undefined;
-      }
-      return this
-    }
-
-    /**
-     * Internal method that draws the individual lines. Will be overwritten
-     * in VML fallback mode below.
-     */
-  , lines: function (el, o) {
-      var i = 0
-        , start = (o.lines - 1) * (1 - o.direction) / 2
-        , seg;
-
-      function fill (color, shadow) {
-        return css(createEl(), {
-          position: 'absolute'
-        , width: o.scale * (o.length + o.width) + 'px'
-        , height: o.scale * o.width + 'px'
-        , background: color
-        , boxShadow: shadow
-        , transformOrigin: 'left'
-        , transform: 'rotate(' + ~~(360/o.lines*i + o.rotate) + 'deg) translate(' + o.scale*o.radius + 'px' + ',0)'
-        , borderRadius: (o.corners * o.scale * o.width >> 1) + 'px'
-        })
-      }
-
-      for (; i < o.lines; i++) {
-        seg = css(createEl(), {
-          position: 'absolute'
-        , top: 1 + ~(o.scale * o.width / 2) + 'px'
-        , transform: o.hwaccel ? 'translate3d(0,0,0)' : ''
-        , opacity: o.opacity
-        , animation: useCssAnimations && addAnimation(o.opacity, o.trail, start + i * o.direction, o.lines) + ' ' + 1 / o.speed + 's linear infinite'
-        });
-
-        if (o.shadow) ins(seg, css(fill('#000', '0 0 4px #000'), {top: '2px'}));
-        ins(el, ins(seg, fill(getColor(o.color, i), '0 0 1px rgba(0,0,0,.1)')));
-      }
-      return el
-    }
-
-    /**
-     * Internal method that adjusts the opacity of a single line.
-     * Will be overwritten in VML fallback mode below.
-     */
-  , opacity: function (el, i, val) {
-      if (i < el.childNodes.length) el.childNodes[i].style.opacity = val;
-    }
-
-  });
-
-
-  function initVML () {
-
-    /* Utility function to create a VML tag */
-    function vml (tag, attr) {
-      return createEl('<' + tag + ' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">', attr)
-    }
-
-    // No CSS transforms but VML support, add a CSS rule for VML elements:
-    sheet.addRule('.spin-vml', 'behavior:url(#default#VML)');
-
-    Spinner.prototype.lines = function (el, o) {
-      var r = o.scale * (o.length + o.width)
-        , s = o.scale * 2 * r;
-
-      function grp () {
-        return css(
-          vml('group', {
-            coordsize: s + ' ' + s
-          , coordorigin: -r + ' ' + -r
-          })
-        , { width: s, height: s }
-        )
-      }
-
-      var margin = -(o.width + o.length) * o.scale * 2 + 'px'
-        , g = css(grp(), {position: 'absolute', top: margin, left: margin})
-        , i;
-
-      function seg (i, dx, filter) {
-        ins(
-          g
-        , ins(
-            css(grp(), {rotation: 360 / o.lines * i + 'deg', left: ~~dx})
-          , ins(
-              css(
-                vml('roundrect', {arcsize: o.corners})
-              , { width: r
-                , height: o.scale * o.width
-                , left: o.scale * o.radius
-                , top: -o.scale * o.width >> 1
-                , filter: filter
-                }
-              )
-            , vml('fill', {color: getColor(o.color, i), opacity: o.opacity})
-            , vml('stroke', {opacity: 0}) // transparent stroke to fix color bleeding upon opacity change
-            )
-          )
-        );
-      }
-
-      if (o.shadow)
-        for (i = 1; i <= o.lines; i++) {
-          seg(i, -2, 'progid:DXImageTransform.Microsoft.Blur(pixelradius=2,makeshadow=1,shadowopacity=.3)');
+    Spinner.prototype.stop = function () {
+        if (this.el) {
+            if (typeof requestAnimationFrame !== 'undefined') {
+                cancelAnimationFrame(this.animateId);
+            }
+            else {
+                clearTimeout(this.animateId);
+            }
+            if (this.el.parentNode) {
+                this.el.parentNode.removeChild(this.el);
+            }
+            this.el = undefined;
         }
-
-      for (i = 1; i <= o.lines; i++) seg(i);
-      return ins(el, g)
+        return this;
     };
-
-    Spinner.prototype.opacity = function (el, i, val, o) {
-      var c = el.firstChild;
-      o = o.shadow && o.lines || 0;
-      if (c && i + o < c.childNodes.length) {
-        c = c.childNodes[i + o]; c = c && c.firstChild; c = c && c.firstChild;
-        if (c) c.opacity = val;
-      }
-    };
-  }
-
-  if (typeof document !== 'undefined') {
-    sheet = (function () {
-      var el = createEl('style', {type : 'text/css'});
-      ins(document.getElementsByTagName('head')[0], el);
-      return el.sheet || el.styleSheet
-    }());
-
-    var probe = css(createEl('group'), {behavior: 'url(#default#VML)'});
-
-    if (!vendor(probe, 'transform') && probe.adj) initVML();
-    else useCssAnimations = vendor(probe, 'animation');
-  }
-
-  return Spinner
-
-}));
-});
+    return Spinner;
+}());
+function getAdvancePercentage(msSinceLastFrame, roundsPerSecond) {
+    return msSinceLastFrame / 1000 * roundsPerSecond;
+}
+function getLineOpacity(line, state, opts) {
+    var linePercent = (line + 1) / opts.lines;
+    var diff = state - (linePercent * opts.direction);
+    if (diff < 0 || diff > 1) {
+        diff += opts.direction;
+    }
+    // opacity should start at 1, and approach opacity option as diff reaches trail percentage
+    var trailPercent = opts.trail / 100;
+    var opacityPercent = 1 - diff / trailPercent;
+    if (opacityPercent < 0) {
+        return opts.opacity;
+    }
+    var opacityDiff = 1 - opts.opacity;
+    return opacityPercent * opacityDiff + opts.opacity;
+}
+/**
+ * Tries various vendor prefixes and returns the first supported property.
+ */
+function vendor(el, prop) {
+    if (el.style[prop] !== undefined) {
+        return prop;
+    }
+    // needed for transform properties in IE 9
+    var prefixed = 'ms' + prop.charAt(0).toUpperCase() + prop.slice(1);
+    if (el.style[prefixed] !== undefined) {
+        return prefixed;
+    }
+    return '';
+}
+/**
+ * Sets multiple style properties at once.
+ */
+function css(el, props) {
+    for (var prop in props) {
+        el.style[vendor(el, prop) || prop] = props[prop];
+    }
+    return el;
+}
+/**
+ * Returns the line color from the given string or array.
+ */
+function getColor(color, idx) {
+    return typeof color == 'string' ? color : color[idx % color.length];
+}
+/**
+ * Internal method that draws the individual lines.
+ */
+function drawLines(el, opts) {
+    var borderRadius = (Math.round(opts.corners * opts.width * 500) / 1000) + 'px';
+    var shadow = 'none';
+    if (opts.shadow === true) {
+        shadow = '0 2px 4px #000'; // default shadow
+    }
+    else if (typeof opts.shadow === 'string') {
+        shadow = opts.shadow;
+    }
+    var shadows = parseBoxShadow(shadow);
+    for (var i = 0; i < opts.lines; i++) {
+        var degrees = ~~(360 / opts.lines * i + opts.rotate);
+        var backgroundLine = css(document.createElement('div'), {
+            position: 'absolute',
+            top: -opts.width / 2 + "px",
+            width: (opts.length + opts.width) + 'px',
+            height: opts.width + 'px',
+            background: getColor(opts.fadeColor, i),
+            borderRadius: borderRadius,
+            transformOrigin: 'left',
+            transform: "rotate(" + degrees + "deg) translateX(" + opts.radius + "px)",
+        });
+        var line = css(document.createElement('div'), {
+            width: '100%',
+            height: '100%',
+            background: getColor(opts.color, i),
+            borderRadius: borderRadius,
+            boxShadow: normalizeShadow(shadows, degrees),
+            opacity: opts.opacity,
+        });
+        backgroundLine.appendChild(line);
+        el.appendChild(backgroundLine);
+    }
+}
+function parseBoxShadow(boxShadow) {
+    var regex = /^\s*([a-zA-Z]+\s+)?(-?\d+(\.\d+)?)([a-zA-Z]*)\s+(-?\d+(\.\d+)?)([a-zA-Z]*)(.*)$/;
+    var shadows = [];
+    for (var _i = 0, _a = boxShadow.split(','); _i < _a.length; _i++) {
+        var shadow = _a[_i];
+        var matches = shadow.match(regex);
+        if (matches === null) {
+            continue; // invalid syntax
+        }
+        var x = +matches[2];
+        var y = +matches[5];
+        var xUnits = matches[4];
+        var yUnits = matches[7];
+        if (x === 0 && !xUnits) {
+            xUnits = yUnits;
+        }
+        if (y === 0 && !yUnits) {
+            yUnits = xUnits;
+        }
+        if (xUnits !== yUnits) {
+            continue; // units must match to use as coordinates
+        }
+        shadows.push({
+            prefix: matches[1] || '',
+            x: x,
+            y: y,
+            xUnits: xUnits,
+            yUnits: yUnits,
+            end: matches[8],
+        });
+    }
+    return shadows;
+}
+/**
+ * Modify box-shadow x/y offsets to counteract rotation
+ */
+function normalizeShadow(shadows, degrees) {
+    var normalized = [];
+    for (var _i = 0, shadows_1 = shadows; _i < shadows_1.length; _i++) {
+        var shadow = shadows_1[_i];
+        var xy = convertOffset(shadow.x, shadow.y, degrees);
+        normalized.push(shadow.prefix + xy[0] + shadow.xUnits + ' ' + xy[1] + shadow.yUnits + shadow.end);
+    }
+    return normalized.join(', ');
+}
+function convertOffset(x, y, degrees) {
+    var radians = degrees * Math.PI / 180;
+    var sin = Math.sin(radians);
+    var cos = Math.cos(radians);
+    return [
+        Math.round((x * cos + y * sin) * 1000) / 1000,
+        Math.round((-x * sin + y * cos) * 1000) / 1000,
+    ];
+}
 
 /**
  * This class introduces the simplest event system.
@@ -62575,7 +62464,20 @@ var createClass = function () {
 
 
 
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
 
+  return obj;
+};
 
 
 
@@ -62734,7 +62636,7 @@ var VERSION = 0;
  * @alias SettingsObject
  * @namespace
  */
-var defaults$1 = {
+var defaults$2 = {
   /**
    * Default options for all available modes.
    * Use {@link Mode.id} as a dictionary key to access mode options.
@@ -63530,7 +63432,7 @@ function Settings() {
 Settings.prototype = {
   constructor: Settings,
 
-  defaults: defaults$1,
+  defaults: defaults$2,
 
   set: function set(path, value) {
     lodash.set(this.now, path, value);
@@ -63542,7 +63444,7 @@ Settings.prototype = {
   },
 
   reset: function reset() {
-    this.now = lodash.cloneDeep(defaults$1);
+    this.now = lodash.cloneDeep(defaults$2);
     this.old = null;
     this._changed = {};
   },
@@ -63583,7 +63485,7 @@ Settings.prototype = {
   },
 
   getDiffs: function getDiffs(versioned) {
-    var diffs = utils.objectsDiff(this.now, defaults$1);
+    var diffs = utils.objectsDiff(this.now, defaults$2);
     if (versioned) {
       diffs.VERSION = VERSION;
     }
@@ -63591,7 +63493,7 @@ Settings.prototype = {
   },
 
   setPluginOpts: function setPluginOpts(plugin, opts) {
-    defaults$1.plugins[plugin] = lodash.cloneDeep(opts);
+    defaults$2.plugins[plugin] = lodash.cloneDeep(opts);
     this.now.plugins[plugin] = lodash.cloneDeep(opts);
   }
 };
@@ -63717,13 +63619,13 @@ function extractArgs(input, defaultsDict, params) {
       var args = input.substr(bang + 1).split(cLSep);
       input = inputVal;
       if (defaultsDict) {
-        var defaults$$1 = defaultsDict[input];
-        var opts = utils.deriveDeep(defaults$$1, true);
+        var defaults = defaultsDict[input];
+        var opts = utils.deriveDeep(defaults, true);
         args.forEach(function (arg) {
           var pair = arg.split(cL2Ass, 2);
           var key = decodeURIComponent(pair[0]),
               value = decodeURIComponent(pair[1]);
-          var adapter = adapters[_typeof(lodash.get(defaults$$1, key))];
+          var adapter = adapters[_typeof(lodash.get(defaults, key))];
           if (adapter) {
             lodash.set(opts, key, adapter(value));
           } else {
@@ -67543,7 +67445,7 @@ Component.prototype.getMaskedSubdivSequences = function (mask) {
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 var cMaxPairsForHashCode = 32;
-var cHashTableSize = 16384;
+var cHashTableSize = 1024 * 1024;
 var cNumbersPerPair = 4;
 var cMaxNeighbours = 14;
 var cInvalidVal = -1;
@@ -67592,7 +67494,7 @@ AtomPairs.prototype.addPair = function (indexA, indexB) {
       break;
     }
     if (code === codeToAdd) {
-      return;
+      return false;
     }
   }
   // add this new hash code
@@ -67610,6 +67512,7 @@ AtomPairs.prototype.addPair = function (indexA, indexB) {
   this.intBuffer[j + 1] = ib;
   this.intBuffer[j + 2] = codeToAdd;
   this.numPairs++;
+  return true;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -67635,23 +67538,6 @@ function _getBondingRadius(atom) {
   } else {
     throw new Error('_getBondingRadius: Logic error.');
   }
-}
-
-/**
- * Returns value, limited in given range (min, max)
- * @param {number} val modified value
- * @param {number} valMin minimum value in range
- * @param {number} valMax maximum value in range
- * @returns {number} original value (if it lie inside range) or range bound (left or right)
- */
-function _clamp(val, valMin, valMax) {
-  if (val < valMin) {
-    return valMin;
-  }
-  if (val > valMax) {
-    return valMax;
-  }
-  return val;
 }
 
 function _isAtomEligible(atom) {
@@ -67707,80 +67593,60 @@ AutoBond.prototype._addExistingPairs = function () {
   return 0;
 };
 
-AutoBond.prototype._findPairs = function (volMap) {
+AutoBond.prototype._findPairs = function () {
+  var vw = this._complex.getVoxelWorld();
+  if (vw === null) {
+    return;
+  }
+
   var atoms = this._complex._atoms;
   var atomsNum = atoms.length;
-  var vBoxMin = this._vBoxMin;
-  var xB = this.xB;
-  var yB = this.yB;
-  var zB = this.zB;
-  var invPairDist = this.invPairDist;
-  var xyTotalBoxes = yB * xB;
   var isAtomEligible = this.isAtomEligible;
+  var self = this;
+
+  var rA = void 0;
+  var isHydrogenA = void 0;
+  var posA = void 0;
+  var locationA = void 0;
+  var atomA = void 0;
+
+  var processAtom = function processAtom(atomB) {
+    if (isHydrogenA && atomB.isHydrogen()) {
+      return;
+    }
+
+    var locationB = atomB.getLocation();
+    if (locationA !== cSpaceCode && locationB !== cSpaceCode && locationA !== locationB) {
+      return;
+    }
+
+    var dist2 = posA.distanceToSquared(atomB._position);
+    var rB = atomB.element.radiusBonding;
+    var maxAcceptable = cBondRadInJMOL ? rA + rB + cBondTolerance : cVMDTolerance * (rA + rB);
+
+    if (dist2 > maxAcceptable * maxAcceptable) {
+      return;
+    }
+
+    if (dist2 < cEpsilon) {
+      return;
+    }
+
+    self._pairCollection.addPair(atomA._index, atomB._index);
+  };
 
   for (var i = 0; i < atomsNum; ++i) {
-    var atom = atoms[i];
-    if (!isAtomEligible(atom)) {
+    atomA = atoms[i];
+    if (!isAtomEligible(atomA)) {
       continue;
     }
 
-    var rA = atom.element.radiusBonding;
-    // 'H' == 72
-    var isHydrogenA = atom.isHydrogen();
-    var locationA = atom.getLocation();
+    rA = atomA.element.radiusBonding;
+    isHydrogenA = atomA.isHydrogen();
+    posA = atomA._position;
+    locationA = atomA.getLocation();
 
-    var posA = atom._position;
-    var axB = (posA.x - vBoxMin.x) * invPairDist | 0;
-    var ayB = (posA.y - vBoxMin.y) * invPairDist | 0;
-    var azB = (posA.z - vBoxMin.z) * invPairDist | 0;
-
-    for (var dz = -1; dz <= 1; ++dz) {
-      var zInd = azB + dz;
-      if (zInd < 0 || zInd >= zB) {
-        continue;
-      }
-      for (var dy = -1; dy <= 1; ++dy) {
-        var yInd = ayB + dy;
-        if (yInd < 0 || yInd >= yB) {
-          continue;
-        }
-        for (var dx = -1; dx <= 1; ++dx) {
-          var xInd = axB + dx;
-          if (xInd < 0 || xInd >= xB) {
-            continue;
-          }
-          var iIndex = zInd * xyTotalBoxes + yInd * xB + xInd;
-          var neighbours = volMap[iIndex];
-          for (var j = 0; j < neighbours.length; ++j) {
-            var iB = neighbours[j];
-            if (iB <= i) {
-              continue;
-            }
-            var atomB = atoms[iB];
-            if (isHydrogenA && atomB.isHydrogen()) {
-              continue;
-            }
-
-            var locationB = atomB.getLocation();
-            if (locationA !== cSpaceCode && locationB !== cSpaceCode && locationA !== locationB) {
-              continue;
-            }
-            var dist2 = posA.distanceToSquared(atomB._position);
-            var rB = atomB.element.radiusBonding;
-            var maxAcceptable = cBondRadInJMOL ? rA + rB + cBondTolerance : cVMDTolerance * (rA + rB);
-            if (dist2 > maxAcceptable * maxAcceptable) {
-              continue;
-            }
-
-            if (dist2 < cEpsilon) {
-              continue;
-            }
-
-            this._pairCollection.addPair(i, iB);
-          }
-        }
-      }
-    }
+    vw.forEachAtomWithinRadius(posA, 2 * this._maxRad + cBondTolerance, processAtom);
   }
 };
 
@@ -67864,10 +67730,9 @@ AutoBond.prototype._buildInner = function () {
   this.isAtomEligible = settings.now.draft.waterBondingHack ? _isAtomEligibleWithWaterBondingHack : _isAtomEligible;
 
   this._calcBoundingBox();
-  var volMap = this._buildGridMap();
   this._pairCollection = new AtomPairs(atoms.length * cEstBondsMultiplier);
   this._addExistingPairs();
-  this._findPairs(volMap);
+  this._findPairs();
   this._addPairs();
 };
 
@@ -67881,60 +67746,6 @@ AutoBond.prototype._calcBoundingBox = function () {
   this._vBoxMax.addScalar(maxRad);
   this._vBoxMin.addScalar(-maxRad);
   this._maxRad = maxRad * 1.2;
-};
-
-AutoBond.prototype._buildGridMap = function () {
-  var cMaxBoxes = 125000;
-  var cRadMultiplier = 1.26;
-
-  var pairDist = this._maxRad * 2;
-  var newPairDist = pairDist;
-  var vBoxMin = this._vBoxMin;
-  var vBoxMax = this._vBoxMax;
-  var xRange = vBoxMax.x - vBoxMin.x;
-  var yRange = vBoxMax.y - vBoxMin.y;
-  var zRange = vBoxMax.z - vBoxMin.z;
-  var xB, yB, zB, xyTotalBoxes;
-  var invPairDist;
-  var totalBoxes;
-
-  do {
-    pairDist = newPairDist;
-    invPairDist = 1.0 / pairDist;
-    xB = (xRange * invPairDist | 0) + 1;
-    yB = (yRange * invPairDist | 0) + 1;
-    zB = (zRange * invPairDist | 0) + 1;
-    xyTotalBoxes = yB * xB;
-    totalBoxes = xyTotalBoxes * zB;
-    newPairDist = pairDist * cRadMultiplier;
-  } while (totalBoxes > cMaxBoxes);
-  this.xB = xB;
-  this.yB = yB;
-  this.zB = zB;
-  this.invPairDist = invPairDist;
-
-  var voxMap = [];
-  var i = 0;
-  for (; i < totalBoxes; ++i) {
-    voxMap[i] = [];
-  }
-  var atoms = this._complex._atoms;
-  var nAtoms = atoms.length;
-  var isAtomEligible = this.isAtomEligible;
-  for (i = 0; i < nAtoms; ++i) {
-    if (!isAtomEligible(atoms[i])) {
-      continue;
-    }
-    var pos = atoms[i]._position;
-    var axB = _clamp((pos.x - vBoxMin.x) * invPairDist | 0, 0, xB);
-    var ayB = _clamp((pos.y - vBoxMin.y) * invPairDist | 0, 0, yB);
-    var azB = _clamp((pos.z - vBoxMin.z) * invPairDist | 0, 0, zB);
-
-    var iIndex = azB * xyTotalBoxes + ayB * xB + axB;
-    voxMap[iIndex].push(i);
-  }
-
-  return voxMap;
 };
 
 AutoBond.prototype.destroy = function () {
@@ -68183,6 +67994,1343 @@ AromaticLoopsMarker.prototype.detectCycles = function () {
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Calculate min & max radius of a sphere slice between zMin & zMax
+ *
+ * @param {Vector3} center - center of the sphere
+ * @param {number} radius  - sphere radius
+ * @param {number} zMin - lower bound of the slice
+ * @param {number} zMax - upper bound of the slice
+ */
+function _getSphereSliceRadiusRange(center, radius, zMin, zMax) {
+  var dzMin = zMin - center.z;
+  var dzMax = zMax - center.z;
+  var rzMin = Math.sqrt(Math.max(radius * radius - dzMin * dzMin, 0.0));
+  var rzMax = Math.sqrt(Math.max(radius * radius - dzMax * dzMax, 0.0));
+
+  var rMin = Math.min(rzMin, rzMax);
+  var rMax;
+
+  if (zMin <= center.z && zMax >= center.z) {
+    // sphere's main diameter is inside slice
+    rMax = radius;
+  } else {
+    rMax = Math.max(rzMin, rzMax);
+  }
+
+  return [rMin, rMax];
+}
+
+/**
+ * Calculate min & max radius of a circle slice between yMin & yMax.
+ *
+ * To maintain analogy with _getSphereSliceRadiusRange we call radius what in fact is
+ * half-width (along X axis) of the slice, i.e. 1D-sphere radius.
+ *
+ * @param {Vector3} center - center of the circle (z can be ignored)
+ * @param {number} radius  - circle radius
+ * @param {number} yMin - lower bound of the slice
+ * @param {number} yMax - upper bound of the slice
+ * @returns {Array} - array of two numbers (min & max radius, or half-width)
+ */
+function _getCircleSliceRadiusRange(center, radius, yMin, yMax) {
+  var dyMin = yMin - center.y;
+  var dyMax = yMax - center.y;
+  var ryMin = Math.sqrt(Math.max(radius * radius - dyMin * dyMin, 0.0));
+  var ryMax = Math.sqrt(Math.max(radius * radius - dyMax * dyMax, 0.0));
+
+  var rMin = Math.min(ryMin, ryMax);
+  var rMax;
+
+  if (yMin <= center.y && yMax >= center.y) {
+    // slice's main diameter is inside slice
+    rMax = radius;
+  } else {
+    rMax = Math.max(ryMin, ryMax);
+  }
+
+  return [rMin, rMax];
+}
+
+/**
+ * VoxelWorld constructor
+ *
+ * @param {Box3} box - bounding box of the volume to be partitioned
+ * @param {Vector3} vCellSizeHint - target voxel size (actual voxel size may differ from this)
+ */
+function VoxelWorld(box, vCellSizeHint) {
+  var i;
+
+  this._box = box.clone();
+  this._count = box.getSize().divide(vCellSizeHint).floor();
+  this._last = this._count.clone().subScalar(1);
+  this._cellSize = box.getSize().divide(this._count);
+  this._cellInnerR = 0.5 * Math.min(Math.min(this._cellSize.x, this._cellSize.y), this._cellSize.z);
+  this._cellOuterR = 0.5 * Math.sqrt(this._cellSize.dot(this._cellSize));
+
+  // array of voxels, each element contains index of first atom in voxel
+  var numVoxels = this._count.x * this._count.y * this._count.z;
+  this._voxels = utils.allocateTyped(Int32Array, numVoxels);
+  for (i = 0; i < numVoxels; ++i) {
+    this._voxels[i] = -1;
+  }
+
+  // array of atoms that stores multiple single-linked lists
+  // two elements for each atom: Atom ref, index of next atom (in this array
+  this._atoms = [];
+}
+
+/**
+ * Add all atoms from a complex to voxel world
+ *
+ * @param {Complex} complex - complex
+ */
+VoxelWorld.prototype.addAtoms = function (complex) {
+  var self = this;
+
+  var idx = this._atoms.length;
+
+  // resize array of atoms
+  this._atoms.length = this._atoms.length + 2 * complex.getAtomCount();
+
+  complex.forEachAtom(function (atom) {
+    // find which voxel contains this atom
+    var voxelIdx = self._findVoxel(atom._position);
+
+    // push current atom to the head of voxel's atom list
+    self._atoms[idx] = atom;
+    self._atoms[idx + 1] = self._voxels[voxelIdx];
+    self._voxels[voxelIdx] = idx;
+
+    idx += 2;
+  });
+};
+
+/**
+ * Get voxel that contains specified 3D point (we use clamp at the edges)
+ *
+ * @param {Vector3} point - a point in 3D
+ * @returns {number} - index of voxel
+ */
+VoxelWorld.prototype._findVoxel = function () {
+  var zero = new Vector3(0, 0, 0);
+  var voxel = new Vector3();
+
+  return function (point) {
+    voxel.copy(point).sub(this._box.min).divide(this._cellSize).floor().clamp(zero, this._last);
+    return voxel.x + this._count.x * (voxel.y + this._count.y * voxel.z);
+  };
+}();
+
+/**
+ * Call a function for each atom in voxel
+ *
+ * @param {number} voxel - index of voxel
+ * @param {function(Atom)} process - function to call
+ */
+VoxelWorld.prototype._forEachAtomInVoxel = function (voxel, process) {
+  for (var i = this._voxels[voxel]; i >= 0; i = this._atoms[i + 1]) {
+    process(this._atoms[i]);
+  }
+};
+
+/**
+ * Call a function for each voxel that is touched by given sphere. Callback also takes flag
+ * isInside specifying whether voxel lies inside the sphere entirely.
+ *
+ * @param {Vector3} center - center of the sphere
+ * @param {number} radius  - sphere radius
+ * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
+ */
+VoxelWorld.prototype._forEachVoxelWithinRadius = function () {
+  var xRange = new Vector2();
+  var yRange = new Vector2();
+  var zRange = new Vector2();
+
+  return function (center, radius, process) {
+    // switch to a faster method unless cell size is much smaller than sphere radius
+    if (radius / this._cellInnerR < 10) {
+      this._forEachVoxelWithinRadiusSimple(center, radius, process);
+      return;
+    }
+
+    var rRangeXY = void 0,
+        rRangeX = void 0,
+        xVal = void 0,
+        yVal = void 0,
+        zVal = void 0,
+        isInsideX = void 0,
+        isInsideY = void 0,
+        isInsideZ = void 0;
+
+    zRange.set(center.z - radius, center.z + radius);
+    zRange.subScalar(this._box.min.z).divideScalar(this._cellSize.z).floor().clampScalar(0, this._count.z - 1);
+
+    for (var z = zRange.x; z <= zRange.y; ++z) {
+      zVal = [this._box.min.z + z * this._cellSize.z, this._box.min.z + (z + 1) * this._cellSize.z];
+
+      isInsideZ = center.z - radius <= zVal[0] && zVal[1] <= center.z + radius;
+
+      rRangeXY = _getSphereSliceRadiusRange(center, radius, zVal[0], zVal[1]);
+
+      yRange.set(center.y - rRangeXY[1], center.y + rRangeXY[1]);
+      yRange.subScalar(this._box.min.y).divideScalar(this._cellSize.y).floor().clampScalar(0, this._count.y - 1);
+
+      for (var y = yRange.x; y <= yRange.y; ++y) {
+        yVal = [this._box.min.y + y * this._cellSize.y, this._box.min.y + (y + 1) * this._cellSize.y];
+
+        isInsideY = center.y - rRangeXY[0] <= yVal[0] && yVal[1] <= center.y + rRangeXY[0];
+
+        rRangeX = _getCircleSliceRadiusRange(center, rRangeXY[1], yVal[0], yVal[1]);
+
+        xRange.set(center.x - rRangeX[1], center.x + rRangeX[1]);
+        xRange.subScalar(this._box.min.x).divideScalar(this._cellSize.x).floor().clampScalar(0, this._count.x - 1);
+
+        for (var x = xRange.x; x <= xRange.y; ++x) {
+          xVal = [this._box.min.x + x * this._cellSize.x, this._box.min.x + (x + 1) * this._cellSize.x];
+          isInsideX = center.x - rRangeX[0] <= xVal[0] && xVal[1] <= center.x + rRangeX[0];
+
+          process(x + this._count.x * (y + this._count.y * z), isInsideX && isInsideY && isInsideZ);
+        }
+      }
+    }
+  };
+}();
+
+/**
+ * Call a function for each voxel that is touched by given sphere. Callback also takes flag
+ * isInside specifying whether voxel lies inside the sphere entirely.
+ * This is a version of method that doesn't try to "calculate" what voxels fall inside radius
+ * but instead just checks all voxels inside sphere's bounding box. This should be faster
+ * unless cell size is much smaller than sphere radius.
+ *
+ * @param {Vector3} center - center of the sphere
+ * @param {number} radius  - sphere radius
+ * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
+ */
+VoxelWorld.prototype._forEachVoxelWithinRadiusSimple = function () {
+  var xRange = new Vector2();
+  var yRange = new Vector2();
+  var zRange = new Vector2();
+  var vCenter = new Vector3();
+
+  return function (center, radius, process) {
+    var distTouch2 = (radius + this._cellOuterR) * (radius + this._cellOuterR);
+    var distInside2 = -1.0;
+    if (radius > this._cellOuterR) {
+      distInside2 = (radius - this._cellOuterR) * (radius - this._cellOuterR);
+    }
+
+    // calculate bounding box for the sphere
+    xRange.set(center.x - radius, center.x + radius);
+    xRange.subScalar(this._box.min.x).divideScalar(this._cellSize.x).floor();
+    xRange.x = Math.min(Math.max(xRange.x, 0), this._count.x - 1);
+    xRange.y = Math.min(Math.max(xRange.y, 0), this._count.x - 1);
+
+    yRange.set(center.y - radius, center.y + radius);
+    yRange.subScalar(this._box.min.y).divideScalar(this._cellSize.y).floor();
+    yRange.x = Math.min(Math.max(yRange.x, 0), this._count.y - 1);
+    yRange.y = Math.min(Math.max(yRange.y, 0), this._count.y - 1);
+
+    zRange.set(center.z - radius, center.z + radius);
+    zRange.subScalar(this._box.min.z).divideScalar(this._cellSize.z).floor();
+    zRange.x = Math.min(Math.max(zRange.x, 0), this._count.z - 1);
+    zRange.y = Math.min(Math.max(zRange.y, 0), this._count.z - 1);
+
+    for (var z = zRange.x; z <= zRange.y; ++z) {
+      var zVal = [this._box.min.z + z * this._cellSize.z, this._box.min.z + (z + 1) * this._cellSize.z];
+      vCenter.z = 0.5 * (zVal[0] + zVal[1]);
+
+      for (var y = yRange.x; y <= yRange.y; ++y) {
+        var yVal = [this._box.min.y + y * this._cellSize.y, this._box.min.y + (y + 1) * this._cellSize.y];
+        vCenter.y = 0.5 * (yVal[0] + yVal[1]);
+
+        for (var x = xRange.x; x <= xRange.y; ++x) {
+          var xVal = [this._box.min.x + x * this._cellSize.x, this._box.min.x + (x + 1) * this._cellSize.x];
+          vCenter.x = 0.5 * (xVal[0] + xVal[1]);
+
+          var d2 = center.distanceToSquared(vCenter);
+          if (d2 <= distTouch2) {
+            process(x + this._count.x * (y + this._count.y * z), d2 <= distInside2);
+          }
+        }
+      }
+    }
+  };
+}();
+
+/**
+ * Call a function for each atom within given sphere
+ *
+ * @param {Vector3} center - center of the sphere
+ * @param {number} radius  - sphere radius
+ * @param {function(Atom)} process - function to call
+ */
+VoxelWorld.prototype.forEachAtomWithinRadius = function (center, radius, process) {
+  var self = this;
+  var r2 = radius * radius;
+
+  self._forEachVoxelWithinRadius(center, radius, function (voxel, isInside) {
+    if (isInside) {
+      self._forEachAtomInVoxel(voxel, process);
+    } else {
+      self._forEachAtomInVoxel(voxel, function (atom) {
+        if (center.distanceToSquared(atom._position) <= r2) {
+          process(atom);
+        }
+      });
+    }
+  });
+};
+
+/**
+ * Call a function for each atom of given complex within given distance from group of atoms defined by mask
+ *
+ * @param {Complex} complex - complex
+ * @param {number} mask - bit mask
+ * @param {number} dist - distance
+ * @param {function(Atom)} process - function to call
+ */
+VoxelWorld.prototype.forEachAtomWithinDistFromMasked = function (complex, mask, dist, process) {
+  this._forEachAtomWithinDistFromGroup(function (atomProc) {
+    complex.forEachAtom(function (atom) {
+      if ((atom._mask & mask) !== 0) {
+        atomProc(atom);
+      }
+    });
+  }, dist, process);
+};
+
+/**
+ * Call a function for each atom of given complex within given distance from group of atoms defined by selector
+ *
+ * @param {Complex} complex - complex
+ * @param {number} selector - selector
+ * @param {number} dist - distance
+ * @param {function(Atom)} process - function to call
+ */
+VoxelWorld.prototype.forEachAtomWithinDistFromSelected = function (complex, selector, dist, process) {
+  this._forEachAtomWithinDistFromGroup(function (atomProc) {
+    complex.forEachAtom(function (atom) {
+      if (selector.includesAtom(atom)) {
+        atomProc(atom);
+      }
+    });
+  }, dist, process);
+};
+
+/**
+ * Call a function for each atom of given complex within given distance from group of atoms
+ *
+ * @param {function} forEachAtom - enumerator of atoms in the group
+ * @param {number} dist - distance
+ * @param {function(Atom)} process - function to call
+ */
+VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function (forEachAtom, dist, process) {
+  var self = this;
+  var r2 = dist * dist;
+
+  var voxels = [];
+  var atoms = [];
+  var idx = 0;
+
+  // build "within radius" atom list for each voxel
+  forEachAtom(function (atom) {
+    self._forEachVoxelWithinRadius(atom._position, dist, function (voxel, isInside) {
+      if (isInside) {
+        // this voxel is inside circle -- no check will be required
+        voxels[voxel] = -1;
+      } else if (typeof voxels[voxel] === 'undefined') {
+        // this voxel isn't covered yet -- start building list of atoms
+        atoms.push(atom);
+        atoms.push(-1);
+        voxels[voxel] = idx;
+        idx += 2;
+      } else if (voxels[voxel] !== -1) {
+        // this voxel has a list of atoms required for distance check -- add atom to the list
+        atoms.push(atom);
+        atoms.push(voxels[voxel]);
+        voxels[voxel] = idx;
+        idx += 2;
+      }
+    });
+  });
+
+  var voxel;
+
+  var processIfWithin = function processIfWithin(atom) {
+    if (typeof voxels[voxel] === 'undefined') {
+      return;
+    }
+
+    idx = voxels[voxel];
+    if (idx === -1) {
+      // this voxel is fully covered
+      process(atom);
+      return;
+    }
+
+    // check distance to each atom within radius from this voxel
+    for (; idx >= 0; idx = atoms[idx + 1]) {
+      if (atom._position.distanceToSquared(atoms[idx]._position) < r2) {
+        process(atom);
+        break;
+      }
+    }
+  };
+
+  // for each marked voxel
+  for (voxel in voxels) {
+    if (voxels.hasOwnProperty(voxel)) {
+      self._forEachAtomInVoxel(voxel, processIfWithin);
+    }
+  }
+};
+
+var MINIMAL_DISTANCE = 0.5;
+var MIN_HBOND_ENERGY = -9.9;
+var MAX_HBOND_ENERGY = -0.5;
+var COUPLING_CONSTANT = -27.888; // = -332 * 0.42 * 0.2
+var MAX_COUPLING_DISTANCE = 5.0; // how far is the closest atom of a potential partner residue from CA atom
+var MAX_RESIDUES_THRESHOLD = 1000;
+
+var HBondInfo = function () {
+  function HBondInfo(complex) {
+    classCallCheck(this, HBondInfo);
+
+    this._complex = complex;
+    this._hbonds = []; // array of bond info for each residue
+    if (this._complex._residues.length > MAX_RESIDUES_THRESHOLD) {
+      this._buildVW(); // optimized version using voxel grid
+    } else {
+      this._build(); // test all pairs of residues
+    }
+  }
+
+  createClass(HBondInfo, [{
+    key: 'isBond',
+    value: function isBond(from, to) {
+      if (this._hbonds[from]) {
+        var acc = this._hbonds[from].acceptor[0];
+        if (acc && acc.residue === to && acc.energy < MAX_HBOND_ENERGY) {
+          return true;
+        }
+        acc = this._hbonds[from].acceptor[1];
+        if (acc && acc.residue === to && acc.energy < MAX_HBOND_ENERGY) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }, {
+    key: '_build',
+    value: function _build() {
+      var self = this;
+
+      // TODO Replace quadratic algorithm with something better (use voxel grid?)
+      for (var i = 0; i < this._complex._residues.length - 1; ++i) {
+        var ri = this._complex._residues[i];
+        if ((ri.getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+          continue;
+        }
+
+        // get predecessor in chain
+        var preri = null;
+        if (i > 0 && this._complex._residues[i - 1].getType().flags & ResidueType.Flags.PROTEIN && ri._sequence === this._complex._residues[i - 1]._sequence + 1) {
+          preri = this._complex._residues[i - 1];
+        }
+
+        for (var j = i + 1; j < this._complex._residues.length; ++j) {
+          var rj = this._complex._residues[j];
+          if ((rj.getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+            continue;
+          }
+
+          // get predecessor in chain
+          var prerj = null;
+          if (this._complex._residues[j - 1].getType().flags & ResidueType.Flags.PROTEIN && rj._sequence === this._complex._residues[j - 1]._sequence + 1) {
+            prerj = this._complex._residues[j - 1];
+          }
+
+          self._calcHBondEnergy(preri, ri, rj);
+          if (j !== i + 1) {
+            self._calcHBondEnergy(prerj, rj, ri);
+          }
+        }
+      }
+    }
+  }, {
+    key: '_buildVW',
+    value: function _buildVW() {
+      var self = this;
+      var residues = this._complex._residues;
+      var ri = void 0,
+          preri = void 0;
+
+      var vw = this._complex.getVoxelWorld();
+      if (vw === null) {
+        return;
+      }
+
+      var pairs = new AtomPairs(this._complex._residues.length * this._complex._residues.length / 2);
+
+      function processAtom(atom) {
+        var rj = atom._residue;
+
+        if (rj._index === ri._index) {
+          return;
+        }
+
+        if ((rj.getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+          return;
+        }
+
+        if (!pairs.addPair(ri._index, rj._index)) {
+          // we've seen this pair
+          return;
+        }
+
+        // get predecessor in chain
+        var prerj = rj._index > 0 ? residues[rj._index - 1] : null;
+        if (prerj && ((prerj.getType().flags & ResidueType.Flags.PROTEIN) === 0 || rj._sequence !== prerj._sequence + 1)) {
+          prerj = null;
+        }
+
+        self._calcHBondEnergy(preri, ri, rj);
+        if (rj._index !== ri._index + 1) {
+          self._calcHBondEnergy(prerj, rj, ri);
+        }
+      }
+
+      for (var i = 0; i < residues.length - 1; ++i) {
+        ri = residues[i];
+        if ((ri.getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+          continue;
+        }
+
+        // get predecessor in chain
+        preri = i > 0 ? residues[i - 1] : null;
+        if (preri && ((preri.getType().flags & ResidueType.Flags.PROTEIN) === 0 || ri._sequence !== preri._sequence + 1)) {
+          preri = null;
+        }
+
+        vw.forEachAtomWithinRadius(this._residueGetCAlpha(ri), MAX_COUPLING_DISTANCE, processAtom);
+      }
+    }
+  }, {
+    key: '_residueGetCAlpha',
+    value: function _residueGetCAlpha(res) {
+      for (var i = 0; i < res._atoms.length; ++i) {
+        var name = res._atoms[i].getName().getString();
+        if (name === 'CA' || name === 'C1') {
+          return res._atoms[i].getPosition();
+        }
+      }
+
+      return null;
+    }
+  }, {
+    key: '_residueGetCO',
+    value: function _residueGetCO(res) {
+      var c = null,
+          o = null;
+
+      res.forEachAtom(function (a) {
+        if (a.getName().getString() === 'C') {
+          c = a.getPosition();
+        } else if (a.getName().getString() === 'O') {
+          o = a.getPosition();
+        }
+      });
+
+      return [c, o];
+    }
+
+    // TODO Support hydrogen defined in complex
+
+  }, {
+    key: '_residueGetNH',
+    value: function _residueGetNH(prev, res) {
+      var _residueGetCO2 = this._residueGetCO(prev),
+          _residueGetCO3 = slicedToArray(_residueGetCO2, 2),
+          c = _residueGetCO3[0],
+          o = _residueGetCO3[1];
+
+      var n = void 0;
+      res.forEachAtom(function (a) {
+        if (a.getName().getString() === 'N') {
+          n = a.getPosition();
+        }
+      });
+
+      if (c && o && n) {
+        // calculate hydrogen position
+        var h = c.clone();
+        h.sub(o);
+        h.multiplyScalar(1.0 / h.length());
+        h.add(n);
+
+        return [n, h];
+      }
+
+      return [null, null];
+    }
+  }, {
+    key: '_calcHBondEnergy',
+    value: function _calcHBondEnergy(predonor, donor, acceptor) {
+      var result = 0;
+
+      if (predonor === null) {
+        return result;
+      }
+
+      if (donor.getType().getName() !== 'PRO') {
+        var _residueGetNH2 = this._residueGetNH(predonor, donor),
+            _residueGetNH3 = slicedToArray(_residueGetNH2, 2),
+            n = _residueGetNH3[0],
+            h = _residueGetNH3[1];
+
+        var _residueGetCO4 = this._residueGetCO(acceptor),
+            _residueGetCO5 = slicedToArray(_residueGetCO4, 2),
+            c = _residueGetCO5[0],
+            o = _residueGetCO5[1];
+
+        if (n === null || h === null || c === null || o === null) {
+          return result;
+        }
+
+        var distanceHO = h.distanceTo(o);
+        var distanceHC = h.distanceTo(c);
+        var distanceNC = n.distanceTo(c);
+        var distanceNO = n.distanceTo(o);
+
+        if (distanceHO < MINIMAL_DISTANCE || distanceHC < MINIMAL_DISTANCE || distanceNC < MINIMAL_DISTANCE || distanceNO < MINIMAL_DISTANCE) {
+          result = MIN_HBOND_ENERGY;
+        } else {
+          result = COUPLING_CONSTANT / distanceHO - COUPLING_CONSTANT / distanceHC + COUPLING_CONSTANT / distanceNC - COUPLING_CONSTANT / distanceNO;
+        }
+
+        // DSSP compatibility mode:
+        result = Math.round(result * 1000) / 1000;
+
+        if (result < MIN_HBOND_ENERGY) {
+          result = MIN_HBOND_ENERGY;
+        }
+      }
+
+      // update donor
+      if (typeof this._hbonds[donor._index] === 'undefined') {
+        this._hbonds[donor._index] = {
+          donor: [],
+          acceptor: []
+        };
+      }
+      var donorInfo = this._hbonds[donor._index];
+
+      if (donorInfo.acceptor.length < 2) {
+        donorInfo.acceptor.push({
+          residue: acceptor._index,
+          energy: result
+        });
+      }
+
+      if (donorInfo.acceptor.length > 1) {
+        if (result < donorInfo.acceptor[0].energy) {
+          donorInfo.acceptor[1].residue = donorInfo.acceptor[0].residue;
+          donorInfo.acceptor[1].energy = donorInfo.acceptor[0].energy;
+          donorInfo.acceptor[0].residue = acceptor._index;
+          donorInfo.acceptor[0].energy = result;
+        } else if (result < donorInfo.acceptor[1].energy) {
+          donorInfo.acceptor[1].residue = acceptor._index;
+          donorInfo.acceptor[1].energy = result;
+        }
+      }
+
+      // update acceptor
+      if (typeof this._hbonds[acceptor._index] === 'undefined') {
+        this._hbonds[acceptor._index] = {
+          donor: [],
+          acceptor: []
+        };
+      }
+      var accInfo = this._hbonds[acceptor._index];
+
+      if (accInfo.donor.length < 2) {
+        accInfo.donor.push({
+          residue: donor._index,
+          energy: result
+        });
+      }
+
+      if (accInfo.donor.length > 1) {
+        if (result < accInfo.donor[0].energy) {
+          accInfo.donor[1].residue = accInfo.donor[0].residue;
+          accInfo.donor[1].energy = accInfo.donor[0].energy;
+          accInfo.donor[0].residue = donor._index;
+          accInfo.donor[0].energy = result;
+        } else if (result < accInfo.donor[1].energy) {
+          accInfo.donor[1].residue = donor._index;
+          accInfo.donor[1].energy = result;
+        }
+      }
+
+      return result;
+    }
+  }]);
+  return HBondInfo;
+}();
+
+var BridgeType = Object.freeze({
+  NO_BRIDGE: 0,
+  PARALLEL: 1,
+  ANTI_PARALLEL: 2
+});
+
+var HelixFlag = Object.freeze({
+  START: 1,
+  MIDDLE: 2,
+  END: 3,
+  START_AND_END: 4
+});
+
+var StructureType = Object.freeze({
+  LOOP: ' ',
+  ALPHA_HELIX: 'H',
+  BETA_BRIDGE: 'B',
+  STRAND: 'E',
+  HELIX_3_10: 'G',
+  PI_HELIX: 'I',
+  TURN: 'T',
+  BEND: 'S'
+});
+
+var SecondaryStructureMap = function () {
+  function SecondaryStructureMap(complex) {
+    classCallCheck(this, SecondaryStructureMap);
+
+    this._complex = complex;
+    this._build();
+  }
+
+  createClass(SecondaryStructureMap, [{
+    key: '_build',
+    value: function _build() {
+      var self = this;
+      this._hbonds = new HBondInfo(this._complex);
+      this._ss = []; // DSSP map by residue
+
+      // auxilliary data
+      this._sheet = [];
+      this._betaPartners = [];
+      this._bend = [];
+      for (var i = 0; i < this._complex.getResidues().length; ++i) {
+        this._betaPartners[i] = [];
+      }
+      this._helixFlags = [];
+      this._helixFlags[3] = [];
+      this._helixFlags[4] = [];
+      this._helixFlags[5] = [];
+
+      // calculate peptide chain lengths
+      this._chainLengths = [];
+      for (var _i = 0; _i < this._complex._chains.length; ++_i) {
+        var chain = this._complex._chains[_i].getResidues();
+        var len = 0;
+        for (; len < chain.length; ++len) {
+          if ((chain[len].getType().flags & ResidueType.Flags.PROTEIN) === 0) {
+            break;
+          }
+        }
+        this._chainLengths[_i] = len;
+      }
+
+      this._buildBetaSheets();
+
+      for (var _i2 = 0; _i2 < this._complex._chains.length; ++_i2) {
+        self._buildAlphaHelices(this._complex._chains[_i2].getResidues(), this._chainLengths[_i2], false);
+      }
+    }
+  }, {
+    key: '_buildAlphaHelices',
+    value: function _buildAlphaHelices(inResidues, chainLength, inPreferPiHelices) {
+      // Helix and Turn
+      for (var stride = 3; stride <= 5; ++stride) {
+        if (inResidues.length < stride) {
+          break;
+        }
+
+        for (var i = 0; i + stride < chainLength; ++i) {
+          if (this._hbonds.isBond(inResidues[i + stride]._index, inResidues[i]._index)
+          /*&& NoChainBreak(res[i], res[i + stride])*/) {
+              this._helixFlags[stride][inResidues[i + stride]._index] = HelixFlag.END;
+              for (var j = i + 1; j < i + stride; ++j) {
+                if (typeof this._helixFlags[stride][inResidues[j]._index] === 'undefined') {
+                  this._helixFlags[stride][inResidues[j]._index] = HelixFlag.MIDDLE;
+                }
+              }
+
+              if (this._helixFlags[stride][inResidues[i]._index] === HelixFlag.END) {
+                this._helixFlags[stride][inResidues[i]._index] = HelixFlag.START_AND_END;
+              } else {
+                this._helixFlags[stride][inResidues[i]._index] = HelixFlag.START;
+              }
+            }
+        }
+      }
+
+      for (var _i3 = 2; _i3 < chainLength - 2; ++_i3) {
+        var kappa = this._kappa(inResidues[_i3 - 2], inResidues[_i3], inResidues[_i3 + 2]);
+        this._bend[inResidues[_i3]._index] = kappa !== 360 && kappa > 70;
+      }
+
+      for (var _i4 = 1; _i4 + 4 < chainLength; ++_i4) {
+        if (this._isHelixStart(inResidues[_i4]._index, 4) && this._isHelixStart(inResidues[_i4 - 1]._index, 4)) {
+          for (var _j = _i4; _j <= _i4 + 3; ++_j) {
+            this._ss[inResidues[_j]._index] = StructureType.ALPHA_HELIX;
+          }
+        }
+      }
+
+      for (var _i5 = 1; _i5 + 3 < chainLength; ++_i5) {
+        if (this._isHelixStart(inResidues[_i5]._index, 3) && this._isHelixStart(inResidues[_i5 - 1]._index, 3)) {
+          var empty = true;
+          for (var _j2 = _i5; empty && _j2 <= _i5 + 2; ++_j2) {
+            empty = typeof this._ss[inResidues[_j2]._index] === 'undefined' || this._ss[inResidues[_j2]._index] === StructureType.HELIX_3_10;
+          }
+          if (empty) {
+            for (var _j3 = _i5; _j3 <= _i5 + 2; ++_j3) {
+              this._ss[inResidues[_j3]._index] = StructureType.HELIX_3_10;
+            }
+          }
+        }
+      }
+
+      for (var _i6 = 1; _i6 + 5 < chainLength; ++_i6) {
+        if (this._isHelixStart(inResidues[_i6]._index, 5) && this._isHelixStart(inResidues[_i6 - 1]._index, 5)) {
+          var _empty = true;
+          for (var _j4 = _i6; _empty && _j4 <= _i6 + 4; ++_j4) {
+            _empty = typeof this._ss[inResidues[_j4]._index] === 'undefined' || this._ss[inResidues[_j4]._index] === StructureType.PI_HELIX || inPreferPiHelices && this._ss[inResidues[_j4]._index] === StructureType.ALPHA_HELIX;
+          }
+          if (_empty) {
+            for (var _j5 = _i6; _j5 <= _i6 + 4; ++_j5) {
+              this._ss[inResidues[_j5]._index] = StructureType.PI_HELIX;
+            }
+          }
+        }
+      }
+
+      for (var _i7 = 1; _i7 + 1 < chainLength; ++_i7) {
+        if (typeof this._ss[inResidues[_i7]._index] === 'undefined') {
+          var isTurn = false;
+          for (var _stride = 3; _stride <= 5 && !isTurn; ++_stride) {
+            for (var k = 1; k < _stride && !isTurn; ++k) {
+              isTurn = _i7 >= k && this._isHelixStart(inResidues[_i7 - k]._index, _stride);
+            }
+          }
+
+          if (isTurn) {
+            this._ss[inResidues[_i7]._index] = StructureType.TURN;
+          } else if (this._bend[inResidues[_i7]._index]) {
+            this._ss[inResidues[_i7]._index] = StructureType.BEND;
+          }
+        }
+      }
+    }
+  }, {
+    key: '_residueGetCAlpha',
+    value: function _residueGetCAlpha(res) {
+      for (var i = 0; i < res._atoms.length; ++i) {
+        var name = res._atoms[i].getName().getString();
+        if (name === 'CA' || name === 'C1') {
+          return res._atoms[i].getPosition();
+        }
+      }
+
+      return null;
+    }
+  }, {
+    key: '_cosinusAngle',
+    value: function _cosinusAngle(p1, p2, p3, p4) {
+      var v12 = p1.clone();v12.sub(p2);
+      var v34 = p3.clone();v34.sub(p4);
+
+      var result = 0;
+
+      var x = v12.dot(v12) * v34.dot(v34);
+      if (x > 0) {
+        result = v12.dot(v34) / Math.sqrt(x);
+      }
+
+      return result;
+    }
+  }, {
+    key: '_kappa',
+    value: function _kappa(prevPrev, res, nextNext) {
+      var curCA = this._residueGetCAlpha(res);
+      var ppCA = this._residueGetCAlpha(prevPrev);
+      var nnCA = this._residueGetCAlpha(nextNext);
+      if (curCA === null || ppCA === null || nnCA === null) {
+        return 180;
+      }
+
+      var ckap = this._cosinusAngle(curCA, ppCA, nnCA, curCA);
+      var skap = Math.sqrt(1 - ckap * ckap);
+      return Math.atan2(skap, ckap) * 180 / Math.PI;
+    }
+  }, {
+    key: '_isHelixStart',
+    value: function _isHelixStart(res, stride) {
+      return this._helixFlags[stride][res] === HelixFlag.START || this._helixFlags[stride][res] === HelixFlag.START_AND_END;
+    }
+  }, {
+    key: '_buildBetaSheets',
+    value: function _buildBetaSheets() {
+      // find bridges
+      // check each chain against each other chain, and against itself
+      var bridges = [];
+      for (var a = 0; a < this._complex._chains.length; ++a) {
+        var lenA = this._chainLengths[a];
+        if (lenA <= 4) {
+          continue;
+        }
+
+        var chainA = this._complex._chains[a].getResidues();
+
+        for (var b = a; b < this._complex._chains.length; ++b) {
+          var lenB = this._chainLengths[b];
+          if (lenB <= 4) {
+            continue;
+          }
+
+          var chainB = this._complex._chains[b].getResidues();
+
+          for (var i = 1; i + 1 < lenA; ++i) {
+            var ri = chainA[i];
+
+            var j = 1;
+            if (b === a) {
+              j = i + 3; // check for self-bridges forward down the chain
+            }
+
+            for (; j + 1 < lenB; ++j) {
+              var rj = chainB[j];
+
+              var type = this._testBridge(chainA, i, chainB, j);
+              if (type === BridgeType.NO_BRIDGE) {
+                continue;
+              }
+
+              // there is a bridge, try to attach it to previously found sequence
+              var found = false;
+              var _iteratorNormalCompletion = true;
+              var _didIteratorError = false;
+              var _iteratorError = undefined;
+
+              try {
+                for (var _iterator = bridges[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  var bridge = _step.value;
+
+                  if (type !== bridge.type || ri._index !== bridge.i[bridge.i.length - 1] + 1) {
+                    continue;
+                  }
+
+                  if (type === BridgeType.PARALLEL && bridge.j[bridge.j.length - 1] + 1 === rj._index) {
+                    bridge.i.push(ri._index);
+                    bridge.j.push(rj._index);
+                    found = true;
+                    break;
+                  }
+
+                  if (type === BridgeType.ANTI_PARALLEL && bridge.j[0] - 1 === rj._index) {
+                    bridge.i.push(ri._index);
+                    bridge.j.unshift(rj._index);
+                    found = true;
+                    break;
+                  }
+                }
+
+                // this bridge cannot be attached anywhere, start a new sequence
+              } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion && _iterator.return) {
+                    _iterator.return();
+                  }
+                } finally {
+                  if (_didIteratorError) {
+                    throw _iteratorError;
+                  }
+                }
+              }
+
+              if (!found) {
+                bridges.push({
+                  type: type,
+                  i: [ri._index],
+                  chainI: ri.getChain()._index,
+                  j: [rj._index],
+                  chainJ: rj.getChain()._index
+                });
+              }
+            }
+          }
+        }
+      }
+
+      // extend ladders
+      bridges.sort(function (a, b) {
+        if (a.chainI < b.chainI || a.chainI === b.chainI && a.i[0] < b.i[0]) {
+          return -1;
+        }
+        return 1;
+      });
+
+      for (var _i8 = 0; _i8 < bridges.length; ++_i8) {
+        for (var _j6 = _i8 + 1; _j6 < bridges.length; ++_j6) {
+          var ibi = bridges[_i8].i[0];
+          var iei = bridges[_i8].i[bridges[_i8].i.length - 1];
+          var jbi = bridges[_i8].j[0];
+          var jei = bridges[_i8].j[bridges[_i8].j.length - 1];
+          var ibj = bridges[_j6].i[0];
+          var iej = bridges[_j6].i[bridges[_j6].i.length - 1];
+          var jbj = bridges[_j6].j[0];
+          var jej = bridges[_j6].j[bridges[_j6].j.length - 1];
+
+          if (bridges[_i8].type !== bridges[_j6].type || this._hasChainBreak(Math.min(ibi, ibj), Math.max(iei, iej)) || this._hasChainBreak(Math.min(jbi, jbj), Math.max(jei, jej)) || ibj - iei >= 6 || iei >= ibj && ibi <= iej) {
+            continue;
+          }
+
+          var bulge = false;
+          if (bridges[_i8].type === BridgeType.PARALLEL) {
+            bulge = jbj - jei < 6 && ibj - iei < 3 || jbj - jei < 3;
+          } else {
+            bulge = jbi - jej < 6 && ibj - iei < 3 || jbi - jej < 3;
+          }
+
+          if (bulge) {
+            bridges[_i8].i = bridges[_i8].i.concat(bridges[_j6].i);
+            if (bridges[_i8].type === BridgeType.PARALLEL) {
+              bridges[_i8].j = bridges[_i8].j.concat(bridges[_j6].j);
+            } else {
+              bridges[_i8].j = bridges[_j6].j.concat(bridges[_i8].j);
+            }
+            bridges.splice(_j6--, 1);
+          }
+        }
+      }
+
+      // Sheet
+      var ladderset = new Set();
+      for (var _i9 = 0; _i9 < bridges.length; ++_i9) {
+        ladderset.add(bridges[_i9]);
+      }
+
+      var sheet = 1,
+          ladder = 0;
+      while (ladderset.size > 0) {
+        var _bridge = ladderset.values().next().value;
+        ladderset.delete(_bridge);
+
+        var sheetset = new Set();
+        sheetset.add(_bridge);
+
+        var toMove = void 0;
+        do {
+          toMove = new Set();
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
+
+          try {
+            for (var _iterator2 = sheetset.values()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var _a = _step2.value;
+              var _iteratorNormalCompletion4 = true;
+              var _didIteratorError4 = false;
+              var _iteratorError4 = undefined;
+
+              try {
+                for (var _iterator4 = ladderset.values()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                  var _b = _step4.value;
+
+                  if (this._areBridgesLinked(_a, _b)) {
+                    toMove.add(_b);
+                  }
+                }
+              } catch (err) {
+                _didIteratorError4 = true;
+                _iteratorError4 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                    _iterator4.return();
+                  }
+                } finally {
+                  if (_didIteratorError4) {
+                    throw _iteratorError4;
+                  }
+                }
+              }
+            }
+          } catch (err) {
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                _iterator2.return();
+              }
+            } finally {
+              if (_didIteratorError2) {
+                throw _iteratorError2;
+              }
+            }
+          }
+
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+
+          try {
+            for (var _iterator3 = toMove.values()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              _bridge = _step3.value;
+
+              sheetset.add(_bridge);
+              ladderset.delete(_bridge);
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
+        } while (toMove.size > 0);
+
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
+
+        try {
+          for (var _iterator5 = sheetset.values()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            _bridge = _step5.value;
+
+            _bridge.ladder = ladder;
+            _bridge.sheet = sheet;
+            _bridge.link = sheetset;
+            ++ladder;
+          }
+        } catch (err) {
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion5 && _iterator5.return) {
+              _iterator5.return();
+            }
+          } finally {
+            if (_didIteratorError5) {
+              throw _iteratorError5;
+            }
+          }
+        }
+
+        ++sheet;
+      }
+
+      for (var _i10 = 0; _i10 < bridges.length; ++_i10) {
+        var _bridge2 = bridges[_i10];
+
+        // find out if any of the i and j set members already have
+        // a bridge assigned, if so, we're assigning bridge 2
+
+        var betai = 0,
+            betaj = 0;
+
+        for (var l = 0; l < _bridge2.i.length; ++l) {
+          if (this._betaPartners[_bridge2.i[l]][0]) {
+            betai = 1;
+            break;
+          }
+        }
+
+        for (var _l = 0; _l < _bridge2.j.length; ++_l) {
+          if (this._betaPartners[_bridge2.j[_l]][0]) {
+            betaj = 1;
+            break;
+          }
+        }
+
+        var ss = StructureType.BETA_BRIDGE;
+        if (_bridge2.i.length > 1) {
+          ss = StructureType.STRAND;
+        }
+
+        if (_bridge2.type === BridgeType.PARALLEL) {
+          var _j7 = 0;
+          for (var k = 0; k < _bridge2.i.length; ++k) {
+            this._betaPartners[_bridge2.i[k]][betai] = {
+              residue: _bridge2.j[_j7++],
+              ladder: _bridge2.ladder,
+              parallel: true
+            };
+          }
+
+          _j7 = 0;
+          for (var _k = 0; _k < _bridge2.j.length; ++_k) {
+            this._betaPartners[_bridge2.j[_k]][betaj] = {
+              residue: _bridge2.i[_j7++],
+              ladder: _bridge2.ladder,
+              parallel: true
+            };
+          }
+        } else {
+          var _j8 = _bridge2.j.length - 1;
+          for (var _k2 = 0; _k2 < _bridge2.i.length; ++_k2) {
+            this._betaPartners[_bridge2.i[_k2]][betai] = {
+              residue: _bridge2.j[_j8--],
+              ladder: _bridge2.ladder,
+              parallel: false
+            };
+          }
+
+          _j8 = _bridge2.i.length - 1;
+          for (var _k3 = 0; _k3 < _bridge2.j.length; ++_k3) {
+            this._betaPartners[_bridge2.j[_k3]][betaj] = {
+              residue: _bridge2.i[_j8--],
+              ladder: _bridge2.ladder,
+              parallel: false
+            };
+          }
+        }
+
+        for (var _k4 = _bridge2.i[0]; _k4 <= _bridge2.i[_bridge2.i.length - 1]; ++_k4) {
+          if (this._ss[_k4] !== StructureType.STRAND) {
+            this._ss[_k4] = ss;
+            this._sheet[_k4] = _bridge2.sheet;
+          }
+        }
+
+        for (var _k5 = _bridge2.j[0]; _k5 <= _bridge2.j[_bridge2.j.length - 1]; ++_k5) {
+          if (this._ss[_k5] !== StructureType.STRAND) {
+            this._ss[_k5] = ss;
+            this._sheet[_k5] = _bridge2.sheet;
+          }
+        }
+      }
+    }
+  }, {
+    key: '_testBridge',
+    value: function _testBridge(chainA, from, chainB, to) {
+      var result = BridgeType.NO_BRIDGE;
+
+      var a = chainA[from - 1]._index;
+      var b = chainA[from]._index;
+      var c = chainA[from + 1]._index;
+      var d = chainB[to - 1]._index;
+      var e = chainB[to]._index;
+      var f = chainB[to + 1]._index;
+
+      var isBond = this._hbonds.isBond.bind(this._hbonds);
+      if (isBond(c, e) && isBond(e, a) || isBond(f, b) && isBond(b, d)) {
+        result = BridgeType.PARALLEL;
+      } else if (isBond(c, d) && isBond(f, a) || isBond(e, b) && isBond(b, e)) {
+        result = BridgeType.ANTI_PARALLEL;
+      }
+      return result;
+    }
+
+    // return true if any of the residues in bridge a is identical to any of the residues in bridge b
+    // TODO Optimize
+
+  }, {
+    key: '_areBridgesLinked',
+    value: function _areBridgesLinked(a, b) {
+      var ai = new Set(a.i);
+      var aj = new Set(a.j);
+
+      var _iteratorNormalCompletion6 = true;
+      var _didIteratorError6 = false;
+      var _iteratorError6 = undefined;
+
+      try {
+        for (var _iterator6 = b.i[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+          var i = _step6.value;
+
+          if (ai.has(i) || aj.has(i)) {
+            return true;
+          }
+        }
+      } catch (err) {
+        _didIteratorError6 = true;
+        _iteratorError6 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion6 && _iterator6.return) {
+            _iterator6.return();
+          }
+        } finally {
+          if (_didIteratorError6) {
+            throw _iteratorError6;
+          }
+        }
+      }
+
+      var _iteratorNormalCompletion7 = true;
+      var _didIteratorError7 = false;
+      var _iteratorError7 = undefined;
+
+      try {
+        for (var _iterator7 = b.j[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+          var _i11 = _step7.value;
+
+          if (ai.has(_i11) || aj.has(_i11)) {
+            return true;
+          }
+        }
+      } catch (err) {
+        _didIteratorError7 = true;
+        _iteratorError7 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion7 && _iterator7.return) {
+            _iterator7.return();
+          }
+        } finally {
+          if (_didIteratorError7) {
+            throw _iteratorError7;
+          }
+        }
+      }
+
+      return false;
+    }
+  }, {
+    key: '_hasChainBreak',
+    value: function _hasChainBreak(from, to) {
+      for (var i = from + 1; i <= to; ++i) {
+        if (this._complex._residues[i]._sequence !== this._complex._residues[i - 1]._sequence + 1) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }]);
+  return SecondaryStructureMap;
+}();
+
+SecondaryStructureMap.StructureType = StructureType;
+
+var VOXEL_SIZE = 5.0;
 
 /**
  * The entire complex of the molecules under study.
@@ -69197,6 +70345,20 @@ Complex.prototype.getAltLocNames = function () {
   return this._altlocNames;
 };
 
+Complex.prototype.getVoxelWorld = function () {
+  if (!this.hasOwnProperty('_voxelWorld')) {
+    try {
+      this._voxelWorld = new VoxelWorld(this.getDefaultBoundaries().boundingBox, new Vector3(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE));
+      this._voxelWorld.addAtoms(this);
+    } catch (e) {
+      logger.warn('Unable to create voxel world');
+      this._voxelWorld = null;
+    }
+  }
+
+  return this._voxelWorld;
+};
+
 // this function joins multiple complexes into one (this)
 // atom, bond, ... objects are reused -- so input complexes are no longer valid
 Complex.prototype.joinComplexes = function (complexes) {
@@ -69288,6 +70450,68 @@ Complex.prototype.joinComplexes = function (complexes) {
   }
 
   this._computeBounds();
+};
+
+/**
+ * Replace secondary structure with calculated one.
+ *
+ * DSSP algorithm implementation is used.
+ *
+ * Kabsch W, Sander C. 1983. Dictionary of protein secondary structure: pattern recognition of hydrogen-bonded and
+ * geometrical features. Biopolymers. 22(12):2577-2637. doi:10.1002/bip.360221211.
+ */
+Complex.prototype.dssp = function () {
+  var _helixTypes;
+
+  var ssMap = new SecondaryStructureMap(this);
+  var StructureType = SecondaryStructureMap.StructureType;
+  var helixTypes = (_helixTypes = {}, defineProperty(_helixTypes, StructureType.ALPHA_HELIX, 1), defineProperty(_helixTypes, StructureType.HELIX_3_10, 3), defineProperty(_helixTypes, StructureType.PI_HELIX, 5), _helixTypes);
+
+  var helices = [];
+  var sheets = [];
+  var curHelix = null;
+  var curStrand = null;
+  for (var i = 0, n = this._residues.length; i < n; ++i) {
+    var ssCode = ssMap._ss[i];
+    var residue = this._residues[i];
+    residue._secondary = null;
+
+    var helixType = helixTypes[ssCode];
+    if (helixType) {
+      if (curHelix === null) {
+        curHelix = new Helix(helices.length + 1, '', residue, residue, helixType, '', 0);
+        helices.push(curHelix);
+      }
+      residue._secondary = curHelix;
+      curHelix._residues.push(residue);
+      curHelix._end = residue;
+      curHelix._length++;
+    } else if (curHelix) {
+      curHelix = null;
+    }
+
+    if (ssCode === StructureType.STRAND) {
+      if (curStrand === null) {
+        var curSheet = sheets[ssMap._sheet[i]];
+        if (curSheet === undefined) {
+          curSheet = sheets[ssMap._sheet[i]] = new Sheet('', 0);
+        }
+        curStrand = new Strand(curSheet, residue, residue, 0, null, null);
+        curSheet.addStrand(curStrand);
+        curSheet._width++;
+      }
+      residue._secondary = curStrand;
+      curStrand._residues.push(residue);
+      curStrand._end = residue;
+    } else if (curStrand) {
+      curStrand = null;
+    }
+  }
+
+  this._helices = helices;
+  this._sheets = sheets.filter(function (_sheet) {
+    return true;
+  }); // squeeze sheets array
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -69599,323 +70823,6 @@ Volume.prototype.getStrideY = function () {
 
 Volume.prototype.getStrideZ = function () {
   return this._planeElements;
-};
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-
-/**
- * Calculate min & max radius of a sphere slice between zMin & zMax
- *
- * @param {Vector3} center - center of the sphere
- * @param {number} radius  - sphere radius
- * @param {number} zMin - lower bound of the slice
- * @param {number} zMax - upper bound of the slice
- */
-function _getSphereSliceRadiusRange(center, radius, zMin, zMax) {
-  var dzMin = zMin - center.z;
-  var dzMax = zMax - center.z;
-  var rzMin = Math.sqrt(Math.max(radius * radius - dzMin * dzMin, 0.0));
-  var rzMax = Math.sqrt(Math.max(radius * radius - dzMax * dzMax, 0.0));
-
-  var rMin = Math.min(rzMin, rzMax);
-  var rMax;
-
-  if (zMin <= center.z && zMax >= center.z) {
-    // sphere's main diameter is inside slice
-    rMax = radius;
-  } else {
-    rMax = Math.max(rzMin, rzMax);
-  }
-
-  return [rMin, rMax];
-}
-
-/**
- * Calculate min & max radius of a circle slice between yMin & yMax.
- *
- * To maintain analogy with _getSphereSliceRadiusRange we call radius what in fact is
- * half-width (along X axis) of the slice, i.e. 1D-sphere radius.
- *
- * @param {Vector3} center - center of the circle (z can be ignored)
- * @param {number} radius  - circle radius
- * @param {number} yMin - lower bound of the slice
- * @param {number} yMax - upper bound of the slice
- * @returns {Array} - array of two numbers (min & max radius, or half-width)
- */
-function _getCircleSliceRadiusRange(center, radius, yMin, yMax) {
-  var dyMin = yMin - center.y;
-  var dyMax = yMax - center.y;
-  var ryMin = Math.sqrt(Math.max(radius * radius - dyMin * dyMin, 0.0));
-  var ryMax = Math.sqrt(Math.max(radius * radius - dyMax * dyMax, 0.0));
-
-  var rMin = Math.min(ryMin, ryMax);
-  var rMax;
-
-  if (yMin <= center.y && yMax >= center.y) {
-    // slice's main diameter is inside slice
-    rMax = radius;
-  } else {
-    rMax = Math.max(ryMin, ryMax);
-  }
-
-  return [rMin, rMax];
-}
-
-/**
- * VoxelWorld constructor
- *
- * @param {Box3} box - bounding box of the volume to be partitioned
- * @param {Vector3} vCellSizeHint - target voxel size (actual voxel size may differ from this)
- */
-function VoxelWorld(box, vCellSizeHint) {
-  var i;
-
-  this._box = box.clone();
-  this._count = box.size().divide(vCellSizeHint).floor();
-  this._last = this._count.clone().subScalar(1);
-  this._cellSize = box.size().divide(this._count);
-
-  // array of voxels, each element contains index of first atom in voxel
-  var numVoxels = this._count.x * this._count.y * this._count.z;
-  this._voxels = utils.allocateTyped(Int32Array, numVoxels);
-  for (i = 0; i < numVoxels; ++i) {
-    this._voxels[i] = -1;
-  }
-
-  // array of atoms that stores multiple single-linked lists
-  // two elements for each atom: Atom ref, index of next atom (in this array
-  this._atoms = [];
-}
-
-/**
- * Add all atoms from a complex to voxel world
- *
- * @param {Complex} complex - complex
- */
-VoxelWorld.prototype.addAtoms = function (complex) {
-  var self = this;
-
-  var idx = this._atoms.length;
-
-  // resize array of atoms
-  this._atoms.length = this._atoms.length + 2 * complex.getAtomCount();
-
-  complex.forEachAtom(function (atom) {
-    // find which voxel contains this atom
-    var voxelIdx = self._findVoxel(atom._position);
-
-    // push current atom to the head of voxel's atom list
-    self._atoms[idx] = atom;
-    self._atoms[idx + 1] = self._voxels[voxelIdx];
-    self._voxels[voxelIdx] = idx;
-
-    idx += 2;
-  });
-};
-
-/**
- * Get voxel that contains specified 3D point (we use clamp at the edges)
- *
- * @param {Vector3} point - a point in 3D
- * @returns {number} - index of voxel
- */
-VoxelWorld.prototype._findVoxel = function () {
-  var zero = new Vector3(0, 0, 0);
-  var voxel = new Vector3();
-
-  return function (point) {
-    voxel.copy(point).sub(this._box.min).divide(this._cellSize).floor().clamp(zero, this._last);
-    return voxel.x + this._count.x * (voxel.y + this._count.y * voxel.z);
-  };
-}();
-
-/**
- * Call a function for each atom in voxel
- *
- * @param {number} voxel - index of voxel
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype._forEachAtomInVoxel = function (voxel, process) {
-  for (var i = this._voxels[voxel]; i >= 0; i = this._atoms[i + 1]) {
-    process(this._atoms[i]);
-  }
-};
-
-/**
- * Call a function for each voxel that is touched by given sphere. Callback also takes flag
- * isInside specifying whether voxel lies inside the sphere entirely.
- *
- * @param {Vector3} center - center of the sphere
- * @param {number} radius  - sphere radius
- * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
- */
-VoxelWorld.prototype._forEachVoxelWithinRadius = function (center, radius, process) {
-
-  var rRangeXY, rRangeX, xVal, yVal, zVal, isInsideX, isInsideY, isInsideZ;
-  var xRange = new Vector2();
-  var yRange = new Vector2();
-  var zRange = new Vector2();
-
-  zRange.set(center.z - radius, center.z + radius);
-  zRange.subScalar(this._box.min.z).divideScalar(this._cellSize.z).floor().clampScalar(0, this._count.z - 1);
-
-  for (var z = zRange.x; z <= zRange.y; ++z) {
-    zVal = [this._box.min.z + z * this._cellSize.z, this._box.min.z + (z + 1) * this._cellSize.z];
-
-    isInsideZ = center.z - radius <= zVal[0] && zVal[1] <= center.z + radius;
-
-    rRangeXY = _getSphereSliceRadiusRange(center, radius, zVal[0], zVal[1]);
-
-    yRange.set(center.y - rRangeXY[1], center.y + rRangeXY[1]);
-    yRange.subScalar(this._box.min.y).divideScalar(this._cellSize.y).floor().clampScalar(0, this._count.y - 1);
-
-    for (var y = yRange.x; y <= yRange.y; ++y) {
-      yVal = [this._box.min.y + y * this._cellSize.y, this._box.min.y + (y + 1) * this._cellSize.y];
-
-      isInsideY = center.y - rRangeXY[0] <= yVal[0] && yVal[1] <= center.y + rRangeXY[0];
-
-      rRangeX = _getCircleSliceRadiusRange(center, rRangeXY[1], yVal[0], yVal[1]);
-
-      xRange.set(center.x - rRangeX[1], center.x + rRangeX[1]);
-      xRange.subScalar(this._box.min.x).divideScalar(this._cellSize.x).floor().clampScalar(0, this._count.x - 1);
-
-      for (var x = xRange.x; x <= xRange.y; ++x) {
-        xVal = [this._box.min.x + x * this._cellSize.x, this._box.min.x + (x + 1) * this._cellSize.x];
-        isInsideX = center.x - rRangeX[0] <= xVal[0] && xVal[1] <= center.x + rRangeX[0];
-
-        process(x + this._count.x * (y + this._count.y * z), isInsideX && isInsideY && isInsideZ);
-      }
-    }
-  }
-};
-
-/**
- * Call a function for each atom within given sphere
- *
- * @param {Vector3} center - center of the sphere
- * @param {number} radius  - sphere radius
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype.forEachAtomWithinRadius = function (center, radius, process) {
-  var self = this;
-  var r2 = radius * radius;
-
-  self._forEachVoxelWithinRadius(center, radius, function (voxel, isInside) {
-    if (isInside) {
-      self._forEachAtomInVoxel(voxel, process);
-    } else {
-      self._forEachAtomInVoxel(voxel, function (atom) {
-        if (center.distanceToSquared(atom._position) < r2) {
-          process(atom);
-        }
-      });
-    }
-  });
-};
-
-/**
- * Call a function for each atom of given complex within given distance from group of atoms defined by mask
- *
- * @param {Complex} complex - complex
- * @param {number} mask - bit mask
- * @param {number} dist - distance
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype.forEachAtomWithinDistFromMasked = function (complex, mask, dist, process) {
-  this._forEachAtomWithinDistFromGroup(function (atomProc) {
-    complex.forEachAtom(function (atom) {
-      if ((atom._mask & mask) !== 0) {
-        atomProc(atom);
-      }
-    });
-  }, dist, process);
-};
-
-/**
- * Call a function for each atom of given complex within given distance from group of atoms defined by selector
- *
- * @param {Complex} complex - complex
- * @param {number} selector - selector
- * @param {number} dist - distance
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype.forEachAtomWithinDistFromSelected = function (complex, selector, dist, process) {
-  this._forEachAtomWithinDistFromGroup(function (atomProc) {
-    complex.forEachAtom(function (atom) {
-      if (selector.includesAtom(atom)) {
-        atomProc(atom);
-      }
-    });
-  }, dist, process);
-};
-
-/**
- * Call a function for each atom of given complex within given distance from group of atoms
- *
- * @param {function} forEachAtom - enumerator of atoms in the group
- * @param {number} dist - distance
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function (forEachAtom, dist, process) {
-  var self = this;
-  var r2 = dist * dist;
-
-  var voxels = [];
-  var atoms = [];
-  var idx = 0;
-
-  // build "within radius" atom list for each voxel
-  forEachAtom(function (atom) {
-    self._forEachVoxelWithinRadius(atom._position, dist, function (voxel, isInside) {
-      if (isInside) {
-        // this voxel is inside circle -- no check will be required
-        voxels[voxel] = -1;
-      } else if (typeof voxels[voxel] === 'undefined') {
-        // this voxel isn't covered yet -- start building list of atoms
-        atoms.push(atom);
-        atoms.push(-1);
-        voxels[voxel] = idx;
-        idx += 2;
-      } else if (voxels[voxel] !== -1) {
-        // this voxel has a list of atoms required for distance check -- add atom to the list
-        atoms.push(atom);
-        atoms.push(voxels[voxel]);
-        voxels[voxel] = idx;
-        idx += 2;
-      }
-    });
-  });
-
-  var voxel;
-
-  var processIfWithin = function processIfWithin(atom) {
-    if (typeof voxels[voxel] === 'undefined') {
-      return;
-    }
-
-    idx = voxels[voxel];
-    if (idx === -1) {
-      // this voxel is fully covered
-      process(atom);
-      return;
-    }
-
-    // check distance to each atom within radius from this voxel
-    for (; idx >= 0; idx = atoms[idx + 1]) {
-      if (atom._position.distanceToSquared(atoms[idx]._position) < r2) {
-        process(atom);
-        break;
-      }
-    }
-  };
-
-  // for each marked voxel
-  for (voxel in voxels) {
-    if (voxels.hasOwnProperty(voxel)) {
-      self._forEachAtomInVoxel(voxel, processIfWithin);
-    }
-  }
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -78614,8 +79521,7 @@ TextMode.prototype.getTemplateOptions = function () {
 };
 
 TextMode.prototype.getLabelOpts = function () {
-
-  return _.merge(this.opts, {
+  return lodash.merge(this.opts, {
     labels: this.settings.now.labels,
     colors: true,
     adjustColor: true,
@@ -80271,8 +81177,6 @@ var ComplexVisualEdit = {
   FragmentEditor: ComplexFragmentEditor
 };
 
-var VOXEL_SIZE = 5.0;
-
 var selectors$3 = chem.selectors;
 
 function ComplexVisual(name, dataSource) {
@@ -81111,16 +82015,9 @@ ComplexVisual.prototype.setUberOptions = function (values) {
  * @returns {Selector} selector describing result group of atoms
  */
 ComplexVisual.prototype.within = function (selector, radius) {
-  // build voxel world
-  if (!this._voxelWorld) {
-    try {
-      this._voxelWorld = new chem.VoxelWorld(this._complex.getDefaultBoundaries().boundingBox, new Vector3(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE));
-      this._voxelWorld.addAtoms(this._complex);
-    } catch (e) {
-      logger.warn('Unable to create voxel world');
-      this._voxelWorld = null;
-      return selectors$3.none();
-    }
+  var vw = this._complex.getVoxelWorld();
+  if (vw === null) {
+    return false;
   }
 
   // mark atoms of the group as selected
@@ -81128,9 +82025,11 @@ ComplexVisual.prototype.within = function (selector, radius) {
   this._complex.markAtoms(selector, selectionMask);
 
   // mark all atoms within distance as selected
-  this._voxelWorld.forEachAtomWithinDistFromMasked(this._complex, selectionMask, Number(radius), function (atom) {
-    atom._mask |= selectionMask;
-  });
+  if (vw) {
+    vw.forEachAtomWithinDistFromMasked(this._complex, selectionMask, Number(radius), function (atom) {
+      atom._mask |= selectionMask;
+    });
+  }
 
   // update selection count
   this._selectionCount = this._complex.countAtomsByMask(selectionMask);
@@ -87658,7 +88557,7 @@ var WEBVR = function () {
   return WEBVR;
 }();
 
-/* global "0.7.11":false */
+/* global "0.7.12":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -87837,7 +88736,7 @@ Miew.prototype.init = function () {
     this._initGfx();
 
     this._initListeners();
-    this._spinner = new spin({
+    this._spinner = new Spinner({
       lines: 13,
       length: 28,
       width: 14,
@@ -90916,6 +91815,31 @@ Miew.prototype.projected = function (fullAtomName, complexName) {
   };
 };
 
+/**
+ * Replace secondary structure with calculated one.
+ *
+ * DSSP algorithm implementation is used.
+ *
+ * Kabsch W, Sander C. 1983. Dictionary of protein secondary structure: pattern recognition of hydrogen-bonded and
+ * geometrical features. Biopolymers. 22(12):2577-2637. doi:10.1002/bip.360221211.
+ *
+ * @param {string=} complexName - complex name
+ */
+Miew.prototype.dssp = function (complexName) {
+  var visual = this._getComplexVisual(complexName);
+  if (!visual) {
+    return;
+  }
+  visual.getComplex().dssp();
+
+  // rebuild dependent representations (cartoon or ss-colored)
+  visual._reprList.forEach(function (rep) {
+    if (rep.mode.id === 'CA' || rep.colorer.id === 'SS') {
+      rep.needsRebuild = true;
+    }
+  });
+};
+
 var rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
 var rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 var reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
@@ -91177,10 +92101,86 @@ function _parseData(data, opts, job) {
   });
 }
 
+Miew.prototype.exportCML = function () {
+  var self = this;
+
+  function extractRotation(m) {
+    var xAxis = new Vector3();
+    var yAxis = new Vector3();
+    var zAxis = new Vector3();
+    m.extractBasis(xAxis, yAxis, zAxis);
+    xAxis.normalize();
+    yAxis.normalize();
+    zAxis.normalize();
+    var retMat = new Matrix4();
+    retMat.identity();
+    retMat.makeBasis(xAxis, yAxis, zAxis);
+    return retMat;
+  }
+
+  function updateCMLData(complex) {
+    var root = self._gfx.root;
+    var mat = extractRotation(root.matrixWorld);
+    var v4 = new Vector4(0, 0, 0, 0);
+    var vCenter = new Vector4(0, 0, 0, 0);
+    var xml = null;
+    var ap = null;
+
+    // update atoms in cml
+    complex.forEachAtom(function (atom) {
+      if (atom.xmlNodeRef && atom.xmlNodeRef.xmlNode) {
+        xml = atom.xmlNodeRef.xmlNode;
+        ap = atom.getPosition();
+        v4.set(ap.x, ap.y, ap.z, 1.0);
+        v4.applyMatrix4(mat);
+        xml.setAttribute('x3', v4.x.toString());
+        xml.setAttribute('y3', v4.y.toString());
+        xml.setAttribute('z3', v4.z.toString());
+        xml.removeAttribute('x2');
+        xml.removeAttribute('y2');
+      }
+    });
+    // update stereo groups in cml
+    complex.forEachSGroup(function (sGroup) {
+      if (sGroup.xmlNodeRef && sGroup.xmlNodeRef.xmlNode) {
+        xml = sGroup.xmlNodeRef.xmlNode;
+        ap = sGroup.getPosition();
+        v4.set(ap.x, ap.y, ap.z, 1.0);
+        var cp = sGroup.getCentralPoint();
+        if (cp === null) {
+          v4.applyMatrix4(mat);
+        } else {
+          vCenter.set(cp.x, cp.y, cp.z, 0.0);
+          v4.add(vCenter);
+          v4.applyMatrix4(mat); // pos in global space
+          vCenter.set(cp.x, cp.y, cp.z, 1.0);
+          vCenter.applyMatrix4(mat);
+          v4.sub(vCenter);
+        }
+        xml.setAttribute('x', v4.x.toString());
+        xml.setAttribute('y', v4.y.toString());
+        xml.setAttribute('z', v4.z.toString());
+      }
+    });
+  }
+
+  // FIXME save data for all complexes (not only current)
+  var visual = self._getComplexVisual();
+  var complex = visual ? visual.getComplex() : null;
+  if (complex && complex.originalCML) {
+    updateCMLData(complex);
+
+    // serialize xml structure to string
+    var oSerializer = new XMLSerializer();
+    return oSerializer.serializeToString(complex.originalCML);
+  }
+
+  return null;
+};
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew.prototype.VERSION = typeof "0.7.11" !== 'undefined' && "0.7.11" || '0.0.0-dev';
+Miew.prototype.VERSION = typeof "0.7.12" !== 'undefined' && "0.7.12" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew, /** @lends Miew */{
@@ -91297,12 +92297,12 @@ var MiewCLIParser = createCommonjsModule(function (module, exports) {
   }
 */
 var parser = (function(){
-var o=function(k,v,o,l){for(o=o||{}, l=k.length;l--;o[k[l]]=v);return o},$V0=[1,73],$V1=[1,75],$V2=[1,76],$V3=[1,79],$V4=[1,80],$V5=[1,81],$V6=[1,82],$V7=[1,83],$V8=[1,94],$V9=[1,86],$Va=[1,87],$Vb=[1,88],$Vc=[1,89],$Vd=[1,112],$Ve=[1,90],$Vf=[1,113],$Vg=[1,93],$Vh=[1,64],$Vi=[1,95],$Vj=[1,96],$Vk=[1,98],$Vl=[1,97],$Vm=[1,109],$Vn=[1,110],$Vo=[1,111],$Vp=[1,99],$Vq=[1,100],$Vr=[1,101],$Vs=[1,102],$Vt=[1,103],$Vu=[1,104],$Vv=[1,105],$Vw=[1,106],$Vx=[1,107],$Vy=[1,108],$Vz=[1,114],$VA=[1,115],$VB=[1,116],$VC=[1,118],$VD=[1,117],$VE=[1,70],$VF=[1,72],$VG=[1,69],$VH=[1,71],$VI=[1,77],$VJ=[1,78],$VK=[1,84],$VL=[1,85],$VM=[1,91],$VN=[1,92],$VO=[1,66],$VP=[1,67],$VQ=[1,68],$VR=[1,74],$VS=[1,128],$VT=[1,124],$VU=[1,127],$VV=[1,125],$VW=[1,126],$VX=[1,131],$VY=[1,130],$VZ=[1,147],$V_=[1,155],$V$=[1,162],$V01=[1,163],$V11=[1,200],$V21=[5,6,7,9,12,13,14,16,17,18,19,22,24,25,26,29,32,33,34,36,37,40,42,43,44,51,53,54,55,57,58,59,61,62,63,65,66,67,68,69,70,71,72,73,74,76,77,78,79,81,82,84,85,86,90,91,93,96,97,100,102,103],$V31=[5,6,7,9,12,13,14,16,17,18,19,22,24,25,26,29,32,33,34,36,37,40,42,43,44,51,53,54,55,57,58,59,61,62,63,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,81,82,84,85,86,90,91,93,96,97,100,102,103],$V41=[5,6,7,9,12,14,16,17,18,19,22,24,25,26,29,32,33,36,37,40,42,43,44,51,53,54,55,57,58,61,62,63,65,66,67,68,69,70,71,72,73,79,81,82,84,85,86,90,91,100],$V51=[5,90,91],$V61=[5,93],$V71=[1,226],$V81=[5,13,59,74,103],$V91=[75,102];
+var o=function(k,v,o,l){for(o=o||{}, l=k.length;l--;o[k[l]]=v);return o},$V0=[1,74],$V1=[1,76],$V2=[1,77],$V3=[1,80],$V4=[1,81],$V5=[1,82],$V6=[1,83],$V7=[1,84],$V8=[1,95],$V9=[1,87],$Va=[1,88],$Vb=[1,89],$Vc=[1,90],$Vd=[1,113],$Ve=[1,91],$Vf=[1,114],$Vg=[1,94],$Vh=[1,65],$Vi=[1,96],$Vj=[1,97],$Vk=[1,99],$Vl=[1,98],$Vm=[1,110],$Vn=[1,111],$Vo=[1,112],$Vp=[1,100],$Vq=[1,101],$Vr=[1,102],$Vs=[1,103],$Vt=[1,104],$Vu=[1,105],$Vv=[1,106],$Vw=[1,107],$Vx=[1,108],$Vy=[1,109],$Vz=[1,115],$VA=[1,116],$VB=[1,117],$VC=[1,119],$VD=[1,118],$VE=[1,71],$VF=[1,73],$VG=[1,70],$VH=[1,72],$VI=[1,78],$VJ=[1,79],$VK=[1,85],$VL=[1,86],$VM=[1,92],$VN=[1,93],$VO=[1,67],$VP=[1,68],$VQ=[1,69],$VR=[1,75],$VS=[1,129],$VT=[1,125],$VU=[1,128],$VV=[1,126],$VW=[1,127],$VX=[1,132],$VY=[1,131],$VZ=[1,148],$V_=[1,156],$V$=[1,163],$V01=[1,164],$V11=[1,201],$V21=[5,6,7,9,12,13,14,16,17,18,19,22,24,25,26,29,32,33,34,36,37,40,42,44,45,52,54,55,56,58,59,60,62,63,64,66,67,68,69,70,71,72,73,74,75,77,78,79,80,82,83,85,86,87,91,92,94,97,98,101,103,104],$V31=[5,6,7,9,12,13,14,16,17,18,19,22,24,25,26,29,32,33,34,36,37,40,42,44,45,52,54,55,56,58,59,60,62,63,64,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,82,83,85,86,87,91,92,94,97,98,101,103,104],$V41=[5,6,7,9,12,14,16,17,18,19,22,24,25,26,29,32,33,36,37,40,42,44,45,52,54,55,56,58,59,62,63,64,66,67,68,69,70,71,72,73,74,80,82,83,85,86,87,91,92,101],$V51=[5,91,92],$V61=[5,94],$V71=[1,227],$V81=[5,13,60,75,104],$V91=[76,103];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"Program":3,"Command":4,"EOF":5,"RESET":6,"BUILD":7,"ALL":8,"HELP":9,"Path":10,"OneArgCommand":11,"GET":12,"STRING":13,"SET":14,"Value":15,"SET_SAVE":16,"SET_RESTORE":17,"SET_RESET":18,"PRESET":19,"AddRepresentation":20,"EditRepresentation":21,"REMOVE":22,"RepresentationReference":23,"HIDE":24,"SHOW":25,"LIST":26,"EXPAND_KEY":27,"SELECTOR_KEY":28,"SELECT":29,"AS":30,"WordAll":31,"SELECTOR":32,"WITHIN":33,"NUMBER":34,"OF":35,"MATERIAL":36,"IDENTIFIER":37,"ModeCMD":38,"ColorCMD":39,"VIEW":40,"BASE_64":41,"UNIT":42,"SCALE":43,"ROTATE":44,"AxesList":45,"TRANSLATE":46,"GetURLBranch":47,"Screenshot":48,"SrvCMD":49,"SrvScenarioCMD":50,"LINE":51,"ArgList":52,"LISTOBJ":53,"REMOVEOBJ":54,"URL":55,"VIEW_KEY":56,"SCREENSHOT":57,"FILE_LIST":58,"FILE_KEY":59,"PresetPath":60,"FILE_REGISTER":61,"FILE_DELETE":62,"PRESET_ADD":63,"Word":64,"PRESET_DELETE":65,"PRESET_UPDATE":66,"PRESET_RENAME":67,"PRESET_OPEN":68,"CREATE_SCENARIO":69,"RESET_SCENARIO":70,"DELETE_SCENARIO":71,"LIST_SCENARIO":72,"ADD_SCENARIO_ITEM":73,"DELAY_KEY":74,"=":75,"DESCRIPTION_KEY":76,"PDB_KEY":77,"PRST_KEY":78,"LOAD":79,"Url":80,"SCRIPT":81,"ADD":82,"Description":83,"REP":84,"MODE":85,"COLOR":86,"Descriptor":87,"RepresentationOwnProperty":88,"RepresentationOwnPropertyOpts":89,"DESC_KEY":90,"DESC_KEY_OPTS":91,"AxesArg":92,"DESC_KEY_AXES":93,"Arg":94,"PathWoDescKey":95,"HEX":96,"BOOL":97,"CommandSetWoDESC_KEY":98,"DescKeys":99,"CLEAR":100,"CommandSet":101,".":102,"/":103,"HexOrNumber":104,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",6:"RESET",7:"BUILD",8:"ALL",9:"HELP",12:"GET",13:"STRING",14:"SET",16:"SET_SAVE",17:"SET_RESTORE",18:"SET_RESET",19:"PRESET",22:"REMOVE",24:"HIDE",25:"SHOW",26:"LIST",27:"EXPAND_KEY",28:"SELECTOR_KEY",29:"SELECT",30:"AS",32:"SELECTOR",33:"WITHIN",34:"NUMBER",35:"OF",36:"MATERIAL",37:"IDENTIFIER",40:"VIEW",41:"BASE_64",42:"UNIT",43:"SCALE",44:"ROTATE",46:"TRANSLATE",51:"LINE",53:"LISTOBJ",54:"REMOVEOBJ",55:"URL",56:"VIEW_KEY",57:"SCREENSHOT",58:"FILE_LIST",59:"FILE_KEY",61:"FILE_REGISTER",62:"FILE_DELETE",63:"PRESET_ADD",65:"PRESET_DELETE",66:"PRESET_UPDATE",67:"PRESET_RENAME",68:"PRESET_OPEN",69:"CREATE_SCENARIO",70:"RESET_SCENARIO",71:"DELETE_SCENARIO",72:"LIST_SCENARIO",73:"ADD_SCENARIO_ITEM",74:"DELAY_KEY",75:"=",76:"DESCRIPTION_KEY",77:"PDB_KEY",78:"PRST_KEY",79:"LOAD",81:"SCRIPT",82:"ADD",84:"REP",85:"MODE",86:"COLOR",90:"DESC_KEY",91:"DESC_KEY_OPTS",93:"DESC_KEY_AXES",96:"HEX",97:"BOOL",100:"CLEAR",102:".",103:"/"},
-productions_: [0,[3,2],[3,1],[4,1],[4,1],[4,2],[4,1],[4,2],[4,1],[4,2],[4,2],[4,3],[4,3],[4,1],[4,1],[4,1],[4,1],[4,2],[4,1],[4,1],[4,2],[4,2],[4,2],[4,2],[4,1],[4,2],[4,2],[4,2],[4,4],[4,2],[4,6],[4,2],[4,1],[4,1],[4,1],[4,2],[4,2],[4,1],[4,2],[4,2],[4,2],[4,2],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,4],[4,4],[4,1],[4,2],[47,1],[47,2],[47,2],[47,3],[47,3],[48,1],[48,2],[48,3],[49,1],[49,3],[49,2],[49,4],[49,2],[49,4],[49,2],[49,4],[49,1],[49,2],[49,2],[49,2],[49,3],[49,3],[49,3],[49,2],[49,2],[49,2],[49,2],[49,2],[49,2],[49,2],[49,2],[49,3],[49,3],[49,3],[49,2],[49,2],[49,2],[50,2],[50,2],[50,1],[50,2],[50,2],[50,2],[50,1],[50,2],[50,3],[50,3],[50,3],[50,7],[50,13],[50,13],[50,13],[50,13],[11,2],[11,2],[11,2],[11,2],[20,1],[20,2],[20,2],[20,3],[21,2],[21,3],[38,2],[38,3],[39,2],[39,3],[23,1],[23,1],[83,1],[83,2],[83,3],[83,4],[87,1],[87,1],[87,2],[88,3],[89,3],[45,1],[45,2],[92,2],[52,1],[52,2],[94,3],[15,1],[15,1],[15,1],[15,1],[15,1],[64,1],[64,1],[31,1],[31,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[98,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[101,1],[101,1],[95,1],[95,3],[95,3],[10,1],[10,1],[10,3],[10,3],[10,3],[80,1],[60,1],[60,3],[104,1],[104,1]],
+symbols_: {"error":2,"Program":3,"Command":4,"EOF":5,"RESET":6,"BUILD":7,"ALL":8,"HELP":9,"Path":10,"OneArgCommand":11,"GET":12,"STRING":13,"SET":14,"Value":15,"SET_SAVE":16,"SET_RESTORE":17,"SET_RESET":18,"PRESET":19,"AddRepresentation":20,"EditRepresentation":21,"REMOVE":22,"RepresentationReference":23,"HIDE":24,"SHOW":25,"LIST":26,"EXPAND_KEY":27,"SELECTOR_KEY":28,"SELECT":29,"AS":30,"WordAll":31,"SELECTOR":32,"WITHIN":33,"NUMBER":34,"OF":35,"MATERIAL":36,"IDENTIFIER":37,"ModeCMD":38,"ColorCMD":39,"VIEW":40,"BASE_64":41,"UNIT":42,"DSSP":43,"SCALE":44,"ROTATE":45,"AxesList":46,"TRANSLATE":47,"GetURLBranch":48,"Screenshot":49,"SrvCMD":50,"SrvScenarioCMD":51,"LINE":52,"ArgList":53,"LISTOBJ":54,"REMOVEOBJ":55,"URL":56,"VIEW_KEY":57,"SCREENSHOT":58,"FILE_LIST":59,"FILE_KEY":60,"PresetPath":61,"FILE_REGISTER":62,"FILE_DELETE":63,"PRESET_ADD":64,"Word":65,"PRESET_DELETE":66,"PRESET_UPDATE":67,"PRESET_RENAME":68,"PRESET_OPEN":69,"CREATE_SCENARIO":70,"RESET_SCENARIO":71,"DELETE_SCENARIO":72,"LIST_SCENARIO":73,"ADD_SCENARIO_ITEM":74,"DELAY_KEY":75,"=":76,"DESCRIPTION_KEY":77,"PDB_KEY":78,"PRST_KEY":79,"LOAD":80,"Url":81,"SCRIPT":82,"ADD":83,"Description":84,"REP":85,"MODE":86,"COLOR":87,"Descriptor":88,"RepresentationOwnProperty":89,"RepresentationOwnPropertyOpts":90,"DESC_KEY":91,"DESC_KEY_OPTS":92,"AxesArg":93,"DESC_KEY_AXES":94,"Arg":95,"PathWoDescKey":96,"HEX":97,"BOOL":98,"CommandSetWoDESC_KEY":99,"DescKeys":100,"CLEAR":101,"CommandSet":102,".":103,"/":104,"HexOrNumber":105,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",6:"RESET",7:"BUILD",8:"ALL",9:"HELP",12:"GET",13:"STRING",14:"SET",16:"SET_SAVE",17:"SET_RESTORE",18:"SET_RESET",19:"PRESET",22:"REMOVE",24:"HIDE",25:"SHOW",26:"LIST",27:"EXPAND_KEY",28:"SELECTOR_KEY",29:"SELECT",30:"AS",32:"SELECTOR",33:"WITHIN",34:"NUMBER",35:"OF",36:"MATERIAL",37:"IDENTIFIER",40:"VIEW",41:"BASE_64",42:"UNIT",43:"DSSP",44:"SCALE",45:"ROTATE",47:"TRANSLATE",52:"LINE",54:"LISTOBJ",55:"REMOVEOBJ",56:"URL",57:"VIEW_KEY",58:"SCREENSHOT",59:"FILE_LIST",60:"FILE_KEY",62:"FILE_REGISTER",63:"FILE_DELETE",64:"PRESET_ADD",66:"PRESET_DELETE",67:"PRESET_UPDATE",68:"PRESET_RENAME",69:"PRESET_OPEN",70:"CREATE_SCENARIO",71:"RESET_SCENARIO",72:"DELETE_SCENARIO",73:"LIST_SCENARIO",74:"ADD_SCENARIO_ITEM",75:"DELAY_KEY",76:"=",77:"DESCRIPTION_KEY",78:"PDB_KEY",79:"PRST_KEY",80:"LOAD",82:"SCRIPT",83:"ADD",85:"REP",86:"MODE",87:"COLOR",91:"DESC_KEY",92:"DESC_KEY_OPTS",94:"DESC_KEY_AXES",97:"HEX",98:"BOOL",101:"CLEAR",103:".",104:"/"},
+productions_: [0,[3,2],[3,1],[4,1],[4,1],[4,2],[4,1],[4,2],[4,1],[4,2],[4,2],[4,3],[4,3],[4,1],[4,1],[4,1],[4,1],[4,2],[4,1],[4,1],[4,2],[4,2],[4,2],[4,2],[4,1],[4,2],[4,2],[4,2],[4,4],[4,2],[4,6],[4,2],[4,1],[4,1],[4,1],[4,2],[4,2],[4,1],[4,2],[4,1],[4,2],[4,2],[4,2],[4,1],[4,1],[4,1],[4,1],[4,3],[4,3],[4,4],[4,4],[4,1],[4,2],[48,1],[48,2],[48,2],[48,3],[48,3],[49,1],[49,2],[49,3],[50,1],[50,3],[50,2],[50,4],[50,2],[50,4],[50,2],[50,4],[50,1],[50,2],[50,2],[50,2],[50,3],[50,3],[50,3],[50,2],[50,2],[50,2],[50,2],[50,2],[50,2],[50,2],[50,2],[50,3],[50,3],[50,3],[50,2],[50,2],[50,2],[51,2],[51,2],[51,1],[51,2],[51,2],[51,2],[51,1],[51,2],[51,3],[51,3],[51,3],[51,7],[51,13],[51,13],[51,13],[51,13],[11,2],[11,2],[11,2],[11,2],[20,1],[20,2],[20,2],[20,3],[21,2],[21,3],[38,2],[38,3],[39,2],[39,3],[23,1],[23,1],[84,1],[84,2],[84,3],[84,4],[88,1],[88,1],[88,2],[89,3],[90,3],[46,1],[46,2],[93,2],[53,1],[53,2],[95,3],[15,1],[15,1],[15,1],[15,1],[15,1],[65,1],[65,1],[31,1],[31,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[99,1],[100,1],[100,1],[100,1],[100,1],[100,1],[100,1],[100,1],[102,1],[102,1],[96,1],[96,3],[96,3],[10,1],[10,1],[10,3],[10,3],[10,3],[81,1],[61,1],[61,3],[105,1],[105,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -91396,240 +92396,243 @@ case 38:
 this.$ = yy.miew.changeUnit($$[$0]);
 break;
 case 39:
-this.$ = yy.miew.scale($$[$0]);
+this.$ = yy.miew.dssp();
 break;
 case 40:
- for (var i = 0, n = $$[$0].length; i < n; i++) {yy.miew.rotate($$[$0][i]['x'] * Math.PI / 180.0, $$[$0][i]['y'] * Math.PI / 180.0, $$[$0][i]['z'] * Math.PI / 180.0);} 
+this.$ = yy.miew.scale($$[$0]);
 break;
 case 41:
+ for (var i = 0, n = $$[$0].length; i < n; i++) {yy.miew.rotate($$[$0][i]['x'] * Math.PI / 180.0, $$[$0][i]['y'] * Math.PI / 180.0, $$[$0][i]['z'] * Math.PI / 180.0);} 
+break;
+case 42:
  for (var i = 0, n = $$[$0].length; i < n; i++) {yy.miew.translate($$[$0][i]['x'] || 0, $$[$0][i]['y'] || 0, $$[$0][i]['z'] || 0);} 
 break;
-case 46: case 47:
+case 47: case 48:
 this.$ = yy.miew.addObject({type: 'line', params: [$$[$0-1], $$[$0]]}, true);
 break;
-case 48: case 49:
+case 49: case 50:
 this.$ = yy.miew.addObject({type: 'line', params: [$$[$0-2], $$[$0-1]], opts:$$[$0].toJSO(yy.utils, 'objects', 'line')}, true);
 break;
-case 50:
+case 51:
 this.$ = yy.echo(yy.utils.listObjs(yy.miew));
 break;
-case 51:
+case 52:
 this.$ = yy.miew.removeObject($$[$0]);
 break;
-case 52:
+case 53:
 this.$ = yy.echo(yy.miew.getURL({view: false, settings: false}));
 break;
-case 53:
+case 54:
 this.$ = yy.echo(yy.miew.getURL({view: false, settings: true}));
 break;
-case 54:
+case 55:
 this.$ = yy.echo(yy.miew.getURL({view: true,  settings: false}));
 break;
-case 55: case 56:
+case 56: case 57:
 this.$ = yy.echo(yy.miew.getURL({view: true,  settings: true}));
 break;
-case 57:
+case 58:
 this.$ = yy.miew.screenshotSave();
 break;
-case 58:
+case 59:
 this.$ = yy.miew.screenshotSave('', Number($$[$0]));
 break;
-case 59:
+case 60:
 this.$ = yy.miew.screenshotSave('', Number($$[$0-1]), Number($$[$0]));
 break;
-case 60:
+case 61:
 this.$ = yy.srv.fileList(yy.miew, yy.echo, yy.error);
 break;
-case 61:
+case 62:
 this.$ = yy.srv.fileList(yy.miew, yy.echo, yy.error, "", $$[$0]);
 break;
-case 62:
+case 63:
 this.$ = yy.srv.fileList(yy.miew, yy.echo, yy.error, $$[$0]);
 break;
-case 63:
+case 64:
 this.$ = yy.srv.fileList(yy.miew, yy.echo, yy.error, $$[$0-2], $$[$0]);
 break;
-case 64: case 66:
+case 65: case 67:
 this.$ = yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $$[$0], yy.srv.fileList, yy.srv, yy.miew, yy.echo, yy.error);
 break;
-case 65: case 67:
+case 66: case 68:
 this.$ = yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $$[$0-2], yy.srv.fileList, yy.srv, yy.miew, yy.echo, yy.error, $$[$0]);
 break;
-case 68:
+case 69:
 this.$ = yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvTopologyRegister");
 break;
-case 69:
+case 70:
 this.$ = yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvTopologyDelete", $$[$0], false);
 break;
-case 70: case 71:
+case 71: case 72:
 this.$ = yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $$[$0], yy.miew.srvTopologyDelete, false);
 break;
-case 72:
+case 73:
 this.$ = yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvTopologyDelete", $$[$0-1], true);
 break;
-case 73: case 74:
+case 74: case 75:
 this.$ = yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $$[$0-1], yy.miew.srvTopologyDelete, true);
 break;
-case 75: case 76:
+case 76: case 77:
 this.$ = yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetCreate", $$[$0]);
 break;
-case 77:
+case 78:
 this.$ = yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetDelete", $$[$0]);
 break;
-case 78: case 79:
+case 79: case 80:
 this.$ = yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $$[$0], yy.miew.srvPresetDelete);
 break;
-case 80:
+case 81:
 this.$ = yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetUpdate", $$[$0]);
 break;
-case 81: case 82:
+case 82: case 83:
 this.$ = yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $$[$0], yy.miew.srvPresetUpdate);
 break;
-case 83:
+case 84:
 this.$ = yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetRename", $$[$0-1], $$[$0]);
 break;
-case 84: case 85:
+case 85: case 86:
 this.$ = yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $$[$0-1], yy.miew.srvPresetRename, $$[$0]);
 break;
-case 86:
+case 87:
 this.$ = yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetApply", $$[$0]); yy.representations.clear();
 break;
-case 87: case 88:
+case 88: case 89:
 this.$ = yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $$[$0], yy.miew.srvPresetApply); yy.representations.clear();
 break;
-case 89: case 90:
+case 90: case 91:
 this.$ = yy.srv.createScenario($$[$0]);
 break;
-case 91:
+case 92:
 this.$ = yy.srv.resetScenario();
 break;
-case 92: case 93:
+case 93: case 94:
 this.$ = yy.srv.deleteScenario(yy.miew, yy.echo, yy.error, $$[$0]);
 break;
-case 94:
+case 95:
 this.$ = yy.srv.deleteScenario(yy.miew, yy.echo, yy.error, Number($$[$0]));
 break;
-case 95:
+case 96:
 this.$ = yy.srv.listScenario(yy.miew, yy.echo, yy.error);
 break;
-case 96: case 97: case 98: case 99:
+case 97: case 98: case 99: case 100:
 this.$ = yy.srv.listScenario(yy.miew, yy.echo, yy.error, $$[$0]);
 break;
-case 100:
+case 101:
 this.$ =yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, Number($$[$0-3]), $$[$0]);
 break;
-case 101:
+case 102:
 this.$ =yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, Number($$[$0-9]), Number($$[$0-6]), Number($$[$0-3]), $$[$0]);
 break;
-case 102:
+case 103:
 this.$ =yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, $$[$0-9], Number($$[$0-6]), Number($$[$0-3]), $$[$0]);
 break;
-case 103:
+case 104:
 this.$ =yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, Number($$[$0-9]), $$[$0-6], Number($$[$0-3]), $$[$0]);
 break;
-case 104:
+case 105:
 this.$ =yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, $$[$0-9], $$[$0-6], Number($$[$0-3]), $$[$0]);
 break;
-case 105: case 106: case 107:
+case 106: case 107: case 108:
 this.$ = yy.utils.load(yy.miew, $$[$0]); yy.representations.clear();
 break;
-case 108:
+case 109:
 this.$ = yy.notimplemented();
 break;
-case 109:
+case 110:
 this.$ = yy.echo(yy.representations.add(yy.miew.repAdd()));
 break;
-case 110:
+case 111:
 this.$ = yy.echo(yy.representations.add($$[$0], yy.miew.repAdd()));
 break;
-case 111:
+case 112:
 this.$ = yy.echo(yy.representations.add(yy.miew.repAdd($$[$0])));
 break;
-case 112:
+case 113:
 this.$ = yy.echo(yy.representations.add($$[$0-1], yy.miew.repAdd($$[$0])));
 break;
-case 113:
+case 114:
 this.$ = yy.miew.rep($$[$0]); yy.miew.repCurrent($$[$0]);
 break;
-case 114:
+case 115:
 this.$ = yy.miew.rep($$[$0-1], $$[$0]); yy.miew.repCurrent($$[$0-1]);
 break;
-case 115:
+case 116:
 this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0].toUpperCase())});
 break;
-case 116:
+case 117:
 this.$ = yy.miew.rep(yy.miew.repCurrent(), {mode : new Array(yy.utils.checkArg($$[$0-2].toLowerCase(), $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
 break;
-case 117:
+case 118:
 this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : yy.utils.checkArg($$[$0-1].toLowerCase(), $$[$0].toUpperCase())});
 break;
-case 118:
+case 119:
 this.$ = yy.miew.rep(yy.miew.repCurrent(), {colorer : new Array(yy.utils.checkArg($$[$0-2].toLowerCase(), $$[$0-1].toUpperCase()), $$[$0].toJSO(yy.utils, $$[$0-2], $$[$0-1].toUpperCase()))});
 break;
-case 119:
+case 120:
 this.$ = Number(yy.representations.get($$[$0]));
 break;
-case 120: case 136:
+case 121: case 137:
 this.$ = Number($$[$0]);
 break;
-case 121:
+case 122:
 this.$ = $$[$0];
 break;
-case 122:
+case 123:
 this.$ = yy._.assign($$[$0-1], $$[$0]);
 break;
-case 123:
+case 124:
 this.$ = yy._.assign($$[$0-2], $$[$0-1], $$[$0]);
 break;
-case 124:
+case 125:
 this.$ = yy._.assign($$[$0-3], $$[$0-2], $$[$0-1], $$[$0]);
 break;
-case 125: case 126:
+case 126: case 127:
 this.$ = yy.CreateObjectPair($$[$0].key, $$[$0].val);
 break;
-case 127:
+case 128:
 this.$ = yy.CreateObjectPair($$[$0-1].key, new Array($$[$0-1].val, $$[$0].toJSO(yy.utils, $$[$0-1].key, $$[$0-1].val)));
 break;
-case 128: case 129:
+case 129: case 130:
 this.$ = Object.create({'key': yy.keyRemap($$[$0-2]), 'val': yy.utils.checkArg($$[$0-2], $$[$0])});
 break;
-case 130:
+case 131:
 this.$ = [$$[$0]];
 break;
-case 131:
+case 132:
 this.$ = $$[$0-1].concat($$[$0]);
 break;
-case 132:
+case 133:
 this.$ = yy.CreateObjectPair($$[$0-1].toLowerCase(), Number($$[$0]));
 break;
-case 133:
+case 134:
 this.$ = new yy.ArgList($$[$0]);
 break;
-case 134:
+case 135:
 this.$ = $$[$0-1].append($$[$0]);
 break;
-case 135:
+case 136:
 this.$ = new yy.Arg($$[$0-2], $$[$0]);
 break;
-case 137:
+case 138:
 this.$ = parseInt($$[$0]);
 break;
-case 138:
+case 139:
 this.$ = JSON.parse($$[$0]);
 break;
-case 139: case 140:
+case 140: case 141:
 this.$ = String($$[$0]);
 break;
-case 201: case 202: case 205: case 206: case 207:
+case 202: case 203: case 206: case 207: case 208:
 this.$ = $$[$0-2] + $$[$0-1] + $$[$0]; //cause of could be color word in path;
 break;
-case 210:
+case 211:
 this.$ = $$[$0-2] = $$[$0-2] + $$[$0-1] + $$[$0];
 break;
 }
 },
-table: [{3:1,4:2,5:[1,3],6:[1,4],7:[1,5],9:[1,6],11:7,12:[1,8],14:[1,9],16:[1,10],17:[1,11],18:[1,12],19:[1,13],20:14,21:15,22:[1,16],24:[1,17],25:[1,18],26:[1,19],29:[1,20],32:[1,21],33:[1,22],36:[1,23],38:24,39:25,40:[1,26],42:[1,27],43:[1,28],44:[1,29],46:[1,30],47:31,48:32,49:33,50:34,51:[1,35],53:[1,36],54:[1,37],55:[1,44],57:[1,45],58:[1,46],61:[1,47],62:[1,48],63:[1,49],65:[1,50],66:[1,51],67:[1,52],68:[1,53],69:[1,54],70:[1,55],71:[1,56],72:[1,57],73:[1,58],79:[1,38],81:[1,39],82:[1,40],84:[1,41],85:[1,42],86:[1,43]},{1:[3]},{5:[1,59]},{1:[2,2]},{5:[2,3]},{5:[2,4],8:[1,60]},{5:[2,6],6:$V0,7:$V1,9:$V2,10:61,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{5:[2,8]},{6:$V0,7:$V1,9:$V2,10:119,12:$V3,13:[1,120],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{6:$V0,7:$V1,9:$V2,10:121,12:$V3,13:[1,122],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{5:[2,13]},{5:[2,14]},{5:[2,15]},{5:[2,16],13:$VS,15:123,34:$VT,37:$VU,96:$VV,97:$VW},{5:[2,18]},{5:[2,19]},{23:129,34:$VX,37:$VY},{23:132,34:$VX,37:$VY},{23:133,34:$VX,37:$VY},{5:[2,24],23:134,27:[1,135],28:[1,136],34:$VX,37:$VY},{13:[1,137]},{13:[1,138]},{34:[1,139]},{37:[1,140]},{5:[2,32]},{5:[2,33]},{5:[2,34],13:[1,141],41:[1,142]},{5:[2,37],34:[1,143]},{34:[1,144]},{45:145,92:146,93:$VZ},{45:148,92:146,93:$VZ},{5:[2,42]},{5:[2,43]},{5:[2,44]},{5:[2,45]},{6:$V0,7:$V1,9:$V2,10:150,12:$V3,13:[1,149],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{5:[2,50]},{34:[1,151]},{13:$V_,37:[1,153],59:[1,154],80:152},{13:$V_,80:156},{5:[2,109],37:[1,157],83:158,87:159,88:160,89:161,90:$V$,91:$V01},{23:164,34:$VX,37:$VY},{37:[1,165]},{37:[1,166]},{5:[2,52],28:[1,167],56:[1,168]},{5:[2,57],34:[1,169]},{5:[2,60],6:$V0,7:$V1,9:$V2,10:174,12:$V3,13:[1,173],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,171],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,59:[1,170],60:172,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{5:[2,68]},{6:$V0,7:$V1,9:$V2,10:174,12:$V3,13:[1,176],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,175],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,60:177,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{6:$V0,7:$V1,9:$V2,12:$V3,13:[1,178],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:179,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,98:65,100:$VR},{6:$V0,7:$V1,9:$V2,10:174,12:$V3,13:[1,181],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,180],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,60:182,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{6:$V0,7:$V1,9:$V2,10:174,12:$V3,13:[1,184],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,183],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,60:185,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{6:$V0,7:$V1,9:$V2,10:174,12:$V3,13:[1,187],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,186],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,60:188,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{6:$V0,7:$V1,9:$V2,10:174,12:$V3,13:[1,190],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,189],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,60:191,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{6:$V0,7:$V1,9:$V2,12:$V3,13:[1,192],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:193,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,98:65,100:$VR},{5:[2,91]},{6:$V0,7:$V1,9:$V2,12:$V3,13:[1,194],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,196],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:195,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,98:65,100:$VR},{5:[2,95],27:[1,197]},{74:[1,198],77:[1,199]},{1:[2,1]},{5:[2,5]},{5:[2,7],102:$V11},o($V21,[2,203]),o($V21,[2,204]),o($V31,[2,141]),o($V31,[2,142]),o($V21,[2,191]),o($V21,[2,192]),o($V21,[2,193]),o($V21,[2,194]),o($V21,[2,195]),o($V21,[2,196]),o($V21,[2,197]),o($V31,[2,145]),o($V31,[2,146]),o($V31,[2,147]),o($V31,[2,148]),o($V31,[2,149]),o($V31,[2,150]),o($V31,[2,151]),o($V31,[2,152]),o($V31,[2,153]),o($V31,[2,154]),o($V31,[2,155]),o($V31,[2,156]),o($V31,[2,157]),o($V31,[2,158]),o($V31,[2,159]),o($V31,[2,160]),o($V31,[2,161]),o($V31,[2,162]),o($V31,[2,163]),o($V31,[2,164]),o($V31,[2,165]),o($V31,[2,166]),o($V31,[2,167]),o($V31,[2,168]),o($V31,[2,169]),o($V31,[2,170]),o($V31,[2,171]),o($V31,[2,172]),o($V31,[2,173]),o($V31,[2,174]),o($V31,[2,175]),o($V31,[2,176]),o($V31,[2,177]),o($V31,[2,178]),o($V31,[2,179]),o($V31,[2,180]),o($V31,[2,181]),o($V31,[2,182]),o($V31,[2,183]),o($V31,[2,184]),o($V31,[2,185]),o($V31,[2,186]),o($V31,[2,187]),o($V31,[2,188]),o($V31,[2,189]),o($V31,[2,190]),{5:[2,9],102:$V11},{5:[2,10]},{13:$VS,15:201,34:$VT,37:$VU,96:$VV,97:$VW,102:$V11},{13:$VS,15:202,34:$VT,37:$VU,96:$VV,97:$VW},{5:[2,17]},o($V41,[2,136]),o($V41,[2,137]),o($V41,[2,138]),o($V41,[2,139]),o($V41,[2,140]),{5:[2,20]},o($V51,[2,119]),o($V51,[2,120]),{5:[2,21]},{5:[2,22]},{5:[2,23]},{5:[2,25]},{5:[2,26]},{5:[2,27],30:[1,203]},{5:[2,29]},{35:[1,204]},{5:[2,31]},{5:[2,35]},{5:[2,36]},{5:[2,38]},{5:[2,39]},{5:[2,40],92:205,93:$VZ},o($V61,[2,130]),{34:[1,206]},{5:[2,41],92:205,93:$VZ},{13:[1,207]},{6:$V0,7:$V1,9:$V2,10:208,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR,102:$V11},{5:[2,51]},{5:[2,105]},{5:[2,106]},{5:[2,107]},{5:[2,208]},{5:[2,108]},{5:[2,110],83:209,87:159,88:160,89:161,90:$V$,91:$V01},{5:[2,111]},{5:[2,121],87:210,88:160,89:161,90:$V$,91:$V01},o($V51,[2,125]),o($V51,[2,126],{98:65,52:211,94:212,95:213,64:214,6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,100:$VR}),{75:[1,215]},{75:[1,216]},{5:[2,113],83:217,87:159,88:160,89:161,90:$V$,91:$V01},{5:[2,115],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,52:218,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:214,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,94:212,95:213,98:65,100:$VR},{5:[2,117],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,52:219,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:214,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,94:212,95:213,98:65,100:$VR},{5:[2,53],56:[1,220]},{5:[2,54],28:[1,221]},{5:[2,58],34:[1,222]},{13:[1,223]},{5:[2,62],59:[1,224]},{5:[2,64],59:[1,225],103:$V71},{5:[2,66],59:[1,227]},o($V81,[2,209],{102:$V11}),{5:[2,69],59:[1,228]},{5:[2,70],59:[1,229]},{5:[2,71],59:[1,230],103:$V71},{5:[2,75]},{5:[2,76]},{5:[2,77]},{5:[2,78]},{5:[2,79],103:$V71},{5:[2,80]},{5:[2,81]},{5:[2,82],103:$V71},{13:[1,231]},{13:[1,232]},{13:[1,233],103:$V71},{5:[2,86]},{5:[2,87]},{5:[2,88],103:$V71},{5:[2,89]},{5:[2,90]},{5:[2,92]},{5:[2,93]},{5:[2,94]},{5:[2,96],6:$V0,7:$V1,9:$V2,12:$V3,13:[1,236],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,234],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:235,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,98:65,100:$VR},{75:[1,237]},{75:[1,238]},{6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,240],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:239,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:241,100:$VR},{5:[2,11]},{5:[2,12]},{6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,31:242,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:243,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:244,100:$VR},{13:[1,245]},o($V61,[2,131]),o($V61,[2,132]),{5:[2,46],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,52:246,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:214,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,94:212,95:213,98:65,100:$VR},{5:[2,47],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,52:247,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:214,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,94:212,95:213,98:65,100:$VR,102:$V11},{5:[2,112]},{5:[2,122],87:248,88:160,89:161,90:$V$,91:$V01},o($V51,[2,127],{98:65,95:213,64:214,94:249,6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,100:$VR}),o($V41,[2,133]),{75:[1,250],102:[1,251]},o($V91,[2,200]),{13:$VS,15:252,34:$VT,37:$VU,96:$VV,97:$VW},{13:$VS,15:253,34:$VT,37:$VU,96:$VV,97:$VW},{5:[2,114]},{5:[2,116],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:214,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,94:249,95:213,98:65,100:$VR},{5:[2,118],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:214,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,94:249,95:213,98:65,100:$VR},{5:[2,55]},{5:[2,56]},{5:[2,59]},{5:[2,61]},{13:[1,254]},{13:[1,255]},{6:$V0,7:$V1,9:$V2,10:256,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{13:[1,257]},{5:[2,72]},{5:[2,73]},{5:[2,74]},{5:[2,83]},{5:[2,84]},{5:[2,85]},{5:[2,97]},{5:[2,98]},{5:[2,99]},{34:[1,258]},{34:[1,259],37:[1,260]},o($V21,[2,205]),o($V21,[2,206]),o($V21,[2,207]),{5:[2,28]},{5:[2,143]},{5:[2,144]},{30:[1,261]},{5:[2,48],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:214,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,94:249,95:213,98:65,100:$VR},{5:[2,49],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:214,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,94:249,95:213,98:65,100:$VR},{5:[2,123],87:262,88:160,89:161,90:$V$,91:$V01},o($V41,[2,134]),{13:$VS,15:263,34:$VT,37:$VU,96:$VV,97:$VW},{6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,265],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:264,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,98:65,100:$VR},o($V51,[2,128]),o($V41,[2,129]),{5:[2,63]},{5:[2,65]},o($V81,[2,210],{102:$V11}),{5:[2,67]},{76:[1,266]},{78:[1,267]},{78:[1,268]},{6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,31:269,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,61:$Vs,62:$Vt,63:$Vu,64:243,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:244,100:$VR},{5:[2,124]},o($V41,[2,135]),o($V91,[2,201]),o($V91,[2,202]),{75:[1,270]},{75:[1,271]},{75:[1,272]},{5:[2,30]},{13:[1,273]},{6:$V0,7:$V1,9:$V2,10:174,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,274],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,60:275,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{6:$V0,7:$V1,9:$V2,10:174,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,276],36:$Vg,37:$Vh,40:$Vi,42:$Vj,43:$Vk,44:$Vl,51:$Vm,53:$Vn,54:$Vo,55:$Vp,57:$Vq,58:$Vr,60:277,61:$Vs,62:$Vt,63:$Vu,64:62,65:$Vv,66:$Vw,67:$Vx,68:$Vy,69:$Vz,70:$VA,71:$VB,72:$VC,73:$VD,74:$VE,76:$VF,77:$VG,78:$VH,79:$VI,81:$VJ,82:$VK,84:$VL,85:$VM,86:$VN,90:$VO,91:$VP,93:$VQ,98:65,99:63,100:$VR},{5:[2,100]},{74:[1,278]},{74:[1,279],103:$V71},{74:[1,280]},{74:[1,281],103:$V71},{75:[1,282]},{75:[1,283]},{75:[1,284]},{75:[1,285]},{34:[1,286]},{34:[1,287]},{34:[1,288]},{34:[1,289]},{76:[1,290]},{76:[1,291]},{76:[1,292]},{76:[1,293]},{75:[1,294]},{75:[1,295]},{75:[1,296]},{75:[1,297]},{13:[1,298]},{13:[1,299]},{13:[1,300]},{13:[1,301]},{5:[2,101]},{5:[2,103]},{5:[2,102]},{5:[2,104]}],
-defaultActions: {3:[2,2],4:[2,3],7:[2,8],10:[2,13],11:[2,14],12:[2,15],14:[2,18],15:[2,19],24:[2,32],25:[2,33],31:[2,42],32:[2,43],33:[2,44],34:[2,45],36:[2,50],47:[2,68],55:[2,91],59:[2,1],60:[2,5],120:[2,10],123:[2,17],129:[2,20],132:[2,21],133:[2,22],134:[2,23],135:[2,25],136:[2,26],138:[2,29],140:[2,31],141:[2,35],142:[2,36],143:[2,38],144:[2,39],151:[2,51],152:[2,105],153:[2,106],154:[2,107],155:[2,208],156:[2,108],158:[2,111],178:[2,75],179:[2,76],180:[2,77],181:[2,78],183:[2,80],184:[2,81],189:[2,86],190:[2,87],192:[2,89],193:[2,90],194:[2,92],195:[2,93],196:[2,94],201:[2,11],202:[2,12],209:[2,112],217:[2,114],220:[2,55],221:[2,56],222:[2,59],223:[2,61],228:[2,72],229:[2,73],230:[2,74],231:[2,83],232:[2,84],233:[2,85],234:[2,97],235:[2,98],236:[2,99],242:[2,28],243:[2,143],244:[2,144],254:[2,63],255:[2,65],257:[2,67],262:[2,124],269:[2,30],273:[2,100],298:[2,101],299:[2,103],300:[2,102],301:[2,104]},
+table: [{3:1,4:2,5:[1,3],6:[1,4],7:[1,5],9:[1,6],11:7,12:[1,8],14:[1,9],16:[1,10],17:[1,11],18:[1,12],19:[1,13],20:14,21:15,22:[1,16],24:[1,17],25:[1,18],26:[1,19],29:[1,20],32:[1,21],33:[1,22],36:[1,23],38:24,39:25,40:[1,26],42:[1,27],43:[1,28],44:[1,29],45:[1,30],47:[1,31],48:32,49:33,50:34,51:35,52:[1,36],54:[1,37],55:[1,38],56:[1,45],58:[1,46],59:[1,47],62:[1,48],63:[1,49],64:[1,50],66:[1,51],67:[1,52],68:[1,53],69:[1,54],70:[1,55],71:[1,56],72:[1,57],73:[1,58],74:[1,59],80:[1,39],82:[1,40],83:[1,41],85:[1,42],86:[1,43],87:[1,44]},{1:[3]},{5:[1,60]},{1:[2,2]},{5:[2,3]},{5:[2,4],8:[1,61]},{5:[2,6],6:$V0,7:$V1,9:$V2,10:62,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{5:[2,8]},{6:$V0,7:$V1,9:$V2,10:120,12:$V3,13:[1,121],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{6:$V0,7:$V1,9:$V2,10:122,12:$V3,13:[1,123],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{5:[2,13]},{5:[2,14]},{5:[2,15]},{5:[2,16],13:$VS,15:124,34:$VT,37:$VU,97:$VV,98:$VW},{5:[2,18]},{5:[2,19]},{23:130,34:$VX,37:$VY},{23:133,34:$VX,37:$VY},{23:134,34:$VX,37:$VY},{5:[2,24],23:135,27:[1,136],28:[1,137],34:$VX,37:$VY},{13:[1,138]},{13:[1,139]},{34:[1,140]},{37:[1,141]},{5:[2,32]},{5:[2,33]},{5:[2,34],13:[1,142],41:[1,143]},{5:[2,37],34:[1,144]},{5:[2,39]},{34:[1,145]},{46:146,93:147,94:$VZ},{46:149,93:147,94:$VZ},{5:[2,43]},{5:[2,44]},{5:[2,45]},{5:[2,46]},{6:$V0,7:$V1,9:$V2,10:151,12:$V3,13:[1,150],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{5:[2,51]},{34:[1,152]},{13:$V_,37:[1,154],60:[1,155],81:153},{13:$V_,81:157},{5:[2,110],37:[1,158],84:159,88:160,89:161,90:162,91:$V$,92:$V01},{23:165,34:$VX,37:$VY},{37:[1,166]},{37:[1,167]},{5:[2,53],28:[1,168],57:[1,169]},{5:[2,58],34:[1,170]},{5:[2,61],6:$V0,7:$V1,9:$V2,10:175,12:$V3,13:[1,174],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,172],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,60:[1,171],61:173,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{5:[2,69]},{6:$V0,7:$V1,9:$V2,10:175,12:$V3,13:[1,177],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,176],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,61:178,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{6:$V0,7:$V1,9:$V2,12:$V3,13:[1,179],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:180,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,99:66,101:$VR},{6:$V0,7:$V1,9:$V2,10:175,12:$V3,13:[1,182],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,181],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,61:183,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{6:$V0,7:$V1,9:$V2,10:175,12:$V3,13:[1,185],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,184],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,61:186,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{6:$V0,7:$V1,9:$V2,10:175,12:$V3,13:[1,188],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,187],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,61:189,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{6:$V0,7:$V1,9:$V2,10:175,12:$V3,13:[1,191],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,190],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,61:192,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{6:$V0,7:$V1,9:$V2,12:$V3,13:[1,193],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:194,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,99:66,101:$VR},{5:[2,92]},{6:$V0,7:$V1,9:$V2,12:$V3,13:[1,195],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,197],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:196,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,99:66,101:$VR},{5:[2,96],27:[1,198]},{75:[1,199],78:[1,200]},{1:[2,1]},{5:[2,5]},{5:[2,7],103:$V11},o($V21,[2,204]),o($V21,[2,205]),o($V31,[2,142]),o($V31,[2,143]),o($V21,[2,192]),o($V21,[2,193]),o($V21,[2,194]),o($V21,[2,195]),o($V21,[2,196]),o($V21,[2,197]),o($V21,[2,198]),o($V31,[2,146]),o($V31,[2,147]),o($V31,[2,148]),o($V31,[2,149]),o($V31,[2,150]),o($V31,[2,151]),o($V31,[2,152]),o($V31,[2,153]),o($V31,[2,154]),o($V31,[2,155]),o($V31,[2,156]),o($V31,[2,157]),o($V31,[2,158]),o($V31,[2,159]),o($V31,[2,160]),o($V31,[2,161]),o($V31,[2,162]),o($V31,[2,163]),o($V31,[2,164]),o($V31,[2,165]),o($V31,[2,166]),o($V31,[2,167]),o($V31,[2,168]),o($V31,[2,169]),o($V31,[2,170]),o($V31,[2,171]),o($V31,[2,172]),o($V31,[2,173]),o($V31,[2,174]),o($V31,[2,175]),o($V31,[2,176]),o($V31,[2,177]),o($V31,[2,178]),o($V31,[2,179]),o($V31,[2,180]),o($V31,[2,181]),o($V31,[2,182]),o($V31,[2,183]),o($V31,[2,184]),o($V31,[2,185]),o($V31,[2,186]),o($V31,[2,187]),o($V31,[2,188]),o($V31,[2,189]),o($V31,[2,190]),o($V31,[2,191]),{5:[2,9],103:$V11},{5:[2,10]},{13:$VS,15:202,34:$VT,37:$VU,97:$VV,98:$VW,103:$V11},{13:$VS,15:203,34:$VT,37:$VU,97:$VV,98:$VW},{5:[2,17]},o($V41,[2,137]),o($V41,[2,138]),o($V41,[2,139]),o($V41,[2,140]),o($V41,[2,141]),{5:[2,20]},o($V51,[2,120]),o($V51,[2,121]),{5:[2,21]},{5:[2,22]},{5:[2,23]},{5:[2,25]},{5:[2,26]},{5:[2,27],30:[1,204]},{5:[2,29]},{35:[1,205]},{5:[2,31]},{5:[2,35]},{5:[2,36]},{5:[2,38]},{5:[2,40]},{5:[2,41],93:206,94:$VZ},o($V61,[2,131]),{34:[1,207]},{5:[2,42],93:206,94:$VZ},{13:[1,208]},{6:$V0,7:$V1,9:$V2,10:209,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR,103:$V11},{5:[2,52]},{5:[2,106]},{5:[2,107]},{5:[2,108]},{5:[2,209]},{5:[2,109]},{5:[2,111],84:210,88:160,89:161,90:162,91:$V$,92:$V01},{5:[2,112]},{5:[2,122],88:211,89:161,90:162,91:$V$,92:$V01},o($V51,[2,126]),o($V51,[2,127],{99:66,53:212,95:213,96:214,65:215,6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,101:$VR}),{76:[1,216]},{76:[1,217]},{5:[2,114],84:218,88:160,89:161,90:162,91:$V$,92:$V01},{5:[2,116],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,53:219,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:215,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,95:213,96:214,99:66,101:$VR},{5:[2,118],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,53:220,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:215,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,95:213,96:214,99:66,101:$VR},{5:[2,54],57:[1,221]},{5:[2,55],28:[1,222]},{5:[2,59],34:[1,223]},{13:[1,224]},{5:[2,63],60:[1,225]},{5:[2,65],60:[1,226],104:$V71},{5:[2,67],60:[1,228]},o($V81,[2,210],{103:$V11}),{5:[2,70],60:[1,229]},{5:[2,71],60:[1,230]},{5:[2,72],60:[1,231],104:$V71},{5:[2,76]},{5:[2,77]},{5:[2,78]},{5:[2,79]},{5:[2,80],104:$V71},{5:[2,81]},{5:[2,82]},{5:[2,83],104:$V71},{13:[1,232]},{13:[1,233]},{13:[1,234],104:$V71},{5:[2,87]},{5:[2,88]},{5:[2,89],104:$V71},{5:[2,90]},{5:[2,91]},{5:[2,93]},{5:[2,94]},{5:[2,95]},{5:[2,97],6:$V0,7:$V1,9:$V2,12:$V3,13:[1,237],14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,235],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:236,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,99:66,101:$VR},{76:[1,238]},{76:[1,239]},{6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,241],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:240,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:242,101:$VR},{5:[2,11]},{5:[2,12]},{6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,31:243,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:244,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:245,101:$VR},{13:[1,246]},o($V61,[2,132]),o($V61,[2,133]),{5:[2,47],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,53:247,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:215,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,95:213,96:214,99:66,101:$VR},{5:[2,48],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,53:248,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:215,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,95:213,96:214,99:66,101:$VR,103:$V11},{5:[2,113]},{5:[2,123],88:249,89:161,90:162,91:$V$,92:$V01},o($V51,[2,128],{99:66,96:214,65:215,95:250,6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,101:$VR}),o($V41,[2,134]),{76:[1,251],103:[1,252]},o($V91,[2,201]),{13:$VS,15:253,34:$VT,37:$VU,97:$VV,98:$VW},{13:$VS,15:254,34:$VT,37:$VU,97:$VV,98:$VW},{5:[2,115]},{5:[2,117],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:215,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,95:250,96:214,99:66,101:$VR},{5:[2,119],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:215,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,95:250,96:214,99:66,101:$VR},{5:[2,56]},{5:[2,57]},{5:[2,60]},{5:[2,62]},{13:[1,255]},{13:[1,256]},{6:$V0,7:$V1,9:$V2,10:257,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{13:[1,258]},{5:[2,73]},{5:[2,74]},{5:[2,75]},{5:[2,84]},{5:[2,85]},{5:[2,86]},{5:[2,98]},{5:[2,99]},{5:[2,100]},{34:[1,259]},{34:[1,260],37:[1,261]},o($V21,[2,206]),o($V21,[2,207]),o($V21,[2,208]),{5:[2,28]},{5:[2,144]},{5:[2,145]},{30:[1,262]},{5:[2,49],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:215,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,95:250,96:214,99:66,101:$VR},{5:[2,50],6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:215,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,95:250,96:214,99:66,101:$VR},{5:[2,124],88:263,89:161,90:162,91:$V$,92:$V01},o($V41,[2,135]),{13:$VS,15:264,34:$VT,37:$VU,97:$VV,98:$VW},{6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,266],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:265,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,99:66,101:$VR},o($V51,[2,129]),o($V41,[2,130]),{5:[2,64]},{5:[2,66]},o($V81,[2,211],{103:$V11}),{5:[2,68]},{77:[1,267]},{79:[1,268]},{79:[1,269]},{6:$V0,7:$V1,9:$V2,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,31:270,32:$Ve,33:$Vf,36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,62:$Vs,63:$Vt,64:$Vu,65:244,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:245,101:$VR},{5:[2,125]},o($V41,[2,136]),o($V91,[2,202]),o($V91,[2,203]),{76:[1,271]},{76:[1,272]},{76:[1,273]},{5:[2,30]},{13:[1,274]},{6:$V0,7:$V1,9:$V2,10:175,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,275],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,61:276,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{6:$V0,7:$V1,9:$V2,10:175,12:$V3,14:$V4,16:$V5,17:$V6,18:$V7,19:$V8,22:$V9,24:$Va,25:$Vb,26:$Vc,29:$Vd,32:$Ve,33:$Vf,34:[1,277],36:$Vg,37:$Vh,40:$Vi,42:$Vj,44:$Vk,45:$Vl,52:$Vm,54:$Vn,55:$Vo,56:$Vp,58:$Vq,59:$Vr,61:278,62:$Vs,63:$Vt,64:$Vu,65:63,66:$Vv,67:$Vw,68:$Vx,69:$Vy,70:$Vz,71:$VA,72:$VB,73:$VC,74:$VD,75:$VE,77:$VF,78:$VG,79:$VH,80:$VI,82:$VJ,83:$VK,85:$VL,86:$VM,87:$VN,91:$VO,92:$VP,94:$VQ,99:66,100:64,101:$VR},{5:[2,101]},{75:[1,279]},{75:[1,280],104:$V71},{75:[1,281]},{75:[1,282],104:$V71},{76:[1,283]},{76:[1,284]},{76:[1,285]},{76:[1,286]},{34:[1,287]},{34:[1,288]},{34:[1,289]},{34:[1,290]},{77:[1,291]},{77:[1,292]},{77:[1,293]},{77:[1,294]},{76:[1,295]},{76:[1,296]},{76:[1,297]},{76:[1,298]},{13:[1,299]},{13:[1,300]},{13:[1,301]},{13:[1,302]},{5:[2,102]},{5:[2,104]},{5:[2,103]},{5:[2,105]}],
+defaultActions: {3:[2,2],4:[2,3],7:[2,8],10:[2,13],11:[2,14],12:[2,15],14:[2,18],15:[2,19],24:[2,32],25:[2,33],28:[2,39],32:[2,43],33:[2,44],34:[2,45],35:[2,46],37:[2,51],48:[2,69],56:[2,92],60:[2,1],61:[2,5],121:[2,10],124:[2,17],130:[2,20],133:[2,21],134:[2,22],135:[2,23],136:[2,25],137:[2,26],139:[2,29],141:[2,31],142:[2,35],143:[2,36],144:[2,38],145:[2,40],152:[2,52],153:[2,106],154:[2,107],155:[2,108],156:[2,209],157:[2,109],159:[2,112],179:[2,76],180:[2,77],181:[2,78],182:[2,79],184:[2,81],185:[2,82],190:[2,87],191:[2,88],193:[2,90],194:[2,91],195:[2,93],196:[2,94],197:[2,95],202:[2,11],203:[2,12],210:[2,113],218:[2,115],221:[2,56],222:[2,57],223:[2,60],224:[2,62],229:[2,73],230:[2,74],231:[2,75],232:[2,84],233:[2,85],234:[2,86],235:[2,98],236:[2,99],237:[2,100],243:[2,28],244:[2,144],245:[2,145],255:[2,64],256:[2,66],258:[2,68],263:[2,125],270:[2,30],274:[2,101],299:[2,102],300:[2,104],301:[2,103],302:[2,105]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -92111,25 +93114,25 @@ case 3:return 41;
 break;
 case 4:return 34;
 break;
-case 5:return 96;
+case 5:return 97;
 break;
-case 6:return 97;
+case 6:return 98;
 break;
-case 7:return 97;
+case 7:return 98;
 break;
 case 8:return 8;
 break;
 case 9:return 6;
 break;
-case 10:return 100;
+case 10:return 101;
 break;
 case 11:return 7;
 break;
 case 12:return 9;
 break;
-case 13:return 79;
+case 13:return 80;
 break;
-case 14:return 81;
+case 14:return 82;
 break;
 case 15:return 12
 break;
@@ -92143,9 +93146,9 @@ case 19:return 18
 break;
 case 20:return 19
 break;
-case 21:return 82
+case 21:return 83
 break;
-case 22:return 84
+case 22:return 85
 break;
 case 23:return 22
 break;
@@ -92161,9 +93164,9 @@ case 28:return 33
 break;
 case 29:return 32
 break;
-case 30:return 85
+case 30:return 86
 break;
-case 31:return 86
+case 31:return 87
 break;
 case 32:return 36
 break;
@@ -92171,31 +93174,31 @@ case 33:return 40
 break;
 case 34:return 42
 break;
-case 35:return 51
+case 35:return 52
 break;
-case 36:return 53
+case 36:return 54
 break;
-case 37:return 54
+case 37:return 55
 break;
-case 38:return 44
+case 38:return 45
 break;
-case 39:return 46
+case 39:return 47
 break;
-case 40:return 43
+case 40:return 44
 break;
-case 41:return 55
+case 41:return 56
 break;
-case 42:return 57;
+case 42:return 58;
 break;
-case 43:return 58
+case 43:return 43
 break;
-case 44:return 61
+case 44:return 59
 break;
 case 45:return 62
 break;
 case 46:return 63
 break;
-case 47:return 65
+case 47:return 64
 break;
 case 48:return 66
 break;
@@ -92209,62 +93212,64 @@ case 52:return 70
 break;
 case 53:return 71
 break;
-case 54:return 73
+case 54:return 72
 break;
-case 55:return 72
+case 55:return 74
 break;
-case 56:return 90
+case 56:return 73
 break;
-case 57:return 90
+case 57:return 91
 break;
 case 58:return 91
 break;
-case 59:return 91
+case 59:return 92
 break;
-case 60:return 93
+case 60:return 92
 break;
-case 61:return 93
+case 61:return 94
 break;
-case 62:return 93
+case 62:return 94
 break;
-case 63:return 30
+case 63:return 94
 break;
-case 64:return 35
+case 64:return 30
 break;
-case 65:return 77
+case 65:return 35
 break;
-case 66:return 74
+case 66:return 78
 break;
-case 67:return 78
+case 67:return 75
 break;
-case 68:return 76
+case 68:return 79
 break;
-case 69:yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); return 13;
+case 69:return 77
 break;
-case 70:return 37;
+case 70:yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); return 13;
 break;
-case 71:return 5;
+case 71:return 37;
 break;
-case 72:return 102;
+case 72:return 5;
 break;
 case 73:return 103;
 break;
-case 74:return '\\';
+case 74:return 104;
 break;
-case 75:return 27
+case 75:return '\\';
 break;
-case 76:return 59
+case 76:return 27
 break;
-case 77:return 28
+case 77:return 60
 break;
-case 78:return 56
+case 78:return 28
 break;
-case 79:return 75
+case 79:return 57
+break;
+case 80:return 76
 break;
 }
 },
-rules: [/^(?:\s+)/i,/^(?:[#].*)/i,/^(?:\/\/.*)/i,/^(?:([_A-Z0-9\/\+]+==))/i,/^(?:-?[0-9]+(\.[0-9]+)?\b)/i,/^(?:0[xX][0-9A-F]+\b)/i,/^(?:false\b)/i,/^(?:true\b)/i,/^(?:all\b)/i,/^(?:reset\b)/i,/^(?:clear\b)/i,/^(?:build\b)/i,/^(?:help\b)/i,/^(?:load\b)/i,/^(?:script\b)/i,/^(?:get\b)/i,/^(?:set\b)/i,/^(?:set_save\b)/i,/^(?:set_restore\b)/i,/^(?:set_reset\b)/i,/^(?:preset\b)/i,/^(?:add\b)/i,/^(?:rep\b)/i,/^(?:remove\b)/i,/^(?:hide\b)/i,/^(?:show\b)/i,/^(?:list\b)/i,/^(?:select\b)/i,/^(?:within\b)/i,/^(?:selector\b)/i,/^(?:mode\b)/i,/^(?:color\b)/i,/^(?:material\b)/i,/^(?:view\b)/i,/^(?:unit\b)/i,/^(?:line\b)/i,/^(?:listobj\b)/i,/^(?:removeobj\b)/i,/^(?:rotate\b)/i,/^(?:translate\b)/i,/^(?:scale\b)/i,/^(?:url\b)/i,/^(?:screenshot\b)/i,/^(?:file_list\b)/i,/^(?:file_register\b)/i,/^(?:file_delete\b)/i,/^(?:preset_add\b)/i,/^(?:preset_delete\b)/i,/^(?:preset_update\b)/i,/^(?:preset_rename\b)/i,/^(?:preset_open\b)/i,/^(?:create_scenario\b)/i,/^(?:reset_scenario\b)/i,/^(?:delete_scenario\b)/i,/^(?:add_scenario_item\b)/i,/^(?:list_scenario\b)/i,/^(?:s\b)/i,/^(?:mt\b)/i,/^(?:m\b)/i,/^(?:c\b)/i,/^(?:x\b)/i,/^(?:y\b)/i,/^(?:z\b)/i,/^(?:as\b)/i,/^(?:of\b)/i,/^(?:pdb\b)/i,/^(?:delay\b)/i,/^(?:prst\b)/i,/^(?:desc\b)/i,/^(?:((?:"([^"]*)"|'([^']*)')))/i,/^(?:([_A-Z0-9]+))/i,/^(?:$)/i,/^(?:\.)/i,/^(?:\/)/i,/^(?:\\)/i,/^(?:-e\b)/i,/^(?:-f\b)/i,/^(?:-s\b)/i,/^(?:-v\b)/i,/^(?:=)/i],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79],"inclusive":true}}
+rules: [/^(?:\s+)/i,/^(?:[#].*)/i,/^(?:\/\/.*)/i,/^(?:([_A-Z0-9\/\+]+==))/i,/^(?:-?[0-9]+(\.[0-9]+)?\b)/i,/^(?:0[xX][0-9A-F]+\b)/i,/^(?:false\b)/i,/^(?:true\b)/i,/^(?:all\b)/i,/^(?:reset\b)/i,/^(?:clear\b)/i,/^(?:build\b)/i,/^(?:help\b)/i,/^(?:load\b)/i,/^(?:script\b)/i,/^(?:get\b)/i,/^(?:set\b)/i,/^(?:set_save\b)/i,/^(?:set_restore\b)/i,/^(?:set_reset\b)/i,/^(?:preset\b)/i,/^(?:add\b)/i,/^(?:rep\b)/i,/^(?:remove\b)/i,/^(?:hide\b)/i,/^(?:show\b)/i,/^(?:list\b)/i,/^(?:select\b)/i,/^(?:within\b)/i,/^(?:selector\b)/i,/^(?:mode\b)/i,/^(?:color\b)/i,/^(?:material\b)/i,/^(?:view\b)/i,/^(?:unit\b)/i,/^(?:line\b)/i,/^(?:listobj\b)/i,/^(?:removeobj\b)/i,/^(?:rotate\b)/i,/^(?:translate\b)/i,/^(?:scale\b)/i,/^(?:url\b)/i,/^(?:screenshot\b)/i,/^(?:dssp\b)/i,/^(?:file_list\b)/i,/^(?:file_register\b)/i,/^(?:file_delete\b)/i,/^(?:preset_add\b)/i,/^(?:preset_delete\b)/i,/^(?:preset_update\b)/i,/^(?:preset_rename\b)/i,/^(?:preset_open\b)/i,/^(?:create_scenario\b)/i,/^(?:reset_scenario\b)/i,/^(?:delete_scenario\b)/i,/^(?:add_scenario_item\b)/i,/^(?:list_scenario\b)/i,/^(?:s\b)/i,/^(?:mt\b)/i,/^(?:m\b)/i,/^(?:c\b)/i,/^(?:x\b)/i,/^(?:y\b)/i,/^(?:z\b)/i,/^(?:as\b)/i,/^(?:of\b)/i,/^(?:pdb\b)/i,/^(?:delay\b)/i,/^(?:prst\b)/i,/^(?:desc\b)/i,/^(?:((?:"([^"]*)"|'([^']*)')))/i,/^(?:([_A-Z0-9]+))/i,/^(?:$)/i,/^(?:\.)/i,/^(?:\/)/i,/^(?:\\)/i,/^(?:-e\b)/i,/^(?:-f\b)/i,/^(?:-s\b)/i,/^(?:-v\b)/i,/^(?:=)/i],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80],"inclusive":true}}
 });
 return lexer;
 })();

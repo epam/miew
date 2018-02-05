@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.12] - 2018-02-05
+### Added
+- Add `Miew#exportCML()` method to retrieve a CML contents (including modified atom coordiantes) if
+  a CML file was loaded.
+- Add a secondary structure assignment routine: `Miew#dssp()` method and `dssp` script command.
+  Available from UI too.
+
+### Changed
+- Automatic bonding uses a faster approach (voxel grid).
+
+### Fixed
+- Fix a crash in library when TextMode is used.
+- Fix a couple of bugs with parameters of surface modes in UI.
+
 ## [0.7.11] - 2018-01-17
 ### Fixed
 - Fixed a loading error in IE11 when a relative URL is used.
@@ -199,7 +213,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.11...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.12...HEAD
+[0.7.12]: https://github.com/epam/miew/compare/v0.7.11...v0.7.12
 [0.7.11]: https://github.com/epam/miew/compare/v0.7.10...v0.7.11
 [0.7.10]: https://github.com/epam/miew/compare/v0.7.9...v0.7.10
 [0.7.9]: https://github.com/epam/miew/compare/v0.7.8...v0.7.9
