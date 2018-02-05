@@ -682,6 +682,7 @@ Menu.prototype._copyCurReprListItem = function(index) {
   var validReprN = reprList.find('.panel.valid').length;
   selector.html('#' + String(validReprN) + header.substring(header.indexOf(':')));
 
+  // recreate bootstrapswitch param (note: cloning of bootstrapswitch doesn't work)
   var zClipState = curSelector.find('[type=checkbox][data-toggle=zClip]')[0].checked;
   var qSurfParamSelector = reprList.find('.panel:eq(' + index + ') [data-type=surf-param-zclip]');
   qSurfParamSelector.empty();
@@ -698,6 +699,12 @@ Menu.prototype._copyCurReprListItem = function(index) {
     })
   ));
   reprList.find('.panel:eq(' + index + ') input[type=checkbox]').bootstrapSwitch('state', zClipState);
+
+  const isoValue = curSelector.find('[data-type=iso]').val();
+  reprList.find('.panel:eq(' + index + ') [data-type=iso]').val(isoValue);
+
+  const radScale = curSelector.find('[data-type=rad]').val();
+  reprList.find('.panel:eq(' + index + ') [data-type=rad]').val(radScale);
 
   self._initReprListItemListeners(index);
 };
