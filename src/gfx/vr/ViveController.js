@@ -21,7 +21,6 @@ export default class ViveController extends  THREE.Object3D {
     this.contrId = id;
   }
 
-
   getGamepad() {
     return this.gamepad;
   }
@@ -39,15 +38,9 @@ export default class ViveController extends  THREE.Object3D {
   findGamepad(id) {
     // Iterate across gamepads as Vive Controllers may not be
     // in position 0 and 1.
-
-    var gamepads = navigator.getGamepads && navigator.getGamepads();
-    //console.log(gamepads);
-
-    for (var i = 0, j = 0; i < gamepads.length; i++) {
-
-      var gpad = gamepads[i];
-      //console.log(`${i}: ${gpad} id: ${gpad.id}`);
-
+    const gamepads = navigator.getGamepads && navigator.getGamepads();
+    for (let i = 0, j = 0; i < gamepads.length; i++) {
+      const gpad = gamepads[i];
       if (gpad && (gpad.id === 'OpenVR Gamepad' || gpad.id.startsWith('Oculus Touch') ||
           gpad.id.startsWith('Spatial Controller'))) {
         if (j === id) {
@@ -68,8 +61,7 @@ export default class ViveController extends  THREE.Object3D {
       }
 
       //  Position and orientation.
-      var pose = this.gamepad.pose;
-
+      const pose = this.gamepad.pose;
       if (pose.position !== null) this.position.fromArray(pose.position);
       if (pose.orientation !== null) this.quaternion.fromArray(pose.orientation);
       this.matrix.compose(this.position, this.quaternion, this.scale);

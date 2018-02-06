@@ -42,8 +42,8 @@ import EventDispatcher from './utils/EventDispatcher';
 import logger from './utils/logger';
 import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
-import webvr from './gfx/vr/WebVR';
-import ViveController from './gfx/vr/ViveController';
+import WebVRPoC from './gfx/vr/WebVRPoC';
+
 //////////////////////////////////////////////////////////////////////////////
 
 var
@@ -401,7 +401,6 @@ Miew.prototype._initGfx = function() {
     settings.now.camNear, settings.now.camFar
   );
 
-  this._webVRWorld = new gfxutils.RCGroup();
   gfx.root = new gfxutils.RCGroup();
   gfx.scene.add(gfx.root);
 
@@ -525,7 +524,14 @@ Miew.prototype._initGfx = function() {
 
   this._gfx = gfx;
   this._showCanvas();
-  this._toggleWebVR(settings.now.stereo === 'WEBVR');
+
+  if (settings.now.stereo === 'WEBVR') {
+    this.webVR = new WebVRPoC(() => {
+      this._needRender = true;
+      this._onResize();
+    });
+    this.webVR.toggle(true, gfx);
+  }
 
   this._container.appendChild(gfx.renderer2d.getElement());
 
@@ -757,7 +763,7 @@ Miew.prototype.run = function() {
 
     this._objectControls.enable(true);
 
-    const device = this._getWebVRDevice();
+    const device = this.webVR ? this.webVR.getDevice() : null;
     (device || window).requestAnimationFrame(() => this._onTick());
   }
 };
@@ -843,7 +849,7 @@ Miew.prototype._onTick = function() {
 
   this._fps.update();
 
-  const device = this._getWebVRDevice();
+  const device = this.webVR ? this.webVR.getDevice() : null;
   (device || window).requestAnimationFrame(() => this._onTick());
 
   this._onUpdate();
@@ -851,203 +857,6 @@ Miew.prototype._onTick = function() {
     this._onRender();
     this._needRender = !settings.now.suspendRender || settings.now.stereo === 'WEBVR' || !!device;
   }
-};
-
-/**
- * Turn the WebVR when it is supported
- * NOTE: we toggle using button.click, because VRDisplay.requestPresent should be called from user gesture
- */
-Miew.prototype._toggleWebVR = (function() {
-
-  const _mainCamera = new THREE.PerspectiveCamera();
-  let _cameraWasStored = false;
-  let _webVRButton = null;
-
-  let _webVRUser = new gfxutils.RCGroup();
-
-  const _controller1 = new ViveController(0);
-  const _controller2 = new ViveController(1);
-
-  // visualize controllers with cylinders
-  const geometry = new THREE.CylinderGeometry(0.05, 0.05, 0.4);
-  const material = new UberMaterial({lights: false, overrideColor: true});
-  material.setUberOptions({fixedColor: new THREE.Color(0x4444ff)});
-  material.updateUniforms();
-  const cylinder1 = new THREE.Mesh(geometry, material);
-  cylinder1.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
-  _controller1.add(cylinder1);
-  const cylinder2 = new THREE.Mesh(geometry, material);
-  cylinder2.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
-  _controller2.add(cylinder2);
-
-  return function(enable) {
-    const self = this;
-    const gfx = self._gfx;
-    this._pressedGripsCounter = 0;
-    const  renderer = gfx ? gfx.renderer : null;
-    if (!renderer) {
-      throw new Error('No renderer is available to toggle WebVR');
-    } else if (!gfx.camera) {
-      throw new Error('No camera is available to toggle WebVR');
-    }
-
-    self._distance = 0;
-    self._scalingPivot = new THREE.Object3D();
-
-    function startScalingByControllers() {
-
-      self._distance = self._controller1.position.distanceTo(self._controller2.position);
-      gfxutils.getMiddlePoint(self._controller1.position, self._controller2.position, self._scalingPivot.position);
-      // reset scale
-      self._scalingPivot.scale.set(1, 1, 1);
-      self._scalingPivot.updateMatrix();
-      self._scalingPivot.updateMatrixWorld();
-      // link pivot to user
-      self._controller1.parent.add(self._scalingPivot);
-      // link molecule to pivot
-      self._scalingPivot.addSavingWorldTransform(self._webVRWorld);
-    }
-
-    function stopScalingByControllers() {
-      gfx.scene.addSavingWorldTransform(self._webVRWorld);
-    }
-
-    function handleGripsDown(event) {
-      self._pressedGripsCounter++;
-      console.log(`grips count ${self._pressedGripsCounter}`);
-      if (self._pressedGripsCounter === 2) {
-        gfx.scene.addSavingWorldTransform(self._webVRWorld);
-        startScalingByControllers();
-      } else if (self._pressedGripsCounter === 1) {
-        event.target.addSavingWorldTransform(self._webVRWorld);
-      }
-    }
-
-    function handleGripsUp(event) {
-      self._pressedGripsCounter--;
-      console.log(`grips count ${self._pressedGripsCounter}`);
-      if (self._pressedGripsCounter === 1) {
-        stopScalingByControllers();
-        // reattach molecule to other controller
-        const anotherController = event.target === self._controller1 ? self._controller2 : self._controller1;
-        anotherController.addSavingWorldTransform(self._webVRWorld);
-      } else if (self._pressedGripsCounter === 0) {
-        gfx.scene.addSavingWorldTransform(self._webVRWorld);
-      }
-    }
-
-    _controller1.addEventListener('gripsdown', handleGripsDown);
-    _controller1.addEventListener('gripsup', handleGripsUp);
-    _controller2.addEventListener('gripsdown', handleGripsDown);
-    _controller2.addEventListener('gripsup', handleGripsUp);
-
-    if (enable) {
-      // store common camera
-      _mainCamera.copy(gfx.camera);
-      _cameraWasStored = true;
-      // enable vr in renderer
-      renderer.vr.enabled = true;
-      if (!_webVRButton) {
-        _webVRButton = webvr.createButton(this);
-        document.body.appendChild(_webVRButton);
-      } else {
-        _webVRButton.style.display = 'block';
-      }
-      // add hierarchical structure for webVR into scene
-      if (_webVRUser) {
-        gfx.scene.add(_webVRUser);
-        _webVRUser.add(gfx.camera);
-        if (_controller1) _webVRUser.add(_controller1);
-        if (_controller2) _webVRUser.add(_controller2);
-        self._controller1 = _controller1; // TODO rewrite
-        self._controller2 = _controller2;
-      }
-
-      self.settings.now.fog = false;
-      //turn on webvr transformation
-      gfx.scene.add(self._webVRWorld);
-      self._webVRWorld.add(gfx.root);
-
-    } else {
-      //disable vr
-      renderer.vr.enabled = false;
-      if (_webVRButton) {
-        _webVRButton.style.display = 'none';
-      }
-      // restore common camera
-      if (_cameraWasStored) {
-        gfx.camera.copy(_mainCamera);
-        self._onResize();
-      }
-      self.settings.now.fog = true;
-      //turn off webvr transformation
-      const root = self._webVRWorld.children[0];
-      if (root) gfx.scene.add(root);
-      self._webVRWorld.parent = null;
-      if (_webVRUser) {
-        gfx.scene.remove(_webVRUser);
-        _webVRUser.parent = null;
-        _webVRUser.remove(gfx.camera);
-      }
-    }
-    self._needRender = true;
-  };
-}());
-
-Miew.prototype._updateMoleculeScaleWebVR = function() {
-  if (!this._controller1 || !this._controller2) {
-    return;
-  }
-  this._controller1.update();
-  this._controller2.update();
-
-  const self = this;
-
-  function updateScalingByControllers() {
-    // recalc scaling pivot
-    gfxutils.getMiddlePoint(self._controller1.position, self._controller2.position, self._scalingPivot.position);
-    // recalc scaler
-    const dist = self._controller1.position.distanceTo(self._controller2.position);
-    const scaler = dist / self._distance;
-    self._scalingPivot.scale.multiplyScalar(scaler);
-    // save cur distance for next frame
-    self._distance = dist;
-  }
-
-  if (self._pressedGripsCounter === 2) {
-    updateScalingByControllers();
-  }
-};
-
-Miew.prototype._repositionMoleculeForWebVR = function(gfx, _matWorld) {
-  gfx = gfx || this._gfx;
-  const device = this._getWebVRDevice(gfx.renderer);
-  let camDir = new THREE.Vector3(0, 0, -1); //FIXME get from camera
-  let pose;
-
-  if (device.pose) {  // WebVR emulation
-    pose = device.pose;
-  } else if (device.getFrameData) {  // WebVR
-    let frameData = new VRFrameData();
-    device.getFrameData(frameData);
-    pose = frameData.pose;
-  } else {
-    return;
-  }
-  const orient = pose.orientation;
-  const quaternion = new THREE.Quaternion(orient[0], orient[1], orient[2], orient[3]);
-  camDir.applyQuaternion(quaternion);
-  if (pose.position === null) {
-    this.logger.warn('VRDisplay cannot provide its position. Be sure VRDisplay is detected by sensors');
-  }
-  const pos = pose.position || [0, 0, 0];
-  this._webVRWorld.position.fromArray(pos);
-  this._webVRWorld.position.addScaledVector(camDir, 1.3);
-};
-
-Miew.prototype._getWebVRDevice = function(renderer) {
-  const vr = this._gfx.renderer.vr || renderer.vr;
-  return (vr && vr.enabled) ? vr.getDevice() : null;
 };
 
 Miew.prototype._getBSphereRadius = function() {
@@ -1097,7 +906,7 @@ Miew.prototype._onUpdate = function() {
   this._updateFog();
 
   if (this._gfx.renderer.vr.enabled) {
-    this._updateMoleculeScaleWebVR();
+    this.webVR.updateMoleculeScale();
   }
 };
 
@@ -3320,7 +3129,15 @@ Miew.prototype._onSettingsChanged = function(changes) {
       'Autoresolution should be set during miew startup.');
   }
   if (changes.stereo) {
-    this._toggleWebVR(changes.stereo === 'WEBVR');
+    if (changes.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
+      this.webVR = new WebVRPoC(() => {
+        this._needRender = true;
+        this._onResize();
+      });
+    }
+    if (this.webVR) {
+      this.webVR.toggle(changes.stereo === 'WEBVR', this._gfx);
+    }
   }
   this._needRender = true;
 };
