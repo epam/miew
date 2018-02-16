@@ -1,8 +1,11 @@
+/* stylelint-disable no-descending-specificity */
+
 //////////////////////////////////////////////////////////////////////////////
 // Full-page web application
 //////////////////////////////////////////////////////////////////////////////
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   background-color: #202020;
@@ -21,7 +24,7 @@ $titlebar-gray: 64;
 $titlebar-alpha: 0.75;
 $titlebar-height: 40px;
 $back-gray: 32;
-$menu-gray: $titlebar-alpha * $titlebar-gray + (1.0 - $titlebar-alpha) * $back-gray;
+$menu-gray: $titlebar-alpha * $titlebar-gray + (1 - $titlebar-alpha) * $back-gray;
 $selection-panel-row-height: 42px;
 
 .mode-message {
@@ -33,7 +36,8 @@ $selection-panel-row-height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.0;
+  opacity: 0;
+
   p {
     margin: 0;
     text-align: center;
@@ -51,10 +55,12 @@ $selection-panel-row-height: 42px;
   background-color: #333;
   padding-top: 10px;
   font-weight: bold;
+
   p {
     color: yellow;
     margin: 0;
   }
+
   pre {
     margin: 0;
     border-radius: 0;
@@ -74,7 +80,8 @@ $selection-panel-row-height: 42px;
   display: flex;
   align-items: left;
   justify-content: left;
-  opacity: 0.0;
+  opacity: 0;
+
   p {
     margin: 10px;
     text-align: left;
@@ -88,19 +95,29 @@ $selection-panel-row-height: 42px;
 .dg.ac {
   top: $titlebar-height !important;
 }
+
 .dg.a {
   margin-right: 0 !important;
 }
+
 .dg input {
   line-height: normal;
 }
+
 .blur {
   filter: blur(10px);
 }
+
 #miew-menu {
   // TODO: add other selector combinations (see btn-default in bootstrap.css)
-  .btn-titlebar, .btn-titlebar:hover, .btn-titlebar.hover, .btn-titlebar:focus,
-  .btn-titlebar.active, .btn-titlebar.active:hover, .btn-titlebar.active.hover, .btn-titlebar.active:focus {
+  .btn-titlebar,
+  .btn-titlebar:hover,
+  .btn-titlebar.hover,
+  .btn-titlebar:focus,
+  .btn-titlebar.active,
+  .btn-titlebar.active:hover,
+  .btn-titlebar.active.hover,
+  .btn-titlebar.active:focus {
     background-color: transparent;
     color: $titlebar-color;
     border: none;
@@ -110,10 +127,6 @@ $selection-panel-row-height: 42px;
     outline-color: rgba($titlebar-gray, $titlebar-gray, $titlebar-gray, $titlebar-alpha);
     // font-size: larger;
   }
-
-
-
-
 
   .btns-miew-titlebar-left {
     position: absolute;
@@ -140,8 +153,9 @@ $selection-panel-row-height: 42px;
 
     .tooltip-inner {
       color: #383838;
-      background-color: #eeeeee;
+      background-color: #eee;
     }
+
     .tooltip-arrow {
       display: none;
     }
@@ -168,7 +182,7 @@ $selection-panel-row-height: 42px;
       padding: 0;
       margin: 0;
       max-width: 626px;
-      background-color: #eeeeee;
+      background-color: #eee;
 
       .row {
         display: flex;
@@ -178,7 +192,7 @@ $selection-panel-row-height: 42px;
         margin: 0;
 
         .thumbnail {
-          background-color: #eeeeee;
+          background-color: #eee;
           color: #ccc;
           border: hidden;
 
@@ -191,15 +205,15 @@ $selection-panel-row-height: 42px;
             padding: 0;
             margin-top: 5px;
           }
-
         }
 
         .thumbnail.active {
           .caption {
-            color: #ffffff;
+            color: #fff;
             background-color: #337ab7;
           }
         }
+
         h5 {
           color: #333;
           font-weight: 700;
@@ -217,7 +231,7 @@ $selection-panel-row-height: 42px;
     font-weight: 500;
   }
 
-  .blog-nav .active:after {
+  .blog-nav .active::after {
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -229,7 +243,7 @@ $selection-panel-row-height: 42px;
     border-right: 5px solid transparent;
     border-bottom: 5px solid;
     border-left: 5px solid transparent;
-    color: #eeeeee;
+    color: #eee;
   }
 
   .main-menu {
@@ -252,7 +266,8 @@ $selection-panel-row-height: 42px;
       padding: 0;
     }
 
-    .row:before, .row:after {
+    .row::before,
+    .row::after {
       display: none;
     }
 
@@ -264,7 +279,6 @@ $selection-panel-row-height: 42px;
     input[type=number] {
       -moz-appearance: textfield;
     }
-
   }
 
   .panel-menu {
@@ -273,8 +287,9 @@ $selection-panel-row-height: 42px;
     // border-color: #aaa;
     // border-radius: 0;
     border: none;
-    background-color: #eeeeee;
+    background-color: #eee;
     height: 100%;
+
     .panel-heading {
       border-radius: 0;
       border: none;
@@ -282,12 +297,14 @@ $selection-panel-row-height: 42px;
       height: $titlebar-height;
       background-color: rgb($menu-gray, $menu-gray, $menu-gray);
       color: silver;
+
       .panel-title {
         padding: ($titlebar-height - 17px) / 2;
         font-weight: bold;
         text-align: center;
       }
     }
+
     .panel-body {
       height: calc(100% - #{$titlebar-height});
       overflow: auto;
@@ -307,6 +324,7 @@ $selection-panel-row-height: 42px;
         padding-right: 5px;
       }
     }
+
     .list-group {
       padding: 0;
     }
@@ -326,13 +344,16 @@ $selection-panel-row-height: 42px;
 
   .panel-dark {
     background-color: rgb($menu-gray, $menu-gray, $menu-gray);
+
     .list-group {
       border: none;
+
       .list-group-item {
         background-color: rgb($menu-gray, $menu-gray, $menu-gray);
         color: silver;
         border: none;
       }
+
       .list-group-item.active {
         background-color: #eee;
         color: rgb($menu-gray, $menu-gray, $menu-gray);
@@ -344,6 +365,7 @@ $selection-panel-row-height: 42px;
     color: rgb($menu-gray, $menu-gray, $menu-gray);
     background-color: transparent;
   }
+
   .miew-menu-panel-tooltips > .tooltip > .tooltip-arrow {
     display: none;
   }
@@ -357,6 +379,7 @@ $selection-panel-row-height: 42px;
       display: flex;
       margin: 0;
       height: calc(7 * #{$selection-panel-row-height});
+
       .column {
         padding: 0 2px;
 
@@ -370,14 +393,17 @@ $selection-panel-row-height: 42px;
         .list-group {
           height: calc(7 * #{$selection-panel-row-height});
           overflow: auto;
+
           .list-group-item {
             height: $selection-panel-row-height;
           }
+
           .list-group-item.frequent {
             // font-weight: bold; // FIXME: enable when there are any non-frequent words ;)
           }
         }
       }
+
       .calc {
         margin-top: $selection-panel-row-height;
 
@@ -387,31 +413,33 @@ $selection-panel-row-height: 42px;
           padding-right: 3px;
           text-align: center;
           vertical-align: middle;
-          background: linear-gradient(to top, #eeeeee, #f9f9f9);
+          background: linear-gradient(to top, #eee, #f9f9f9);
         }
 
         .btn-calc.digit {
-          background: linear-gradient(to top, #f1f1f1, #ffffff);
+          background: linear-gradient(to top, #f1f1f1, #fff);
         }
+
         .btn-calc.char {
-          background: linear-gradient(to top, #f1f1f1, #ffffff);
+          background: linear-gradient(to top, #f1f1f1, #fff);
         }
       }
     }
   }
 
- [data-modal-type=miew-menu-modal-rename-preset] {
+  [data-modal-type=miew-menu-modal-rename-preset] {
     input[type=text] {
       border-width: 0;
       width: 100%;
     }
+
     input[type=text]:focus {
       outline: none;
       border-width: 0;
     }
   }
 
-  .miew-menu-btns-preset-edit .btn{
+  .miew-menu-btns-preset-edit .btn {
     margin-left: 4px;
     border: none;
     color: #337ab7;
@@ -457,6 +485,7 @@ $selection-panel-row-height: 42px;
     .panel-heading.active {
       background-color: #337ab7;
       color: #fff;
+
       .pseudo-div .badge {
         background-color: #fff;
         color: #337ab7;
@@ -468,11 +497,13 @@ $selection-panel-row-height: 42px;
       }
     }
 
-    .spinner-inc-btn, .spinner-dec-btn {
+    .spinner-inc-btn,
+    .spinner-dec-btn {
       width: auto;
       height: auto;
       padding: 1px 2px;
     }
+
     input[type=number] {
       width: 32px;
       height: auto;
@@ -491,15 +522,18 @@ $selection-panel-row-height: 42px;
         padding: 0;
       }
     }
+
     [data-value=miew-menu-panel-uniform-color] {
       span.pull-right {
         display: flex;
       }
     }
+
     [data-value=miew-menu-panel-selection] {
       display: flex;
       flex-wrap: nowrap;
       justify-content: space-between;
+
       span.pull-right {
         margin-left: 15px;
         display: flex;
@@ -543,12 +577,13 @@ $selection-panel-row-height: 42px;
 
   .checkbox-background {
     .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
-      color: #EEEEEE;
+      color: #eee;
       background-color: #383838;
     }
+
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default {
       color: #383838;
-      background-color: #EEEEEE;
+      background-color: #eee;
     }
   }
 
@@ -557,12 +592,13 @@ $selection-panel-row-height: 42px;
   }
 }
 
-.terminal, .cmd {
-  background-color: transparent!important;
+.terminal,
+.cmd {
+  background-color: transparent !important;
 }
 
 .miew-terminal {
-  position:fixed;
+  position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
@@ -577,14 +613,15 @@ $selection-panel-row-height: 42px;
 }
 
 .miew-terminal-body {
-  display:block;
+  display: block;
   height: 100%;
-  border: 1px solid #444444;
-  background:rgba(0,0,0,0.75);
+  border: 1px solid #444;
+  background: rgba(0, 0, 0, 0.75);
 }
 
-.miew-configured-pdb-list-action, .miew-configured-pdb-list-item-action {
-  color: #337AB7;
+.miew-configured-pdb-list-action,
+.miew-configured-pdb-list-item-action {
+  color: #337ab7;
   cursor: pointer;
 }
 
@@ -596,14 +633,11 @@ $selection-panel-row-height: 42px;
   color: white;
 }
 
-.miew-pdb-item {
-
-}
-
 @keyframes rotating {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -614,15 +648,15 @@ $selection-panel-row-height: 42px;
 }
 
 .toast-error {
-  background-color: #B22746;
+  background-color: #b22746;
 }
 
 .toast-warning {
-  background-color: #F8AA02;
+  background-color: #f8aa02;
 }
 
 .toast-info {
-  background-color: #39C2D7;
+  background-color: #39c2d7;
 }
 
 .toast-top-right {
@@ -630,7 +664,7 @@ $selection-panel-row-height: 42px;
   right: 6px;
 }
 
-#toast-container>div {
+#toast-container > div {
   opacity: 0.9;
   box-shadow: none;
   -webkit-box-shadow: none;
@@ -641,5 +675,5 @@ $selection-panel-row-height: 42px;
 .toolbar-thumb {
   width: 96px;
   height: 96px;
-  box-shadow: inset 0 0 0 4px rgba(0,0,0,0.75);
+  box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.75);
 }
