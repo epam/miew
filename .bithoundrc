@@ -11,12 +11,5 @@
   ],
   "test": [
     "test/**"
-  ],
-  "dependencies": {
-    "mute": [
-      "gulp-mocha",
-
-      "gulp-insert"
-    ]
-  }
+  ]
 }

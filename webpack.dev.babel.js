@@ -10,6 +10,7 @@ export default webpackMerge(webpackCommon, {
     publicPath: '/',
     compress: true,
     clientLogLevel: 'info',
+    overlay: true,
     stats: {
       assets: false,
       colors: true,
