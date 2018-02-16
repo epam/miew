@@ -57,17 +57,14 @@ number consists of several parts, e.g. `0.7.10+20171225.164646.68e4556`:
 
 First, prepare your development environment. Ensure that you installed [git] and [Node.js].
 You are also encouraged to use [Yarn] package manager to guarantee that package versions are
-consistent across all build machines. [Gulp.js] v3 is used as a task manager.
+consistent across all build machines. [NPM scripts] are used to perform development tasks.
 
 [git]: https://git-scm.com/
 [Node.js]: https://nodejs.org/
 [Yarn]: https://yarnpkg.com/
-[Gulp.js]: http://gulpjs.com/
+[NPM scripts]: https://docs.npmjs.com/misc/scripts/
 
 ```sh
-# install gulp
-yarn global add gulp-cli 
-
 # grab the project
 git clone git@github.com:epam/miew.git
 cd miew
@@ -76,10 +73,10 @@ cd miew
 yarn
 
 # execute the full build pipeline
-gulp
+npm run ci
 
 # run the demo application
-gulp serve
+npm run demo
 ```
 
 
@@ -125,14 +122,14 @@ git checkout -b hotfix/great-fix-whatever -t origin/master
 yarn
 
 # start development server, with in-memory builds and live reload
-gulp serve:webpack
+npm start
 ```
 
 Before you commit and push, please ensure that the build is not broken:
-  - Run the full build pipeline using `gulp` command, it includes code linting and unit tests.
-  - Verify that the demo application is working as expected (run `gulp serve`).
+  - Run the full build pipeline using `npm run ci` command, it includes code linting and unit tests.
+  - Verify that the demo application is working as expected (`npm run demo`).
   - Check that examples for the library are working (see `build/examples/`).
-  - It is also a good idea to run the graphics regression tests (run `gulp test:e2e`).
+  - It is also a good idea to run the graphics regression tests (`npm run test:e2e`, `npm run show:e2e`).
     Unfortunately, some tests fail yet.
 
 
@@ -161,7 +158,7 @@ git fetch upstream
 git rebase upstream/master
 
 # lint, test and build
-gulp
+npm run ci
 
 # run automated and manual tests, etc.
 ...

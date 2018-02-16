@@ -10,11 +10,10 @@ init:
   - git config --global core.autocrlf true
 install:
   - ps: Install-Product node $env:nodejs_version
-  - yarn global add gulp-cli
   - yarn install
 test_script:
-  - node --version && gulp --version
-  - gulp
+  - node --version
+  - npm run ci
 build: off
 notifications:
   - provider: Slack

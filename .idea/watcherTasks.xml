@@ -1,39 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ProjectTasksOptions" suppressed-tasks="Babel">
-    <TaskOptions isEnabled="false">
-      <option name="arguments" value="$FileName$ $FileNameWithoutExtension$.css --source-map $FileNameWithoutExtension$.css.map" />
-      <option name="checkSyntaxErrors" value="true" />
-      <option name="description" value="Compiles .scss files into .css files" />
-      <option name="exitCodeBehavior" value="ERROR" />
-      <option name="fileExtension" value="scss" />
-      <option name="immediateSync" value="false" />
-      <option name="name" value="SCSS" />
-      <option name="output" value="$FileNameWithoutExtension$.css" />
-      <option name="outputFilters">
-        <array />
-      </option>
-      <option name="outputFromStdout" value="false" />
-      <option name="program" value="$ProjectFileDir$/node_modules/.bin/node-sass.cmd" />
-      <option name="scopeName" value="Project Files" />
-      <option name="trackOnlyRoot" value="true" />
-      <option name="workingDir" value="$FileDir$" />
-      <envs />
-    </TaskOptions>
     <TaskOptions isEnabled="true">
-      <option name="arguments" value="tools:jison --file=$FilePath$" />
+      <option name="arguments" value="run jison:one -- $FileRelativePath$" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />
       <option name="exitCodeBehavior" value="ERROR" />
       <option name="fileExtension" value="*" />
       <option name="immediateSync" value="false" />
-      <option name="name" value="Gulp Jison" />
-      <option name="output" value="$FileNameWithoutExtension$.js" />
+      <option name="name" value="Jison" />
+      <option name="output" value="$FileRelativeDir$\$FileNameWithoutExtension$.js" />
       <option name="outputFilters">
         <array />
       </option>
       <option name="outputFromStdout" value="false" />
-      <option name="program" value="gulp.cmd" />
+      <option name="program" value="npm.cmd" />
+      <option name="runOnExternalChanges" value="true" />
       <option name="scopeName" value="Jison files" />
       <option name="trackOnlyRoot" value="false" />
       <option name="workingDir" value="$ProjectFileDir$" />

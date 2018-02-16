@@ -16,7 +16,7 @@ Copyright (c) 2015–2017 [EPAM Systems, Inc.](https://www.epam.com/)
 Miew is a high performance web tool for advanced visualization and manipulation of molecular
 structures.
 
-![Miew - 3D Molecular Viewer](docs/demo.png)
+![Screenshot](README.png)
 
 It provides a full-featured set of tools for 3D visualization and editing of small molecules as
 well as large molecular complexes, including means to view, analyze, and modify the 3D structure
