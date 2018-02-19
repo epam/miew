@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.12 Copyright (c) 2015-2018 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.13 Copyright (c) 2015-2018 EPAM Systems, Inc. */
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -8,25 +8,11 @@
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-function commonjsRequire () {
-	throw new Error('Dynamic requires are not currently supported by rollup-plugin-commonjs');
-}
-
-
-
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
 var lodash = createCommonjsModule(function (module, exports) {
-/**
- * @license
- * Lodash <https://lodash.com/>
- * Copyright JS Foundation and other contributors <https://js.foundation/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
 (function() {
 
   /** Used as a safe reference for `undefined` in pre-ES5 environments. */
@@ -53333,8 +53319,6 @@ Object.assign( Font.prototype, {
 								cpx0 = laste.x;
 								cpy0 = laste.y;
 
-								
-
 							}
 
 							break;
@@ -53356,8 +53340,6 @@ Object.assign( Font.prototype, {
 
 								cpx0 = laste.x;
 								cpy0 = laste.y;
-
-								
 
 							}
 
@@ -60951,8 +60933,6 @@ function CanvasRenderer() {
 }
 
 
-
-
 var THREE = Object.freeze({
 	WebGLRenderTargetCube: WebGLRenderTargetCube,
 	WebGLRenderTarget: WebGLRenderTarget,
@@ -61594,7 +61574,6 @@ function convertOffset(x, y, degrees) {
 /**
  * This class introduces the simplest event system.
  */
-
 function isUndefOrEqual(param, value) {
   return !param || param === value;
 }
@@ -61671,12 +61650,6 @@ EventDispatcher$1.prototype.dispatchEvent = function (event) {
   });
 };
 
-/**
- * This module contains class for logging.
- * Returns an instance of a logger that have already been created.
- * Allows users to log messages for five different levels,
- * enable console output and catch signal on each message.
- */
 var logLevels = {
   debug: 0,
   info: 1,
@@ -62432,16 +62405,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
-
-
-
-
-
-
-
-
-
-
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -62466,10 +62429,6 @@ var createClass = function () {
   };
 }();
 
-
-
-
-
 var defineProperty = function (obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -62484,8 +62443,6 @@ var defineProperty = function (obj, key, value) {
 
   return obj;
 };
-
-
 
 var inherits = function (subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
@@ -62503,16 +62460,6 @@ var inherits = function (subClass, superClass) {
   if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 };
 
-
-
-
-
-
-
-
-
-
-
 var possibleConstructorReturn = function (self, call) {
   if (!self) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -62520,10 +62467,6 @@ var possibleConstructorReturn = function (self, call) {
 
   return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
-
-
-
-
 
 var slicedToArray = function () {
   function sliceIterator(arr, i) {
@@ -62562,18 +62505,6 @@ var slicedToArray = function () {
     }
   };
 }();
-
-
-
-
-
-
-
-
-
-
-
-
 
 var toConsumableArray = function (arr) {
   if (Array.isArray(arr)) {
@@ -64073,7 +64004,6 @@ Element.getByName = function (element) {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Atom measurements.
@@ -64749,7 +64679,6 @@ function _addParam(param, list) {
 _addParam('hydrophobicity', hydro);
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 var cNucleicControlNames = ['C3\'', 'C3*', 'P', 'H5T', 'H3T'];
 var cNucleicWing1Names = ['OP1', 'O1P'];
@@ -65022,7 +64951,6 @@ Residue.prototype._finalize = function () {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Residue chain.
@@ -65171,7 +65099,6 @@ Chain.prototype.collectMask = function () {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Helical secondary structure of a protein.
@@ -65230,7 +65157,6 @@ Helix.prototype._finalize = function (residueHash, complex) {
   this._end = residueHash[this._end];
 };
 
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -65306,7 +65232,6 @@ Strand.prototype._finalize = function (serialAtomMap, residueHash, complex) {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Sheet secondary structure of a protein.
@@ -65354,7 +65279,6 @@ Sheet.prototype._finalize = function (serialAtomMap, residueHash, complex) {
   }
 };
 
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -65450,989 +65374,698 @@ SGroup.prototype.buildChemicalFormula = function (complex, part) {
   return formula;
 };
 
-var empty = {};
+/* eslint-disable */
+// DO NOT EDIT! Automatically generated from .jison
+/* parser generated by jison 0.4.18 */
+/*
+  Returns a Parser object of the following structure:
 
-
-var empty$1 = Object.freeze({
-	default: empty
-});
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// resolves . and .. elements in a path array with directory names there
-// must be no slashes, empty elements, or device names (c:\) in the array
-// (so also no leading and trailing slashes - it does not distinguish
-// relative and absolute paths)
-function normalizeArray(parts, allowAboveRoot) {
-  // if the path tries to go above the root, `up` ends up > 0
-  var up = 0;
-  for (var i = parts.length - 1; i >= 0; i--) {
-    var last = parts[i];
-    if (last === '.') {
-      parts.splice(i, 1);
-    } else if (last === '..') {
-      parts.splice(i, 1);
-      up++;
-    } else if (up) {
-      parts.splice(i, 1);
-      up--;
-    }
+  Parser: {
+    yy: {}
   }
 
-  // if the path is allowed to go above the root, restore leading ..s
-  if (allowAboveRoot) {
-    for (; up--; up) {
-      parts.unshift('..');
-    }
-  }
+  Parser.prototype: {
+    yy: {},
+    trace: function(),
+    symbols_: {associative list: name ==> number},
+    terminals_: {associative list: number ==> name},
+    productions_: [...],
+    performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate, $$, _$),
+    table: [...],
+    defaultActions: {...},
+    parseError: function(str, hash),
+    parse: function(input),
 
-  return parts;
-}
-
-// Split a filename into [root, dir, basename, ext], unix version
-// 'root' is just a slash, or nothing.
-var splitPathRe =
-    /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
-var splitPath = function(filename) {
-  return splitPathRe.exec(filename).slice(1);
-};
-
-// path.resolve([from ...], to)
-// posix version
-function resolve() {
-  var resolvedPath = '',
-      resolvedAbsolute = false;
-
-  for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    var path = (i >= 0) ? arguments[i] : '/';
-
-    // Skip empty and invalid entries
-    if (typeof path !== 'string') {
-      throw new TypeError('Arguments to path.resolve must be strings');
-    } else if (!path) {
-      continue;
-    }
-
-    resolvedPath = path + '/' + resolvedPath;
-    resolvedAbsolute = path.charAt(0) === '/';
-  }
-
-  // At this point the path should be resolved to a full absolute path, but
-  // handle relative paths to be safe (might happen when process.cwd() fails)
-
-  // Normalize the path
-  resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
-    return !!p;
-  }), !resolvedAbsolute).join('/');
-
-  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
-}
-
-// path.normalize(path)
-// posix version
-function normalize(path) {
-  var isPathAbsolute = isAbsolute(path),
-      trailingSlash = substr(path, -1) === '/';
-
-  // Normalize the path
-  path = normalizeArray(filter(path.split('/'), function(p) {
-    return !!p;
-  }), !isPathAbsolute).join('/');
-
-  if (!path && !isPathAbsolute) {
-    path = '.';
-  }
-  if (path && trailingSlash) {
-    path += '/';
-  }
-
-  return (isPathAbsolute ? '/' : '') + path;
-}
-
-// posix version
-function isAbsolute(path) {
-  return path.charAt(0) === '/';
-}
-
-// posix version
-function join() {
-  var paths = Array.prototype.slice.call(arguments, 0);
-  return normalize(filter(paths, function(p, index) {
-    if (typeof p !== 'string') {
-      throw new TypeError('Arguments to path.join must be strings');
-    }
-    return p;
-  }).join('/'));
-}
-
-
-// path.relative(from, to)
-// posix version
-function relative(from, to) {
-  from = resolve(from).substr(1);
-  to = resolve(to).substr(1);
-
-  function trim(arr) {
-    var start = 0;
-    for (; start < arr.length; start++) {
-      if (arr[start] !== '') break;
-    }
-
-    var end = arr.length - 1;
-    for (; end >= 0; end--) {
-      if (arr[end] !== '') break;
-    }
-
-    if (start > end) return [];
-    return arr.slice(start, end - start + 1);
-  }
-
-  var fromParts = trim(from.split('/'));
-  var toParts = trim(to.split('/'));
-
-  var length = Math.min(fromParts.length, toParts.length);
-  var samePartsLength = length;
-  for (var i = 0; i < length; i++) {
-    if (fromParts[i] !== toParts[i]) {
-      samePartsLength = i;
-      break;
-    }
-  }
-
-  var outputParts = [];
-  for (var i = samePartsLength; i < fromParts.length; i++) {
-    outputParts.push('..');
-  }
-
-  outputParts = outputParts.concat(toParts.slice(samePartsLength));
-
-  return outputParts.join('/');
-}
-
-var sep = '/';
-var delimiter = ':';
-
-function dirname(path) {
-  var result = splitPath(path),
-      root = result[0],
-      dir = result[1];
-
-  if (!root && !dir) {
-    // No dirname whatsoever
-    return '.';
-  }
-
-  if (dir) {
-    // It has a dirname, strip trailing slash
-    dir = dir.substr(0, dir.length - 1);
-  }
-
-  return root + dir;
-}
-
-function basename(path, ext) {
-  var f = splitPath(path)[2];
-  // TODO: make this comparison case-insensitive on windows?
-  if (ext && f.substr(-1 * ext.length) === ext) {
-    f = f.substr(0, f.length - ext.length);
-  }
-  return f;
-}
-
-
-function extname(path) {
-  return splitPath(path)[3];
-}
-var path = {
-  extname: extname,
-  basename: basename,
-  dirname: dirname,
-  sep: sep,
-  delimiter: delimiter,
-  relative: relative,
-  join: join,
-  isAbsolute: isAbsolute,
-  normalize: normalize,
-  resolve: resolve
-};
-function filter (xs, f) {
-    if (xs.filter) return xs.filter(f);
-    var res = [];
-    for (var i = 0; i < xs.length; i++) {
-        if (f(xs[i], i, xs)) res.push(xs[i]);
-    }
-    return res;
-}
-
-// String.prototype.substr - negative index don't work in IE8
-var substr = 'ab'.substr(-1) === 'b' ?
-    function (str, start, len) { return str.substr(start, len) } :
-    function (str, start, len) {
-        if (start < 0) start = str.length + start;
-        return str.substr(start, len);
-    };
-
-
-var path$1 = Object.freeze({
-	resolve: resolve,
-	normalize: normalize,
-	isAbsolute: isAbsolute,
-	join: join,
-	relative: relative,
-	sep: sep,
-	delimiter: delimiter,
-	dirname: dirname,
-	basename: basename,
-	extname: extname,
-	default: path
-});
-
-var require$$0 = ( empty$1 && empty ) || empty$1;
-
-var require$$1 = ( path$1 && path ) || path$1;
-
-var SelectionParser = createCommonjsModule(function (module, exports) {
-    /* eslint-disable */
-    // DO NOT EDIT! Automatically generated from .jison
-    /* parser generated by jison 0.4.17 */
-    /*
-      Returns a Parser object of the following structure:
-    
-      Parser: {
-        yy: {}
-      }
-    
-      Parser.prototype: {
-        yy: {},
-        trace: function(),
-        symbols_: {associative list: name ==> number},
-        terminals_: {associative list: number ==> name},
-        productions_: [...],
-        performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate, $$, _$),
-        table: [...],
-        defaultActions: {...},
+    lexer: {
+        EOF: 1,
         parseError: function(str, hash),
-        parse: function(input),
-    
-        lexer: {
-            EOF: 1,
-            parseError: function(str, hash),
-            setInput: function(input),
-            input: function(),
-            unput: function(str),
-            more: function(),
-            less: function(n),
-            pastInput: function(),
-            upcomingInput: function(),
-            showPosition: function(),
-            test_match: function(regex_match_array, rule_index),
-            next: function(),
-            lex: function(),
-            begin: function(condition),
-            popState: function(),
-            _currentRules: function(),
-            topState: function(),
-            pushState: function(condition),
-    
-            options: {
-                ranges: boolean           (optional: true ==> token location info will include a .range[] member)
-                flex: boolean             (optional: true ==> flex-like lexing behaviour where the rules are tested exhaustively to find the longest match)
-                backtrack_lexer: boolean  (optional: true ==> lexer regexes are tested in order and for each matching regex the action code is invoked; the lexer terminates the scan when a token is returned by the action code)
-            },
-    
-            performAction: function(yy, yy_, $avoiding_name_collisions, YY_START),
-            rules: [...],
-            conditions: {associative list: name ==> set},
-        }
-      }
-    
-    
-      token location info (@$, _$, etc.): {
-        first_line: n,
-        last_line: n,
-        first_column: n,
-        last_column: n,
-        range: [start_number, end_number]       (where the numbers are indexes into the input string, regular zero-based)
-      }
-    
-    
-      the parseError function receives a 'hash' object with these members for lexer and parser errors: {
-        text:        (matched text)
-        token:       (the produced terminal token, if any)
-        line:        (yylineno)
-      }
-      while parser (grammar) errors will also provide these members, i.e. parser errors deliver a superset of attributes: {
-        loc:         (yylloc)
-        expected:    (string describing the set of expected tokens)
-        recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
-      }
-    */
-    var parser = function () {
-        var o = function o(k, v, _o, l) {
-            for (_o = _o || {}, l = k.length; l--; _o[k[l]] = v) {}return _o;
-        },
-            $V0 = [1, 4],
-            $V1 = [1, 5],
-            $V2 = [1, 6],
-            $V3 = [1, 7],
-            $V4 = [1, 8],
-            $V5 = [1, 9],
-            $V6 = [1, 11],
-            $V7 = [1, 12],
-            $V8 = [5, 7, 8, 11],
-            $V9 = [1, 17],
-            $Va = [1, 22],
-            $Vb = [1, 20],
-            $Vc = [1, 21],
-            $Vd = [5, 7, 8, 11, 19];
-        var parser = { trace: function trace() {},
-            yy: {},
-            symbols_: { "error": 2, "Program": 3, "Expression": 4, "EOF": 5, "Selector": 6, "OR": 7, "AND": 8, "NOT": 9, "(": 10, ")": 11, "SELECTOR": 12, "NAMED_SELECTOR": 13, "SELECTOR_RANGED": 14, "RangeList": 15, "SELECTOR_NAMED": 16, "NameList": 17, "Range": 18, ",": 19, "NUMBER": 20, ":": 21, "Name": 22, "IDENTIFIER": 23, "STRING": 24, "$accept": 0, "$end": 1 },
-            terminals_: { 2: "error", 5: "EOF", 7: "OR", 8: "AND", 9: "NOT", 10: "(", 11: ")", 12: "SELECTOR", 13: "NAMED_SELECTOR", 14: "SELECTOR_RANGED", 16: "SELECTOR_NAMED", 19: ",", 20: "NUMBER", 21: ":", 23: "IDENTIFIER", 24: "STRING" },
-            productions_: [0, [3, 2], [4, 1], [4, 3], [4, 3], [4, 2], [4, 3], [6, 1], [6, 1], [6, 2], [6, 2], [15, 1], [15, 3], [18, 1], [18, 3], [17, 1], [17, 3], [22, 1], [22, 1], [22, 1]],
-            performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
-                /* this == yyval */
+        setInput: function(input),
+        input: function(),
+        unput: function(str),
+        more: function(),
+        less: function(n),
+        pastInput: function(),
+        upcomingInput: function(),
+        showPosition: function(),
+        test_match: function(regex_match_array, rule_index),
+        next: function(),
+        lex: function(),
+        begin: function(condition),
+        popState: function(),
+        _currentRules: function(),
+        topState: function(),
+        pushState: function(condition),
 
-                var $0 = $$.length - 1;
-                switch (yystate) {
+        options: {
+            ranges: boolean           (optional: true ==> token location info will include a .range[] member)
+            flex: boolean             (optional: true ==> flex-like lexing behaviour where the rules are tested exhaustively to find the longest match)
+            backtrack_lexer: boolean  (optional: true ==> lexer regexes are tested in order and for each matching regex the action code is invoked; the lexer terminates the scan when a token is returned by the action code)
+        },
+
+        performAction: function(yy, yy_, $avoiding_name_collisions, YY_START),
+        rules: [...],
+        conditions: {associative list: name ==> set},
+    }
+  }
+
+
+  token location info (@$, _$, etc.): {
+    first_line: n,
+    last_line: n,
+    first_column: n,
+    last_column: n,
+    range: [start_number, end_number]       (where the numbers are indexes into the input string, regular zero-based)
+  }
+
+
+  the parseError function receives a 'hash' object with these members for lexer and parser errors: {
+    text:        (matched text)
+    token:       (the produced terminal token, if any)
+    line:        (yylineno)
+  }
+  while parser (grammar) errors will also provide these members, i.e. parser errors deliver a superset of attributes: {
+    loc:         (yylloc)
+    expected:    (string describing the set of expected tokens)
+    recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
+  }
+*/
+var parser = function () {
+    var o = function o(k, v, _o, l) {
+        for (_o = _o || {}, l = k.length; l--; _o[k[l]] = v) {}return _o;
+    },
+        $V0 = [1, 4],
+        $V1 = [1, 5],
+        $V2 = [1, 6],
+        $V3 = [1, 7],
+        $V4 = [1, 8],
+        $V5 = [1, 9],
+        $V6 = [1, 11],
+        $V7 = [1, 12],
+        $V8 = [5, 7, 8, 11],
+        $V9 = [1, 17],
+        $Va = [1, 22],
+        $Vb = [1, 20],
+        $Vc = [1, 21],
+        $Vd = [5, 7, 8, 11, 19];
+    var parser = { trace: function trace() {},
+        yy: {},
+        symbols_: { "error": 2, "Program": 3, "Expression": 4, "EOF": 5, "Selector": 6, "OR": 7, "AND": 8, "NOT": 9, "(": 10, ")": 11, "SELECTOR": 12, "NAMED_SELECTOR": 13, "SELECTOR_RANGED": 14, "RangeList": 15, "SELECTOR_NAMED": 16, "NameList": 17, "Range": 18, ",": 19, "NUMBER": 20, ":": 21, "Name": 22, "IDENTIFIER": 23, "STRING": 24, "$accept": 0, "$end": 1 },
+        terminals_: { 2: "error", 5: "EOF", 7: "OR", 8: "AND", 9: "NOT", 10: "(", 11: ")", 12: "SELECTOR", 13: "NAMED_SELECTOR", 14: "SELECTOR_RANGED", 16: "SELECTOR_NAMED", 19: ",", 20: "NUMBER", 21: ":", 23: "IDENTIFIER", 24: "STRING" },
+        productions_: [0, [3, 2], [4, 1], [4, 3], [4, 3], [4, 2], [4, 3], [6, 1], [6, 1], [6, 2], [6, 2], [15, 1], [15, 3], [18, 1], [18, 3], [17, 1], [17, 3], [22, 1], [22, 1], [22, 1]],
+        performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
+            /* this == yyval */
+
+            var $0 = $$.length - 1;
+            switch (yystate) {
+                case 1:
+                    return $$[$0 - 1];
+                    break;
+                case 3:
+                    this.$ = yy.keyword('or')($$[$0 - 2], $$[$0]);
+                    break;
+                case 4:
+                    this.$ = yy.keyword('and')($$[$0 - 2], $$[$0]);
+                    break;
+                case 5:
+                    this.$ = yy.keyword('not')($$[$0]);
+                    break;
+                case 6:
+                    this.$ = $$[$0 - 1];
+                    break;
+                case 7:
+                    this.$ = yy.keyword($$[$0])();
+                    break;
+                case 8:
+                    this.$ = yy.GetSelector($$[$0].toLowerCase().slice(1, $$[$0].length));
+                    break;
+                case 9:case 10:
+                    this.$ = yy.keyword($$[$0 - 1])($$[$0]);
+                    break;
+                case 11:
+                    this.$ = new yy.RangeList($$[$0]);
+                    break;
+                case 12:case 16:
+                    this.$ = $$[$0 - 2].append($$[$0]);
+                    break;
+                case 13:
+                    this.$ = new yy.Range(Number($$[$0]));
+                    break;
+                case 14:
+                    this.$ = new yy.Range(Number($$[$0 - 2]), Number($$[$0]));
+                    break;
+                case 15:
+                    this.$ = new yy.ValueList($$[$0]);
+                    break;
+            }
+        },
+        table: [{ 3: 1, 4: 2, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, { 1: [3] }, { 5: [1, 10], 7: $V6, 8: $V7 }, o($V8, [2, 2]), { 4: 13, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, { 4: 14, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, o($V8, [2, 7]), o($V8, [2, 8]), { 15: 15, 18: 16, 20: $V9 }, { 17: 18, 20: $Va, 22: 19, 23: $Vb, 24: $Vc }, { 1: [2, 1] }, { 4: 23, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, { 4: 24, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, o($V8, [2, 5]), { 7: $V6, 8: $V7, 11: [1, 25] }, o($V8, [2, 9], { 19: [1, 26] }), o($Vd, [2, 11]), o($Vd, [2, 13], { 21: [1, 27] }), o($V8, [2, 10], { 19: [1, 28] }), o($Vd, [2, 15]), o($Vd, [2, 17]), o($Vd, [2, 18]), o($Vd, [2, 19]), o([5, 7, 11], [2, 3], { 8: $V7 }), o($V8, [2, 4]), o($V8, [2, 6]), { 18: 29, 20: $V9 }, { 20: [1, 30] }, { 20: $Va, 22: 31, 23: $Vb, 24: $Vc }, o($Vd, [2, 12]), o($Vd, [2, 14]), o($Vd, [2, 16])],
+        defaultActions: { 10: [2, 1] },
+        parseError: function parseError(str, hash) {
+            if (hash.recoverable) {
+                this.trace(str);
+            } else {
+                var error = new Error(str);
+                error.hash = hash;
+                throw error;
+            }
+        },
+        parse: function parse(input) {
+            var self = this,
+                stack = [0],
+                tstack = [],
+                vstack = [null],
+                lstack = [],
+                table = this.table,
+                yytext = '',
+                yylineno = 0,
+                yyleng = 0,
+                TERROR = 2,
+                EOF = 1;
+            var args = lstack.slice.call(arguments, 1);
+            var lexer = Object.create(this.lexer);
+            var sharedState = { yy: {} };
+            for (var k in this.yy) {
+                if (Object.prototype.hasOwnProperty.call(this.yy, k)) {
+                    sharedState.yy[k] = this.yy[k];
+                }
+            }
+            lexer.setInput(input, sharedState.yy);
+            sharedState.yy.lexer = lexer;
+            sharedState.yy.parser = this;
+            if (typeof lexer.yylloc == 'undefined') {
+                lexer.yylloc = {};
+            }
+            var yyloc = lexer.yylloc;
+            lstack.push(yyloc);
+            var ranges = lexer.options && lexer.options.ranges;
+            if (typeof sharedState.yy.parseError === 'function') {
+                this.parseError = sharedState.yy.parseError;
+            } else {
+                this.parseError = Object.getPrototypeOf(this).parseError;
+            }
+            function lex() {
+                var token;
+                token = tstack.pop() || lexer.lex() || EOF;
+                if (typeof token !== 'number') {
+                    if (token instanceof Array) {
+                        tstack = token;
+                        token = tstack.pop();
+                    }
+                    token = self.symbols_[token] || token;
+                }
+                return token;
+            }
+            var symbol,
+                preErrorSymbol,
+                state,
+                action,
+                r,
+                yyval = {},
+                p,
+                len,
+                newState,
+                expected;
+            while (true) {
+                state = stack[stack.length - 1];
+                if (this.defaultActions[state]) {
+                    action = this.defaultActions[state];
+                } else {
+                    if (symbol === null || typeof symbol == 'undefined') {
+                        symbol = lex();
+                    }
+                    action = table[state] && table[state][symbol];
+                }
+                if (typeof action === 'undefined' || !action.length || !action[0]) {
+                    var errStr = '';
+                    expected = [];
+                    for (p in table[state]) {
+                        if (this.terminals_[p] && p > TERROR) {
+                            expected.push('\'' + this.terminals_[p] + '\'');
+                        }
+                    }
+                    if (lexer.showPosition) {
+                        errStr = 'Parse error on line ' + (yylineno + 1) + ':\n' + lexer.showPosition() + '\nExpecting ' + expected.join(', ') + ', got \'' + (this.terminals_[symbol] || symbol) + '\'';
+                    } else {
+                        errStr = 'Parse error on line ' + (yylineno + 1) + ': Unexpected ' + (symbol == EOF ? 'end of input' : '\'' + (this.terminals_[symbol] || symbol) + '\'');
+                    }
+                    this.parseError(errStr, {
+                        text: lexer.match,
+                        token: this.terminals_[symbol] || symbol,
+                        line: lexer.yylineno,
+                        loc: yyloc,
+                        expected: expected
+                    });
+                }
+                if (action[0] instanceof Array && action.length > 1) {
+                    throw new Error('Parse Error: multiple actions possible at state: ' + state + ', token: ' + symbol);
+                }
+                switch (action[0]) {
                     case 1:
-                        return $$[$0 - 1];
+                        stack.push(symbol);
+                        vstack.push(lexer.yytext);
+                        lstack.push(lexer.yylloc);
+                        stack.push(action[1]);
+                        symbol = null;
+                        if (!preErrorSymbol) {
+                            yyleng = lexer.yyleng;
+                            yytext = lexer.yytext;
+                            yylineno = lexer.yylineno;
+                            yyloc = lexer.yylloc;
+                        } else {
+                            symbol = preErrorSymbol;
+                            preErrorSymbol = null;
+                        }
+                        break;
+                    case 2:
+                        len = this.productions_[action[1]][1];
+                        yyval.$ = vstack[vstack.length - len];
+                        yyval._$ = {
+                            first_line: lstack[lstack.length - (len || 1)].first_line,
+                            last_line: lstack[lstack.length - 1].last_line,
+                            first_column: lstack[lstack.length - (len || 1)].first_column,
+                            last_column: lstack[lstack.length - 1].last_column
+                        };
+                        if (ranges) {
+                            yyval._$.range = [lstack[lstack.length - (len || 1)].range[0], lstack[lstack.length - 1].range[1]];
+                        }
+                        r = this.performAction.apply(yyval, [yytext, yyleng, yylineno, sharedState.yy, action[1], vstack, lstack].concat(args));
+                        if (typeof r !== 'undefined') {
+                            return r;
+                        }
+                        if (len) {
+                            stack = stack.slice(0, -1 * len * 2);
+                            vstack = vstack.slice(0, -1 * len);
+                            lstack = lstack.slice(0, -1 * len);
+                        }
+                        stack.push(this.productions_[action[1]][0]);
+                        vstack.push(yyval.$);
+                        lstack.push(yyval._$);
+                        newState = table[stack[stack.length - 2]][stack[stack.length - 1]];
+                        stack.push(newState);
                         break;
                     case 3:
-                        this.$ = yy.keyword('or')($$[$0 - 2], $$[$0]);
+                        return true;
+                }
+            }
+            return true;
+        } };
+
+    /* generated by jison-lex 0.3.4 */
+    var lexer = function () {
+        var lexer = {
+
+            EOF: 1,
+
+            parseError: function parseError(str, hash) {
+                if (this.yy.parser) {
+                    this.yy.parser.parseError(str, hash);
+                } else {
+                    throw new Error(str);
+                }
+            },
+
+            // resets the lexer, sets new input
+            setInput: function setInput(input, yy) {
+                this.yy = yy || this.yy || {};
+                this._input = input;
+                this._more = this._backtrack = this.done = false;
+                this.yylineno = this.yyleng = 0;
+                this.yytext = this.matched = this.match = '';
+                this.conditionStack = ['INITIAL'];
+                this.yylloc = {
+                    first_line: 1,
+                    first_column: 0,
+                    last_line: 1,
+                    last_column: 0
+                };
+                if (this.options.ranges) {
+                    this.yylloc.range = [0, 0];
+                }
+                this.offset = 0;
+                return this;
+            },
+
+            // consumes and returns one char from the input
+            input: function input() {
+                var ch = this._input[0];
+                this.yytext += ch;
+                this.yyleng++;
+                this.offset++;
+                this.match += ch;
+                this.matched += ch;
+                var lines = ch.match(/(?:\r\n?|\n).*/g);
+                if (lines) {
+                    this.yylineno++;
+                    this.yylloc.last_line++;
+                } else {
+                    this.yylloc.last_column++;
+                }
+                if (this.options.ranges) {
+                    this.yylloc.range[1]++;
+                }
+
+                this._input = this._input.slice(1);
+                return ch;
+            },
+
+            // unshifts one char (or a string) into the input
+            unput: function unput(ch) {
+                var len = ch.length;
+                var lines = ch.split(/(?:\r\n?|\n)/g);
+
+                this._input = ch + this._input;
+                this.yytext = this.yytext.substr(0, this.yytext.length - len);
+                //this.yyleng -= len;
+                this.offset -= len;
+                var oldLines = this.match.split(/(?:\r\n?|\n)/g);
+                this.match = this.match.substr(0, this.match.length - 1);
+                this.matched = this.matched.substr(0, this.matched.length - 1);
+
+                if (lines.length - 1) {
+                    this.yylineno -= lines.length - 1;
+                }
+                var r = this.yylloc.range;
+
+                this.yylloc = {
+                    first_line: this.yylloc.first_line,
+                    last_line: this.yylineno + 1,
+                    first_column: this.yylloc.first_column,
+                    last_column: lines ? (lines.length === oldLines.length ? this.yylloc.first_column : 0) + oldLines[oldLines.length - lines.length].length - lines[0].length : this.yylloc.first_column - len
+                };
+
+                if (this.options.ranges) {
+                    this.yylloc.range = [r[0], r[0] + this.yyleng - len];
+                }
+                this.yyleng = this.yytext.length;
+                return this;
+            },
+
+            // When called from action, caches matched text and appends it on next action
+            more: function more() {
+                this._more = true;
+                return this;
+            },
+
+            // When called from action, signals the lexer that this rule fails to match the input, so the next matching rule (regex) should be tested instead.
+            reject: function reject() {
+                if (this.options.backtrack_lexer) {
+                    this._backtrack = true;
+                } else {
+                    return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. You can only invoke reject() in the lexer when the lexer is of the backtracking persuasion (options.backtrack_lexer = true).\n' + this.showPosition(), {
+                        text: "",
+                        token: null,
+                        line: this.yylineno
+                    });
+                }
+                return this;
+            },
+
+            // retain first n characters of the match
+            less: function less(n) {
+                this.unput(this.match.slice(n));
+            },
+
+            // displays already matched input, i.e. for error messages
+            pastInput: function pastInput() {
+                var past = this.matched.substr(0, this.matched.length - this.match.length);
+                return (past.length > 20 ? '...' : '') + past.substr(-20).replace(/\n/g, "");
+            },
+
+            // displays upcoming input, i.e. for error messages
+            upcomingInput: function upcomingInput() {
+                var next = this.match;
+                if (next.length < 20) {
+                    next += this._input.substr(0, 20 - next.length);
+                }
+                return (next.substr(0, 20) + (next.length > 20 ? '...' : '')).replace(/\n/g, "");
+            },
+
+            // displays the character position where the lexing error occurred, i.e. for error messages
+            showPosition: function showPosition() {
+                var pre = this.pastInput();
+                var c = new Array(pre.length + 1).join("-");
+                return pre + this.upcomingInput() + "\n" + c + "^";
+            },
+
+            // test the lexed token: return FALSE when not a match, otherwise return token
+            test_match: function test_match(match, indexed_rule) {
+                var token, lines, backup;
+
+                if (this.options.backtrack_lexer) {
+                    // save context
+                    backup = {
+                        yylineno: this.yylineno,
+                        yylloc: {
+                            first_line: this.yylloc.first_line,
+                            last_line: this.last_line,
+                            first_column: this.yylloc.first_column,
+                            last_column: this.yylloc.last_column
+                        },
+                        yytext: this.yytext,
+                        match: this.match,
+                        matches: this.matches,
+                        matched: this.matched,
+                        yyleng: this.yyleng,
+                        offset: this.offset,
+                        _more: this._more,
+                        _input: this._input,
+                        yy: this.yy,
+                        conditionStack: this.conditionStack.slice(0),
+                        done: this.done
+                    };
+                    if (this.options.ranges) {
+                        backup.yylloc.range = this.yylloc.range.slice(0);
+                    }
+                }
+
+                lines = match[0].match(/(?:\r\n?|\n).*/g);
+                if (lines) {
+                    this.yylineno += lines.length;
+                }
+                this.yylloc = {
+                    first_line: this.yylloc.last_line,
+                    last_line: this.yylineno + 1,
+                    first_column: this.yylloc.last_column,
+                    last_column: lines ? lines[lines.length - 1].length - lines[lines.length - 1].match(/\r?\n?/)[0].length : this.yylloc.last_column + match[0].length
+                };
+                this.yytext += match[0];
+                this.match += match[0];
+                this.matches = match;
+                this.yyleng = this.yytext.length;
+                if (this.options.ranges) {
+                    this.yylloc.range = [this.offset, this.offset += this.yyleng];
+                }
+                this._more = false;
+                this._backtrack = false;
+                this._input = this._input.slice(match[0].length);
+                this.matched += match[0];
+                token = this.performAction.call(this, this.yy, this, indexed_rule, this.conditionStack[this.conditionStack.length - 1]);
+                if (this.done && this._input) {
+                    this.done = false;
+                }
+                if (token) {
+                    return token;
+                } else if (this._backtrack) {
+                    // recover context
+                    for (var k in backup) {
+                        this[k] = backup[k];
+                    }
+                    return false; // rule action called reject() implying the next rule should be tested instead.
+                }
+                return false;
+            },
+
+            // return next match in input
+            next: function next() {
+                if (this.done) {
+                    return this.EOF;
+                }
+                if (!this._input) {
+                    this.done = true;
+                }
+
+                var token, match, tempMatch, index;
+                if (!this._more) {
+                    this.yytext = '';
+                    this.match = '';
+                }
+                var rules = this._currentRules();
+                for (var i = 0; i < rules.length; i++) {
+                    tempMatch = this._input.match(this.rules[rules[i]]);
+                    if (tempMatch && (!match || tempMatch[0].length > match[0].length)) {
+                        match = tempMatch;
+                        index = i;
+                        if (this.options.backtrack_lexer) {
+                            token = this.test_match(tempMatch, rules[i]);
+                            if (token !== false) {
+                                return token;
+                            } else if (this._backtrack) {
+                                match = false;
+                                continue; // rule action called reject() implying a rule MISmatch.
+                            } else {
+                                // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
+                                return false;
+                            }
+                        } else if (!this.options.flex) {
+                            break;
+                        }
+                    }
+                }
+                if (match) {
+                    token = this.test_match(match, rules[index]);
+                    if (token !== false) {
+                        return token;
+                    }
+                    // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
+                    return false;
+                }
+                if (this._input === "") {
+                    return this.EOF;
+                } else {
+                    return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. Unrecognized text.\n' + this.showPosition(), {
+                        text: "",
+                        token: null,
+                        line: this.yylineno
+                    });
+                }
+            },
+
+            // return next match that has a token
+            lex: function lex() {
+                var r = this.next();
+                if (r) {
+                    return r;
+                } else {
+                    return this.lex();
+                }
+            },
+
+            // activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
+            begin: function begin(condition) {
+                this.conditionStack.push(condition);
+            },
+
+            // pop the previously active lexer condition state off the condition stack
+            popState: function popState() {
+                var n = this.conditionStack.length - 1;
+                if (n > 0) {
+                    return this.conditionStack.pop();
+                } else {
+                    return this.conditionStack[0];
+                }
+            },
+
+            // produce the lexer rule set which is active for the currently active lexer condition state
+            _currentRules: function _currentRules() {
+                if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
+                    return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
+                } else {
+                    return this.conditions["INITIAL"].rules;
+                }
+            },
+
+            // return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
+            topState: function topState(n) {
+                n = this.conditionStack.length - 1 - Math.abs(n || 0);
+                if (n >= 0) {
+                    return this.conditionStack[n];
+                } else {
+                    return "INITIAL";
+                }
+            },
+
+            // alias for begin(condition)
+            pushState: function pushState(condition) {
+                this.begin(condition);
+            },
+
+            // return the number of states currently on the stack
+            stateStackSize: function stateStackSize() {
+                return this.conditionStack.length;
+            },
+            options: { "case-insensitive": true },
+            performAction: function anonymous(yy, yy_, $avoiding_name_collisions, YY_START) {
+                switch ($avoiding_name_collisions) {
+                    case 0:
+                        /* skip whitespace */
+                        break;
+                    case 1:
+                        return 20;
+                        break;
+                    case 2:
+                        return 7;
+                        break;
+                    case 3:
+                        return 8;
                         break;
                     case 4:
-                        this.$ = yy.keyword('and')($$[$0 - 2], $$[$0]);
+                        return 9;
                         break;
                     case 5:
-                        this.$ = yy.keyword('not')($$[$0]);
+                        return 12;
                         break;
                     case 6:
-                        this.$ = $$[$0 - 1];
+                        return 16;
                         break;
                     case 7:
-                        this.$ = yy.keyword($$[$0])();
+                        return 14;
                         break;
                     case 8:
-                        this.$ = yy.GetSelector($$[$0].toLowerCase().slice(1, $$[$0].length));
+                        return 10;
                         break;
-                    case 9:case 10:
-                        this.$ = yy.keyword($$[$0 - 1])($$[$0]);
+                    case 9:
+                        return 11;
+                        break;
+                    case 10:
+                        return 19;
                         break;
                     case 11:
-                        this.$ = new yy.RangeList($$[$0]);
+                        return 21;
                         break;
-                    case 12:case 16:
-                        this.$ = $$[$0 - 2].append($$[$0]);
+                    case 12:
+                        return '<=';
                         break;
                     case 13:
-                        this.$ = new yy.Range(Number($$[$0]));
+                        return '>=';
                         break;
                     case 14:
-                        this.$ = new yy.Range(Number($$[$0 - 2]), Number($$[$0]));
+                        return '<';
                         break;
                     case 15:
-                        this.$ = new yy.ValueList($$[$0]);
+                        return '>';
+                        break;
+                    case 16:
+                        yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2);return 24;
+                        break;
+                    case 17:
+                        return 13;
+                        break;
+                    case 18:
+                        return 23;
+                        break;
+                    case 19:
+                        return 5;
+                        break;
+                    case 20:
+                        return 'INVALID';
                         break;
                 }
             },
-            table: [{ 3: 1, 4: 2, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, { 1: [3] }, { 5: [1, 10], 7: $V6, 8: $V7 }, o($V8, [2, 2]), { 4: 13, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, { 4: 14, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, o($V8, [2, 7]), o($V8, [2, 8]), { 15: 15, 18: 16, 20: $V9 }, { 17: 18, 20: $Va, 22: 19, 23: $Vb, 24: $Vc }, { 1: [2, 1] }, { 4: 23, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, { 4: 24, 6: 3, 9: $V0, 10: $V1, 12: $V2, 13: $V3, 14: $V4, 16: $V5 }, o($V8, [2, 5]), { 7: $V6, 8: $V7, 11: [1, 25] }, o($V8, [2, 9], { 19: [1, 26] }), o($Vd, [2, 11]), o($Vd, [2, 13], { 21: [1, 27] }), o($V8, [2, 10], { 19: [1, 28] }), o($Vd, [2, 15]), o($Vd, [2, 17]), o($Vd, [2, 18]), o($Vd, [2, 19]), o([5, 7, 11], [2, 3], { 8: $V7 }), o($V8, [2, 4]), o($V8, [2, 6]), { 18: 29, 20: $V9 }, { 20: [1, 30] }, { 20: $Va, 22: 31, 23: $Vb, 24: $Vc }, o($Vd, [2, 12]), o($Vd, [2, 14]), o($Vd, [2, 16])],
-            defaultActions: { 10: [2, 1] },
-            parseError: function parseError(str, hash) {
-                if (hash.recoverable) {
-                    this.trace(str);
-                } else {
-                    var _parseError = function _parseError(msg, hash) {
-                        this.message = msg;
-                        this.hash = hash;
-                    };
-
-                    _parseError.prototype = Error;
-
-                    throw new _parseError(str, hash);
-                }
-            },
-            parse: function parse(input) {
-                var self = this,
-                    stack = [0],
-                    tstack = [],
-                    vstack = [null],
-                    lstack = [],
-                    table = this.table,
-                    yytext = '',
-                    yylineno = 0,
-                    yyleng = 0,
-                    recovering = 0,
-                    TERROR = 2,
-                    EOF = 1;
-                var args = lstack.slice.call(arguments, 1);
-                var lexer = Object.create(this.lexer);
-                var sharedState = { yy: {} };
-                for (var k in this.yy) {
-                    if (Object.prototype.hasOwnProperty.call(this.yy, k)) {
-                        sharedState.yy[k] = this.yy[k];
-                    }
-                }
-                lexer.setInput(input, sharedState.yy);
-                sharedState.yy.lexer = lexer;
-                sharedState.yy.parser = this;
-                if (typeof lexer.yylloc == 'undefined') {
-                    lexer.yylloc = {};
-                }
-                var yyloc = lexer.yylloc;
-                lstack.push(yyloc);
-                var ranges = lexer.options && lexer.options.ranges;
-                if (typeof sharedState.yy.parseError === 'function') {
-                    this.parseError = sharedState.yy.parseError;
-                } else {
-                    this.parseError = Object.getPrototypeOf(this).parseError;
-                }
-                function lex() {
-                    var token;
-                    token = tstack.pop() || lexer.lex() || EOF;
-                    if (typeof token !== 'number') {
-                        if (token instanceof Array) {
-                            tstack = token;
-                            token = tstack.pop();
-                        }
-                        token = self.symbols_[token] || token;
-                    }
-                    return token;
-                }
-                var symbol,
-                    preErrorSymbol,
-                    state,
-                    action,
-                    a,
-                    r,
-                    yyval = {},
-                    p,
-                    len,
-                    newState,
-                    expected;
-                while (true) {
-                    state = stack[stack.length - 1];
-                    if (this.defaultActions[state]) {
-                        action = this.defaultActions[state];
-                    } else {
-                        if (symbol === null || typeof symbol == 'undefined') {
-                            symbol = lex();
-                        }
-                        action = table[state] && table[state][symbol];
-                    }
-                    if (typeof action === 'undefined' || !action.length || !action[0]) {
-                        var errStr = '';
-                        expected = [];
-                        for (p in table[state]) {
-                            if (this.terminals_[p] && p > TERROR) {
-                                expected.push('\'' + this.terminals_[p] + '\'');
-                            }
-                        }
-                        if (lexer.showPosition) {
-                            errStr = 'Parse error on line ' + (yylineno + 1) + ':\n' + lexer.showPosition() + '\nExpecting ' + expected.join(', ') + ', got \'' + (this.terminals_[symbol] || symbol) + '\'';
-                        } else {
-                            errStr = 'Parse error on line ' + (yylineno + 1) + ': Unexpected ' + (symbol == EOF ? 'end of input' : '\'' + (this.terminals_[symbol] || symbol) + '\'');
-                        }
-                        this.parseError(errStr, {
-                            text: lexer.match,
-                            token: this.terminals_[symbol] || symbol,
-                            line: lexer.yylineno,
-                            loc: yyloc,
-                            expected: expected
-                        });
-                    }
-                    if (action[0] instanceof Array && action.length > 1) {
-                        throw new Error('Parse Error: multiple actions possible at state: ' + state + ', token: ' + symbol);
-                    }
-                    switch (action[0]) {
-                        case 1:
-                            stack.push(symbol);
-                            vstack.push(lexer.yytext);
-                            lstack.push(lexer.yylloc);
-                            stack.push(action[1]);
-                            symbol = null;
-                            if (!preErrorSymbol) {
-                                yyleng = lexer.yyleng;
-                                yytext = lexer.yytext;
-                                yylineno = lexer.yylineno;
-                                yyloc = lexer.yylloc;
-                                
-                            } else {
-                                symbol = preErrorSymbol;
-                                preErrorSymbol = null;
-                            }
-                            break;
-                        case 2:
-                            len = this.productions_[action[1]][1];
-                            yyval.$ = vstack[vstack.length - len];
-                            yyval._$ = {
-                                first_line: lstack[lstack.length - (len || 1)].first_line,
-                                last_line: lstack[lstack.length - 1].last_line,
-                                first_column: lstack[lstack.length - (len || 1)].first_column,
-                                last_column: lstack[lstack.length - 1].last_column
-                            };
-                            if (ranges) {
-                                yyval._$.range = [lstack[lstack.length - (len || 1)].range[0], lstack[lstack.length - 1].range[1]];
-                            }
-                            r = this.performAction.apply(yyval, [yytext, yyleng, yylineno, sharedState.yy, action[1], vstack, lstack].concat(args));
-                            if (typeof r !== 'undefined') {
-                                return r;
-                            }
-                            if (len) {
-                                stack = stack.slice(0, -1 * len * 2);
-                                vstack = vstack.slice(0, -1 * len);
-                                lstack = lstack.slice(0, -1 * len);
-                            }
-                            stack.push(this.productions_[action[1]][0]);
-                            vstack.push(yyval.$);
-                            lstack.push(yyval._$);
-                            newState = table[stack[stack.length - 2]][stack[stack.length - 1]];
-                            stack.push(newState);
-                            break;
-                        case 3:
-                            return true;
-                    }
-                }
-                return true;
-            } };
-
-        /* generated by jison-lex 0.3.4 */
-        var lexer = function () {
-            var lexer = {
-
-                EOF: 1,
-
-                parseError: function parseError(str, hash) {
-                    if (this.yy.parser) {
-                        this.yy.parser.parseError(str, hash);
-                    } else {
-                        throw new Error(str);
-                    }
-                },
-
-                // resets the lexer, sets new input
-                setInput: function setInput(input, yy) {
-                    this.yy = yy || this.yy || {};
-                    this._input = input;
-                    this._more = this._backtrack = this.done = false;
-                    this.yylineno = this.yyleng = 0;
-                    this.yytext = this.matched = this.match = '';
-                    this.conditionStack = ['INITIAL'];
-                    this.yylloc = {
-                        first_line: 1,
-                        first_column: 0,
-                        last_line: 1,
-                        last_column: 0
-                    };
-                    if (this.options.ranges) {
-                        this.yylloc.range = [0, 0];
-                    }
-                    this.offset = 0;
-                    return this;
-                },
-
-                // consumes and returns one char from the input
-                input: function input() {
-                    var ch = this._input[0];
-                    this.yytext += ch;
-                    this.yyleng++;
-                    this.offset++;
-                    this.match += ch;
-                    this.matched += ch;
-                    var lines = ch.match(/(?:\r\n?|\n).*/g);
-                    if (lines) {
-                        this.yylineno++;
-                        this.yylloc.last_line++;
-                    } else {
-                        this.yylloc.last_column++;
-                    }
-                    if (this.options.ranges) {
-                        this.yylloc.range[1]++;
-                    }
-
-                    this._input = this._input.slice(1);
-                    return ch;
-                },
-
-                // unshifts one char (or a string) into the input
-                unput: function unput(ch) {
-                    var len = ch.length;
-                    var lines = ch.split(/(?:\r\n?|\n)/g);
-
-                    this._input = ch + this._input;
-                    this.yytext = this.yytext.substr(0, this.yytext.length - len);
-                    //this.yyleng -= len;
-                    this.offset -= len;
-                    var oldLines = this.match.split(/(?:\r\n?|\n)/g);
-                    this.match = this.match.substr(0, this.match.length - 1);
-                    this.matched = this.matched.substr(0, this.matched.length - 1);
-
-                    if (lines.length - 1) {
-                        this.yylineno -= lines.length - 1;
-                    }
-                    var r = this.yylloc.range;
-
-                    this.yylloc = {
-                        first_line: this.yylloc.first_line,
-                        last_line: this.yylineno + 1,
-                        first_column: this.yylloc.first_column,
-                        last_column: lines ? (lines.length === oldLines.length ? this.yylloc.first_column : 0) + oldLines[oldLines.length - lines.length].length - lines[0].length : this.yylloc.first_column - len
-                    };
-
-                    if (this.options.ranges) {
-                        this.yylloc.range = [r[0], r[0] + this.yyleng - len];
-                    }
-                    this.yyleng = this.yytext.length;
-                    return this;
-                },
-
-                // When called from action, caches matched text and appends it on next action
-                more: function more() {
-                    this._more = true;
-                    return this;
-                },
-
-                // When called from action, signals the lexer that this rule fails to match the input, so the next matching rule (regex) should be tested instead.
-                reject: function reject() {
-                    if (this.options.backtrack_lexer) {
-                        this._backtrack = true;
-                    } else {
-                        return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. You can only invoke reject() in the lexer when the lexer is of the backtracking persuasion (options.backtrack_lexer = true).\n' + this.showPosition(), {
-                            text: "",
-                            token: null,
-                            line: this.yylineno
-                        });
-                    }
-                    return this;
-                },
-
-                // retain first n characters of the match
-                less: function less(n) {
-                    this.unput(this.match.slice(n));
-                },
-
-                // displays already matched input, i.e. for error messages
-                pastInput: function pastInput() {
-                    var past = this.matched.substr(0, this.matched.length - this.match.length);
-                    return (past.length > 20 ? '...' : '') + past.substr(-20).replace(/\n/g, "");
-                },
-
-                // displays upcoming input, i.e. for error messages
-                upcomingInput: function upcomingInput() {
-                    var next = this.match;
-                    if (next.length < 20) {
-                        next += this._input.substr(0, 20 - next.length);
-                    }
-                    return (next.substr(0, 20) + (next.length > 20 ? '...' : '')).replace(/\n/g, "");
-                },
-
-                // displays the character position where the lexing error occurred, i.e. for error messages
-                showPosition: function showPosition() {
-                    var pre = this.pastInput();
-                    var c = new Array(pre.length + 1).join("-");
-                    return pre + this.upcomingInput() + "\n" + c + "^";
-                },
-
-                // test the lexed token: return FALSE when not a match, otherwise return token
-                test_match: function test_match(match, indexed_rule) {
-                    var token, lines, backup;
-
-                    if (this.options.backtrack_lexer) {
-                        // save context
-                        backup = {
-                            yylineno: this.yylineno,
-                            yylloc: {
-                                first_line: this.yylloc.first_line,
-                                last_line: this.last_line,
-                                first_column: this.yylloc.first_column,
-                                last_column: this.yylloc.last_column
-                            },
-                            yytext: this.yytext,
-                            match: this.match,
-                            matches: this.matches,
-                            matched: this.matched,
-                            yyleng: this.yyleng,
-                            offset: this.offset,
-                            _more: this._more,
-                            _input: this._input,
-                            yy: this.yy,
-                            conditionStack: this.conditionStack.slice(0),
-                            done: this.done
-                        };
-                        if (this.options.ranges) {
-                            backup.yylloc.range = this.yylloc.range.slice(0);
-                        }
-                    }
-
-                    lines = match[0].match(/(?:\r\n?|\n).*/g);
-                    if (lines) {
-                        this.yylineno += lines.length;
-                    }
-                    this.yylloc = {
-                        first_line: this.yylloc.last_line,
-                        last_line: this.yylineno + 1,
-                        first_column: this.yylloc.last_column,
-                        last_column: lines ? lines[lines.length - 1].length - lines[lines.length - 1].match(/\r?\n?/)[0].length : this.yylloc.last_column + match[0].length
-                    };
-                    this.yytext += match[0];
-                    this.match += match[0];
-                    this.matches = match;
-                    this.yyleng = this.yytext.length;
-                    if (this.options.ranges) {
-                        this.yylloc.range = [this.offset, this.offset += this.yyleng];
-                    }
-                    this._more = false;
-                    this._backtrack = false;
-                    this._input = this._input.slice(match[0].length);
-                    this.matched += match[0];
-                    token = this.performAction.call(this, this.yy, this, indexed_rule, this.conditionStack[this.conditionStack.length - 1]);
-                    if (this.done && this._input) {
-                        this.done = false;
-                    }
-                    if (token) {
-                        return token;
-                    } else if (this._backtrack) {
-                        // recover context
-                        for (var k in backup) {
-                            this[k] = backup[k];
-                        }
-                        return false; // rule action called reject() implying the next rule should be tested instead.
-                    }
-                    return false;
-                },
-
-                // return next match in input
-                next: function next() {
-                    if (this.done) {
-                        return this.EOF;
-                    }
-                    if (!this._input) {
-                        this.done = true;
-                    }
-
-                    var token, match, tempMatch, index;
-                    if (!this._more) {
-                        this.yytext = '';
-                        this.match = '';
-                    }
-                    var rules = this._currentRules();
-                    for (var i = 0; i < rules.length; i++) {
-                        tempMatch = this._input.match(this.rules[rules[i]]);
-                        if (tempMatch && (!match || tempMatch[0].length > match[0].length)) {
-                            match = tempMatch;
-                            index = i;
-                            if (this.options.backtrack_lexer) {
-                                token = this.test_match(tempMatch, rules[i]);
-                                if (token !== false) {
-                                    return token;
-                                } else if (this._backtrack) {
-                                    match = false;
-                                    continue; // rule action called reject() implying a rule MISmatch.
-                                } else {
-                                    // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
-                                    return false;
-                                }
-                            } else if (!this.options.flex) {
-                                break;
-                            }
-                        }
-                    }
-                    if (match) {
-                        token = this.test_match(match, rules[index]);
-                        if (token !== false) {
-                            return token;
-                        }
-                        // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
-                        return false;
-                    }
-                    if (this._input === "") {
-                        return this.EOF;
-                    } else {
-                        return this.parseError('Lexical error on line ' + (this.yylineno + 1) + '. Unrecognized text.\n' + this.showPosition(), {
-                            text: "",
-                            token: null,
-                            line: this.yylineno
-                        });
-                    }
-                },
-
-                // return next match that has a token
-                lex: function lex() {
-                    var r = this.next();
-                    if (r) {
-                        return r;
-                    } else {
-                        return this.lex();
-                    }
-                },
-
-                // activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
-                begin: function begin(condition) {
-                    this.conditionStack.push(condition);
-                },
-
-                // pop the previously active lexer condition state off the condition stack
-                popState: function popState() {
-                    var n = this.conditionStack.length - 1;
-                    if (n > 0) {
-                        return this.conditionStack.pop();
-                    } else {
-                        return this.conditionStack[0];
-                    }
-                },
-
-                // produce the lexer rule set which is active for the currently active lexer condition state
-                _currentRules: function _currentRules() {
-                    if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
-                        return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
-                    } else {
-                        return this.conditions["INITIAL"].rules;
-                    }
-                },
-
-                // return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
-                topState: function topState(n) {
-                    n = this.conditionStack.length - 1 - Math.abs(n || 0);
-                    if (n >= 0) {
-                        return this.conditionStack[n];
-                    } else {
-                        return "INITIAL";
-                    }
-                },
-
-                // alias for begin(condition)
-                pushState: function pushState(condition) {
-                    this.begin(condition);
-                },
-
-                // return the number of states currently on the stack
-                stateStackSize: function stateStackSize() {
-                    return this.conditionStack.length;
-                },
-                options: { "case-insensitive": true },
-                performAction: function anonymous(yy, yy_, $avoiding_name_collisions, YY_START) {
-                    switch ($avoiding_name_collisions) {
-                        case 0:
-                            /* skip whitespace */
-                            break;
-                        case 1:
-                            return 20;
-                            break;
-                        case 2:
-                            return 7;
-                            break;
-                        case 3:
-                            return 8;
-                            break;
-                        case 4:
-                            return 9;
-                            break;
-                        case 5:
-                            return 12;
-                            break;
-                        case 6:
-                            return 16;
-                            break;
-                        case 7:
-                            return 14;
-                            break;
-                        case 8:
-                            return 10;
-                            break;
-                        case 9:
-                            return 11;
-                            break;
-                        case 10:
-                            return 19;
-                            break;
-                        case 11:
-                            return 21;
-                            break;
-                        case 12:
-                            return '<=';
-                            break;
-                        case 13:
-                            return '>=';
-                            break;
-                        case 14:
-                            return '<';
-                            break;
-                        case 15:
-                            return '>';
-                            break;
-                        case 16:
-                            yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2);return 24;
-                            break;
-                        case 17:
-                            return 13;
-                            break;
-                        case 18:
-                            return 23;
-                            break;
-                        case 19:
-                            return 5;
-                            break;
-                        case 20:
-                            return 'INVALID';
-                            break;
-                    }
-                },
-                rules: [/^(?:\s+)/i, /^(?:(-?(?:[1-9][0-9]+|[0-9]))\b)/i, /^(?:OR\b)/i, /^(?:AND\b)/i, /^(?:NOT\b)/i, /^(?:((ALL|NONE|HETATM|PROTEIN|BASIC|ACIDIC|CHARGED|POLAR|NONPOLAR|AROMATIC|NUCLEIC|PURINE|PYRIMIDINE|WATER|POLARH|NONPOLARH))\b)/i, /^(?:((NAME|ELEM|TYPE|RESIDUE|ICODE|CHAIN|ALTLOC))\b)/i, /^(?:((SERIAL|SEQUENCE|RESIDX))\b)/i, /^(?:\()/i, /^(?:\))/i, /^(?:,)/i, /^(?::)/i, /^(?:<=)/i, /^(?:>=)/i, /^(?:<)/i, /^(?:>)/i, /^(?:((?:"([^"]*)"|'([^']*)')))/i, /^(?:(@[_A-Z0-9]+))/i, /^(?:([_A-Z0-9]+))/i, /^(?:$)/i, /^(?:.)/i],
-                conditions: { "INITIAL": { "rules": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "inclusive": true } }
-            };
-            return lexer;
-        }();
-        parser.lexer = lexer;
-        function Parser() {
-            this.yy = {};
-        }
-        Parser.prototype = parser;parser.Parser = Parser;
-        return new Parser();
+            rules: [/^(?:\s+)/i, /^(?:(-?(?:[1-9][0-9]+|[0-9]))\b)/i, /^(?:OR\b)/i, /^(?:AND\b)/i, /^(?:NOT\b)/i, /^(?:((ALL|NONE|HETATM|PROTEIN|BASIC|ACIDIC|CHARGED|POLAR|NONPOLAR|AROMATIC|NUCLEIC|PURINE|PYRIMIDINE|WATER|POLARH|NONPOLARH))\b)/i, /^(?:((NAME|ELEM|TYPE|RESIDUE|ICODE|CHAIN|ALTLOC))\b)/i, /^(?:((SERIAL|SEQUENCE|RESIDX))\b)/i, /^(?:\()/i, /^(?:\))/i, /^(?:,)/i, /^(?::)/i, /^(?:<=)/i, /^(?:>=)/i, /^(?:<)/i, /^(?:>)/i, /^(?:((?:"([^"]*)"|'([^']*)')))/i, /^(?:(@[_A-Z0-9]+))/i, /^(?:([_A-Z0-9]+))/i, /^(?:$)/i, /^(?:.)/i],
+            conditions: { "INITIAL": { "rules": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "inclusive": true } }
+        };
+        return lexer;
     }();
-
-    if (typeof commonjsRequire !== 'undefined' && 'object' !== 'undefined') {
-        exports.parser = parser;
-        exports.Parser = parser.Parser;
-        exports.parse = function () {
-            return parser.parse.apply(parser, arguments);
-        };
-        exports.main = function commonjsMain(args) {
-            if (!args[1]) {
-                console.log('Usage: ' + args[0] + ' FILE');
-                process.exit(1);
-            }
-            var source = require$$0.readFileSync(require$$1.normalize(args[1]), "utf8");
-            return exports.parser.parse(source);
-        };
-        if ('object' !== 'undefined' && commonjsRequire.main === module) {
-            exports.main(process.argv.slice(1));
-        }
+    parser.lexer = lexer;
+    function Parser() {
+        this.yy = {};
     }
-});
+    Parser.prototype = parser;parser.Parser = Parser;
+    return new Parser();
+}();
 
+var SelectionParser = { parser: parser };
 var SelectionParser_1 = SelectionParser.parser;
-var SelectionParser_2 = SelectionParser.Parser;
-var SelectionParser_3 = SelectionParser.parse;
-var SelectionParser_4 = SelectionParser.main;
 
 var keywords = {};
 
@@ -67128,7 +66761,6 @@ SelectionParser_1.yy = selectors;
 SelectionParser_1.yy.parseError = SelectionParser_1.parseError; // FIXME: workaround for incorrect JISON parser generator for AMD module
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Basic biological structure class.
@@ -67203,7 +66835,6 @@ BioStructure.prototype.getBoundaries = function () {
 
 BioStructure.prototype.finalize = function () {};
 
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -67449,7 +67080,6 @@ Component.prototype.getMaskedSubdivSequences = function (mask) {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 var cMaxPairsForHashCode = 32;
 var cHashTableSize = 1024 * 1024;
 var cNumbersPerPair = 4;
@@ -67521,7 +67151,6 @@ AtomPairs.prototype.addPair = function (indexA, indexB) {
   return true;
 };
 
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 var cProfileBondBuilder = false;
 var cEstBondsMultiplier = 4;
@@ -67760,7 +67389,6 @@ AutoBond.prototype.destroy = function () {
   }
 };
 
-//////////////////////////////////////////////////////////////////////////////
 var cCrossThresh = 0.1;
 var cAromaticType = Bond.BondType.AROMATIC;
 var cAromaticAtoms = [Element.ByName.C.number, Element.ByName.N.number
@@ -67998,7 +67626,6 @@ AromaticLoopsMarker.prototype.detectCycles = function () {
   this._findLoops(_isPossibleAromatic, _checkCycleComplex);
 };
 
-//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -69334,6 +68961,7 @@ var SecondaryStructureMap = function () {
   return SecondaryStructureMap;
 }();
 
+
 SecondaryStructureMap.StructureType = StructureType;
 
 var VOXEL_SIZE = 5.0;
@@ -70521,7 +70149,6 @@ Complex.prototype.dssp = function () {
 };
 
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Volume constructor
@@ -70905,10 +70532,6 @@ var chem = {
   Molecule: Molecule
 };
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function CSS2DObject(element) {
   Object3D.call(this);
   var self = this;
@@ -71032,8 +70655,6 @@ var capabilities = {
   }
 };
 
-/* eslint-disable no-magic-numbers */
-/* eslint-disable guard-for-in */
 //  var INSTANCED_SPRITE_OVERSCALE = 1.3;
 
 var defaultUniforms = UniformsUtils.merge([UniformsLib.common, //FIXME is it needed
@@ -71300,7 +70921,6 @@ UberMaterial.prototype.updateUniforms = function () {
   this.transparent = true;
 };
 
-/* eslint-disable no-magic-numbers */
 var LAYERS = {
   DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4
 };
@@ -71318,6 +70938,20 @@ Object3D.prototype.updateMatrixWorldRecursive = function () {
   }
   this.updateMatrixWorld();
 };
+// add object to parent, saving objects' world transform
+Object3D.prototype.addSavingWorldTransform = function () {
+  var _worldMatrixInverse = new Matrix4();
+
+  return function (object) {
+    if (object instanceof Object3D) {
+      _worldMatrixInverse.getInverse(this.matrixWorld);
+      _worldMatrixInverse.multiply(object.matrixWorld);
+      object.matrix.copy(_worldMatrixInverse);
+      object.matrix.decompose(object.position, object.quaternion, object.scale);
+      this.add(object);
+    }
+  };
+}();
 
 // render a tiny transparent quad in the center of the screen
 WebGLRenderer.prototype.renderDummyQuad = function () {
@@ -71665,6 +71299,16 @@ function applySelectionMaterial(geo) {
   });
 }
 
+function getMiddlePoint(point1, point2, optionalTarget) {
+  var result = optionalTarget || new Vector3();
+
+  result.set(0, 0, 0);
+  result.addScaledVector(point1, 0.5);
+  result.addScaledVector(point2, 0.5);
+
+  return result;
+}
+
 var gfxutils = {
   calcCylinderMatrix: _calcCylinderMatrix,
   calcChunkMatrix: _calcChunkMatrix,
@@ -71680,6 +71324,7 @@ var gfxutils = {
   processTransparentMaterial: processTransparentMaterial,
   makeVisibleMeshes: makeVisibleMeshes,
   applySelectionMaterial: applySelectionMaterial,
+  getMiddlePoint: getMiddlePoint,
   LAYERS: LAYERS
 };
 
@@ -74995,7 +74640,7 @@ IsosurfaceBuildNormals.prototype.buildNormals = function (numVertices, vertices,
     vNormalZ += dz * w;
     numCloseAtoms++;
   };
-
+  // process all vertices, one by one
   for (var i = 0; i < numVertices; i++) {
     vx = vertices[i].x;
     vy = vertices[i].y;
@@ -75006,6 +74651,7 @@ IsosurfaceBuildNormals.prototype.buildNormals = function (numVertices, vertices,
 
     this.forEachRelatedAtom(vertices[i], gatherNormals);
 
+    // normalize vNormal
     dist2 = vNormalX * vNormalX + vNormalY * vNormalY + vNormalZ * vNormalZ;
     if (numCloseAtoms > 0) {
       koef = 1.0 / Math.sqrt(dist2);
@@ -75096,9 +74742,6 @@ IsosurfaceBuildNormals.prototype.buildColors = function (numVertices, vertices, 
   } // for (i) all vertices
   return 0;
 };
-
-// suppress some JSHint warnings
-/*jshint bitwise: false*/
 
 function IsoSurfaceCluster(fileIn, pdbAtomsIn, atomsIn, vBoxMinIn, vBoxMaxIn, numVoxelsIn, colorModeIn) {
   this.complex = fileIn;
@@ -75288,8 +74931,6 @@ IsoSurfaceCluster.prototype.buildSimple = function (complex, colorer) {
         atomsClustered[numSpheres].colorY = vColorY;
         atomsClustered[numSpheres].colorZ = vColorZ;
         numSpheres++;
-
-        
       } // for (x)
     } // for (y)
   } // for (z)
@@ -76912,8 +76553,6 @@ AtomsSurfaceGroup.prototype._makeGeoArgs = function (selection, mode, _colorer, 
   return [n, opts];
 };
 
-/* This is a stub class keep it until SAS/SES is refactored */
-
 function AtomsSASSESGroupStub(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
   AtomsSphereGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
 }
@@ -77798,7 +77437,6 @@ Licensed under MIT license (see "Smooth.js MIT license.txt")
 
 }).call(commonjsGlobal);
 });
-
 var Smooth_1 = Smooth.Smooth;
 
 var ResidueType$2 = chem.ResidueType;
@@ -79039,7 +78677,6 @@ Mode.prototype.buildGeometry = function (complex, colorer, mask, material) {
   return group;
 };
 
-/* eslint-disable no-magic-numbers */
 /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 function LabeledMode(opts) {
   Mode.call(this, opts);
@@ -79119,7 +78756,6 @@ LinesMode.prototype.getLabelOpts = function () {
   };
 };
 
-/* eslint-disable no-magic-numbers */
 function LicoriceMode(opts) {
   LabeledMode.call(this, opts);
 }
@@ -79168,7 +78804,6 @@ LicoriceMode.prototype.getLabelOpts = function () {
   };
 };
 
-/* eslint-disable no-magic-numbers */
 function BallsAndSticksMode(opts) {
   LabeledMode.call(this, opts);
 }
@@ -79534,11 +79169,6 @@ TextMode.prototype.getLabelOpts = function () {
     transparent: true
   });
 };
-
-/**
- * Mode list.
- * @module gfx/modes
- */
 
 // FIXME: deps for amdclean
 
@@ -80506,10 +80136,6 @@ MoleculeColorer.prototype.getResidueColor = function (residue, _complex) {
   return this.palette.getGradientColor(0, this.opts.gradient);
 };
 
-/**
- * Colorer list.
- * @module gfx/colorers
- */
 var colorerList = [];
 var colorerDict = {};
 var ag$2 = [ElementColorer, ResidueTypeColorer, SequenceColorer, ChainColorer, SecondaryStructureColorer, UniformColorer, ConditionalColorer, ConformationColorer, TemperatureColorer, OccupancyColorer, HydrophobicityColorer, MoleculeColorer];
@@ -81801,8 +81427,6 @@ ComplexVisual.prototype.rebuild = function () {
               throw e;
             }
           }
-
-          
         }
 
         hasGeometry = errorOccured || hasGeometry || gfxutils.groupHasGeometryToRender(repr.geo);
@@ -82048,8 +81672,6 @@ ComplexVisual.prototype.within = function (selector, radius) {
 
 var volumeFrag = "uniform mat4 projectionMatrix;\r\n\r\n// 3D volume texture\r\nuniform vec3 volumeDim;    // volume dimensions, pixels\r\nuniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data\r\nuniform vec2 tileTexSize;  // size of tiled texture, pixels\r\nuniform vec2 tileStride;   // UV stride between slices in tile tex, pixels\r\n\r\nuniform float _isoLevel0;\r\nuniform float _flipV;\r\nuniform sampler2D _BFLeft;\r\nuniform sampler2D _BFRight;\r\nuniform sampler2D _FFLeft;\r\nuniform sampler2D _FFRight;\r\nuniform sampler2D _WFFLeft;\r\nuniform sampler2D _WFFRight;\r\n\r\nvarying vec4 screenSpacePos;\r\n\r\nvec4 sample3DTexture(vec3 texCoord)\r\n{\r\n  float rowTiles = floor(tileTexSize.x / tileStride.x);\r\n\r\n  // a pair of Z slices is determined by nearest slice border\r\n  float zSliceBorder = floor(texCoord.z * volumeDim.z + 0.5);\r\n  float zSliceNumber1 = max(zSliceBorder - 1.0, 0.0);\r\n  float zSliceNumber2 = min(zSliceBorder, volumeDim.z - 1.0);\r\n\r\n  // calculate coords in tile texture for both slices\r\n  vec2 tileOffset = vec2(mod(zSliceNumber1, rowTiles), floor(zSliceNumber1 / rowTiles));\r\n  vec2 texCoordSlice1 = (texCoord.xy * volumeDim.xy + tileOffset * tileStride) / tileTexSize.xy;\r\n  tileOffset = vec2(mod(zSliceNumber2, rowTiles), floor(zSliceNumber2 / rowTiles));\r\n  vec2 texCoordSlice2 = (texCoord.xy * volumeDim.xy + tileOffset * tileStride) / tileTexSize.xy;\r\n\r\n  // bilinear filtering\r\n  vec4 colorSlice1 = texture2D(tileTex, texCoordSlice1);\r\n  vec4 colorSlice2 = texture2D(tileTex, texCoordSlice2);\r\n  float weightSlice2 = texCoord.z * volumeDim.z - (zSliceNumber1 + 0.5);\r\n  return mix(colorSlice1, colorSlice2, weightSlice2);\r\n}\r\n\r\nfloat CalcColor(vec3 iter, vec3 dir)\r\n{\r\n  float d = 1.0 / 128.0;\r\n  vec3 dx = vec3(d, 0.0, 0.0);\r\n  vec3 dy = vec3(0.0, d, 0.0);\r\n  vec3 dz = vec3(0.0, 0.0, d);\r\n  vec3 N;\r\n  N.x = sample3DTexture(iter + dx).r - sample3DTexture(iter - dx).r;\r\n  N.y = sample3DTexture(iter + dy).r - sample3DTexture(iter - dy).r;\r\n  N.z = sample3DTexture(iter + dz).r - sample3DTexture(iter - dz).r;\r\n  N = normalize(N);\r\n  float dif = max(0.0, dot(N,dir));\r\n  return dif;\r\n}\r\n\r\nvec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)\r\n{\r\n  for (int i = 0; i < 5; i++)\r\n  {\r\n    vec3 iterator = 0.5*(left + right);\r\n    float vol = sample3DTexture(iterator).r;\r\n    if ((volLeft - threshold)*(vol - threshold) < 0.)\r\n      right = iterator;\r\n    else\r\n      left = iterator;\r\n  }\r\n  return 0.5*(left + right);\r\n}\r\n\r\nvec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count)\r\n{\r\n  float vol, stepSize = (0.5*float(count) + 1.) / 85.;\r\n  //    \t\tfloat vol, stepSize = (0.5*count + 1.) / 64.;// 128.;\r\n  vec3 step = stepSize*dir, iterator = start, left, right;\r\n  vec4 acc = vec4(0., 0., 0., 0.);\r\n    for (int i=0; i < 200; i++)\r\n    {\r\n      iterator = iterator + step;\r\n      vol = sample3DTexture(iterator).r;\r\n      if (length(iterator - back) < stepSize || vol > tr)\r\n        break;\r\n    }\r\n    if (vol > tr)\r\n    {\r\n      left = iterator - step;\r\n      right = iterator;\r\n      for (int j = 0; j < 5; j++)\r\n      {\r\n        iterator = 0.5*(left + right);\r\n        float vol = sample3DTexture(iterator).r;\r\n        if (vol > tr)\r\n          right = iterator;\r\n        else\r\n          left = iterator;\r\n      }\r\n      acc = vec4(0.5*(left + right), 1.);\r\n    }\r\n\r\n  return acc;\r\n}\r\n\r\nvec3 GetCol(float vol, vec3 ad)\r\n{\r\n  vec3 col;\r\n  float a = 0.36, b = 0.44;\r\n  if (vol < a)\r\n    col = mix(vec3(0., 0., 1.), vec3(0., 1., 0.), max(0., (vol - _isoLevel0)*ad.r));// / (a - IsoLevel0)));\r\n  if (vol > a && vol < b)\r\n    col = mix(vec3(0., 1., 0.), vec3(0.5, 0.5, 0.), (vol - a)*ad.b); // / (b - a));\r\n  if (vol > b)\r\n    col = mix(vec3(0.5, 0.5, 0.), vec3(1., 0., 0.), (vol - b)*ad.g); // / (0.52 - b));\r\n  return col;\r\n}\r\n\r\nvec3 CorrectIso(vec3 left, vec3 right, float tr)\r\n{\r\n  for (int j = 0; j < 5; j++)\r\n  {\r\n    vec3 iterator = 0.5*(left + right);\r\n    float vol = sample3DTexture(iterator).r;\r\n    if (vol < tr)\r\n      right = iterator;\r\n    else\r\n      left = iterator;\r\n  }\r\n  return 0.5*(left + right);\r\n}\r\n\r\nvec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  vec4 acc = vec4(0., 0., 0., 0.), iso;\r\n  vec3 iterator = start, sumColor = vec3(0., 0., 0.);\r\n  //\t\t\t\tfloat stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;\r\n  float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;\r\n  vec3 step = stepSize*dir, col, colOld, right;\r\n  float tr0 = _isoLevel0;\r\n  float dif, r, kd, finish;\r\n  int count = 0, stopMol = 0;\r\n  float a = 0.36, b = 0.44;\r\n  vec3 ad = vec3(1. / (a - _isoLevel0), 1. / (b - a), 1. / (0.52 - b));\r\n  kd = 140.*tr0*stepSize;\r\n  r = 1. - kd;\r\n\r\n  for (int k = 0; k < 3; k++)\r\n  {\r\n    stepSize = (0.5*float(k) + 1.) / 85.;\r\n    kd = 140.*tr0*stepSize;\r\n    r = 1. - kd;\r\n    step = stepSize*dir;\r\n    iso = GetIso1(iterator, back, molDist, dir, tr0, k);\r\n    if (iso.a < 0.1 || length(iso.rgb - start) > molDist)\r\n      break;\r\n    iterator = iso.rgb;\r\n    dif = 1.;// CalcColor(iterator, dir);\r\n    colOld = GetCol(tr0, ad);\r\n    curStepSize = stepSize;\r\n    for (int i=0; i < 200; i++)\r\n    {\r\n      iterator = iterator + step;\r\n      molD = length(iterator - start);\r\n      vol = sample3DTexture(iterator).r;\r\n      finish = distance(iterator, back) - stepSize;\r\n      if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)\r\n        break;\r\n      alpha = (1. - r);\r\n      col = GetCol(vol, ad);\r\n      vol = sample3DTexture(iterator - 0.5*step).r;\r\n      vec3 colMid = GetCol(vol, ad);\r\n      sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;\r\n      sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);\r\n      colOld = col;\r\n    } // for i\r\n    if (finish < 0.0 || sumAlpha > 0.97)\r\n      break;\r\n    if (molD > molDist)\r\n    {\r\n      curStepSize = stepSize - (molD - molDist);\r\n      right = iterator - (molD - molDist)*dir;\r\n      vol = sample3DTexture(right).r;\r\n    }\r\n    else\r\n    {\r\n      vec3 left = iterator - step;\r\n      right = CorrectIso(left, iterator, tr0);\r\n      curStepSize = distance(left, right);\r\n      vol = tr0;\r\n    }\r\n    alpha = (1. - r)*curStepSize / stepSize;\r\n    dif = 1.;// CalcColor(right, dir);\r\n    col = GetCol(vol, ad);\r\n    vol = sample3DTexture(iterator - 0.5*curStepSize / stepSize*step).r;\r\n    vec3 colMid = GetCol(vol, ad);\r\n    sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;\r\n    sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);\r\n    if (molD > molDist)\r\n      break;\r\n  } // for k\r\n  acc.rgb = 1.*sumColor / sumAlpha;\r\n  acc.a = sumAlpha;\r\n  return acc;\r\n}\r\n\r\nvec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  float stepSize = 1.0 / 200.0;\r\n  float len = length(back - start);\r\n  vec3 step = stepSize*dir;\r\n  vec3 iterator = start;\r\n  float acc = 0.0;\r\n\r\n  for (int i=0; i < 200; i++)\r\n  {\r\n    if (float(i) * stepSize > len) break;\r\n    iterator = iterator + step;\r\n    acc += sample3DTexture(iterator).r / 200.0;\r\n  }\r\n\r\n  return vec4(1,1,1, acc);\r\n}\r\n\r\nvec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  vec4 tst = GetIso1(start, back, 2., dir, 0.28, 0);\r\n  vec4 col = vec4(0, 0., 0., 0.);\r\n  if (tst.a > 0.1)\r\n  {\r\n   float dif = CalcColor(tst.rgb, dir);\r\n   col = vec4(dif, 0., 0., 1.);\r\n  }\r\n  return col;\r\n}\r\n\r\nvec4 VolRender3(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  return sample3DTexture(start);\r\n}\r\n\r\nvoid main()\r\n{\r\n  vec3 tc = screenSpacePos.xyz / screenSpacePos.w * 0.5 + 0.5;\r\n\r\n  if (_flipV > 0.0) {\r\n    tc.y = 1.0 - tc.y;\r\n  }\r\n\r\n  vec3 start;\r\n  vec3 back;\r\n  vec3 molBack;\r\n  if (projectionMatrix[0][2] < 0.0)\r\n  {\r\n    start = texture2D(_FFLeft, tc.xy).xyz;\r\n    back = texture2D(_BFLeft, tc.xy).xyz;\r\n    molBack = texture2D(_WFFLeft, tc.xy).xyz;\r\n  }\r\n  else\r\n  {\r\n    start = texture2D(_FFRight, tc.xy).xyz;\r\n    back = texture2D(_BFRight, tc.xy).xyz;\r\n    molBack = texture2D(_WFFRight, tc.xy).xyz;\r\n  }\r\n\r\n  vec3 dir = normalize(back - start);\r\n\r\n  float molDist = 2.0;\r\n  if (length(molBack) > 0.001)\r\n  {\r\n    molDist = distance(start, molBack);\r\n  }\r\n\r\n  //gl_FragColor = texture2D(_WFFLeft, tc.xy);\r\n  //gl_FragColor = texture2D(tileTex, tc.xy);\r\n  gl_FragColor = VolRender(start, back, molDist, dir);\r\n}\r\n";
 
-/* eslint-disable no-magic-numbers */
-/* eslint-disable guard-for-in */
 var volumeUniforms = UniformsUtils.merge([{
   volumeDim: { type: 'v3', value: new Vector3(512, 512, 512) },
   tileTex: { type: 't', value: null },
@@ -82892,6 +82514,7 @@ var Loader$1 = function (_EventDispatcher) {
   return Loader;
 }(EventDispatcher$1);
 
+
 makeContextDependent(Loader$1.prototype);
 
 var FileLoader$1 = function (_Loader) {
@@ -82958,6 +82581,7 @@ var FileLoader$1 = function (_Loader) {
   }]);
   return FileLoader;
 }(Loader$1);
+
 
 FileLoader$1.types = ['file', 'blob'];
 
@@ -83039,6 +82663,7 @@ var XHRLoader$1 = function (_Loader) {
   return XHRLoader;
 }(Loader$1);
 
+
 XHRLoader$1.types = ['url'];
 
 var ImmediateLoader = function (_Loader) {
@@ -83070,6 +82695,7 @@ var ImmediateLoader = function (_Loader) {
   }]);
   return ImmediateLoader;
 }(Loader$1);
+
 
 ImmediateLoader.types = ['immediate'];
 
@@ -83229,6 +82855,7 @@ var Parser = function () {
   }]);
   return Parser;
 }();
+
 
 makeContextDependent(Parser.prototype);
 
@@ -83420,13 +83047,13 @@ var PDBStream = function () {
   return PDBStream;
 }();
 
-var Complex$2 = chem.Complex;
-var Element$3 = chem.Element;
-var Helix$2 = chem.Helix;
-var Sheet$2 = chem.Sheet;
-var Strand$2 = chem.Strand;
-var Bond$2 = chem.Bond;
-var Molecule$2 = chem.Molecule;
+var Complex$2 = chem.Complex,
+    Element$3 = chem.Element,
+    Helix$2 = chem.Helix,
+    Sheet$2 = chem.Sheet,
+    Strand$2 = chem.Strand,
+    Bond$2 = chem.Bond,
+    Molecule$2 = chem.Molecule;
 
 var TAG_LENGTH = 6;
 
@@ -83902,11 +83529,11 @@ PDBParser.prototype.parseSync = function () {
 PDBParser.formats = ['pdb'];
 PDBParser.extensions = ['.pdb', '.ent'];
 
-var Complex$3 = chem.Complex;
-var Element$4 = chem.Element;
-var AtomName$2 = chem.AtomName;
-var SGroup$2 = chem.SGroup;
-var Bond$3 = chem.Bond;
+var Complex$3 = chem.Complex,
+    Element$4 = chem.Element,
+    AtomName$2 = chem.AtomName,
+    SGroup$2 = chem.SGroup,
+    Bond$3 = chem.Bond;
 
 var cOrderCharCodes = {
   A: 0,
@@ -84577,17 +84204,17 @@ var mmtf = createCommonjsModule(function (module, exports) {
 !function(r,t){if("function"==typeof undefined&&undefined.amd)undefined(["exports"],t);else t(exports);}(commonjsGlobal,function(r){function t(r,t,n){for(var e=(r.byteLength, 0),i=n.length;i>e;e++){var o=n.charCodeAt(e);if(128>o)r.setUint8(t++,o>>>0&127|0);else if(2048>o)r.setUint8(t++,o>>>6&31|192), r.setUint8(t++,o>>>0&63|128);else if(65536>o)r.setUint8(t++,o>>>12&15|224), r.setUint8(t++,o>>>6&63|128), r.setUint8(t++,o>>>0&63|128);else{if(!(1114112>o))throw new Error("bad codepoint "+o);r.setUint8(t++,o>>>18&7|240), r.setUint8(t++,o>>>12&63|128), r.setUint8(t++,o>>>6&63|128), r.setUint8(t++,o>>>0&63|128);}}}function n(r){for(var t=0,n=0,e=r.length;e>n;n++){var i=r.charCodeAt(n);if(128>i)t+=1;else if(2048>i)t+=2;else if(65536>i)t+=3;else{if(!(1114112>i))throw new Error("bad codepoint "+i);t+=4;}}return t}function e(r,i,o){var a=typeof r;if("string"===a){var u=n(r);if(32>u)return i.setUint8(o,160|u), t(i,o+1,r), 1+u;if(256>u)return i.setUint8(o,217), i.setUint8(o+1,u), t(i,o+2,r), 2+u;if(65536>u)return i.setUint8(o,218), i.setUint16(o+1,u), t(i,o+3,r), 3+u;if(4294967296>u)return i.setUint8(o,219), i.setUint32(o+1,u), t(i,o+5,r), 5+u}if(r instanceof Uint8Array){var u=r.byteLength,s=new Uint8Array(i.buffer);if(256>u)return i.setUint8(o,196), i.setUint8(o+1,u), s.set(r,o+2), 2+u;if(65536>u)return i.setUint8(o,197), i.setUint16(o+1,u), s.set(r,o+3), 3+u;if(4294967296>u)return i.setUint8(o,198), i.setUint32(o+1,u), s.set(r,o+5), 5+u}if("number"===a){if(!isFinite(r))throw new Error("Number not finite: "+r);if(Math.floor(r)!==r)return i.setUint8(o,203), i.setFloat64(o+1,r), 9;if(r>=0){if(128>r)return i.setUint8(o,r), 1;if(256>r)return i.setUint8(o,204), i.setUint8(o+1,r), 2;if(65536>r)return i.setUint8(o,205), i.setUint16(o+1,r), 3;if(4294967296>r)return i.setUint8(o,206), i.setUint32(o+1,r), 5;throw new Error("Number too big 0x"+r.toString(16))}if(r>=-32)return i.setInt8(o,r), 1;if(r>=-128)return i.setUint8(o,208), i.setInt8(o+1,r), 2;if(r>=-32768)return i.setUint8(o,209), i.setInt16(o+1,r), 3;if(r>=-2147483648)return i.setUint8(o,210), i.setInt32(o+1,r), 5;throw new Error("Number too small -0x"+(-r).toString(16).substr(1))}if(null===r)return i.setUint8(o,192), 1;if("boolean"===a)return i.setUint8(o,r?195:194), 1;if("object"===a){var u,f=0,c=Array.isArray(r);if(c)u=r.length;else{var d=Object.keys(r);u=d.length;}var f;if(16>u?(i.setUint8(o,u|(c?144:128)), f=1):65536>u?(i.setUint8(o,c?220:222), i.setUint16(o+1,u), f=3):4294967296>u&&(i.setUint8(o,c?221:223), i.setUint32(o+1,u), f=5), c)for(var l=0;u>l;l++)f+=e(r[l],i,o+f);else for(var l=0;u>l;l++){var v=d[l];f+=e(v,i,o+f), f+=e(r[v],i,o+f);}return f}throw new Error("Unknown type "+a)}function i(r){var t=typeof r;if("string"===t){var e=n(r);if(32>e)return 1+e;if(256>e)return 2+e;if(65536>e)return 3+e;if(4294967296>e)return 5+e}if(r instanceof Uint8Array){var e=r.byteLength;if(256>e)return 2+e;if(65536>e)return 3+e;if(4294967296>e)return 5+e}if("number"===t){if(Math.floor(r)!==r)return 9;if(r>=0){if(128>r)return 1;if(256>r)return 2;if(65536>r)return 3;if(4294967296>r)return 5;throw new Error("Number too big 0x"+r.toString(16))}if(r>=-32)return 1;if(r>=-128)return 2;if(r>=-32768)return 3;if(r>=-2147483648)return 5;throw new Error("Number too small -0x"+r.toString(16).substr(1))}if("boolean"===t||null===r)return 1;if("object"===t){var e,o=0;if(Array.isArray(r)){e=r.length;for(var a=0;e>a;a++)o+=i(r[a]);}else{var u=Object.keys(r);e=u.length;for(var a=0;e>a;a++){var s=u[a];o+=i(s)+i(r[s]);}}if(16>e)return 1+o;if(65536>e)return 3+o;if(4294967296>e)return 5+o;throw new Error("Array or object too long 0x"+e.toString(16))}throw new Error("Unknown type "+t)}function o(r){var t=new ArrayBuffer(i(r)),n=new DataView(t);return e(r,n,0), new Uint8Array(t)}function a(r,t,n){return t?new r(t.buffer,t.byteOffset,t.byteLength/(n||1)):void 0}function u(r){return a(DataView,r)}function s(r){return a(Uint8Array,r)}function f(r){return a(Int8Array,r)}function c(r){return a(Int32Array,r,4)}function d(r){return a(Float32Array,r,4)}function l(r,t){var n=r.length/2;t||(t=new Int16Array(n));for(var e=0,i=0;n>e;++e, i+=2)t[e]=r[i]<<8^r[i+1]<<0;return t}function v(r,t){var n=r.length;t||(t=new Uint8Array(2*n));for(var e=u(t),i=0;n>i;++i)e.setInt16(2*i,r[i]);return s(t)}function g(r,t){var n=r.length/4;t||(t=new Int32Array(n));for(var e=0,i=0;n>e;++e, i+=4)t[e]=r[i]<<24^r[i+1]<<16^r[i+2]<<8^r[i+3]<<0;return t}function L(r,t){var n=r.length;t||(t=new Uint8Array(4*n));for(var e=u(t),i=0;n>i;++i)e.setInt32(4*i,r[i]);return s(t)}function h(r,t){var n=r.length;t||(t=new Float32Array(n/4));for(var e=u(t),i=u(r),o=0,a=0,s=n/4;s>o;++o, a+=4)e.setFloat32(a,i.getFloat32(a),!0);return t}function y(r,t,n){var e=r.length,i=1/t;n||(n=new Float32Array(e));for(var o=0;e>o;++o)n[o]=r[o]*i;return n}function m(r,t,n){var e=r.length;n||(n=new Int32Array(e));for(var i=0;e>i;++i)n[i]=Math.round(r[i]*t);return n}function p(r,t){var n,e;if(!t){var i=0;for(n=0, e=r.length;e>n;n+=2)i+=r[n+1];t=new r.constructor(i);}var o=0;for(n=0, e=r.length;e>n;n+=2)for(var a=r[n],u=r[n+1],s=0;u>s;++s)t[o]=a, ++o;return t}function U(r){if(0===r.length)return new Int32Array;var t,n,e=2;for(t=1, n=r.length;n>t;++t)r[t-1]!==r[t]&&(e+=2);var i=new Int32Array(e),o=0,a=1;for(t=1, n=r.length;n>t;++t)r[t-1]!==r[t]?(i[o]=r[t-1], i[o+1]=a, a=1, o+=2):++a;return i[o]=r[r.length-1], i[o+1]=a, i}function b(r,t){var n=r.length;t||(t=new r.constructor(n)), n&&(t[0]=r[0]);for(var e=1;n>e;++e)t[e]=r[e]+t[e-1];return t}function I(r,t){var n=r.length;t||(t=new r.constructor(n)), t[0]=r[0];for(var e=1;n>e;++e)t[e]=r[e]-r[e-1];return t}function w(r,t){var n,e,i=r instanceof Int8Array?127:32767,o=-i-1,a=r.length;if(!t){var u=0;for(n=0;a>n;++n)r[n]<i&&r[n]>o&&++u;t=new Int32Array(u);}for(n=0, e=0;a>n;){for(var s=0;r[n]===i||r[n]===o;)s+=r[n], ++n;s+=r[n], ++n, t[e]=s, ++e;}return t}function C(r,t){var n,e=t?127:32767,i=-e-1,o=r.length,a=0;for(n=0;o>n;++n){var u=r[n];0===u?++a:a+=u===e||u===i?2:u>0?Math.ceil(u/e):Math.ceil(u/i);}var s=t?new Int8Array(a):new Int16Array(a),f=0;for(n=0;o>n;++n){var u=r[n];if(u>=0)for(;u>=e;)s[f]=e, ++f, u-=e;else for(;i>=u;)s[f]=i, ++f, u-=i;s[f]=u, ++f;}return s}function A(r,t){return b(p(r),t)}function x(r){return U(I(r))}function M(r,t,n){return y(p(r,c(n)),t,n)}function F(r,t){return U(m(r,t))}function S(r,t,n){return y(b(r,c(n)),t,n)}function E(r,t,n){return I(m(r,t),n)}function N(r,t,n){return y(w(r,c(n)),t,n)}function O(r,t,n){var e=w(r,c(n));return S(e,t,d(e))}function T(r,t,n){return C(E(r,t),n)}function k(r){var t=u(r),n=t.getInt32(0),e=t.getInt32(4),i=r.subarray(8,12),r=r.subarray(12);return[n,r,e,i]}function j(r,t,n,e){var i=new ArrayBuffer(12+e.byteLength),o=new Uint8Array(i),a=new DataView(i);return a.setInt32(0,r), a.setInt32(4,t), n&&o.set(n,8), o.set(e,12), o}function q(r){var t=r.length,n=s(r);return j(2,t,void 0,n)}function D(r){var t=r.length,n=L(r);return j(4,t,void 0,n)}function P(r,t){var n=r.length/t,e=L([t]),i=s(r);return j(5,n,e,i)}function z(r){var t=r.length,n=L(U(r));return j(6,t,void 0,n)}function B(r){var t=r.length,n=L(x(r));return j(8,t,void 0,n)}function V(r,t){var n=r.length,e=L([t]),i=L(F(r,t));return j(9,n,e,i)}function G(r,t){var n=r.length,e=L([t]),i=v(T(r,t));return j(10,n,e,i)}function R(r){var t={};return rr.forEach(function(n){void 0!==r[n]&&(t[n]=r[n]);}), r.bondAtomList&&(t.bondAtomList=D(r.bondAtomList)), r.bondOrderList&&(t.bondOrderList=q(r.bondOrderList)), t.xCoordList=G(r.xCoordList,1e3), t.yCoordList=G(r.yCoordList,1e3), t.zCoordList=G(r.zCoordList,1e3), r.bFactorList&&(t.bFactorList=G(r.bFactorList,100)), r.atomIdList&&(t.atomIdList=B(r.atomIdList)), r.altLocList&&(t.altLocList=z(r.altLocList)), r.occupancyList&&(t.occupancyList=V(r.occupancyList,100)), t.groupIdList=B(r.groupIdList), t.groupTypeList=D(r.groupTypeList), r.secStructList&&(t.secStructList=q(r.secStructList,1)), r.insCodeList&&(t.insCodeList=z(r.insCodeList)), r.sequenceIndexList&&(t.sequenceIndexList=B(r.sequenceIndexList)), t.chainIdList=P(r.chainIdList,4), r.chainNameList&&(t.chainNameList=P(r.chainNameList,4)), t}function H(r){function t(r){for(var t={},n=0;r>n;n++){var e=o();t[e]=o();}return t}function n(t){var n=r.subarray(a,a+t);return a+=t, n}function e(t){var n=r.subarray(a,a+t);a+=t;var e=65535;if(t>e){for(var i=[],o=0;o<n.length;o+=e)i.push(String.fromCharCode.apply(null,n.subarray(o,o+e)));return i.join("")}return String.fromCharCode.apply(null,n)}function i(r){for(var t=new Array(r),n=0;r>n;n++)t[n]=o();return t}function o(){var o,s,f=r[a];if(0===(128&f))return a++, f;if(128===(240&f))return s=15&f, a++, t(s);if(144===(240&f))return s=15&f, a++, i(s);if(160===(224&f))return s=31&f, a++, e(s);if(224===(224&f))return o=u.getInt8(a), a++, o;switch(f){case 192:return a++, null;case 194:return a++, !1;case 195:return a++, !0;case 196:return s=u.getUint8(a+1), a+=2, n(s);case 197:return s=u.getUint16(a+1), a+=3, n(s);case 198:return s=u.getUint32(a+1), a+=5, n(s);case 202:return o=u.getFloat32(a+1), a+=5, o;case 203:return o=u.getFloat64(a+1), a+=9, o;case 204:return o=r[a+1], a+=2, o;case 205:return o=u.getUint16(a+1), a+=3, o;case 206:return o=u.getUint32(a+1), a+=5, o;case 208:return o=u.getInt8(a+1), a+=2, o;case 209:return o=u.getInt16(a+1), a+=3, o;case 210:return o=u.getInt32(a+1), a+=5, o;case 217:return s=u.getUint8(a+1), a+=2, e(s);case 218:return s=u.getUint16(a+1), a+=3, e(s);case 219:return s=u.getUint32(a+1), a+=5, e(s);case 220:return s=u.getUint16(a+1), a+=3, i(s);case 221:return s=u.getUint32(a+1), a+=5, i(s);case 222:return s=u.getUint16(a+1), a+=3, t(s);case 223:return s=u.getUint32(a+1), a+=5, t(s)}throw new Error("Unknown type 0x"+f.toString(16))}var a=0,u=new DataView(r.buffer);return o()}function W(r,t,n,e){switch(r){case 1:return h(t);case 2:return f(t);case 3:return l(t);case 4:return g(t);case 5:return s(t);case 6:return p(g(t),new Uint8Array(n));case 7:return p(g(t));case 8:return A(g(t));case 9:return M(g(t),g(e)[0]);case 10:return O(l(t),g(e)[0]);case 11:return y(l(t),g(e)[0]);case 12:return N(l(t),g(e)[0]);case 13:return N(f(t),g(e)[0]);case 14:return w(l(t));case 15:return w(f(t))}}function X(r,t){t=t||{};var n=t.ignoreFields,e={};return nr.forEach(function(t){var i=n?-1!==n.indexOf(t):!1,o=r[t];i||void 0===o||(o instanceof Uint8Array?e[t]=W.apply(null,k(o)):e[t]=o);}), e}function J(r){return String.fromCharCode.apply(null,r).replace(/\0/g,"")}function K(r,t,n){n=n||{};var e,i,o,a,u,s,f=n.firstModelOnly,c=t.onModel,d=t.onChain,l=t.onGroup,v=t.onAtom,g=t.onBond,L=0,h=0,y=0,m=0,p=0,U=-1,b=r.chainNameList,I=r.secStructList,w=r.insCodeList,C=r.sequenceIndexList,A=r.atomIdList,x=r.bFactorList,M=r.altLocList,F=r.occupancyList,S=r.bondAtomList,E=r.bondOrderList;for(e=0, i=r.chainsPerModel.length;i>e&&!(f&&L>0);++e){var N=r.chainsPerModel[L];for(c&&c({chainCount:N,modelIndex:L}), o=0;N>o;++o){var O=r.groupsPerChain[h];if(d){var T=J(r.chainIdList.subarray(4*h,4*h+4)),k=null;b&&(k=J(b.subarray(4*h,4*h+4))), d({groupCount:O,chainIndex:h,modelIndex:L,chainId:T,chainName:k});}for(a=0;O>a;++a){var j=r.groupList[r.groupTypeList[y]],q=j.atomNameList.length;if(l){var D=null;I&&(D=I[y]);var P=null;r.insCodeList&&(P=String.fromCharCode(w[y]));var z=null;C&&(z=C[y]), l({atomCount:q,groupIndex:y,chainIndex:h,modelIndex:L,groupId:r.groupIdList[y],groupType:r.groupTypeList[y],groupName:j.groupName,singleLetterCode:j.singleLetterCode,chemCompType:j.chemCompType,secStruct:D,insCode:P,sequenceIndex:z});}for(u=0;q>u;++u){if(v){var B=null;A&&(B=A[m]);var V=null;x&&(V=x[m]);var G=null;M&&(G=String.fromCharCode(M[m]));var R=null;F&&(R=F[m]), v({atomIndex:m,groupIndex:y,chainIndex:h,modelIndex:L,atomId:B,element:j.elementList[u],atomName:j.atomNameList[u],formalCharge:j.formalChargeList[u],xCoord:r.xCoordList[m],yCoord:r.yCoordList[m],zCoord:r.zCoordList[m],bFactor:V,altLoc:G,occupancy:R});}m+=1;}if(g){var H=j.bondAtomList;for(u=0, s=j.bondOrderList.length;s>u;++u)g({atomIndex1:m-q+H[2*u],atomIndex2:m-q+H[2*u+1],bondOrder:j.bondOrderList[u]});}y+=1;}h+=1;}if(p=U+1, U=m-1, g&&S)for(u=0, s=S.length;s>u;u+=2){var W=S[u],X=S[u+1];(W>=p&&U>=W||X>=p&&U>=X)&&g({atomIndex1:W,atomIndex2:X,bondOrder:E?E[u/2]:null});}L+=1;}}function Q(r){return o(R(r))}function Y(r,t){r instanceof ArrayBuffer&&(r=new Uint8Array(r));var n;return n=r instanceof Uint8Array?H(r):r, X(n,t)}function Z(r,t,n,e){function i(){try{var r=Y(o.response);n(r);}catch(t){e(t);}}var o=new XMLHttpRequest;o.addEventListener("load",i,!0), o.addEventListener("error",e,!0), o.responseType="arraybuffer", o.open("GET",t+r.toUpperCase()), o.send();}function $(r,t,n){Z(r,or,t,n);}function _(r,t,n){Z(r,ar,t,n);}var rr=["mmtfVersion","mmtfProducer","unitCell","spaceGroup","structureId","title","depositionDate","releaseDate","experimentalMethods","resolution","rFree","rWork","bioAssemblyList","ncsOperatorList","entityList","groupList","numBonds","numAtoms","numGroups","numChains","numModels","groupsPerChain","chainsPerModel"],tr=["xCoordList","yCoordList","zCoordList","groupIdList","groupTypeList","chainIdList","bFactorList","atomIdList","altLocList","occupancyList","secStructList","insCodeList","sequenceIndexList","chainNameList","bondAtomList","bondOrderList"],nr=rr.concat(tr),er="v1.1.0dev",ir="//mmtf.rcsb.org/v1.0/",or=ir+"full/",ar=ir+"reduced/";r.encode=Q, r.decode=Y, r.traverse=K, r.fetch=$, r.fetchReduced=_, r.version=er, r.fetchUrl=or, r.fetchReducedUrl=ar, r.encodeMsgpack=o, r.encodeMmtf=R, r.decodeMsgpack=H, r.decodeMmtf=X;});
 });
 
-var Complex$4 = chem.Complex;
-var Chain$2 = chem.Chain;
-var Atom$2 = chem.Atom;
-var AtomName$3 = chem.AtomName;
-var Element$5 = chem.Element;
-var Helix$3 = chem.Helix;
-var Sheet$3 = chem.Sheet;
-var Strand$3 = chem.Strand;
-var Bond$4 = chem.Bond;
-var Assembly$3 = chem.Assembly;
-var Molecule$3 = chem.Molecule;
+var Complex$4 = chem.Complex,
+    Chain$2 = chem.Chain,
+    Atom$2 = chem.Atom,
+    AtomName$3 = chem.AtomName,
+    Element$5 = chem.Element,
+    Helix$3 = chem.Helix,
+    Sheet$3 = chem.Sheet,
+    Strand$3 = chem.Strand,
+    Bond$4 = chem.Bond,
+    Assembly$3 = chem.Assembly,
+    Molecule$3 = chem.Molecule;
 
 function ArrayComparator(original) {
   this._original = Array.from(original);
@@ -85021,13 +84648,13 @@ MMTFParser.formats = ['mmtf'];
 MMTFParser.extensions = ['.mmtf'];
 MMTFParser.binary = true;
 
-var Complex$5 = chem.Complex;
-var Element$6 = chem.Element;
-var Helix$4 = chem.Helix;
-var Sheet$4 = chem.Sheet;
-var Strand$4 = chem.Strand;
-var Assembly$4 = chem.Assembly;
-var Molecule$4 = chem.Molecule;
+var Complex$5 = chem.Complex,
+    Element$6 = chem.Element,
+    Helix$4 = chem.Helix,
+    Sheet$4 = chem.Sheet,
+    Strand$4 = chem.Strand,
+    Assembly$4 = chem.Assembly,
+    Molecule$4 = chem.Molecule;
 
 var cRequiredAtomFields = ['auth_seq_id', 'Cartn_x', 'Cartn_y', 'Cartn_z', 'label_atom_id'];
 
@@ -86040,8 +85667,8 @@ CCP4Parser.formats = ['ccp4'];
 CCP4Parser.extensions = ['.ccp4'];
 CCP4Parser.binary = true;
 
-var Complex$6 = chem.Complex;
-var Element$7 = chem.Element;
+var Complex$6 = chem.Complex,
+    Element$7 = chem.Element;
 
 function PubChemParser(data, options) {
   Parser.call(this, data, options);
@@ -86141,10 +85768,6 @@ var io = {
   loaders: loaders,
   parsers: parsers
 };
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
 
 var tempColor = new Color();
 
@@ -86275,9 +85898,6 @@ CSS2DRenderer.prototype.render = function (scene, camera) {
   this._renderObject(scene, camera, scene);
 };
 
-//////////////////////////////////////////////////////////////////////////////
-/* eslint-disable no-magic-numbers */ // FIXME: Remove this?
-/* eslint-disable guard-for-in */ // FIXME: Remove this?
 var VK_LEFT = 37;
 var VK_UP = 38;
 var VK_RIGHT = 39;
@@ -87100,9 +86720,6 @@ ObjectControls.prototype.translatePivot = function (x, y, z) {
   this.dispatchEvent({ type: 'change' });
 };
 
-//////////////////////////////////////////////////////////////////////////////
-/* eslint-disable no-magic-numbers */ // FIXME: Remove this?
-/* eslint-disable guard-for-in */ // FIXME: Remove this?
 function Picker(gfxObj, camera, domElement) {
   EventDispatcher$1.call(this);
   var self = this;
@@ -87840,8 +87457,6 @@ var vertexShader$1 = "varying vec2 vUv;\r\n\r\nvoid main() {\r\n  vUv = uv;\r\n 
 
 var fragmentShader$1 = "uniform sampler2D srcTex;\r\nuniform vec2 srcTexSize;\r\nvarying vec2 vUv;\r\n\r\nvoid main() {\r\n\r\n  vec2 pixelSize = vec2(1, 1) / srcTexSize;\r\n\r\n  vec4 c00 = texture2D(srcTex, vUv + vec2(-pixelSize.x,-pixelSize.y));\r\n  vec4 c01 = texture2D(srcTex, vUv + vec2(0,-pixelSize.y));\r\n  vec4 c02 = texture2D(srcTex, vUv + vec2(pixelSize.x,-pixelSize.y));\r\n  vec4 c10 = texture2D(srcTex, vUv + vec2(-pixelSize.x,0));\r\n  vec4 c12 = texture2D(srcTex, vUv + vec2(pixelSize.x,0));\r\n  vec4 c20 = texture2D(srcTex, vUv + vec2(-pixelSize.x,pixelSize.y));\r\n  vec4 c21 = texture2D(srcTex, vUv + vec2(0,pixelSize.y));\r\n  vec4 c22 = texture2D(srcTex, vUv + vec2(pixelSize.x,pixelSize.y));\r\n\r\n  vec4 horizEdge = - c00 - 2.0 * c01 - c02 + c20 + 2.0 * c21 + c22;\r\n  vec4 vertEdge  = - c00 - 2.0 * c10 - c20 + c02 + 2.0 * c12 + c22;\r\n\r\n  vec4 grad = sqrt(horizEdge * horizEdge + vertEdge * vertEdge);\r\n\r\n  gl_FragColor = grad;\r\n}\r\n";
 
-/* eslint-disable no-magic-numbers */
-/* eslint-disable guard-for-in */
 var defaultUniforms$1 = UniformsUtils.merge([{
   srcTex: { type: 't', value: null },
   srcTexSize: { type: 'v2', value: new Vector2(512, 512) },
@@ -87872,8 +87487,6 @@ function OutlineMaterial(params) {
 
 var fragmentShader$2 = "// edge end finding algorithm parameters\r\n#define FXAA_QUALITY_PS 8\r\n#define FXAA_QUALITY_P0 1.0\r\n#define FXAA_QUALITY_P1 1.5\r\n#define FXAA_QUALITY_P2 2.0\r\n#define FXAA_QUALITY_P3 2.0\r\n#define FXAA_QUALITY_P4 2.0\r\n#define FXAA_QUALITY_P5 2.0\r\n#define FXAA_QUALITY_P6 4.0\r\n#define FXAA_QUALITY_P7 12.0\r\n// constants\r\nfloat fxaaQualityEdgeThreshold = 0.125;\r\nfloat fxaaQualityEdgeThresholdMin = 0.0625;\r\nfloat fxaaQualitySubpix = 0.7; //0.65;\r\n// global params\r\nuniform sampler2D srcTex;\r\nuniform vec2 srcTexelSize;\r\n// from vs\r\nvarying vec2 vUv;\r\n//=====================================================================//\r\n// calc luminance from rgb\r\n//'float FxaaLuma(vec3 rgb) {return rgb.y * (0.587/0.299) + rgb.x; } // Lotte's idea about game luminance\r\nfloat FxaaLuma(vec3 rgb) {return dot(rgb, vec3(0.299, 0.587, 0.114)); } // real luminance calculation\r\n                                                                           // for non-real scene rendering\r\n// texture sampling by pixel position(coords) and offset(in pixels)\r\nvec3 FxaaTex(sampler2D tex, vec2 pos, vec2 off,  vec2 res ) {return texture2D( tex, pos + off * res ).xyz;}\r\nvec3 FxaaTexTop(sampler2D tex, vec2 pos) {return texture2D( tex, pos).xyz;}\r\n//=====================================================================//\r\nvoid main() {\r\n// renaming\r\n  vec2 posM = vUv;\r\n// get luminance for neighbours\r\n  float lumaS = FxaaLuma(FxaaTex(srcTex, posM, vec2( 0.0, 1.0 ), srcTexelSize));\r\n  float lumaE = FxaaLuma(FxaaTex(srcTex, posM, vec2( 1.0, 0.0 ), srcTexelSize));\r\n  float lumaN = FxaaLuma(FxaaTex(srcTex, posM, vec2( 0.0, -1.0 ), srcTexelSize));\r\n  float lumaW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0, 0.0 ), srcTexelSize));\r\n  float lumaM = FxaaLuma(FxaaTexTop(srcTex, posM));\r\n// find max and min luminance\r\n  float rangeMax = max(max(lumaN, lumaW), max(lumaE, max(lumaS, lumaM)));\r\n  float rangeMin = min(min(lumaN, lumaW), min(lumaE, min(lumaS, lumaM)));\r\n// calc maximum non-edge range\r\n  float rangeMaxScaled = rangeMax * fxaaQualityEdgeThreshold;\r\n  float range = rangeMax - rangeMin;\r\n  float rangeMaxClamped = max(fxaaQualityEdgeThresholdMin, rangeMaxScaled);\r\n// exit when luma contrast is small (is not edge)\r\n  if(range < rangeMaxClamped){\r\n    gl_FragColor = vec4(FxaaTexTop(srcTex, posM).xyz, 1.0);\r\n    return;\r\n  }\r\n  float subpixRcpRange = 1.0/range;\r\n// calc other neighbours luminance\r\n  float lumaNE = FxaaLuma(FxaaTex(srcTex, posM, vec2(  1.0, -1.0 ), srcTexelSize));\r\n  float lumaSW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0,  1.0 ), srcTexelSize));\r\n  float lumaSE = FxaaLuma(FxaaTex(srcTex, posM, vec2(  1.0,  1.0 ), srcTexelSize));\r\n  float lumaNW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0, -1.0 ), srcTexelSize));\r\n/*--------------span calculation and subpix amount calulation-----------------*/\r\n  float lumaNS = lumaN + lumaS;\r\n  float lumaWE = lumaW + lumaE;\r\n  float subpixNSWE = lumaNS + lumaWE;\r\n  float edgeHorz1 = (-2.0 * lumaM) + lumaNS;\r\n  float edgeVert1 = (-2.0 * lumaM) + lumaWE;\r\n/*--------------------------------------------------------------------------*/\r\n  float lumaNESE = lumaNE + lumaSE;\r\n  float lumaNWNE = lumaNW + lumaNE;\r\n  float edgeHorz2 = (-2.0 * lumaE) + lumaNESE;\r\n  float edgeVert2 = (-2.0 * lumaN) + lumaNWNE;\r\n/*--------------------------------------------------------------------------*/\r\n  float lumaNWSW = lumaNW + lumaSW;\r\n  float lumaSWSE = lumaSW + lumaSE;\r\n  float edgeHorz4 = (abs(edgeHorz1) * 2.0) + abs(edgeHorz2);\r\n  float edgeVert4 = (abs(edgeVert1) * 2.0) + abs(edgeVert2);\r\n  float edgeHorz3 = (-2.0 * lumaW) + lumaNWSW;\r\n  float edgeVert3 = (-2.0 * lumaS) + lumaSWSE;\r\n  float edgeHorz = abs(edgeHorz3) + edgeHorz4;\r\n  float edgeVert = abs(edgeVert3) + edgeVert4;\r\n/*--------------------subpix amount calulation------------------------------*/\r\n  float subpixNWSWNESE = lumaNWSW + lumaNESE;\r\n  float lengthSign = srcTexelSize.x;\r\n  bool horzSpan = edgeHorz >= edgeVert;\r\n   // debug  code edge span visualization\r\n/*'  if (horzSpan)\r\n      gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\r\n  else\r\n    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\r\n  return;*/\r\n  float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;\r\n/*--------------------------------------------------------------------------*/\r\n  if(!horzSpan) lumaN = lumaW;\r\n  if(!horzSpan) lumaS = lumaE;\r\n  if(horzSpan) lengthSign = srcTexelSize.y;\r\n  float subpixB = (subpixA * (1.0/12.0)) - lumaM;\r\n/*--------------------------------------------------------------------------*/\r\n  float gradientN = lumaN - lumaM;\r\n  float gradientS = lumaS - lumaM;\r\n  float lumaNN = lumaN + lumaM;\r\n  float lumaSS = lumaS + lumaM;\r\n  bool pairN = abs(gradientN) >= abs(gradientS);\r\n  float gradient = max(abs(gradientN), abs(gradientS));\r\n  if(pairN) lengthSign = -lengthSign;\r\n  float subpixC = clamp(abs(subpixB) * subpixRcpRange, 0.0, 1.0);\r\n/*--------------------------------------------------------------------------*/\r\n  vec2 posB;\r\n  posB = posM;\r\n  vec2 offNP;\r\n  offNP.x = (!horzSpan) ? 0.0 : srcTexelSize.x;\r\n  offNP.y = ( horzSpan) ? 0.0 : srcTexelSize.y;\r\n  if(!horzSpan) posB.x += lengthSign * 0.5;\r\n  if( horzSpan) posB.y += lengthSign * 0.5;\r\n/*--------------------------------------------------------------------------*/\r\n  vec2 posN;\r\n  posN = posB - offNP * FXAA_QUALITY_P0;\r\n  vec2 posP;\r\n  posP = posB + offNP * FXAA_QUALITY_P0;\r\n  float subpixD = ((-2.0)*subpixC) + 3.0;\r\n  float lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN));\r\n  float subpixE = subpixC * subpixC;\r\n  float lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP));\r\n/*--------------------------------------------------------------------------*/\r\n  if(!pairN) lumaNN = lumaSS;\r\n  float gradientScaled = gradient * 1.0/4.0;\r\n  float lumaMM = lumaM - lumaNN * 0.5;\r\n  float subpixF = subpixD * subpixE;\r\n  bool lumaMLTZero = lumaMM < 0.0;\r\n/*---------------------looped edge-end search-------------------------------*/\r\n  lumaEndN -= lumaNN * 0.5;\r\n  lumaEndP -= lumaNN * 0.5;\r\n  bool doneN = abs(lumaEndN) >= gradientScaled;\r\n  bool doneP = abs(lumaEndP) >= gradientScaled;\r\n  if(!doneN) posN -= offNP * FXAA_QUALITY_P1;\r\n  bool doneNP = (!doneN) || (!doneP);\r\n  if(!doneP) posP += offNP * FXAA_QUALITY_P1;\r\n/*--------------------------------------------------------------------------*/\r\n  if(doneNP) {\r\n    if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n    if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n    if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n    if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n    doneN = abs(lumaEndN) >= gradientScaled;\r\n    doneP = abs(lumaEndP) >= gradientScaled;\r\n    if(!doneN) posN -= offNP * FXAA_QUALITY_P2;\r\n    doneNP = (!doneN) || (!doneP);\r\n    if(!doneP) posP += offNP * FXAA_QUALITY_P2;\r\n/*--------------------------------------------------------------------------*/\r\n    #if (FXAA_QUALITY_PS > 3)\r\n      if(doneNP) {\r\n        if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n        if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n        if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n        if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n        doneN = abs(lumaEndN) >= gradientScaled;\r\n        doneP = abs(lumaEndP) >= gradientScaled;\r\n        if(!doneN) posN -= offNP * FXAA_QUALITY_P3;\r\n        doneNP = (!doneN) || (!doneP);\r\n        if(!doneP) posP += offNP * FXAA_QUALITY_P3;\r\n/*--------------------------------------------------------------------------*/\r\n        #if (FXAA_QUALITY_PS > 4)\r\n          if(doneNP) {\r\n            if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n            if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n            if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n            if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n            doneN = abs(lumaEndN) >= gradientScaled;\r\n            doneP = abs(lumaEndP) >= gradientScaled;\r\n            if(!doneN) posN -= offNP * FXAA_QUALITY_P4;\r\n            doneNP = (!doneN) || (!doneP);\r\n            if(!doneP) posP += offNP * FXAA_QUALITY_P4;\r\n/*--------------------------------------------------------------------------*/\r\n            #if (FXAA_QUALITY_PS > 5)\r\n               if(doneNP) {\r\n                 if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n                 if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n                 if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n                 if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n                 doneN = abs(lumaEndN) >= gradientScaled;\r\n                 doneP = abs(lumaEndP) >= gradientScaled;\r\n                 if(!doneN) posN -= offNP * FXAA_QUALITY_P5;\r\n                 doneNP = (!doneN) || (!doneP);\r\n                 if(!doneP) posP += offNP * FXAA_QUALITY_P5;\r\n/*--------------------------------------------------------------------------*/\r\n                 #if (FXAA_QUALITY_PS > 6)\r\n                   if(doneNP) {\r\n                     if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n                     if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n                     if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n                     if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n                     doneN = abs(lumaEndN) >= gradientScaled;\r\n                     doneP = abs(lumaEndP) >= gradientScaled;\r\n                     if(!doneN) posN -= offNP * FXAA_QUALITY_P6;\r\n                     doneNP = (!doneN) || (!doneP);\r\n                     if(!doneP) posP += offNP * FXAA_QUALITY_P6;\r\n/*--------------------------------------------------------------------------*/\r\n                     #if (FXAA_QUALITY_PS > 7)\r\n                       if(doneNP) {\r\n                         if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n                         if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n                         if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n                         if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n                         doneN = abs(lumaEndN) >= gradientScaled;\r\n                         doneP = abs(lumaEndP) >= gradientScaled;\r\n                         if(!doneN) posN -= offNP * FXAA_QUALITY_P7;\r\n                         doneNP = (!doneN) || (!doneP);\r\n                         if(!doneP) posP += offNP * FXAA_QUALITY_P7;\r\n/*--------------------------------------------------------------------------*/\r\n                       }\r\n                     #endif\r\n                   }\r\n                 #endif\r\n               }\r\n             #endif\r\n           }\r\n         #endif\r\n      }\r\n    #endif\r\n  }\r\n/*----------------calculate subpix offset due to edge ends-------------------*/\r\n  float dstN = posM.x - posN.x;\r\n  float dstP = posP.x - posM.x;\r\n  if(!horzSpan) dstN = posM.y - posN.y;\r\n  if(!horzSpan) dstP = posP.y - posM.y;\r\n/*--------------------------------------------------------------------------*/\r\n  bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;\r\n  float spanLength = (dstP + dstN);\r\n  bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;\r\n  float spanLengthRcp = 1.0/spanLength;\r\n/*--------------------------------------------------------------------------*/\r\n  bool directionN = dstN < dstP;\r\n  float dst = min(dstN, dstP);\r\n  bool goodSpan = directionN ? goodSpanN : goodSpanP;\r\n  float subpixG = subpixF * subpixF;\r\n  float pixelOffset = (dst * (-spanLengthRcp)) + 0.5;\r\n  float subpixH = subpixG * fxaaQualitySubpix;\r\n/*-----------------calc texture offest using subpix-------------------------*/\r\n  float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;\r\n  float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);\r\n  if(!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;\r\n  if( horzSpan) posM.y += pixelOffsetSubpix * lengthSign;\r\n  gl_FragColor = vec4(FxaaTexTop(srcTex, posM).xyz, 1.0);\r\n  return;\r\n}\r\n";
 
-/* eslint-disable no-magic-numbers */
-/* eslint-disable guard-for-in */
 var defaultUniforms$2 = UniformsUtils.merge([{
   srcTex: { type: 't', value: null },
   srcTexelSize: { type: 'v2', value: new Vector2(1.0 / 512.0, 1.0 / 512.0) }
@@ -87907,8 +87520,6 @@ var fragmentHorBilateralBlur5Shader = "#define MAX_SAMPLES_COUNT 5\r\nuniform fl
 
 var fragmentVertBilateralBlur5Shader = "#define MAX_SAMPLES_COUNT 5\r\nuniform float samplesOffsets[MAX_SAMPLES_COUNT];\r\nuniform sampler2D diffuseTexture;\r\nuniform sampler2D aoMap;\r\nuniform sampler2D depthTexture;\r\nuniform vec2      srcTexelSize;\r\n\r\nvarying vec2 vUv;\r\n\r\nvoid main() {\r\n  float x = vUv.x;\r\n  float y = vUv.y;\r\n  vec4 res = vec4(0.0);\r\n  float pixelDepth = texture2D(depthTexture, vec2(x, y)).x;\r\n  float weightSum = 0.0;\r\n  for (int i = 0; i < MAX_SAMPLES_COUNT; ++i) {\r\n    vec2 samplePos = vec2(x, y + samplesOffsets[i] * srcTexelSize.y);\r\n    float depth = texture2D(depthTexture, samplePos).x;\r\n    float weight = (1.0 / (0.0001 + abs(depth - pixelDepth)));\r\n    res += texture2D(aoMap, vec2(x, y + samplesOffsets[i] * srcTexelSize.y)) * weight;\r\n    weightSum += weight;\r\n  }\r\n  res /= weightSum;\r\n  vec3 color = texture2D(diffuseTexture, vec2(x, y)).rgb;\r\n  gl_FragColor = vec4(color * res.rgb, 1.0);\r\n}";
 
-/* eslint-disable no-magic-numbers */
-/* eslint-disable guard-for-in */
 var SSAOUniforms = UniformsUtils.merge([{
   noiseTexture: { type: 't', value: null },
   noiseTexelSize: { type: 'v2', value: new Vector2(1.0 / 512.0, 1.0 / 512.0) }, // FIXME calc uvs in vshader
@@ -87992,8 +87603,6 @@ var ao = {
 
 var fragmentShader$3 = "uniform sampler2D srcL;\r\nuniform sampler2D srcR;\r\nvarying vec2 vUv;\r\n\r\nvoid main() {\r\n  vec4 l = texture2D(srcL, vUv);\r\n  vec4 r = texture2D(srcR, vUv);\r\n  gl_FragColor = vec4(l.r, r.g, r.b, 1.0);\r\n}\r\n";
 
-/* eslint-disable no-magic-numbers */
-/* eslint-disable guard-for-in */
 var defaultUniforms$3 = UniformsUtils.merge([{
   srcL: { type: 't', value: null },
   srcR: { type: 't', value: null }
@@ -88459,121 +88068,463 @@ Cookies.prototype._exists = function (key) {
   return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
 };
 
+/**
+ * @author mrdoob / http://mrdoob.com
+ * @author stewdio / http://stewd.io
+ */
+
+var ViveController = function (_THREE$Object3D) {
+  inherits(ViveController, _THREE$Object3D);
+
+  function ViveController(id) {
+    classCallCheck(this, ViveController);
+
+    var _this = possibleConstructorReturn(this, (ViveController.__proto__ || Object.getPrototypeOf(ViveController)).call(this));
+
+    _this.gamepad = null;
+
+    _this.axes = [0, 0];
+    _this.thumbpadIsPressed = false;
+    _this.triggerIsPressed = false;
+    _this.gripsArePressed = false;
+    _this.menuIsPressed = false;
+
+    _this.matrixAutoUpdate = false;
+    _this.contrId = id;
+    return _this;
+  }
+
+  createClass(ViveController, [{
+    key: 'getGamepad',
+    value: function getGamepad() {
+      return this.gamepad;
+    }
+  }, {
+    key: 'getButtonState',
+    value: function getButtonState(button) {
+
+      if (button === 'thumbpad') return this.thumbpadIsPressed;
+      if (button === 'trigger') return this.triggerIsPressed;
+      if (button === 'grips') return this.gripsArePressed;
+      if (button === 'menu') return this.menuIsPressed;
+
+      return null;
+    }
+  }, {
+    key: 'findGamepad',
+    value: function findGamepad(id) {
+      // Iterate across gamepads as Vive Controllers may not be
+      // in position 0 and 1.
+      var gamepads = navigator.getGamepads && navigator.getGamepads();
+      for (var i = 0, j = 0; i < gamepads.length; i++) {
+        var gpad = gamepads[i];
+        if (gpad && (gpad.id === 'OpenVR Gamepad' || gpad.id.startsWith('Oculus Touch') || gpad.id.startsWith('Spatial Controller'))) {
+          if (j === id) {
+            return gpad;
+          }
+          j++;
+        }
+      }
+      return null;
+    }
+  }, {
+    key: 'update',
+    value: function update() {
+
+      this.gamepad = this.findGamepad(this.contrId);
+      if (this.gamepad && this.gamepad.pose) {
+        if (this.gamepad.pose === null) {
+          return; // No user action yet
+        }
+
+        //  Position and orientation.
+        var pose = this.gamepad.pose;
+        if (pose.position !== null) this.position.fromArray(pose.position);
+        if (pose.orientation !== null) this.quaternion.fromArray(pose.orientation);
+        this.matrix.compose(this.position, this.quaternion, this.scale);
+        this.matrixWorldNeedsUpdate = true;
+        this.visible = true;
+
+        //  Thumbpad and Buttons.
+        if (this.axes[0] !== this.gamepad.axes[0] || this.axes[1] !== this.gamepad.axes[1]) {
+          this.axes[0] = this.gamepad.axes[0]; //  X axis: -1 = Left, +1 = Right.
+          this.axes[1] = this.gamepad.axes[1]; //  Y axis: -1 = Bottom, +1 = Top.
+          this.dispatchEvent({ type: 'axischanged', axes: this.axes });
+        }
+
+        if (this.thumbpadIsPressed !== this.gamepad.buttons[0].pressed) {
+          this.thumbpadIsPressed = this.gamepad.buttons[0].pressed;
+          this.dispatchEvent({ type: this.thumbpadIsPressed ? 'thumbpaddown' : 'thumbpadup', axes: this.axes });
+        }
+
+        if (this.triggerIsPressed !== this.gamepad.buttons[1].pressed) {
+          this.triggerIsPressed = this.gamepad.buttons[1].pressed;
+          this.dispatchEvent({ type: this.triggerIsPressed ? 'triggerdown' : 'triggerup' });
+        }
+
+        if (this.gripsArePressed !== this.gamepad.buttons[2].pressed) {
+          this.gripsArePressed = this.gamepad.buttons[2].pressed;
+          this.dispatchEvent({ type: this.gripsArePressed ? 'gripsdown' : 'gripsup' });
+        }
+
+        if (this.menuIsPressed !== this.gamepad.buttons[3].pressed) {
+          this.menuIsPressed = this.gamepad.buttons[3].pressed;
+          this.dispatchEvent({ type: this.menuIsPressed ? 'menudown' : 'menuup' });
+        }
+      } else {
+        this.visible = false;
+      }
+    }
+  }]);
+  return ViveController;
+}(Object3D);
+
+var GeoViveController = function (_ViveController) {
+  inherits(GeoViveController, _ViveController);
+
+  function GeoViveController(id) {
+    classCallCheck(this, GeoViveController);
+
+    // visualize controllers with cylinders
+    var _this = possibleConstructorReturn(this, (GeoViveController.__proto__ || Object.getPrototypeOf(GeoViveController)).call(this, id));
+
+    var geometry = new CylinderGeometry(0.04, 0.04, 0.3);
+    var material = new UberMaterial({ lights: false, overrideColor: true });
+    material.setUberOptions({ fixedColor: new Color(0x4444ff) });
+    material.updateUniforms();
+    var cylinder = new Mesh(geometry, material);
+    cylinder.quaternion.setFromAxisAngle(new Vector3(1, 0, 0), Math.PI / 2);
+    _this.add(cylinder);
+    return _this;
+  }
+
+  return GeoViveController;
+}(ViveController);
+
 /*******
  * Toggling WebVR is done through button.click because of limitations on calling requestPresent in webVR:
  * VRDisplay::requestPresent should be called from user gesture:
  * https://developer.mozilla.org/en-US/docs/Web/API/VRDisplay/requestPresent
  */
-var WEBVR = function () {
-  function WEBVR() {
-    classCallCheck(this, WEBVR);
+function createWebVRButton (webVRPoC) {
+  function showEnterVR(display, button) {
+
+    button.style.display = '';
+    button.style.cursor = 'pointer';
+    button.style.left = 'calc(50% - 50px)';
+    button.style.width = '100px';
+
+    button.textContent = 'ENTER VR';
+
+    button.onmouseenter = function () {
+      button.style.opacity = '1.0';
+    };
+    button.onmouseleave = function () {
+      button.style.opacity = '0.5';
+    };
+
+    button.onclick = function () {
+      if (display.isPresenting) {
+        display.exitPresent();
+      } else {
+        display.requestPresent([{ source: webVRPoC.getCanvas() }]);
+        webVRPoC.translateMolecule();
+      }
+    };
+    webVRPoC.setDevice(display);
   }
 
-  createClass(WEBVR, null, [{
-    key: 'createButton',
-    value: function createButton(renderer) {
-      function showEnterVR(display, button) {
+  function showVRNotFound(button) {
 
-        button.style.display = '';
-        button.style.cursor = 'pointer';
-        button.style.left = 'calc(50% - 50px)';
-        button.style.width = '100px';
+    button.style.display = '';
+    button.style.cursor = 'auto';
+    button.style.left = 'calc(50% - 75px)';
+    button.style.width = '150px';
+    button.textContent = 'VR NOT FOUND';
+    button.onmouseenter = null;
+    button.onmouseleave = null;
+    button.onclick = null;
 
-        button.textContent = 'ENTER VR';
+    webVRPoC.setDevice(null);
+  }
 
-        button.onmouseenter = function () {
-          button.style.opacity = '1.0';
-        };
-        button.onmouseleave = function () {
-          button.style.opacity = '0.5';
-        };
+  function stylizeElement(element) {
+    element.style.position = 'absolute';
+    element.style.bottom = '20px';
+    element.style.padding = '12px 6px';
+    element.style.border = '1px solid #fff';
+    element.style.borderRadius = '4px';
+    element.style.background = 'transparent';
+    element.style.color = '#fff';
+    element.style.font = 'normal 13px sans-serif';
+    element.style.textAlign = 'center';
+    element.style.opacity = '0.5';
+    element.style.outline = 'none';
+    element.style.zIndex = '999';
+  }
 
-        button.onclick = function () {
-          if (display.isPresenting) {
-            display.exitPresent();
-          } else {
-            display.requestPresent([{ source: renderer.domElement }]);
-          }
-        };
-        renderer.vr.setDevice(display);
-      }
-
-      function showVRNotFound(button) {
-
-        button.style.display = '';
-        button.style.cursor = 'auto';
-        button.style.left = 'calc(50% - 75px)';
-        button.style.width = '150px';
-        button.textContent = 'VR NOT FOUND';
-        button.onmouseenter = null;
-        button.onmouseleave = null;
-        button.onclick = null;
-
-        renderer.vr.setDevice(null);
-      }
-
-      function stylizeElement(element) {
-        element.style.position = 'absolute';
-        element.style.bottom = '20px';
-        element.style.padding = '12px 6px';
-        element.style.border = '1px solid #fff';
-        element.style.borderRadius = '4px';
-        element.style.background = 'transparent';
-        element.style.color = '#fff';
-        element.style.font = 'normal 13px sans-serif';
-        element.style.textAlign = 'center';
-        element.style.opacity = '0.5';
-        element.style.outline = 'none';
-        element.style.zIndex = '999';
-      }
-
-      if ('getVRDisplays' in navigator) {
-        var button = document.createElement('button');
-        button.style.display = 'none';
-        stylizeElement(button);
-        window.addEventListener('vrdisplayconnect', function (event) {
-          showEnterVR(event.display, button);
-        }, false);
-        window.addEventListener('vrdisplaydisconnect', function (_event) {
-          showVRNotFound(button);
-        }, false);
-        window.addEventListener('vrdisplaypresentchange', function (event) {
-          button.textContent = event.display.isPresenting ? 'EXIT VR' : 'ENTER VR';
-        }, false);
-        navigator.getVRDisplays().then(function (displays) {
-          if (displays.length > 0) {
-            showEnterVR(displays[0], button);
-          } else {
-            showVRNotFound(button);
-          }
-        });
-        return button;
+  if ('getVRDisplays' in navigator) {
+    var button = document.createElement('button');
+    button.style.display = 'none';
+    stylizeElement(button);
+    window.addEventListener('vrdisplayconnect', function (event) {
+      showEnterVR(event.display, button);
+    }, false);
+    window.addEventListener('vrdisplaydisconnect', function (_event) {
+      showVRNotFound(button);
+    }, false);
+    window.addEventListener('vrdisplaypresentchange', function (event) {
+      button.textContent = event.display.isPresenting ? 'EXIT VR' : 'ENTER VR';
+    }, false);
+    navigator.getVRDisplays().then(function (displays) {
+      if (displays.length > 0) {
+        showEnterVR(displays[0], button);
       } else {
-        var message = document.createElement('a');
-        message.href = 'https://webvr.info';
-        message.innerHTML = 'WEBVR NOT SUPPORTED';
-        message.style.left = 'calc(50% - 90px)';
-        message.style.width = '180px';
-        message.style.textDecoration = 'none';
-        stylizeElement(message);
-        return message;
+        showVRNotFound(button);
+      }
+    });
+    return button;
+  } else {
+    var message = document.createElement('a');
+    message.href = 'https://webvr.info';
+    message.innerHTML = 'WEBVR NOT SUPPORTED';
+    message.style.left = 'calc(50% - 90px)';
+    message.style.width = '180px';
+    message.style.textDecoration = 'none';
+    stylizeElement(message);
+    return message;
+  }
+}
+
+var WebVRPoC = function () {
+  function WebVRPoC(onToggle) {
+    classCallCheck(this, WebVRPoC);
+
+    this._mainCamera = new PerspectiveCamera();
+    this._cameraWasStored = false;
+    this._button = null;
+    this._onToggle = onToggle;
+
+    this._molContainer = new gfxutils.RCGroup();
+    this._user = new gfxutils.RCGroup();
+    this._scalingPivot = new Object3D();
+    this._user.add(this._scalingPivot);
+
+    this._controller1 = new GeoViveController(0);
+    this._controller2 = new GeoViveController(1);
+    this._user.add(this._controller1);
+    this._user.add(this._controller2);
+    this._pressedGripsCounter = 0;
+    this._distance = 0;
+
+    this._gfx = null;
+
+    var self = this;
+    function startScalingByControllers() {
+      // reset scale
+      self._distance = self._controller1.position.distanceTo(self._controller2.position);
+      gfxutils.getMiddlePoint(self._controller1.position, self._controller2.position, self._scalingPivot.position);
+      self._scalingPivot.scale.set(1, 1, 1);
+      self._scalingPivot.updateMatrix();
+      self._scalingPivot.updateMatrixWorld();
+      // link molecule to pivot
+      self._scalingPivot.addSavingWorldTransform(self._molContainer);
+    }
+
+    function stopScalingByControllers() {
+      self._gfx.scene.addSavingWorldTransform(self._molContainer);
+    }
+
+    function handleGripsDown(event) {
+      self._pressedGripsCounter++;
+      if (self._pressedGripsCounter === 2) {
+        startScalingByControllers();
+      } else if (self._pressedGripsCounter === 1) {
+        event.target.addSavingWorldTransform(self._molContainer);
       }
     }
+
+    function handleGripsUp(event) {
+      self._pressedGripsCounter--;
+      if (self._pressedGripsCounter === 1) {
+        stopScalingByControllers();
+        // reattach molecule to other controller
+        var anotherController = event.target === self._controller1 ? self._controller2 : self._controller1;
+        anotherController.addSavingWorldTransform(self._molContainer);
+      } else if (self._pressedGripsCounter === 0) {
+        self._gfx.scene.addSavingWorldTransform(self._molContainer);
+      }
+    }
+
+    self._controller1.addEventListener('gripsdown', handleGripsDown);
+    self._controller1.addEventListener('gripsup', handleGripsUp);
+    self._controller2.addEventListener('gripsdown', handleGripsDown);
+    self._controller2.addEventListener('gripsup', handleGripsUp);
+  }
+
+  /**
+   * Turn the WebVR when it is supported
+   * NOTE: we toggle using button.click, because VRDisplay.requestPresent should be called from user gesture
+   */
+
+
+  createClass(WebVRPoC, [{
+    key: 'toggle',
+    value: function toggle(enable, gfx) {
+      if (typeof gfx === 'undefined') {
+        logger.warn('WebVR couldn\'t be enabled, because gfx is not defined');
+      }
+      var self = this;
+      this._gfx = gfx;
+      var renderer = gfx ? gfx.renderer : null;
+      if (!renderer) {
+        throw new Error('No renderer is available to toggle WebVR');
+      } else if (!gfx.camera) {
+        throw new Error('No camera is available to toggle WebVR');
+      }
+
+      if (enable && !renderer.vr.enabled) {
+        // store common camera
+        self._mainCamera.copy(gfx.camera);
+        self._cameraWasStored = true;
+        // enable vr in renderer
+        renderer.vr.enabled = true;
+        if (!this._button) {
+          self._button = createWebVRButton(this);
+          document.body.appendChild(self._button);
+        } else {
+          self._button.style.display = 'block';
+        }
+        // add hierarchical structure for webVR into scene
+        if (self._user) {
+          gfx.scene.add(self._user);
+          self._user.add(gfx.camera);
+        }
+
+        settings.now.fog = false;
+        //turn on webvr transformation
+        gfx.scene.add(self._molContainer);
+        self._molContainer.add(gfx.root);
+      } else if (!enable && renderer.vr.enabled) {
+        //disable vr
+        var display = self.getDevice();
+        if (display && display.isPresenting) {
+          display.exitPresent();
+        }
+        renderer.vr.enabled = false;
+        if (self._button) {
+          self._button.style.display = 'none';
+        }
+        // restore common camera
+        if (self._cameraWasStored) {
+          gfx.camera.copy(self._mainCamera);
+        }
+        settings.now.fog = true;
+        //turn off webvr transformation
+        var root = self._molContainer.children[0];
+        if (root) gfx.scene.add(root);
+        self._molContainer.parent.remove(self._molContainer);
+        if (self._user) {
+          gfx.scene.remove(self._user);
+          self._user.remove(gfx.camera);
+        }
+      }
+      if (self._onToggle) {
+        self._onToggle(enable);
+      }
+    }
+  }, {
+    key: 'updateMoleculeScale',
+    value: function updateMoleculeScale() {
+      if (!this._controller1 || !this._controller2) {
+        return;
+      }
+      this._controller1.update();
+      this._controller2.update();
+
+      var self = this;
+
+      // update molecule scaling by controllers
+      if (self._pressedGripsCounter === 2) {
+        // recalc scaling pivot
+        gfxutils.getMiddlePoint(self._controller1.position, self._controller2.position, self._scalingPivot.position);
+        // recalc scaler
+        var dist = self._controller1.position.distanceTo(self._controller2.position);
+        var scaler = dist / self._distance;
+        self._scalingPivot.scale.multiplyScalar(scaler);
+        // save cur distance for next frame
+        self._distance = dist;
+      }
+    }
+
+    // move slightly the molecule from the world center toward the camera direction
+
+  }, {
+    key: 'translateMolecule',
+    value: function translateMolecule() {
+      var device = this.getDevice();
+      if (!device) {
+        return;
+      }
+
+      // Cam dir in CameraSpace
+      var camDir = new Vector3(0, 0, -1);
+      var pose = void 0;
+
+      if (device.pose) {
+        // WebVR emulation
+        pose = device.pose;
+      } else if (device.getFrameData) {
+        // WebVR
+        var frameData = new VRFrameData();
+        device.getFrameData(frameData);
+        pose = frameData.pose;
+      } else {
+        return;
+      }
+      var orient = pose.orientation;
+      var quaternion = new Quaternion(orient[0], orient[1], orient[2], orient[3]);
+      camDir.applyQuaternion(quaternion);
+      if (pose.position === null) {
+        logger.warn('VRDisplay cannot provide its position. Be sure VRDisplay is detected by sensors');
+      }
+      var pos = pose.position || [0, 0, 0];
+      this._molContainer.position.fromArray(pos);
+      this._molContainer.position.addScaledVector(camDir, 1.3);
+    }
+  }, {
+    key: 'getDevice',
+    value: function getDevice() {
+      var vr = this._gfx && this._gfx.renderer ? this._gfx.renderer.vr : null;
+      return vr && vr.enabled ? vr.getDevice() : null;
+    }
+  }, {
+    key: 'setDevice',
+    value: function setDevice(display) {
+      var vr = this._gfx && this._gfx.renderer ? this._gfx.renderer.vr : null;
+      if (vr) {
+        vr.setDevice(display);
+      }
+    }
+  }, {
+    key: 'getCanvas',
+    value: function getCanvas() {
+      var gfx = this._gfx;
+      return gfx && gfx.renderer ? gfx.renderer.domElement : null;
+    }
   }]);
-  return WEBVR;
+  return WebVRPoC;
 }();
 
-/* global "0.7.12":false */
+/* global "0.7.13":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////
-
-var selectors$4 = chem.selectors;
-var Atom$3 = chem.Atom;
-var Residue$2 = chem.Residue;
-var Chain$3 = chem.Chain;
-var Molecule$5 = chem.Molecule;
+var selectors$4 = chem.selectors,
+    Atom$3 = chem.Atom,
+    Residue$2 = chem.Residue,
+    Chain$3 = chem.Chain,
+    Molecule$5 = chem.Molecule;
 
 var EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 
@@ -88861,6 +88812,8 @@ Miew.prototype._showCanvas = function () {
  * @private
  */
 Miew.prototype._initGfx = function () {
+  var _this = this;
+
   var gfx = {
     width: this._container.clientWidth,
     height: this._container.clientHeight
@@ -88990,10 +88943,16 @@ Miew.prototype._initGfx = function () {
     minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, depthBuffer: false
   });
 
-  this._toggleWebVR(settings.now.stereo === 'WEBVR', gfx);
-
   this._gfx = gfx;
   this._showCanvas();
+
+  if (settings.now.stereo === 'WEBVR') {
+    this.webVR = new WebVRPoC(function () {
+      _this._needRender = true;
+      _this._onResize();
+    });
+    this.webVR.toggle(true, gfx);
+  }
 
   this._container.appendChild(gfx.renderer2d.getElement());
 
@@ -89215,7 +89174,7 @@ Miew.prototype.setCurrentVisual = function (name) {
  * @see Miew#halt
  */
 Miew.prototype.run = function () {
-  var _this = this;
+  var _this2 = this;
 
   if (!this._running) {
     this._running = true;
@@ -89226,9 +89185,9 @@ Miew.prototype.run = function () {
 
     this._objectControls.enable(true);
 
-    var device = this._getWebVRDevice();
+    var device = this.webVR ? this.webVR.getDevice() : null;
     (device || window).requestAnimationFrame(function () {
-      return _this._onTick();
+      return _this2._onTick();
     });
   }
 };
@@ -89306,7 +89265,7 @@ Miew.prototype._resizeOffscreenBuffers = function (width, height, stereo) {
  * @private
  */
 Miew.prototype._onTick = function () {
-  var _this2 = this;
+  var _this3 = this;
 
   if (this._halting) {
     this._running = false;
@@ -89316,9 +89275,9 @@ Miew.prototype._onTick = function () {
 
   this._fps.update();
 
-  var device = this._getWebVRDevice();
+  var device = this.webVR ? this.webVR.getDevice() : null;
   (device || window).requestAnimationFrame(function () {
-    return _this2._onTick();
+    return _this3._onTick();
   });
 
   this._onUpdate();
@@ -89326,58 +89285,6 @@ Miew.prototype._onTick = function () {
     this._onRender();
     this._needRender = !settings.now.suspendRender || settings.now.stereo === 'WEBVR' || !!device;
   }
-};
-
-/**
- * Turn the WebVR when it is supported
- * NOTE: we toggle using button.click, because VRDisplay.requestPresent should be called from user gesture
- */
-Miew.prototype._toggleWebVR = function () {
-
-  var _mainCamera = new PerspectiveCamera();
-  var _cameraWasStored = false;
-  var _webVRButton = null;
-
-  return function (enable, gfx) {
-    var self = this;
-    var renderer = gfx ? gfx.renderer : null;
-    if (!renderer) {
-      throw new Error('No renderer is available to toggle WebVR');
-    } else if (!gfx.camera) {
-      throw new Error('No camera is available to toggle WebVR');
-    }
-
-    if (enable) {
-      // store common camera
-      _mainCamera.copy(gfx.camera);
-      _cameraWasStored = true;
-      // enable vr in renderer
-      renderer.vr.enabled = true;
-      if (!_webVRButton) {
-        _webVRButton = WEBVR.createButton(renderer);
-        document.body.appendChild(_webVRButton);
-      } else {
-        _webVRButton.style.display = 'block';
-      }
-    } else {
-      //disable vr
-      renderer.vr.enabled = false;
-      if (_webVRButton) {
-        _webVRButton.style.display = 'none';
-      }
-      // restore common camera
-      if (_cameraWasStored) {
-        gfx.camera.copy(_mainCamera);
-        self._onResize();
-      }
-    }
-    self._needRender = true;
-  };
-}();
-
-Miew.prototype._getWebVRDevice = function () {
-  var vr = this._gfx.renderer.vr;
-  return vr && vr.enabled ? vr.getDevice() : null;
 };
 
 Miew.prototype._getBSphereRadius = function () {
@@ -89425,6 +89332,10 @@ Miew.prototype._onUpdate = function () {
   }
 
   this._updateFog();
+
+  if (this._gfx.renderer.vr.enabled) {
+    this.webVR.updateMoleculeScale();
+  }
 };
 
 Miew.prototype._onRender = function () {
@@ -89944,7 +89855,7 @@ Miew.prototype.resetView = function () {
  * @returns {Promise} name of the visual that was added to the viewer
  */
 Miew.prototype.load = function (source, opts) {
-  var _this3 = this;
+  var _this4 = this;
 
   opts = lodash.merge({}, opts, {
     context: this
@@ -89973,18 +89884,18 @@ Miew.prototype.load = function (source, opts) {
   var job = new JobHandle();
   this._loading.push(job);
   job.addEventListener('notification', function (e) {
-    _this3.dispatchEvent(e.slaveEvent);
+    _this4.dispatchEvent(e.slaveEvent);
   });
 
   this._spinner.spin(this._container);
 
   var onLoadEnd = function onLoadEnd(anything) {
-    var jobIndex = _this3._loading.indexOf(job);
+    var jobIndex = _this4._loading.indexOf(job);
     if (jobIndex !== -1) {
-      _this3._loading.splice(jobIndex, 1);
+      _this4._loading.splice(jobIndex, 1);
     }
-    _this3._spinner.stop();
-    _this3._refreshTitle();
+    _this4._spinner.stop();
+    _this4._refreshTitle();
     return anything;
   };
 
@@ -89993,11 +89904,11 @@ Miew.prototype.load = function (source, opts) {
   }).then(function (data) {
     return _parseData(data, opts, job);
   }).then(function (object) {
-    var name = _this3._onLoad(object, opts);
+    var name = _this4._onLoad(object, opts);
     return onLoadEnd(name);
   }).catch(function (err) {
-    _this3.logger.error('Could not load data');
-    _this3.logger.debug(err);
+    _this4.logger.error('Could not load data');
+    _this4.logger.debug(err);
     throw onLoadEnd(err);
   });
 };
@@ -90265,7 +90176,7 @@ Miew.prototype.resetEd = function () {
 };
 
 Miew.prototype.loadEd = function (source) {
-  var _this4 = this;
+  var _this5 = this;
 
   this.resetEd();
 
@@ -90283,13 +90194,13 @@ Miew.prototype.loadEd = function (source) {
       throw new Error('Could not find suitable parser for this source');
     }
     var parser = new TheParser(data);
-    parser.context = _this4;
+    parser.context = _this5;
     return parser.parse().then(function (dataSource) {
-      _this4._onLoadEd(dataSource);
+      _this5._onLoadEd(dataSource);
     });
   }).catch(function (error) {
-    _this4.logger.error('Could not load ED data');
-    _this4.logger.debug(error);
+    _this5.logger.error('Could not load ED data');
+    _this5.logger.debug(error);
   });
 };
 
@@ -90431,7 +90342,7 @@ Miew.prototype.setNeedRender = function () {
 };
 
 Miew.prototype._extractRepresentation = function () {
-  var _this5 = this;
+  var _this6 = this;
 
   var changed = [];
 
@@ -90449,7 +90360,7 @@ Miew.prototype._extractRepresentation = function () {
     });
     if (idx < 0) {
       if (visual.repCount() === ComplexVisual.NUM_REPRESENTATION_BITS) {
-        _this5.logger.warn('Number of representations is limited to ' + ComplexVisual.NUM_REPRESENTATION_BITS);
+        _this6.logger.warn('Number of representations is limited to ' + ComplexVisual.NUM_REPRESENTATION_BITS);
       }
       return;
     }
@@ -91531,6 +91442,8 @@ Miew.prototype._fogFarUpdateValue = function () {
  * @private
  */
 Miew.prototype._onSettingsChanged = function (changes) {
+  var _this7 = this;
+
   if (!(changes instanceof Object)) {
     return;
   }
@@ -91572,7 +91485,15 @@ Miew.prototype._onSettingsChanged = function (changes) {
     this.logger.warn('Benchmarks are missed, autoresolution will not work! ' + 'Autoresolution should be set during miew startup.');
   }
   if (changes.stereo) {
-    this._toggleWebVR(changes.stereo === 'WEBVR', this._gfx);
+    if (changes.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
+      this.webVR = new WebVRPoC(function () {
+        _this7._needRender = true;
+        _this7._onResize();
+      });
+    }
+    if (this.webVR) {
+      this.webVR.toggle(changes.stereo === 'WEBVR', this._gfx);
+    }
   }
   this._needRender = true;
 };
@@ -92186,7 +92107,7 @@ Miew.prototype.exportCML = function () {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew.prototype.VERSION = typeof "0.7.12" !== 'undefined' && "0.7.12" || '0.0.0-dev';
+Miew.prototype.VERSION = typeof "0.7.13" !== 'undefined' && "0.7.13" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew, /** @lends Miew */{
@@ -92226,7 +92147,6 @@ lodash.assign(Miew, /** @lends Miew */{
   }
 });
 
-var MiewCLIParser = createCommonjsModule(function (module, exports) {
 /* eslint-disable */
 // DO NOT EDIT! Automatically generated from .jison
 /* parser generated by jison 0.4.18 */
@@ -92302,7 +92222,7 @@ var MiewCLIParser = createCommonjsModule(function (module, exports) {
     recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
   }
 */
-var parser = (function(){
+var parser$1 = (function(){
 var o=function(k,v,o,l){for(o=o||{}, l=k.length;l--;o[k[l]]=v);return o},$V0=[1,74],$V1=[1,76],$V2=[1,77],$V3=[1,80],$V4=[1,81],$V5=[1,82],$V6=[1,83],$V7=[1,84],$V8=[1,95],$V9=[1,87],$Va=[1,88],$Vb=[1,89],$Vc=[1,90],$Vd=[1,113],$Ve=[1,91],$Vf=[1,114],$Vg=[1,94],$Vh=[1,65],$Vi=[1,96],$Vj=[1,97],$Vk=[1,99],$Vl=[1,98],$Vm=[1,110],$Vn=[1,111],$Vo=[1,112],$Vp=[1,100],$Vq=[1,101],$Vr=[1,102],$Vs=[1,103],$Vt=[1,104],$Vu=[1,105],$Vv=[1,106],$Vw=[1,107],$Vx=[1,108],$Vy=[1,109],$Vz=[1,115],$VA=[1,116],$VB=[1,117],$VC=[1,119],$VD=[1,118],$VE=[1,71],$VF=[1,73],$VG=[1,70],$VH=[1,72],$VI=[1,78],$VJ=[1,79],$VK=[1,85],$VL=[1,86],$VM=[1,92],$VN=[1,93],$VO=[1,67],$VP=[1,68],$VQ=[1,69],$VR=[1,75],$VS=[1,129],$VT=[1,125],$VU=[1,128],$VV=[1,126],$VW=[1,127],$VX=[1,132],$VY=[1,131],$VZ=[1,148],$V_=[1,156],$V$=[1,163],$V01=[1,164],$V11=[1,201],$V21=[5,6,7,9,12,13,14,16,17,18,19,22,24,25,26,29,32,33,34,36,37,40,42,44,45,52,54,55,56,58,59,60,62,63,64,66,67,68,69,70,71,72,73,74,75,77,78,79,80,82,83,85,86,87,91,92,94,97,98,101,103,104],$V31=[5,6,7,9,12,13,14,16,17,18,19,22,24,25,26,29,32,33,34,36,37,40,42,44,45,52,54,55,56,58,59,60,62,63,64,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,82,83,85,86,87,91,92,94,97,98,101,103,104],$V41=[5,6,7,9,12,14,16,17,18,19,22,24,25,26,29,32,33,36,37,40,42,44,45,52,54,55,56,58,59,62,63,64,66,67,68,69,70,71,72,73,74,80,82,83,85,86,87,91,92,101],$V51=[5,91,92],$V61=[5,94],$V71=[1,227],$V81=[5,13,60,75,104],$V91=[76,103];
 var parser = {trace: function trace() { },
 yy: {},
@@ -92336,17 +92256,13 @@ case 9: case 10:
 this.$ = yy.utils.propagateProp($$[$0]); yy.echo(yy.miew.get($$[$0]).toString());
 break;
 case 11: case 12:
-this.$ = yy.miew.set($$[$0-1], yy.utils.propagateProp($$[$0-1], $$[$0]));;
-break;
+this.$ = yy.miew.set($$[$0-1], yy.utils.propagateProp($$[$0-1], $$[$0]));break;
 case 13:
-this.$ = yy.miew.saveSettings();;
-break;
+this.$ = yy.miew.saveSettings();break;
 case 14:
-this.$ = yy.miew.restoreSettings();;
-break;
+this.$ = yy.miew.restoreSettings();break;
 case 15:
-this.$ = yy.miew.resetSettings();;
-break;
+this.$ = yy.miew.resetSettings();break;
 case 16:
 this.$ = yy.miew.resetReps();
 break;
@@ -92649,7 +92565,7 @@ parseError: function parseError(str, hash) {
     }
 },
 parse: function parse(input) {
-    var self = this, stack = [0], tstack = [], vstack = [null], lstack = [], table = this.table, yytext = '', yylineno = 0, yyleng = 0, recovering = 0, TERROR = 2, EOF = 1;
+    var self = this, stack = [0], tstack = [], vstack = [null], lstack = [], table = this.table, yytext = '', yylineno = 0, yyleng = 0, TERROR = 2, EOF = 1;
     var args = lstack.slice.call(arguments, 1);
     var lexer = Object.create(this.lexer);
     var sharedState = { yy: {} };
@@ -92672,7 +92588,7 @@ parse: function parse(input) {
     } else {
         this.parseError = Object.getPrototypeOf(this).parseError;
     }
-    function lex() {
+            function lex() {
             var token;
             token = tstack.pop() || lexer.lex() || EOF;
             if (typeof token !== 'number') {
@@ -92684,7 +92600,7 @@ parse: function parse(input) {
             }
             return token;
         }
-    var symbol, preErrorSymbol, state, action, a, r, yyval = {}, p, len, newState, expected;
+    var symbol, preErrorSymbol, state, action, r, yyval = {}, p, len, newState, expected;
     while (true) {
         state = stack[stack.length - 1];
         if (this.defaultActions[state]) {
@@ -92731,7 +92647,6 @@ parse: function parse(input) {
                 yytext = lexer.yytext;
                 yylineno = lexer.yylineno;
                 yyloc = lexer.yylloc;
-                
             } else {
                 symbol = preErrorSymbol;
                 preErrorSymbol = null;
@@ -93287,29 +93202,8 @@ Parser.prototype = parser;parser.Parser = Parser;
 return new Parser;
 })();
 
-
-if (typeof commonjsRequire !== 'undefined' && 'object' !== 'undefined') {
-exports.parser = parser;
-exports.Parser = parser.Parser;
-exports.parse = function () { return parser.parse.apply(parser, arguments); };
-exports.main = function commonjsMain(args) {
-    if (!args[1]) {
-        console.log('Usage: '+args[0]+' FILE');
-        process.exit(1);
-    }
-    var source = require$$0.readFileSync(require$$1.normalize(args[1]), "utf8");
-    return exports.parser.parse(source);
-};
-if ('object' !== 'undefined' && commonjsRequire.main === module) {
-  exports.main(process.argv.slice(1));
-}
-}
-});
-
+var MiewCLIParser = {parser: parser$1};
 var MiewCLIParser_1 = MiewCLIParser.parser;
-var MiewCLIParser_2 = MiewCLIParser.Parser;
-var MiewCLIParser_3 = MiewCLIParser.parse;
-var MiewCLIParser_4 = MiewCLIParser.main;
 
 var modeIdDesc = {
   $help: ['Rendering mode shortcut', '    BS - balls and sticks mode', '    LN - lines mode', '    LC - licorice mode', '    VW - van der waals mode', '    TR - trace mode', '    TU - tube mode', '    CA - cartoon mode', '    SA - isosurface mode', '    QS - quick surface mode', '    SE - solvent excluded mode', '    TX - text mode'],
@@ -93624,13 +93518,13 @@ var JSONtoSelectorConverter = function () {
   return JSONtoSelectorConverter;
 }();
 
-var selectors$5 = Miew.chem.selectors;
-var modes$1 = Miew.modes;
-var colorers$1 = Miew.colorers;
-var materials$1 = Miew.materials;
-var palettes$1 = Miew.palettes;
-var options$1 = Miew.options;
-var settings$1 = Miew.settings;
+var selectors$5 = Miew.chem.selectors,
+    modes$1 = Miew.modes,
+    colorers$1 = Miew.colorers,
+    materials$1 = Miew.materials,
+    palettes$1 = Miew.palettes,
+    options$1 = Miew.options,
+    settings$1 = Miew.settings;
 
 function None() {}
 

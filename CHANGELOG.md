@@ -5,14 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.7.13] - 2018-02-19
+### Added
+- Add basic support for HTC Vive controllers in VR.
+
 ### Changed
-- Replaced a Gulp pipeline with direct NPM scripts.
+- Replace Gulp with direct NPM scripts (#32).
 
 ## [0.7.12] - 2018-02-05
 ### Added
 - Add `Miew#exportCML()` method to retrieve a CML contents (including modified atom coordiantes) if
   a CML file was loaded.
-- Add a secondary structure assignment routine: `Miew#dssp()` method and `dssp` script command.
+- Add a secondary structure assignment routine (#30): `Miew#dssp()` method and `dssp` script command.
   Available from UI too.
 
 ### Changed
@@ -215,7 +220,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.12...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.13...HEAD
+[0.7.13]: https://github.com/epam/miew/compare/v0.7.12...v0.7.13
 [0.7.12]: https://github.com/epam/miew/compare/v0.7.11...v0.7.12
 [0.7.11]: https://github.com/epam/miew/compare/v0.7.10...v0.7.11
 [0.7.10]: https://github.com/epam/miew/compare/v0.7.9...v0.7.10

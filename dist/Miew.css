@@ -1,0 +1,72 @@
+.miew-canvas > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.miew-container,
+.miew-canvas {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.miew-message {
+  background-color: #ccc;
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+.miew-message p {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  font-size: large;
+}
+
+.mode-message {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: 4px;
+  color: silver;
+  background-color: rgba(64, 64, 64, 0.75);
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  opacity: 0;
+}
+
+.atom-info {
+  margin: 10px;
+  text-align: left;
+}
+
+.overlay {
+  pointer-events: none;
+}
+
+.theme-dark .label-obj,
+.theme-dark .label-fg {
+  color: #ccc;
+  background-color: #202020;
+}
+
+.theme-dark .label-bg {
+  color: #202020;
+  background-color: #ccc;
+}
+
+.theme-light .label-obj,
+.theme-light .label-fg {
+  color: #202020;
+  background-color: #ccc;
+}
+
+.theme-light .label-bg {
+  color: #ccc;
+  background-color: #202020;
+}
+/*# sourceMappingURL=Miew.css.map */

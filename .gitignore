@@ -2,12 +2,9 @@ node_modules/
 build/
 coverage/
 .nyc_output/
-dist/*.map
-docs/auto/
 .sonar/
 .idea/workspace.xml
 .idea/tasks.xml
-demo/styles/*.map
 test/e2e/mismatch/*.png
 test/e2e/mismatch/*.html
 !*.pdb
