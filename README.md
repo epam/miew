@@ -11,7 +11,7 @@
 [![Code Climate](https://codeclimate.com/github/epam/miew/badges/gpa.svg)](https://codeclimate.com/github/epam/miew)
 [![Quality Gate](https://sonarcloud.io/api/badges/gate?key=epam:miew)](https://sonarcloud.io/dashboard/index/epam:miew)
 
-Copyright (c) 2015–2017 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2018 [EPAM Systems, Inc.](https://www.epam.com/)
 
 Miew is a high performance web tool for advanced visualization and manipulation of molecular
 structures.
