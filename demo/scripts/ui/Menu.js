@@ -2950,8 +2950,8 @@ Menu.prototype._updateReprList = function() {
       matPresetId = matPresetItem.firstElementChild.firstElementChild.getAttribute('data-id');
       uniColor = stringColorToHex(uniColorItem.firstElementChild.firstElementChild.getAttribute('data-id'));
       zClip = $(element).find('[type=checkbox][data-toggle=zClip]')[0].checked;
-      radScale = $(element).find('[data-type=rad]').val();
-      isoValue = $(element).find('[data-type=iso]').val();
+      radScale = parseFloat($(element).find('[data-type=rad]').val());
+      isoValue = parseFloat($(element).find('[data-type=iso]').val());
 
       if (isDeleted) {
         removeIdxList.push(index);
