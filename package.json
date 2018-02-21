@@ -29,7 +29,7 @@
     "build": "run-s build:*",
     "build:js": "run-s build:js:*",
     "build:js:bundle": "rollup -c",
-    "build:js:minify": "uglifyjs build/dist/Miew.js -o build/dist/Miew.min.js -mc drop_console=true --comments /copyright/i --source-map \"content='build/dist/Miew.js.map'\"",
+    "build:js:minify": "uglifyjs build/dist/Miew.js -o build/dist/Miew.min.js -mc drop_console=true --comments /copyright/i --source-map \"content='build/dist/Miew.js.map',url='Miew.min.js.map'\"",
     "build:css": "run-s build:css:*",
     "build:css:bundle": "node-sass --source-map=true --source-map-contents=true --output-style=expanded src/Miew.scss -o build/dist",
     "build:css:prefix": "postcss build/dist/Miew.css -o build/dist/Miew.css --map --use autoprefixer",
