@@ -7,7 +7,6 @@ import rollupPluginCommonJS from 'rollup-plugin-commonjs';
 import rollupPluginReplace from 'rollup-plugin-replace';
 import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
 import rollupPluginAlias from 'rollup-plugin-alias';
-import rollupPluginNodeBuiltins from 'rollup-plugin-node-builtins';
 import rollupPluginString from 'rollup-plugin-string';
 
 import version from './tools/version';
@@ -34,7 +33,6 @@ export default {
       PACKAGE_VERSION: JSON.stringify(version.combined),
       DEBUG: false,
     }),
-    rollupPluginNodeBuiltins(),
     rollupPluginString({
       include: '**/*.glsl',
     }),
