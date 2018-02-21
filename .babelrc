@@ -1,6 +1,11 @@
 {
   "presets": ["env"],
   "plugins": [
-    [ "babel-plugin-webpack-alias", {"config": "./webpack.config.js", "findConfig": true}]
-  ]
+    [ "babel-plugin-webpack-alias", {"config": "./webpack.common.js"}]
+  ],
+  "env": {
+    "coverage": {
+      "plugins": ["istanbul"]
+    }
+  }
 }

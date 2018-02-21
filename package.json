@@ -21,7 +21,7 @@
     "lint:js": "eslint -f unix *.js src/ demo/ examples/ test/ tools/",
     "lint:css": "stylelint src/**/*.scss demo/**/*.scss",
     "test": "run-s test:unit",
-    "test-cover": "nyc --all --reporter=text-summary --reporter=lcov mocha",
+    "test-cover": "cross-env NODE_ENV=coverage nyc mocha",
     "test:unit": "mocha",
     "test:e2e": "rimraf ./test/e2e/mismatch/*.png && mocha --opts ./test/mocha.e2e.opts",
     "start": "webpack-dev-server --config webpack.dev.babel.js --open",
@@ -71,16 +71,32 @@
     "last 2 FirefoxAndroid versions"
   ],
   "nyc": {
+    "cache": true,
+    "all": true,
     "include": [
       "src/**/*.js",
       "!src/**/*.test.js"
-    ]
+    ],
+    "exclude": [
+      "@(node_modules|dist|vendor|demo|coverage|docs|examples|test|tools)",
+      "**/*.test.js"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "sourceMap": false,
+    "instrument": false
   },
   "devDependencies": {
     "autoprefixer": "^8.0.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-istanbul": "^4.1.5",
     "babel-plugin-webpack-alias": "^2.1.2",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
