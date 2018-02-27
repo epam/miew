@@ -21,11 +21,6 @@ const roServerReplacer = {
 export default {
   entry: {
     demo: './demo/scripts/index.js',
-    vendor: [
-      'three',
-      'mmtf',
-      'Smooth',
-    ],
   },
   output: {
     publicPath: './',
@@ -101,15 +96,21 @@ export default {
     ]),
     new StringReplaceWebpackPlugin(),
     new webpack.HashedModuleIdsPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: module => module.context && module.context.indexOf('node_modules') !== -1,
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest',
-      minChunks: Infinity,
-    }),
   ],
+  optimization: {
+    runtimeChunk: {
+      name: 'manifest'
+    },
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          name: 'vendor',
+          test: /[\\/](node_modules|vendor)[\\/]/,
+        },
+      },
+    },
+  },
   watchOptions: {
     ignored: /node_modules/,
   },
