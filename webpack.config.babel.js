@@ -4,6 +4,7 @@ import webpackMerge from 'webpack-merge';
 import webpackCommon from './webpack.common.js';
 
 export default webpackMerge(webpackCommon, {
+  mode: 'production',
   devtool: 'source-map',
   stats: {
     colors: true,
@@ -11,9 +12,11 @@ export default webpackMerge(webpackCommon, {
     chunks: true,
   },
   plugins: [
+    /*
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
     }),
+    */
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': JSON.stringify('production'),
