@@ -24,7 +24,7 @@
     "test-cover": "cross-env NODE_ENV=coverage nyc mocha",
     "test:unit": "mocha",
     "test:e2e": "rimraf ./test/e2e/mismatch/*.png && mocha --opts ./test/mocha.e2e.opts",
-    "start": "webpack-dev-server --config webpack.dev.babel.js --open",
+    "start": "webpack-dev-server --mode development --open",
     "clean": "rimraf build/* coverage/*",
     "build": "run-s build:*",
     "build:js": "run-s build:js:*",
@@ -34,7 +34,7 @@
     "build:css:bundle": "node-sass --source-map=true --source-map-contents=true --output-style=expanded src/Miew.scss -o build/dist",
     "build:css:prefix": "postcss build/dist/Miew.css -o build/dist/Miew.css --map --use autoprefixer",
     "build:css:minify": "postcss build/dist/Miew.css -o build/dist/Miew.min.css --map --use cssnano",
-    "build:demo": "webpack",
+    "build:demo": "webpack --mode production",
     "build:examples": "ncp examples/ build/examples/",
     "build:docs": "jsdoc -c jsdoc.config.js",
     "demo": "node tools/serve.js",
@@ -157,7 +157,6 @@
     "webpack": "^4.0.1",
     "webpack-cli": "^2.0.9",
     "webpack-dev-server": "^3.0.0",
-    "webpack-merge": "^4.1.2",
     "yargs": "^11.0.0"
   }
 }
