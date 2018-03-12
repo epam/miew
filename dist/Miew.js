@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.13 Copyright (c) 2015-2018 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.14 Copyright (c) 2015-2018 EPAM Systems, Inc. */
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -73556,6 +73556,9 @@ VolumeSurfaceGeometry.prototype._makeSurface = function (surface, params) {
     this.addAttribute('position', new BufferAttribute(isoSurf._position, 3));
     this.addAttribute('normal', new BufferAttribute(isoSurf._normals, 3));
     this.addAttribute('color', new BufferAttribute(isoSurf._colors, 3));
+  } else {
+    // geometry should have at least empty position attributes to be processed in wireframe mode by three.js
+    this.addAttribute('position', new BufferAttribute(utils.allocateTyped(Float32Array, 0), 3));
   }
 };
 
@@ -73577,7 +73580,7 @@ VolumeSurfaceGeometry.prototype._calcSurface = function (params) {
   this._makeSurface(surface, params);
 };
 
-var Volume$2 = chem.Volume;
+var Volume$1 = chem.Volume;
 
 /**
  * This class implements 'quick' isosurface geometry generation algorithm.
@@ -73597,13 +73600,13 @@ QuickSurfGeometry.prototype._computeSurface = function (packedArrays, box, bound
   this._shiftByOrigin(packedArrays.posRad);
 
   var surface = {
-    volMap: new Volume$2(Float32Array, this.numVoxels, box),
-    volTexMap: new Volume$2(Float32Array, this.numVoxels, box, 3)
+    volMap: new Volume$1(Float32Array, this.numVoxels, box),
+    volTexMap: new Volume$1(Float32Array, this.numVoxels, box, 3)
   };
 
   if (this._visibilitySelector != null) {
     surface.atomMap = [];
-    surface.atomWeightMap = new Volume$2(Float32Array, this.numVoxels, box);
+    surface.atomWeightMap = new Volume$1(Float32Array, this.numVoxels, box);
   }
 
   this.gaussdensity(surface, packedArrays, null, params);
@@ -74335,7 +74338,7 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   };
 }
 
-var Volume$3 = chem.Volume;
+var Volume$2 = chem.Volume;
 
 /**
  * This class implements 'contact' isosurface geometry generation algorithm.
@@ -74355,10 +74358,10 @@ ContactSurfaceGeometry.prototype._computeSurface = function (packedArrays, box, 
   contactSurface.build();
 
   var surface = {
-    volMap: new Volume$3(Float32Array, this.numVoxels, box, 1, contactSurface.volMap),
-    volTexMap: new Volume$3(Float32Array, this.numVoxels, box, 3, contactSurface.volTexMap),
+    volMap: new Volume$2(Float32Array, this.numVoxels, box, 1, contactSurface.volMap),
+    volTexMap: new Volume$2(Float32Array, this.numVoxels, box, 3, contactSurface.volTexMap),
     atomMap: contactSurface.atomMap,
-    atomWeightMap: new Volume$3(Float32Array, this.numVoxels, box, 1, contactSurface.weightsMap)
+    atomWeightMap: new Volume$2(Float32Array, this.numVoxels, box, 1, contactSurface.weightsMap)
   };
   return surface;
 };
@@ -74983,7 +74986,7 @@ IsoSurfaceGeo.prototype.destroy = function () {
 
 var COLOR_SIZE$3 = 3;
 var HASH_SIZE = 32768;
-var Element$2 = chem.Element;
+var Element$1 = chem.Element;
 
 /**
  * This class implements 'quick' isosurface geometry generation algorithm.
@@ -75420,7 +75423,7 @@ SSIsosurfaceGeometry.prototype.getType = function (letter) {
   var atomT = [0, 0, 1, 1, 2, 6, 3, 6, 4, 6, 5, 6, 6, 0, 7, 3, 8, 2, 9, 6, 10, 6, 11, 6, 12, 6, 13, 6, 14, 6, 15, 4, 16, 5, 17, 6, 18, 6, 19, 6, 20, 6, 21, 6, 22, 6, 23, 6, 24, 6, 25, 6, 26, 6, 27, 6, 28, 6, 29, 6, 30, 6, 31, 6, 32, 6, 33, 6, 34, 6, 35, 6, 36, 6, 37, 6, 38, 6, 39, 6, 40, 6, 41, 6, 42, 6, 43, 6, 44, 6, 45, 6, 46, 6, 47, 6, 48, 6, 49, 6, 50, 6, 51, 6, 52, 6, 53, 6, 54, 6, 55, 6, 56, 6, 57, 6, 58, 6, 59, 6, 60, 6, 61, 6, 62, 6, 63, 6, 64, 6, 65, 6, 66, 6, 67, 6, 68, 6, 69, 6, 70, 6, 71, 6, 72, 6, 73, 6, 74, 6, 75, 6, 76, 6, 77, 6, 78, 6, 79, 6, 80, 6, 81, 6, 82, 6, 83, 6, 84, 6, 85, 6, 86, 6, 87, 6, 88, 6, 89, 6, 90, 6, 91, 6, 92, 6, 93, 6, 94, 6, 95, 6, 96, 6, 97, 6, 98, 6, 99, 6, 100, 6, 101, 6, 102, 6, 103, 6, 104, 6, 105, 6, 106, 6, 107, 6, 108, 6, 109, 6];
   /* eslint-enable no-magic-numbers */
 
-  if (letter < 1 || letter > atomT.length / 2 || Object.keys(Element$2.ByAtomicNumber).length * 2 !== atomT.length) {
+  if (letter < 1 || letter > atomT.length / 2 || Object.keys(Element$1.ByAtomicNumber).length * 2 !== atomT.length) {
     throw new Error('atomT.length  should be equal Element.ByAtomicNumber.length * 2');
   }
   return atomT[letter * 2];
@@ -77439,7 +77442,7 @@ Licensed under MIT license (see "Smooth.js MIT license.txt")
 });
 var Smooth_1 = Smooth.Smooth;
 
-var ResidueType$2 = chem.ResidueType;
+var ResidueType$1 = chem.ResidueType;
 
 var calcMatrix = gfxutils.calcChunkMatrix;
 
@@ -77478,7 +77481,7 @@ function _addPoints(centerPoints, topPoints, idx, residue) {
 }
 
 function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
-  var nucleic = (residue._type.flags & ResidueType$2.Flags.NUCLEIC) !== 0;
+  var nucleic = (residue._type.flags & ResidueType$1.Flags.NUCLEIC) !== 0;
   var nameFrom = nucleic ? 'C5\'' : 'N';
   var nameTo = nucleic ? 'C3\'' : 'C';
 
@@ -79003,7 +79006,7 @@ CartoonMode.prototype.buildGeometry = function (complex, colorer, mask, material
   return Mode.prototype.buildGeometry.call(this, complex, colorer, mask, material);
 };
 
-var selectors$2 = chem.selectors;
+var selectors$1 = chem.selectors;
 
 function getRenderParams$1() {
   return {
@@ -79034,7 +79037,7 @@ SurfaceMode.prototype.calcAtomRadius = function (atom) {
 SurfaceMode.prototype.getVisibilitySelector = function () {
   var visibilitySelector = null;
   if (this.opts.subset !== '') {
-    var res = selectors$2.parse(this.opts.subset);
+    var res = selectors$1.parse(this.opts.subset);
     if (!res.error) {
       visibilitySelector = res.selector;
     }
@@ -80809,7 +80812,7 @@ var ComplexVisualEdit = {
   FragmentEditor: ComplexFragmentEditor
 };
 
-var selectors$3 = chem.selectors;
+var selectors$2 = chem.selectors;
 
 function ComplexVisual(name, dataSource) {
   Visual.call(this, name, dataSource);
@@ -80880,10 +80883,10 @@ ComplexVisual.prototype.resetReps = function (reps) {
     var selector, selectorString;
     if (typeof rep.selector === 'string') {
       selectorString = rep.selector;
-      selector = selectors$3.parse(selectorString).selector;
+      selector = selectors$2.parse(selectorString).selector;
     } else if (typeof rep.selector === 'undefined') {
       selectorString = settings.now.presets.default[0].selector;
-      selector = selectors$3.parse(selectorString).selector;
+      selector = selectors$2.parse(selectorString).selector;
     } else {
       selector = rep.selector;
       selectorString = selector.toString();
@@ -80980,7 +80983,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
 
     // modify selector
     if (rep.selector) {
-      var newSelectorObject = selectors$3.parse(rep.selector).selector;
+      var newSelectorObject = selectors$2.parse(rep.selector).selector;
       var newSelector = String(newSelectorObject);
       if (desc.selector !== newSelector) {
         target.selectorString = desc.selector = newSelector;
@@ -81094,7 +81097,7 @@ ComplexVisual.prototype.repAdd = function (rep) {
     material: def.material
   }, rep);
 
-  var selector = typeof desc.selector === 'string' ? selectors$3.parse(desc.selector).selector : desc.selector;
+  var selector = typeof desc.selector === 'string' ? selectors$2.parse(desc.selector).selector : desc.selector;
   var target = new Representation(this._selectionBit, exports$1.create(desc.mode), exports$2.create(desc.colorer), selector);
   target.selectorString = selector.toString();
   target.setMaterialPreset(materials.get(desc.material));
@@ -81497,41 +81500,41 @@ ComplexVisual.prototype._buildSelectorFromSortedLists = function (atoms, residue
         last = value;
       } else {
         if (!Number.isNaN(first)) {
-          result[k++] = new selectors$3.Range(first, last);
+          result[k++] = new selectors$2.Range(first, last);
         }
         first = last = value;
       }
     }
     if (!Number.isNaN(first)) {
-      result[k] = new selectors$3.Range(first, last);
+      result[k] = new selectors$2.Range(first, last);
     }
     return result;
   }
 
   var expression = null;
   if (chains.length === complex._chains.length) {
-    expression = selectors$3.all();
+    expression = selectors$2.all();
   } else {
     var selector;
     if (chains.length > 0) {
-      selector = selectors$3.chain(chains);
-      expression = expression ? selectors$3.or(expression, selector) : selector; // NOSONAR
+      selector = selectors$2.chain(chains);
+      expression = expression ? selectors$2.or(expression, selector) : selector; // NOSONAR
     }
     if (Object.keys(residues).length > 0) {
       for (var ch in residues) {
         if (residues.hasOwnProperty(ch)) {
-          selector = selectors$3.and(selectors$3.chain(ch), selectors$3.residx(optimizeList(residues[ch])));
-          expression = expression ? selectors$3.or(expression, selector) : selector;
+          selector = selectors$2.and(selectors$2.chain(ch), selectors$2.residx(optimizeList(residues[ch])));
+          expression = expression ? selectors$2.or(expression, selector) : selector;
         }
       }
     }
     if (atoms.length > 0) {
-      selector = selectors$3.serial(optimizeList(atoms));
-      expression = expression ? selectors$3.or(expression, selector) : selector;
+      selector = selectors$2.serial(optimizeList(atoms));
+      expression = expression ? selectors$2.or(expression, selector) : selector;
     }
 
     if (!expression) {
-      expression = selectors$3.none();
+      expression = selectors$2.none();
     }
   }
 
@@ -82904,7 +82907,7 @@ Remark290.prototype.parse = function (stream) {
   }
 };
 
-var Assembly$2 = chem.Assembly;
+var Assembly$1 = chem.Assembly;
 
 /**
  * Parser helper for PDB tag "REMARK 350".
@@ -82968,7 +82971,7 @@ Remark350.prototype.parse = function (stream) {
     // TODO: assert(molIndex === this.assemblies.length + 1);
     this._matrix = null;
     this._matrixIndex = -1;
-    this._assembly = assembly = new Assembly$2(this._complex);
+    this._assembly = assembly = new Assembly$1(this._complex);
     this.assemblies.push(assembly);
   }
 };
@@ -83047,13 +83050,13 @@ var PDBStream = function () {
   return PDBStream;
 }();
 
-var Complex$2 = chem.Complex,
-    Element$3 = chem.Element,
-    Helix$2 = chem.Helix,
-    Sheet$2 = chem.Sheet,
-    Strand$2 = chem.Strand,
-    Bond$2 = chem.Bond,
-    Molecule$2 = chem.Molecule;
+var Complex$1 = chem.Complex,
+    Element$2 = chem.Element,
+    Helix$1 = chem.Helix,
+    Sheet$1 = chem.Sheet,
+    Strand$1 = chem.Strand,
+    Bond$1 = chem.Bond,
+    Molecule$1 = chem.Molecule;
 
 var TAG_LENGTH = 6;
 
@@ -83169,7 +83172,7 @@ PDBParser.prototype._finalizeMolecules = function () {
       var chain = chainDict[name];
       residues = residues.concat(chain._residues.slice());
     }
-    var molecule = new Molecule$2(this._complex, m._name, i + 1);
+    var molecule = new Molecule$1(this._complex, m._name, i + 1);
     molecule._residues = residues;
     this._complex._molecules[i] = molecule;
   }
@@ -83268,8 +83271,8 @@ PDBParser.prototype._parseATOM = function (stream) {
   // but names may include extra spaces. From this point on we don't need those spaces anymore.
   name = name.trim();
 
-  var type = Element$3.getByName(element);
-  var role = Element$3.Role[name]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
+  var type = Element$2.getByName(element);
+  var role = Element$2.Role[name]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
 
   // NOTE: Residues of a particular chain are not required to be listed next to each other.
   // https://github.com/biasmv/pv/commit/7319b898b7473ba380c26699e3b028b2b1a7e1a1
@@ -83306,16 +83309,16 @@ PDBParser.prototype._parseCONECT = function (stream) {
 
   // Keep bonds ordered by atom serial
   if (serial1 && serial1 > serial0) {
-    complex.addBond(serial0, serial1, 0, Bond$2.BondType.UNKNOWN, true);
+    complex.addBond(serial0, serial1, 0, Bond$1.BondType.UNKNOWN, true);
   }
   if (serial2 && serial2 > serial0) {
-    complex.addBond(serial0, serial2, 0, Bond$2.BondType.UNKNOWN, true);
+    complex.addBond(serial0, serial2, 0, Bond$1.BondType.UNKNOWN, true);
   }
   if (serial3 && serial3 > serial0) {
-    complex.addBond(serial0, serial3, 0, Bond$2.BondType.UNKNOWN, true);
+    complex.addBond(serial0, serial3, 0, Bond$1.BondType.UNKNOWN, true);
   }
   if (serial4 && serial4 > serial0) {
-    complex.addBond(serial0, serial4, 0, Bond$2.BondType.UNKNOWN, true);
+    complex.addBond(serial0, serial4, 0, Bond$1.BondType.UNKNOWN, true);
   }
 };
 
@@ -83437,15 +83440,15 @@ PDBParser.prototype._parseSTRUCTURE = function (stream, pars, adder) {
       this._sheet = null;
     }
     if (cs === null) {
-      this._sheet = obj = new Sheet$2(structureName, shWidth);
+      this._sheet = obj = new Sheet$1(structureName, shWidth);
       adder(obj);
     } else {
       obj = cs;
     }
-    var strand = new Strand$2(obj, this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode), this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode), helType, shCur, shPrev);
+    var strand = new Strand$1(obj, this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode), this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode), helType, shCur, shPrev);
     obj.addStrand(strand);
   } else {
-    obj = new Helix$2(serialNumber, structureName, this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode), this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode), helType, comment, helLength);
+    obj = new Helix$1(serialNumber, structureName, this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode), this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode), helType, comment, helLength);
     adder(obj);
   }
 };
@@ -83497,7 +83500,7 @@ var tagParsers = {
 
 PDBParser.prototype.parseSync = function () {
   var stream = new PDBStream(this._data);
-  var result = this._complex = new Complex$2();
+  var result = this._complex = new Complex$1();
 
   // parse PDB line by line
   while (!stream.end()) {
@@ -83529,11 +83532,11 @@ PDBParser.prototype.parseSync = function () {
 PDBParser.formats = ['pdb'];
 PDBParser.extensions = ['.pdb', '.ent'];
 
-var Complex$3 = chem.Complex,
-    Element$4 = chem.Element,
-    AtomName$2 = chem.AtomName,
-    SGroup$2 = chem.SGroup,
-    Bond$3 = chem.Bond;
+var Complex$2 = chem.Complex,
+    Element$3 = chem.Element,
+    AtomName$1 = chem.AtomName,
+    SGroup$1 = chem.SGroup,
+    Bond$2 = chem.Bond;
 
 var cOrderCharCodes = {
   A: 0,
@@ -83605,7 +83608,7 @@ CMLParser.prototype._rebuidBondIndexes = function (atoms, bonds) {
 };
 
 CMLParser.prototype._createSGroup = function (molecule, moleculeArr) {
-  var newGroup = new SGroup$2(molecule.id, molecule.fieldData, new Vector3(parseFloat(molecule.x), parseFloat(molecule.y), 0), molecule.atomRefs, molecule);
+  var newGroup = new SGroup$1(molecule.id, molecule.fieldData, new Vector3(parseFloat(molecule.x), parseFloat(molecule.y), 0), molecule.atomRefs, molecule);
   if (molecule.placement === 'Relative') {
     newGroup._center = new Vector3(0, 0, 0);
   }
@@ -83866,7 +83869,7 @@ CMLParser.prototype._selectComponents = function (text) {
       var tc = parseInt(orderAttr, 10);
       // the default bond order is unknown
       localBond[_i].order = 0;
-      localBond[_i].type = Bond$3.BondType.UNKNOWN;
+      localBond[_i].type = Bond$2.BondType.UNKNOWN;
       if (tc > 1) {
         localBond[_i].order = tc;
       } else {
@@ -83875,7 +83878,7 @@ CMLParser.prototype._selectComponents = function (text) {
         if (order !== undefined) {
           localBond[_i].order = order;
           if (orderAttr === 'A') {
-            localBond[_i].type = Bond$3.BondType.AROMATIC;
+            localBond[_i].type = Bond$2.BondType.AROMATIC;
           }
         }
       }
@@ -84018,7 +84021,7 @@ CMLParser.prototype._fixBondsArray = function () {
 };
 
 CMLParser.prototype._parseSet = function (varData) {
-  var complex = this._complex = new Complex$3();
+  var complex = this._complex = new Complex$2();
   var data = varData;
   var currentLabel = data.curr;
   var atoms = data.atoms;
@@ -84063,7 +84066,7 @@ CMLParser.prototype._parseSet = function (varData) {
       atom = atoms[reorder[i]];
       var atomHtmlNode = null;
 
-      var atomFullNameStruct = new AtomName$2(atom.elementType, atomHtmlNode);
+      var atomFullNameStruct = new AtomName$1(atom.elementType, atomHtmlNode);
 
       if (atom.sgroupRef) {
         var countRef = atom.sgroupRef.length;
@@ -84101,16 +84104,16 @@ CMLParser.prototype._parseSet = function (varData) {
         } else if (atom.x2) {
           xyz = new Vector3(parseFloat(atom.x2), parseFloat(atom.y2), 0);
         }
-        var element = Element$4.ByName[atom.elementType.toUpperCase()];
+        var element = Element$3.ByName[atom.elementType.toUpperCase()];
         if (!element) {
-          element = JSON.parse(JSON.stringify(Element$4.ByName[Object.keys(Element$4.ByName)[Object.keys(Element$4.ByName).length - 1]]));
+          element = JSON.parse(JSON.stringify(Element$3.ByName[Object.keys(Element$3.ByName)[Object.keys(Element$3.ByName).length - 1]]));
           element.number += 1;
           element.name = atom.elementType.toUpperCase();
           element.fullName = 'Unknown';
-          Element$4.ByName[atom.elementType.toUpperCase()] = element;
+          Element$3.ByName[atom.elementType.toUpperCase()] = element;
         }
         var atomSerial = parseInt(atom.id.replace(/[^0-9]/, ''), 10);
-        var added = residue.addAtom(atomFullNameStruct, element, xyz, Element$4.Role.SG, true, atomSerial, ' ', 1.0, 0.0, atomCharge);
+        var added = residue.addAtom(atomFullNameStruct, element, xyz, Element$3.Role.SG, true, atomSerial, ' ', 1.0, 0.0, atomCharge);
         if (atom.hydrogenCount) {
           added._hydrogenCount = parseInt(atom.hydrogenCount, 10);
         }
@@ -84186,14 +84189,14 @@ CMLParser.prototype.parseSync = function () {
   }
 
   if (complexes.length > 1) {
-    var joinedComplex = new Complex$3();
+    var joinedComplex = new Complex$2();
     joinedComplex.joinComplexes(complexes);
     joinedComplex.originalCML = complexes[0].originalCML;
     return joinedComplex;
   } else if (complexes.length === 1) {
     return complexes[0];
   } else {
-    return new Complex$3();
+    return new Complex$2();
   }
 };
 
@@ -84204,17 +84207,17 @@ var mmtf = createCommonjsModule(function (module, exports) {
 !function(r,t){if("function"==typeof undefined&&undefined.amd)undefined(["exports"],t);else t(exports);}(commonjsGlobal,function(r){function t(r,t,n){for(var e=(r.byteLength, 0),i=n.length;i>e;e++){var o=n.charCodeAt(e);if(128>o)r.setUint8(t++,o>>>0&127|0);else if(2048>o)r.setUint8(t++,o>>>6&31|192), r.setUint8(t++,o>>>0&63|128);else if(65536>o)r.setUint8(t++,o>>>12&15|224), r.setUint8(t++,o>>>6&63|128), r.setUint8(t++,o>>>0&63|128);else{if(!(1114112>o))throw new Error("bad codepoint "+o);r.setUint8(t++,o>>>18&7|240), r.setUint8(t++,o>>>12&63|128), r.setUint8(t++,o>>>6&63|128), r.setUint8(t++,o>>>0&63|128);}}}function n(r){for(var t=0,n=0,e=r.length;e>n;n++){var i=r.charCodeAt(n);if(128>i)t+=1;else if(2048>i)t+=2;else if(65536>i)t+=3;else{if(!(1114112>i))throw new Error("bad codepoint "+i);t+=4;}}return t}function e(r,i,o){var a=typeof r;if("string"===a){var u=n(r);if(32>u)return i.setUint8(o,160|u), t(i,o+1,r), 1+u;if(256>u)return i.setUint8(o,217), i.setUint8(o+1,u), t(i,o+2,r), 2+u;if(65536>u)return i.setUint8(o,218), i.setUint16(o+1,u), t(i,o+3,r), 3+u;if(4294967296>u)return i.setUint8(o,219), i.setUint32(o+1,u), t(i,o+5,r), 5+u}if(r instanceof Uint8Array){var u=r.byteLength,s=new Uint8Array(i.buffer);if(256>u)return i.setUint8(o,196), i.setUint8(o+1,u), s.set(r,o+2), 2+u;if(65536>u)return i.setUint8(o,197), i.setUint16(o+1,u), s.set(r,o+3), 3+u;if(4294967296>u)return i.setUint8(o,198), i.setUint32(o+1,u), s.set(r,o+5), 5+u}if("number"===a){if(!isFinite(r))throw new Error("Number not finite: "+r);if(Math.floor(r)!==r)return i.setUint8(o,203), i.setFloat64(o+1,r), 9;if(r>=0){if(128>r)return i.setUint8(o,r), 1;if(256>r)return i.setUint8(o,204), i.setUint8(o+1,r), 2;if(65536>r)return i.setUint8(o,205), i.setUint16(o+1,r), 3;if(4294967296>r)return i.setUint8(o,206), i.setUint32(o+1,r), 5;throw new Error("Number too big 0x"+r.toString(16))}if(r>=-32)return i.setInt8(o,r), 1;if(r>=-128)return i.setUint8(o,208), i.setInt8(o+1,r), 2;if(r>=-32768)return i.setUint8(o,209), i.setInt16(o+1,r), 3;if(r>=-2147483648)return i.setUint8(o,210), i.setInt32(o+1,r), 5;throw new Error("Number too small -0x"+(-r).toString(16).substr(1))}if(null===r)return i.setUint8(o,192), 1;if("boolean"===a)return i.setUint8(o,r?195:194), 1;if("object"===a){var u,f=0,c=Array.isArray(r);if(c)u=r.length;else{var d=Object.keys(r);u=d.length;}var f;if(16>u?(i.setUint8(o,u|(c?144:128)), f=1):65536>u?(i.setUint8(o,c?220:222), i.setUint16(o+1,u), f=3):4294967296>u&&(i.setUint8(o,c?221:223), i.setUint32(o+1,u), f=5), c)for(var l=0;u>l;l++)f+=e(r[l],i,o+f);else for(var l=0;u>l;l++){var v=d[l];f+=e(v,i,o+f), f+=e(r[v],i,o+f);}return f}throw new Error("Unknown type "+a)}function i(r){var t=typeof r;if("string"===t){var e=n(r);if(32>e)return 1+e;if(256>e)return 2+e;if(65536>e)return 3+e;if(4294967296>e)return 5+e}if(r instanceof Uint8Array){var e=r.byteLength;if(256>e)return 2+e;if(65536>e)return 3+e;if(4294967296>e)return 5+e}if("number"===t){if(Math.floor(r)!==r)return 9;if(r>=0){if(128>r)return 1;if(256>r)return 2;if(65536>r)return 3;if(4294967296>r)return 5;throw new Error("Number too big 0x"+r.toString(16))}if(r>=-32)return 1;if(r>=-128)return 2;if(r>=-32768)return 3;if(r>=-2147483648)return 5;throw new Error("Number too small -0x"+r.toString(16).substr(1))}if("boolean"===t||null===r)return 1;if("object"===t){var e,o=0;if(Array.isArray(r)){e=r.length;for(var a=0;e>a;a++)o+=i(r[a]);}else{var u=Object.keys(r);e=u.length;for(var a=0;e>a;a++){var s=u[a];o+=i(s)+i(r[s]);}}if(16>e)return 1+o;if(65536>e)return 3+o;if(4294967296>e)return 5+o;throw new Error("Array or object too long 0x"+e.toString(16))}throw new Error("Unknown type "+t)}function o(r){var t=new ArrayBuffer(i(r)),n=new DataView(t);return e(r,n,0), new Uint8Array(t)}function a(r,t,n){return t?new r(t.buffer,t.byteOffset,t.byteLength/(n||1)):void 0}function u(r){return a(DataView,r)}function s(r){return a(Uint8Array,r)}function f(r){return a(Int8Array,r)}function c(r){return a(Int32Array,r,4)}function d(r){return a(Float32Array,r,4)}function l(r,t){var n=r.length/2;t||(t=new Int16Array(n));for(var e=0,i=0;n>e;++e, i+=2)t[e]=r[i]<<8^r[i+1]<<0;return t}function v(r,t){var n=r.length;t||(t=new Uint8Array(2*n));for(var e=u(t),i=0;n>i;++i)e.setInt16(2*i,r[i]);return s(t)}function g(r,t){var n=r.length/4;t||(t=new Int32Array(n));for(var e=0,i=0;n>e;++e, i+=4)t[e]=r[i]<<24^r[i+1]<<16^r[i+2]<<8^r[i+3]<<0;return t}function L(r,t){var n=r.length;t||(t=new Uint8Array(4*n));for(var e=u(t),i=0;n>i;++i)e.setInt32(4*i,r[i]);return s(t)}function h(r,t){var n=r.length;t||(t=new Float32Array(n/4));for(var e=u(t),i=u(r),o=0,a=0,s=n/4;s>o;++o, a+=4)e.setFloat32(a,i.getFloat32(a),!0);return t}function y(r,t,n){var e=r.length,i=1/t;n||(n=new Float32Array(e));for(var o=0;e>o;++o)n[o]=r[o]*i;return n}function m(r,t,n){var e=r.length;n||(n=new Int32Array(e));for(var i=0;e>i;++i)n[i]=Math.round(r[i]*t);return n}function p(r,t){var n,e;if(!t){var i=0;for(n=0, e=r.length;e>n;n+=2)i+=r[n+1];t=new r.constructor(i);}var o=0;for(n=0, e=r.length;e>n;n+=2)for(var a=r[n],u=r[n+1],s=0;u>s;++s)t[o]=a, ++o;return t}function U(r){if(0===r.length)return new Int32Array;var t,n,e=2;for(t=1, n=r.length;n>t;++t)r[t-1]!==r[t]&&(e+=2);var i=new Int32Array(e),o=0,a=1;for(t=1, n=r.length;n>t;++t)r[t-1]!==r[t]?(i[o]=r[t-1], i[o+1]=a, a=1, o+=2):++a;return i[o]=r[r.length-1], i[o+1]=a, i}function b(r,t){var n=r.length;t||(t=new r.constructor(n)), n&&(t[0]=r[0]);for(var e=1;n>e;++e)t[e]=r[e]+t[e-1];return t}function I(r,t){var n=r.length;t||(t=new r.constructor(n)), t[0]=r[0];for(var e=1;n>e;++e)t[e]=r[e]-r[e-1];return t}function w(r,t){var n,e,i=r instanceof Int8Array?127:32767,o=-i-1,a=r.length;if(!t){var u=0;for(n=0;a>n;++n)r[n]<i&&r[n]>o&&++u;t=new Int32Array(u);}for(n=0, e=0;a>n;){for(var s=0;r[n]===i||r[n]===o;)s+=r[n], ++n;s+=r[n], ++n, t[e]=s, ++e;}return t}function C(r,t){var n,e=t?127:32767,i=-e-1,o=r.length,a=0;for(n=0;o>n;++n){var u=r[n];0===u?++a:a+=u===e||u===i?2:u>0?Math.ceil(u/e):Math.ceil(u/i);}var s=t?new Int8Array(a):new Int16Array(a),f=0;for(n=0;o>n;++n){var u=r[n];if(u>=0)for(;u>=e;)s[f]=e, ++f, u-=e;else for(;i>=u;)s[f]=i, ++f, u-=i;s[f]=u, ++f;}return s}function A(r,t){return b(p(r),t)}function x(r){return U(I(r))}function M(r,t,n){return y(p(r,c(n)),t,n)}function F(r,t){return U(m(r,t))}function S(r,t,n){return y(b(r,c(n)),t,n)}function E(r,t,n){return I(m(r,t),n)}function N(r,t,n){return y(w(r,c(n)),t,n)}function O(r,t,n){var e=w(r,c(n));return S(e,t,d(e))}function T(r,t,n){return C(E(r,t),n)}function k(r){var t=u(r),n=t.getInt32(0),e=t.getInt32(4),i=r.subarray(8,12),r=r.subarray(12);return[n,r,e,i]}function j(r,t,n,e){var i=new ArrayBuffer(12+e.byteLength),o=new Uint8Array(i),a=new DataView(i);return a.setInt32(0,r), a.setInt32(4,t), n&&o.set(n,8), o.set(e,12), o}function q(r){var t=r.length,n=s(r);return j(2,t,void 0,n)}function D(r){var t=r.length,n=L(r);return j(4,t,void 0,n)}function P(r,t){var n=r.length/t,e=L([t]),i=s(r);return j(5,n,e,i)}function z(r){var t=r.length,n=L(U(r));return j(6,t,void 0,n)}function B(r){var t=r.length,n=L(x(r));return j(8,t,void 0,n)}function V(r,t){var n=r.length,e=L([t]),i=L(F(r,t));return j(9,n,e,i)}function G(r,t){var n=r.length,e=L([t]),i=v(T(r,t));return j(10,n,e,i)}function R(r){var t={};return rr.forEach(function(n){void 0!==r[n]&&(t[n]=r[n]);}), r.bondAtomList&&(t.bondAtomList=D(r.bondAtomList)), r.bondOrderList&&(t.bondOrderList=q(r.bondOrderList)), t.xCoordList=G(r.xCoordList,1e3), t.yCoordList=G(r.yCoordList,1e3), t.zCoordList=G(r.zCoordList,1e3), r.bFactorList&&(t.bFactorList=G(r.bFactorList,100)), r.atomIdList&&(t.atomIdList=B(r.atomIdList)), r.altLocList&&(t.altLocList=z(r.altLocList)), r.occupancyList&&(t.occupancyList=V(r.occupancyList,100)), t.groupIdList=B(r.groupIdList), t.groupTypeList=D(r.groupTypeList), r.secStructList&&(t.secStructList=q(r.secStructList,1)), r.insCodeList&&(t.insCodeList=z(r.insCodeList)), r.sequenceIndexList&&(t.sequenceIndexList=B(r.sequenceIndexList)), t.chainIdList=P(r.chainIdList,4), r.chainNameList&&(t.chainNameList=P(r.chainNameList,4)), t}function H(r){function t(r){for(var t={},n=0;r>n;n++){var e=o();t[e]=o();}return t}function n(t){var n=r.subarray(a,a+t);return a+=t, n}function e(t){var n=r.subarray(a,a+t);a+=t;var e=65535;if(t>e){for(var i=[],o=0;o<n.length;o+=e)i.push(String.fromCharCode.apply(null,n.subarray(o,o+e)));return i.join("")}return String.fromCharCode.apply(null,n)}function i(r){for(var t=new Array(r),n=0;r>n;n++)t[n]=o();return t}function o(){var o,s,f=r[a];if(0===(128&f))return a++, f;if(128===(240&f))return s=15&f, a++, t(s);if(144===(240&f))return s=15&f, a++, i(s);if(160===(224&f))return s=31&f, a++, e(s);if(224===(224&f))return o=u.getInt8(a), a++, o;switch(f){case 192:return a++, null;case 194:return a++, !1;case 195:return a++, !0;case 196:return s=u.getUint8(a+1), a+=2, n(s);case 197:return s=u.getUint16(a+1), a+=3, n(s);case 198:return s=u.getUint32(a+1), a+=5, n(s);case 202:return o=u.getFloat32(a+1), a+=5, o;case 203:return o=u.getFloat64(a+1), a+=9, o;case 204:return o=r[a+1], a+=2, o;case 205:return o=u.getUint16(a+1), a+=3, o;case 206:return o=u.getUint32(a+1), a+=5, o;case 208:return o=u.getInt8(a+1), a+=2, o;case 209:return o=u.getInt16(a+1), a+=3, o;case 210:return o=u.getInt32(a+1), a+=5, o;case 217:return s=u.getUint8(a+1), a+=2, e(s);case 218:return s=u.getUint16(a+1), a+=3, e(s);case 219:return s=u.getUint32(a+1), a+=5, e(s);case 220:return s=u.getUint16(a+1), a+=3, i(s);case 221:return s=u.getUint32(a+1), a+=5, i(s);case 222:return s=u.getUint16(a+1), a+=3, t(s);case 223:return s=u.getUint32(a+1), a+=5, t(s)}throw new Error("Unknown type 0x"+f.toString(16))}var a=0,u=new DataView(r.buffer);return o()}function W(r,t,n,e){switch(r){case 1:return h(t);case 2:return f(t);case 3:return l(t);case 4:return g(t);case 5:return s(t);case 6:return p(g(t),new Uint8Array(n));case 7:return p(g(t));case 8:return A(g(t));case 9:return M(g(t),g(e)[0]);case 10:return O(l(t),g(e)[0]);case 11:return y(l(t),g(e)[0]);case 12:return N(l(t),g(e)[0]);case 13:return N(f(t),g(e)[0]);case 14:return w(l(t));case 15:return w(f(t))}}function X(r,t){t=t||{};var n=t.ignoreFields,e={};return nr.forEach(function(t){var i=n?-1!==n.indexOf(t):!1,o=r[t];i||void 0===o||(o instanceof Uint8Array?e[t]=W.apply(null,k(o)):e[t]=o);}), e}function J(r){return String.fromCharCode.apply(null,r).replace(/\0/g,"")}function K(r,t,n){n=n||{};var e,i,o,a,u,s,f=n.firstModelOnly,c=t.onModel,d=t.onChain,l=t.onGroup,v=t.onAtom,g=t.onBond,L=0,h=0,y=0,m=0,p=0,U=-1,b=r.chainNameList,I=r.secStructList,w=r.insCodeList,C=r.sequenceIndexList,A=r.atomIdList,x=r.bFactorList,M=r.altLocList,F=r.occupancyList,S=r.bondAtomList,E=r.bondOrderList;for(e=0, i=r.chainsPerModel.length;i>e&&!(f&&L>0);++e){var N=r.chainsPerModel[L];for(c&&c({chainCount:N,modelIndex:L}), o=0;N>o;++o){var O=r.groupsPerChain[h];if(d){var T=J(r.chainIdList.subarray(4*h,4*h+4)),k=null;b&&(k=J(b.subarray(4*h,4*h+4))), d({groupCount:O,chainIndex:h,modelIndex:L,chainId:T,chainName:k});}for(a=0;O>a;++a){var j=r.groupList[r.groupTypeList[y]],q=j.atomNameList.length;if(l){var D=null;I&&(D=I[y]);var P=null;r.insCodeList&&(P=String.fromCharCode(w[y]));var z=null;C&&(z=C[y]), l({atomCount:q,groupIndex:y,chainIndex:h,modelIndex:L,groupId:r.groupIdList[y],groupType:r.groupTypeList[y],groupName:j.groupName,singleLetterCode:j.singleLetterCode,chemCompType:j.chemCompType,secStruct:D,insCode:P,sequenceIndex:z});}for(u=0;q>u;++u){if(v){var B=null;A&&(B=A[m]);var V=null;x&&(V=x[m]);var G=null;M&&(G=String.fromCharCode(M[m]));var R=null;F&&(R=F[m]), v({atomIndex:m,groupIndex:y,chainIndex:h,modelIndex:L,atomId:B,element:j.elementList[u],atomName:j.atomNameList[u],formalCharge:j.formalChargeList[u],xCoord:r.xCoordList[m],yCoord:r.yCoordList[m],zCoord:r.zCoordList[m],bFactor:V,altLoc:G,occupancy:R});}m+=1;}if(g){var H=j.bondAtomList;for(u=0, s=j.bondOrderList.length;s>u;++u)g({atomIndex1:m-q+H[2*u],atomIndex2:m-q+H[2*u+1],bondOrder:j.bondOrderList[u]});}y+=1;}h+=1;}if(p=U+1, U=m-1, g&&S)for(u=0, s=S.length;s>u;u+=2){var W=S[u],X=S[u+1];(W>=p&&U>=W||X>=p&&U>=X)&&g({atomIndex1:W,atomIndex2:X,bondOrder:E?E[u/2]:null});}L+=1;}}function Q(r){return o(R(r))}function Y(r,t){r instanceof ArrayBuffer&&(r=new Uint8Array(r));var n;return n=r instanceof Uint8Array?H(r):r, X(n,t)}function Z(r,t,n,e){function i(){try{var r=Y(o.response);n(r);}catch(t){e(t);}}var o=new XMLHttpRequest;o.addEventListener("load",i,!0), o.addEventListener("error",e,!0), o.responseType="arraybuffer", o.open("GET",t+r.toUpperCase()), o.send();}function $(r,t,n){Z(r,or,t,n);}function _(r,t,n){Z(r,ar,t,n);}var rr=["mmtfVersion","mmtfProducer","unitCell","spaceGroup","structureId","title","depositionDate","releaseDate","experimentalMethods","resolution","rFree","rWork","bioAssemblyList","ncsOperatorList","entityList","groupList","numBonds","numAtoms","numGroups","numChains","numModels","groupsPerChain","chainsPerModel"],tr=["xCoordList","yCoordList","zCoordList","groupIdList","groupTypeList","chainIdList","bFactorList","atomIdList","altLocList","occupancyList","secStructList","insCodeList","sequenceIndexList","chainNameList","bondAtomList","bondOrderList"],nr=rr.concat(tr),er="v1.1.0dev",ir="//mmtf.rcsb.org/v1.0/",or=ir+"full/",ar=ir+"reduced/";r.encode=Q, r.decode=Y, r.traverse=K, r.fetch=$, r.fetchReduced=_, r.version=er, r.fetchUrl=or, r.fetchReducedUrl=ar, r.encodeMsgpack=o, r.encodeMmtf=R, r.decodeMsgpack=H, r.decodeMmtf=X;});
 });
 
-var Complex$4 = chem.Complex,
-    Chain$2 = chem.Chain,
-    Atom$2 = chem.Atom,
-    AtomName$3 = chem.AtomName,
-    Element$5 = chem.Element,
-    Helix$3 = chem.Helix,
-    Sheet$3 = chem.Sheet,
-    Strand$3 = chem.Strand,
-    Bond$4 = chem.Bond,
-    Assembly$3 = chem.Assembly,
-    Molecule$3 = chem.Molecule;
+var Complex$3 = chem.Complex,
+    Chain$1 = chem.Chain,
+    Atom$1 = chem.Atom,
+    AtomName$2 = chem.AtomName,
+    Element$4 = chem.Element,
+    Helix$2 = chem.Helix,
+    Sheet$2 = chem.Sheet,
+    Strand$2 = chem.Strand,
+    Bond$3 = chem.Bond,
+    Assembly$2 = chem.Assembly,
+    Molecule$2 = chem.Molecule;
 
 function ArrayComparator(original) {
   this._original = Array.from(original);
@@ -84298,7 +84301,7 @@ MMTFParser.prototype._onChain = function (chainData) {
     return;
   }
 
-  var chain = new Chain$2(this._complex, chainData.chainName);
+  var chain = new Chain$1(this._complex, chainData.chainName);
   this._complex._chains[chainData.chainIndex] = chain;
   chain._index = chainData.chainIndex;
 };
@@ -84329,8 +84332,8 @@ MMTFParser.prototype._onAtom = function (atomData) {
   }
 
   var altLoc = !atomData.altLoc.charCodeAt(0) ? '' : atomData.altLoc;
-  var atom = new Atom$2(atomData.groupIndex, // we store residue index here to replace it later with actual reference
-  new AtomName$3(atomData.atomName), Element$5.getByName(atomData.element.toUpperCase()), new Vector3(atomData.xCoord, atomData.yCoord, atomData.zCoord), Element$5.Role[atomData.atomName], false, // hetero atoms will be marked later
+  var atom = new Atom$1(atomData.groupIndex, // we store residue index here to replace it later with actual reference
+  new AtomName$2(atomData.atomName), Element$4.getByName(atomData.element.toUpperCase()), new Vector3(atomData.xCoord, atomData.yCoord, atomData.zCoord), Element$4.Role[atomData.atomName], false, // hetero atoms will be marked later
   atomData.atomId, altLoc, atomData.occupancy, atomData.bFactor, atomData.formalCharge);
 
   this._complex._atoms[atomData.atomIndex] = atom;
@@ -84345,7 +84348,7 @@ MMTFParser.prototype._onBond = function (bondData) {
     return;
   }
   var left = Math.min(bondData.atomIndex1, bondData.atomIndex2);
-  this._complex.addBond(this._complex._atoms[left], this._complex._atoms[right], bondData.bondOrder, Bond$4.BondType.UNKNOWN, true);
+  this._complex.addBond(this._complex._atoms[left], this._complex._atoms[right], bondData.bondOrder, Bond$3.BondType.UNKNOWN, true);
 };
 
 MMTFParser.prototype._updateSecStructure = function (complex, residue, groupData) {
@@ -84354,7 +84357,7 @@ MMTFParser.prototype._updateSecStructure = function (complex, residue, groupData
   if (!lodash.isUndefined(groupData) && groupData.secStruct === this._ssType) {
     residue._secondary = this._ssStruct;
 
-    if (this._ssStruct instanceof Helix$3 || this._ssStruct instanceof Strand$3) {
+    if (this._ssStruct instanceof Helix$2 || this._ssStruct instanceof Strand$2) {
       this._ssStruct._residues.push(residue);
     }
     return;
@@ -84362,7 +84365,7 @@ MMTFParser.prototype._updateSecStructure = function (complex, residue, groupData
 
   // finish current secondary structure
   if (this._ssType !== -1) {
-    if (this._ssStruct instanceof Helix$3 || this._ssStruct instanceof Strand$3) {
+    if (this._ssStruct instanceof Helix$2 || this._ssStruct instanceof Strand$2) {
       this._ssStruct._end = this._ssStruct._residues[this._ssStruct._residues.length - 1];
     }
   }
@@ -84379,13 +84382,13 @@ MMTFParser.prototype._updateSecStructure = function (complex, residue, groupData
       case 0:
       case 2:
       case 4:
-        struct = new Helix$3(0, '', residue, null, helixTypes[this._ssType], '', 0);
+        struct = new Helix$2(0, '', residue, null, helixTypes[this._ssType], '', 0);
         complex._helices.push(struct);
         break;
       case 3:
-        var sheet = new Sheet$3('', 0);
+        var sheet = new Sheet$2('', 0);
         complex._sheets.push(sheet);
-        struct = new Strand$3(sheet, residue, null, 0);
+        struct = new Strand$2(sheet, residue, null, 0);
         break;
       default:
         struct = { type: 'mmtf' + this._ssType };
@@ -84417,7 +84420,7 @@ MMTFParser.prototype._updateMolecules = function (mmtfData) {
       var chain = this._complex._chains[chainIndex];
       residues = residues.concat(chain._residues.slice());
     }
-    var molecule = new Molecule$3(this._complex, entity.description, i + 1);
+    var molecule = new Molecule$2(this._complex, entity.description, i + 1);
     molecule._residues = residues;
     this._complex._molecules[i] = molecule;
   }
@@ -84522,7 +84525,7 @@ MMTFParser.prototype._parseAssemblyInfo = function (mmtfData) {
       logger.debug('MMTF: Assembly is missing some of the synonymous chains. Skipping...');
     }
 
-    var a = new Assembly$3(this._complex);
+    var a = new Assembly$2(this._complex);
 
     // add chains to assembly
     for (name in chainNames) {
@@ -84624,7 +84627,7 @@ MMTFParser.prototype._joinSynonymousChains = function () {
 MMTFParser.prototype.parseSync = function () {
   var mmtfData = mmtf.decode(this._data);
 
-  this._complex = new Complex$4();
+  this._complex = new Complex$3();
   this._serialAtomMap = {}; // filled during traversal
 
   this._traverse(mmtfData);
@@ -84648,13 +84651,13 @@ MMTFParser.formats = ['mmtf'];
 MMTFParser.extensions = ['.mmtf'];
 MMTFParser.binary = true;
 
-var Complex$5 = chem.Complex,
-    Element$6 = chem.Element,
-    Helix$4 = chem.Helix,
-    Sheet$4 = chem.Sheet,
-    Strand$4 = chem.Strand,
-    Assembly$4 = chem.Assembly,
-    Molecule$4 = chem.Molecule;
+var Complex$4 = chem.Complex,
+    Element$5 = chem.Element,
+    Helix$3 = chem.Helix,
+    Sheet$3 = chem.Sheet,
+    Strand$3 = chem.Strand,
+    Assembly$3 = chem.Assembly,
+    Molecule$3 = chem.Molecule;
 
 var cRequiredAtomFields = ['auth_seq_id', 'Cartn_x', 'Cartn_y', 'Cartn_z', 'label_atom_id'];
 
@@ -84745,7 +84748,7 @@ CIFParser.prototype.parseSync = function () {
  * @private
  */
 CIFParser.prototype._toComplex = function (cifData) {
-  var complex = new Complex$5();
+  var complex = new Complex$4();
   var complexData = cifData[Object.keys(cifData)[0]];
   this._extractAtoms(complex, complexData);
   this._extractSecondary(complex, complexData);
@@ -84788,7 +84791,7 @@ CIFParser.prototype._extractMolecules = function (complex, complexData) {
   var molecules = complex.getMolecules();
   for (i = 0; i < count; i++) {
     var molecule = this.molecules[i];
-    molecules[i] = new Molecule$4(complex, molecule.name, i + 1);
+    molecules[i] = new Molecule$3(complex, molecule.name, i + 1);
     molecules[i]._residues = molecule.residues;
   }
 };
@@ -84866,8 +84869,8 @@ CIFParser.prototype._extractAtoms = function (complex, complexData) {
 
     var name = names[i];
     var element = elements[i] || nameToElement$1(name);
-    var type = Element$6.getByName(element);
-    var role = Element$6.Role[name.trim()];
+    var type = Element$5.getByName(element);
+    var role = Element$5.Role[name.trim()];
     var xyz = new Vector3(x[i], y[i], z[i]);
     var het = group[i] === 'HETATM' || false;
     var serial = serials[i] || i;
@@ -84918,7 +84921,7 @@ CIFParser.prototype._extractSheets = function (complex, sheetData) {
         return sheets[i];
       }
     }
-    sheets[n] = new Sheet$4(name, 0);
+    sheets[n] = new Sheet$3(name, 0);
     return sheets[n];
   }
 
@@ -84946,7 +84949,7 @@ CIFParser.prototype._extractSheets = function (complex, sheetData) {
       continue;
     }
 
-    var strand = new Strand$4(sheet, start[0], end[0], 0, null, null);
+    var strand = new Strand$3(sheet, start[0], end[0], 0, null, null);
     var residues = chain.getResidues();
     for (var r = start[1]; r <= end[1]; ++r) {
       residues[r]._secondary = strand;
@@ -85007,7 +85010,7 @@ CIFParser.prototype._extractConfs = function (complex, helicesData) {
     // TODO Add turns and strands(!)?
     if (type === 'helix') {
       var idx = complex._helices.length;
-      struct = new Helix$4(idx, name, start[0], end[0], helClass, comment, length);
+      struct = new Helix$3(idx, name, start[0], end[0], helClass, comment, length);
       complex.addHelix(struct);
     } else {
       struct = null;
@@ -85122,7 +85125,7 @@ CIFParser.prototype._extractAssemblies = function (complex, complexData) {
   }
 
   for (var i = 0, n = asmIdx.length; i < n; ++i) {
-    var asm = new Assembly$4(complex);
+    var asm = new Assembly$3(complex);
     var assemblyOps = _extractOperations(asmOper[i], operList);
     var entries = asmList[i].split(',');
     for (var ii = 0, nn = entries.length; ii < nn; ++ii) {
@@ -85458,7 +85461,7 @@ CIFParser._parseToObject = function (source) {
 CIFParser.formats = ['cif', 'mmcif'];
 CIFParser.extensions = ['.cif', '.mmcif'];
 
-var Volume$4 = chem.Volume;
+var Volume$3 = chem.Volume;
 
 function Ccp4Model() {}
 
@@ -85660,15 +85663,15 @@ CCP4Parser.canProbablyParse = function (_data) {
 CCP4Parser.prototype.parseSync = function () {
   var ccp4 = new Ccp4Model();
   ccp4.load(this._data);
-  return new Volume$4(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
+  return new Volume$3(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
 };
 
 CCP4Parser.formats = ['ccp4'];
 CCP4Parser.extensions = ['.ccp4'];
 CCP4Parser.binary = true;
 
-var Complex$6 = chem.Complex,
-    Element$7 = chem.Element;
+var Complex$5 = chem.Complex,
+    Element$6 = chem.Element;
 
 function PubChemParser(data, options) {
   Parser.call(this, data, options);
@@ -85703,7 +85706,7 @@ PubChemParser.prototype.parseSync = function () {
 };
 
 PubChemParser.prototype._toComplex = function (jsonData) {
-  var complex = new Complex$6();
+  var complex = new Complex$5();
   var complexData = jsonData.PC_Compounds && jsonData.PC_Compounds[0];
   if (complexData) {
     this._extractAtoms(complex, complexData);
@@ -85740,7 +85743,7 @@ PubChemParser.prototype._extractAtoms = function (complex, complexData) {
 
   for (var i = 0, n = aids.length; i < n; ++i) {
     var aid = aids[i];
-    var element = Element$7.ByAtomicNumber[elements[aid]];
+    var element = Element$6.ByAtomicNumber[elements[aid]];
     var xyz = new Vector3(xs[i], ys[i], zs[i] || 0.0);
     atoms[aid] = residue.addAtom(element.name, element, xyz, undefined, true, aid, ' ', 1.0, 0.0, 0);
   }
@@ -88516,15 +88519,15 @@ var WebVRPoC = function () {
   return WebVRPoC;
 }();
 
-/* global "0.7.13":false */
+/* global "0.7.14":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
-var selectors$4 = chem.selectors,
-    Atom$3 = chem.Atom,
-    Residue$2 = chem.Residue,
-    Chain$3 = chem.Chain,
-    Molecule$5 = chem.Molecule;
+var selectors$3 = chem.selectors,
+    Atom$2 = chem.Atom,
+    Residue$1 = chem.Residue,
+    Chain$2 = chem.Chain,
+    Molecule$4 = chem.Molecule;
 
 var EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 
@@ -90832,7 +90835,7 @@ Miew.prototype._updateInfoPanel = function () {
   var aName = '';
   var coordLine = '';
 
-  if (this._lastPick instanceof Atom$3) {
+  if (this._lastPick instanceof Atom$2) {
     atom = this._lastPick;
     residue = atom._residue;
 
@@ -90850,13 +90853,13 @@ Miew.prototype._updateInfoPanel = function () {
     }
 
     coordLine = 'Coord: (' + atom._position.x.toFixed(2).toString() + ',     ' + atom._position.y.toFixed(2).toString() + ',     ' + atom._position.z.toFixed(2).toString() + ')';
-  } else if (this._lastPick instanceof Residue$2) {
+  } else if (this._lastPick instanceof Residue$1) {
     residue = this._lastPick;
 
     secondLine = residue._type._fullName + ':       ' + residue._chain._name + '.' + residue._type._name + residue._sequence + residue._icode.trim();
-  } else if (this._lastPick instanceof Chain$3) {
+  } else if (this._lastPick instanceof Chain$2) {
     secondLine = 'chain ' + this._lastPick._name;
-  } else if (this._lastPick instanceof Molecule$5) {
+  } else if (this._lastPick instanceof Molecule$4) {
     secondLine = 'molecule ' + this._lastPick._name;
   }
 
@@ -91530,7 +91533,7 @@ Miew.prototype.select = function (expression, append) {
 
   var sel = expression;
   if (lodash.isString(expression)) {
-    sel = selectors$4.parse(expression).selector;
+    sel = selectors$3.parse(expression).selector;
   }
 
   visual.select(sel, append);
@@ -91697,11 +91700,11 @@ Miew.prototype.pan = function (x, y) {
 Miew.prototype.within = function (selector, radius) {
   var visual = this._getComplexVisual();
   if (!visual) {
-    return selectors$4.None();
+    return selectors$3.None();
   }
 
   if (selector instanceof String) {
-    selector = selectors$4.parse(selector);
+    selector = selectors$3.parse(selector);
   }
 
   var res = visual.within(selector, radius);
@@ -92107,7 +92110,7 @@ Miew.prototype.exportCML = function () {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew.prototype.VERSION = typeof "0.7.13" !== 'undefined' && "0.7.13" || '0.0.0-dev';
+Miew.prototype.VERSION = typeof "0.7.14" !== 'undefined' && "0.7.14" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew, /** @lends Miew */{
@@ -93518,9 +93521,9 @@ var JSONtoSelectorConverter = function () {
   return JSONtoSelectorConverter;
 }();
 
-var selectors$5 = Miew.chem.selectors,
-    modes$1 = Miew.modes,
-    colorers$1 = Miew.colorers,
+var selectors$4 = Miew.chem.selectors,
+    modes = Miew.modes,
+    colorers = Miew.colorers,
     materials$1 = Miew.materials,
     palettes$1 = Miew.palettes,
     options$1 = Miew.options,
@@ -93680,7 +93683,7 @@ CLIUtils.prototype.load = function (miew, arg) {
 CLIUtils.prototype.checkArg = function (key, arg, modificate) {
   if (key !== undefined && arg !== undefined) {
     if (keyRemap(key) === 'selector') {
-      var res = selectors$5.parse(arg);
+      var res = selectors$4.parse(arg);
 
       if (res.error !== undefined) {
         var selExc = { message: res.error };
@@ -93694,8 +93697,8 @@ CLIUtils.prototype.checkArg = function (key, arg, modificate) {
     }
 
     var modificators = {
-      'colorers': colorers$1,
-      'modes': modes$1,
+      'colorers': colorers,
+      'modes': modes,
       'materials': materials$1
     };
 
@@ -94433,8 +94436,8 @@ cliutils.srv = srvFunctions;
 cliutils._ = lodash;
 cliutils.CreateObjectPair = CreateObjectPair;
 cliutils.keyRemap = keyRemap;
-cliutils.Context = selectors$5.Context;
-cliutils.ClearContext = selectors$5.ClearContext;
+cliutils.Context = selectors$4.Context;
+cliutils.ClearContext = selectors$4.ClearContext;
 
 cliutils.NULL = NULL;
 
