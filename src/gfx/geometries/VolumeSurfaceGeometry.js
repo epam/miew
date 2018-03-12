@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import IsoSurfaceGeometry from './IsoSurfaceGeometry';
 import IsoSurface from './IsoSurface';
-
+import utils from '../../utils';
 
 /**
  * This is a base class for volumetric maps based isosurface algorithms.
@@ -95,6 +95,8 @@ VolumeSurfaceGeometry.prototype._makeSurface = function(surface, params) {
     this.addAttribute('position', new THREE.BufferAttribute(isoSurf._position, 3));
     this.addAttribute('normal', new THREE.BufferAttribute(isoSurf._normals, 3));
     this.addAttribute('color', new THREE.BufferAttribute(isoSurf._colors, 3));
+  } else { // geometry should have at least empty position attributes to be processed in wireframe mode by three.js
+    this.addAttribute('position', new THREE.BufferAttribute(utils.allocateTyped(Float32Array, 0), 3));
   }
 };
 
