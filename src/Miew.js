@@ -1892,10 +1892,16 @@ Miew.prototype._rebuildObjects = function() {
 
 Miew.prototype.changeUnit = function(unitIdx, name) {
   var visual = this._getComplexVisual(name);
+  let log = '';
   if (unitIdx === undefined) {
     var unit = visual ? visual.getComplex().getCurrentStructure() : 0;
     var type = unit > 0 ? ('Bio molecule ' + unit) : 'Asymmetric unit';
-    return 'Current unit: ' + unit + ' (' + type + ')';
+    log = 'Current unit: ' + unit + ' (' + type + ')';
+    return log;
+  }
+  if (_.isString(unitIdx)) {
+    unitIdx = Math.max(parseInt(unitIdx, 10), 0);
+    log = 'Current unit: ' + unitIdx;
   }
   if (!visual) {
     throw new Error('There is no complex to change!');
@@ -1904,7 +1910,7 @@ Miew.prototype.changeUnit = function(unitIdx, name) {
     this._resetScene();
   }
 
-  return '';
+  return log;
 };
 
 /**

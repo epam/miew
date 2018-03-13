@@ -170,7 +170,7 @@ case 37:
 this.$ = yy.echo(yy.miew.changeUnit());
 break;
 case 38:
-this.$ = yy.miew.changeUnit($$[$0]);
+this.$ = yy.echo(yy.miew.changeUnit($$[$0]));
 break;
 case 39:
 this.$ = yy.miew.dssp();

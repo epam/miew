@@ -182,7 +182,7 @@ Command
     | VIEW STRING                         -> yy.miew.view($2)
     | VIEW BASE_64                        -> yy.miew.view($2)
     | UNIT                                -> yy.echo(yy.miew.changeUnit())
-    | UNIT NUMBER                         -> yy.miew.changeUnit($2)
+    | UNIT NUMBER                         -> yy.echo(yy.miew.changeUnit($2))
     | DSSP                                -> yy.miew.dssp()
     | SCALE NUMBER                        -> yy.miew.scale($2)
     | ROTATE AxesList                     { for (var i = 0, n = $2.length; i < n; i++) {yy.miew.rotate($2[i]['x'] * Math.PI / 180.0, $2[i]['y'] * Math.PI / 180.0, $2[i]['z'] * Math.PI / 180.0)} }
