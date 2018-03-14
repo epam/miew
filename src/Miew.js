@@ -1891,26 +1891,27 @@ Miew.prototype._rebuildObjects = function() {
 };
 
 Miew.prototype.changeUnit = function(unitIdx, name) {
-  var visual = this._getComplexVisual(name);
-  let log = '';
+  const visual = this._getComplexVisual(name);
+  if (!visual) {
+    throw new Error('There is no complex to change!');
+  }
+
+  function currentUnitInfo() {
+    const unit = visual ? visual.getComplex().getCurrentStructure() : 0;
+    const type = unit > 0 ? ('Bio molecule ' + unit) : 'Asymmetric unit';
+    return 'Current unit: ' + unit + ' (' + type + ')';
+  }
+
   if (unitIdx === undefined) {
-    var unit = visual ? visual.getComplex().getCurrentStructure() : 0;
-    var type = unit > 0 ? ('Bio molecule ' + unit) : 'Asymmetric unit';
-    log = 'Current unit: ' + unit + ' (' + type + ')';
-    return log;
+    return currentUnitInfo();
   }
   if (_.isString(unitIdx)) {
     unitIdx = Math.max(parseInt(unitIdx, 10), 0);
-    log = 'Current unit: ' + unitIdx;
-  }
-  if (!visual) {
-    throw new Error('There is no complex to change!');
   }
   if (visual.getComplex().setCurrentStructure(unitIdx)) {
     this._resetScene();
   }
-
-  return log;
+  return currentUnitInfo();
 };
 
 /**
