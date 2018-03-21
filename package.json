@@ -144,7 +144,7 @@
     "rollup-plugin-string": "^2.0.2",
     "sass-loader": "^6.0.7",
     "selenium-webdriver": "^3.5.0",
-    "sinon": "^4.4.3",
+    "sinon": "^5.0.0",
     "sinon-chai": "^3.0.0",
     "spin.js": "^3.1.0",
     "string-replace-webpack-plugin": "^0.1.3",
