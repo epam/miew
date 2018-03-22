@@ -27,32 +27,32 @@ utils.deriveClass(OccupancyColorer, Colorer, {
 });
 
 OccupancyColorer.prototype.getAtomColor = function(atom, _complex) {
-  var opts = this.opts;
+  const opts = this.opts;
   if (atom._occupancy && opts) {
-    var factor = 1 - atom._occupancy;
+    const factor = 1 - atom._occupancy;
     return this.palette.getGradientColor(factor, opts.gradient);
   }
-  return this.palette.defaultElementColor;
+  return this.palette.defaultGradientColor;
 };
 
 OccupancyColorer.prototype.getResidueColor = function(_residue, _complex) {
-  var opts = this.opts;
+  const opts = this.opts;
   if (!opts) {
-    return this.palette.defaultResidueColor;
+    return this.palette.defaultGradientColor;
   }
   // get temperature from CA atom for residue color definition
-  var occupancyCA = -1;
+  let occupancyCA = -1;
   _residue.forEachAtom(function(a) {
     if (a._occupancy && a._role === chem.Element.Constants.Lead) {
       occupancyCA = a._occupancy;
     }
   });
   if (occupancyCA > 0) {
-    var factor = 1 - occupancyCA;
+    const factor = 1 - occupancyCA;
     return this.palette.getGradientColor(factor, opts.gradient);
   }
   // no CA atom?
-  return this.palette.defaultResidueColor;
+  return this.palette.defaultGradientColor;
 };
 
 export default OccupancyColorer;

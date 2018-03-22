@@ -49,6 +49,8 @@ Palette.prototype = {
   defaultSecondaryColor: 0xFFFFFF,
   secondaryColors: {},
 
+  defaultGradientColor: 0x000000,
+
   defaultNamedColor: 0xFFFFFF,
   namedColorsArray: [
     ['indianred',               0xcd5c5c],

@@ -37,13 +37,13 @@ TemperatureColorer.prototype.getAtomColor = function(atom, _complex) {
     }
     return this.palette.getGradientColor(factor, opts.gradient);
   }
-  return this.palette.defaultElementColor;
+  return this.palette.defaultGradientColor;
 };
 
 TemperatureColorer.prototype.getResidueColor = function(_residue, _complex) {
-  var opts = this.opts;
+  const opts = this.opts;
   if (!opts) {
-    return this.palette.defaultResidueColor;
+    return this.palette.defaultGradientColor;
   }
   // get temperature from CA atom for residue color definition
   let temperatureCA = -1;
@@ -63,7 +63,7 @@ TemperatureColorer.prototype.getResidueColor = function(_residue, _complex) {
     return this.palette.getGradientColor(factor, opts.gradient);
   }
   // no CA atom?
-  return this.palette.defaultResidueColor;
+  return this.palette.defaultGradientColor;
 };
 
 export default TemperatureColorer;
