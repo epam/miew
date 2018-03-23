@@ -56,6 +56,8 @@ function Residue(chain, type, sequence, icode) {
   this._isValid = true;
   this._het = false;
   this._molecule = null;
+  this.temperature = null;
+  this.occupancy = null;
 }
 
 // Getters and setters
@@ -240,13 +242,17 @@ Residue.prototype.isConnected = function(anotherResidue) {
 };
 
 Residue.prototype._finalize = function() {
-  var self = this;
+  const self = this;
   this._firstAtom = this._atoms[0];
   this._lastAtom = this._atoms[this._atoms.length - 1];
 
   this._leadAtom = null;
   this._wingAtom = null;
 
+  let tempCount = 0;
+  let temperature = 0; // average temperature
+  let occupCount = 0;
+  let occupancy = 0; // average occupancy
   // TODO: Is it correct? Is it fast?
   this.forEachAtom(function(a) {
     if (self._leadAtom === null) {
@@ -259,8 +265,23 @@ Residue.prototype._finalize = function() {
         self._wingAtom = a;
       }
     }
+    if (a._temperature) {
+      temperature += a._temperature;
+      tempCount++;
+    }
+    if (a._occupancy) {
+      occupancy += a._occupancy;
+      occupCount++;
+    }
     return (self._leadAtom !== null && self._wingAtom !== null);
   });
+
+  if (tempCount > 0) {
+    this.temperature = temperature / tempCount;
+  }
+  if (occupCount > 0) {
+    this.occupancy = occupancy / occupCount;
+  }
 
   //Still try to make monomer look valid
   if (this._leadAtom === null || this._wingAtom === null) {

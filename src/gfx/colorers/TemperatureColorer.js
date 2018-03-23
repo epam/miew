@@ -40,29 +40,20 @@ TemperatureColorer.prototype.getAtomColor = function(atom, _complex) {
   return this.palette.defaultGradientColor;
 };
 
-TemperatureColorer.prototype.getResidueColor = function(_residue, _complex) {
+TemperatureColorer.prototype.getResidueColor = function(residue, _complex) {
   const opts = this.opts;
   if (!opts) {
     return this.palette.defaultGradientColor;
   }
-  // get temperature from CA atom for residue color definition
-  let temperatureCA = -1;
-  _residue.forEachAtom(function(a) {
-    if (a._temperature && a._role === chem.Element.Constants.Lead) {
-      temperatureCA = a._temperature;
-    }
-  });
-  if (temperatureCA > 0) {
+  if (residue.temperature) {
     let factor = 0;
     if (opts.min === opts.max) {
-      factor = temperatureCA > opts.max ? 1 : 0;
+      factor = residue.temperature > opts.max ? 1 : 0;
     } else {
-      factor = (temperatureCA - opts.min) / (opts.max - opts.min);
+      factor = (residue.temperature - opts.min) / (opts.max - opts.min);
     }
-    //const factor = (temperatureCA - opts.min) / (opts.max - opts.min);
     return this.palette.getGradientColor(factor, opts.gradient);
   }
-  // no CA atom?
   return this.palette.defaultGradientColor;
 };
 

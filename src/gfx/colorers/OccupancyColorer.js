@@ -35,23 +35,15 @@ OccupancyColorer.prototype.getAtomColor = function(atom, _complex) {
   return this.palette.defaultGradientColor;
 };
 
-OccupancyColorer.prototype.getResidueColor = function(_residue, _complex) {
+OccupancyColorer.prototype.getResidueColor = function(residue, _complex) {
   const opts = this.opts;
   if (!opts) {
     return this.palette.defaultGradientColor;
   }
-  // get temperature from CA atom for residue color definition
-  let occupancyCA = -1;
-  _residue.forEachAtom(function(a) {
-    if (a._occupancy && a._role === chem.Element.Constants.Lead) {
-      occupancyCA = a._occupancy;
-    }
-  });
-  if (occupancyCA > 0) {
-    const factor = 1 - occupancyCA;
+  if (residue.occupancy > 0) {
+    const factor = 1 - residue.occupancy;
     return this.palette.getGradientColor(factor, opts.gradient);
   }
-  // no CA atom?
   return this.palette.defaultGradientColor;
 };
 
