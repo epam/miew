@@ -2,7 +2,6 @@
 
 import utils from '../../utils';
 import Colorer from './Colorer';
-import chem from '../../chem';
 
 /**
  * Create new colorer.
