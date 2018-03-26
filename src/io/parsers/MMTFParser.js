@@ -121,7 +121,7 @@ MMTFParser.prototype._onGroup = function(groupData) {
 
   var chain = this._complex._chains[groupData.chainIndex];
   var icode = !groupData.insCode.charCodeAt(0) ? '' : groupData.insCode;
-  var residue = chain.addResidue(groupData.groupName, groupData.sequenceIndex, icode);
+  var residue = chain.addResidue(groupData.groupName, groupData.groupId, icode);
   residue._index = groupData.groupIndex;
 
   this._updateSecStructure(this._complex, residue, groupData);
