@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.15] - 2018-03-26
+### Fixed
+- Fix a crash when a non-integer unit index is set.
+- Fix message about current unit after try to change.
+- Use default gradient color for the case of no temperature/occupancy.
+- Use average temperature and occupancy for residue coloring.
+- Use `groupId` as a sequence index for MMTF.
+
 ## [0.7.14] - 2018-03-12
 ### Added
 - Add GitHub and EPAM urls to the demo app menu.
@@ -233,7 +241,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.14...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.15...HEAD
+[0.7.15]: https://github.com/epam/miew/compare/v0.7.14...v0.7.15
 [0.7.14]: https://github.com/epam/miew/compare/v0.7.13...v0.7.14
 [0.7.13]: https://github.com/epam/miew/compare/v0.7.12...v0.7.13
 [0.7.12]: https://github.com/epam/miew/compare/v0.7.11...v0.7.12
