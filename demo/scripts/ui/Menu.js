@@ -450,9 +450,10 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
         }, [
           'Selection',
           createElement('span', {'class' : 'pull-right'}, [
-            createElement('span', {
-              'class' : '-text-muted',
-              'data-type' : 'selection-target'
+            createElement('label', {
+              'class' : 'text-muted',
+              'data-type' : 'selection-target',
+              'style' : 'word-break: break-all'
             }, String(repr.selector)),
             createElement('span', {'class' : 'glyphicon glyphicon-menu-right'})])]),
         createElement('li', {
