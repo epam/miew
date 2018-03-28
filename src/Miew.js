@@ -2637,7 +2637,7 @@ Miew.prototype.benchmarkGfx = function(force) {
  * @returns {string} Data URL representing the image contents.
  */
 Miew.prototype.screenshot = function(width, height) {
-  var gfx = this._gfx;
+  const gfx = this._gfx;
 
   function Fov2Tan(fov) {
     return Math.tan(THREE.Math.degToRad(0.5 * fov));
@@ -2650,24 +2650,23 @@ Miew.prototype.screenshot = function(width, height) {
   height = height || width || gfx.height;
   width = width || gfx.width;
 
-  var screenshotURI;
+  let screenshotURI;
 
   if (width === gfx.width && height === gfx.height) {
     // copy current canvas to screenshot
     screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
   } else {
 
-    var originalAspect = gfx.camera.aspect;
-    var originalFov = gfx.camera.fov;
-    var originalTanFov2 = Fov2Tan(gfx.camera.fov);
+    const originalAspect = gfx.camera.aspect;
+    const originalFov = gfx.camera.fov;
+    const originalTanFov2 = Fov2Tan(gfx.camera.fov);
 
     // screenshot should contain the principal area of interest (a centered square touching screen sides)
-    var areaOfInterestSize = Math.min(gfx.width, gfx.height);
-    //var areaOfInterestFov = originalFov * areaOfInterestSize / gfx.height;
-    var areaOfInterestTanFov2 = originalTanFov2 * areaOfInterestSize / gfx.height;
+    const areaOfInterestSize = Math.min(gfx.width, gfx.height);
+    const areaOfInterestTanFov2 = originalTanFov2 * areaOfInterestSize / gfx.height;
 
     // set appropriate camera aspect & FOV
-    var shotAspect = width / height;
+    const shotAspect = width / height;
     gfx.camera.aspect = shotAspect;
     gfx.camera.fov = Tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
     gfx.camera.updateProjectionMatrix();
@@ -2676,7 +2675,7 @@ Miew.prototype.screenshot = function(width, height) {
     gfx.renderer.setSize(width, height);
 
     // make screenshot
-    this._renderFrame('NONE');
+    this._renderFrame(settings.now.stereo);
     screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
 
     // restore original camera & canvas proportions
