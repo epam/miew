@@ -413,11 +413,12 @@ function _processRepsForScript(rep, index) {
 }
 
 function toScript(opts) {
-  var commandsList = [];
-  var idx = 0;
-  function checkAndAdd(command, value) {
+  let commandsList = [];
+  let idx = 0;
+  function checkAndAdd(command, value, saveQuotes) {
     if (value !== null && value !== undefined) {
-      commandsList[idx++] = command + ' ' + value;
+      const quote = (typeof value === 'string' && saveQuotes) ? '"' : '';
+      commandsList[idx++] = command + ' ' + quote + value + quote;
     }
   }
 
@@ -426,17 +427,16 @@ function toScript(opts) {
       return;
     }
 
-    for (var i = 0, n = repList.length; i < n; ++i) {
+    for (let i = 0, n = repList.length; i < n; ++i) {
       checkAndAdd('rep', _processRepsForScript(repList[i], i));
     }
-
   }
 
   function addObjects(objList) {
     if (!objList) {
       return;
     }
-    for (var i = 0, n = objList.length; i < n; ++i) {
+    for (let i = 0, n = objList.length; i < n; ++i) {
       checkAndAdd('', _processObjForScript(objList[i]));
     }
   }
@@ -454,7 +454,7 @@ function toScript(opts) {
     if (key === 'preset') {
       return;
     }
-    checkAndAdd('set ' + key, value);
+    checkAndAdd('set ' + key, value, true);
   });
   checkAndAdd('view', opts.view);
 
