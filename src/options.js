@@ -442,7 +442,7 @@ function toScript(opts) {
   }
 
   checkAndAdd('set', 'autobuild false');
-  checkAndAdd('load', opts.load);
+  checkAndAdd('load', opts.load, true);
   checkAndAdd('unit', opts.unit);
   checkAndAdd('preset', opts.preset);
   addReps(opts.reps);

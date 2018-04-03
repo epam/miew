@@ -2986,7 +2986,7 @@ Miew.prototype._compareReps = function(complexVisual, compareWithDefaults) {
    * @returns {Object} State object.
    */
 Miew.prototype.getState = function(opts) {
-  var state = {};
+  const state = {};
 
   opts = _.defaults(opts, {
     compact: true,
@@ -2997,20 +2997,23 @@ Miew.prototype.getState = function(opts) {
   // FIXME state should include all complexes (not only current)
 
   // load
-  var visual = this._getComplexVisual();
+  const visual = this._getComplexVisual();
   if (visual !== null) {
     // TODO type?
-    if (visual.getComplex().metadata.id) {
-      state.load = visual.getComplex().metadata.id;
+    const complex = visual.getComplex();
+    const metadata = complex.metadata;
+    if (metadata.id) {
+      const format = metadata.format ? `${metadata.format}:` : '';
+      state.load = format + metadata.id;
     }
-    var unit = visual.getComplex().getCurrentStructure();
+    const unit = complex.getCurrentStructure();
     if (unit !== 1) {
       state.unit = unit;
     }
   }
 
   // representations
-  var repsInfo = this._compareReps(visual, opts.compact);
+  const repsInfo = this._compareReps(visual, opts.compact);
   if (repsInfo.preset) {
     state.preset = repsInfo.preset;
   }
@@ -3020,9 +3023,9 @@ Miew.prototype.getState = function(opts) {
   }
 
   // objects
-  var objects = this._objects;
-  var objectsState = [];
-  for (var i = 0, n = objects.length; i < n; ++i) {
+  const objects = this._objects;
+  const objectsState = [];
+  for (let i = 0, n = objects.length; i < n; ++i) {
     objectsState[i] = objects[i].identify();
   }
   if (objects.length > 0) {
@@ -3036,7 +3039,7 @@ Miew.prototype.getState = function(opts) {
 
   // settings
   if (opts.settings) {
-    var diff = this.settings.getDiffs(false);
+    const diff = this.settings.getDiffs(false);
     if (!_.isEmpty(diff)) {
       state.settings = diff;
     }
