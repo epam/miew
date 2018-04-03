@@ -534,8 +534,11 @@ ObjectControls.prototype.setScale = function(scale) {
   this.object.scale.set(scale, scale, scale);
 };
 
-// scale object by factor
+// scale object by factor (factor should be greater than zero)
 ObjectControls.prototype.scale = function(factor) {
+  if (factor <= 0) {
+    return;
+  }
   this.setScale(this.object.scale.x * factor);
 };
 
@@ -702,6 +705,7 @@ ObjectControls.prototype.mousewheel = function(event) {
   }
 
   var factor = 1.0 + delta * 0.05;
+  factor = Math.max(factor, 0.01);
   this.scale(factor);
 
   this.dispatchEvent({type: 'change', action: 'zoom', factor: factor});

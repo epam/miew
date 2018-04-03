@@ -3320,7 +3320,7 @@ Miew.prototype.rotate = function(x, y, z) {
 
 /**
  * Scale object by factor
- * @param {number} factor - scale multiplier
+ * @param {number} factor - scale multiplier, should greater than zero
  */
 Miew.prototype.scale = function(factor) {
   if (factor <= 0) {
