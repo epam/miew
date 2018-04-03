@@ -245,10 +245,18 @@ MMTFParser.prototype._updateMolecules = function(mmtfData) {
 
 // populate complex with chains, residues and atoms
 MMTFParser.prototype._traverse = function(mmtfData) {
-  var self = this;
+  const self = this;
+
+  // get metadata
+  const metadata = this._complex.metadata;
+  metadata.id = mmtfData.structureId;
+  metadata.title = [];
+  metadata.title[0] = mmtfData.title;
+  metadata.date = mmtfData.releaseDate;
+  metadata.format = 'mmtf';
 
   // create event callback functions
-  var eventCallbacks = {
+  const eventCallbacks = {
     onModel: function(modelData) { self._onModel(modelData); },
     onChain: function(chainData) { self._onChain(chainData); },
     onGroup: function(groupData) { self._onGroup(groupData); },
