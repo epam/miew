@@ -430,6 +430,7 @@ PDBParser.prototype._parseHEADER = function(stream) {
   if (id) {
     this._complex.name = id;
   }
+  metadata.format = 'pdb';
 };
 
 PDBParser.prototype._parseTITLE = function(stream) {

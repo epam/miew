@@ -113,6 +113,7 @@ CIFParser.prototype._toComplex = function(cifData) {
   this._extractSecondary(complex, complexData);
   this._extractAssemblies(complex, complexData);
   this._extractMolecules(complex, complexData);
+  this._extractMetadata(complex, complexData);
   complex.finalize({
     needAutoBonding: true,
     detectAromaticLoops: this.settings.now.aromatic,
@@ -129,6 +130,23 @@ function AtomDataError(message) {
 }
 
 AtomDataError.prototype = Object.create(Error.prototype);
+
+/**
+ * Extract metadata
+ * @param complex structure to fill
+ * @param complexData complex data from CIF file
+ * @private
+ */
+CIFParser.prototype._extractMetadata = function(complex, complexData) {
+  const metadata = complex.metadata;
+  metadata.id = complexData.entry.id;
+  metadata.classification = complexData.struct_keywords.pdbx_keywords;
+  const databaserev = complexData.database_PDB_rev;
+  metadata.date = (databaserev && databaserev.date_original) ? databaserev.date_original : '';
+  metadata.format = 'cif';
+  metadata.title = [];
+  metadata.title[0] = complexData.struct.title;
+};
 
 /**
  * Extract molecules information from CIF structure (should be called strictly after _extractAtoms)
