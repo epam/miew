@@ -870,6 +870,8 @@ Settings.prototype = {
     if (diffs.hasOwnProperty('VERSION') && diffs.VERSION !== VERSION) {
       throw new Error('Settings version does not match!');
     }
+    // VERSION shouldn't be presented inside settings structure
+    delete diffs['VERSION'];
     this.reset();
     _.merge(this.now, diffs);
   },
