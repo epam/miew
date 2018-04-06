@@ -102,7 +102,7 @@ CLIUtils.prototype.listRep = function(miew, repMap, repIndex, key) {
   const colorer = rep.colorer;
   const material = rep.materialPreset;
 
-  ret += '#' + index + ' : ' + mode.name + (repName === '<no name>' ? '' : repName) + '\n';
+  ret += '#' + index + ' : ' + mode.name + (repName === '<no name>' ? '' : ', ' + repName) + '\n';
 
   if (key !== undefined) {
     ret += '    selection : "' + selectionStr + '"\n';
