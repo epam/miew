@@ -392,6 +392,21 @@ function enquoteString(value) {
   return value;
 }
 
+function unquoteString(value) {
+  if (!_.isString(value)) {
+    return value;
+  }
+  if (value[0] === '"' && value[value.length - 1] === '"') {
+    value = value.slice(1, value.length - 1);
+    return value.replace(/\\"/g, '"');
+  }
+  if (value[0] === "'" && value[value.length - 1] === "'") {
+    value = value.slice(1, value.length - 1);
+    return value.replace(/\\'/g, "'");
+  }
+  throw new SyntaxError('Incorrect string format, can\'t unqute it');
+}
+
 function getFileExtension(fileName) {
   return fileName.slice((Math.max(0, fileName.lastIndexOf('.')) || Infinity));
 }
@@ -530,6 +545,7 @@ export default {
   objectsDiff: objectsDiff,
   forInRecursive: forInRecursive,
   enquoteString: enquoteString,
+  unquoteString: unquoteString,
   shotOpen: shotOpen,
   shotDownload: shotDownload,
   copySubArrays: copySubArrays,

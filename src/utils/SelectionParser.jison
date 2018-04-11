@@ -15,7 +15,7 @@
 NUM                   \-?(?:[1-9][0-9]+|[0-9])
 IDENTIFIER            [_A-Z0-9]+
 NAMED_SELECTOR        \@[_A-Z0-9]+
-STRING                (?:\"([^"]*)\"|\'([^']*)\')
+STRING                (?:\"(?:\\.|[^\\"])*\"|\'(?:\\.|[^\\'])*\')
 KEYWORD_SIMPLE        ("ALL"|"NONE"|"HETATM"|"PROTEIN"|"BASIC"|"ACIDIC"|"CHARGED"|"POLAR"|"NONPOLAR"|"AROMATIC"|"NUCLEIC"|"PURINE"|"PYRIMIDINE"|"WATER"|"POLARH"|"NONPOLARH")
 KEYWORD_NAMED         ("NAME"|"ELEM"|"TYPE"|"RESIDUE"|"ICODE"|"CHAIN"|"ALTLOC")
 KEYWORD_RANGED        ("SERIAL"|"SEQUENCE"|"RESIDX")

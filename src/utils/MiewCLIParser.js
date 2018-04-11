@@ -1029,7 +1029,7 @@ case 68:return 79
 break;
 case 69:return 77
 break;
-case 70:yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); return 13;
+case 70:yy_.yytext = yy.utils.unquoteString(yy_.yytext); return 13;
 break;
 case 71:return 37;
 break;
@@ -1053,7 +1053,7 @@ case 80:return 76
 break;
 }
 },
-rules: [/^(?:\s+)/i,/^(?:[#].*)/i,/^(?:\/\/.*)/i,/^(?:([_A-Z0-9\/\+]+==))/i,/^(?:-?[0-9]+(\.[0-9]+)?\b)/i,/^(?:0[xX][0-9A-F]+\b)/i,/^(?:false\b)/i,/^(?:true\b)/i,/^(?:all\b)/i,/^(?:reset\b)/i,/^(?:clear\b)/i,/^(?:build\b)/i,/^(?:help\b)/i,/^(?:load\b)/i,/^(?:script\b)/i,/^(?:get\b)/i,/^(?:set\b)/i,/^(?:set_save\b)/i,/^(?:set_restore\b)/i,/^(?:set_reset\b)/i,/^(?:preset\b)/i,/^(?:add\b)/i,/^(?:rep\b)/i,/^(?:remove\b)/i,/^(?:hide\b)/i,/^(?:show\b)/i,/^(?:list\b)/i,/^(?:select\b)/i,/^(?:within\b)/i,/^(?:selector\b)/i,/^(?:mode\b)/i,/^(?:color\b)/i,/^(?:material\b)/i,/^(?:view\b)/i,/^(?:unit\b)/i,/^(?:line\b)/i,/^(?:listobj\b)/i,/^(?:removeobj\b)/i,/^(?:rotate\b)/i,/^(?:translate\b)/i,/^(?:scale\b)/i,/^(?:url\b)/i,/^(?:screenshot\b)/i,/^(?:dssp\b)/i,/^(?:file_list\b)/i,/^(?:file_register\b)/i,/^(?:file_delete\b)/i,/^(?:preset_add\b)/i,/^(?:preset_delete\b)/i,/^(?:preset_update\b)/i,/^(?:preset_rename\b)/i,/^(?:preset_open\b)/i,/^(?:create_scenario\b)/i,/^(?:reset_scenario\b)/i,/^(?:delete_scenario\b)/i,/^(?:add_scenario_item\b)/i,/^(?:list_scenario\b)/i,/^(?:s\b)/i,/^(?:mt\b)/i,/^(?:m\b)/i,/^(?:c\b)/i,/^(?:x\b)/i,/^(?:y\b)/i,/^(?:z\b)/i,/^(?:as\b)/i,/^(?:of\b)/i,/^(?:pdb\b)/i,/^(?:delay\b)/i,/^(?:prst\b)/i,/^(?:desc\b)/i,/^(?:((?:"([^"]*)"|'([^']*)')))/i,/^(?:([_A-Z0-9]+))/i,/^(?:$)/i,/^(?:\.)/i,/^(?:\/)/i,/^(?:\\)/i,/^(?:-e\b)/i,/^(?:-f\b)/i,/^(?:-s\b)/i,/^(?:-v\b)/i,/^(?:=)/i],
+rules: [/^(?:\s+)/i,/^(?:[#].*)/i,/^(?:\/\/.*)/i,/^(?:([_A-Z0-9\/\+]+==))/i,/^(?:-?[0-9]+(\.[0-9]+)?\b)/i,/^(?:0[xX][0-9A-F]+\b)/i,/^(?:false\b)/i,/^(?:true\b)/i,/^(?:all\b)/i,/^(?:reset\b)/i,/^(?:clear\b)/i,/^(?:build\b)/i,/^(?:help\b)/i,/^(?:load\b)/i,/^(?:script\b)/i,/^(?:get\b)/i,/^(?:set\b)/i,/^(?:set_save\b)/i,/^(?:set_restore\b)/i,/^(?:set_reset\b)/i,/^(?:preset\b)/i,/^(?:add\b)/i,/^(?:rep\b)/i,/^(?:remove\b)/i,/^(?:hide\b)/i,/^(?:show\b)/i,/^(?:list\b)/i,/^(?:select\b)/i,/^(?:within\b)/i,/^(?:selector\b)/i,/^(?:mode\b)/i,/^(?:color\b)/i,/^(?:material\b)/i,/^(?:view\b)/i,/^(?:unit\b)/i,/^(?:line\b)/i,/^(?:listobj\b)/i,/^(?:removeobj\b)/i,/^(?:rotate\b)/i,/^(?:translate\b)/i,/^(?:scale\b)/i,/^(?:url\b)/i,/^(?:screenshot\b)/i,/^(?:dssp\b)/i,/^(?:file_list\b)/i,/^(?:file_register\b)/i,/^(?:file_delete\b)/i,/^(?:preset_add\b)/i,/^(?:preset_delete\b)/i,/^(?:preset_update\b)/i,/^(?:preset_rename\b)/i,/^(?:preset_open\b)/i,/^(?:create_scenario\b)/i,/^(?:reset_scenario\b)/i,/^(?:delete_scenario\b)/i,/^(?:add_scenario_item\b)/i,/^(?:list_scenario\b)/i,/^(?:s\b)/i,/^(?:mt\b)/i,/^(?:m\b)/i,/^(?:c\b)/i,/^(?:x\b)/i,/^(?:y\b)/i,/^(?:z\b)/i,/^(?:as\b)/i,/^(?:of\b)/i,/^(?:pdb\b)/i,/^(?:delay\b)/i,/^(?:prst\b)/i,/^(?:desc\b)/i,/^(?:((?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*')))/i,/^(?:([_A-Z0-9]+))/i,/^(?:$)/i,/^(?:\.)/i,/^(?:\/)/i,/^(?:\\)/i,/^(?:-e\b)/i,/^(?:-f\b)/i,/^(?:-s\b)/i,/^(?:-v\b)/i,/^(?:=)/i],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80],"inclusive":true}}
 });
 return lexer;

@@ -254,6 +254,11 @@ CLIUtils.prototype.propagateProp = function(path, arg) {
   }
   return arg;
 };
+
+CLIUtils.prototype.unquoteString = function(value) {
+  return utils.unquoteString(value);
+};
+
 var utilFunctions = new CLIUtils();
 
 function SRVScenarioItem(_pdbID, _presetId, _delay, _description) {

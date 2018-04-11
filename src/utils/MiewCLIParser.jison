@@ -15,7 +15,7 @@
 BASE_64               [_A-Z0-9\/\+]+\=\=
 NUM                   \-?(?:[1-9][0-9]+|[0-9])
 IDENTIFIER            [_A-Z0-9]+
-STRING                (?:\"([^"]*)\"|\'([^']*)\')
+STRING                (?:\"(?:\\.|[^\\"])*\"|\'(?:\\.|[^\\'])*\')
 
 %%
 
@@ -109,7 +109,7 @@ of                    return 'OF'
 "prst"                return 'PRST_KEY'
 'desc'                return 'DESCRIPTION_KEY'
 
-{STRING}              yytext = yytext.substr(1,yyleng-2); return 'STRING';
+{STRING}              yytext = yy.utils.unquoteString(yytext); return 'STRING';
 {IDENTIFIER}          return 'IDENTIFIER';
 <<EOF>>               return 'EOF';
 "."                   return '.';

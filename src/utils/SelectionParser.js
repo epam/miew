@@ -651,7 +651,7 @@ case 20:return 'INVALID';
 break;
 }
 },
-rules: [/^(?:\s+)/i,/^(?:(-?(?:[1-9][0-9]+|[0-9]))\b)/i,/^(?:OR\b)/i,/^(?:AND\b)/i,/^(?:NOT\b)/i,/^(?:((ALL|NONE|HETATM|PROTEIN|BASIC|ACIDIC|CHARGED|POLAR|NONPOLAR|AROMATIC|NUCLEIC|PURINE|PYRIMIDINE|WATER|POLARH|NONPOLARH))\b)/i,/^(?:((NAME|ELEM|TYPE|RESIDUE|ICODE|CHAIN|ALTLOC))\b)/i,/^(?:((SERIAL|SEQUENCE|RESIDX))\b)/i,/^(?:\()/i,/^(?:\))/i,/^(?:,)/i,/^(?::)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:<)/i,/^(?:>)/i,/^(?:((?:"([^"]*)"|'([^']*)')))/i,/^(?:(@[_A-Z0-9]+))/i,/^(?:([_A-Z0-9]+))/i,/^(?:$)/i,/^(?:.)/i],
+rules: [/^(?:\s+)/i,/^(?:(-?(?:[1-9][0-9]+|[0-9]))\b)/i,/^(?:OR\b)/i,/^(?:AND\b)/i,/^(?:NOT\b)/i,/^(?:((ALL|NONE|HETATM|PROTEIN|BASIC|ACIDIC|CHARGED|POLAR|NONPOLAR|AROMATIC|NUCLEIC|PURINE|PYRIMIDINE|WATER|POLARH|NONPOLARH))\b)/i,/^(?:((NAME|ELEM|TYPE|RESIDUE|ICODE|CHAIN|ALTLOC))\b)/i,/^(?:((SERIAL|SEQUENCE|RESIDX))\b)/i,/^(?:\()/i,/^(?:\))/i,/^(?:,)/i,/^(?::)/i,/^(?:<=)/i,/^(?:>=)/i,/^(?:<)/i,/^(?:>)/i,/^(?:((?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*')))/i,/^(?:(@[_A-Z0-9]+))/i,/^(?:([_A-Z0-9]+))/i,/^(?:$)/i,/^(?:.)/i],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"inclusive":true}}
 });
 return lexer;
