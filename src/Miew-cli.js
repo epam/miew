@@ -4,7 +4,7 @@ import {parser as parsercli} from './utils/MiewCLIParser';
 import clihelp from './utils/MiewCLIHelp';
 import JSONConverter from './utils/JSONtoSelectorConverter';
 import logger from './utils/logger';
-
+import utils from './utils';
 
 var
   selectors = Miew.chem.selectors,
@@ -907,12 +907,12 @@ ArgList.prototype.remove = function(value) {
   return this;
 };
 
-ArgList.prototype.toJSO = function(utils, cmd, arg) {
+ArgList.prototype.toJSO = function(cliUtils, cmd, arg) {
   var res = {};
 
   var list = this._values;
   for (var i = 0, n = list.length; i < n; ++i) {
-    _.set(res, list[i].id, utils.propagateProp(keyRemap(cmd) + '.' + arg + '.' + list[i].id, list[i].val));
+    _.set(res, list[i].id, cliUtils.propagateProp(keyRemap(cmd) + '.' + arg + '.' + list[i].id, list[i].val));
   }
 
   return res;
