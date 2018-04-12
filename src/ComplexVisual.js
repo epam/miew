@@ -76,7 +76,7 @@ ComplexVisual.prototype.getEditor = function() {
 ComplexVisual.prototype.resetReps = function(reps) {
   // Create all necessary representations
   if (this._complex) {
-    this._complex.resetAtomMask(0);
+    this._complex.clearAtomBits(~0);
   }
   this._reprListChanged = true;
   this._reprUsedBits = 0;
