@@ -994,16 +994,27 @@ Menu.prototype._init = function() {
   $(document).on('keyup keydown', function(e) {
     shifted = e.shiftKey;
   });
-  $(document).on('mousewheel', function(e) {
+  function _zoomClipPlane(e) {
     if (shifted) {
-      var draft = self._viewer.settings.now.draft;
+      let delta = 0;
+      const event = e.originalEvent;
+      if (event.wheelDelta) {
+        // WebKit / Opera / Explorer 9
+        delta = event.wheelDelta;
+      } else if (event.detail) {
+        // Firefox
+        delta = -event.detail * 10;
+      }
+      const draft = self._viewer.settings.now.draft;
       self._viewer.set({
         draft: {
-          clipPlaneFactor: draft.clipPlaneFactor - e.originalEvent.wheelDelta * draft.clipPlaneSpeed
+          clipPlaneFactor: draft.clipPlaneFactor - delta * draft.clipPlaneSpeed
         }
       });
     }
-  });
+  }
+  $(document).on('mousewheel', e => _zoomClipPlane(e)); // Chrome
+  $(document).on('DOMMouseScroll', e => _zoomClipPlane(e)); // Opera, Firefox
 
   this._initMiewEventListeners();
   this._initToolbar();
