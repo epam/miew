@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.15 Copyright (c) 2015-2018 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.16 Copyright (c) 2015-2018 EPAM Systems, Inc. */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -62178,6 +62178,21 @@ function enquoteString(value) {
   return value;
 }
 
+function unquoteString(value) {
+  if (!lodash.isString(value)) {
+    return value;
+  }
+  if (value[0] === '"' && value[value.length - 1] === '"') {
+    value = value.slice(1, value.length - 1);
+    return value.replace(/\\"/g, '"');
+  }
+  if (value[0] === "'" && value[value.length - 1] === "'") {
+    value = value.slice(1, value.length - 1);
+    return value.replace(/\\'/g, "'");
+  }
+  throw new SyntaxError('Incorrect string format, can\'t unqute it');
+}
+
 function getFileExtension(fileName) {
   return fileName.slice(Math.max(0, fileName.lastIndexOf('.')) || Infinity);
 }
@@ -62316,6 +62331,7 @@ var utils = {
   objectsDiff: objectsDiff,
   forInRecursive: forInRecursive,
   enquoteString: enquoteString,
+  unquoteString: unquoteString,
   shotOpen: shotOpen,
   shotDownload: shotDownload,
   copySubArrays: copySubArrays,
@@ -63410,6 +63426,8 @@ Settings.prototype = {
     if (diffs.hasOwnProperty('VERSION') && diffs.VERSION !== VERSION) {
       throw new Error('Settings version does not match!');
     }
+    // VERSION shouldn't be presented inside settings structure
+    delete diffs.VERSION;
     this.reset();
     lodash.merge(this.now, diffs);
   },
@@ -63840,9 +63858,10 @@ function _processRepsForScript(rep, index) {
 function toScript(opts) {
   var commandsList = [];
   var idx = 0;
-  function checkAndAdd(command, value) {
+  function checkAndAdd(command, value, saveQuotes) {
     if (value !== null && value !== undefined) {
-      commandsList[idx++] = command + ' ' + value;
+      var quote = typeof value === 'string' && saveQuotes ? '"' : '';
+      commandsList[idx++] = command + ' ' + quote + value + quote;
     }
   }
 
@@ -63866,7 +63885,7 @@ function toScript(opts) {
   }
 
   checkAndAdd('set', 'autobuild false');
-  checkAndAdd('load', opts.load);
+  checkAndAdd('load', opts.load, true);
   checkAndAdd('unit', opts.unit);
   checkAndAdd('preset', opts.preset);
   addReps(opts.reps);
@@ -63878,7 +63897,7 @@ function toScript(opts) {
     if (key === 'preset') {
       return;
     }
-    checkAndAdd('set ' + key, value);
+    checkAndAdd('set ' + key, value, true);
   });
   checkAndAdd('view', opts.view);
 
@@ -66065,7 +66084,7 @@ var parser = function () {
                         break;
                 }
             },
-            rules: [/^(?:\s+)/i, /^(?:(-?(?:[1-9][0-9]+|[0-9]))\b)/i, /^(?:OR\b)/i, /^(?:AND\b)/i, /^(?:NOT\b)/i, /^(?:((ALL|NONE|HETATM|PROTEIN|BASIC|ACIDIC|CHARGED|POLAR|NONPOLAR|AROMATIC|NUCLEIC|PURINE|PYRIMIDINE|WATER|POLARH|NONPOLARH))\b)/i, /^(?:((NAME|ELEM|TYPE|RESIDUE|ICODE|CHAIN|ALTLOC))\b)/i, /^(?:((SERIAL|SEQUENCE|RESIDX))\b)/i, /^(?:\()/i, /^(?:\))/i, /^(?:,)/i, /^(?::)/i, /^(?:<=)/i, /^(?:>=)/i, /^(?:<)/i, /^(?:>)/i, /^(?:((?:"([^"]*)"|'([^']*)')))/i, /^(?:(@[_A-Z0-9]+))/i, /^(?:([_A-Z0-9]+))/i, /^(?:$)/i, /^(?:.)/i],
+            rules: [/^(?:\s+)/i, /^(?:(-?(?:[1-9][0-9]+|[0-9]))\b)/i, /^(?:OR\b)/i, /^(?:AND\b)/i, /^(?:NOT\b)/i, /^(?:((ALL|NONE|HETATM|PROTEIN|BASIC|ACIDIC|CHARGED|POLAR|NONPOLAR|AROMATIC|NUCLEIC|PURINE|PYRIMIDINE|WATER|POLARH|NONPOLARH))\b)/i, /^(?:((NAME|ELEM|TYPE|RESIDUE|ICODE|CHAIN|ALTLOC))\b)/i, /^(?:((SERIAL|SEQUENCE|RESIDX))\b)/i, /^(?:\()/i, /^(?:\))/i, /^(?:,)/i, /^(?::)/i, /^(?:<=)/i, /^(?:>=)/i, /^(?:<)/i, /^(?:>)/i, /^(?:((?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*')))/i, /^(?:(@[_A-Z0-9]+))/i, /^(?:([_A-Z0-9]+))/i, /^(?:$)/i, /^(?:.)/i],
             conditions: { "INITIAL": { "rules": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "inclusive": true } }
         };
         return lexer;
@@ -80871,7 +80890,7 @@ ComplexVisual.prototype.getEditor = function () {
 ComplexVisual.prototype.resetReps = function (reps) {
   // Create all necessary representations
   if (this._complex) {
-    this._complex.resetAtomMask(0);
+    this._complex.clearAtomBits(~0);
   }
   this._reprListChanged = true;
   this._reprUsedBits = 0;
@@ -83462,6 +83481,7 @@ PDBParser.prototype._parseHEADER = function (stream) {
   if (id) {
     this._complex.name = id;
   }
+  metadata.format = 'pdb';
 };
 
 PDBParser.prototype._parseTITLE = function (stream) {
@@ -84429,6 +84449,14 @@ MMTFParser.prototype._updateMolecules = function (mmtfData) {
 MMTFParser.prototype._traverse = function (mmtfData) {
   var self = this;
 
+  // get metadata
+  var metadata = this._complex.metadata;
+  metadata.id = mmtfData.structureId;
+  metadata.title = [];
+  metadata.title[0] = mmtfData.title;
+  metadata.date = mmtfData.releaseDate;
+  metadata.format = 'mmtf';
+
   // create event callback functions
   var eventCallbacks = {
     onModel: function onModel(modelData) {
@@ -84753,6 +84781,7 @@ CIFParser.prototype._toComplex = function (cifData) {
   this._extractSecondary(complex, complexData);
   this._extractAssemblies(complex, complexData);
   this._extractMolecules(complex, complexData);
+  this._extractMetadata(complex, complexData);
   complex.finalize({
     needAutoBonding: true,
     detectAromaticLoops: this.settings.now.aromatic,
@@ -84769,6 +84798,23 @@ function AtomDataError(message) {
 }
 
 AtomDataError.prototype = Object.create(Error.prototype);
+
+/**
+ * Extract metadata
+ * @param complex structure to fill
+ * @param complexData complex data from CIF file
+ * @private
+ */
+CIFParser.prototype._extractMetadata = function (complex, complexData) {
+  var metadata = complex.metadata;
+  metadata.id = complexData.entry.id;
+  metadata.classification = complexData.struct_keywords.pdbx_keywords;
+  var databaserev = complexData.database_PDB_rev;
+  metadata.date = databaserev && databaserev.date_original ? databaserev.date_original : '';
+  metadata.format = 'cif';
+  metadata.title = [];
+  metadata.title[0] = complexData.struct.title;
+};
 
 /**
  * Extract molecules information from CIF structure (should be called strictly after _extractAtoms)
@@ -86392,8 +86438,11 @@ ObjectControls.prototype.setScale = function (scale) {
   this.object.scale.set(scale, scale, scale);
 };
 
-// scale object by factor
+// scale object by factor (factor should be greater than zero)
 ObjectControls.prototype.scale = function (factor) {
+  if (factor <= 0) {
+    return;
+  }
   this.setScale(this.object.scale.x * factor);
 };
 
@@ -86558,6 +86607,7 @@ ObjectControls.prototype.mousewheel = function (event) {
   }
 
   var factor = 1.0 + delta * 0.05;
+  factor = Math.max(factor, 0.01);
   this.scale(factor);
 
   this.dispatchEvent({ type: 'change', action: 'zoom', factor: factor });
@@ -88518,7 +88568,7 @@ var WebVRPoC = function () {
   return WebVRPoC;
 }();
 
-/* global "0.7.15":false */
+/* global "0.7.16":false */
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -91017,7 +91067,7 @@ Miew.prototype.screenshot = function (width, height) {
   height = height || width || gfx.height;
   width = width || gfx.width;
 
-  var screenshotURI;
+  var screenshotURI = void 0;
 
   if (width === gfx.width && height === gfx.height) {
     // copy current canvas to screenshot
@@ -91030,7 +91080,6 @@ Miew.prototype.screenshot = function (width, height) {
 
     // screenshot should contain the principal area of interest (a centered square touching screen sides)
     var areaOfInterestSize = Math.min(gfx.width, gfx.height);
-    //var areaOfInterestFov = originalFov * areaOfInterestSize / gfx.height;
     var areaOfInterestTanFov2 = originalTanFov2 * areaOfInterestSize / gfx.height;
 
     // set appropriate camera aspect & FOV
@@ -91043,7 +91092,7 @@ Miew.prototype.screenshot = function (width, height) {
     gfx.renderer.setSize(width, height);
 
     // make screenshot
-    this._renderFrame('NONE');
+    this._renderFrame(settings.now.stereo);
     screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
 
     // restore original camera & canvas proportions
@@ -91362,10 +91411,13 @@ Miew.prototype.getState = function (opts) {
   var visual = this._getComplexVisual();
   if (visual !== null) {
     // TODO type?
-    if (visual.getComplex().metadata.id) {
-      state.load = visual.getComplex().metadata.id;
+    var complex = visual.getComplex();
+    var metadata = complex.metadata;
+    if (metadata.id) {
+      var format = metadata.format ? metadata.format + ':' : '';
+      state.load = format + metadata.id;
     }
-    var unit = visual.getComplex().getCurrentStructure();
+    var unit = complex.getCurrentStructure();
     if (unit !== 1) {
       state.unit = unit;
     }
@@ -91674,7 +91726,7 @@ Miew.prototype.rotate = function (x, y, z) {
 
 /**
  * Scale object by factor
- * @param {number} factor - scale multiplier
+ * @param {number} factor - scale multiplier, should greater than zero
  */
 Miew.prototype.scale = function (factor) {
   if (factor <= 0) {
@@ -92116,7 +92168,7 @@ Miew.prototype.exportCML = function () {
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 
-Miew.prototype.VERSION = typeof "0.7.15" !== 'undefined' && "0.7.15" || '0.0.0-dev';
+Miew.prototype.VERSION = typeof "0.7.16" !== 'undefined' && "0.7.16" || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew, /** @lends Miew */{
@@ -93174,7 +93226,7 @@ case 68:return 79
 break;
 case 69:return 77
 break;
-case 70:yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); return 13;
+case 70:yy_.yytext = yy.utils.unquoteString(yy_.yytext); return 13;
 break;
 case 71:return 37;
 break;
@@ -93198,7 +93250,7 @@ case 80:return 76
 break;
 }
 },
-rules: [/^(?:\s+)/i,/^(?:[#].*)/i,/^(?:\/\/.*)/i,/^(?:([_A-Z0-9\/\+]+==))/i,/^(?:-?[0-9]+(\.[0-9]+)?\b)/i,/^(?:0[xX][0-9A-F]+\b)/i,/^(?:false\b)/i,/^(?:true\b)/i,/^(?:all\b)/i,/^(?:reset\b)/i,/^(?:clear\b)/i,/^(?:build\b)/i,/^(?:help\b)/i,/^(?:load\b)/i,/^(?:script\b)/i,/^(?:get\b)/i,/^(?:set\b)/i,/^(?:set_save\b)/i,/^(?:set_restore\b)/i,/^(?:set_reset\b)/i,/^(?:preset\b)/i,/^(?:add\b)/i,/^(?:rep\b)/i,/^(?:remove\b)/i,/^(?:hide\b)/i,/^(?:show\b)/i,/^(?:list\b)/i,/^(?:select\b)/i,/^(?:within\b)/i,/^(?:selector\b)/i,/^(?:mode\b)/i,/^(?:color\b)/i,/^(?:material\b)/i,/^(?:view\b)/i,/^(?:unit\b)/i,/^(?:line\b)/i,/^(?:listobj\b)/i,/^(?:removeobj\b)/i,/^(?:rotate\b)/i,/^(?:translate\b)/i,/^(?:scale\b)/i,/^(?:url\b)/i,/^(?:screenshot\b)/i,/^(?:dssp\b)/i,/^(?:file_list\b)/i,/^(?:file_register\b)/i,/^(?:file_delete\b)/i,/^(?:preset_add\b)/i,/^(?:preset_delete\b)/i,/^(?:preset_update\b)/i,/^(?:preset_rename\b)/i,/^(?:preset_open\b)/i,/^(?:create_scenario\b)/i,/^(?:reset_scenario\b)/i,/^(?:delete_scenario\b)/i,/^(?:add_scenario_item\b)/i,/^(?:list_scenario\b)/i,/^(?:s\b)/i,/^(?:mt\b)/i,/^(?:m\b)/i,/^(?:c\b)/i,/^(?:x\b)/i,/^(?:y\b)/i,/^(?:z\b)/i,/^(?:as\b)/i,/^(?:of\b)/i,/^(?:pdb\b)/i,/^(?:delay\b)/i,/^(?:prst\b)/i,/^(?:desc\b)/i,/^(?:((?:"([^"]*)"|'([^']*)')))/i,/^(?:([_A-Z0-9]+))/i,/^(?:$)/i,/^(?:\.)/i,/^(?:\/)/i,/^(?:\\)/i,/^(?:-e\b)/i,/^(?:-f\b)/i,/^(?:-s\b)/i,/^(?:-v\b)/i,/^(?:=)/i],
+rules: [/^(?:\s+)/i,/^(?:[#].*)/i,/^(?:\/\/.*)/i,/^(?:([_A-Z0-9\/\+]+==))/i,/^(?:-?[0-9]+(\.[0-9]+)?\b)/i,/^(?:0[xX][0-9A-F]+\b)/i,/^(?:false\b)/i,/^(?:true\b)/i,/^(?:all\b)/i,/^(?:reset\b)/i,/^(?:clear\b)/i,/^(?:build\b)/i,/^(?:help\b)/i,/^(?:load\b)/i,/^(?:script\b)/i,/^(?:get\b)/i,/^(?:set\b)/i,/^(?:set_save\b)/i,/^(?:set_restore\b)/i,/^(?:set_reset\b)/i,/^(?:preset\b)/i,/^(?:add\b)/i,/^(?:rep\b)/i,/^(?:remove\b)/i,/^(?:hide\b)/i,/^(?:show\b)/i,/^(?:list\b)/i,/^(?:select\b)/i,/^(?:within\b)/i,/^(?:selector\b)/i,/^(?:mode\b)/i,/^(?:color\b)/i,/^(?:material\b)/i,/^(?:view\b)/i,/^(?:unit\b)/i,/^(?:line\b)/i,/^(?:listobj\b)/i,/^(?:removeobj\b)/i,/^(?:rotate\b)/i,/^(?:translate\b)/i,/^(?:scale\b)/i,/^(?:url\b)/i,/^(?:screenshot\b)/i,/^(?:dssp\b)/i,/^(?:file_list\b)/i,/^(?:file_register\b)/i,/^(?:file_delete\b)/i,/^(?:preset_add\b)/i,/^(?:preset_delete\b)/i,/^(?:preset_update\b)/i,/^(?:preset_rename\b)/i,/^(?:preset_open\b)/i,/^(?:create_scenario\b)/i,/^(?:reset_scenario\b)/i,/^(?:delete_scenario\b)/i,/^(?:add_scenario_item\b)/i,/^(?:list_scenario\b)/i,/^(?:s\b)/i,/^(?:mt\b)/i,/^(?:m\b)/i,/^(?:c\b)/i,/^(?:x\b)/i,/^(?:y\b)/i,/^(?:z\b)/i,/^(?:as\b)/i,/^(?:of\b)/i,/^(?:pdb\b)/i,/^(?:delay\b)/i,/^(?:prst\b)/i,/^(?:desc\b)/i,/^(?:((?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*')))/i,/^(?:([_A-Z0-9]+))/i,/^(?:$)/i,/^(?:\.)/i,/^(?:\/)/i,/^(?:\\)/i,/^(?:-e\b)/i,/^(?:-f\b)/i,/^(?:-s\b)/i,/^(?:-v\b)/i,/^(?:=)/i],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80],"inclusive":true}}
 });
 return lexer;
@@ -93620,7 +93672,7 @@ CLIUtils.prototype.listRep = function (miew, repMap, repIndex, key) {
   var colorer = rep.colorer;
   var material = rep.materialPreset;
 
-  ret += '#' + index + ' : ' + mode.name + (repName === '<no name>' ? '' : repName) + '\n';
+  ret += '#' + index + ' : ' + mode.name + (repName === '<no name>' ? '' : ', ' + repName) + '\n';
 
   if (key !== undefined) {
     ret += '    selection : "' + selectionStr + '"\n';
@@ -93774,6 +93826,11 @@ CLIUtils.prototype.propagateProp = function (path, arg) {
   }
   return arg;
 };
+
+CLIUtils.prototype.unquoteString = function (value) {
+  return utils.unquoteString(value);
+};
+
 var utilFunctions = new CLIUtils();
 
 function SRVScenarioItem(_pdbID, _presetId, _delay, _description) {
@@ -94412,12 +94469,12 @@ ArgList.prototype.remove = function (value) {
   return this;
 };
 
-ArgList.prototype.toJSO = function (utils, cmd, arg) {
+ArgList.prototype.toJSO = function (cliUtils, cmd, arg) {
   var res = {};
 
   var list = this._values;
   for (var i = 0, n = list.length; i < n; ++i) {
-    lodash.set(res, list[i].id, utils.propagateProp(keyRemap(cmd) + '.' + arg + '.' + list[i].id, list[i].val));
+    lodash.set(res, list[i].id, cliUtils.propagateProp(keyRemap(cmd) + '.' + arg + '.' + list[i].id, list[i].val));
   }
 
   return res;

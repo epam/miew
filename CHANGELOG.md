@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.16] - 2018-04-16
+### Fixed
+- Fix screenshots in stereo mode.
+- Clear selection correctly during reset.
+- Fix quoted quotes (`"\""`) processing in scripts.
+- Keep string values as quoted strings in script.
+- Prevent `VERSION` setting field from appearing in script and URL.
+- Add delimiter between mode and reps name in result of list command
+- Fix abnormal mouse zooming leading to negative scale
+- Support `Mouse Wheel + Shift` for cliplane tuning in Firefox and Opera
+- Fix text wrapping of a selector on Representation panel.
+
 ## [0.7.15] - 2018-03-26
 ### Fixed
 - Fix a crash when a non-integer unit index is set.
@@ -241,7 +253,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.15...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.16...HEAD
+[0.7.16]: https://github.com/epam/miew/compare/v0.7.15...v0.7.16
 [0.7.15]: https://github.com/epam/miew/compare/v0.7.14...v0.7.15
 [0.7.14]: https://github.com/epam/miew/compare/v0.7.13...v0.7.14
 [0.7.13]: https://github.com/epam/miew/compare/v0.7.12...v0.7.13
