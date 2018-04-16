@@ -163,3 +163,53 @@ npm run ci
 # run automated and manual tests, etc.
 ...
 ```
+
+## Releasing a Version
+
+Unfortunately, it is still a semi-manual process.
+
+1.  Ensure that you have a clean repo. Check the build pipeline etc.
+
+        git status
+        npm run ci
+        ...
+
+2.  Use npm to automatically increment version (patch, minor or major).
+
+        npm version patch
+
+3.  Manually update some files.
+
+    -   Increment product version in the `sonar-project.properties` file.
+
+    -   Update `CHANGELOG.md` file. Don't copy the git log blindly, summarize, reword and reorder. Use the following groups order:
+
+            ## [0.0.1] - 2000-01-01
+            ### Added
+            ### Changed
+            ### Deprecated
+            ### Removed
+            ### Fixed
+            ### Security
+            ### Internal
+
+    -   Replace the automatic commit and move the tag.
+
+            git add sonar-project.properties CHANGELOG.md 
+            git commit --amend
+            git tag -fa v0.0.1 -m "0.0.1"
+
+4.  Merge `master` into `latest` branch.
+
+        git checkout latest
+        git merge --ff-only master
+        git checkout master
+
+5.  Push updated branches and tags.
+
+        git push origin master latest
+        git push --tags
+
+Upon commit [Travis CI][] builds `master`, `latest` branches and `v0.0.1` tag. The tag automatically initiates NPM publish process if the build is successful.
+
+[Travis CI]: https://travis-ci.org/epam/miew
