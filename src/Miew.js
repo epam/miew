@@ -368,10 +368,10 @@ Miew.prototype._initGfx = function() {
 
   // z-sprites and ambient occlusion possibility
   if (!gfx.renderer.getContext().getExtension('EXT_frag_depth')) {
-    settings.now.zSprites = false;
+    settings.set('zSprites', false);
   }
   if (!gfx.renderer.getContext().getExtension('WEBGL_depth_texture')) {
-    settings.now.ao = false;
+    settings.set('ao', false);
   }
 
   gfx.renderer.autoClear = false;
@@ -2040,7 +2040,7 @@ Miew.prototype.applyPreset = function(preset) {
   ];
   let reps = null;
   for (let i = 0; !reps && i < presList.length; ++i) {
-    settings.now.preset = presList[i];
+    settings.set('preset', presList[i]);
     reps = presets[settings.now.preset];
     if (!reps) {
       this.logger.warn('Unknown preset "' + settings.now.preset + '"');

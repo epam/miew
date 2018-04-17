@@ -211,7 +211,7 @@ ComplexVisual.prototype.rep = function(index, rep) {
         if (target.mode.isSurface &&
             (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
           logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
-          settings.now.resolution = 'medium';
+          settings.set('resolution', 'medium');
         }
       }
     }

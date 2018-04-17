@@ -873,7 +873,7 @@ Settings.prototype = {
     // VERSION shouldn't be presented inside settings structure
     delete diffs.VERSION;
     this.reset();
-    _.merge(this.now, diffs);
+    this.override(diffs);
   },
 
   getDiffs: function(versioned) {

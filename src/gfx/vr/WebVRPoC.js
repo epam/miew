@@ -104,7 +104,7 @@ export default class WebVRPoC {
         gfx.scene.add(self._user);
       }
 
-      settings.now.fog = false;
+      settings.set('fog', false);
       //turn on webvr transformation
       gfx.scene.add(self._molContainer);
       self._molContainer.add(gfx.root);
@@ -126,7 +126,7 @@ export default class WebVRPoC {
       if (self._cameraWasStored) {
         gfx.camera.copy(self._mainCamera);
       }
-      settings.now.fog = true;
+      settings.set('fog', true);
       //turn off webvr transformation
       const root = self._molContainer.children[0];
       if (root) gfx.scene.add(root);
