@@ -32,7 +32,8 @@ BioStructure.prototype.computeBoundaries = function() {
   boundingBox.makeEmpty();
   if (n === 1) {
     boundingBox.expandByPoint(atoms[0]._position);
-    var bbc = boundingBox.getCenter();
+    const bbc = new THREE.Vector3();
+    boundingBox.getCenter(bbc);
     var s = 2 * atoms[0].element.radius; //*settings.now.modes.BS.atom; FIXME N: hack commented
     boundingBox.setFromCenterAndSize(bbc, new THREE.Vector3(s, s, s));
   } else {
@@ -45,7 +46,8 @@ BioStructure.prototype.computeBoundaries = function() {
 
   // Build bounding sphere
   var radiusSquared = 0.0;
-  var center = boundingBox.isEmpty() ? new THREE.Vector3() : boundingBox.getCenter();
+  const center = new THREE.Vector3();
+  boundingBox.getCenter(center);
   if (n === 1) {
     // * settings.now.modes.BS.atom); FIXME N: hack commented
     this._boundaries.boundingSphere.set(center, atoms[0].element.radius);

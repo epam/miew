@@ -71,7 +71,8 @@ SphereCollisionGeo.prototype.computeBoundingSphere = function() {
   var boundingBox = this.boundingBox;
   // Build bounding sphere
   var radiusSquared = 0.0;
-  var center = boundingBox.isEmpty() ? new THREE.Vector3() : boundingBox.getCenter();
+  var center = new THREE.Vector3();
+  boundingBox.getCenter(center);
   for (var i = 0, n = objects.length; i < n; ++i) {
     var pos = objects[i]._position;
     var lengthSquared = center.distanceToSquared(pos);

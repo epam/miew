@@ -23,6 +23,7 @@ ZSpriteMesh.prototype._onBeforeRender = function(_renderer, _scene, camera, _geo
     this.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.matrixWorld);
     // get inverse matrix
     material.uniforms.invModelViewMatrix.value.getInverse(this.modelViewMatrix);
+    material.uniformsNeedUpdate = true;
   }
 };
 

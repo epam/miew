@@ -343,7 +343,6 @@ function applyTransformsToMeshes(root, mtc) {
     mesh.applyMatrix(mtc[0]);
     for (var j = 1; j < mtcCount; ++j) {
       var newMesh = new mesh.constructor(mesh.geometry, mesh.material);
-      newMesh.material.forceUniformsUpdate = true;
       parent.add(newMesh);
       newMesh.applyMatrix(mtc[j]);
     }

@@ -6,7 +6,7 @@ function Axes(target, targetCamera) {
   this._target = target;
   this._targetCamera = targetCamera;
   this._camera = new THREE.PerspectiveCamera(targetCamera.fov, targetCamera.aspect, 1, 100);
-  this._object = new THREE.AxisHelper(1);
+  this._object = new THREE.AxesHelper(1);
   this._scene = new THREE.Scene();
   this._scene.add(this._object);
 

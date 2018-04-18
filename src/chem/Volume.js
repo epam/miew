@@ -120,7 +120,8 @@ Volume.prototype.getBox = function() {
 };
 
 Volume.prototype.getCellSize = function() {
-  var boxSize = this._box.getSize();
+  var boxSize = new THREE.Vector3();
+  this._box.getSize(boxSize);
   var res = new THREE.Vector3();
   res.x = this._dimX > 1 ? boxSize.x / (this._dimX - 1) : 0;
   res.y = this._dimY > 1 ? boxSize.y / (this._dimY - 1) : 0;

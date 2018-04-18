@@ -73,9 +73,11 @@ function VoxelWorld(box, vCellSizeHint) {
   var i;
 
   this._box = box.clone();
-  this._count = box.getSize().divide(vCellSizeHint).floor();
+  const size = new THREE.Vector3();
+  box.getSize(size);
+  this._count = size.clone().divide(vCellSizeHint).floor();
   this._last = this._count.clone().subScalar(1);
-  this._cellSize = box.getSize().divide(this._count);
+  this._cellSize = size.clone().divide(this._count);
   this._cellInnerR = 0.5 * Math.min(Math.min(this._cellSize.x, this._cellSize.y), this._cellSize.z);
   this._cellOuterR = 0.5 * Math.sqrt(this._cellSize.dot(this._cellSize));
 

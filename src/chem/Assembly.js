@@ -34,7 +34,9 @@ Assembly.prototype.computeBoundaries = function() {
   }
 
   var newRad = boundingBox.max.distanceTo(boundingBox.min) / 2 + oldRad;
-  this._boundaries.boundingSphere = new THREE.Sphere().set(boundingBox.getCenter(), newRad);
+  const center  = new THREE.Vector3();
+  boundingBox.getCenter(center);
+  this._boundaries.boundingSphere = new THREE.Sphere().set(center, newRad);
   boundingBox.max.addScalar(oldRad);
   boundingBox.min.subScalar(oldRad);
 };

@@ -69,7 +69,6 @@ TransformGroup.prototype._createMeshes = function(geometry) {
   var transforms = this._transforms;
   var Mesh = this._geoParams.Object;
   var material = this._material;
-  material.forceUniformsUpdate = true;
   var meshes = [];
   for (var i = 0, n = transforms.length; i < n; ++i) {
     var mesh = new Mesh(geometry, material);

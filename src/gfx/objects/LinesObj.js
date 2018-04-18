@@ -39,10 +39,10 @@ LinesObj.prototype.build = function(complex) {
   geom.vertices[0] = this._atom1._position.clone();
   geom.vertices[1] = this._atom2._position.clone();
   geom.dynamic = true;
-  geom.computeLineDistances();
   geom.computeBoundingBox();
 
   this._line = new meshes.Line(geom, new UberMaterial({lights: false, overrideColor: true, dashedLine: true}));
+  this._line.computeLineDistances();
   this._line.material.setUberOptions({
     fixedColor: new THREE.Color(this.opts.color),
     dashedLineSize: this.opts.dashSize,
@@ -67,8 +67,8 @@ LinesObj.prototype.updateToFrame = function(frameData) {
   var geo = this._line.geometry;
   geo.vertices[0].copy(frameData.getAtomPos(this._atom1._index));
   geo.vertices[1].copy(frameData.getAtomPos(this._atom2._index));
+  this._line.computeLineDistances();
   //geo.computeBoundingBox();
-  geo.computeLineDistances();
   geo.computeBoundingSphere();
 
   geo.verticesNeedUpdate = true;

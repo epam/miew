@@ -22,7 +22,10 @@ LinesGeometry.prototype.computeBoundingSphere = function() {
   var boundingBox = this.boundingBox;
   // Build bounding sphere
   var radiusSquared = 0.0;
-  var center = !boundingBox ? new THREE.Vector3() : boundingBox.getCenter();
+  var center = new THREE.Vector3();
+  if (boundingBox) {
+    boundingBox.getCenter(center);
+  }
   var positions = this._positions;
   var sphere = this.boundingSphere || new THREE.Sphere();
   var size = this._positions.length;
