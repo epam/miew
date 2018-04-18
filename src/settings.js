@@ -825,8 +825,12 @@ Settings.prototype = {
   defaults: defaults,
 
   set: function(path, value) {
-    _.set(this.now, path, value);
-    this._changed[path] = true;
+    if (_.isString(path)) {
+      _.set(this.now, path, value);
+      this._changed[path] = true;
+    } else {
+      _.merge(this.now, path);
+    }
   },
 
   get: function(path, defaultValue) {
@@ -861,8 +865,9 @@ Settings.prototype = {
     return keys;
   },
 
+  /** @deprecated Use Settings#set instead */
   override: function(other) {
-    _.merge(this.now, other);
+    this.set(other);
   },
 
   applyDiffs: function(diffs) {

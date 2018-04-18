@@ -149,7 +149,7 @@ function Miew(opts) {
   this._cookies = new Cookies(this);
   this._loadSettings();
   if (opts && opts.settings) {
-    this.settings.override(opts.settings);
+    this.settings.set(opts.settings);
   }
 
   /** @type {?Spinner} */
@@ -3157,15 +3157,14 @@ Miew.prototype._onSettingsChanged = function(changes) {
  * @param {*=} value - Value.
  */
 Miew.prototype.set = function(params, value) {
+  settings.set(params, value);
+
+  // old-style replacement for events
   if (typeof params === 'string' && value !== undefined) { // slow but avoids code duplication
     const key = params;
     params = {};
     _.set(params, key, value);
   }
-  if (!(params instanceof Object)) {
-    return;
-  }
-  settings.override(params);
   this._onSettingsChanged(params);
 };
 

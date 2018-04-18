@@ -20,7 +20,7 @@ settings.setPluginOpts('srv', {
 function resetSettings() {
   var plugins = _.cloneDeep(settings.now.plugins);
   settings.reset();
-  settings.override({plugins});
+  settings.set({plugins});
 }
 
 //////////////////////////////////////////////////////////////////////////////
