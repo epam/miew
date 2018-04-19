@@ -19,6 +19,7 @@ export default class ViveController extends  THREE.Object3D {
 
     this.matrixAutoUpdate = false;
     this.contrId = id;
+    this.standingMatrix = new THREE.Matrix4();
   }
 
   getGamepad() {
@@ -65,6 +66,8 @@ export default class ViveController extends  THREE.Object3D {
       if (pose.position !== null) this.position.fromArray(pose.position);
       if (pose.orientation !== null) this.quaternion.fromArray(pose.orientation);
       this.matrix.compose(this.position, this.quaternion, this.scale);
+      this.matrix.premultiply(this.standingMatrix);
+      this.matrix.decompose(this.position, this.quaternion, this.scale); // someone may want to use on the frame
       this.matrixWorldNeedsUpdate = true;
       this.visible = true;
 

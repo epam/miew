@@ -102,13 +102,15 @@ export default class WebVRPoC {
       // add hierarchical structure for webVR into scene
       if (self._user) {
         gfx.scene.add(self._user);
-        self._user.add(gfx.camera);
       }
 
       settings.now.fog = false;
       //turn on webvr transformation
       gfx.scene.add(self._molContainer);
       self._molContainer.add(gfx.root);
+
+      this._controller1.standingMatrix = renderer.vr.getStandingMatrix();
+      this._controller2.standingMatrix = renderer.vr.getStandingMatrix();
 
     } else if (!enable && renderer.vr.enabled) {
       //disable vr
@@ -131,7 +133,6 @@ export default class WebVRPoC {
       self._molContainer.parent.remove(self._molContainer);
       if (self._user) {
         gfx.scene.remove(self._user);
-        self._user.remove(gfx.camera);
       }
     }
     if (self._onToggle) {
@@ -161,35 +162,25 @@ export default class WebVRPoC {
     }
   }
 
-  // move slightly the molecule from the world center toward the camera direction
+  // reposition molecule right before the camera
   translateMolecule() {
     const device = this.getDevice();
     if (!device) {
       return;
     }
+    const gfx = this._gfx;
+    const camera = gfx.camera;
 
-    // Cam dir in CameraSpace
-    let camDir = new THREE.Vector3(0, 0, -1);
-    let pose;
+    // set container position in camera space
+    const container = this._molContainer;
+    container.matrix.identity();
+    container.position.set(0, 0, -1.3);
+    container.updateMatrix();
 
-    if (device.pose) {  // WebVR emulation
-      pose = device.pose;
-    } else if (device.getFrameData) {  // WebVR
-      let frameData = new VRFrameData();
-      device.getFrameData(frameData);
-      pose = frameData.pose;
-    } else {
-      return;
-    }
-    const orient = pose.orientation;
-    const quaternion = new THREE.Quaternion(orient[0], orient[1], orient[2], orient[3]);
-    camDir.applyQuaternion(quaternion);
-    if (pose.position === null) {
-      logger.warn('VRDisplay cannot provide its position. Be sure VRDisplay is detected by sensors');
-    }
-    const pos = pose.position || [0, 0, 0];
-    this._molContainer.position.fromArray(pos);
-    this._molContainer.position.addScaledVector(camDir, 1.3);
+    // update container world matrix
+    container.matrixWorld.multiplyMatrices(camera.matrixWorld, container.matrix);
+    // readd to scene
+    gfx.scene.addSavingWorldTransform(container);
   }
 
   getDevice() {
