@@ -2,6 +2,7 @@ import utils from './utils';
 
 import chai, {expect} from 'chai';
 import dirtyChai from 'dirty-chai';
+import _ from 'lodash';
 
 chai.use(dirtyChai);
 
@@ -144,6 +145,85 @@ describe('utils.getFileExtension()', () => {
 
   it('accepts empty string', () => {
     expect(getFileExtension('')).to.equal('');
+  });
+
+});
+
+describe('utils.objectsDiff()', () => {
+
+  const objectsDiff = utils.objectsDiff;
+
+  const ref = {
+    num: 42,
+    obj: {x: 1, y: 2, z: 3},
+    array: [1, 2, 3],
+    date: new Date(1522576800),
+  };
+
+  ref.deep = {inside: _.clone(ref)};
+
+  const expectSame = (o) => {
+    expect(objectsDiff(o, ref)).to.deep.equal(o);
+  };
+
+  const expectEmpty = (o) => {
+    expect(objectsDiff(o, ref)).to.be.empty();
+  };
+
+  it('ignores the same value', () => {
+    expectEmpty({num: ref.num});
+    expectEmpty({obj: _.clone(ref.obj)});
+    expectEmpty({array: _.clone(ref.array)});
+    expectEmpty({date: _.clone(ref.date)});
+  });
+
+  it('detects a changed value', () => {
+    expectSame({num: 0});
+    expectSame({obj: {x: 0}});
+    expectSame({array: [0]});
+    expectSame({date: new Date()});
+  });
+
+  it('detects a new value', () => {
+    expectSame({xnum: 0});
+    expectSame({xobj: {x: 0}});
+    expectSame({xarray: [0]});
+    expectSame({xdate: new Date()});
+  });
+
+  it('deeply ignores the same value', () => {
+    expectEmpty({deep: {inside: {num: ref.num}}});
+    expectEmpty({deep: {inside: {obj: _.clone(ref.obj)}}});
+    expectEmpty({deep: {inside: {array: _.clone(ref.array)}}});
+    expectEmpty({deep: {inside: {date: _.clone(ref.date)}}});
+  });
+
+  it('deeply detects a changed value', () => {
+    expectSame({deep: {inside: {num: 0}}});
+    expectSame({deep: {inside: {obj: {x: 0}}}});
+    expectSame({deep: {inside: {array: [0]}}});
+    expectSame({deep: {inside: {date: new Date()}}});
+  });
+
+  it('deeply detects a new value', () => {
+    expectSame({deep: {inside: {xnum: 0}}});
+    expectSame({deep: {inside: {xobj: {x: 0}}}});
+    expectSame({deep: {inside: {xarray: [0]}}});
+    expectSame({deep: {inside: {xdate: new Date()}}});
+  });
+
+  it('detects multiple changes', () => {
+    expectSame({num: 0, xnum: 5, deep: {inside: {obj: {x: 5, w: 0}}}});
+  });
+
+  it('allows type change', () => {
+    expectSame({num: {deep: {inside: 'ok'}}});
+    expectSame({num: [1, 2, 3]});
+    expectSame({num: new Date()});
+
+    expectSame({obj: 5});
+    expectSame({array: 5});
+    expectSame({date: 5});
   });
 
 });

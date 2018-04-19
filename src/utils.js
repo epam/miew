@@ -350,21 +350,32 @@ function compareOptionsWithDefaults(opts, defOpts) {
   return '';
 }
 
+function isAlmostPlainObject(o) {
+  if (_.isPlainObject(o)) {
+    return true;
+  }
+  const proto = o && Object.getPrototypeOf(o);
+  return !!proto && !proto.hasOwnProperty('constructor') && isAlmostPlainObject(proto);
+}
+
 /**
- * Returns objects that contains difference in values for all defined fields of left and right
- * @param left
- * @param right
+ * Build an object that contains properties (and subproperties) of `src` different from those
+ * in `dst`. Objects are parsed recursively, other values (including arrays) are compared for
+ * equality using `_.isEqual()`.
+ * @param {!object} src - a new object to compare, may contain changed or new properties
+ * @param {!object} dst - an old reference object
  */
-function objectsDiff(left, right) {
-  var diff = {};
-  _.forIn(left, function(value, key) {
-    if (value instanceof Object) {
-      var smallDiff = objectsDiff(value, right[key]);
-      if (!_.isEmpty(smallDiff)) {
-        diff[key] = smallDiff;
+function objectsDiff(src, dst) {
+  const diff = {};
+  _.forIn(src, function(srcValue, key) {
+    const dstValue = dst[key];
+    if (isAlmostPlainObject(srcValue) && isAlmostPlainObject(dstValue)) {
+      var deepDiff = objectsDiff(srcValue, dstValue);
+      if (!_.isEmpty(deepDiff)) {
+        diff[key] = deepDiff;
       }
-    } else if (!right || right[key] === undefined || right[key] !== value) {
-      diff[key] = value;
+    } else if (!_.isEqual(srcValue, dstValue)) {
+      diff[key] = srcValue;
     }
   });
   return diff;

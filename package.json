@@ -78,7 +78,7 @@
       "!src/**/*.test.js"
     ],
     "exclude": [
-      "@(node_modules|dist|vendor|demo|coverage|docs|examples|test|tools)",
+      "@(node_modules|dist|build|vendor|demo|coverage|docs|examples|test|tools)",
       "**/*.test.js"
     ],
     "require": [
