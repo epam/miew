@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import utils from './utils';
+import EventDispatcher from './utils/EventDispatcher';
 
 var VERSION = 0;
 
@@ -812,6 +813,8 @@ var defaults = {
   //////////////////////////////////////////////////////////////////////////
 
 function Settings() {
+  EventDispatcher.call(this);
+
   this.old = null;
   this.now = {};
   this._changed = {};
@@ -819,9 +822,7 @@ function Settings() {
   this.reset();
 }
 
-Settings.prototype = {
-  constructor: Settings,
-
+utils.deriveClass(Settings, EventDispatcher, {
   defaults: defaults,
 
   set: function(path, value) {
@@ -829,15 +830,13 @@ Settings.prototype = {
       const oldValue = _.get(this.now, path);
       if (oldValue !== value) {
         _.set(this.now, path, value);
-        this._changed[path] = true;
+        this._notifyChange(path, value);
       }
     } else {
       const diff = utils.objectsDiff(path, this.now);
       if (!_.isEmpty(diff)) {
         _.merge(this.now, diff);
-        utils.forInRecursive(diff, (deepValue, deepPath) => {
-          this._changed[deepPath] = true;
-        });
+        this._notifyChanges(diff);
       }
     }
   },
@@ -847,8 +846,10 @@ Settings.prototype = {
   },
 
   reset: function() {
+    const diff = utils.objectsDiff(defaults, this.now);
     this.now = _.cloneDeep(defaults);
     this.old = null;
+    this._notifyChanges(diff);
     this._changed = {};
   },
 
@@ -857,9 +858,15 @@ Settings.prototype = {
     this._changed = {};
   },
 
-  undo: function() {
-    this.now = _.cloneDeep(this.old);
-    this._changed = {};
+  _notifyChange: function(path, value) {
+    this._changed[path] = true;
+    this.dispatchEvent({type: `change:${path}`, value});
+  },
+
+  _notifyChanges: function(diff) {
+    utils.forInRecursive(diff, (deepValue, deepPath) => {
+      this._notifyChange(deepPath, deepValue);
+    });
   },
 
   changed: function() {
@@ -902,7 +909,7 @@ Settings.prototype = {
     defaults.plugins[plugin] = _.cloneDeep(opts);
     this.now.plugins[plugin] = _.cloneDeep(opts);
   },
-};
+});
 
 
 export default new Settings();
