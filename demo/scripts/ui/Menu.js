@@ -2671,9 +2671,8 @@ Menu.prototype._onMenuOff = function() {
 
   // Apply changed settings
   var changedKeys = settings.changed();
-  var rebuild = this._reprListChanged ||  // TODO: list has changed, not rep!?
-      contain(changedKeys, ['resolution', 'palette']);
   var rebuildAll = contain(changedKeys, ['resolution', 'palette']);
+  var rebuild = this._reprListChanged || rebuildAll; // TODO: list has changed, not rep!?
   var rerender = contain(changedKeys, ['theme', 'axes', 'fxaa', 'fog', 'ao']);
 
   if (rebuild) {

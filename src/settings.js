@@ -826,10 +826,19 @@ Settings.prototype = {
 
   set: function(path, value) {
     if (_.isString(path)) {
-      _.set(this.now, path, value);
-      this._changed[path] = true;
+      const oldValue = _.get(this.now, path);
+      if (oldValue !== value) {
+        _.set(this.now, path, value);
+        this._changed[path] = true;
+      }
     } else {
-      _.merge(this.now, path);
+      const diff = utils.objectsDiff(path, this.now);
+      if (!_.isEmpty(diff)) {
+        _.merge(this.now, diff);
+        utils.forInRecursive(diff, (deepValue, deepPath) => {
+          this._changed[deepPath] = true;
+        });
+      }
     }
   },
 
@@ -878,7 +887,7 @@ Settings.prototype = {
     // VERSION shouldn't be presented inside settings structure
     delete diffs.VERSION;
     this.reset();
-    this.override(diffs);
+    this.set(diffs);
   },
 
   getDiffs: function(versioned) {
