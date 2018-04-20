@@ -147,7 +147,7 @@ function Miew(opts) {
   this.logger = log;
 
   this._cookies = new Cookies(this);
-  this._loadSettings();
+  this.restoreSettings();
   if (opts && opts.settings) {
     this.settings.set(opts.settings);
   }
@@ -185,6 +185,8 @@ function Miew(opts) {
   Miew.registeredPlugins.forEach(function(plugin) {
     plugin.call(self);
   });
+
+  this._initOnSettingsChanged();
 }
 
 Miew.prototype = Object.create(EventDispatcher.prototype);
@@ -881,6 +883,7 @@ Miew.prototype._updateFog = function() {
     gfx.scene.fog = undefined;
     this._setUberMaterialValues({fog: settings.now.fog});
   }
+  this._needRender = true;
 };
 
 Miew.prototype._onUpdate = function() {
@@ -1000,6 +1003,7 @@ Miew.prototype._onThemeChanged = (function() {
       }
       gfx.renderer.setClearColor(color);
     }
+    this._needRender = true;
   };
 })();
 
@@ -2742,7 +2746,10 @@ Miew.prototype.saveSettings = function() {
   this._cookies.setCookie(this._opts.settingsCookie, JSON.stringify(this.settings.getDiffs(true)));
 };
 
-Miew.prototype._loadSettings = function() {
+/**
+ * Load settings from cookies.
+ */
+Miew.prototype.restoreSettings = function() {
   try {
     const cookie = this._cookies.getCookie(this._opts.settingsCookie);
     const diffs = cookie ? JSON.parse(cookie) : {};
@@ -2753,23 +2760,10 @@ Miew.prototype._loadSettings = function() {
 };
 
 /**
- * Load settings from cookies.
- */
-Miew.prototype.restoreSettings = function() {
-  const oldSettings = _.cloneDeep(this.settings.now);
-  this._loadSettings();
-  const changes = utils.objectsDiff(this.settings.now, oldSettings);
-  this._onSettingsChanged(changes);
-};
-
-/**
  * Reset current settings to the defaults.
  */
 Miew.prototype.resetSettings = function() {
-  const oldSettings = _.cloneDeep(this.settings.now);
   this.settings.reset();
-  const changes = utils.objectsDiff(this.settings.now, oldSettings);
-  this._onSettingsChanged(changes);
 };
 
 /*
@@ -3089,55 +3083,48 @@ Miew.prototype._fogFarUpdateValue = function() {
   }
 };
 
-/**
- * Perform required actions when settings were changed.
- * @param changes - differences with previous settings
- * @private
- */
-Miew.prototype._onSettingsChanged = function(changes) {
-  if (!(changes instanceof Object)) {
-    return;
-  }
-  // TODO: think about 'change' events
-  if (changes.theme !== undefined) {
-    this._onThemeChanged();
-  }
+Miew.prototype._initOnSettingsChanged = function() {
+  const on = (props, func) => {
+    props = _.isArray(props) ? props : [props];
+    props.forEach((prop) => {
+      this.settings.addEventListener(`change:${prop}`, func);
+    });
+  };
 
-  if (changes.draft !== undefined) {
-    if (changes.draft.clipPlane !== undefined) {
-      // TODO: update materials
-      const values = {clipPlane: settings.now.draft.clipPlane};
-      this._forEachComplexVisual(visual => visual.setMaterialValues(values));
-      for (let i = 0, n = this._objects.length; i < n; ++i) {
-        const obj = this._objects[i];
-        if (obj._line) {
-          obj._line.material.setValues(values);
-          obj._line.material.needsUpdate = true;
-        }
+  on('theme', () => {
+    this._onThemeChanged();
+  });
+
+  on('draft.clipPlane', (evt) => {
+    // TODO: update materials
+    const values = {clipPlane: evt.value};
+    this._forEachComplexVisual(visual => visual.setMaterialValues(values));
+    for (let i = 0, n = this._objects.length; i < n; ++i) {
+      const obj = this._objects[i];
+      if (obj._line) {
+        obj._line.material.setValues(values);
+        obj._line.material.needsUpdate = true;
       }
-      this.rebuildAll();
     }
-  }
-  if (changes.transparency !== undefined ||
-      changes.resolution !== undefined) {
     this.rebuildAll();
-  }
-  if (changes.fps !== undefined) {
+  });
+
+  on('fps', () => {
     this._fps.show(settings.now.fps);
-  }
-  if (changes.fogNearFactor !== undefined ||
-      changes.fogFarFactor !== undefined ||
-      changes.fog !== undefined) {
+  });
+
+  on(['fog', 'fogNearFactor', 'fogFarFactor'], () => {
     this._updateFog();
-  }
-  if (changes.palette) {
-    this.rebuildAll();
-  }
-  if (changes.autoResolution && !this._gfxScore) {
-    this.logger.warn('Benchmarks are missed, autoresolution will not work! ' +
-      'Autoresolution should be set during miew startup.');
-  }
-  if (changes.stereo) {
+  });
+
+  on('autoResolution', (evt) => {
+    if (evt.value && !this._gfxScore) {
+      this.logger.warn('Benchmarks are missed, autoresolution will not work! ' +
+        'Autoresolution should be set during miew startup.');
+    }
+  });
+
+  on('stereo', () => {
     if (changes.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
       this.webVR = new WebVRPoC(() => {
         this._needRender = true;
@@ -3147,8 +3134,15 @@ Miew.prototype._onSettingsChanged = function(changes) {
     if (this.webVR) {
       this.webVR.toggle(changes.stereo === 'WEBVR', this._gfx);
     }
-  }
-  this._needRender = true;
+  });
+
+  on(['transparency', 'resolution', 'palette'], () => {
+    this.rebuildAll();
+  });
+
+  on(['axes', 'fxaa', 'ao'], () => {
+    this._needRender = true;
+  });
 };
 
 /**
@@ -3158,14 +3152,6 @@ Miew.prototype._onSettingsChanged = function(changes) {
  */
 Miew.prototype.set = function(params, value) {
   settings.set(params, value);
-
-  // old-style replacement for events
-  if (typeof params === 'string' && value !== undefined) { // slow but avoids code duplication
-    const key = params;
-    params = {};
-    _.set(params, key, value);
-  }
-  this._onSettingsChanged(params);
 };
 
 /**

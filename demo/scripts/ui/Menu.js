@@ -2659,45 +2659,9 @@ Menu.prototype._onTerminalOn = function() {
 Menu.prototype._onMenuOff = function() {
   this._updateReprList();
 
-  function contain(array, elements) {
-    if (elements instanceof Array) {
-      return elements.some(function(value) {
-        return array.indexOf(value) >= 0;
-      });
-    } else {
-      return array.indexOf(elements) >= 0;
-    }
-  }
-
   // Apply changed settings
-  var changedKeys = settings.changed();
-  var rebuildAll = contain(changedKeys, ['resolution', 'palette']);
-  var rebuild = this._reprListChanged || rebuildAll; // TODO: list has changed, not rep!?
-  var rerender = contain(changedKeys, ['theme', 'axes', 'fxaa', 'fog', 'ao']);
-
-  if (rebuild) {
-    if (rebuildAll) {
-      // TODO: isn't it a rebuildAll() call?
-      for (var idx = 0, reprCount = this._viewer.repCount(); idx < reprCount; ++idx) {
-        this._viewer.repGet(idx).needsRebuild = true;
-      }
-    } else {
-      this._viewer.repGet().needsRebuild = true;
-    }
-    this._viewer.rebuild(); // TODO: implicit rebuild is enough
-  }
-
-  if (contain(changedKeys, 'fps')) {
-    $('#stats').toggle(settings.now.fps);
-  }
-
-  if (contain(changedKeys, 'theme')) {
-    var viewer = this._viewer;
-    viewer._onThemeChanged();
-  }
-
-  if (rerender) {
-    this._viewer.setNeedRender();
+  if (this._reprListChanged) { // TODO: list has changed, not rep!?
+    this._viewer.repGet().needsRebuild = true;
   }
 
   this.hide();
