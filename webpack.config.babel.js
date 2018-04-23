@@ -63,7 +63,6 @@ export default {
     alias: {
       Miew:    path.resolve(__dirname, 'src/index.js'),
       // lib
-      three:   path.resolve(__dirname, 'vendor/js/three.module.js'),
       Smooth:  path.resolve(__dirname, 'vendor/js/Smooth.js'),
       mmtf:    path.resolve(__dirname, 'vendor/js/mmtf.js'),
     },
