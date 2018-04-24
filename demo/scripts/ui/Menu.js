@@ -1094,11 +1094,15 @@ Menu.prototype._initLoadPanel = function() {
     trigger : 'hover'
   });
 
-  $(self._menuId + ' [data-toggle="preset-pdb"]').on('click', /** @this HTMLElement */ function() {
-    var path = this.getAttribute('data-value');
+  $(self._menuId + ' [data-toggle="preset-pdb"]').on('click', /** @this HTMLElement */ function(evt) {
+    const path = this.getAttribute('data-value');
+    const query = this.getAttribute('data-query');
     $(self._menuId + ' .panel-menu[data-panel-type=miew-menu-panel-representation] .miew-repr-list').empty();
-    self._viewer.load(path);
+    self._viewer.load(path).then(() => {
+      self._viewer.setOptions(query || '');
+    });
     self._onMenuOff();
+    evt.preventDefault();
     return false;
   });
 

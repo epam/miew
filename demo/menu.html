@@ -114,6 +114,9 @@
           <a href="#" class="list-group-item" data-toggle="panel" data-value="miew-menu-panel-presets">
             <span class="glyphicon glyphicon-folder-open"></span>&nbsp;<!-- span class="glyphicon glyphicon-menu-right pull-right"></span -->
             Load</a>
+          <a href="#" class="list-group-item" data-toggle="panel" data-value="miew-menu-panel-gallery">
+            <span class="glyphicon glyphicon-star"></span>&nbsp;<!-- span class="glyphicon glyphicon-menu-right pull-right"></span -->
+            Gallery</a>
           <a href="#" class="list-group-item" data-toggle="panel" data-value="miew-menu-panel-representation">
             <span class="glyphicon glyphicon-picture"></span>&nbsp;<!-- span class="glyphicon glyphicon-menu-right pull-right"></span -->
             Representations</a>
@@ -139,13 +142,13 @@
         <div class="panel-body"></div>
       </div>
 
-      <!-- Presets panel -->
+      <!-- Load panel -->
 
       <div class="col-xs-12 col-sm-9 panel panel-default panel-menu" data-panel-type="miew-menu-panel-presets" style="display: none">
         <div class="panel-heading">
           <button class="btn btn-default btn-titlebar pull-left main-back-button visible-xs" data-toggle="main-panel" data-value="miew-menu-panel-main"><span class="glyphicon glyphicon-menu-left"></span></button>
           <button class="btn btn-default btn-titlebar pull-left presets-back-button hidden presets-panel-action" data-presets-panel-action="navigate-back"><span class="glyphicon glyphicon-menu-left"></span></button>
-          <h3 class="panel-title">Presets</h3>
+          <h3 class="panel-title">Load</h3>
         </div>
         <div class="panel-body">
           <div class="main">
@@ -254,6 +257,57 @@
               <div class="alert alert-info" role="alert" data-label-type="miew-label-add-new-preset-info" style="margin-top: 10px; text-align: center;">Load pdb file first to create new preset.</div>
             </div>
             <!-- endblock:READONLY_SERVER-3 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery panel -->
+
+      <div class="col-xs-12 col-sm-9 panel panel-default panel-menu" data-panel-type="miew-menu-panel-gallery" style="display: none">
+        <div class="panel-heading">
+          <button class="btn btn-default btn-titlebar pull-left visible-xs" data-toggle="main-panel" data-value="miew-menu-panel-main"><span class="glyphicon glyphicon-menu-left"></span></button>
+          <h3 class="panel-title">Gallery</h3>
+        </div>
+        <div class="panel-body">
+          <div class="container-fluid">
+            <div class="row-fluid">
+              <div class="col-xs-6 col-sm-4" data-toggle="preset-pdb" data-value="pc:serotonin" data-query="p=small&mt=ME&v=1P1erPnlYqD3sL7u8kNxQPmZl0L4NUDlA0c6VPg%3D%3D">
+                <a href="#" class="thumbnail">
+                  <img src="images/serotonin.png">
+                  <div class="caption text-center">Serotonin</div>
+                </a>
+              </div>
+              <div class="col-xs-6 col-sm-4" data-toggle="preset-pdb" data-value="data/1CRN.pdb" data-query="p=macro">
+                <a href="#" class="thumbnail">
+                  <img src="images/1CRN.png">
+                  <div class="caption text-center">1CRN <small>(0.3k)</small></div>
+                </a>
+              </div>
+              <div class="col-xs-6 col-sm-4" data-toggle="preset-pdb" data-value="1AID" data-query="p=macro&m=CS&c=CH&r=1&s=hetatm+and+altloc+A&v=1XA99wmIQG8LRIls%2BLXGoPRDqTb%2BdvOC/PEyQPg%3D%3D">
+                <a href="#" class="thumbnail">
+                  <img src="images/1AID.png">
+                  <div class="caption text-center">1AID <small>(1.6k)</small></div>
+                </a>
+              </div>
+              <div class="col-xs-6 col-sm-4" data-toggle="preset-pdb" data-value="2BFU" data-query="p=macro&c=CH&r=2&s=all&m=CS&c=CH&mt=TR&v=1AAAAgAAAAIAAAACAAtq6O7plpT4VEF6%2B1/WQPQ%3D%3D">
+                <a href="#" class="thumbnail">
+                  <img src="images/2BFU.png">
+                  <div class="caption text-center">2BFU <small>(5.2k)</small></div>
+                </a>
+              </div>
+              <div class="col-xs-6 col-sm-4" data-toggle="preset-pdb" data-value="5B40" data-query="p=macro&r=2&s=nucleic&m=CS&c=SS&mt=TR&v=1EBjRwvhTz0CYbo7BE0KGPBxejb/3yk2//Wb1vg%3D%3D">
+                <a href="#" class="thumbnail">
+                  <img src="images/5B40.png">
+                  <div class="caption text-center">5B40 <small>(11.8k)</small></div>
+                </a>
+              </div>
+              <div class="col-xs-6 col-sm-4" data-toggle="preset-pdb" data-value="mmtf:4TNW" data-query="p=macro&c=SQ&v=1xQCuQgIrbUHD9arAmmsnPIj8NL/mF6u%2Bx26BPg%3D%3D">
+                <a href="#" class="thumbnail">
+                  <img src="images/4TNW.png">
+                  <div class="caption text-center">4TNW <small>(30.4k)</small></div>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
