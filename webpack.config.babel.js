@@ -62,9 +62,6 @@ export default {
   resolve: {
     alias: {
       Miew:    path.resolve(__dirname, 'src/index.js'),
-      // lib
-      Smooth:  path.resolve(__dirname, 'vendor/js/Smooth.js'),
-      mmtf:    path.resolve(__dirname, 'vendor/js/mmtf.js'),
     },
   },
   plugins: [

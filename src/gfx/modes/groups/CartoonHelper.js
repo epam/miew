@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {Smooth} from 'Smooth';
+import {Smooth} from '../../../../vendor/js/Smooth';
 import gfxutils from '../../gfxutils';
 import chem from '../../../chem';
 

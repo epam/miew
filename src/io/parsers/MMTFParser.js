@@ -4,7 +4,7 @@ import Parser from './Parser';
 import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
-import MMTF from 'mmtf';
+import MMTF from '../../../vendor/js/mmtf';
 
 var
   Complex = chem.Complex,

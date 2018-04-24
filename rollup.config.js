@@ -1,12 +1,10 @@
 /* eslint-env node */
 /* global require */
 
-import path from 'path';
 import rollupPluginBabel from 'rollup-plugin-babel';
 import rollupPluginCommonJS from 'rollup-plugin-commonjs';
 import rollupPluginReplace from 'rollup-plugin-replace';
 import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
-import rollupPluginAlias from 'rollup-plugin-alias';
 import rollupPluginString from 'rollup-plugin-string';
 
 import version from './tools/version';
@@ -35,11 +33,6 @@ export default {
     }),
     rollupPluginString({
       include: '**/*.glsl',
-    }),
-    rollupPluginAlias({
-      // lib
-      Smooth:  path.resolve(__dirname, 'vendor/js/Smooth.js'),
-      mmtf:    path.resolve(__dirname, 'vendor/js/mmtf.js'),
     }),
     rollupPluginNodeResolve(),
     rollupPluginCommonJS({
