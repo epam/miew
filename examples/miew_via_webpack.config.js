@@ -1,6 +1,7 @@
 module.exports = {
   entry: './miew_via_webpack.js',
   output: {
+    path: __dirname,
     filename: 'miew_via_webpack.bundle.js'
   },
   module: {

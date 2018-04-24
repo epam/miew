@@ -1,5 +1,5 @@
 import '../dist/Miew.min.css';
-import Miew from '..';
+import Miew from '../dist/Miew';
 
 window.onload = function() {
   var viewer = new Miew({

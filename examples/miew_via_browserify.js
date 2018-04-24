@@ -1,4 +1,4 @@
-var Miew = require('..');
+var Miew = require('../dist/Miew');
 
 window.onload = function() {
   var viewer = new Miew({
