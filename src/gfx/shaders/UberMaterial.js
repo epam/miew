@@ -292,8 +292,6 @@ UberMaterial.prototype.updateUniforms = function() {
       }
     }
   });
-
-  this.transparent = true;
 };
 
 export default UberMaterial;

@@ -41,6 +41,7 @@ Representation.prototype.setMode = function(mode) {
 Representation.prototype.setMaterialPreset = function(preset) {
   this.materialPreset = preset;
   this.material.setUberOptions(preset.uberOptions);
+  this.material.setValues(preset.values);
 };
 
 Representation.prototype.reset = function() {

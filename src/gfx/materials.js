@@ -18,6 +18,12 @@ var materialList = [
       specular: neutralColor(0.0),
       shininess: 1,
       opacity: 1.0
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: true,
     }
   }, {
     id: 'SF',
@@ -28,6 +34,12 @@ var materialList = [
       specular: neutralColor(0.1),
       shininess: 30,
       opacity: 1.0
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: true,
     }
   }, {
     id: 'PL',
@@ -38,6 +50,12 @@ var materialList = [
       specular: neutralColor(0.28),
       shininess: 100,
       opacity: 1.0
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: true,
     }
   }, {
     id: 'ME',
@@ -48,6 +66,12 @@ var materialList = [
       specular: neutralColor(0.55),
       shininess: 30,
       opacity: 1.0
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: true,
     }
   }, {
     id: 'TR',
@@ -58,16 +82,42 @@ var materialList = [
       specular: neutralColor(0.0),
       shininess: 1,
       opacity: 0.5
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: true,
     }
   }, {
     id: 'GL',
     name: 'Glass',
     shortName: 'Glass',
+    depthWrite: true,
     uberOptions: {
       diffuse: neutralColor(0.50),
       specular: neutralColor(0.65),
       shininess: 100,
       opacity: 0.5
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: true,
+    }
+  }, {
+    id: 'BA',
+    name: 'Backdrop',
+    shortName: 'Backdrop',
+    uberOptions: {
+      opacity: 1.0,
+    },
+    values: {
+      lights: false,
+      fog: false,
+      depthWrite: false,
+      transparent: false,
     }
   }
 ];
