@@ -65,7 +65,9 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
         uvC.fromBufferAttribute(uv, c);
         intersection.uv = uvIntersection(intersectionPoint, vA, vB, vC, uvA, uvB, uvC);
       }
-      intersection.face = new THREE.Face3(a, b, c, THREE.Triangle.normal(vA, vB, vC));
+      const normal = new THREE.Vector3();
+      THREE.Triangle.getNormal(vA, vB, vC, normal);
+      intersection.face = new THREE.Face3(a, b, c, normal);
       intersection.faceIndex = a;
     }
 
