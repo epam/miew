@@ -113,7 +113,7 @@ describe('Parsed Complex data', () => {
               lookFor('_chains.length', entry.num.chains);
 
               lookFor('_molecules.length', entry.num.molecules);
-              lookFor('structures.length', entry.num.structures);
+              lookFor('units.length', entry.num.units);
               lookFor('symmetry.length', entry.num.symmetries);
 
               lookFor('_helices.length', entry.num.helices);

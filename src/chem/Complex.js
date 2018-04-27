@@ -14,7 +14,7 @@ import Bond from './Bond';
 import AutoBond from './AutoBond';
 import SGroup from './SGroup';
 import AromaticLoopsMarker from './AromaticLoopsMarker';
-import BioStructure from './BioStructure';
+import BiologicalUnit from './BiologicalUnit';
 import selectors from './selectors';
 import VoxelWorld from './VoxelWorld';
 import SecondaryStructureMap from './SecondaryStructureMap';
@@ -44,8 +44,8 @@ function Complex() {
   this.metadata = {};
 
   this.symmetry = [];
-  this.structures = [new BioStructure(this)];
-  this._currentStructure = 0; // default biological structure is the asymmetric unit
+  this.units = [new BiologicalUnit(this)];
+  this._currentUnit = 0; // default biological unit is the asymmetric unit
 }
 
 utils.deriveClass(Complex, DataSource, {
@@ -693,46 +693,64 @@ Complex.prototype._fillComponents = function(enableEditing) {
   }
 };
 
-Complex.prototype.getCurrentStructure = function() {
-  return this._currentStructure;
+Complex.prototype.getCurrentUnit = function() {
+  return this._currentUnit;
 };
 
 Complex.prototype.getDefaultBoundaries = function() {
-  return this.structures[0].getBoundaries();
+  return this.units[0].getBoundaries();
 };
 
 Complex.prototype.getBoundaries = function() {
-  return this.structures[this._currentStructure].getBoundaries();
+  return this.units[this._currentUnit].getBoundaries();
 };
 
 Complex.prototype.getTransforms = function() {
-  return this.structures[this._currentStructure].getTransforms();
+  return this.units[this._currentUnit].getTransforms();
 };
 
 Complex.prototype.getSelector = function() {
-  return this.structures[this._currentStructure].getSelector();
+  return this.units[this._currentUnit].getSelector();
 };
 
-Complex.prototype.resetCurrentStructure = function() {
-  this._currentStructure = 0;
-  this.setCurrentStructure(1);
+Complex.prototype.resetCurrentUnit = function() {
+  this._currentUnit = 0;
+  this.setCurrentUnit(1);
 };
 
-Complex.prototype.setCurrentStructure = function(newStructure) {
-  if (newStructure !== null && newStructure !== undefined &&
-      newStructure !== this._currentStructure &&
-      newStructure >= 0 &&
-      newStructure < this.structures.length) {
-    this._currentStructure = newStructure;
+Complex.prototype.setCurrentUnit = function(newUnit) {
+  if (newUnit !== null && newUnit !== undefined &&
+      newUnit !== this._currentUnit &&
+      newUnit >= 0 &&
+      newUnit < this.units.length) {
+    this._currentUnit = newUnit;
     return true;
   }
   return false;
 };
 
+/**
+ * @function
+ * @deprecated Renamed to {@link Complex#getCurrentUnit}
+ */
+Complex.prototype.getCurrentStructure = Complex.prototype.getCurrentUnit;
+
+/**
+ * @function
+ * @deprecated Renamed to {@link Complex#resetCurrentUnit}
+ */
+Complex.prototype.resetCurrentStructure = Complex.prototype.resetCurrentUnit;
+
+/**
+ * @function
+ * @deprecated Renamed to {@link Complex#setCurrentUnit}
+ */
+Complex.prototype.setCurrentStructure = Complex.prototype.setCurrentUnit;
+
 Complex.prototype._computeBounds = function() {
-  var structures = this.structures;
-  for (var i = 0, n = structures.length; i < n; ++i) {
-    structures[i].computeBoundaries();
+  var units = this.units;
+  for (var i = 0, n = units.length; i < n; ++i) {
+    units[i].computeBoundaries();
   }
 };
 
@@ -802,12 +820,12 @@ Complex.prototype.finalize = function(opts) {
   });
 
   // WARNING! this MUST be done BEFORE computeBounds is called
-  var structures = this.structures;
-  for (i = 0, n = structures.length; i < n; ++i) {
-    structures[i].finalize();
+  var units = this.units;
+  for (i = 0, n = units.length; i < n; ++i) {
+    units[i].finalize();
   }
   // try setting first biomolecule by defaults
-  this.setCurrentStructure(1);
+  this.setCurrentUnit(1);
 
   var helices = this._helices;
   var residueHash = {};

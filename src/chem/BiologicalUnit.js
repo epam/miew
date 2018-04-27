@@ -1,17 +1,13 @@
-
-
-//////////////////////////////////////////////////////////////////////////////
 import * as THREE from 'three';
 import selectors from './selectors';
-//////////////////////////////////////////////////////////////////////////////
 
 /**
- * Basic biological structure class.
+ * Basic biological unit class.
  *
- * @exports BioStructure
+ * @exports BiologicalUnit
  * @constructor
  */
-function BioStructure(complex) {
+function BiologicalUnit(complex) {
   this._complex = complex;
   this._selector = selectors.keyword('All')();
   this._boundaries = {
@@ -20,9 +16,9 @@ function BioStructure(complex) {
   };
 }
 
-BioStructure.prototype.constructor = BioStructure;
+BiologicalUnit.prototype.constructor = BiologicalUnit;
 
-BioStructure.prototype.computeBoundaries = function() {
+BiologicalUnit.prototype.computeBoundaries = function() {
   var atoms = this._complex._atoms;
   var n = atoms.length;
   var selector = this._selector;
@@ -66,20 +62,20 @@ BioStructure.prototype.computeBoundaries = function() {
   }
 };
 
-BioStructure.prototype.getTransforms = function() {
+BiologicalUnit.prototype.getTransforms = function() {
   return [];
 };
 
-BioStructure.prototype.getSelector = function() {
+BiologicalUnit.prototype.getSelector = function() {
   return this._selector;
 };
 
-BioStructure.prototype.getBoundaries = function() {
+BiologicalUnit.prototype.getBoundaries = function() {
   return this._boundaries;
 };
 
-BioStructure.prototype.finalize = function() {
+BiologicalUnit.prototype.finalize = function() {
 };
 
-export default BioStructure;
+export default BiologicalUnit;
 

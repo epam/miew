@@ -98,7 +98,7 @@ PDBParser.prototype._finalize = function() {
 
   // add loaded biological assemblies
   var remark350 = this._remarks[350];
-  this._complex.structures = this._complex.structures.concat(_.isUndefined(remark350) ? [] : remark350.assemblies);
+  this._complex.units = this._complex.units.concat(_.isUndefined(remark350) ? [] : remark350.assemblies);
 
   // add loaded macromolecules
   this._finalizeMolecules();

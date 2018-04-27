@@ -441,7 +441,7 @@ MMTFParser.prototype.parseSync = function() {
   this._linkAtomsToResidues();
   this._markHeteroAtoms(mmtfData);
   this._chainsByName = this._findSynonymousChains();
-  Array.prototype.push.apply(this._complex.structures, this._parseAssemblyInfo(mmtfData));
+  Array.prototype.push.apply(this._complex.units, this._parseAssemblyInfo(mmtfData));
   this._joinSynonymousChains();
 
   this._complex.finalize({

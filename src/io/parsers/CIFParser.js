@@ -518,7 +518,7 @@ CIFParser.prototype._extractAssemblies = function(complex, complexData) {
       }
     }
     asm.matrices = assemblyOps;
-    complex.structures.push(asm);
+    complex.units.push(asm);
   }
 };
 

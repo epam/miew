@@ -1737,7 +1737,7 @@ Miew.prototype._onLoad = function(dataSource, opts) {
         desc.chains + ' chains).');
 
     if (_.isNumber(this._opts.unit)) {
-      complex.setCurrentStructure(this._opts.unit);
+      complex.setCurrentUnit(this._opts.unit);
     }
 
     if (opts.preset) {
@@ -1901,7 +1901,7 @@ Miew.prototype.changeUnit = function(unitIdx, name) {
   }
 
   function currentUnitInfo() {
-    const unit = visual ? visual.getComplex().getCurrentStructure() : 0;
+    const unit = visual ? visual.getComplex().getCurrentUnit() : 0;
     const type = unit > 0 ? ('Bio molecule ' + unit) : 'Asymmetric unit';
     return 'Current unit: ' + unit + ' (' + type + ')';
   }
@@ -1912,7 +1912,7 @@ Miew.prototype.changeUnit = function(unitIdx, name) {
   if (_.isString(unitIdx)) {
     unitIdx = Math.max(parseInt(unitIdx, 10), 0);
   }
-  if (visual.getComplex().setCurrentStructure(unitIdx)) {
+  if (visual.getComplex().setCurrentUnit(unitIdx)) {
     this._resetScene();
   }
   return currentUnitInfo();
@@ -2806,9 +2806,9 @@ Miew.prototype.setOptions = function(opts) {
   // FIXME we need a way to associate "unit" option with particular complex
   const visual = this._getComplexVisual();
   if (visual) {
-    visual.getComplex().resetCurrentStructure();
+    visual.getComplex().resetCurrentUnit();
     if (_.isNumber(opts.unit)) {
-      visual.getComplex().setCurrentStructure(opts.unit);
+      visual.getComplex().setCurrentUnit(opts.unit);
     }
     this.resetView();
     this.rebuildAll();
@@ -3000,7 +3000,7 @@ Miew.prototype.getState = function(opts) {
       const format = metadata.format ? `${metadata.format}:` : '';
       state.load = format + metadata.id;
     }
-    const unit = complex.getCurrentStructure();
+    const unit = complex.getCurrentUnit();
     if (unit !== 1) {
       state.unit = unit;
     }

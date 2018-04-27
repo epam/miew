@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 import * as THREE from 'three';
 import selectors from './selectors';
-import BioStructure from './BioStructure';
+import BiologicalUnit from './BiologicalUnit';
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -13,16 +13,16 @@ import BioStructure from './BioStructure';
  * @constructor
  */
 function Assembly(complex) {
-  BioStructure.call(this, complex);
+  BiologicalUnit.call(this, complex);
   this.chains = [];
   this.matrices = [];
 }
 
-Assembly.prototype = Object.create(BioStructure.prototype);
+Assembly.prototype = Object.create(BiologicalUnit.prototype);
 Assembly.prototype.constructor = Assembly;
 
 Assembly.prototype.computeBoundaries = function() {
-  BioStructure.prototype.computeBoundaries.call(this);
+  BiologicalUnit.prototype.computeBoundaries.call(this);
   // fix up the boundaries
   var matrices = this.matrices;
   var oldCenter = this._boundaries.boundingSphere.center;
