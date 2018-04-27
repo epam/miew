@@ -1183,7 +1183,6 @@ Complex.prototype.dssp = function() {
         helices.push(curHelix);
       }
       residue._secondary = curHelix;
-      curHelix._residues.push(residue);
       curHelix._end = residue;
       curHelix._length++;
     } else if (curHelix) {
@@ -1201,7 +1200,6 @@ Complex.prototype.dssp = function() {
         curSheet._width++;
       }
       residue._secondary = curStrand;
-      curStrand._residues.push(residue);
       curStrand._end = residue;
     } else if (curStrand) {
       curStrand = null;

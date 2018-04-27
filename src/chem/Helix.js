@@ -26,8 +26,6 @@ function Helix(serial, name, start, end, type, comment, length) {
   this._type = type;
   this._comment = comment;
   this._length = length;
-
-  this._residues = []; // TODO: list or range? is it correct to use ranges?
 }
 
 Helix.prototype.type = 'helix';
@@ -52,7 +50,6 @@ Helix.prototype._finalize = function(residueHash, complex) {
         if (typeof residueHash[midCode] !== 'undefined') {
           var res = residueHash[midCode];
           res._secondary = this;
-          this._residues.push(res);
         }
       }
     }

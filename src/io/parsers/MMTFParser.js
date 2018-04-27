@@ -174,17 +174,9 @@ MMTFParser.prototype._updateSecStructure = function(complex, residue, groupData)
 
     if (this._ssStruct instanceof Helix ||
           this._ssStruct instanceof Strand) {
-      this._ssStruct._residues.push(residue);
+      this._ssStruct._end = residue;
     }
     return;
-  }
-
-  // finish current secondary structure
-  if (this._ssType !== -1) {
-    if (this._ssStruct instanceof Helix ||
-          this._ssStruct instanceof Strand) {
-      this._ssStruct._end = this._ssStruct._residues[this._ssStruct._residues.length - 1];
-    }
   }
 
   if (!_.isUndefined(groupData)) {

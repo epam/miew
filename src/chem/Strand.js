@@ -24,8 +24,6 @@ function Strand(sheet, start, end, sense, cur, prev) {
   this._sense = sense;
   this._cur = cur;
   this._prev = prev;
-
-  this._residues = [];
 }
 
 Strand.prototype.type = 'strand';
@@ -59,7 +57,6 @@ Strand.prototype._finalize = function(serialAtomMap, residueHash, complex) {
         if (typeof residueHash[midCode] !== 'undefined') {
           var res = residueHash[midCode];
           res._secondary = this;
-          this._residues.push(res);
         }
       }
     }

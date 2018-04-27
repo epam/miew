@@ -234,10 +234,8 @@ FrameInfo.prototype._updateSecondary = function() {
       _start: myResidues[start],
       _end: myResidues[end],
       type: oldSec.type,
-      _residues: [],
     };
     for (var j = start; j <= end; ++j) {
-      nSec._residues.push(myResidues[j]);
       myResidues[j]._secondary = nSec;
     }
   }
