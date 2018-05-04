@@ -18,6 +18,7 @@ import BiologicalUnit from './BiologicalUnit';
 import selectors from './selectors';
 import VoxelWorld from './VoxelWorld';
 import SecondaryStructureMap from './SecondaryStructureMap';
+import StructuralElement from './StructuralElement';
 
 const VOXEL_SIZE = 5.0;
 
@@ -1178,17 +1179,29 @@ Complex.prototype.joinComplexes = function(complexes) {
  */
 Complex.prototype.dssp = function() {
   const ssMap = new SecondaryStructureMap(this);
+
   const StructureType = SecondaryStructureMap.StructureType;
+  const StructuralElementType = StructuralElement.Type;
+
   const helixClassMap = {
     [StructureType.HELIX_ALPHA]: 1,
     [StructureType.HELIX_310]: 3,
     [StructureType.HELIX_PI]: 5,
   };
 
+  const loopMap = {
+    [StructureType.BRIDGE]: StructuralElementType.BRIDGE,
+    [StructureType.TURN]: StructuralElementType.TURN,
+    [StructureType.BEND]: StructuralElementType.BEND,
+    [StructureType.LOOP]: StructuralElementType.COIL,
+  };
+
   const helices = [];
   const sheets = [];
+  const loops = [];
   let curHelix = null;
   let curStrand = null;
+  let curLoop = null;
   for (let i = 0, n = this._residues.length; i < n; ++i) {
     const ssCode = ssMap._ss[i];
     const residue = this._residues[i];
@@ -1222,10 +1235,23 @@ Complex.prototype.dssp = function() {
     } else if (curStrand) {
       curStrand = null;
     }
+
+    const loopType = loopMap[ssCode];
+    if (loopType) {
+      if (curLoop === null) {
+        curLoop = new StructuralElement(loopType, residue, residue);
+        loops.push(curLoop);
+      }
+      residue._secondary = curLoop;
+      curLoop.term = residue;
+    } else if (curLoop) {
+      curLoop = null;
+    }
   }
 
   this._helices = helices;
   this._sheets = sheets.filter(_sheet => true); // squeeze sheets array
+  this._loops = loops;
 };
 
 export default Complex;

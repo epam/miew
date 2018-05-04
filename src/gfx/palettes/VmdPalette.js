@@ -91,7 +91,10 @@ const StructuralElementType = StructuralElement.Type;
 palette.secondaryColors = {
   [StructuralElementType.HELIX_ALPHA]: 0xA600A6,
   [StructuralElementType.HELIX_310]: 0x0000FF,
+  [StructuralElementType.HELIX_PI]: 0xFF0000,
   [StructuralElementType.STRAND]: 0xFFFF00,
+  [StructuralElementType.BRIDGE]: 0x808033,
+  [StructuralElementType.TURN]: 0x40C0C0,
 };
 
 export default palette;
