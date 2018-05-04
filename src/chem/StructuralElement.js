@@ -38,10 +38,11 @@ class StructuralElement {
    * **NOTE:** I'm sorry. It's a legacy code waiting for refactoring.
    * Just copying it as-is right now and hoping for the best.
    *
+   * @param {object} serialAtomMap A dictionary of atoms
    * @param {object} residueHash A dictionary of hashed residues to check.
    * @param {Complex} complex The molecular complex this element belongs to.
    */
-  _finalize(residueHash, complex) {
+  _finalize(serialAtomMap, residueHash, complex) {
     if (this.init instanceof Residue && this.term instanceof Residue) {
       return;
     }

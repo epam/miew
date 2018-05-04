@@ -31,6 +31,7 @@ Sheet.prototype.getWidth = function() {
 
 Sheet.prototype.addStrand = function(strand) {
   this._strands.push(strand);
+  this._width = this._strands.length;
 };
 
 Sheet.prototype.addEmptyStrand = function() {

@@ -33,6 +33,7 @@ function Complex() {
   this._components = [];
   this._helices = [];
   this._sheets = [];
+  this.structures = [];
 
   this._residueTypes = Object.create(ResidueType.StandardTypes);
   this._atoms = [];    // TODO: preallocate
@@ -828,7 +829,6 @@ Complex.prototype.finalize = function(opts) {
   // try setting first biomolecule by defaults
   this.setCurrentUnit(1);
 
-  var helices = this._helices;
   var residueHash = {};
   for (i = 0, n = residues.length; i < n; ++i) {
     var res = residues[i];
@@ -838,9 +838,17 @@ Complex.prototype.finalize = function(opts) {
       res.getSequence(), res.getICode().charCodeAt(0)
     )] = res;
   }
-  for (i = 0, n = helices.length; i < n; ++i) {
-    helices[i]._finalize(residueHash, this);
+
+  var structures = this.structures;
+  for (i = 0, n = structures.length; i < n; ++i) {
+    structures[i]._finalize(opts.serialAtomMap, residueHash, this);
   }
+
+  var helices = this._helices;
+  for (i = 0, n = helices.length; i < n; ++i) {
+    helices[i]._finalize(opts.serialAtomMap, residueHash, this);
+  }
+
   var sheets = this._sheets;
   for (i = 0, n = sheets.length; i < n; ++i) {
     sheets[i]._finalize(opts.serialAtomMap, residueHash, this);
@@ -1086,6 +1094,7 @@ Complex.prototype.joinComplexes = function(complexes) {
   this._components = [];
   this._helices = [];
   this._sheets = [];
+  this.structures = [];
   this._atoms = [];
   this._residues = [];
   this._bonds = [];
@@ -1129,6 +1138,11 @@ Complex.prototype.joinComplexes = function(complexes) {
       this._chains.push(chain);
     }
 
+    // add structures
+    for (j = 0; j < c.structures.length; ++j) {
+      this.structures.push(c.structures[j]);
+    }
+
     // add sheets
     for (j = 0; j < c._sheets.length; ++j) {
       this._sheets.push(c._sheets[j]);
@@ -1169,6 +1183,22 @@ Complex.prototype.joinComplexes = function(complexes) {
   this._computeBounds();
 };
 
+const StructureType = SecondaryStructureMap.StructureType;
+const StructuralElementType = StructuralElement.Type;
+
+const helixClassMap = {
+  [StructureType.HELIX_ALPHA]: 1,
+  [StructureType.HELIX_310]: 3,
+  [StructureType.HELIX_PI]: 5,
+};
+
+const loopMap = {
+  [StructureType.BRIDGE]: StructuralElementType.BRIDGE,
+  [StructureType.TURN]: StructuralElementType.TURN,
+  [StructureType.BEND]: StructuralElementType.BEND,
+  [StructureType.LOOP]: StructuralElementType.COIL,
+};
+
 /**
  * Replace secondary structure with calculated one.
  *
@@ -1180,78 +1210,67 @@ Complex.prototype.joinComplexes = function(complexes) {
 Complex.prototype.dssp = function() {
   const ssMap = new SecondaryStructureMap(this);
 
-  const StructureType = SecondaryStructureMap.StructureType;
-  const StructuralElementType = StructuralElement.Type;
+  const structures = this.structures = [];
+  const helices = this._helices = [];
+  const sheets = this._sheets = [];
 
-  const helixClassMap = {
-    [StructureType.HELIX_ALPHA]: 1,
-    [StructureType.HELIX_310]: 3,
-    [StructureType.HELIX_PI]: 5,
+  const getSheet = (index) => {
+    let item = sheets[index];
+    if (!item) {
+      item = sheets[index] = new Sheet(String(index), 0);
+    }
+    return item;
   };
 
-  const loopMap = {
-    [StructureType.BRIDGE]: StructuralElementType.BRIDGE,
-    [StructureType.TURN]: StructuralElementType.TURN,
-    [StructureType.BEND]: StructuralElementType.BEND,
-    [StructureType.LOOP]: StructuralElementType.COIL,
-  };
-
-  const helices = [];
-  const sheets = [];
-  const loops = [];
-  let curHelix = null;
-  let curStrand = null;
-  let curLoop = null;
+  let lastCode;
+  let lastSheetIndex;
+  let lastHelixIndex = 0;
+  let curStructure = null;
   for (let i = 0, n = this._residues.length; i < n; ++i) {
-    const ssCode = ssMap._ss[i];
-    const residue = this._residues[i];
-    residue._secondary = null;
+    const curCode = ssMap._ss[i];
+    const curResidue = this._residues[i];
+    const curSheetIndex = ssMap._sheet[i];
 
-    const helixClass = helixClassMap[ssCode];
-    if (helixClass) {
-      if (curHelix === null) {
-        curHelix = new Helix(helixClass, residue, residue, helices.length + 1, '', '', 0);
-        helices.push(curHelix);
+    // expand the last structure
+    if (curCode === lastCode && curSheetIndex === lastSheetIndex) {
+      curResidue._secondary = curStructure;
+      if (curStructure) {
+        curStructure.term = curResidue;
       }
-      residue._secondary = curHelix;
-      curHelix.term = residue;
-      curHelix.length++;
-    } else if (curHelix) {
-      curHelix = null;
+      if (curStructure instanceof Helix) {
+        curStructure.length++;
+      }
+      continue;
     }
 
-    if (ssCode === StructureType.STRAND) {
-      if (curStrand === null) {
-        let curSheet = sheets[ssMap._sheet[i]];
-        if (curSheet === undefined) {
-          curSheet = sheets[ssMap._sheet[i]] = new Sheet('', 0);
-        }
-        curStrand = new Strand(curSheet, residue, residue, 0, null, null);
-        curSheet.addStrand(curStrand);
-        curSheet._width++;
-      }
-      residue._secondary = curStrand;
-      curStrand.term = residue;
-    } else if (curStrand) {
-      curStrand = null;
+    // create a new structure
+    const helixClass = helixClassMap[curCode];
+    const loopType = loopMap[curCode];
+    if (curCode === StructureType.STRAND) {
+      let curSheet = getSheet(curSheetIndex);
+      curStructure = new Strand(curSheet, curResidue, curResidue, 0, null, null);
+      curSheet.addStrand(curStructure);
+    } else if (helixClass !== undefined) {
+      lastHelixIndex++;
+      curStructure = new Helix(helixClass, curResidue, curResidue, lastHelixIndex, String(lastHelixIndex), '', 1);
+      helices.push(curStructure);
+    } else if (loopType !== undefined) {
+      curStructure = new StructuralElement(loopType, curResidue, curResidue);
+    } else {
+      curStructure = null;
     }
 
-    const loopType = loopMap[ssCode];
-    if (loopType) {
-      if (curLoop === null) {
-        curLoop = new StructuralElement(loopType, residue, residue);
-        loops.push(curLoop);
-      }
-      residue._secondary = curLoop;
-      curLoop.term = residue;
-    } else if (curLoop) {
-      curLoop = null;
+    if (curStructure) {
+      structures.push(curStructure);
     }
+
+    curResidue._secondary = curStructure;
+
+    lastCode = curCode;
+    lastSheetIndex = curSheetIndex;
   }
 
-  this._helices = helices;
   this._sheets = sheets.filter(_sheet => true); // squeeze sheets array
-  this._loops = loops;
 };
 
 export default Complex;

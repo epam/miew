@@ -59,7 +59,7 @@ class Strand extends StructuralElement {
    * @override
    */
   _finalize(serialAtomMap, residueHash, complex) {
-    super._finalize(residueHash, complex);
+    super._finalize(serialAtomMap, residueHash, complex);
 
     var as = this.atomCur;
     if (as !== null && !Number.isNaN(as)) {
