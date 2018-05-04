@@ -4,6 +4,9 @@ module.exports = {
       'README.md',
       'src/Miew.js',
       'src/settings.js',
+      'src/chem/StructuralElement.js',
+      'src/chem/Helix.js',
+      'src/chem/Strand.js',
       // 'src/gfx/modes.js',
       // 'src/gfx/modes/Mode.js',
       // 'src/gfx/colorers.js',
@@ -20,7 +23,7 @@ module.exports = {
     private: false,
   },
   templates: {
-    cleverLinks: false,
+    cleverLinks: true,
     monospaceLinks: false,
     default: {
       outputSourceFiles: false,

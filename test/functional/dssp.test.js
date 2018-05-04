@@ -4,6 +4,7 @@ import chai, {expect} from 'chai';
 import dirtyChai from 'dirty-chai';
 
 import PDBParser from '../../src/io/parsers/PDBParser';
+import StructuralElement from '../../src/chem/StructuralElement';
 
 chai.use(dirtyChai);
 
@@ -23,16 +24,16 @@ function load(filePath) {
 function extract(complex) {
   return {
     helices: complex._helices.map((helix) => ({
-      begin: helix._start._sequence,
-      end: helix._end._sequence,
-      type: helix._type,
+      init: helix.init._sequence,
+      term: helix.term._sequence,
+      type: helix.type,
     })),
     sheets: complex._sheets.map((sheet) => ({
       width: sheet._width,
       strands: sheet._strands.map((strand) => ({
-        begin: strand._start._sequence,
-        end: strand._end._sequence,
-        sense: strand._sense,
+        init: strand.init._sequence,
+        term: strand.term._sequence,
+        sense: strand.sense,
       })),
     })),
   };
@@ -53,14 +54,14 @@ describe('The secondary structure in 1CRN', () => {
   it('parsed correctly', function() {
     const ss = extract(complex);
     expect(ss.helices).to.deep.equal([
-      {begin: 7, end: 19, type: 1},
-      {begin: 23, end: 30, type: 1},
+      {init:  7, term: 19, type: StructuralElement.Type.HELIX_ALPHA},
+      {init: 23, term: 30, type: StructuralElement.Type.HELIX_ALPHA},
     ]);
     expect(ss.sheets).to.deep.equal([{
       width: 2,
       strands: [
-        {begin: 1, end: 4, sense: 0},
-        {begin: 32, end: 35, sense: -1},
+        {init:  1, term:  4, sense:  0},
+        {init: 32, term: 35, sense: -1},
       ],
     }]);
   });
@@ -70,15 +71,15 @@ describe('The secondary structure in 1CRN', () => {
     complex.dssp();
     const ss = extract(complex);
     expect(ss.helices).to.deep.equal([
-      {begin: 7, end: 17, type: 1},
-      {begin: 23, end: 30, type: 1},
-      {begin: 42, end: 44, type: 3},
+      {init:  7, term: 17, type: StructuralElement.Type.HELIX_ALPHA},
+      {init: 23, term: 30, type: StructuralElement.Type.HELIX_ALPHA},
+      {init: 42, term: 44, type: StructuralElement.Type.HELIX_PI},
     ]);
     expect(ss.sheets).to.deep.equal([{
       width: 2,
       strands: [
-        {begin: 2, end: 3, sense: 0},
-        {begin: 33, end: 34, sense: 0}, // should be -1 here
+        {init:  2, term:  3, sense: 0},
+        {init: 33, term: 34, sense: 0}, // should be -1 here
       ],
     }]);
   });

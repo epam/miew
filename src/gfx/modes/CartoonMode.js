@@ -23,14 +23,14 @@ utils.deriveClass(CartoonMode, Mode, {
 
 CartoonMode.prototype.getResidueStartRadius = function(residue) {
   var second = residue.getSecondary();
-  if (!second || !second.type) {
+  if (!second || !second.generic) {
     return this.TUBE_RADIUS;
   }
-  var secOpts = this.secCache[second.type];
+  var secOpts = this.secCache[second.generic];
   if (!secOpts) {
     return this.TUBE_RADIUS;
   }
-  if (second._end === residue) {
+  if (second.term === residue) {
     return secOpts.start;
   }
   return secOpts.center;
@@ -38,14 +38,14 @@ CartoonMode.prototype.getResidueStartRadius = function(residue) {
 
 CartoonMode.prototype.getResidueEndRadius = function(residue) {
   var second = residue.getSecondary();
-  if (second === null || !second.type) {
+  if (second === null || !second.generic) {
     return this.TUBE_RADIUS;
   }
-  var secOpts = this.secCache[second.type];
+  var secOpts = this.secCache[second.generic];
   if (!secOpts) {
     return this.TUBE_RADIUS;
   }
-  if (second._end === residue) {
+  if (second.term === residue) {
     return this.ARROW_END;
   }
   return secOpts.center;

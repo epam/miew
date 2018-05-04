@@ -361,7 +361,7 @@ CIFParser.prototype._extractConfs = function(complex, helicesData) {
   var endICodes = arrize(helicesData.pdbx_end_PDB_ins_code) || [];
   var comments = arrize(helicesData.details) || [];
   var lengths = arrize(helicesData.pdbx_PDB_helix_length) || [];
-  var helClasses = arrize(helicesData.pdbx_PDB_helix_class) || [];
+  var helixClasses = arrize(helicesData.pdbx_PDB_helix_class) || [];
   var names = arrize(helicesData.id) || [];
   var chains = arrize(helicesData.beg_label_asym_id);
 
@@ -387,12 +387,12 @@ CIFParser.prototype._extractConfs = function(complex, helicesData) {
     }
     var comment = comments[i] || '';
     var length = lengths[i] || 0;
-    var helClass = helClasses[i] || ' ';
+    var helixClass = helixClasses[i] || ' ';
     var struct;
     // TODO Add turns and strands(!)?
     if (type === 'helix') {
       const idx = complex._helices.length;
-      struct = new Helix(idx, name, start[0], end[0], helClass, comment, length);
+      struct = new Helix(helixClass, start[0], end[0], idx, name, comment, length);
       complex.addHelix(struct);
     } else {
       struct = null;

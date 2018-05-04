@@ -1179,10 +1179,10 @@ Complex.prototype.joinComplexes = function(complexes) {
 Complex.prototype.dssp = function() {
   const ssMap = new SecondaryStructureMap(this);
   const StructureType = SecondaryStructureMap.StructureType;
-  const helixTypes = {
-    [StructureType.ALPHA_HELIX]: 1,
-    [StructureType.HELIX_3_10]: 3,
-    [StructureType.PI_HELIX]: 5,
+  const helixClassMap = {
+    [StructureType.HELIX_ALPHA]: 1,
+    [StructureType.HELIX_310]: 3,
+    [StructureType.HELIX_PI]: 5,
   };
 
   const helices = [];
@@ -1194,15 +1194,15 @@ Complex.prototype.dssp = function() {
     const residue = this._residues[i];
     residue._secondary = null;
 
-    const helixType = helixTypes[ssCode];
-    if (helixType) {
+    const helixClass = helixClassMap[ssCode];
+    if (helixClass) {
       if (curHelix === null) {
-        curHelix = new Helix(helices.length + 1, '', residue, residue, helixType, '', 0);
+        curHelix = new Helix(helixClass, residue, residue, helices.length + 1, '', '', 0);
         helices.push(curHelix);
       }
       residue._secondary = curHelix;
-      curHelix._end = residue;
-      curHelix._length++;
+      curHelix.term = residue;
+      curHelix.length++;
     } else if (curHelix) {
       curHelix = null;
     }
@@ -1218,7 +1218,7 @@ Complex.prototype.dssp = function() {
         curSheet._width++;
       }
       residue._secondary = curStrand;
-      curStrand._end = residue;
+      curStrand.term = residue;
     } else if (curStrand) {
       curStrand = null;
     }

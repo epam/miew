@@ -166,15 +166,13 @@ MMTFParser.prototype._onBond = function(bondData) {
 };
 
 MMTFParser.prototype._updateSecStructure = function(complex, residue, groupData) {
-  var helixTypes = [3, -1, 1, -1, 5];
+  var helixClasses = [3, -1, 1, -1, 5];
 
-  if (!_.isUndefined(groupData) &&
-        groupData.secStruct === this._ssType) {
+  if (!_.isUndefined(groupData) && groupData.secStruct === this._ssType) {
     residue._secondary = this._ssStruct;
 
-    if (this._ssStruct instanceof Helix ||
-          this._ssStruct instanceof Strand) {
-      this._ssStruct._end = residue;
+    if (this._ssStruct instanceof Helix || this._ssStruct instanceof Strand) {
+      this._ssStruct.term = residue;
     }
     return;
   }
@@ -191,7 +189,7 @@ MMTFParser.prototype._updateSecStructure = function(complex, residue, groupData)
     case 0:
     case 2:
     case 4:
-      struct = new Helix(0, '', residue, null, helixTypes[this._ssType], '', 0);
+      struct = new Helix(helixClasses[this._ssType], residue, null, 0, '', '', 0);
       complex._helices.push(struct);
       break;
     case 3:

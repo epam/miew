@@ -368,7 +368,7 @@ PDBParser.prototype._parseSTRUCTURE = function(stream, pars, adder) { // FIXME: 
   var structureName = stream.readString(12, 14).trim(); // FIXME: LString(3) forbids trim()
   var comment = stream.readString(41, 70).trim();
   var helLength = stream.readInt(72, 76);
-  var helType = stream.readInt(39, 40);
+  var helixClass = stream.readInt(39, 40);
   var shWidth = stream.readInt(15, 16);
   var shCur = stream.readInt(42, 45);
   var shPrev = stream.readInt(57, 60);
@@ -406,15 +406,16 @@ PDBParser.prototype._parseSTRUCTURE = function(stream, pars, adder) { // FIXME: 
     var strand = new Strand(
       obj,
       this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode),
-      this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode), helType,
-      shCur, shPrev
+      this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode),
+      helixClass, shCur, shPrev
     );
     obj.addStrand(strand);
   } else {
     obj = new Helix(
-      serialNumber, structureName,
+      helixClass,
       this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode),
-      this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode), helType, comment, helLength
+      this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode),
+      serialNumber, structureName, comment, helLength
     );
     adder(obj);
   }

@@ -1,6 +1,5 @@
-
-
 import Palette from './Palette';
+import StructuralElement from '../../chem/StructuralElement';
 
 var palette = new Palette('Jmol', 'JM');
 
@@ -224,14 +223,14 @@ palette.chainColors = [
   0xFFB22222, // firebrick
 ];
 
+const StructuralElementType = StructuralElement.Type;
+
 palette.secondaryColors = {
-  'helix': {
-    1: 0xFF0080, // RH alpha
-    3: 0x600080, // RH pi
-    5: 0xA00080, // RH 3-10
-  },
-  'strand': 0xFFC800,
-  'turn': 0x6080FF,
+  [StructuralElementType.HELIX_ALPHA]: 0xFF0080,
+  [StructuralElementType.HELIX_PI]: 0x600080,
+  [StructuralElementType.HELIX_310]: 0xA00080,
+  [StructuralElementType.STRAND]: 0xFFC800,
+  [StructuralElementType.TURN]: 0x6080FF,
   'dna': 0xAE00FE,
   'rna': 0xFD0162,
 };

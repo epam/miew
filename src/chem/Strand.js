@@ -1,78 +1,75 @@
-
-
-//////////////////////////////////////////////////////////////////////////////
-import Residue from './Residue';
-//////////////////////////////////////////////////////////////////////////////
+import StructuralElement from './StructuralElement';
 
 /**
  * A single strand of a sheet in a protein secondary structure.
- *
- * @param {Sheet} sheet   -
- * @param {Residue} start -
- * @param {Residue} end   -
- * @param {number} sense  -
- * @param {Atom} cur      -
- * @param {Atom} prev     -
- *
- * @exports Strand
- * @constructor
+ * @extends StructuralElement
  */
-function Strand(sheet, start, end, sense, cur, prev) {
-  this._sheet = sheet;
-  this._start = start;
-  this._end = end;
-  this._sense = sense;
-  this._cur = cur;
-  this._prev = prev;
-}
+class Strand extends StructuralElement {
+  /**
+   * Create a strand.
+   *
+   * @param {Sheet} sheet Parent sheet this strand belongs to.
+   * @param {Residue} init Initial residue.
+   * @param {Residue} term Terminal residue.
+   * @param {number} sense Sense of strand with respect to previous strand in the sheet.
+   *   - 0 if the first strand,
+   *   - 1 if parallel, and
+   *   - -1 if anti-parallel.
+   * @param {Atom} atomCur Atom in current strand (see PDB Format).
+   * @param {Atom} atomPrev Atom in previous strand (see PDB Format).
+   */
+  constructor(sheet, init, term, sense, atomCur, atomPrev) {
+    super(StructuralElement.Type.STRAND, init, term);
 
-Strand.prototype.type = 'strand';
-
-// Getters and setters
-Strand.prototype.getSheet = function() {
-  return this._name;
-};
-
-Strand.prototype.setSheet = function(sheet) {
-  this._sheet = sheet;
-};
-
-Strand.prototype.getStart = function() {
-  return this._width;
-};
-
-Strand.prototype._finalize = function(serialAtomMap, residueHash, complex) {
-  if (this._start instanceof Residue &&
-        this._end instanceof Residue) {
-    // no need to convert unified serial numbers to actual references
-    return;
+    /**
+     * Parent sheet this strand belongs to.
+     * @type {Sheet}
+     */
+    this.sheet = sheet;
+    /**
+     * Sense of strand with respect to previous strand in the sheet.
+     * - 0 if the first strand,
+     * - 1 if parallel, and
+     * - -1 if anti-parallel.
+     * @type {number}
+     */
+    this.sense = sense;
+    /**
+     * Atom in current strand (see PDB Format).
+     * @type {Atom}
+     */
+    this.atomCur = atomCur;
+    /**
+     * Atom in previous strand (see PDB Format).
+     * @type {Atom}
+     */
+    this.atomPrev = atomPrev;
   }
 
-  var start = complex.splitUnifiedSerial(this._start);
-  var end = complex.splitUnifiedSerial(this._end);
-  for (var chainId = start.chain; chainId <= end.chain; chainId++) {
-    for (var serId = start.serial; serId <= end.serial; serId++) {
-      for (var iCodeId = start.iCode; iCodeId <= end.iCode; iCodeId++) {
-        var midCode = complex.getUnifiedSerial(chainId, serId, iCodeId);
-        if (typeof residueHash[midCode] !== 'undefined') {
-          var res = residueHash[midCode];
-          res._secondary = this;
-        }
-      }
+  /**
+   * An internal method for making a final pass over the complex to set all required references.
+   *
+   * **NOTE:** I'm sorry. It's a legacy code waiting for refactoring.
+   * Just copying it as-is right now and hoping for the best.
+   *
+   * @param {object} serialAtomMap A dictionary of atoms
+   * @param {object} residueHash A dictionary of hashed residues to check.
+   * @param {Complex} complex The molecular complex this element belongs to.
+   *
+   * @override
+   */
+  _finalize(serialAtomMap, residueHash, complex) {
+    super._finalize(residueHash, complex);
+
+    var as = this.atomCur;
+    if (as !== null && !Number.isNaN(as)) {
+      this.atomCur = serialAtomMap[as];
+    }
+    as = this.atomPrev;
+    if (as !== null && !Number.isNaN(as)) {
+      this.atomPrev = serialAtomMap[as];
     }
   }
-  var as = this._cur;
-  if (!Number.isNaN(as)) {
-    this._cur = serialAtomMap[as];
-  }
-  as = this._prev;
-  if (!Number.isNaN(as)) {
-    this._prev = serialAtomMap[as];
-  }
-  //Replace unfined serials by objects
-  this._start = residueHash[this._start];
-  this._end = residueHash[this._end];
-};
+}
 
 export default Strand;
-

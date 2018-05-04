@@ -21,7 +21,6 @@ function CMLParser(data, options) {
   Parser.call(this, data, options);
 
   this._complex = null;
-  this._sheet = null;
   this._residue = null;
   this._serialAtomMap = null;
   this._modelId = 1;

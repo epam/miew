@@ -239,14 +239,14 @@ Palette.prototype = {
     ],
   },
 
-  getElementColor: function(name) {
+  getElementColor: function(name, asIs = false) {
     var color = this.elementColors[name];
-    return color === undefined ? this.defaultElementColor : color;
+    return color === undefined && !asIs ? this.defaultElementColor : color;
   },
 
-  getResidueColor: function(name) {
+  getResidueColor: function(name, asIs = false) {
     var color = this.residueColors[name];
-    return color === undefined ? this.defaultResidueColor : color;
+    return color === undefined && !asIs ? this.defaultResidueColor : color;
   },
 
   getChainColor: function(name) {
@@ -256,12 +256,9 @@ Palette.prototype = {
     return this.chainColors[chain];
   },
 
-  getSecondaryColor: function(typeName, subType) {
-    var color = this.secondaryColors[typeName];
-    if (color instanceof Object) {
-      color = color[subType];
-    }
-    return color === undefined ? this.defaultSecondaryColor : color;
+  getSecondaryColor: function(type, asIs = false) {
+    var color = this.secondaryColors[type];
+    return color === undefined && !asIs ? this.defaultSecondaryColor : color;
   },
 
   getSequentialColor: function(index) {
@@ -284,9 +281,9 @@ Palette.prototype = {
     }
   },
 
-  getNamedColor: function(name, asItIs) {
+  getNamedColor: function(name, asIs = false) {
     var color = this.namedColors[name];
-    return color === undefined && !asItIs ? this.defaultNamedColor : color;
+    return color === undefined && !asIs ? this.defaultNamedColor : color;
   },
 };
 

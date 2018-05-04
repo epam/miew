@@ -234,6 +234,7 @@ FrameInfo.prototype._updateSecondary = function() {
       _start: myResidues[start],
       _end: myResidues[end],
       type: oldSec.type,
+      generic: oldSec.generic,
     };
     for (var j = start; j <= end; ++j) {
       myResidues[j]._secondary = nSec;

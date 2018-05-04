@@ -1,63 +1,54 @@
+import StructuralElement from './StructuralElement';
 
+const StructuralElementType = StructuralElement.Type;
 
-//////////////////////////////////////////////////////////////////////////////
-import Residue from './Residue';
-//////////////////////////////////////////////////////////////////////////////
+const typeByPDBHelixClass = {
+  1: StructuralElementType.HELIX_ALPHA,
+  3: StructuralElementType.HELIX_PI,
+  5: StructuralElementType.HELIX_310,
+};
 
 /**
  * Helical secondary structure of a protein.
- *
- * @param {number} serial  -
- * @param {string} name    -
- * @param {Residue} start  -
- * @param {Residue} end    -
- * @param {number} type    -
- * @param {string} comment -
- * @param {number} length  -
- *
- * @exports Helix
- * @constructor
+ * @extends StructuralElement
  */
-function Helix(serial, name, start, end, type, comment, length) {
-  this._serial = serial;
-  this._name = name;
-  this._start = start;
-  this._end = end;
-  this._type = type;
-  this._comment = comment;
-  this._length = length;
+class Helix extends StructuralElement {
+  /**
+   * Create a helix.
+   *
+   * @param {number} helixClass A helix class according to the
+   *   [PDB Format](http://www.wwpdb.org/documentation/file-format-content/format33/sect5.html#HELIX).
+   * @param {Residue} init Initial residue.
+   * @param {Residue} term Terminal residue.
+   * @param {number} serial Serial number of the helix (see PDB Format).
+   * @param {string} name Helix identifier (see PDB Format).
+   * @param {string} comment Comment about this helix (see PDB Format).
+   * @param {number} length Length of this helix, in residues (see PDB Format).
+   */
+  constructor(helixClass, init, term, serial, name, comment, length) {
+    super(typeByPDBHelixClass[helixClass] || StructuralElement.Type.HELIX, init, term);
+
+    /**
+     * Serial number of the helix (see PDB Format).
+     * @type {number}
+     */
+    this.serial = serial;
+    /**
+     * Helix identifier (see PDB Format).
+     * @type {string}
+     */
+    this.name = name;
+    /**
+     * Comment about this helix (see PDB Format).
+     * @type {string}
+     */
+    this.comment = comment;
+    /**
+     * Length of this helix, in residues (see PDB Format).
+     * @type {number}
+     */
+    this.length = length;
+  }
 }
 
-Helix.prototype.type = 'helix';
-
-Helix.prototype.getName = function() {
-  return this._name;
-};
-
-Helix.prototype._finalize = function(residueHash, complex) {
-  if (this._start instanceof Residue &&
-        this._end instanceof Residue) {
-    // no need to convert unified serial numbers to actual references
-    return;
-  }
-
-  var start = complex.splitUnifiedSerial(this._start);
-  var end = complex.splitUnifiedSerial(this._end);
-  for (var chainId = start.chain; chainId <= end.chain; chainId++) {
-    for (var serId = start.serial; serId <= end.serial; serId++) {
-      for (var iCodeId = start.iCode; iCodeId <= end.iCode; iCodeId++) {
-        var midCode = complex.getUnifiedSerial(chainId, serId, iCodeId);
-        if (typeof residueHash[midCode] !== 'undefined') {
-          var res = residueHash[midCode];
-          res._secondary = this;
-        }
-      }
-    }
-  }
-  //Replace unfined serials by objects
-  this._start = residueHash[this._start];
-  this._end = residueHash[this._end];
-};
-
 export default Helix;
-

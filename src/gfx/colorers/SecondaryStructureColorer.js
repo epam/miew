@@ -26,9 +26,13 @@ SecondaryStructureColorer.prototype.getResidueColor = function(residue, _complex
   }
   const secondary = residue.getSecondary();
   if (secondary) {
-    return this.palette.getSecondaryColor(secondary.type, secondary._type);
+    let color = this.palette.getSecondaryColor(secondary.type, true);
+    if (color === undefined) {
+      color = this.palette.getSecondaryColor(secondary.generic);
+    }
+    return color;
   }
-  return this.palette.getSecondaryColor('');
+  return this.palette.defaultSecondaryColor;
 };
 
 export default SecondaryStructureColorer;

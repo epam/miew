@@ -1,6 +1,5 @@
-
-
 import Palette from './Palette';
+import StructuralElement from '../../chem/StructuralElement';
 
 var palette = new Palette('VMD', 'VM');
 
@@ -87,10 +86,12 @@ palette.residueColors = {
 
 palette.chainColors = [0xFFFFFF].concat(palette.colors);
 
+const StructuralElementType = StructuralElement.Type;
+
 palette.secondaryColors = {
-  'helix': {1: 0xA600A6, 5: 0x0000FF},
-  'strand': 0xFFFF00
+  [StructuralElementType.HELIX_ALPHA]: 0xA600A6,
+  [StructuralElementType.HELIX_310]: 0x0000FF,
+  [StructuralElementType.STRAND]: 0xFFFF00,
 };
 
 export default palette;
-

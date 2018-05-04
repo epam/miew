@@ -15,14 +15,14 @@ const HelixFlag = Object.freeze({
 });
 
 const StructureType = Object.freeze({
-  LOOP: ' ',
-  ALPHA_HELIX: 'H',
-  BETA_BRIDGE: 'B',
   STRAND: 'E',
-  HELIX_3_10: 'G',
-  PI_HELIX: 'I',
+  BRIDGE: 'B',
+  HELIX_310: 'G',
+  HELIX_ALPHA: 'H',
+  HELIX_PI: 'I',
   TURN: 'T',
   BEND: 'S',
+  LOOP: ' ',
 });
 
 export default class SecondaryStructureMap {
@@ -102,7 +102,7 @@ export default class SecondaryStructureMap {
     for (let i = 1; i + 4 < chainLength; ++i) {
       if (this._isHelixStart(inResidues[i]._index, 4) && this._isHelixStart(inResidues[i - 1]._index, 4)) {
         for (let j = i; j <= i + 3; ++j) {
-          this._ss[inResidues[j]._index] = StructureType.ALPHA_HELIX;
+          this._ss[inResidues[j]._index] = StructureType.HELIX_ALPHA;
         }
       }
     }
@@ -112,11 +112,11 @@ export default class SecondaryStructureMap {
         let empty = true;
         for (let j = i; empty && j <= i + 2; ++j) {
           empty = typeof this._ss[inResidues[j]._index] === 'undefined' ||
-                  this._ss[inResidues[j]._index] === StructureType.HELIX_3_10;
+                  this._ss[inResidues[j]._index] === StructureType.HELIX_310;
         }
         if (empty) {
           for (let j = i; j <= i + 2; ++j) {
-            this._ss[inResidues[j]._index] = StructureType.HELIX_3_10;
+            this._ss[inResidues[j]._index] = StructureType.HELIX_310;
           }
         }
       }
@@ -127,12 +127,12 @@ export default class SecondaryStructureMap {
         let empty = true;
         for (let j = i; empty && j <= i + 4; ++j) {
           empty = typeof this._ss[inResidues[j]._index] === 'undefined' ||
-                  this._ss[inResidues[j]._index] === StructureType.PI_HELIX ||
-                  (inPreferPiHelices && this._ss[inResidues[j]._index] === StructureType.ALPHA_HELIX);
+                  this._ss[inResidues[j]._index] === StructureType.HELIX_PI ||
+                  (inPreferPiHelices && this._ss[inResidues[j]._index] === StructureType.HELIX_ALPHA);
         }
         if (empty) {
           for (let j = i; j <= i + 4; ++j) {
-            this._ss[inResidues[j]._index] = StructureType.PI_HELIX;
+            this._ss[inResidues[j]._index] = StructureType.HELIX_PI;
           }
         }
       }
@@ -380,7 +380,7 @@ export default class SecondaryStructureMap {
         }
       }
 
-      let ss = StructureType.BETA_BRIDGE;
+      let ss = StructureType.BRIDGE;
       if (bridge.i.length > 1) {
         ss = StructureType.STRAND;
       }
