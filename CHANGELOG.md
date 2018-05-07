@@ -6,6 +6,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.17] - 2018-05-07
+### Added
+- Added the Gallery menu panel with a set of predefined molecules / configurations.
+- Added a Backdrop Material to the list of available materials. It should be used
+  with one of the Surface Modes and the Uniform Colorer to create a background for the
+  entire molecule or its parts.
+- Added ability to attach a listener and get notified when a particular setting change,
+  e.g. `settings.addEventListener('change:palette', myHandler)`. These events are used
+  internally to process changes no matter where do they come from (menus, the terminal
+  or even API).
+- Added other secondary structure types beside helices and strands (turns, bends, bridges).
+  Support them in MMTF and CIF format, detect them during DSSP analysis.
+
+### Deprecated
+- Deprecate `settings.override()`, use `settings.set()` instead.
+
+### Fixed
+- Fixed `utils.objectDiff()` object comparison function.
+- Notice even bulk changes in settings.
+
+### Internal
+- Performed some internal class/method/property renames.
+- Included building Webpack and Browserify examples into the build pipeline.
+- Upgraded three.js to r91 (using the version from NPM now with no hacks added).
+- Updated other dependencies.
+
 ## [0.7.16] - 2018-04-16
 ### Fixed
 - Fix screenshots in stereo mode.
@@ -253,7 +279,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.16...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.17...HEAD
+[0.7.17]: https://github.com/epam/miew/compare/v0.7.16...v0.7.17
 [0.7.16]: https://github.com/epam/miew/compare/v0.7.15...v0.7.16
 [0.7.15]: https://github.com/epam/miew/compare/v0.7.14...v0.7.15
 [0.7.14]: https://github.com/epam/miew/compare/v0.7.13...v0.7.14
