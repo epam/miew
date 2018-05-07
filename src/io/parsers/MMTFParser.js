@@ -166,6 +166,20 @@ MMTFParser.prototype._onBond = function(bondData) {
   );
 };
 
+const StructuralElementType = StructuralElement.Type;
+
+// see https://github.com/rcsb/mmtf-javascript/blob/master/src/mmtf-traverse.js
+const secStructToType = [
+  StructuralElementType.HELIX_PI,    // 0
+  StructuralElementType.BEND,        // 1
+  StructuralElementType.HELIX_ALPHA, // 2
+  StructuralElementType.STRAND,      // 3
+  StructuralElementType.HELIX_310,   // 4
+  StructuralElementType.BRIDGE,      // 5
+  StructuralElementType.TURN,        // 6
+  StructuralElementType.COIL,        // 7
+];
+
 MMTFParser.prototype._updateSecStructure = function(complex, residue, groupData) {
   var helixClasses = [3, -1, 1, -1, 5];
 
@@ -179,26 +193,30 @@ MMTFParser.prototype._updateSecStructure = function(complex, residue, groupData)
 
   if (!_.isUndefined(groupData)) {
     // start new secondary structure
+    const type = secStructToType[groupData.secStruct];
     this._ssType = groupData.secStruct;
     this._ssStart = residue;
 
     var struct = null;
     switch (this._ssType) {
-    case -1:
+    case -1: // undefined
+    case 7:  // coil
       break;
-    case 0:
-    case 2:
-    case 4:
+    case 0:  // pi helix
+    case 2:  // alpha helix
+    case 4:  // 3-10 helix
       struct = new Helix(helixClasses[this._ssType], residue, residue, 0, '', '', 0);
       complex._helices.push(struct);
       break;
-    case 3:
+    case 3:  // extended
       var sheet = new Sheet('', 0);
       complex._sheets.push(sheet);
       struct = new Strand(sheet, residue, residue, 0, null, null);
       break;
     default:
-      struct = new StructuralElement(`mmtf${this._ssType}`, residue, residue);
+      if (type !== undefined) {
+        struct = new StructuralElement(type, residue, residue);
+      }
       break;
     }
 

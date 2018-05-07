@@ -2,6 +2,7 @@ import Parser from './Parser';
 import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
+import StructuralElement from '../../chem/StructuralElement';
 
 var
   Complex = chem.Complex,
@@ -394,6 +395,9 @@ CIFParser.prototype._extractConfs = function(complex, helicesData) {
       const idx = complex._helices.length;
       struct = new Helix(helixClass, start[0], end[0], idx, name, comment, length);
       complex.addHelix(struct);
+      complex.structures.push(struct);
+    } else if (type === 'turn') {
+      struct = new StructuralElement(StructuralElement.Type.TURN, start[0], end[0]);
       complex.structures.push(struct);
     } else {
       struct = null;
