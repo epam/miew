@@ -5,6 +5,7 @@ import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
 import MMTF from '../../../vendor/js/mmtf';
+import StructuralElement from '../../chem/StructuralElement';
 
 var
   Complex = chem.Complex,
@@ -170,8 +171,7 @@ MMTFParser.prototype._updateSecStructure = function(complex, residue, groupData)
 
   if (!_.isUndefined(groupData) && groupData.secStruct === this._ssType) {
     residue._secondary = this._ssStruct;
-
-    if (this._ssStruct instanceof Helix || this._ssStruct instanceof Strand) {
+    if (this._ssStruct) {
       this._ssStruct.term = residue;
     }
     return;
@@ -189,21 +189,24 @@ MMTFParser.prototype._updateSecStructure = function(complex, residue, groupData)
     case 0:
     case 2:
     case 4:
-      struct = new Helix(helixClasses[this._ssType], residue, null, 0, '', '', 0);
+      struct = new Helix(helixClasses[this._ssType], residue, residue, 0, '', '', 0);
       complex._helices.push(struct);
       break;
     case 3:
       var sheet = new Sheet('', 0);
       complex._sheets.push(sheet);
-      struct = new Strand(sheet, residue, null, 0);
+      struct = new Strand(sheet, residue, residue, 0, null, null);
       break;
     default:
-      struct = {type: 'mmtf' + this._ssType};
+      struct = new StructuralElement(`mmtf${this._ssType}`, residue, residue);
       break;
     }
 
     this._ssStruct = struct;
     residue._secondary = struct;
+    if (struct) {
+      complex.structures.push(struct);
+    }
   }
 };
 

@@ -341,6 +341,7 @@ PDBParser.prototype._parseHELIX = function(stream) {
   /* eslint-enable no-magic-numbers */
   this._parseSTRUCTURE(stream, fields, function(obj) {
     this._complex.addHelix(obj);
+    this._complex.structures.push(obj);
   }.bind(this));
 };
 
@@ -410,6 +411,7 @@ PDBParser.prototype._parseSTRUCTURE = function(stream, pars, adder) { // FIXME: 
       helixClass, shCur, shPrev
     );
     obj.addStrand(strand);
+    this._complex.structures.push(strand);
   } else {
     obj = new Helix(
       helixClass,

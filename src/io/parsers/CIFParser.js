@@ -336,7 +336,7 @@ CIFParser.prototype._extractSheets = function(complex, sheetData) {
       residues[r]._secondary = strand;
     }
     sheet.addStrand(strand);
-    sheet._width = sheet._strands.length;
+    complex.structures.push(strand);
   }
 };
 
@@ -394,6 +394,7 @@ CIFParser.prototype._extractConfs = function(complex, helicesData) {
       const idx = complex._helices.length;
       struct = new Helix(helixClass, start[0], end[0], idx, name, comment, length);
       complex.addHelix(struct);
+      complex.structures.push(struct);
     } else {
       struct = null;
     }
