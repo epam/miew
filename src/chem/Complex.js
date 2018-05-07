@@ -1186,10 +1186,11 @@ Complex.prototype.joinComplexes = function(complexes) {
 const StructureType = SecondaryStructureMap.StructureType;
 const StructuralElementType = StructuralElement.Type;
 
+// see http://www.wwpdb.org/documentation/file-format-content/format33/sect5.html#HELIX
 const helixClassMap = {
   [StructureType.HELIX_ALPHA]: 1,
-  [StructureType.HELIX_310]: 3,
-  [StructureType.HELIX_PI]: 5,
+  [StructureType.HELIX_PI]: 3,
+  [StructureType.HELIX_310]: 5,
 };
 
 const loopMap = {
