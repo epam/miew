@@ -73,7 +73,7 @@ describe('The secondary structure in 1CRN', () => {
     expect(ss.helices).to.deep.equal([
       {init:  7, term: 17, type: StructuralElement.Type.HELIX_ALPHA},
       {init: 23, term: 30, type: StructuralElement.Type.HELIX_ALPHA},
-      {init: 42, term: 44, type: StructuralElement.Type.HELIX_PI},
+      {init: 42, term: 44, type: StructuralElement.Type.HELIX_310},
     ]);
     expect(ss.sheets).to.deep.equal([{
       width: 2,
