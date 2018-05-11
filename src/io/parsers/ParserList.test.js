@@ -11,6 +11,7 @@ function getSomeParserClass(fmt = 'some') {
       return data === `${fmt}-data`;
     }
   };
+  SomeParser.id = fmt;
   SomeParser.formats = [fmt, `${fmt}-format`];
   SomeParser.extensions = [`.${fmt}`, `.${fmt}2`];
   return SomeParser;
@@ -34,25 +35,24 @@ describe('ParserList', () => {
 
     it('creates an empty list', () => {
       const parserList = new ParserList();
-      expect(parserList.all).to.be.empty();
       expect(parserList.formats).to.be.empty();
       expect(parserList.extensions).to.be.empty();
     });
 
     it('allows to pre-populate the list', () => {
-      const parserList = new ParserList([A, B, C]);
-      expect(parserList.all).to.deep.equal([A, B, C]);
+      const parserList = new ParserList([A, B]);
+      expect(parserList.formats.sort()).to.deep.equal(fmtAB);
+      expect(parserList.extensions.sort()).to.deep.equal(extAB);
     });
 
   });
 
   describe('#register()', () => {
 
-    it('adds a parser to the list in order', () => {
+    it('adds a parser to the list', () => {
       const parserList = new ParserList();
       parserList.register(A);
       parserList.register(B);
-      expect(parserList.all).to.deep.equal([A, B]);
       expect(parserList.formats.sort()).to.deep.equal(fmtAB);
       expect(parserList.extensions.sort()).to.deep.equal(extAB);
     });
@@ -61,7 +61,6 @@ describe('ParserList', () => {
       const parserList = new ParserList();
       parserList.register(A);
       parserList.register(A);
-      expect(parserList.all).to.deep.equal([A]);
       expect(parserList.formats).to.deep.equal(fmtA);
       expect(parserList.extensions).to.deep.equal(extA);
     });
@@ -70,7 +69,6 @@ describe('ParserList', () => {
       const parserList = new ParserList();
       parserList.register(A);
       parserList.register(A2);
-      expect(parserList.all).to.deep.equal([A, A2]);
       expect(parserList.formats).to.deep.equal(fmtA);
       expect(parserList.extensions).to.deep.equal(extA);
     });
@@ -82,7 +80,6 @@ describe('ParserList', () => {
     it('removes a parser from the list', () => {
       const parserList = new ParserList([A, B]);
       parserList.unregister(A);
-      expect(parserList.all).to.deep.equal([B]);
       expect(parserList.formats).to.deep.equal(fmtB);
       expect(parserList.extensions).to.deep.equal(extB);
     });
@@ -91,7 +88,6 @@ describe('ParserList', () => {
       const parserList = new ParserList([A, B]);
       parserList.unregister(C);
       parserList.unregister(A2);
-      expect(parserList.all).to.deep.equal([A, B]);
       expect(parserList.formats.sort()).to.deep.equal(fmtAB);
       expect(parserList.extensions.sort()).to.deep.equal(extAB);
     });
@@ -99,32 +95,11 @@ describe('ParserList', () => {
     it('supports multiple parsers for the same format', () => {
       const parserList = new ParserList([A, A2]);
       parserList.unregister(A2);
-      expect(parserList.all).to.deep.equal([A]);
       expect(parserList.formats).to.deep.equal(fmtA);
       expect(parserList.extensions).to.deep.equal(extA);
       parserList.unregister(A);
-      expect(parserList.all).to.be.empty();
       expect(parserList.formats).to.be.empty();
       expect(parserList.extensions).to.be.empty();
-    });
-
-  });
-
-  describe('#all', () => {
-
-    it('gives a new copy of the real list', () => {
-      const parserList = new ParserList([A]);
-
-      const listA1 = parserList.all;
-      const listA2 = parserList.all;
-      expect(listA2).to.not.equal(listA1);
-      expect(listA2).to.deep.equal(listA1);
-
-      listA2.push(B);
-
-      const listA3 = parserList.all;
-      expect(listA2).to.not.deep.equal(listA1);
-      expect(listA3).to.deep.equal(listA1);
     });
 
   });

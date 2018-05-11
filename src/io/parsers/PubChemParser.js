@@ -99,6 +99,7 @@ PubChemParser.prototype._extractAtoms = function(complex, complexData) {
   }
 };
 
+PubChemParser.id = 'pubchem';
 PubChemParser.formats = ['pubchem', 'pubchem+json', 'pc'];
 PubChemParser.extensions = ['.json'];
 

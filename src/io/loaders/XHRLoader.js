@@ -63,4 +63,5 @@ export default class XHRLoader extends Loader {
   }
 }
 
+XHRLoader.id = 'xhr';
 XHRLoader.types = ['url'];

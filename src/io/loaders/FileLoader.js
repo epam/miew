@@ -49,4 +49,5 @@ export default class FileLoader extends Loader {
   }
 }
 
+FileLoader.id = 'file';
 FileLoader.types = ['file', 'blob'];

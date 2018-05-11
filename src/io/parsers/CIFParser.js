@@ -806,6 +806,7 @@ CIFParser._parseToObject = function(source) {
   return ret;
 };
 
+CIFParser.id = 'cif';
 CIFParser.formats = ['cif', 'mmcif'];
 CIFParser.extensions = ['.cif', '.mmcif'];
 

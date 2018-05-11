@@ -11,6 +11,7 @@ function getSomeLoaderClass(type = 'some') {
       return source === `${type}-source`;
     }
   };
+  SomeLoader.id = type;
   SomeLoader.types = [type, `${type}-type`];
   return SomeLoader;
 }
@@ -30,24 +31,22 @@ describe('LoaderList', () => {
 
     it('creates an empty list', () => {
       const loaderList = new LoaderList();
-      expect(loaderList.all).to.be.empty();
       expect(loaderList.types).to.be.empty();
     });
 
     it('allows to pre-populate the list', () => {
-      const loaderList = new LoaderList([A, B, C]);
-      expect(loaderList.all).to.deep.equal([A, B, C]);
+      const loaderList = new LoaderList([A, B]);
+      expect(loaderList.types.sort()).to.deep.equal(typeAB);
     });
 
   });
 
   describe('#register()', () => {
 
-    it('adds a loader to the list in order', () => {
+    it('adds a loader to the list', () => {
       const loaderList = new LoaderList();
       loaderList.register(A);
       loaderList.register(B);
-      expect(loaderList.all).to.deep.equal([A, B]);
       expect(loaderList.types.sort()).to.deep.equal(typeAB);
     });
 
@@ -55,15 +54,13 @@ describe('LoaderList', () => {
       const loaderList = new LoaderList();
       loaderList.register(A);
       loaderList.register(A);
-      expect(loaderList.all).to.deep.equal([A]);
       expect(loaderList.types).to.deep.equal(typeA);
     });
 
-    it('allows multiple loaders for the same format', () => {
+    it('allows multiple loaders for the same type', () => {
       const loaderList = new LoaderList();
       loaderList.register(A);
       loaderList.register(A2);
-      expect(loaderList.all).to.deep.equal([A, A2]);
       expect(loaderList.types).to.deep.equal(typeA);
     });
 
@@ -74,7 +71,6 @@ describe('LoaderList', () => {
     it('removes a loader from the list', () => {
       const loaderList = new LoaderList([A, B]);
       loaderList.unregister(A);
-      expect(loaderList.all).to.deep.equal([B]);
       expect(loaderList.types).to.deep.equal(typeB);
     });
 
@@ -82,37 +78,15 @@ describe('LoaderList', () => {
       const loaderList = new LoaderList([A, B]);
       loaderList.unregister(C);
       loaderList.unregister(A2);
-      expect(loaderList.all).to.deep.equal([A, B]);
       expect(loaderList.types.sort()).to.deep.equal(typeAB);
     });
 
-    it('supports multiple loaders for the same format', () => {
+    it('supports multiple loaders for the same type', () => {
       const loaderList = new LoaderList([A, A2]);
       loaderList.unregister(A2);
-      expect(loaderList.all).to.deep.equal([A]);
       expect(loaderList.types).to.deep.equal(typeA);
       loaderList.unregister(A);
-      expect(loaderList.all).to.be.empty();
       expect(loaderList.types).to.be.empty();
-    });
-
-  });
-
-  describe('#all', () => {
-
-    it('gives a new copy of the real list', () => {
-      const loaderList = new LoaderList([A]);
-
-      const listA1 = loaderList.all;
-      const listA2 = loaderList.all;
-      expect(listA2).to.not.equal(listA1);
-      expect(listA2).to.deep.equal(listA1);
-
-      listA2.push(B);
-
-      const listA3 = loaderList.all;
-      expect(listA2).to.not.deep.equal(listA1);
-      expect(listA3).to.deep.equal(listA1);
     });
 
   });

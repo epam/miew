@@ -500,6 +500,7 @@ PDBParser.prototype.parseSync = function() {
   return result;
 };
 
+PDBParser.id = 'pdb';
 PDBParser.formats = ['pdb'];
 PDBParser.extensions = ['.pdb', '.ent'];
 

@@ -1,13 +1,20 @@
-import {
-  registerInList,
-  unregisterFromList,
-  registerInDict,
-  unregisterFromDict,
-} from '../../utils';
+import EntityList from '../../utils/EntityList';
 
-export default class ParserList {
+/**
+ * A list of available parsers.
+ * @extends EntityList
+ */
+class ParserList extends EntityList {
+  /**
+   * Create a list of parsers.
+   * The parsers can be retrieved later by matching against specs (see {@link ParsrerList#find}).
+   *
+   * @param {!Array<function(new:Parser)>=} someParsers A list of {@link Parser} subclasses to
+   *   automatically register at creation time.
+   * @see ParserList#register
+   */
   constructor(someParsers = []) {
-    this._list = [];
+    super();
     this._byFormat = {};
     this._byExt = {};
 
@@ -17,41 +24,62 @@ export default class ParserList {
   /**
    * Register a parser for a specific data format.
    *
-   * @param {function} SomeParser - a Parser subclass to register
-   * @param {string[]} SomeParser.formats - supported data formats
-   * @param {string[]} SomeParser.extensions - supported file extensions
+   * @param {function(new:Parser)} SomeParser A {@link Parser} subclass to register.
+   * @param {string} SomeParser.id A case-insensitive identifier.
+   * @param {Array<string>} SomeParser.formats Supported data formats.
+   * @param {Array<string>} SomeParser.extensions Supported file extensions.
+   * @see ParserList#unregister
    */
   register(SomeParser) {
-    registerInList(this._list, SomeParser);
-    registerInDict(this._byFormat, SomeParser.formats, SomeParser);
-    registerInDict(this._byExt, SomeParser.extensions, SomeParser);
+    super.register(SomeParser);
+    EntityList.registerInDict(this._byFormat, SomeParser.formats, SomeParser);
+    EntityList.registerInDict(this._byExt, SomeParser.extensions, SomeParser);
   }
 
+  /**
+   * Remove a parser from this list.
+   *
+   * @param {function(new:Parser)} SomeParser A {@link Parser} subclass to unregister.
+   * @param {string} SomeParser.id A case-insensitive identifier.
+   * @param {Array<string>} SomeParser.formats Supported data formats.
+   * @param {Array<string>} SomeParser.extensions Supported file extensions.
+   * @see ParserList#register
+   */
   unregister(SomeParser) {
-    unregisterFromList(this._list, SomeParser);
-    unregisterFromDict(this._byFormat, SomeParser.formats, SomeParser);
-    unregisterFromDict(this._byExt, SomeParser.extensions, SomeParser);
+    super.unregister(SomeParser);
+    EntityList.unregisterFromDict(this._byFormat, SomeParser.formats, SomeParser);
+    EntityList.unregisterFromDict(this._byExt, SomeParser.extensions, SomeParser);
   }
 
-  get all() {
-    return [...this._list];
-  }
-
+  /**
+   * An unordered list of data formats for registered parsers.
+   * It is a read-only copy, use {@link ParserList#register} and {@link ParserList#unregister}
+   * to modify it.
+   *
+   * @type {!Array<string>}
+   */
   get formats() {
     return Object.keys(this._byFormat);
   }
 
+  /**
+   * An unordered list of file extensions for registered parsers.
+   * It is a read-only copy, use {@link ParserList#register} and {@link ParserList#unregister}
+   * to modify it.
+   *
+   * @type {!Array<string>}
+   */
   get extensions() {
     return Object.keys(this._byExt);
   }
 
   /**
-   * Find a suitable parser for data
+   * Find a suitable parser for data.
    *
-   * @param {object} specs - parser specifications
-   * @param {string=} specs.format - supported data format
-   * @param {string=} specs.ext - supported filename extension
-   * @param {data=} specs.data - data to parse
+   * @param {Object} specs Parser specifications.
+   * @param {string=} specs.format Supported data format.
+   * @param {string=} specs.ext Supported filename extension.
+   * @param {*} specs.data Data to parse.
    */
   find(specs) {
     let list = [];
@@ -67,3 +95,5 @@ export default class ParserList {
     return [...list];
   }
 }
+
+export default ParserList;

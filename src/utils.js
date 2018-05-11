@@ -491,45 +491,6 @@ function correctSelectorIdentifier(value) {
   return enquoteHelper.join('');
 }
 
-export function registerInList(list, value) {
-  if (!list.includes(value)) {
-    list.push(value);
-  }
-}
-
-export function unregisterFromList(list, value) {
-  const pos = list.indexOf(value);
-  if (pos !== -1) {
-    list.splice(pos, 1);
-  }
-}
-
-export function registerInDict(dict, keys, value) {
-  keys.forEach((key) => {
-    key = key.toLowerCase();
-    const list = dict[key] = dict[key] || [];
-    if (!list.includes(value)) {
-      list.push(value);
-    }
-  });
-}
-
-export function unregisterFromDict(dict, keys, value) {
-  keys.forEach((key) => {
-    key = key.toLowerCase();
-    const list = dict[key];
-    if (list) {
-      const pos = list.indexOf(value);
-      if (pos !== -1) {
-        list.splice(pos, 1);
-      }
-      if (list.length === 0) {
-        delete dict[key];
-      }
-    }
-  });
-}
-
 ////////////////////////////////////////////////////////////////////////////
 // Exports
 
