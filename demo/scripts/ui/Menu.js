@@ -16,6 +16,7 @@ var
   materials = Miew.materials,
   settings = Miew.settings,
   utils = Miew.utils,
+  parsers = Miew.io.parsers,
   Representation = Miew.gfx.Representation,
   fbxExport = Miew.gfx.fbxExport;
 
@@ -1397,9 +1398,9 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function(self) {
         mainExtension = extractExtension(self.presetsPanel.inputs.main);
       }
 
-      const extensions = ['pdb', 'ent', 'cif', 'mmcif', 'mmtf', 'cml', 'json', 'ccp4'].sort();
-      const extRegExp = new RegExp('^(' + extensions.join('|') + ')$');
-      const extString = extensions.map(ext => `.${ext}`).join(', ');
+      const extensions = parsers.keys('extensions').sort();
+      const extRegExp = new RegExp('^(' + extensions.map(ext => ext.substr(1)).join('|') + ')$');
+      const extString = extensions.join(', ');
 
       if (mainExtension.match(/^(top|prmtop)$/)) {
         self.presetsPanel.inputs.mainIsAMBER = true;

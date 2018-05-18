@@ -3750,6 +3750,7 @@ _.assign(Miew, /** @lends Miew */ {
 
   // export namespaces // TODO: WIP: refactoring external interface
   chem: chem,
+  io: io,
   modes: modes,
   colorers: colorers,
   materials: materials,
