@@ -687,7 +687,6 @@ CMLParser.prototype.parseSync = function() {
   }
 };
 
-CMLParser.id = 'cml';
 CMLParser.formats = ['cml'];
 CMLParser.extensions = ['.cml'];
 

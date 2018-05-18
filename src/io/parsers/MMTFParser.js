@@ -473,7 +473,6 @@ MMTFParser.prototype.parseSync = function() {
   return this._complex;
 };
 
-MMTFParser.id = 'mmtf';
 MMTFParser.formats = ['mmtf'];
 MMTFParser.extensions = ['.mmtf'];
 MMTFParser.binary = true;

@@ -9,12 +9,18 @@ function getSomeEntity(id = 'some') {
   return {id};
 }
 
+function getMultiEntity(id) {
+  return {id1: `${id}1`, id2: `${id}2`};
+}
+
 describe('EntityList', () => {
 
   const A = getSomeEntity('a');
   const B = getSomeEntity('b');
   const C = getSomeEntity('See');
   const A2 = getSomeEntity('a');
+  const MA = getMultiEntity('a');
+  const MB = getMultiEntity('b');
 
   describe('constructor', () => {
 
@@ -99,19 +105,35 @@ describe('EntityList', () => {
 
   });
 
+  describe('#keys()', () => {
+
+    it('returns a list of unique keys', () => {
+      const entityList = new EntityList([A, B, A2]);
+      expect(entityList.keys().sort()).to.deep.equal(['a', 'b']);
+    });
+
+    it('returns a list of keys for secondary index', () => {
+      const entityList = new EntityList([MA, MB], ['id1', 'id2']);
+      expect(entityList.keys('id2').sort()).to.deep.equal(['a2', 'b2']);
+    });
+
+  });
+
   describe('#get()', () => {
 
     let entityList;
+    let secondList;
 
     beforeEach(() => {
       entityList = new EntityList([A, B]);
+      secondList = new EntityList([MA, MB], ['id1', 'id2']);
     });
 
-    it('returns matching id', () => {
+    it('returns matching key', () => {
       expect(entityList.get('b')).to.equal(B);
     });
 
-    it('ignores mismatching id', () => {
+    it('ignores mismatching key', () => {
       expect(entityList.get('c')).to.be.an('undefined');
     });
 
@@ -120,7 +142,7 @@ describe('EntityList', () => {
       expect(entityList.get('a')).to.be.an('undefined');
     });
 
-    it('is case insensitive for id', () => {
+    it('is case insensitive for key', () => {
       entityList.register(C);
       expect(entityList.get('A')).to.equal(A);
       expect(entityList.get('sEe')).to.equal(C);
@@ -129,6 +151,22 @@ describe('EntityList', () => {
     it('returns the first of matching entities', () => {
       entityList.register(A2);
       expect(entityList.get('a')).to.equal(A);
+    });
+
+    it('allows specifying an index to search', () => {
+      expect(entityList.get('b', 'id')).to.equal(B);
+    });
+
+    it('returns matching key for the secondary index', () => {
+      expect(secondList.get('b2', 'id2')).to.equal(MB);
+    });
+
+    it('ignores mismatching key for the secondary index', () => {
+      expect(secondList.get('b1', 'id2')).to.be.an('undefined');
+    });
+
+    it('ignores mismatching index', () => {
+      expect(secondList.get('b1', 'id')).to.be.an('undefined');
     });
 
   });

@@ -1,15 +1,21 @@
-/** A generic list of objects or classes. */
+/** An indexed list of objects or classes. */
 class EntityList {
   /**
    * Create a list of objects.
-   * The objects can be retrieved later by their `id` property or by index.
+   * The objects can be indexed by one or more properties for the later retrieval.
    *
    * @param {!Array<Object>=} entities A list of objects to automatically register at creation time.
+   * @param {!Array<string>=} indices A list of property names to use for case-insensitive indexing.
+   *   By default, a single `.id` property is used.
    * @see EntityList#register
    */
-  constructor(entities = []) {
+  constructor(entities = [], indices = ['id']) {
     this._list = [];
     this._dict = {};
+    this._indices = [...indices];
+    this._indices.forEach((index) => {
+      this._dict[index] = {};
+    });
 
     entities.forEach(entity => this.register(entity));
   }
@@ -93,26 +99,30 @@ class EntityList {
   /**
    * Add an entity to this list.
    *
-   * @param {!Object} entity An object or a class to register. Must include case-insensitive
-   *   `id` property which is used for subsequent retrievals.
-   * @param {string} entity.id A case-insensitive identifier.
+   * @param {!Object} entity An object or a class to register. The object must include all
+   *   properties specified as indices on construction.
    * @see EntityList#unregister
    */
   register(entity) {
     EntityList.registerInList(this._list, entity);
-    EntityList.registerInDict(this._dict, [entity.id], entity);
+    this._indices.forEach((index) => {
+      EntityList.registerInDict(this._dict[index], _ensureArray(entity[index]), entity);
+    });
   }
 
   /**
    * Remove an entity from this list.
    *
-   * @param {!Object} entity An object or a class to unregister.
-   * @param {string} entity.id A case-insensitive identifier.
+   * @param {!Object} entity An object or a class to unregister. The object may be
+   *   missing from the list but it must include all properties specified as indices
+   *   on construction.
    * @see EntityList#register
    */
   unregister(entity) {
     EntityList.unregisterFromList(this._list, entity);
-    EntityList.unregisterFromDict(this._dict, [entity.id], entity);
+    this._indices.forEach((index) => {
+      EntityList.unregisterFromDict(this._dict[index], _ensureArray(entity[index]), entity);
+    });
   }
 
   /**
@@ -127,16 +137,41 @@ class EntityList {
   }
 
   /**
-   * Retrieve an entity by id.
+   * Retrieve a list of keys for the index.
    *
-   * @param {string} id A case-insensitive identifier of the entity.
-   * @return {Object=} A value registered under the specified id. If there are multiple values
-   *   with the same id, the first one is returned.
+   * @param {string=} index One of the indices specified during the list construction. If omitted,
+   *   the first of the indices is used.
+   * @returns {!Array<string>} An unordered list of keys in the index, i.e. particular property
+   *   values for all registered entities.
    */
-  get(id) {
-    const values = this._dict[id.toLowerCase()];
-    return values && values.length > 0 ? values[0] : undefined;
+  keys(index) {
+    return Object.keys(this._dict[index || this._indices[0]]);
   }
+
+  /**
+   * Retrieve an entity by its key.
+   *
+   * @param {string} key A case-insensitive property value to look-up.
+   * @param {string=} index One of the indices specified during the list construction. If omitted,
+   *   the first of the indices is used.
+   * @returns {Object=} An object registered in the index under the key. If there are multiple
+   *   objects under the same key, the first one is returned.
+   */
+  get(key, index) {
+    const dict = this._dict[index || this._indices[0]];
+    if (dict) {
+      const values = dict[key.toLowerCase()];
+      return values && values.length > 0 ? values[0] : undefined;
+    }
+    return undefined;
+  }
+}
+
+function _ensureArray(x) {
+  if (x === null || x === undefined || Array.isArray(x)) {
+    return x;
+  }
+  return [x];
 }
 
 export default EntityList;

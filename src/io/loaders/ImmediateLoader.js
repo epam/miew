@@ -19,5 +19,4 @@ export default class ImmediateLoader extends Loader {
   }
 }
 
-ImmediateLoader.id = 'immediate';
 ImmediateLoader.types = ['immediate'];

@@ -210,7 +210,6 @@ CCP4Parser.prototype.parseSync = function() {
   return new Volume(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
 };
 
-CCP4Parser.id = 'ccp4';
 CCP4Parser.formats = ['ccp4'];
 CCP4Parser.extensions = ['.ccp4'];
 CCP4Parser.binary = true;
