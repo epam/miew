@@ -1,27 +1,27 @@
+import EntityList from '../utils/EntityList';
 
+import cpkPalette from './palettes/cpkPalette';
+import jmolPalette from './palettes/jmolPalette';
+import vmdPalette from './palettes/vmdPalette';
 
-import _JM from './palettes/JmolPalette';
-import _VM from './palettes/VmdPalette'; // FIXME: deps for amdclean
+const palettes = new EntityList([
+  cpkPalette,
+  jmolPalette,
+  vmdPalette,
+]);
 
-var paletteList = [];
-var paletteDict = {};
-var ag = [_JM, _VM];
+/** @deprecated */
+Object.defineProperty(palettes, 'list', {
+  get: function() {
+    return this.all;
+  },
+});
 
-for (var i = 0, n = ag.length; i < n; ++i) {
-  var palette = ag[i];
-  paletteList.push(palette);
-  if (palette.id) {
-    paletteDict[palette.id] = palette;
-  }
-}
+/** @deprecated */
+Object.defineProperty(palettes, 'any', {
+  get: function() {
+    return this.first;
+  },
+});
 
-export default {
-  list: paletteList,
-
-  any: paletteList[0],
-
-  get: function(name) {
-    return paletteDict[name];
-  }
-};
-
+export default palettes;

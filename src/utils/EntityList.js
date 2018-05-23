@@ -137,6 +137,16 @@ class EntityList {
   }
 
   /**
+   * The first registered entity.
+   * Use it if you do not care which entity you are referring to.
+   *
+   * @type {Object=}
+   */
+  get first() {
+    return this._list[0];
+  }
+
+  /**
    * Retrieve a list of keys for the index.
    *
    * @param {string=} index One of the indices specified during the list construction. If omitted,

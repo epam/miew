@@ -157,7 +157,8 @@ Menu.prototype._initializeTerminal = function() {
 Menu.prototype._fillUniformColorCombo = function(paletteID) {
   var self = this;
   var frag = document.createDocumentFragment();
-  var colorList = (palettes.get(paletteID) || palettes.any).namedColorsArray;
+  const palette = palettes.get(paletteID) || palettes.first;
+  var colorList = palette.namedColorsArray;
 
   var comboboxPanel = $(self._menuId + ' [data-panel-type=miew-menu-panel-uniform-color]');
   for (var i = 0, n = colorList.length; i < n; i++) {
@@ -2092,8 +2093,9 @@ Menu.prototype._initRenderPanel = function() {
   $(self._menuId + ' [data-toggle=palette]').on('click', /** @this HTMLSelectElement */ function() {
     var elements = $(self._menuId + ' .list-group-item[data-value=miew-menu-panel-palette]');
     var itemID = this.getAttribute('data-value');
+    const palette = palettes.get(itemID);
 
-    elements[0].firstElementChild.firstElementChild.textContent = (palettes.get(itemID) || palettes.any).name;
+    elements[0].firstElementChild.firstElementChild.textContent = palette ? palette.name : 'Unknown';
     self._fillUniformColorCombo(itemID);
     //Here should be palettes colors mapping
     /*var ucSelector = $(self._menuId + ' .panel-menu[data-panel-type=miew-menu-panel-representation]' +

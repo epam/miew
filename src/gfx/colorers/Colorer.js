@@ -32,7 +32,7 @@ function Colorer(opts) {
    * Palette in use.
    * @type {Palette}
    */
-  this.palette = palettes.any;
+  this.palette = palettes.first;
 }
 
 /**

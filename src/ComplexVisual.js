@@ -617,7 +617,7 @@ ComplexVisual.prototype.rebuild = function() {
     setTimeout(function _rebuild() {
       console.time('build');
       var reprList = self._reprList;
-      var palette = palettes.get(settings.now.palette) || palettes.any;
+      var palette = palettes.get(settings.now.palette) || palettes.first;
       var hasGeometry = false;
       for (var i = 0, n = reprList.length; i < n; ++i) {
         var repr = reprList[i];

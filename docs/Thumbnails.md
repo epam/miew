@@ -59,3 +59,18 @@ If you decide to update the thumbnails, here are the instructions.
     
  5. Save the file to `demo/images/material/XX.png` using two-letter Material ID as a file name.
 
+## Palettes
+
+ 1. Use the following URL Query String to see Glycine from the fixed viewpoint. 
+
+        ?l=pc:glycine&axes=0&v=1TZW7PYUIlT05tEi8X2ztPgAAAAAAAACAmoKCPw==
+
+ 2. Select the desired palette.
+ 3. Open the terminal window and take a 512 &times; 512 screenshot.
+ 
+        screenshot 512
+
+ 4. Resize the file to 96 &times; 96 pixels using Lanczos2 filter (sharper).
+    Alternatively, apply Unsharp Mask filter.
+    
+ 5. Save the file to `demo/images/palette/XX.png` using two-letter Palette ID as a file name.

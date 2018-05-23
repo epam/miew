@@ -105,6 +105,20 @@ describe('EntityList', () => {
 
   });
 
+  describe('#first', () => {
+
+    it('gives the first registered entity', () => {
+      const entityList = new EntityList([A2, A]);
+      expect(entityList.first).to.equal(A2);
+    });
+
+    it('is undefined for empty list', () => {
+      const entityList = new EntityList();
+      expect(entityList.first).to.be.an('undefined');
+    });
+
+  });
+
   describe('#keys()', () => {
 
     it('returns a list of unique keys', () => {
