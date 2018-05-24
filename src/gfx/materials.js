@@ -1,8 +1,6 @@
-
-
 import _ from 'lodash';
 import * as THREE from 'three';
-import settings from '../settings';
+import EntityList from '../utils/EntityList';
 
 function neutralColor(intensity) {
   return new THREE.Color(intensity, intensity, intensity);
@@ -122,23 +120,27 @@ var materialList = [
   }
 ];
 
-var materialDict = {};
+const materials = new EntityList(materialList);
 
-for (var i = 0, n = materialList.length; i < n; ++i) {
-  if (materialList[i].id) {
-    materialDict[materialList[i].id] = materialList[i];
-  }
-}
-
-export default {
-  list: materialList,
-
-  descriptions: _.map(materialList, (m) => _.pick(m, ['id', 'name'])),
-
-  any: materialDict[settings.now.presets.default.material] || materialList[0],
-
-  get: function(id) {
-    return materialDict[id];
+/** @deprecated */
+Object.defineProperty(materials, 'list', {
+  get: function() {
+    return this.all;
   },
-};
+});
 
+/** @deprecated */
+Object.defineProperty(materials, 'any', {
+  get: function() {
+    return this.first;
+  },
+});
+
+/** @deprecated */
+Object.defineProperty(materials, 'descriptions', {
+  get: function() {
+    return _.map(this._list, (m) => _.pick(m, ['id', 'name']));
+  },
+});
+
+export default materials;

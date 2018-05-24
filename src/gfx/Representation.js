@@ -15,7 +15,7 @@ function Representation(index, mode, colorer, selector) {
   this.count = 0;
   this.material = new UberMaterial();
   this.material.setValues({clipPlane: settings.now.draft.clipPlane});
-  this.materialPreset = materials.any;
+  this.materialPreset = materials.first;
   this.needsRebuild = true;
   this.visible = true;
 

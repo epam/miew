@@ -97,7 +97,7 @@ ComplexVisual.prototype.resetReps = function(reps) {
     }
     var mode = modes.create(rep.mode);
     var colorer = colorers.create(rep.colorer);
-    var material = materials.get(rep.material) || materials.any;
+    var material = materials.get(rep.material) || materials.first;
 
     this._reprList[i] = new Representation(i, mode, colorer, selector);
     this._reprList[i].setMaterialPreset(material);
