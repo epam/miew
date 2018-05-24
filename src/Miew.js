@@ -379,7 +379,7 @@ Miew.prototype._initGfx = function() {
   gfx.renderer.autoClear = false;
   gfx.renderer.setPixelRatio(window.devicePixelRatio);
   gfx.renderer.setSize(gfx.width, gfx.height);
-  gfx.renderer.setClearColor(settings.now.themes[settings.now.theme]);
+  gfx.renderer.setClearColor(settings.now.bg.color);
   gfx.renderer.clearColor();
 
   gfx.renderer2d.setSize(gfx.width, gfx.height);
@@ -399,7 +399,7 @@ Miew.prototype._initGfx = function() {
 
   gfx.scene = new THREE.Scene();
   gfx.scene.fog = new THREE.Fog(
-    settings.now.themes[settings.now.theme],
+    settings.now.bg.color,
     settings.now.camNear, settings.now.camFar
   );
 
@@ -875,7 +875,7 @@ Miew.prototype._updateFog = function() {
 
   if (settings.now.fog) {
     if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
-      gfx.scene.fog = new THREE.Fog(settings.now.themes[settings.now.theme]);
+      gfx.scene.fog = new THREE.Fog(settings.now.bg.color);
       this._setUberMaterialValues({fog: settings.now.fog});
     }
     updateFogRange(gfx.scene.fog, gfx.camera.position.z, this._getBSphereRadius());
@@ -987,7 +987,7 @@ Miew.prototype._renderFrame = (function() {
   };
 
 })();
-
+/** @deprecated - use _onBgColorChanged */
 Miew.prototype._onThemeChanged = (function() {
   var themeRE = /\s*theme-\w+\b/g;
   return function() {
@@ -995,9 +995,16 @@ Miew.prototype._onThemeChanged = (function() {
     var div = this._containerRoot;
     div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
 
-    var gfx = this._gfx;
+    settings.set('bg.color',settings.now.themes[theme]);
+    this._needRender = true;
+  };
+})();
+
+Miew.prototype._onBgColorChanged  = (function() {
+  return function() {
+    const gfx = this._gfx;
+    const color = settings.now.bg.color;
     if (gfx) {
-      var color = settings.now.themes[theme];
       if (gfx.scene.fog) {
         gfx.scene.fog.color.set(color);
       }
@@ -1025,7 +1032,7 @@ Miew.prototype._renderScene = (function() {
     var gfx = this._gfx;
 
     // render to offscreen buffer
-    gfx.renderer.setClearColor(settings.now.themes[settings.now.theme], 1);
+    gfx.renderer.setClearColor(settings.now.bg.color, 1);
     gfx.renderer.clearTarget(target);
     if (gfx.renderer.vr.enabled) {
       gfx.renderer.render(gfx.scene, camera);
@@ -1299,7 +1306,7 @@ Miew.prototype._performFXAA = (function() {
     var gfx = self._gfx;
 
     // clear canvas
-    gfx.renderer.setClearColor(settings.now.themes[settings.now.theme], 1);
+    gfx.renderer.setClearColor(settings.now.bg.color, 1);
     gfx.renderer.clearTarget(targetBuffer);
 
     // do fxaa processing of offscreen buff2
@@ -3092,7 +3099,12 @@ Miew.prototype._initOnSettingsChanged = function() {
   };
 
   on('theme', () => {
+    // TODO add warning
     this._onThemeChanged();
+  });
+
+  on('bg.color', () => {
+    this._onBgColorChanged();
   });
 
   on('draft.clipPlane', (evt) => {
