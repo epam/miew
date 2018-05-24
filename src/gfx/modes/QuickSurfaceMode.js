@@ -12,6 +12,8 @@ utils.deriveClass(QuickSurfaceMode, SurfaceMode, {
   name: 'Quick Surface',
   shortName: 'Quick Surf',
   surfaceNames: ['QuickSurfGeo'],
+}, {
+  id: 'QS',
 });
 
 QuickSurfaceMode.prototype.getSurfaceOpts = function() {

@@ -194,11 +194,15 @@ function createElement(tag, attrs, content) {
  * Derive the class from the base.
  * @param cls {function} - Class (constructor) to derive.
  * @param base {function} - Class (constructor) to derive from.
- * @param members {object=} - Optional members to add.
+ * @param members {object=} - Optional instance members to add.
+ * @param statics {object=} - Optional static class members to add.
  * @returns {function} Original class.
  */
-function deriveClass(cls, base, members) {
+function deriveClass(cls, base, members, statics) {
   cls.prototype = _.assign(Object.create(base.prototype), {constructor: cls}, members);
+  if (statics) {
+    _.assign(cls, statics);
+  }
   return cls;
 }
 

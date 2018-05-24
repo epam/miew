@@ -23,6 +23,8 @@ utils.deriveClass(TemperatureColorer, Colorer, {
   id: 'TM', // [T]e[M]perature
   name: 'Temperature',
   shortName: 'Temperature',
+}, {
+  id: 'TM',
 });
 
 TemperatureColorer.prototype.getAtomColor = function(atom, _complex) {

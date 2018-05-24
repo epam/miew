@@ -21,9 +21,11 @@ function ElementColorer(opts) {
 
 utils.deriveClass(ElementColorer, Colorer, {
   id: 'EL',
-  aliases: ['AT'], // backward compatibility after renaming [A]tom [T]ype -> [EL]ement
+  aliases: ['AT'], // @deprecated
   name: 'Element',
   shortName: 'Element',
+}, {
+  id: ['EL', 'AT'], // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
 });
 
 ElementColorer.prototype.getAtomColor = function(atom, _complex) {

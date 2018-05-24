@@ -11,6 +11,8 @@ utils.deriveClass(TextMode, Mode, {
   name: 'Text mode',
   shortName: 'Text',
   depGroups: ['TextLabelsGeo']
+}, {
+  id: 'TX',
 });
 
 TextMode.prototype.getTemplateOptions = function() {

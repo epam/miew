@@ -26,6 +26,8 @@ utils.deriveClass(LinesMode, LabeledMode, {
     'BondsLines',
     'OrphanedAtomsCrosses',
   ],
+}, {
+  id: 'LN',
 });
 
 LinesMode.prototype.drawMultiorderBonds = function() {

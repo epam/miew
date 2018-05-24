@@ -9,9 +9,11 @@ function SequenceColorer(opts) {
 
 utils.deriveClass(SequenceColorer, Colorer, {
   id: 'SQ',
-  aliases: ['RI'], // backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
+  aliases: ['RI'], // @deprecated
   name: 'Sequence',
   shortName: 'Sequence',
+}, {
+  id: ['SQ', 'RI'], // 'RI' is @deprecated backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
 });
 
 SequenceColorer.prototype.getAtomColor = function(atom, complex) {

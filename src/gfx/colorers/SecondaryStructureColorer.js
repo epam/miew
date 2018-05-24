@@ -12,6 +12,8 @@ utils.deriveClass(SecondaryStructureColorer, Colorer, {
   id: 'SS',
   name: 'Secondary Structure',
   shortName: 'Structure',
+}, {
+  id: 'SS',
 });
 
 SecondaryStructureColorer.prototype.getAtomColor = function(atom, complex) {

@@ -16,6 +16,8 @@ utils.deriveClass(LicoriceMode, LabeledMode, {
     'BondsCylinders',
     'ALoopsTorus',
   ],
+}, {
+  id: 'LC',
 });
 
 LicoriceMode.prototype.calcAtomRadius = function(_atom) {

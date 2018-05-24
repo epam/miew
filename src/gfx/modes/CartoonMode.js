@@ -19,6 +19,8 @@ utils.deriveClass(CartoonMode, Mode, {
     'NucleicSpheres',
     'NucleicCylinders',
   ],
+}, {
+  id: 'CA',
 });
 
 CartoonMode.prototype.getResidueStartRadius = function(residue) {

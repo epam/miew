@@ -11,6 +11,8 @@ utils.deriveClass(IsoSurfaceSESMode, IsoSurfaceMode, {
   id: 'SE',
   name: 'Solvent Excluded Surface',
   shortName: 'SES',
+}, {
+  id: 'SE',
 });
 
 export default IsoSurfaceSESMode;

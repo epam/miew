@@ -13,6 +13,8 @@ utils.deriveClass(TubeMode, Mode, {
   name: 'Tube',
   shortName: 'Tube',
   depGroups: ['CartoonChains'],
+}, {
+  id: 'TU',
 });
 
 TubeMode.prototype.getResidueRadius = function(_residue) {

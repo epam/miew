@@ -11,6 +11,8 @@ utils.deriveClass(UniformColorer, Colorer, {
   id: 'UN',
   name: 'Uniform',
   shortName: 'Uniform',
+}, {
+  id: 'UN',
 });
 
 UniformColorer.prototype.getAtomColor = function(_atom, _complex) {

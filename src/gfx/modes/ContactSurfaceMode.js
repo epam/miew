@@ -13,6 +13,8 @@ utils.deriveClass(ContactSurfaceMode, SurfaceMode, {
   shortName: 'Contact Surf',
   isSurface: true,
   surfaceNames: ['ContactSurfaceGeo'],
+}, {
+  id: 'CS',
 });
 
 ContactSurfaceMode.prototype.getSurfaceOpts = function() {

@@ -11,6 +11,8 @@ utils.deriveClass(ConformationColorer, Colorer, {
   id: 'CF', // [C]on[F]ormation
   name: 'Conformation',
   shortName: 'Conformation',
+}, {
+  id: 'CF',
 });
 
 ConformationColorer.prototype.getAtomColor = function(atom, _complex) {

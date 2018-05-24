@@ -12,6 +12,8 @@ utils.deriveClass(VanDerWaalsMode, Mode, {
   name: 'Van der Waals',
   shortName: 'VDW',
   depGroups: ['AtomsSpheres'],
+}, {
+  id: 'VW',
 });
 
 VanDerWaalsMode.prototype.calcAtomRadius = function(atom) {

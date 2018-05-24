@@ -11,6 +11,8 @@ utils.deriveClass(HydrophobicityColorer, Colorer, {
   id: 'HY',
   name: 'Hydrophobicity',
   shortName: 'Hydrophobicity',
+}, {
+  id: 'HY',
 });
 
 HydrophobicityColorer.prototype.getAtomColor = function(atom, complex) {

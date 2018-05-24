@@ -24,6 +24,8 @@ utils.deriveClass(ConditionalColorer, Colorer, {
   id: 'CO',
   name: 'Conditional',
   shortName: 'Conditional',
+}, {
+  id: 'CO',
 });
 
 ConditionalColorer.prototype.getAtomColor = function(atom, _complex) {

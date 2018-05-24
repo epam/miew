@@ -17,6 +17,8 @@ utils.deriveClass(BallsAndSticksMode, LabeledMode, {
     'BondsCylinders',
     'ALoopsTorus',
   ],
+}, {
+  id: 'BS',
 });
 
 BallsAndSticksMode.prototype.calcAtomRadius = function(atom) {

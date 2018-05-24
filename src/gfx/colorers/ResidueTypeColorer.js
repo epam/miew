@@ -19,6 +19,8 @@ utils.deriveClass(ResidueTypeColorer, Colorer, {
   id: 'RT',
   name: 'Residue Type',
   shortName: 'Residue',
+}, {
+  id: 'RT',
 });
 
 ResidueTypeColorer.prototype.getAtomColor = function(atom, complex) {

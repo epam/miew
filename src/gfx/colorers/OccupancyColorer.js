@@ -23,6 +23,8 @@ utils.deriveClass(OccupancyColorer, Colorer, {
   id: 'OC', // [OC]cupancy
   name: 'Occupancy',
   shortName: 'Occupancy',
+}, {
+  id: 'OC',
 });
 
 OccupancyColorer.prototype.getAtomColor = function(atom, _complex) {

@@ -11,6 +11,8 @@ utils.deriveClass(MoleculeColorer, Colorer, {
   id: 'MO',
   name: 'Molecule',
   shortName: 'Molecule',
+}, {
+  id: 'MO',
 });
 
 MoleculeColorer.prototype.getAtomColor = function(atom, complex) {

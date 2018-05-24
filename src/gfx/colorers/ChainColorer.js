@@ -11,6 +11,8 @@ utils.deriveClass(ChainColorer, Colorer, {
   id: 'CH',
   name: 'Chain',
   shortName: 'Chain',
+}, {
+  id: 'CH',
 });
 
 ChainColorer.prototype.getAtomColor = function(atom, complex) {

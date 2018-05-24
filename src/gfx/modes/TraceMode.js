@@ -12,6 +12,8 @@ utils.deriveClass(TraceMode, Mode, {
   name: 'Trace',
   shortName: 'Trace',
   depGroups: ['TraceChains'],
+}, {
+  id: 'TR',
 });
 
 TraceMode.prototype.calcStickRadius = function() {
