@@ -3,10 +3,12 @@
     <properties>
       <sourceFilesUrls>
         <item url="file://$PROJECT_DIR$/src/utils/MiewCLIParser.js" />
+        <item url="file://$PROJECT_DIR$/src/utils/SelectionParser.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
       <root url="file://$PROJECT_DIR$/src/utils/MiewCLIParser.js" />
+      <root url="file://$PROJECT_DIR$/src/utils/SelectionParser.js" />
     </CLASSES>
     <SOURCES />
   </library>
