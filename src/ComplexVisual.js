@@ -73,6 +73,15 @@ ComplexVisual.prototype.getEditor = function() {
   return this._editor;
 };
 
+function lookupAndCreate(entityList, specs) {
+  if (!Array.isArray(specs)) {
+    specs = [specs];
+  }
+  let [id, opts] = specs;
+  let Entity = entityList.get(id) || entityList.first;
+  return new Entity(opts);
+}
+
 ComplexVisual.prototype.resetReps = function(reps) {
   // Create all necessary representations
   if (this._complex) {
@@ -95,8 +104,8 @@ ComplexVisual.prototype.resetReps = function(reps) {
       selector = rep.selector;
       selectorString = selector.toString();
     }
-    var mode = modes.create(rep.mode);
-    var colorer = colorers.create(rep.colorer);
+    var mode = lookupAndCreate(modes, rep.mode);
+    var colorer = lookupAndCreate(colorers, rep.colorer);
     var material = materials.get(rep.material) || materials.first;
 
     this._reprList[i] = new Representation(i, mode, colorer, selector);
@@ -203,7 +212,7 @@ ComplexVisual.prototype.rep = function(index, rep) {
       const newMode = rep.mode;
       if (!_.isEqual(desc.mode, newMode)) {
         desc.mode = newMode;
-        target.setMode(modes.create(rep.mode));
+        target.setMode(lookupAndCreate(modes, rep.mode));
         changed = true;
         logger.debug('rep[' + index + '].mode changed to ' + newMode);
 
@@ -221,7 +230,7 @@ ComplexVisual.prototype.rep = function(index, rep) {
       const newColorer = rep.colorer;
       if (!_.isEqual(desc.colorer, newColorer)) {
         desc.colorer = newColorer;
-        target.colorer = colorers.create(rep.colorer);
+        target.colorer = lookupAndCreate(colorers, rep.colorer);
         changed = true;
         logger.debug('rep[' + index + '].colorer changed to ' + newColorer);
       }
@@ -305,8 +314,8 @@ ComplexVisual.prototype.repAdd = function(rep) {
   var selector = (typeof desc.selector === 'string') ? selectors.parse(desc.selector).selector : desc.selector;
   var target = new Representation(
     this._selectionBit,
-    modes.create(desc.mode),
-    colorers.create(desc.colorer),
+    lookupAndCreate(modes, desc.mode),
+    lookupAndCreate(colorers, desc.colorer),
     selector
   );
   target.selectorString = selector.toString();

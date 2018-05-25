@@ -50,26 +50,13 @@ Object.defineProperty(colorers, 'descriptions', {
   },
 });
 
-/**
- * Create a colorer instance.
- *
- * @deprecated
- * @param {string|Array} colorer - Colorer identifier or two-element array containing both colorer identifier
- *   and options.
- * @param {object=} opts - Colorer options object overriding defaults.
- * @returns {object} New colorer object.
- *
- * @example
- * c = create('UN');                      // create Unified colorer
- * c = create('UN', {color: 0x00FF00});   // override unified color
- * c = create(['UN', {color: 0x00FF00}]); // pass an array (e.g. received from deserializing the colorer settings)
- */
+/** @deprecated */
 colorers.create = function(colorer, opts) {
   if (!opts && colorer instanceof Array) {
     opts = colorer[1];
     colorer = colorer[0];
   }
-  const Colorer = this.get(colorer) || this.any;
+  const Colorer = this.get(colorer) || this.first;
   return new Colorer(opts);
 };
 

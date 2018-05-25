@@ -205,14 +205,15 @@ Menu.prototype._fillUniformColorCombo = function(paletteID) {
   });
 };
 
-Menu.prototype._fillCombo = function(type, name, path, module) {
+Menu.prototype._fillCombo = function(type, name, path, entityList) {
   var self = this;
   var frag = document.createDocumentFragment();
   var newItem;
 
   var comboboxPanel = $(self._menuId + ' [data-panel-type=' + type + ']').get(0);
-  for (var i = 0, n = module.list.length; i < n; i++) {
-    var entry = module.list[i];
+  var list = entityList.all;
+  for (var i = 0, n = list.length; i < n; i++) {
+    var entry = list[i];
     entry = entry.prototype || entry;  // entry may be Class or Object
     newItem = createElement('a', {
       'href':        '#',
@@ -1120,7 +1121,9 @@ Menu.prototype._initReprPanel = function() {
     if (index > 0) {
       self._copyCurReprListItem(index);
     } else {
-      var fakeRepr = new Representation(0, modes.create(), colorers.create(), selectors.all());
+      var Mode = modes.first;
+      var Colorer = colorers.first;
+      var fakeRepr = new Representation(0, new Mode(), new Colorer(), selectors.all());
       self._addReprListItem(reprList.get(0), index, fakeRepr);
       var selector = reprList.find('.panel:eq(' + index + ')');
       selector.addClass('added');
@@ -2423,10 +2426,11 @@ Menu.prototype._initToolbar = function() {
   var frag = document.createDocumentFragment();
   var newItem;
 
-  function fillToolbar(type, name, option, module) {
+  function fillToolbar(type, name, option, entityList) {
     var toolbar = $(self._menuId + ' [data-toolbar-type=' + type + ']').get(0);
-    for (var i = 0, n = module.list.length; i < n; i++) {
-      var entry = module.list[i];
+    var list = entityList.all;
+    for (var i = 0, n = list.length; i < n; i++) {
+      var entry = list[i];
       entry = entry.prototype || entry;  // entry may be Class or Object
       newItem = createElement('a', {
         'href':        '#',
@@ -2718,8 +2722,8 @@ Menu.prototype._isXS = function() {
   return document.documentElement.clientWidth < nWideWidth;
 };
 
-Menu.prototype._updateDisplayOptions = function(id, name, module) {
-  var entry = module.get(settings.get(name)) || module.any;
+Menu.prototype._updateDisplayOptions = function(id, name, entityList) {
+  var entry = entityList.get(settings.get(name)) || entityList.first;
   entry = entry.prototype || entry;
   $(this._menuId + ' .list-group-item[data-value="' +
       id + '"]')[0].firstElementChild.firstElementChild.textContent = entry.name;

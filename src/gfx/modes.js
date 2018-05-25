@@ -50,23 +50,13 @@ Object.defineProperty(modes, 'descriptions', {
   },
 });
 
-/**
-* Create a mode instance.
-* @param {string|Array} mode - Mode identifier or two-element array containing both mode identifier and options.
-* @param {object=} opts - Mode options object overriding defaults.
-* @returns {Mode} New mode object.
-*
-* @example
-* m = create('BS');                // create Balls and Sticks mode
-* m = create('BS', {atom: 0.1});   // override atom radius
-* m = create(['BS', {atom: 0.1}]); // pass an array (e.g. received from deserializing the mode settings)
-*/
+/** @deprecated */
 modes.create = function(mode, opts) {
   if (!opts && mode instanceof Array) {
     opts = mode[1];
     mode = mode[0];
   }
-  const Mode = this.get(mode) || this.any;
+  const Mode = this.get(mode) || this.first;
   return new Mode(opts);
 };
 

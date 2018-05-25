@@ -62,7 +62,8 @@ describe('As a power user, I want to', function() {
     ['materials', 'SF'],
   ].forEach(([listName, sampleId]) => {
     it(`retrieve a list of ${listName} including "${sampleId}"`, function() {
-      retrieve[listName] = page.getValueFor(`miew.constructor.${listName}.descriptions`);
+      const func = 'function(x){return{id:Array.isArray(x.id)?x.id[0]:x.id,name:x.prototype?x.prototype.name:x.name};}';
+      retrieve[listName] = page.getValueFor(`miew.constructor.${listName}.all.map(${func})`);
       return retrieve[listName].then((list) => {
         expect(list).to.be.an('Array');
         expect(list).to.be.not.empty();
