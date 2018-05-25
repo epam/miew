@@ -28,7 +28,7 @@ If you decide to update the thumbnails, here are the instructions.
 
  1. Use the following URL Query String to see 1AID file from the fixed viewpoint. 
 
-        ?l=1AID&r=0&m=VW&s=not+water&c=CF&v=18KeRwuF6IsJGtmPAs%2B8XPZrOGD9xy0I/ku/APQ==&fogFarFactor=0.4&fogNearFactor=0&axes=false&fxaa=false&ao=true
+        ?l=mmtf:1AID&r=0&m=VW&s=not+water&c=CF&v=18KeRwuF6IsJGtmPAs%2B8XPZrOGD9xy0I/ku/APQ==&fogFarFactor=0.4&fogNearFactor=0&axes=false&fxaa=false&ao=true
 
  2. Select the desired coloring.
  3. Open the terminal window and take a 512 &times; 512 screenshot.
@@ -63,7 +63,8 @@ If you decide to update the thumbnails, here are the instructions.
 
  1. Use the following URL Query String to see Glycine from the fixed viewpoint. 
 
-        ?l=pc:glycine&axes=0&v=1TZW7PYUIlT05tEi8X2ztPgAAAAAAAACAmoKCPw==
+        ?l=mmtf:1CRN&p=macro&s=sequence+22:34&r=1&s=sequence+2:3&v=1bjwPwW3%2BQsFuFMbA1kUQPpO4Wj8/v1K/zsjhPg%3D%3D&theme=light&axes=false&fog=false
+
 
  2. Select the desired palette.
  3. Open the terminal window and take a 512 &times; 512 screenshot.
