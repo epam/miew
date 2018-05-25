@@ -170,7 +170,7 @@ class EntityList {
   get(key, index) {
     const dict = this._dict[index || this._indices[0]];
     if (dict) {
-      const values = dict[key.toLowerCase()];
+      const values = dict[key && key.toLowerCase()];
       return values && values.length > 0 ? values[0] : undefined;
     }
     return undefined;

@@ -151,6 +151,10 @@ describe('EntityList', () => {
       expect(entityList.get('c')).to.be.an('undefined');
     });
 
+    it('ignores undefined key', () => {
+      expect(secondList.get(undefined)).to.be.an('undefined');
+    });
+
     it('ignores anything if empty', () => {
       entityList = new EntityList();
       expect(entityList.get('a')).to.be.an('undefined');
