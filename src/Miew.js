@@ -358,7 +358,7 @@ Miew.prototype._initGfx = function() {
     height: this._container.clientHeight
   };
 
-  var webGLOptions = {preserveDrawingBuffer: true};
+  var webGLOptions = {preserveDrawingBuffer: true, alpha: true};
   if (settings.now.antialias) {
     webGLOptions.antialias = true;
   }
@@ -379,7 +379,7 @@ Miew.prototype._initGfx = function() {
   gfx.renderer.autoClear = false;
   gfx.renderer.setPixelRatio(window.devicePixelRatio);
   gfx.renderer.setSize(gfx.width, gfx.height);
-  gfx.renderer.setClearColor(settings.now.bg.color);
+  gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
   gfx.renderer.clearColor();
 
   gfx.renderer2d.setSize(gfx.width, gfx.height);
@@ -1008,7 +1008,7 @@ Miew.prototype._onBgColorChanged  = (function() {
       if (gfx.scene.fog) {
         gfx.scene.fog.color.set(color);
       }
-      gfx.renderer.setClearColor(color);
+      gfx.renderer.setClearColor(color, settings.now.bg.transparent ? 0 : 1);
     }
     this._needRender = true;
   };
@@ -1032,7 +1032,7 @@ Miew.prototype._renderScene = (function() {
     var gfx = this._gfx;
 
     // render to offscreen buffer
-    gfx.renderer.setClearColor(settings.now.bg.color, 1);
+    gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
     gfx.renderer.clearTarget(target);
     if (gfx.renderer.vr.enabled) {
       gfx.renderer.render(gfx.scene, camera);
@@ -1306,7 +1306,7 @@ Miew.prototype._performFXAA = (function() {
     var gfx = self._gfx;
 
     // clear canvas
-    gfx.renderer.setClearColor(settings.now.bg.color, 1);
+    gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
     gfx.renderer.clearTarget(targetBuffer);
 
     // do fxaa processing of offscreen buff2
@@ -3104,6 +3104,10 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('bg.color', () => {
+    this._onBgColorChanged();
+  });
+
+  on('bg.transparent', () => {
     this._onBgColorChanged();
   });
 
