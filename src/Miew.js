@@ -995,7 +995,7 @@ Miew.prototype._onThemeChanged = (function() {
     var div = this._containerRoot;
     div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
 
-    settings.set('bg.color',settings.now.themes[theme]);
+    settings.set('bg.color', settings.now.themes[theme]);
     this._needRender = true;
   };
 })();
