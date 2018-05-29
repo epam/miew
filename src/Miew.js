@@ -358,7 +358,7 @@ Miew.prototype._initGfx = function() {
     height: this._container.clientHeight
   };
 
-  var webGLOptions = {preserveDrawingBuffer: true, alpha: true};
+  var webGLOptions = {preserveDrawingBuffer: true, alpha: true, premultipliedAlpha: false};
   if (settings.now.antialias) {
     webGLOptions.antialias = true;
   }
@@ -1010,6 +1010,17 @@ Miew.prototype._onBgColorChanged  = (function() {
       }
       gfx.renderer.setClearColor(color, settings.now.bg.transparent ? 0 : 1);
     }
+    this._needRender = true;
+  };
+})();
+
+Miew.prototype._onBgTransparentChanged  = (function() {
+  return function() {
+    const gfx = this._gfx;
+    if (gfx) {
+      gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
+    }
+    this._setUberMaterialValues({transparent: false, fogTransparent: settings.now.bg.transparent});
     this._needRender = true;
   };
 })();
@@ -3108,7 +3119,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('bg.transparent', () => {
-    this._onBgColorChanged();
+    this._onBgTransparentChanged();
   });
 
   on('draft.clipPlane', (evt) => {

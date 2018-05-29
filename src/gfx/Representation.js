@@ -14,7 +14,7 @@ function Representation(index, mode, colorer, selector) {
   this.selectorString = ''; // FIXME
   this.count = 0;
   this.material = new UberMaterial();
-  this.material.setValues({clipPlane: settings.now.draft.clipPlane});
+  this.material.setValues({clipPlane: settings.now.draft.clipPlane, fogTransparent: settings.now.bg.transparent});
   this.materialPreset = materials.first;
   this.needsRebuild = true;
   this.visible = true;

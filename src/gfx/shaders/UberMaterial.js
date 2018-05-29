@@ -86,6 +86,8 @@ function UberMaterial(params) {
   this.transparent = true;
   // mark as thick lines
   this.thickLine = false;
+  // makes fog begin transparency (required for transparent background)
+  this.fogTransparent = false;
 
   // uber options of "root" materials are inherited from single uber-options object that resides in prototype
   this.uberOptions = Object.create(UberMaterial.prototype.uberOptions);
@@ -170,6 +172,7 @@ UberMaterial.prototype.copy = function(source) {
   this.prepassTransparancy = source.prepassTransparancy;
   this.dashedLine = source.dashedLine;
   this.thickLine = source.thickLine;
+  this.fogTransparent = source.fogTransparent;
 
   this.uberOptions.copy(source.uberOptions);
 
@@ -248,6 +251,9 @@ UberMaterial.prototype.setValues = function(values) {
   }
   if (this.thickLine) {
     defines.THICK_LINE = 1;
+  }
+  if (this.fogTransparent) {
+    defines.FOG_TRANSPARENT = 1;
   }
   // set dependent values
   this.defines = defines;

@@ -6,6 +6,7 @@ import SceneObject from './SceneObject';
 import gfxutils from '../gfxutils';
 import UberMaterial from '../shaders/UberMaterial';
 import meshes from '../meshes/meshes';
+import settings from '../../settings';
 
 function LinesObj(params, opts) {
   SceneObject.call(this, params, opts);
@@ -41,7 +42,12 @@ LinesObj.prototype.build = function(complex) {
   geom.dynamic = true;
   geom.computeBoundingBox();
 
-  this._line = new meshes.Line(geom, new UberMaterial({lights: false, overrideColor: true, dashedLine: true}));
+  this._line = new meshes.Line(geom, new UberMaterial({
+    lights: false,
+    overrideColor: true,
+    dashedLine: true,
+    fogTransparent: settings.now.bg.transparent
+  }));
   this._line.computeLineDistances();
   this._line.material.setUberOptions({
     fixedColor: new THREE.Color(this.opts.color),

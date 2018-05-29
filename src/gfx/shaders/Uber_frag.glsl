@@ -420,7 +420,11 @@ void main() {
 
   #ifdef USE_FOG
     float fogFactor = smoothstep( fogNear, fogFar, vViewPosition.z );
-    gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+    #ifdef FOG_TRANSPARENT
+      gl_FragColor.a = 1.0 - fogFactor;
+    #else
+      gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+    #endif
   #endif
 #endif
 
