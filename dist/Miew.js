@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.17 Copyright (c) 2015-2018 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.18 Copyright (c) 2015-2018 EPAM Systems, Inc. */
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -64058,11 +64058,15 @@
 	 * Derive the class from the base.
 	 * @param cls {function} - Class (constructor) to derive.
 	 * @param base {function} - Class (constructor) to derive from.
-	 * @param members {object=} - Optional members to add.
+	 * @param members {object=} - Optional instance members to add.
+	 * @param statics {object=} - Optional static class members to add.
 	 * @returns {function} Original class.
 	 */
-	function deriveClass(cls, base, members) {
+	function deriveClass(cls, base, members, statics) {
 	  cls.prototype = lodash.assign(Object.create(base.prototype), { constructor: cls }, members);
+	  if (statics) {
+	    lodash.assign(cls, statics);
+	  }
 	  return cls;
 	}
 
@@ -64353,45 +64357,6 @@
 	  // quote incorrect identifier
 	  enquoteHelper[1] = value;
 	  return enquoteHelper.join('');
-	}
-
-	function registerInList(list, value) {
-	  if (!list.includes(value)) {
-	    list.push(value);
-	  }
-	}
-
-	function unregisterFromList(list, value) {
-	  var pos = list.indexOf(value);
-	  if (pos !== -1) {
-	    list.splice(pos, 1);
-	  }
-	}
-
-	function registerInDict(dict, keys, value) {
-	  keys.forEach(function (key) {
-	    key = key.toLowerCase();
-	    var list = dict[key] = dict[key] || [];
-	    if (!list.includes(value)) {
-	      list.push(value);
-	    }
-	  });
-	}
-
-	function unregisterFromDict(dict, keys, value) {
-	  keys.forEach(function (key) {
-	    key = key.toLowerCase();
-	    var list = dict[key];
-	    if (list) {
-	      var pos = list.indexOf(value);
-	      if (pos !== -1) {
-	        list.splice(pos, 1);
-	      }
-	      if (list.length === 0) {
-	        delete dict[key];
-	      }
-	    }
-	  });
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -65303,11 +65268,18 @@
 	   * Theme to use, 'dark' or 'light'.
 	   * @type {string}
 	   * @instance
+	   * @deprecated Old-fashioned theme paradigma, to be removed in the next major version.
 	   */
 	  theme: 'dark',
+	  /** @deprecated Old-fashioned theme paradigma, to be removed in the next major version. */
 	  themes: {
 	    dark: 0x202020,
 	    light: 0xcccccc
+	  },
+
+	  bg: {
+	    color: 0x202020,
+	    transparent: false
 	  },
 
 	  draft: {
@@ -72445,7 +72417,8 @@
 	var StructureType$1 = SecondaryStructureMap.StructureType;
 	var StructuralElementType$2 = StructuralElement.Type;
 
-	var helixClassMap = (_helixClassMap = {}, defineProperty(_helixClassMap, StructureType$1.HELIX_ALPHA, 1), defineProperty(_helixClassMap, StructureType$1.HELIX_310, 3), defineProperty(_helixClassMap, StructureType$1.HELIX_PI, 5), _helixClassMap);
+	// see http://www.wwpdb.org/documentation/file-format-content/format33/sect5.html#HELIX
+	var helixClassMap = (_helixClassMap = {}, defineProperty(_helixClassMap, StructureType$1.HELIX_ALPHA, 1), defineProperty(_helixClassMap, StructureType$1.HELIX_PI, 3), defineProperty(_helixClassMap, StructureType$1.HELIX_310, 5), _helixClassMap);
 
 	var loopMap = (_loopMap = {}, defineProperty(_loopMap, StructureType$1.BRIDGE, StructuralElementType$2.BRIDGE), defineProperty(_loopMap, StructureType$1.TURN, StructuralElementType$2.TURN), defineProperty(_loopMap, StructureType$1.BEND, StructuralElementType$2.BEND), defineProperty(_loopMap, StructureType$1.LOOP, StructuralElementType$2.COIL), _loopMap);
 
@@ -73731,6 +73704,237 @@
 	Visual.prototype.getBoundaries = function () {
 	  return _defaultBoundaries;
 	};
+
+	/** An indexed list of objects or classes. */
+	var EntityList = function () {
+	  /**
+	   * Create a list of objects.
+	   * The objects can be indexed by one or more properties for the later retrieval.
+	   *
+	   * @param {!Array<Object>=} entities A list of objects to automatically register at creation time.
+	   * @param {!Array<string>=} indices A list of property names to use for case-insensitive indexing.
+	   *   By default, a single `.id` property is used.
+	   * @see EntityList#register
+	   */
+	  function EntityList() {
+	    var _this = this;
+
+	    var entities = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+	    var indices = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ['id'];
+	    classCallCheck(this, EntityList);
+
+	    this._list = [];
+	    this._dict = {};
+	    this._indices = [].concat(toConsumableArray(indices));
+	    this._indices.forEach(function (index) {
+	      _this._dict[index] = {};
+	    });
+
+	    entities.forEach(function (entity) {
+	      return _this.register(entity);
+	    });
+	  }
+
+	  /**
+	   * Add a value to the end of a list.
+	   * The list will contain only one copy of the value.
+	   *
+	   * @param {!Array} list An array.
+	   * @param {*} value A value to add.
+	   * @see EntityList.unregisterFromList
+	   * @see EntityList.registerInDict
+	   */
+
+
+	  createClass(EntityList, [{
+	    key: 'register',
+
+
+	    /**
+	     * Add an entity to this list.
+	     *
+	     * @param {!Object} entity An object or a class to register. The object must include all
+	     *   properties specified as indices on construction.
+	     * @see EntityList#unregister
+	     */
+	    value: function register(entity) {
+	      var _this2 = this;
+
+	      EntityList.registerInList(this._list, entity);
+	      this._indices.forEach(function (index) {
+	        EntityList.registerInDict(_this2._dict[index], _ensureArray(entity[index]), entity);
+	      });
+	    }
+
+	    /**
+	     * Remove an entity from this list.
+	     *
+	     * @param {!Object} entity An object or a class to unregister. The object may be
+	     *   missing from the list but it must include all properties specified as indices
+	     *   on construction.
+	     * @see EntityList#register
+	     */
+
+	  }, {
+	    key: 'unregister',
+	    value: function unregister(entity) {
+	      var _this3 = this;
+
+	      EntityList.unregisterFromList(this._list, entity);
+	      this._indices.forEach(function (index) {
+	        EntityList.unregisterFromDict(_this3._dict[index], _ensureArray(entity[index]), entity);
+	      });
+	    }
+
+	    /**
+	     * An ordered list of all registered entities.
+	     * It is a read-only copy, use {@link EntityList#register} and {@link EntityList#unregister}
+	     * to modify it.
+	     *
+	     * @type {!Array<Object>}
+	     */
+
+	  }, {
+	    key: 'keys',
+
+
+	    /**
+	     * Retrieve a list of keys for the index.
+	     *
+	     * @param {string=} index One of the indices specified during the list construction. If omitted,
+	     *   the first of the indices is used.
+	     * @returns {!Array<string>} An unordered list of keys in the index, i.e. particular property
+	     *   values for all registered entities.
+	     */
+	    value: function keys(index) {
+	      return Object.keys(this._dict[index || this._indices[0]]);
+	    }
+
+	    /**
+	     * Retrieve an entity by its key.
+	     *
+	     * @param {string} key A case-insensitive property value to look-up.
+	     * @param {string=} index One of the indices specified during the list construction. If omitted,
+	     *   the first of the indices is used.
+	     * @returns {Object=} An object registered in the index under the key. If there are multiple
+	     *   objects under the same key, the first one is returned.
+	     */
+
+	  }, {
+	    key: 'get',
+	    value: function get$$1(key, index) {
+	      var dict = this._dict[index || this._indices[0]];
+	      if (dict) {
+	        var values = dict[key && key.toLowerCase()];
+	        return values && values.length > 0 ? values[0] : undefined;
+	      }
+	      return undefined;
+	    }
+	  }, {
+	    key: 'all',
+	    get: function get$$1() {
+	      return [].concat(toConsumableArray(this._list));
+	    }
+
+	    /**
+	     * The first registered entity.
+	     * Use it if you do not care which entity you are referring to.
+	     *
+	     * @type {Object=}
+	     */
+
+	  }, {
+	    key: 'first',
+	    get: function get$$1() {
+	      return this._list[0];
+	    }
+	  }], [{
+	    key: 'registerInList',
+	    value: function registerInList(list, value) {
+	      if (!list.includes(value)) {
+	        list.push(value);
+	      }
+	    }
+
+	    /**
+	     * Remove a value from a list if it is there.
+	     *
+	     * @param {!Array} list An array.
+	     * @param {*} value A value to remove.
+	     * @see EntityList.registerInList
+	     */
+
+	  }, {
+	    key: 'unregisterFromList',
+	    value: function unregisterFromList(list, value) {
+	      var pos = list.indexOf(value);
+	      if (pos !== -1) {
+	        list.splice(pos, 1);
+	      }
+	    }
+
+	    /**
+	     * Add a value to a dictionary.
+	     * The value may be stored under multiple different keys (aliases).
+	     * There might be multiples values stored under the same key.
+	     *
+	     * @param {!Object<string,*>} dict A dictionary.
+	     * @param {!Array<string>} keys An array of keys.
+	     * @param {*} value A value to add.
+	     * @see EntityList.unregisterFromDict
+	     * @see EntityList.registerInList
+	     */
+
+	  }, {
+	    key: 'registerInDict',
+	    value: function registerInDict(dict, keys, value) {
+	      keys.forEach(function (key) {
+	        key = key.toLowerCase();
+	        var list = dict[key] = dict[key] || [];
+	        if (!list.includes(value)) {
+	          list.push(value);
+	        }
+	      });
+	    }
+
+	    /**
+	     * Remove a value from a dictionary.
+	     * The value may be stored under multiple different keys (aliases).
+	     * There might be multiples values stored under the same key.
+	     *
+	     * @param {!Object<string,*>} dict A dictionary.
+	     * @param {!Array<string>} keys An array of keys.
+	     * @param {*} value A value to add.
+	     * @see EntityList.registerInDict
+	     */
+
+	  }, {
+	    key: 'unregisterFromDict',
+	    value: function unregisterFromDict(dict, keys, value) {
+	      keys.forEach(function (key) {
+	        key = key.toLowerCase();
+	        var list = dict[key];
+	        if (list) {
+	          var pos = list.indexOf(value);
+	          if (pos !== -1) {
+	            list.splice(pos, 1);
+	          }
+	          if (list.length === 0) {
+	            delete dict[key];
+	          }
+	        }
+	      });
+	    }
+	  }]);
+	  return EntityList;
+	}();
+
+	function _ensureArray(x) {
+	  if (x === null || x === undefined || Array.isArray(x)) {
+	    return x;
+	  }
+	  return [x];
+	}
 
 	function makeContextDependent(prototype) {
 	  Object.defineProperties(prototype, {
@@ -81105,6 +81309,8 @@
 	  name: 'Lines',
 	  shortName: 'Lines',
 	  depGroups: ['ALoopsLines', 'BondsLines', 'OrphanedAtomsCrosses']
+	}, {
+	  id: 'LN'
 	});
 
 	LinesMode.prototype.drawMultiorderBonds = function () {
@@ -81149,6 +81355,8 @@
 	  name: 'Licorice',
 	  shortName: 'Licorice',
 	  depGroups: ['AtomsSpheres', 'BondsCylinders', 'ALoopsTorus']
+	}, {
+	  id: 'LC'
 	});
 
 	LicoriceMode.prototype.calcAtomRadius = function (_atom) {
@@ -81197,6 +81405,8 @@
 	  name: 'Balls and Sticks',
 	  shortName: 'Balls',
 	  depGroups: ['AtomsSpheres', 'BondsCylinders', 'ALoopsTorus']
+	}, {
+	  id: 'BS'
 	});
 
 	BallsAndSticksMode.prototype.calcAtomRadius = function (atom) {
@@ -81245,6 +81455,8 @@
 	  name: 'Van der Waals',
 	  shortName: 'VDW',
 	  depGroups: ['AtomsSpheres']
+	}, {
+	  id: 'VW'
 	});
 
 	VanDerWaalsMode.prototype.calcAtomRadius = function (atom) {
@@ -81260,6 +81472,8 @@
 	  name: 'Trace',
 	  shortName: 'Trace',
 	  depGroups: ['TraceChains']
+	}, {
+	  id: 'TR'
 	});
 
 	TraceMode.prototype.calcStickRadius = function () {
@@ -81275,6 +81489,8 @@
 	  name: 'Tube',
 	  shortName: 'Tube',
 	  depGroups: ['CartoonChains']
+	}, {
+	  id: 'TU'
 	});
 
 	TubeMode.prototype.getResidueRadius = function (_residue) {
@@ -81307,6 +81523,8 @@
 	  name: 'Cartoon',
 	  shortName: 'Cartoon',
 	  depGroups: ['CartoonChains', 'NucleicSpheres', 'NucleicCylinders']
+	}, {
+	  id: 'CA'
 	});
 
 	CartoonMode.prototype.getResidueStartRadius = function (residue) {
@@ -81435,6 +81653,8 @@
 	  name: 'Quick Surface',
 	  shortName: 'Quick Surf',
 	  surfaceNames: ['QuickSurfGeo']
+	}, {
+	  id: 'QS'
 	});
 
 	QuickSurfaceMode.prototype.getSurfaceOpts = function () {
@@ -81493,6 +81713,8 @@
 	  id: 'SA',
 	  name: 'Solvent Accessible Surface',
 	  shortName: 'SAS'
+	}, {
+	  id: 'SA'
 	});
 
 	function IsoSurfaceSESMode(opts) {
@@ -81503,6 +81725,8 @@
 	  id: 'SE',
 	  name: 'Solvent Excluded Surface',
 	  shortName: 'SES'
+	}, {
+	  id: 'SE'
 	});
 
 	function ContactSurfaceMode(opts) {
@@ -81515,6 +81739,8 @@
 	  shortName: 'Contact Surf',
 	  isSurface: true,
 	  surfaceNames: ['ContactSurfaceGeo']
+	}, {
+	  id: 'CS'
 	});
 
 	ContactSurfaceMode.prototype.getSurfaceOpts = function () {
@@ -81539,6 +81765,8 @@
 	  name: 'Text mode',
 	  shortName: 'Text',
 	  depGroups: ['TextLabelsGeo']
+	}, {
+	  id: 'TX'
 	});
 
 	TextMode.prototype.getTemplateOptions = function () {
@@ -81554,77 +81782,39 @@
 	  });
 	};
 
-	// FIXME: deps for amdclean
+	var modes = new EntityList([LinesMode, LicoriceMode, BallsAndSticksMode, VanDerWaalsMode, TraceMode, TubeMode, CartoonMode, QuickSurfaceMode, IsoSurfaceSASMode, IsoSurfaceSESMode, ContactSurfaceMode, TextMode]);
 
-	var modeList = [];
-	var modeDict = {};
-	var ag = [LinesMode, LicoriceMode, BallsAndSticksMode, VanDerWaalsMode, TraceMode, TubeMode, CartoonMode, QuickSurfaceMode, IsoSurfaceSASMode, IsoSurfaceSESMode, ContactSurfaceMode, TextMode];
-
-	(function (plugins) {
-	  for (var i = 0, n = plugins.length; i < n; ++i) {
-	    var Mode = plugins[i];
-	    modeList.push(Mode);
-	    if (Mode.prototype.id) {
-	      modeDict[Mode.prototype.id] = Mode;
-	    }
+	/** @deprecated */
+	Object.defineProperty(modes, 'list', {
+	  get: function get() {
+	    return this.all;
 	  }
-	})(ag);
+	});
 
-	// NOTE: workaround for https://github.com/gfranko/amdclean/issues/115
-	var exports$1 = /** @alias module:gfx/modes */{
-	  /**
-	   *  The list of mode constructor functions available.
-	   *  @type {Array<function(new:Mode)>}
-	   */
-	  list: modeList,
-
-	  /**
-	   * The list of mode descriptions.
-	   * @type {Array<{id:string, name:string}>}
-	   */
-	  descriptions: lodash.map(modeList, function (m) {
-	    return lodash.pick(m.prototype, ['id', 'name']);
-	  }),
-
-	  /**
-	   * The mode constructor one can use if he doesn't care (the default one).
-	   * @type {function(new:Mode)}
-	   */
-	  any: modeDict[settings.now.presets.default[0].mode] || modeList[0],
-
-	  /**
-	   * Get mode constructor function by id.
-	   * @param {string} name - Mode identifier.
-	   * @returns {function(new:Mode)} Constructor for the specified mode.
-	   * @see {@link module:gfx/modes.create|modes.create}
-	   *
-	   * @example
-	   * var Mode = modes.get('BS'); // get Balls and Sticks mode
-	   * m = new Mode();
-	   */
-	  get: function get(name) {
-	    return modeDict[name];
-	  },
-
-	  /**
-	   * Create a mode instance.
-	   * @param {string|Array} mode - Mode identifier or two-element array containing both mode identifier and options.
-	   * @param {object=} opts - Mode options object overriding defaults.
-	   * @returns {Mode} New mode object.
-	   *
-	   * @example
-	   * m = create('BS');                // create Balls and Sticks mode
-	   * m = create('BS', {atom: 0.1});   // override atom radius
-	   * m = create(['BS', {atom: 0.1}]); // pass an array (e.g. received from deserializing the mode settings)
-	   */
-	  create: function create(mode, opts) {
-	    if (!opts && mode instanceof Array) {
-	      opts = mode[1];
-	      mode = mode[0];
-	    }
-	    var Mode = this.get(mode) || this.any;
-	    return new Mode(opts);
+	/** @deprecated */
+	Object.defineProperty(modes, 'any', {
+	  get: function get() {
+	    return this.first;
 	  }
+	});
+
+	/** @deprecated */
+	Object.defineProperty(modes, 'descriptions', {
+	  get: function get() {
+	    return lodash.map(this._list, function (m) {
+	      return lodash.pick(m.prototype, ['id', 'name']);
+	    });
+	  }
+	});
+
+	/** @deprecated */
+	modes.create = function (mode, opts) {
+	  if (!opts && mode instanceof Array) {
+	    opts = mode[1];
+	    mode = mode[0];
+	  }
+	  var Mode = this.get(mode) || this.first;
+	  return new Mode(opts);
 	};
 
 	function clamp(x, a, b) {
@@ -81770,11 +81960,33 @@
 	  namedColors[namedColor[0]] = namedColor[1];
 	}
 
+	var palette = new Palette('CPK', 'CP');
+
+	// DO NOT EDIT MANUALLY! Autogenerated from atom_types.csv by atom_types.py.
+	palette.elementColors = {
+	  /* eslint-disable no-magic-numbers */
+	  H: 0xFFFFFF,
+	  C: 0x202020,
+	  N: 0x2060FF,
+	  O: 0xEE2010,
+	  F: 0x00FF00,
+	  P: 0x8020FF,
+	  S: 0xFFFF00,
+	  CL: 0x00BB00,
+	  FE: 0xD0D0D0,
+	  CO: 0xD0D0D0,
+	  NI: 0xD0D0D0,
+	  CU: 0xD0D0D0,
+	  BR: 0x008800,
+	  I: 0x005500
+	  /* eslint-enable no-magic-numbers */
+	};
+
 	var _palette$secondaryCol;
 
-	var palette = new Palette('Jmol', 'JM');
+	var palette$1 = new Palette('Jmol', 'JM');
 
-	palette.colors = [
+	palette$1.colors = [
 	/* eslint-disable no-magic-numbers */
 	0x0000FF, // blue
 	0x0055FF, //
@@ -81796,7 +82008,7 @@
 	0x5500FF];
 
 	// DO NOT EDIT MANUALLY! Autogenerated from atom_types.csv by atom_types.py.
-	palette.elementColors = {
+	palette$1.elementColors = {
 	  /* eslint-disable no-magic-numbers */
 	  H: 0xFFFFFF,
 	  D: 0xFFFFC0,
@@ -81912,10 +82124,10 @@
 	  /* eslint-enable no-magic-numbers */
 	};
 
-	palette.defaultResidueColor = 0xBEA06E;
+	palette$1.defaultResidueColor = 0xBEA06E;
 
 	// DO NOT EDIT MANUALLY! Autogenerated from residue_types.csv by residue_types.py.
-	palette.residueColors = {
+	palette$1.residueColors = {
 	  /* eslint-disable no-magic-numbers */
 	  'ALA': 0xC8C8C8,
 	  'ARG': 0x145AFF,
@@ -81958,7 +82170,7 @@
 	  /* eslint-enable no-magic-numbers */
 	};
 
-	palette.chainColors = [
+	palette$1.chainColors = [
 	// ' '->0 'A'->1, 'B'->2
 	0xFFffffff, // ' ' & '0' white
 	//
@@ -81993,13 +82205,13 @@
 
 	var StructuralElementType$3 = StructuralElement.Type;
 
-	palette.secondaryColors = (_palette$secondaryCol = {}, defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_ALPHA, 0xFF0080), defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_PI, 0x600080), defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_310, 0xA00080), defineProperty(_palette$secondaryCol, StructuralElementType$3.STRAND, 0xFFC800), defineProperty(_palette$secondaryCol, StructuralElementType$3.TURN, 0x6080FF), defineProperty(_palette$secondaryCol, 'dna', 0xAE00FE), defineProperty(_palette$secondaryCol, 'rna', 0xFD0162), _palette$secondaryCol);
+	palette$1.secondaryColors = (_palette$secondaryCol = {}, defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_ALPHA, 0xFF0080), defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_PI, 0x600080), defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_310, 0xA00080), defineProperty(_palette$secondaryCol, StructuralElementType$3.STRAND, 0xFFC800), defineProperty(_palette$secondaryCol, StructuralElementType$3.TURN, 0x6080FF), defineProperty(_palette$secondaryCol, 'dna', 0xAE00FE), defineProperty(_palette$secondaryCol, 'rna', 0xFD0162), _palette$secondaryCol);
 
 	var _palette$secondaryCol$1;
 
-	var palette$1 = new Palette('VMD', 'VM');
+	var palette$2 = new Palette('VMD', 'VM');
 
-	palette$1.colors = [
+	palette$2.colors = [
 	/* eslint-disable no-magic-numbers */
 	0x0000FF, // blue
 	0xFF0000, // red
@@ -82020,10 +82232,10 @@
 	/* eslint-enable no-magic-numbers */
 	];
 
-	palette$1.defaultElementColor = 0x804D00;
+	palette$2.defaultElementColor = 0x804D00;
 
 	// DO NOT EDIT MANUALLY! Autogenerated from atom_types.csv by atom_types.py.
-	palette$1.elementColors = {
+	palette$2.elementColors = {
 	  /* eslint-disable no-magic-numbers */
 	  H: 0xFFFFFF,
 	  C: 0x40BFBF,
@@ -82034,10 +82246,10 @@
 	  /* eslint-enable no-magic-numbers */
 	};
 
-	palette$1.defaultResidueColor = 0x40C0C0;
+	palette$2.defaultResidueColor = 0x40C0C0;
 
 	// DO NOT EDIT MANUALLY! Autogenerated from residue_types.csv by residue_types.py.
-	palette$1.residueColors = {
+	palette$2.residueColors = {
 	  /* eslint-disable no-magic-numbers */
 	  'ALA': 0x0000FF,
 	  'ARG': 0xFFFFFF,
@@ -82080,33 +82292,27 @@
 	  /* eslint-enable no-magic-numbers */
 	};
 
-	palette$1.chainColors = [0xFFFFFF].concat(palette$1.colors);
+	palette$2.chainColors = [0xFFFFFF].concat(palette$2.colors);
 
 	var StructuralElementType$4 = StructuralElement.Type;
 
-	palette$1.secondaryColors = (_palette$secondaryCol$1 = {}, defineProperty(_palette$secondaryCol$1, StructuralElementType$4.HELIX_ALPHA, 0xA600A6), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.HELIX_310, 0x0000FF), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.HELIX_PI, 0xFF0000), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.STRAND, 0xFFFF00), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.BRIDGE, 0x808033), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.TURN, 0x40C0C0), _palette$secondaryCol$1);
+	palette$2.secondaryColors = (_palette$secondaryCol$1 = {}, defineProperty(_palette$secondaryCol$1, StructuralElementType$4.HELIX_ALPHA, 0xA600A6), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.HELIX_310, 0x0000FF), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.HELIX_PI, 0xFF0000), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.STRAND, 0xFFFF00), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.BRIDGE, 0x808033), defineProperty(_palette$secondaryCol$1, StructuralElementType$4.TURN, 0x40C0C0), _palette$secondaryCol$1);
 
-	var paletteList = [];
-	var paletteDict = {};
-	var ag$1 = [palette, palette$1];
+	var palettes = new EntityList([palette, palette$1, palette$2]);
 
-	for (var i$1 = 0, n = ag$1.length; i$1 < n; ++i$1) {
-	  var palette$2 = ag$1[i$1];
-	  paletteList.push(palette$2);
-	  if (palette$2.id) {
-	    paletteDict[palette$2.id] = palette$2;
+	/** @deprecated */
+	Object.defineProperty(palettes, 'list', {
+	  get: function get() {
+	    return this.all;
 	  }
-	}
+	});
 
-	var palettes = {
-	  list: paletteList,
-
-	  any: paletteList[0],
-
-	  get: function get(name) {
-	    return paletteDict[name];
+	/** @deprecated */
+	Object.defineProperty(palettes, 'any', {
+	  get: function get() {
+	    return this.first;
 	  }
-	};
+	});
 
 	/**
 	 * Create new colorer.
@@ -82135,7 +82341,7 @@
 	   * Palette in use.
 	   * @type {Palette}
 	   */
-	  this.palette = palettes.any;
+	  this.palette = palettes.first;
 	}
 
 	/**
@@ -82176,9 +82382,11 @@
 
 	utils.deriveClass(ElementColorer, Colorer, {
 	  id: 'EL',
-	  aliases: ['AT'], // backward compatibility after renaming [A]tom [T]ype -> [EL]ement
+	  aliases: ['AT'], // @deprecated
 	  name: 'Element',
 	  shortName: 'Element'
+	}, {
+	  id: ['EL', 'AT'] // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
 	});
 
 	ElementColorer.prototype.getAtomColor = function (atom, _complex) {
@@ -82209,6 +82417,8 @@
 	  id: 'RT',
 	  name: 'Residue Type',
 	  shortName: 'Residue'
+	}, {
+	  id: 'RT'
 	});
 
 	ResidueTypeColorer.prototype.getAtomColor = function (atom, complex) {
@@ -82225,9 +82435,11 @@
 
 	utils.deriveClass(SequenceColorer, Colorer, {
 	  id: 'SQ',
-	  aliases: ['RI'], // backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
+	  aliases: ['RI'], // @deprecated
 	  name: 'Sequence',
 	  shortName: 'Sequence'
+	}, {
+	  id: ['SQ', 'RI'] // 'RI' is @deprecated backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
 	});
 
 	SequenceColorer.prototype.getAtomColor = function (atom, complex) {
@@ -82252,6 +82464,8 @@
 	  id: 'CH',
 	  name: 'Chain',
 	  shortName: 'Chain'
+	}, {
+	  id: 'CH'
 	});
 
 	ChainColorer.prototype.getAtomColor = function (atom, complex) {
@@ -82270,6 +82484,8 @@
 	  id: 'SS',
 	  name: 'Secondary Structure',
 	  shortName: 'Structure'
+	}, {
+	  id: 'SS'
 	});
 
 	SecondaryStructureColorer.prototype.getAtomColor = function (atom, complex) {
@@ -82301,6 +82517,8 @@
 	  id: 'UN',
 	  name: 'Uniform',
 	  shortName: 'Uniform'
+	}, {
+	  id: 'UN'
 	});
 
 	UniformColorer.prototype.getAtomColor = function (_atom, _complex) {
@@ -82331,6 +82549,8 @@
 	  id: 'CO',
 	  name: 'Conditional',
 	  shortName: 'Conditional'
+	}, {
+	  id: 'CO'
 	});
 
 	ConditionalColorer.prototype.getAtomColor = function (atom, _complex) {
@@ -82355,6 +82575,8 @@
 	  id: 'CF', // [C]on[F]ormation
 	  name: 'Conformation',
 	  shortName: 'Conformation'
+	}, {
+	  id: 'CF'
 	});
 
 	ConformationColorer.prototype.getAtomColor = function (atom, _complex) {
@@ -82385,6 +82607,8 @@
 	  id: 'TM', // [T]e[M]perature
 	  name: 'Temperature',
 	  shortName: 'Temperature'
+	}, {
+	  id: 'TM'
 	});
 
 	TemperatureColorer.prototype.getAtomColor = function (atom, _complex) {
@@ -82438,6 +82662,8 @@
 	  id: 'OC', // [OC]cupancy
 	  name: 'Occupancy',
 	  shortName: 'Occupancy'
+	}, {
+	  id: 'OC'
 	});
 
 	OccupancyColorer.prototype.getAtomColor = function (atom, _complex) {
@@ -82469,6 +82695,8 @@
 	  id: 'HY',
 	  name: 'Hydrophobicity',
 	  shortName: 'Hydrophobicity'
+	}, {
+	  id: 'HY'
 	});
 
 	HydrophobicityColorer.prototype.getAtomColor = function (atom, complex) {
@@ -82494,6 +82722,8 @@
 	  id: 'MO',
 	  name: 'Molecule',
 	  shortName: 'Molecule'
+	}, {
+	  id: 'MO'
 	});
 
 	MoleculeColorer.prototype.getAtomColor = function (atom, complex) {
@@ -82509,82 +82739,39 @@
 	  return this.palette.getGradientColor(0, this.opts.gradient);
 	};
 
-	var colorerList = [];
-	var colorerDict = {};
-	var ag$2 = [ElementColorer, ResidueTypeColorer, SequenceColorer, ChainColorer, SecondaryStructureColorer, UniformColorer, ConditionalColorer, ConformationColorer, TemperatureColorer, OccupancyColorer, HydrophobicityColorer, MoleculeColorer];
+	var colorers = new EntityList([ElementColorer, ResidueTypeColorer, SequenceColorer, ChainColorer, SecondaryStructureColorer, UniformColorer, ConditionalColorer, ConformationColorer, TemperatureColorer, OccupancyColorer, HydrophobicityColorer, MoleculeColorer]);
 
-	(function (plugins) {
-	  for (var i = 0, n = plugins.length; i < n; ++i) {
-	    var Colorer = plugins[i];
-	    colorerList.push(Colorer);
-	    if (Colorer.prototype.id) {
-	      colorerDict[Colorer.prototype.id] = Colorer;
-	    }
-	    var aliases = Colorer.prototype.aliases;
-	    if (Array.isArray(aliases)) {
-	      for (var j = 0, m = aliases.length; j < m; ++j) {
-	        colorerDict[aliases[j]] = Colorer;
-	      }
-	    }
+	/** @deprecated */
+	Object.defineProperty(colorers, 'list', {
+	  get: function get() {
+	    return this.all;
 	  }
-	})(ag$2);
+	});
 
-	// NOTE: workaround for https://github.com/gfranko/amdclean/issues/115
-	var exports$2 = /** @alias module:gfx/colorers */{
-	  /**
-	   *  The list of colorer constructor functions available.
-	   *  @type {Function[]}
-	   */
-	  list: colorerList,
-
-	  /**
-	   * The list of colorer descriptions.
-	   * @type {Array<{id:string, name:string}>}
-	   */
-	  descriptions: lodash.map(colorerList, function (m) {
-	    return lodash.pick(m.prototype, ['id', 'name']);
-	  }),
-
-	  /**
-	   * The colorer constructor one can use if he doesn't care (the default one).
-	   * @type {Function}
-	   */
-	  any: colorerDict[settings.now.presets.default[0].colorer] || colorerList[0],
-
-	  /**
-	   * Get colorer constructor function by id.
-	   * @param {string} name - Colorer identifier.
-	   * @returns {Function} Constructor for the specified colorer.
-	   * @see {@link module:gfx/colorers.create|colorers.create}
-	   *
-	   * @example
-	   * var Colorer = colorers.get('EL'); // get coloring by element
-	   * m = new Colorer();
-	   */
-	  get: function get(name) {
-	    return colorerDict[name];
-	  },
-
-	  /**
-	   * Create a colorer instance.
-	   * @param {string|Array} colorer - Colorer identifier or two-element array containing both colorer identifier
-	   *   and options.
-	   * @param {object=} opts - Colorer options object overriding defaults.
-	   * @returns {object} New colorer object.
-	   *
-	   * @example
-	   * c = create('UN');                      // create Unified colorer
-	   * c = create('UN', {color: 0x00FF00});   // override unified color
-	   * c = create(['UN', {color: 0x00FF00}]); // pass an array (e.g. received from deserializing the colorer settings)
-	   */
-	  create: function create(colorer, opts) {
-	    if (!opts && colorer instanceof Array) {
-	      opts = colorer[1];
-	      colorer = colorer[0];
-	    }
-	    var Colorer = this.get(colorer) || this.any;
-	    return new Colorer(opts);
+	/** @deprecated */
+	Object.defineProperty(colorers, 'any', {
+	  get: function get() {
+	    return this.first;
 	  }
+	});
+
+	/** @deprecated */
+	Object.defineProperty(colorers, 'descriptions', {
+	  get: function get() {
+	    return lodash.map(this._list, function (m) {
+	      return lodash.pick(m.prototype, ['id', 'name']);
+	    });
+	  }
+	});
+
+	/** @deprecated */
+	colorers.create = function (colorer, opts) {
+	  if (!opts && colorer instanceof Array) {
+	    opts = colorer[1];
+	    colorer = colorer[0];
+	  }
+	  var Colorer = this.get(colorer) || this.first;
+	  return new Colorer(opts);
 	};
 
 	function neutralColor(intensity) {
@@ -82703,27 +82890,30 @@
 	  }
 	}];
 
-	var materialDict = {};
+	var materials = new EntityList(materialList);
 
-	for (var i$2 = 0, n$1 = materialList.length; i$2 < n$1; ++i$2) {
-	  if (materialList[i$2].id) {
-	    materialDict[materialList[i$2].id] = materialList[i$2];
+	/** @deprecated */
+	Object.defineProperty(materials, 'list', {
+	  get: function get() {
+	    return this.all;
 	  }
-	}
+	});
 
-	var materials = {
-	  list: materialList,
-
-	  descriptions: lodash.map(materialList, function (m) {
-	    return lodash.pick(m, ['id', 'name']);
-	  }),
-
-	  any: materialDict[settings.now.presets.default.material] || materialList[0],
-
-	  get: function get(id) {
-	    return materialDict[id];
+	/** @deprecated */
+	Object.defineProperty(materials, 'any', {
+	  get: function get() {
+	    return this.first;
 	  }
-	};
+	});
+
+	/** @deprecated */
+	Object.defineProperty(materials, 'descriptions', {
+	  get: function get() {
+	    return lodash.map(this._list, function (m) {
+	      return lodash.pick(m, ['id', 'name']);
+	    });
+	  }
+	});
 
 	function Representation(index, mode, colorer, selector) {
 	  this.index = index;
@@ -82734,7 +82924,7 @@
 	  this.count = 0;
 	  this.material = new UberMaterial();
 	  this.material.setValues({ clipPlane: settings.now.draft.clipPlane });
-	  this.materialPreset = materials.any;
+	  this.materialPreset = materials.first;
 	  this.needsRebuild = true;
 	  this.visible = true;
 
@@ -83290,6 +83480,20 @@
 	  return this._editor;
 	};
 
+	function lookupAndCreate(entityList, specs) {
+	  if (!Array.isArray(specs)) {
+	    specs = [specs];
+	  }
+
+	  var _specs = specs,
+	      _specs2 = slicedToArray(_specs, 2),
+	      id = _specs2[0],
+	      opts = _specs2[1];
+
+	  var Entity = entityList.get(id) || entityList.first;
+	  return new Entity(opts);
+	}
+
 	ComplexVisual.prototype.resetReps = function (reps) {
 	  // Create all necessary representations
 	  if (this._complex) {
@@ -83312,9 +83516,9 @@
 	      selector = rep.selector;
 	      selectorString = selector.toString();
 	    }
-	    var mode = exports$1.create(rep.mode);
-	    var colorer = exports$2.create(rep.colorer);
-	    var material = materials.get(rep.material) || materials.any;
+	    var mode = lookupAndCreate(modes, rep.mode);
+	    var colorer = lookupAndCreate(colorers, rep.colorer);
+	    var material = materials.get(rep.material) || materials.first;
 
 	    this._reprList[i] = new Representation(i, mode, colorer, selector);
 	    this._reprList[i].setMaterialPreset(material);
@@ -83420,7 +83624,7 @@
 	      var newMode = rep.mode;
 	      if (!lodash.isEqual(desc.mode, newMode)) {
 	        desc.mode = newMode;
-	        target.setMode(exports$1.create(rep.mode));
+	        target.setMode(lookupAndCreate(modes, rep.mode));
 	        changed = true;
 	        logger.debug('rep[' + index + '].mode changed to ' + newMode);
 
@@ -83437,7 +83641,7 @@
 	      var newColorer = rep.colorer;
 	      if (!lodash.isEqual(desc.colorer, newColorer)) {
 	        desc.colorer = newColorer;
-	        target.colorer = exports$2.create(rep.colorer);
+	        target.colorer = lookupAndCreate(colorers, rep.colorer);
 	        changed = true;
 	        logger.debug('rep[' + index + '].colorer changed to ' + newColorer);
 	      }
@@ -83519,7 +83723,7 @@
 	  }, rep);
 
 	  var selector = typeof desc.selector === 'string' ? selectors$2.parse(desc.selector).selector : desc.selector;
-	  var target = new Representation(this._selectionBit, exports$1.create(desc.mode), exports$2.create(desc.colorer), selector);
+	  var target = new Representation(this._selectionBit, lookupAndCreate(modes, desc.mode), lookupAndCreate(colorers, desc.colorer), selector);
 	  target.selectorString = selector.toString();
 	  target.setMaterialPreset(materials.get(desc.material));
 	  target.markAtoms(this._complex);
@@ -83830,7 +84034,7 @@
 	    setTimeout(function _rebuild() {
 	      console.time('build');
 	      var reprList = self._reprList;
-	      var palette = palettes.get(settings.now.palette) || palettes.any;
+	      var palette = palettes.get(settings.now.palette) || palettes.first;
 	      var hasGeometry = false;
 	      for (var i = 0, n = reprList.length; i < n; ++i) {
 	        var repr = reprList[i];
@@ -84795,56 +84999,45 @@
 	  return this._prof ? this._prof.min() : 0.0;
 	};
 
-	var LoaderList = function () {
-	  function LoaderList() {
-	    var _this = this;
+	/**
+	 * A list of available loaders.
+	 * @extends EntityList
+	 */
 
+	var LoaderList = function (_EntityList) {
+	  inherits(LoaderList, _EntityList);
+
+	  /**
+	   * Create a list of loaders.
+	   * The loaders are indexed by supported source types (`.types` property of a Loader
+	   * subclass).
+	   * The loaders can be retrieved later by matching against specs (see {@link LoaderList#find}).
+	   *
+	   * @param {!Array<function(new:Loader)>=} someLoaders A list of {@link Loader} subclasses to
+	   *   automatically register at creation time.
+	   * @see LoaderList#register
+	   */
+	  function LoaderList() {
 	    var someLoaders = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 	    classCallCheck(this, LoaderList);
-
-	    this._list = [];
-	    this._byType = {};
-
-	    someLoaders.forEach(function (SomeLoader) {
-	      return _this.register(SomeLoader);
-	    });
+	    return possibleConstructorReturn(this, (LoaderList.__proto__ || Object.getPrototypeOf(LoaderList)).call(this, someLoaders, ['types']));
 	  }
 
 	  /**
-	   * Register a parser for a specific data format.
+	   * Find a suitable loader for a source type.
 	   *
-	   * @param {function} SomeLoader - a Parser subclass to register
-	   * @param {string[]} SomeLoader.types - supported data formats
+	   * @param {Object} specs Loader specifications.
+	   * @param {string=} specs.type Supported source type.
+	   * @param {*=} specs.source Source to load from.
 	   */
 
 
 	  createClass(LoaderList, [{
-	    key: 'register',
-	    value: function register(SomeLoader) {
-	      registerInList(this._list, SomeLoader);
-	      registerInDict(this._byType, SomeLoader.types, SomeLoader);
-	    }
-	  }, {
-	    key: 'unregister',
-	    value: function unregister(SomeLoader) {
-	      unregisterFromList(this._list, SomeLoader);
-	      unregisterFromDict(this._byType, SomeLoader.types, SomeLoader);
-	    }
-	  }, {
 	    key: 'find',
-
-
-	    /**
-	     * Find a suitable loader for the data source
-	     *
-	     * @param {object} specs - parser specifications
-	     * @param {string=} specs.type - supported source type
-	     * @param {data=} specs.source - source to load from
-	     */
 	    value: function find(specs) {
 	      var list = [];
 	      if (specs.type) {
-	        list = this._byType[specs.type.toLowerCase()] || [];
+	        list = this._dict.types[specs.type.toLowerCase()] || [];
 	      } else if (specs.source) {
 	        return this._list.filter(function (SomeLoader) {
 	          return SomeLoader.canProbablyLoad && SomeLoader.canProbablyLoad(specs.source);
@@ -84852,19 +85045,9 @@
 	      }
 	      return [].concat(toConsumableArray(list));
 	    }
-	  }, {
-	    key: 'all',
-	    get: function get$$1() {
-	      return [].concat(toConsumableArray(this._list));
-	    }
-	  }, {
-	    key: 'types',
-	    get: function get$$1() {
-	      return Object.keys(this._byType);
-	    }
 	  }]);
 	  return LoaderList;
-	}();
+	}(EntityList);
 
 	var Loader$1 = function (_EventDispatcher) {
 	  inherits(Loader, _EventDispatcher);
@@ -85127,63 +85310,48 @@
 	// note: order might be important
 	FileLoader$1, XHRLoader$1, ImmediateLoader]);
 
-	var ParserList = function () {
-	  function ParserList() {
-	    var _this = this;
+	/**
+	 * A list of available parsers.
+	 * @extends EntityList
+	 */
 
+	var ParserList = function (_EntityList) {
+	  inherits(ParserList, _EntityList);
+
+	  /**
+	   * Create a list of parsers.
+	   * The parsers are indexed by supported data formats and file extensions (`.formats` and
+	   * `.extensions` properties of a Parser subclass).
+	   * The parsers can be retrieved later by matching against specs (see {@link ParsrerList#find}).
+	   *
+	   * @param {!Array<function(new:Parser)>=} someParsers A list of {@link Parser} subclasses to
+	   *   automatically register at creation time.
+	   * @see ParserList#register
+	   */
+	  function ParserList() {
 	    var someParsers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 	    classCallCheck(this, ParserList);
-
-	    this._list = [];
-	    this._byFormat = {};
-	    this._byExt = {};
-
-	    someParsers.forEach(function (SomeParser) {
-	      return _this.register(SomeParser);
-	    });
+	    return possibleConstructorReturn(this, (ParserList.__proto__ || Object.getPrototypeOf(ParserList)).call(this, someParsers, ['formats', 'extensions']));
 	  }
 
 	  /**
-	   * Register a parser for a specific data format.
+	   * Find a suitable parser for data.
 	   *
-	   * @param {function} SomeParser - a Parser subclass to register
-	   * @param {string[]} SomeParser.formats - supported data formats
-	   * @param {string[]} SomeParser.extensions - supported file extensions
+	   * @param {Object} specs Parser specifications.
+	   * @param {string=} specs.format Supported data format.
+	   * @param {string=} specs.ext Supported filename extension.
+	   * @param {*=} specs.data Data to parse.
 	   */
 
 
 	  createClass(ParserList, [{
-	    key: 'register',
-	    value: function register(SomeParser) {
-	      registerInList(this._list, SomeParser);
-	      registerInDict(this._byFormat, SomeParser.formats, SomeParser);
-	      registerInDict(this._byExt, SomeParser.extensions, SomeParser);
-	    }
-	  }, {
-	    key: 'unregister',
-	    value: function unregister(SomeParser) {
-	      unregisterFromList(this._list, SomeParser);
-	      unregisterFromDict(this._byFormat, SomeParser.formats, SomeParser);
-	      unregisterFromDict(this._byExt, SomeParser.extensions, SomeParser);
-	    }
-	  }, {
 	    key: 'find',
-
-
-	    /**
-	     * Find a suitable parser for data
-	     *
-	     * @param {object} specs - parser specifications
-	     * @param {string=} specs.format - supported data format
-	     * @param {string=} specs.ext - supported filename extension
-	     * @param {data=} specs.data - data to parse
-	     */
 	    value: function find(specs) {
 	      var list = [];
 	      if (specs.format) {
-	        list = this._byFormat[specs.format.toLowerCase()] || [];
+	        list = this._dict.formats[specs.format.toLowerCase()] || [];
 	      } else if (specs.ext) {
-	        list = this._byExt[specs.ext.toLowerCase()] || [];
+	        list = this._dict.extensions[specs.ext.toLowerCase()] || [];
 	      }
 	      // autodetect only if no format is forced
 	      if (list.length === 0 && !specs.format && specs.data) {
@@ -85193,24 +85361,9 @@
 	      }
 	      return [].concat(toConsumableArray(list));
 	    }
-	  }, {
-	    key: 'all',
-	    get: function get$$1() {
-	      return [].concat(toConsumableArray(this._list));
-	    }
-	  }, {
-	    key: 'formats',
-	    get: function get$$1() {
-	      return Object.keys(this._byFormat);
-	    }
-	  }, {
-	    key: 'extensions',
-	    get: function get$$1() {
-	      return Object.keys(this._byExt);
-	    }
 	  }]);
 	  return ParserList;
-	}();
+	}(EntityList);
 
 	var Parser = function () {
 	  function Parser(data, options) {
@@ -89922,7 +90075,7 @@
 	  geo.verticesNeedUpdate = true;
 	};
 
-	var vertexScreenQuadShader = "varying vec2 vUv;\r\n\r\nvoid main() {\r\n  vUv = uv;\r\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\r\n}\r\n";
+	var vertexShader$1 = "varying vec2 vUv;\r\n\r\nvoid main() {\r\n  vUv = uv;\r\n  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\r\n}\r\n";
 
 	var fragmentShader$1 = "uniform sampler2D srcTex;\r\nuniform vec2 srcTexSize;\r\nvarying vec2 vUv;\r\n\r\nvoid main() {\r\n\r\n  vec2 pixelSize = vec2(1, 1) / srcTexSize;\r\n\r\n  vec4 c00 = texture2D(srcTex, vUv + vec2(-pixelSize.x,-pixelSize.y));\r\n  vec4 c01 = texture2D(srcTex, vUv + vec2(0,-pixelSize.y));\r\n  vec4 c02 = texture2D(srcTex, vUv + vec2(pixelSize.x,-pixelSize.y));\r\n  vec4 c10 = texture2D(srcTex, vUv + vec2(-pixelSize.x,0));\r\n  vec4 c12 = texture2D(srcTex, vUv + vec2(pixelSize.x,0));\r\n  vec4 c20 = texture2D(srcTex, vUv + vec2(-pixelSize.x,pixelSize.y));\r\n  vec4 c21 = texture2D(srcTex, vUv + vec2(0,pixelSize.y));\r\n  vec4 c22 = texture2D(srcTex, vUv + vec2(pixelSize.x,pixelSize.y));\r\n\r\n  vec4 horizEdge = - c00 - 2.0 * c01 - c02 + c20 + 2.0 * c21 + c22;\r\n  vec4 vertEdge  = - c00 - 2.0 * c10 - c20 + c02 + 2.0 * c12 + c22;\r\n\r\n  vec4 grad = sqrt(horizEdge * horizEdge + vertEdge * vertEdge);\r\n\r\n  gl_FragColor = grad;\r\n}\r\n";
 
@@ -89945,7 +90098,7 @@
 	function OutlineMaterial(params) {
 	  var settings = {
 	    uniforms: overrideUniforms$1(params),
-	    vertexShader: vertexScreenQuadShader,
+	    vertexShader: vertexShader$1,
 	    fragmentShader: fragmentShader$1,
 	    transparent: true,
 	    depthTest: false,
@@ -89974,7 +90127,7 @@
 	function FXAAMaterial(params) {
 	  var settings = {
 	    uniforms: overrideUniforms$2(params),
-	    vertexShader: vertexScreenQuadShader,
+	    vertexShader: vertexShader$1,
 	    fragmentShader: fragmentShader$2,
 	    transparent: true,
 	    depthTest: false,
@@ -90031,7 +90184,7 @@
 	function AOMaterial(params) {
 	  var settings = {
 	    uniforms: overrideUniforms$3(params, SSAOUniforms),
-	    vertexShader: vertexScreenQuadShader,
+	    vertexShader: vertexShader$1,
 	    fragmentShader: fragmentSSAOShader,
 	    transparent: false,
 	    depthTest: false,
@@ -90043,7 +90196,7 @@
 	function HorBilateralBlurMaterial5(params) {
 	  var settings = {
 	    uniforms: overrideUniforms$3(params, blurUniforms5),
-	    vertexShader: vertexScreenQuadShader,
+	    vertexShader: vertexShader$1,
 	    fragmentShader: fragmentHorBilateralBlur5Shader,
 	    transparent: false,
 	    depthTest: false,
@@ -90055,7 +90208,7 @@
 	function VertBilateralBlurMaterial5(params) {
 	  var settings = {
 	    uniforms: overrideUniforms$3(params, blurUniforms5),
-	    vertexShader: vertexScreenQuadShader,
+	    vertexShader: vertexShader$1,
 	    fragmentShader: fragmentVertBilateralBlur5Shader,
 	    transparent: false,
 	    depthTest: false,
@@ -90090,7 +90243,7 @@
 	function AnaglyphMaterial(params) {
 	  var settings = {
 	    uniforms: overrideUniforms$4(params),
-	    vertexShader: vertexScreenQuadShader,
+	    vertexShader: vertexShader$1,
 	    fragmentShader: fragmentShader$3,
 	    transparent: false,
 	    depthTest: false,
@@ -90977,7 +91130,7 @@
 	  return WebVRPoC;
 	}();
 
-	/* global "0.7.17":false */
+	/* global "0.7.18":false */
 
 	//////////////////////////////////////////////////////////////////////////////
 
@@ -91282,7 +91435,7 @@
 	    height: this._container.clientHeight
 	  };
 
-	  var webGLOptions = { preserveDrawingBuffer: true };
+	  var webGLOptions = { preserveDrawingBuffer: true, alpha: true };
 	  if (settings.now.antialias) {
 	    webGLOptions.antialias = true;
 	  }
@@ -91303,7 +91456,7 @@
 	  gfx.renderer.autoClear = false;
 	  gfx.renderer.setPixelRatio(window.devicePixelRatio);
 	  gfx.renderer.setSize(gfx.width, gfx.height);
-	  gfx.renderer.setClearColor(settings.now.themes[settings.now.theme]);
+	  gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
 	  gfx.renderer.clearColor();
 
 	  gfx.renderer2d.setSize(gfx.width, gfx.height);
@@ -91319,7 +91472,7 @@
 	  gfx.stereoCam = new StereoCamera();
 
 	  gfx.scene = new Scene();
-	  gfx.scene.fog = new Fog(settings.now.themes[settings.now.theme], settings.now.camNear, settings.now.camFar);
+	  gfx.scene.fog = new Fog(settings.now.bg.color, settings.now.camNear, settings.now.camFar);
 
 	  gfx.root = new gfxutils.RCGroup();
 	  gfx.scene.add(gfx.root);
@@ -91764,7 +91917,7 @@
 
 	  if (settings.now.fog) {
 	    if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
-	      gfx.scene.fog = new Fog(settings.now.themes[settings.now.theme]);
+	      gfx.scene.fog = new Fog(settings.now.bg.color);
 	      this._setUberMaterialValues({ fog: settings.now.fog });
 	    }
 	    updateFogRange(gfx.scene.fog, gfx.camera.position.z, this._getBSphereRadius());
@@ -91875,7 +92028,7 @@
 	    }
 	  };
 	}();
-
+	/** @deprecated - use _onBgColorChanged */
 	Miew.prototype._onThemeChanged = function () {
 	  var themeRE = /\s*theme-\w+\b/g;
 	  return function () {
@@ -91883,13 +92036,20 @@
 	    var div = this._containerRoot;
 	    div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
 
+	    settings.set('bg.color', settings.now.themes[theme]);
+	    this._needRender = true;
+	  };
+	}();
+
+	Miew.prototype._onBgColorChanged = function () {
+	  return function () {
 	    var gfx = this._gfx;
+	    var color = settings.now.bg.color;
 	    if (gfx) {
-	      var color = settings.now.themes[theme];
 	      if (gfx.scene.fog) {
 	        gfx.scene.fog.color.set(color);
 	      }
-	      gfx.renderer.setClearColor(color);
+	      gfx.renderer.setClearColor(color, settings.now.bg.transparent ? 0 : 1);
 	    }
 	    this._needRender = true;
 	  };
@@ -91912,7 +92072,7 @@
 	    var gfx = this._gfx;
 
 	    // render to offscreen buffer
-	    gfx.renderer.setClearColor(settings.now.themes[settings.now.theme], 1);
+	    gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
 	    gfx.renderer.clearTarget(target);
 	    if (gfx.renderer.vr.enabled) {
 	      gfx.renderer.render(gfx.scene, camera);
@@ -92173,7 +92333,7 @@
 	    var gfx = self._gfx;
 
 	    // clear canvas
-	    gfx.renderer.setClearColor(settings.now.themes[settings.now.theme], 1);
+	    gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
 	    gfx.renderer.clearTarget(targetBuffer);
 
 	    // do fxaa processing of offscreen buff2
@@ -93911,7 +94071,16 @@
 	  };
 
 	  on('theme', function () {
+	    // TODO add warning
 	    _this7._onThemeChanged();
+	  });
+
+	  on('bg.color', function () {
+	    _this7._onBgColorChanged();
+	  });
+
+	  on('bg.transparent', function () {
+	    _this7._onBgColorChanged();
 	  });
 
 	  on('draft.clipPlane', function (evt) {
@@ -94574,8 +94743,9 @@
 
 	  // export namespaces // TODO: WIP: refactoring external interface
 	  chem: chem,
-	  modes: exports$1,
-	  colorers: exports$2,
+	  io: io,
+	  modes: modes,
+	  colorers: colorers,
 	  materials: materials,
 	  palettes: palettes,
 	  options: options,
@@ -95976,8 +96146,8 @@
 	}();
 
 	var selectors$4 = Miew.chem.selectors,
-	    modes = Miew.modes,
-	    colorers = Miew.colorers,
+	    modes$1 = Miew.modes,
+	    colorers$1 = Miew.colorers,
 	    materials$1 = Miew.materials,
 	    palettes$1 = Miew.palettes,
 	    options$1 = Miew.options,
@@ -96151,8 +96321,8 @@
 	    }
 
 	    var modificators = {
-	      'colorers': colorers,
-	      'modes': modes,
+	      'colorers': colorers$1,
+	      'modes': modes$1,
 	      'materials': materials$1
 	    };
 

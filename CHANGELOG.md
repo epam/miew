@@ -6,6 +6,34 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.18] - 2018-05-29
+### Added
+- Add the original patented CPK palette back (`CP` identifier).
+- Add the ability to specify a transparent background. Use a boolean `bg.transparent` (`false` by default).
+  Some special effects are still in development (FXAA, fogging).
+
+### Changed
+- The background color is now specified via `bg.color` setting (an rgb-coded number like 0xFF0000
+  for red) instead of themes. Themes are still working until the next major version.
+
+### Deprecated
+- Themes in their current implementation (`theme`, `themes.light`, `themes.dark` settings)
+  are deprecated as they are related mostly to the UI and demo app, not to the miew core library.
+  Use `bg.color` setting directly instead.
+- Some methods of refactored lists (loaders, parsers, modes, colorers, materials, palettes) are
+  marked as deprecated. Probably you didn't use them.
+
+### Fixed
+- Fix mismatched helix types in DSSP (pi- and 3/10-helices).
+- Use the real list of supported file extensions in the UI instead of a hardcoded one.
+- Update colorers and palettes thumbnails to better reflect the latest changes.
+
+### Internal
+- Add a base class for a lists of identifiable entities. Refactor lists of loaders, parsers,
+  modes, colorers, materials, palettes to use the new class and API. Old API is deprecated
+  and will be removed in the next major version.
+- Update dependencies. Note that the new `jquery.terminal` would break the UI.
+
 ## [0.7.17] - 2018-05-07
 ### Added
 - Added the Gallery menu panel with a set of predefined molecules / configurations.
@@ -279,7 +307,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.17...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.18...HEAD
+[0.7.18]: https://github.com/epam/miew/compare/v0.7.17...v0.7.18
 [0.7.17]: https://github.com/epam/miew/compare/v0.7.16...v0.7.17
 [0.7.16]: https://github.com/epam/miew/compare/v0.7.15...v0.7.16
 [0.7.15]: https://github.com/epam/miew/compare/v0.7.14...v0.7.15
