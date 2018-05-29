@@ -93,6 +93,11 @@
     "sourceMap": false,
     "instrument": false
   },
+  "greenkeeper": {
+    "ignore": [
+      "bootstrap"
+    ]
+  },
   "devDependencies": {
     "autoprefixer": "^8.5.1",
     "babel-core": "^6.26.3",
@@ -124,7 +129,7 @@
     "html-webpack-plugin": "^3.2.0",
     "jison": "^0.4.18",
     "jquery": "^3.3.1",
-    "jquery.terminal": "1.14.0",
+    "jquery.terminal": "^1.14.0",
     "jsdoc": "^3.5.5",
     "lodash": "^4.17.10",
     "mocha": "^5.2.0",
@@ -137,7 +142,7 @@
     "postcss-cli": "^5.0.0",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.2",
-    "rollup": "^0.58.2",
+    "rollup": "^0.59.4",
     "rollup-plugin-babel": "^3.0.4",
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-resolve": "^3.3.0",
@@ -145,14 +150,14 @@
     "rollup-plugin-string": "^2.0.2",
     "sass-loader": "^7.0.1",
     "selenium-webdriver": "^3.5.0",
-    "sinon": "^4.5.0",
+    "sinon": "^5.0.10",
     "sinon-chai": "^3.1.0",
-    "spin.js": "^3.1.0",
+    "spin.js": "^4.0.0",
     "string-replace-webpack-plugin": "^0.1.3",
     "style-loader": "^0.21.0",
     "stylelint": "^9.2.1",
     "stylelint-config-standard": "^18.2.0",
-    "three": "0.91.0",
+    "three": "0.92.0",
     "toastr": "^2.1.4",
     "uglify-js": "^3.3.27",
     "url-loader": "^1.0.1",
