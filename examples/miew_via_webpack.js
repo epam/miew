@@ -1,7 +1,6 @@
 import '../dist/Miew.min.css';
-import Miew from '../dist/Miew';
 
-window.onload = function() {
+function onMiewLoaded(Miew) {
   var viewer = new Miew({
     container: document.getElementsByClassName('miew-container')[0],
     load: '1CRN',
@@ -10,4 +9,8 @@ window.onload = function() {
   if (viewer.init()) {
     viewer.run();
   }
-};
+}
+
+import(/* webpackChunkName: "Miew" */ '../dist/Miew.module').then(({default: Miew}) => {
+  onMiewLoaded(Miew);
+});

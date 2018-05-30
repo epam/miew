@@ -1,5 +1,6 @@
 {
   "presets": ["env"],
+  "plugins": ["syntax-dynamic-import"],
   "env": {
     "coverage": {
       "plugins": ["istanbul"]
