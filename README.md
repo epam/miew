@@ -5,8 +5,11 @@
 [![Windows Build Status](https://img.shields.io/appveyor/ci/paulsmirnov/miew/master.svg?label=windows)](https://ci.appveyor.com/project/paulsmirnov/miew/branch/master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/epam/miew.svg)](https://greenkeeper.io/)
 [![Coverage Status](https://coveralls.io/repos/github/epam/miew/badge.svg)](https://coveralls.io/github/epam/miew)
+<br>
 [![Code Climate](https://codeclimate.com/github/epam/miew/badges/gpa.svg)](https://codeclimate.com/github/epam/miew)
-[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=epam:miew)](https://sonarcloud.io/dashboard/index/epam:miew)
+[![SonarCloud Maintainability](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=sqale_rating)](https://sonarcloud.io/component_measures?id=epam:miew&metric=Maintainability)
+[![SonarCloud Reliability](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=epam:miew&metric=Reliability)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=alert_status)](https://sonarcloud.io/dashboard?id=epam:miew)
 
 Copyright (c) 2015–2018 [EPAM Systems, Inc.](https://www.epam.com/)
 
