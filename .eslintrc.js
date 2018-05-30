@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   extends: 'airbnb-base/legacy', // https://github.com/airbnb/javascript/tree/master/es5
 
+  parser: 'babel-eslint',
   parserOptions: {
    sourceType: 'module',
   },
