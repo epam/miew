@@ -4,6 +4,8 @@ import path from 'path';
 import webpack from 'webpack';
 import yargs from 'yargs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import ScriptExtHtmlWebpackPlugin from 'script-ext-html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import StringReplaceWebpackPlugin from 'string-replace-webpack-plugin';
 import version from './tools/version';
@@ -18,7 +20,7 @@ const roServerReplacer = {
   })
 };
 
-export default {
+const configure = (prod) => ({
   entry: {
     demo: './demo/scripts/index.js',
   },
@@ -26,6 +28,7 @@ export default {
     publicPath: './',
     path: path.resolve(__dirname, 'build'),
     filename: '[name].[chunkhash].js',
+    chunkFilename: '[name].[chunkhash].js',
   },
   module: {
     rules: [{
@@ -34,10 +37,17 @@ export default {
       use: ['babel-loader'],
     }, {
       test: /\.css$/,
-      use: ['style-loader', 'css-loader'],
+      use: [
+        prod ? MiniCssExtractPlugin.loader : 'style-loader',
+        'css-loader'
+      ],
     }, {
       test: /\.scss$/,
-      use: ['style-loader', 'css-loader', 'sass-loader'],
+      use: [
+        prod ? MiniCssExtractPlugin.loader : 'style-loader',
+        'css-loader',
+        'sass-loader'
+      ],
     }, {
       test: /\.glsl$/,
       use: ['raw-loader'],
@@ -70,6 +80,7 @@ export default {
       READONLY_SERVER: config.roServer,
       PRESET_SERVER: JSON.stringify(yargs.argv.service),
       COOKIE_PATH: JSON.stringify(yargs.argv.cookiePath),
+      DEBUG: !prod,
     }),
     new webpack.IgnorePlugin(/vertx/), // https://github.com/webpack/webpack/issues/353
     new webpack.ProvidePlugin({
@@ -79,6 +90,13 @@ export default {
       template: 'demo/index.ejs',
       title: 'Miew – 3D Molecular Viewer',
       favicon: 'demo/favicon.ico',
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[name].[contenthash].css',
+    }),
+    new ScriptExtHtmlWebpackPlugin({
+      defaultAttribute: 'defer',
     }),
     new CopyWebpackPlugin([
       {from: 'demo/data', to: 'data'},
@@ -124,4 +142,6 @@ export default {
       cachedAssets: false,
     },
   },
-};
+});
+
+export default (env, argv) => configure(argv.mode === 'production');

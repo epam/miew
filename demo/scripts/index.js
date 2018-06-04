@@ -13,13 +13,6 @@ import toastr from 'toastr';
 
 window.DEBUG = true;
 
-const div = document.createElement('div');
-div.className = 'miew-container';
-div.innerHTML = '<div class="miew-message"><p>Please wait<br><small>while viewer is loading</small></p></div>';
-
-const body = document.querySelector('body');
-body.appendChild(div);
-
 function onError(err) {
   var doc = document.createDocumentFragment();
 
