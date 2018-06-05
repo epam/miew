@@ -1,3 +1,16 @@
+// @import "~spin.js/spin.css"  // TODO: webpack & webstorm need tilde, postcss hate it
+
+@keyframes spinner-line-fade-default {
+  0%,
+  100% {
+    opacity: 0.22; /* minimum opacity */
+  }
+
+  1% {
+    opacity: 1;
+  }
+}
+
 .miew-canvas > canvas {
   display: block;
   width: 100%;

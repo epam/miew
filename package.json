@@ -33,7 +33,7 @@
     "build:css": "run-s build:css:*",
     "build:css:bundle": "node-sass --source-map=true --source-map-contents=true --output-style=expanded src/Miew.scss -o build/dist",
     "build:css:prefix": "postcss build/dist/Miew.css -o build/dist/Miew.css --map --use autoprefixer",
-    "build:css:minify": "postcss build/dist/Miew.css -o build/dist/Miew.min.css --map --use cssnano",
+    "build:css:minify": "postcss build/dist/Miew.css -o build/dist/Miew.min.css",
     "build:demo": "webpack --mode production",
     "build:examples": "ncp examples/ build/examples/ && run-s build:examples:*",
     "build:examples:webpack": "cd build/examples/ && webpack --mode production --config miew_via_webpack.config.js",
