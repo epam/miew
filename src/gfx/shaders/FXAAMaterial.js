@@ -6,34 +6,53 @@ import * as THREE from 'three';
 import vertexShader from './ScreenQuad_vert.glsl';
 import fragmentShader from './FXAA_frag.glsl';
 
-var defaultUniforms = THREE.UniformsUtils.merge([
+const defaultUniforms = THREE.UniformsUtils.merge([
   {
-    srcTex:     {type: 't', value: null},
+    srcTex:       {type: 't', value: null},
     srcTexelSize: {type: 'v2', value: new THREE.Vector2(1.0 / 512.0, 1.0 / 512.0)},
+    bgColor:      {type: 'c', value: new THREE.Color(0xffffff)},
   }
 ]);
 
-function overrideUniforms(params) {
-  var uniforms = THREE.UniformsUtils.clone(defaultUniforms);
-  for (var p in params) {
-    if (uniforms.hasOwnProperty(p)) {
-      uniforms[p].value = params[p];
-    }
-  }
-  return uniforms;
-}
-
 function FXAAMaterial(params) {
-  var settings = {
-    uniforms : overrideUniforms(params),
-    vertexShader: vertexShader,
+
+  THREE.ShaderMaterial.call(this);
+  this.bgTransparent = false;
+
+  //TODO RawShaderMaterial? Why we use ShaderMaterial now ?
+  // set default values
+  THREE.ShaderMaterial.prototype.setValues.call(this, {
+    uniforms: THREE.UniformsUtils.clone(defaultUniforms),
+    vertexShader: vertexShader, // TODO make texccord fo samples calculated in VS to reduce PS
     fragmentShader: fragmentShader,
-    transparent: true,
+    transparent: false,
     depthTest: false,
     depthWrite: false
-  };
-  return new THREE.ShaderMaterial(settings);
+  });
+
+  this.setValues(params);
 }
+
+FXAAMaterial.prototype = Object.create(THREE.ShaderMaterial.prototype);
+FXAAMaterial.prototype.constructor = FXAAMaterial;
+
+FXAAMaterial.prototype.setValues = function(values) {
+  if (typeof values === 'undefined') {
+    return;
+  }
+
+  // set direct values
+  THREE.ShaderMaterial.prototype.setValues.call(this, values);
+
+  const defines = {};
+
+  if (this.bgTransparent) {
+    defines.BG_TRANSPARENT = 1;
+  }
+  // set dependent values
+  this.defines = defines;
+
+};
 
 export default FXAAMaterial;
 

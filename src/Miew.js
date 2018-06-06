@@ -1020,7 +1020,7 @@ Miew.prototype._onBgTransparentChanged  = (function() {
     if (gfx) {
       gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
     }
-    this._setUberMaterialValues({transparent: false, fogTransparent: settings.now.bg.transparent});
+    this._setUberMaterialValues({fogTransparent: settings.now.bg.transparent});
     this._needRender = true;
   };
 })();
@@ -1305,7 +1305,7 @@ Miew.prototype._renderWithPrepassTransparency = (function() {
 
 Miew.prototype._performFXAA = (function() {
 
-  var _fxaaMaterial = new FXAAMaterial();
+  const _fxaaMaterial = new FXAAMaterial();
 
   return function(srcBuffer, targetBuffer) {
 
@@ -1313,8 +1313,7 @@ Miew.prototype._performFXAA = (function() {
       return;
     }
 
-    var self = this;
-    var gfx = self._gfx;
+    const gfx = this._gfx;
 
     // clear canvas
     gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
@@ -1323,7 +1322,12 @@ Miew.prototype._performFXAA = (function() {
     // do fxaa processing of offscreen buff2
     _fxaaMaterial.uniforms.srcTex.value = srcBuffer.texture;
     _fxaaMaterial.uniforms.srcTexelSize.value.set(1.0 / srcBuffer.width, 1.0 / srcBuffer.height);
-    _fxaaMaterial.transparent = true;
+    _fxaaMaterial.uniforms.bgColor.value.set(settings.now.bg.color);
+
+    if (_fxaaMaterial.bgTransparent !== settings.now.bg.transparent) {
+      _fxaaMaterial.setValues({bgTransparent: settings.now.bg.transparent});
+      _fxaaMaterial.needsUpdate = true;
+    }
     gfx.renderer.renderScreenQuad(_fxaaMaterial, targetBuffer);
   };
 

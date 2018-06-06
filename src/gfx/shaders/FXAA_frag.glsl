@@ -15,6 +15,7 @@ float fxaaQualitySubpix = 0.7; //0.65;
 // global params
 uniform sampler2D srcTex;
 uniform vec2 srcTexelSize;
+uniform vec3 bgColor;
 // from vs
 varying vec2 vUv;
 //=====================================================================//
@@ -23,32 +24,50 @@ varying vec2 vUv;
 float FxaaLuma(vec3 rgb) {return dot(rgb, vec3(0.299, 0.587, 0.114)); } // real luminance calculation
                                                                            // for non-real scene rendering
 // texture sampling by pixel position(coords) and offset(in pixels)
-vec3 FxaaTex(sampler2D tex, vec2 pos, vec2 off,  vec2 res ) {return texture2D( tex, pos + off * res ).xyz;}
-vec3 FxaaTexTop(sampler2D tex, vec2 pos) {return texture2D( tex, pos).xyz;}
+ vec3 FxaaTex(sampler2D tex, vec2 pos, vec2 off,  vec2 res ) {
+  #ifdef BG_TRANSPARENT
+    vec4 color = texture2D( tex, pos + off * res );
+    return mix(color.rgb, bgColor, 1.0 - color.a);
+  #else
+    return texture2D( tex, pos + off * res ).xyz;
+  #endif
+}
+vec3 FxaaTexTop(sampler2D tex, vec2 pos) {
+  #ifdef BG_TRANSPARENT
+    vec4 color = texture2D( tex, pos );
+    return mix(color.rgb, bgColor, 1.0 - color.a);
+  #else
+    return texture2D( tex, pos).xyz;
+  #endif
+}
+vec4 FxaaTexTopAlpha(sampler2D tex, vec2 pos) {
+  return texture2D( tex, pos);
+}
+
 //=====================================================================//
 void main() {
-// renaming
+  // renaming
   vec2 posM = vUv;
-// get luminance for neighbours
+  // get luminance for neighbours
   float lumaS = FxaaLuma(FxaaTex(srcTex, posM, vec2( 0.0, 1.0 ), srcTexelSize));
   float lumaE = FxaaLuma(FxaaTex(srcTex, posM, vec2( 1.0, 0.0 ), srcTexelSize));
   float lumaN = FxaaLuma(FxaaTex(srcTex, posM, vec2( 0.0, -1.0 ), srcTexelSize));
   float lumaW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0, 0.0 ), srcTexelSize));
   float lumaM = FxaaLuma(FxaaTexTop(srcTex, posM));
-// find max and min luminance
+  // find max and min luminance
   float rangeMax = max(max(lumaN, lumaW), max(lumaE, max(lumaS, lumaM)));
   float rangeMin = min(min(lumaN, lumaW), min(lumaE, min(lumaS, lumaM)));
-// calc maximum non-edge range
+  // calc maximum non-edge range
   float rangeMaxScaled = rangeMax * fxaaQualityEdgeThreshold;
   float range = rangeMax - rangeMin;
   float rangeMaxClamped = max(fxaaQualityEdgeThresholdMin, rangeMaxScaled);
-// exit when luma contrast is small (is not edge)
+  // exit when luma contrast is small (is not edge)
   if(range < rangeMaxClamped){
-    gl_FragColor = vec4(FxaaTexTop(srcTex, posM).xyz, 1.0);
+    gl_FragColor = FxaaTexTopAlpha(srcTex, posM);
     return;
   }
   float subpixRcpRange = 1.0/range;
-// calc other neighbours luminance
+  // calc other neighbours luminance
   float lumaNE = FxaaLuma(FxaaTex(srcTex, posM, vec2(  1.0, -1.0 ), srcTexelSize));
   float lumaSW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0,  1.0 ), srcTexelSize));
   float lumaSE = FxaaLuma(FxaaTex(srcTex, posM, vec2(  1.0,  1.0 ), srcTexelSize));
@@ -221,7 +240,7 @@ void main() {
   bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;
   float spanLength = (dstP + dstN);
   bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;
-  float spanLengthRcp = 1.0/spanLength;
+  float spanLengthRcp = 1.0 / spanLength;
 /*--------------------------------------------------------------------------*/
   bool directionN = dstN < dstP;
   float dst = min(dstN, dstP);
@@ -232,8 +251,29 @@ void main() {
 /*-----------------calc texture offest using subpix-------------------------*/
   float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;
   float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);
-  if(!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;
-  if( horzSpan) posM.y += pixelOffsetSubpix * lengthSign;
-  gl_FragColor = vec4(FxaaTexTop(srcTex, posM).xyz, 1.0);
+
+  float offset = pixelOffsetSubpix * lengthSign;
+  #ifdef BG_TRANSPARENT
+    // get original texel
+    vec4 rgbaA = FxaaTexTopAlpha(srcTex, posM);
+    // calc step to blended texel
+    vec2 step = sign((!horzSpan) ? vec2 (offset, 0.0) : vec2 (0.0, offset));
+    // get neighboring texel
+    vec4 rgbaB = FxaaTexTopAlpha(srcTex, posM + step * srcTexelSize);
+    //  calc blend factor from offset
+    float f = (!horzSpan) ? offset / srcTexelSize.x : offset / srcTexelSize.y;
+    f = abs(f);
+    // calc alpha (special formula to emulate blending with bg)
+    gl_FragColor.a = 1.0 - mix(1.0 - rgbaA.a, 1.0 - rgbaB.a, f);
+    // calc color (special formula to emulate blending with bg)
+    gl_FragColor.rgb = mix(rgbaA.rgb * rgbaA.a, rgbaB.rgb * rgbaB.a, f) / gl_FragColor.a;
+  #else
+    if(!horzSpan) {
+       posM.x += offset;
+    } else {
+       posM.y += offset;
+    }
+    gl_FragColor = FxaaTexTopAlpha(srcTex, posM);
+  #endif
   return;
 }
