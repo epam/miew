@@ -21,6 +21,6 @@ void main() {
     weightSum += weight;
   }
   res /= weightSum;
-  vec3 color = texture2D(diffuseTexture, vec2(x, y)).rgb;
-  gl_FragColor = vec4(color * res.rgb, 1.0);
+  vec4 color = texture2D(diffuseTexture, vec2(x, y));
+  gl_FragColor = vec4(color.rgb * res.rgb, color.a);
 }

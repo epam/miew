@@ -68,7 +68,7 @@ void main() {
   // remap coordinates to prevent noise exture rescale
   vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;
   // restore normal from depth buffer
-  vec3 normal = RestoreNormalFromDepth(vUv, viewPos); 
+  vec3 normal = RestoreNormalFromDepth(vUv, viewPos);
   // get random vector for sampling sphere rotation
   vec3 randN = texture2D(noiseTexture, vUvNoise).rgb * 2.0 - 1.0;
   randN = normalize(randN);
@@ -97,7 +97,6 @@ void main() {
   AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);
   // calc result AO-map color
   AO = 1.0 - max(0.0, AO / 32.0 * factor); // TODO use MAX_SAMPLES_COUNT
-  vec3 color = texture2D(diffuseTexture, vUv).rgb;
   // check if the fragment doesn't belong to background
   if (abs(- viewPos.z - camNearFar.y) < 0.1) { // FIXME remove temporal fix for background darkening
     gl_FragColor = vec4(1.0);
