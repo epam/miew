@@ -21,7 +21,7 @@ var materialList = [
       lights: true,
       fog: true,
       depthWrite: true,
-      transparent: true,
+      transparent: false,
     }
   }, {
     id: 'SF',
@@ -37,7 +37,7 @@ var materialList = [
       lights: true,
       fog: true,
       depthWrite: true,
-      transparent: true,
+      transparent: false,
     }
   }, {
     id: 'PL',
@@ -53,7 +53,7 @@ var materialList = [
       lights: true,
       fog: true,
       depthWrite: true,
-      transparent: true,
+      transparent: false,
     }
   }, {
     id: 'ME',
@@ -69,7 +69,7 @@ var materialList = [
       lights: true,
       fog: true,
       depthWrite: true,
-      transparent: true,
+      transparent: false,
     }
   }, {
     id: 'TR',
