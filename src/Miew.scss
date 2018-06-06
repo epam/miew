@@ -1,15 +1,4 @@
-// @import "~spin.js/spin.css"  // TODO: webpack & webstorm need tilde, postcss hate it
-
-@keyframes spinner-line-fade-default {
-  0%,
-  100% {
-    opacity: 0.22; /* minimum opacity */
-  }
-
-  1% {
-    opacity: 1;
-  }
-}
+@import "spin.js/spin.css";
 
 .miew-canvas > canvas {
   display: block;
@@ -28,7 +17,7 @@
 $back-gray: 32;
 $dark-gray: rgba(64, 64, 64, 0.75);
 $titlebar-color: silver;
-$dark-color: #202020; // FIXME: $back-gray
+$dark-color: #202020; /* FIXME: $back-gray */
 $light-color: #ccc;
 
 .miew-message {

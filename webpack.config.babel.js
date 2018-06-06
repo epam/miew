@@ -36,17 +36,17 @@ const configure = (prod) => ({
       exclude: /(node_modules|vendor)/,
       use: ['babel-loader'],
     }, {
-      test: /\.css$/,
+      test: /\.[sp]?css$/,
       use: [
         prod ? MiniCssExtractPlugin.loader : 'style-loader',
-        'css-loader'
-      ],
-    }, {
-      test: /\.scss$/,
-      use: [
-        prod ? MiniCssExtractPlugin.loader : 'style-loader',
-        'css-loader',
-        'sass-loader'
+        {
+          loader: 'css-loader',
+          options: {
+            importLoaders: 1,
+            minimize: prod,
+          },
+        },
+        'postcss-loader',
       ],
     }, {
       test: /\.glsl$/,

@@ -1,5 +1,7 @@
 /* stylelint-disable no-descending-specificity */
 
+@import "../../src/Miew.scss";
+
 //////////////////////////////////////////////////////////////////////////////
 // Full-page web application
 //////////////////////////////////////////////////////////////////////////////
@@ -10,8 +12,6 @@ body {
   margin: 0;
   background-color: #202020;
 }
-
-@import "../../src/Miew";
 
 //////////////////////////////////////////////////////////////////////////////
 // ...
@@ -24,11 +24,11 @@ $titlebar-gray: 64;
 $titlebar-alpha: 0.75;
 $titlebar-height: 40px;
 $back-gray: 32;
-$menu-gray: $titlebar-alpha * $titlebar-gray + (1 - $titlebar-alpha) * $back-gray;
+$menu-gray: calc(#{$titlebar-alpha} * #{$titlebar-gray} + (1 - #{$titlebar-alpha}) * #{$back-gray});
 $selection-panel-row-height: 42px;
 
 .mode-message {
-  top: $titlebar-height + 10px;
+  top: calc(#{$titlebar-height} + 10px);
   width: 200px;
   height: 50px;
   color: $titlebar-color;
@@ -72,7 +72,7 @@ $selection-panel-row-height: 42px;
 
 .atom-info {
   position: absolute;
-  top: $titlebar-height + 10px;
+  top: calc(#{$titlebar-height} + 10px);
   right: 10px;
   border-radius: 4px;
   color: $titlebar-color;
@@ -144,7 +144,7 @@ $selection-panel-row-height: 42px;
     position: absolute;
     left: 0;
     top: 0;
-    padding: ($titlebar-height - 20px)/2;
+    padding: calc((#{$titlebar-height} - 20px) / 2);
     width: 100%;
     height: $titlebar-height;
     text-align: center;
@@ -299,7 +299,7 @@ $selection-panel-row-height: 42px;
       color: silver;
 
       .panel-title {
-        padding: ($titlebar-height - 17px) / 2;
+        padding: calc((#{$titlebar-height} - 17px) / 2);
         font-weight: bold;
         text-align: center;
       }
@@ -604,7 +604,7 @@ $selection-panel-row-height: 42px;
   bottom: 0;
   width: 30%;
   padding: 0;
-  margin-top: #{$titlebar-height};
+  margin-top: $titlebar-height;
 
   .row {
     margin-left: 0;
@@ -660,7 +660,7 @@ $selection-panel-row-height: 42px;
 }
 
 .toast-top-right {
-  top: $titlebar-height + 6px;
+  top: calc(#{$titlebar-height} + 6px);
   right: 6px;
 }
 

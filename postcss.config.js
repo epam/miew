@@ -1,9 +1,10 @@
 module.exports = {
-  map: true,
+  parser: 'postcss-scss',
   plugins: [
-    require('cssnano')({
-      preset: 'default',
-      discardUnused: false,
-    }),
+    require('postcss-import')(),
+    require('postcss-advanced-variables')(),
+    require('postcss-nested')(),
+    require('postcss-calc')(),
+    require('autoprefixer')(),
   ],
 };
