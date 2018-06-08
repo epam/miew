@@ -1014,17 +1014,6 @@ Miew.prototype._onBgColorChanged  = (function() {
   };
 })();
 
-Miew.prototype._onBgTransparentChanged  = (function() {
-  return function() {
-    const gfx = this._gfx;
-    if (gfx) {
-      gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
-    }
-    this._setUberMaterialValues({fogTransparent: settings.now.bg.transparent});
-    this._needRender = true;
-  };
-})();
-
 Miew.prototype._setUberMaterialValues = function(values) {
   this._gfx.root.traverse(function(obj) {
     if ((obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments || obj instanceof THREE.Line) &&
@@ -3122,8 +3111,22 @@ Miew.prototype._initOnSettingsChanged = function() {
     this._onBgColorChanged();
   });
 
-  on('bg.transparent', () => {
-    this._onBgTransparentChanged();
+  on('bg.transparent', (evt) => {
+    const gfx = this._gfx;
+    if (gfx) {
+      gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
+    }
+    // TODO: update materials
+    const values = {fogTransparent: evt.value};
+    this._forEachComplexVisual(visual => visual.setMaterialValues(values));
+    for (let i = 0, n = this._objects.length; i < n; ++i) {
+      const obj = this._objects[i];
+      if (obj._line) {
+        obj._line.material.setValues(values);
+        obj._line.material.needsUpdate = true;
+      }
+    }
+    this.rebuildAll();
   });
 
   on('draft.clipPlane', (evt) => {
