@@ -156,7 +156,7 @@
     "sass-loader": "^7.0.1",
     "script-ext-html-webpack-plugin": "^2.0.1",
     "selenium-webdriver": "^3.5.0",
-    "sinon": "^5.0.10",
+    "sinon": "^6.0.0",
     "sinon-chai": "^3.1.0",
     "spin.js": "^4.0.0",
     "string-replace-webpack-plugin": "^0.1.3",
