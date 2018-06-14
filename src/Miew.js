@@ -379,7 +379,7 @@ Miew.prototype._initGfx = function() {
   gfx.renderer.autoClear = false;
   gfx.renderer.setPixelRatio(window.devicePixelRatio);
   gfx.renderer.setSize(gfx.width, gfx.height);
-  gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
+  gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
   gfx.renderer.clearColor();
 
   gfx.renderer2d.setSize(gfx.width, gfx.height);
@@ -1008,7 +1008,7 @@ Miew.prototype._onBgColorChanged  = (function() {
       if (gfx.scene.fog) {
         gfx.scene.fog.color.set(color);
       }
-      gfx.renderer.setClearColor(color, settings.now.bg.transparent ? 0 : 1);
+      gfx.renderer.setClearColor(color,  Number(!settings.now.bg.transparent));
     }
     this._needRender = true;
   };
@@ -1032,7 +1032,7 @@ Miew.prototype._renderScene = (function() {
     var gfx = this._gfx;
 
     // render to offscreen buffer
-    gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
+    gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
     gfx.renderer.clearTarget(target);
     if (gfx.renderer.vr.enabled) {
       gfx.renderer.render(gfx.scene, camera);
@@ -1305,7 +1305,7 @@ Miew.prototype._performFXAA = (function() {
     const gfx = this._gfx;
 
     // clear canvas
-    gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
+    gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
     gfx.renderer.clearTarget(targetBuffer);
 
     // do fxaa processing of offscreen buff2
@@ -3114,7 +3114,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   on('bg.transparent', (evt) => {
     const gfx = this._gfx;
     if (gfx) {
-      gfx.renderer.setClearColor(settings.now.bg.color, settings.now.bg.transparent ? 0 : 1);
+      gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     }
     // TODO: update materials
     const values = {fogTransparent: evt.value};
