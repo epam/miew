@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.19] - 2018-06-18
+### Changed
+- Demo app uses deferred scripts loading and the stylesheet is extracted to a separate file.
+- Finishing transparent background mode: fog affects transparency now, FXAA and SSAO effects support transparency too.
+  Transparent materials are not fully supported in this mode due to limitations in rendering pipeline.
+  See the [transparent background example](examples/transparent_background.html) for details on proper setup.
+
+### Fixed
+- Fix broken spinner after unnoticed package upgrade.
+- Pin broken jquery.terminal to version 1.14, will investigate CSS issues later.
+
+### Internal
+- Use PostCSS instead of node-sass to get rid of issues with binaries and to make processing faster.
+
 ## [0.7.18] - 2018-05-29
 ### Added
 - Add the original patented CPK palette back (`CP` identifier).
@@ -307,7 +321,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.18...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.19...HEAD
+[0.7.19]: https://github.com/epam/miew/compare/v0.7.18...v0.7.19
 [0.7.18]: https://github.com/epam/miew/compare/v0.7.17...v0.7.18
 [0.7.17]: https://github.com/epam/miew/compare/v0.7.16...v0.7.17
 [0.7.16]: https://github.com/epam/miew/compare/v0.7.15...v0.7.16

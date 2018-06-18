@@ -1,3 +1,30 @@
+@keyframes spinner-line-fade-more {
+  0%, 100% {
+    opacity: 0; /* minimum opacity */
+  }
+  1% {
+    opacity: 1;
+  }
+}
+
+@keyframes spinner-line-fade-quick {
+  0%, 39%, 100% {
+    opacity: 0.25; /* minimum opacity */
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes spinner-line-fade-default {
+  0%, 100% {
+    opacity: 0.22; /* minimum opacity */
+  }
+  1% {
+    opacity: 1;
+  }
+}
+
 .miew-canvas > canvas {
   display: block;
   width: 100%;
@@ -12,7 +39,10 @@
   position: relative;
 }
 
+/* FIXME: $back-gray */
+
 .miew-message {
+  /* hack for centered error-reporting*/
   background-color: #ccc;
   display: table;
   width: 100%;
@@ -20,11 +50,11 @@
 }
 
 .miew-message p {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-  font-size: large;
-}
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    font-size: large;
+  }
 
 .mode-message {
   position: absolute;
@@ -49,24 +79,23 @@
 }
 
 .theme-dark .label-obj,
-.theme-dark .label-fg {
-  color: #ccc;
-  background-color: #202020;
-}
+  .theme-dark .label-fg {
+    color: #ccc;
+    background-color: #202020;
+  }
 
 .theme-dark .label-bg {
-  color: #202020;
-  background-color: #ccc;
-}
+    color: #202020;
+    background-color: #ccc;
+  }
 
 .theme-light .label-obj,
-.theme-light .label-fg {
-  color: #202020;
-  background-color: #ccc;
-}
+  .theme-light .label-fg {
+    color: #202020;
+    background-color: #ccc;
+  }
 
 .theme-light .label-bg {
-  color: #ccc;
-  background-color: #202020;
-}
-/*# sourceMappingURL=Miew.css.map */
+    color: #ccc;
+    background-color: #202020;
+  }
