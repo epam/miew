@@ -970,10 +970,10 @@ Miew.prototype.finishAwaitingCMDInProcess = function() {
 };
 
 Miew.prototype.isScriptingCommandAvailable = function() {
-  return this.commandInAction !== undefined
-        && !this.commandInAction
-        && this.cmdQueue !== undefined
-        && this.cmdQueue.length > 0;
+  return this.commandInAction !== undefined &&
+         !this.commandInAction &&
+         this.cmdQueue !== undefined &&
+         this.cmdQueue.length > 0;
 };
 
 Miew.prototype.callNextCmd = function() {
