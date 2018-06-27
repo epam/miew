@@ -53,7 +53,8 @@ module.exports = {
     'no-bitwise': 'off',
     'no-plusplus': 'off', // TODO: consider ["error", {"allowForLoopAfterthoughts": true}]
     'no-multi-assign': 'off',
-
     'class-methods-use-this': 'off',
+    'operator-linebreak': ['error', 'after'],
+    'no-multiple-empty-lines': 'off',
   },
 };
