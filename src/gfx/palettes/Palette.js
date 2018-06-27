@@ -251,8 +251,8 @@ Palette.prototype = {
 
   getChainColor: function(name) {
     var chain = name.charCodeAt(0);
-    chain = ((chain < 0 ? 0 : chain >= 256 ? chain - 256 : chain) & 0x1F)
-        % this.chainColors.length;
+    chain = ((chain < 0 ? 0 : chain >= 256 ? chain - 256 : chain) & 0x1F) %
+            this.chainColors.length;
     return this.chainColors[chain];
   },
 
