@@ -1587,6 +1587,10 @@ clone-regexp@^1.0.0:
     is-regexp "^1.0.0"
     is-supported-regexp-flag "^1.0.0"
 
+clone@^1.0.2:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
+
 co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
@@ -2094,6 +2098,12 @@ default-require-extensions@^1.0.0:
   resolved "https://registry.yarnpkg.com/default-require-extensions/-/default-require-extensions-1.0.0.tgz#f37ea15d3e13ffd9b437d33e1a75b5fb97874cb8"
   dependencies:
     strip-bom "^2.0.0"
+
+defaults@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/defaults/-/defaults-1.0.3.tgz#c656051e9817d9ff08ed881477f3fe4019f3ef7d"
+  dependencies:
+    clone "^1.0.2"
 
 define-properties@^1.1.2:
   version "1.1.2"
@@ -4063,11 +4073,12 @@ jpeg-js@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.2.0.tgz#53e448ec9d263e683266467e9442d2c5a2ef5482"
 
-jquery.terminal@~1.14.0:
-  version "1.14.0"
-  resolved "https://registry.yarnpkg.com/jquery.terminal/-/jquery.terminal-1.14.0.tgz#de8541d9b843fe55ee5eebe8a545ff3ca0d09a94"
+jquery.terminal@~1.17.0:
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/jquery.terminal/-/jquery.terminal-1.17.0.tgz#5c28867da76bd0cf6d5e599010d4e384bdcfe6f3"
   dependencies:
     jquery "~3"
+    wcwidth "^1.0.1"
 
 jquery@>=1.12.0, jquery@^3.3.1, jquery@~3:
   version "3.3.1"
@@ -7805,6 +7816,12 @@ wbuf@^1.1.0, wbuf@^1.7.2:
   resolved "https://registry.yarnpkg.com/wbuf/-/wbuf-1.7.3.tgz#c1d8d149316d3ea852848895cb6a0bfe887b87df"
   dependencies:
     minimalistic-assert "^1.0.0"
+
+wcwidth@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/wcwidth/-/wcwidth-1.0.1.tgz#f0b0dcf915bc5ff1528afadb2c0e17b532da2fe8"
+  dependencies:
+    defaults "^1.0.3"
 
 webpack-cli@^3.0.8:
   version "3.0.8"
