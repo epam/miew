@@ -1,27 +1,24 @@
 
 
-import utils from '../../utils';
 import Colorer from './Colorer';
 
-function ChainColorer(opts) {
-  Colorer.call(this, opts);
+class ChainColorer extends Colorer {
+  constructor(opts) {
+    super(opts);
+  }
+
+  getAtomColor(atom, complex) {
+    return this.getResidueColor(atom._residue, complex);
+  }
+
+  getResidueColor(residue, _complex) {
+    return this.palette.getChainColor(residue.getChain()._name);
+  }
 }
 
-utils.deriveClass(ChainColorer, Colorer, {
-  id: 'CH',
-  name: 'Chain',
-  shortName: 'Chain',
-}, {
-  id: 'CH',
-});
-
-ChainColorer.prototype.getAtomColor = function(atom, complex) {
-  return this.getResidueColor(atom._residue, complex);
-};
-
-ChainColorer.prototype.getResidueColor = function(residue, _complex) {
-  return this.palette.getChainColor(residue.getChain()._name);
-};
+ChainColorer.id = 'CH';
+ChainColorer.prototype.id = 'CH';
+ChainColorer.prototype.name = 'Chain';
+ChainColorer.prototype.shortName = 'Chain';
 
 export default ChainColorer;
-
