@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import UberObject from './UberObject';
-var Mesh = UberObject(THREE.Mesh);
+const Mesh = UberObject(THREE.Mesh);
 
 function ZSpriteMesh(geometry, material) {
   Mesh.call(this, geometry, material);
@@ -12,7 +12,7 @@ ZSpriteMesh.prototype = Object.create(Mesh.prototype);
 ZSpriteMesh.prototype.constructor = ZSpriteMesh;
 
 ZSpriteMesh.prototype._onBeforeRender = function(_renderer, _scene, camera, _geometry, _material, _group) {
-  var material = this.material;
+  const material = this.material;
   if (!material) {
     return;
   }

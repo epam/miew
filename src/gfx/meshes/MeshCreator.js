@@ -28,8 +28,8 @@ function _createInstancedCylinders(useZSprites, openEnded) {
 }
 
 function _createLineSegmentsGeoTriplet(geo, renderParams) {
-  var thickLines = geo.prototype instanceof ThickLinesGeometry;
-  var lineWidth = renderParams.lineWidth || 0;
+  const thickLines = geo.prototype instanceof ThickLinesGeometry;
+  const lineWidth = renderParams.lineWidth || 0;
   return {
     Geometry: geo,
     Object: thickLines ? meshes.ThickLineMesh : meshes.LineSegments,
@@ -56,7 +56,7 @@ function _createSimpleGeoTriplet(geoClass) {
 }
 
 function _createIsoSurfaceGeoTriplet(geoClass, caps, settings, renderParams) {
-  var surfaceOpts = {
+  const surfaceOpts = {
     wireframe: !!renderParams.wireframe,
     fakeOpacity: settings.now.isoSurfaceFakeOpacity,
     zClip: renderParams.zClip,
@@ -79,7 +79,7 @@ function MeshCreator() {
 }
 
 MeshCreator.createSpheres = function(caps, settings) {
-  var useZSprites = settings.now.zSprites;
+  const useZSprites = settings.now.zSprites;
   return {
     Geometry: function(a, b) {
       return new geometries.InstancedSpheresGeometry(a, b, useZSprites);

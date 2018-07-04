@@ -9,7 +9,7 @@ function TextMesh(geometry, _material) {
   THREE.Group.call(this);
   this.geometry = geometry;
 
-  var self = this;
+  let self = this;
   self.initialized = false;
   this.geometry.addEventListener('update', function() {
     self.update();
@@ -20,24 +20,24 @@ TextMesh.prototype = Object.create(THREE.Group.prototype);
 TextMesh.prototype.constructor = TextMesh;
 
 TextMesh.prototype.init = function() {
-  var children = this.children;
-  var i = children.length - 1;
+  const children = this.children;
+  let i = children.length - 1;
   for (; i >= 0; --i) {
     this.remove(children[i]);
   }
 
-  var items = this.geometry.items;
-  var userData = this.geometry.userData;
-  var n = items.length;
+  const items = this.geometry.items;
+  const userData = this.geometry.userData;
+  const n = items.length;
   for (i = 0; i < n; ++i) {
-    var srcItem = items[i];
+    const srcItem = items[i];
     if (!srcItem) {
       continue;
     }
-    var item = utils.shallowCloneNode(srcItem);
-    var label = new CSS2DObject(item);
+    const item = utils.shallowCloneNode(srcItem);
+    const label = new CSS2DObject(item);
     label.userData = _.clone(userData);
-    var el = label.getElement();
+    const el = label.getElement();
     el.style.visibility = 'visible';
     label.source = srcItem;
     this.add(label);
@@ -46,18 +46,18 @@ TextMesh.prototype.init = function() {
 };
 
 TextMesh.prototype.update = function() {
-  var geo = this.geometry;
+  const geo = this.geometry;
   if (!geo.needsUpdate) {
     return;
   }
-  var children = this.children;
+  const children = this.children;
   if (!this.initialized) {
     this.init();
   }
 
-  for (var i = 0, n = children.length; i < n; ++i) {
-    var child = children[i];
-    var item = child.source;
+  for (let i = 0, n = children.length; i < n; ++i) {
+    const child = children[i];
+    const item = child.source;
     child.position.copy(item.worldPos);
     child.userData.color = item.opts.color;
     child.userData.background = item.opts.background;
