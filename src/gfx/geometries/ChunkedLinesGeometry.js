@@ -1,7 +1,7 @@
 import LinesGeometry from './LinesGeometry';
 import CylinderCollisionGeo from './CylinderCollisionGeo';
 
-var COLLISION_RAD = 0.1;
+const COLLISION_RAD = 0.1;
 
 /**
  * This class represents geometry which consists of separate chunks.
@@ -30,7 +30,7 @@ ChunkedLinesGeometry.prototype.startUpdate = function() {
 };
 
 ChunkedLinesGeometry.prototype.computeBoundingSphere = function() {
-  var collisionGeo = this._collisionGeo;
+  const collisionGeo = this._collisionGeo;
   if (collisionGeo)  {
     collisionGeo.computeBoundingSphere();
     this.boundingSphere = collisionGeo.boundingSphere;
@@ -40,7 +40,7 @@ ChunkedLinesGeometry.prototype.computeBoundingSphere = function() {
 };
 
 ChunkedLinesGeometry.prototype.computeBoundingBox = function() {
-  var collisionGeo = this._collisionGeo;
+  const collisionGeo = this._collisionGeo;
   if (collisionGeo)  {
     collisionGeo.computeBoundingBox();
     this.boundingBox = collisionGeo.boundingBox;
@@ -50,14 +50,14 @@ ChunkedLinesGeometry.prototype.computeBoundingBox = function() {
 };
 
 ChunkedLinesGeometry.prototype.raycast = function(raycaster, intersects) {
-  var collisionGeo = this._collisionGeo;
+  const collisionGeo = this._collisionGeo;
   if (!collisionGeo)  {
     return;
   }
-  var segCount = this._chunkSize;
+  const segCount = this._chunkSize;
   this._collisionGeo.raycast(raycaster, intersects);
-  for (var i = 0, n = intersects.length; i < n; ++i) {
-    var chunkIdx = intersects[i].chunkIdx;
+  for (let i = 0, n = intersects.length; i < n; ++i) {
+    let chunkIdx = intersects[i].chunkIdx;
     if (chunkIdx === undefined) {
       continue;
     }
@@ -67,15 +67,15 @@ ChunkedLinesGeometry.prototype.raycast = function(raycaster, intersects) {
 };
 
 ChunkedLinesGeometry.prototype.setColor = function(chunkIdx, colorVal) {
-  var chunkSize = this._chunkSize;
-  for (var i = chunkIdx * chunkSize, end = i + chunkSize; i < end; ++i) {
+  const chunkSize = this._chunkSize;
+  for (let i = chunkIdx * chunkSize, end = i + chunkSize; i < end; ++i) {
     this.parent.setColor.call(this, i, colorVal);
   }
 };
 
 ChunkedLinesGeometry.prototype.setSegment = function(chunkIdx, segIdx, pos1, pos2) {
-  var chunkSize = this._chunkSize;
-  var idx = chunkIdx * chunkSize + segIdx;
+  const chunkSize = this._chunkSize;
+  const idx = chunkIdx * chunkSize + segIdx;
   this.parent.setSegment.call(this, idx, pos1, pos2);
   if (this._collisionGeo) {
     this._collisionGeo.setItem(chunkIdx * chunkSize + segIdx, pos1, pos2, COLLISION_RAD);
@@ -89,20 +89,20 @@ ChunkedLinesGeometry.prototype.finalize = function() {
 };
 
 ChunkedLinesGeometry.prototype.setOpacity = function(chunkIndices, value) {
-  var chunkSize = this._chunkSize;
-  for (var i = 0, n = chunkIndices.length; i < n; ++i) {
-    var left = chunkIndices[i] * chunkSize;
+  const chunkSize = this._chunkSize;
+  for (let i = 0, n = chunkIndices.length; i < n; ++i) {
+    const left = chunkIndices[i] * chunkSize;
     this.parent.setOpacity.call(this, left, left + chunkSize - 1, value);
   }
 };
 
 ChunkedLinesGeometry.prototype.getSubset = function(chunkIndices) {
-  var instanceCount = chunkIndices.length;
-  var chunkSize = this._chunkSize;
-  var subset = new ChunkedLinesGeometry(instanceCount, chunkSize, false);
-  for (var i = 0, n = chunkIndices.length; i < n; ++i) {
-    var dstPtOffset = i * chunkSize;
-    var startSegIdx = chunkIndices[i] * chunkSize;
+  const instanceCount = chunkIndices.length;
+  const chunkSize = this._chunkSize;
+  const subset = new ChunkedLinesGeometry(instanceCount, chunkSize, false);
+  for (let i = 0, n = chunkIndices.length; i < n; ++i) {
+    const dstPtOffset = i * chunkSize;
+    const startSegIdx = chunkIndices[i] * chunkSize;
     subset.setSegments(dstPtOffset, this.getSubsetSegments(startSegIdx, chunkSize));
     subset.setColors(dstPtOffset, this.getSubsetColors(startSegIdx, chunkSize));
   }
