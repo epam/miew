@@ -5,9 +5,9 @@ import utils from '../../../utils';
 
 /* Functions wasn't encapsulated to the class to be visible only to this class */
 function adjustColor(color) {
-  var r = (color >> 16) & 255;
-  var g = (color >> 8) & 255;
-  var b = color & 255;
+  let r = (color >> 16) & 255;
+  let g = (color >> 8) & 255;
+  let b = color & 255;
 
   if (0.2126 * r + 0.7152 * g + 0.0722 * b > 127) {
     r = r * 3 / 10;
@@ -23,9 +23,9 @@ function adjustColor(color) {
 }
 
 function inverseColor(color) {
-  var r = (color >> 16) & 255;
-  var g = (color >> 8) & 255;
-  var b = color & 255;
+  const r = (color >> 16) & 255;
+  const g = (color >> 8) & 255;
+  const b = color & 255;
 
   return ((255 - r) << 16) | ((255 - g) << 8) | (255 - b);
 }
@@ -42,7 +42,7 @@ function getAtomText(atom) {
   return atom.getVisualName();
 }
 
-var colorMappings = {
+const colorMappings = {
   none: function(c) {
     return c;
   },
@@ -65,7 +65,7 @@ function propagateColor(color, rule) {
   return result;
 }
 
-var templateMappings = {
+const templateMappings = {
   serial: function(a) {
     return a.getSerial();
   },
@@ -92,9 +92,9 @@ var templateMappings = {
   },
 };
 
-var parseTemplate = function(atom, str) {
+const parseTemplate = function(atom, str) {
   return str.replace(/\{\{(\s*\w+\s*)\}\}/g, function(m) {
-    var key = m.replace(/\s+/g, '');
+    let key = m.replace(/\s+/g, '');
     key = key.substring(2, key.length - 2).toLowerCase();
 
     if (templateMappings.hasOwnProperty(key)) {
@@ -111,27 +111,27 @@ class AtomsTextGroup extends AtomsGroup {
   }
 
   _makeGeoArgs(selection, mode, _colorer, _polyComplexity) {
-    var opts = mode.getLabelOpts();
+    const opts = mode.getLabelOpts();
     return [selection.chunks.length, opts];
   }
 
   _build() {
-    var opts = this._mode.getLabelOpts();
+    const opts = this._mode.getLabelOpts();
     // TODO is it correct to filter atoms here?
-    var atomsIdc = this._selection.chunks;
-    var atoms = this._selection.atoms;
-    var parent = this._selection.parent;
-    var colorer = this._colorer;
-    var geo = this._geo;
-    for (var i = 0, n = atomsIdc.length; i < n; ++i) {
-      var atom = atoms[atomsIdc[i]];
-      var text = opts.template ? parseTemplate(atom, opts.template) : getAtomText(atom);
+    const atomsIdc = this._selection.chunks;
+    const atoms = this._selection.atoms;
+    const parent = this._selection.parent;
+    const colorer = this._colorer;
+    const geo = this._geo;
+    for (let i = 0, n = atomsIdc.length; i < n; ++i) {
+      const atom = atoms[atomsIdc[i]];
+      const text = opts.template ? parseTemplate(atom, opts.template) : getAtomText(atom);
       if (!text) {
         continue;
       }
-      var color = colorer.getAtomColor(atom, parent);
-      var fgColor = parseInt(propagateColor(color, opts.fg).substring(1), 16);
-      var bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
+      const color = colorer.getAtomColor(atom, parent);
+      const fgColor = parseInt(propagateColor(color, opts.fg).substring(1), 16);
+      const bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
       geo.setItem(i, atom.getPosition(), text);
       geo.setColor(i, fgColor, bgColor);
     }
@@ -141,22 +141,22 @@ class AtomsTextGroup extends AtomsGroup {
   updateToFrame(frameData) {
     // TODO This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
-    var opts = this._mode.getLabelOpts();
+    const opts = this._mode.getLabelOpts();
     // TODO is it correct to filter atoms here?
-    var atomsIdc = this._selection.chunks;
-    var atoms = this._selection.atoms;
-    var colorer = this._colorer;
-    var geo = this._geo;
-    var updateColor = frameData.needsColorUpdate(colorer);
-    for (var i = 0, n = atomsIdc.length; i < n; ++i) {
-      var atom = atoms[atomsIdc[i]];
-      var text = opts.template ? parseTemplate(atom, opts.template) : getAtomText(atom);
+    const atomsIdc = this._selection.chunks;
+    const atoms = this._selection.atoms;
+    const colorer = this._colorer;
+    const geo = this._geo;
+    const updateColor = frameData.needsColorUpdate(colorer);
+    for (let i = 0, n = atomsIdc.length; i < n; ++i) {
+      const atom = atoms[atomsIdc[i]];
+      const text = opts.template ? parseTemplate(atom, opts.template) : getAtomText(atom);
       if (!text) {
         continue;
       }
-      var color = frameData.getAtomColor(colorer, atom);
-      var fgColor = parseInt(propagateColor(color, opts.fg).substring(1), 16);
-      var bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
+      const color = frameData.getAtomColor(colorer, atom);
+      const fgColor = parseInt(propagateColor(color, opts.fg).substring(1), 16);
+      const bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
       geo.setItem(i, frameData.getAtomPos(atomsIdc[i]), text);
       if (updateColor) {
         geo.setColor(i, fgColor, bgColor);

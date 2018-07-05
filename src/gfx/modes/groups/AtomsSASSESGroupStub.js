@@ -10,14 +10,14 @@ class AtomsSASSESGroupStub extends AtomsSphereGroup {
   }
 
   _makeGeoArgs(selection, mode, colorer, _polyComplexity) {
-    var selectedAtoms = [];
-    var atoms = selection.atoms;
-    var chunks = selection.chunks;
-    var i = 0, n = chunks.length;
+    const selectedAtoms = [];
+    const atoms = selection.atoms;
+    const chunks = selection.chunks;
+    let i = 0, n = chunks.length;
     for (; i < n; ++i) {
       selectedAtoms[i] = atoms[chunks[i]];
     }
-    var opts = mode.getSurfaceOpts();
+    const opts = mode.getSurfaceOpts();
     opts.atoms = selectedAtoms;
     opts.selection = selection;
     opts.colorMode = colorer;

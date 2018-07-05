@@ -8,16 +8,16 @@ class AtomsGroup extends ChemGroup {
   }
 
   raycast(raycaster, intersects) {
-    var atoms = this._selection.atoms;
-    var inters = [];
+    const atoms = this._selection.atoms;
+    const inters = [];
     this._mesh.raycast(raycaster, inters);
-    var atomsIdc = this._chunksIdc;
+    const atomsIdc = this._chunksIdc;
     // process inters array - arr object references
-    for (var i = 0, n = inters.length; i < n; ++i) {
+    for (let i = 0, n = inters.length; i < n; ++i) {
       if (!inters[i].hasOwnProperty('chunkIdx')) {
         continue;
       }
-      var atomIdx = atomsIdc[inters[i].chunkIdx];
+      const atomIdx = atomsIdc[inters[i].chunkIdx];
       if (atomIdx < atoms.length) {
         inters[i].atom = atoms[atomIdx];
         intersects.push(inters[i]);
@@ -26,11 +26,11 @@ class AtomsGroup extends ChemGroup {
   }
 
   _calcChunksList(mask) {
-    var chunksList = [];
-    var atoms = this._selection.atoms;
-    var atomsIdc = this._chunksIdc;
-    for (var i = 0, n = atomsIdc.length; i < n; ++i) {
-      var atom = atoms[atomsIdc[i]];
+    const chunksList = [];
+    const atoms = this._selection.atoms;
+    const atomsIdc = this._chunksIdc;
+    for (let i = 0, n = atomsIdc.length; i < n; ++i) {
+      const atom = atoms[atomsIdc[i]];
       if ((atom._mask & mask) !== 0) {
         chunksList.push(i);
       }

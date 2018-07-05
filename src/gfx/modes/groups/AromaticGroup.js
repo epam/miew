@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import AtomsGroup from './AtomsGroup';
 
 function _slerp(omega, v1, v2, t) {
-  var oSin = Math.sin(omega);
+  const oSin = Math.sin(omega);
   return v1.clone().multiplyScalar(Math.sin((1 - t) * omega) / oSin).addScaledVector(v2, Math.sin(t * omega) / oSin);
 }
 
@@ -14,36 +14,36 @@ class AromaticGroup extends AtomsGroup {
   }
 
   _buildInner(radOffset, addChunk) {
-    var chunksToIdx = this._selection.chunks;
+    const chunksToIdx = this._selection.chunks;
 
-    var prevVector = new THREE.Vector3();
-    var currVector = new THREE.Vector3();
-    var segmentsHeight = this._segmentsHeight;
-    var leprStep = 1.0 / segmentsHeight;
-    var colorer = this._colorer;
+    const prevVector = new THREE.Vector3();
+    const currVector = new THREE.Vector3();
+    const segmentsHeight = this._segmentsHeight;
+    const leprStep = 1.0 / segmentsHeight;
+    const colorer = this._colorer;
 
-    var cycles = this._selection.cycles;
-    var parent = this._selection.parent;
-    var chunkIdx = 0;
-    var currAtomIdx = chunksToIdx[chunkIdx];
+    const cycles = this._selection.cycles;
+    const parent = this._selection.parent;
+    let chunkIdx = 0;
+    let currAtomIdx = chunksToIdx[chunkIdx];
 
-    for (var cIdx = 0, cCount = cycles.length; cIdx < cCount; ++cIdx) {
-      var cycle = cycles[cIdx];
-      var cycAtoms = cycle.atoms;
-      var chunkPoints = [];
-      var tmpDir = [];
-      var center = cycle.center;
-      var cycleRad = cycle.radius - radOffset;
-      var n = cycAtoms.length;
-      var i = 0;
-      var prevPos = cycAtoms[n - 1]._position;
-      var currPos = cycAtoms[i]._position;
+    for (let cIdx = 0, cCount = cycles.length; cIdx < cCount; ++cIdx) {
+      const cycle = cycles[cIdx];
+      const cycAtoms = cycle.atoms;
+      const chunkPoints = [];
+      const tmpDir = [];
+      const center = cycle.center;
+      const cycleRad = cycle.radius - radOffset;
+      const n = cycAtoms.length;
+      let i = 0;
+      const prevPos = cycAtoms[n - 1]._position;
+      let currPos = cycAtoms[i]._position;
       prevVector.subVectors(prevPos, center);
       currVector.subVectors(currPos, center);
-      var upDir = currVector.clone().cross(prevVector).normalize();
+      const upDir = currVector.clone().cross(prevVector).normalize();
 
       for (; i < n; ++i) {
-        var omega = prevVector.angleTo(currVector);
+        const omega = prevVector.angleTo(currVector);
         tmpDir[i] = _slerp(omega, prevVector, currVector, 0.5).normalize();
         currPos = cycAtoms[(i + 1) % n]._position;
         prevVector.copy(currVector);
@@ -54,12 +54,12 @@ class AromaticGroup extends AtomsGroup {
         if (cycAtoms[i]._index !== currAtomIdx) {
           continue;
         }
-        var start = tmpDir[i];
-        var end = tmpDir[(i + 1) % n];
-        var color = colorer.getAtomColor(cycAtoms[i], parent);
-        var currAngle = start.angleTo(end);
+        const start = tmpDir[i];
+        const end = tmpDir[(i + 1) % n];
+        const color = colorer.getAtomColor(cycAtoms[i], parent);
+        const currAngle = start.angleTo(end);
 
-        for (var j = 0; j <= segmentsHeight; ++j) {
+        for (let j = 0; j <= segmentsHeight; ++j) {
           chunkPoints[j] = _slerp(currAngle, start, end, j * leprStep).multiplyScalar(cycleRad).add(center);
         }
 

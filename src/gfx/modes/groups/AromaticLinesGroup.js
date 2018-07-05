@@ -3,15 +3,15 @@
 import AromaticGroup from './AromaticGroup';
 
 function AromaticLinesGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-  var self = this;
-  var segmentsHeight = this._segmentsHeight = mode.getAromaticArcChunks();
+  const self = this;
+  const segmentsHeight = this._segmentsHeight = mode.getAromaticArcChunks();
   self._build = function() {
-    var geo = self._geo;
-    var radOffset = mode.getAromaticOffset();
+    const geo = self._geo;
+    const radOffset = mode.getAromaticOffset();
     self._buildInner(radOffset, function(chunkIdx, color, points) {
-      var prevPt = points[0];//do not replace with start
-      for (var j = 1; j <= segmentsHeight; ++j) {
-        var currPoint = points[j];
+      let prevPt = points[0];//do not replace with start
+      for (let j = 1; j <= segmentsHeight; ++j) {
+        const currPoint = points[j];
         geo.setSegment(chunkIdx, j - 1, prevPt, currPoint);
         prevPt = currPoint;
       }
