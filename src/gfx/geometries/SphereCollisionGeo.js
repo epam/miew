@@ -4,20 +4,20 @@ import * as THREE from 'three';
 
 //////////////////////////////////////////////////////////////////////////////
 
-function CollisionSphere(position, radius) {
-  this._position = position;
-  this._radius = radius;
-}
 
-CollisionSphere.prototype.raycast = (function() {
+class CollisionSphere {
+  constructor(position, radius) {
+    this._position = position;
+    this._radius = radius;
+  }
 
-  var sphere = new THREE.Sphere();
+  static _sphere = new THREE.Sphere();
 
-  return function raycast(raycaster) {
+  raycast(raycaster) {
 
-    sphere.set(this._position, this._radius);
+    CollisionSphere._sphere.set(this._position, this._radius);
 
-    var p = raycaster.ray.intersectSphere(sphere);
+    const p = raycaster.ray.intersectSphere(CollisionSphere._sphere);
     if (p) {
       return {
         distance: raycaster.ray.origin.distanceTo(p),
@@ -25,8 +25,8 @@ CollisionSphere.prototype.raycast = (function() {
       };
     }
     return null;
-  };
-}());
+  }
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
