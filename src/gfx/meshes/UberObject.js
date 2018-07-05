@@ -20,7 +20,7 @@ export default function(SuperClass) {
   };
 
   NewObjectType.prototype._update = function() {
-    var material = this.material;
+    const material = this.material;
     if (!material) {
       return;
     }
