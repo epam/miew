@@ -3,6 +3,7 @@
 import AtomsGroup from './AtomsGroup';
 import utils from '../../../utils';
 
+/* Functions wasn't encapsulated to the class to be visible only to this class */
 function adjustColor(color) {
   var r = (color >> 16) & 255;
   var g = (color >> 8) & 255;
@@ -103,69 +104,68 @@ var parseTemplate = function(atom, str) {
   });
 };
 
-function AtomsTextGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-  this._geoArgs = this._makeGeoArgs(selection, mode, colorer, polyComplexity);
-  AtomsGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-}
-
-AtomsTextGroup.prototype = Object.create(AtomsGroup.prototype);
-AtomsTextGroup.prototype.constructor = AtomsTextGroup;
-
-AtomsTextGroup.prototype._makeGeoArgs = function(selection, mode, _colorer, _polyComplexity) {
-  var opts = mode.getLabelOpts();
-  return [selection.chunks.length, opts];
-};
-
-AtomsTextGroup.prototype._build = function() {
-  var opts = this._mode.getLabelOpts();
-  // TODO is it correct to filter atoms here?
-  var atomsIdc  = this._selection.chunks;
-  var atoms = this._selection.atoms;
-  var parent = this._selection.parent;
-  var colorer = this._colorer;
-  var geo = this._geo;
-  for (var i = 0, n = atomsIdc.length; i < n; ++i) {
-    var atom = atoms[atomsIdc[i]];
-    var text = opts.template ? parseTemplate(atom, opts.template) : getAtomText(atom);
-    if (!text) {
-      continue;
-    }
-    var color = colorer.getAtomColor(atom, parent);
-    var fgColor =  parseInt(propagateColor(color, opts.fg).substring(1), 16);
-    var bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
-    geo.setItem(i, atom.getPosition(), text);
-    geo.setColor(i, fgColor, bgColor);
+class AtomsTextGroup extends AtomsGroup {
+  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
+    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
+    this._geoArgs = this._makeGeoArgs(selection, mode, colorer, polyComplexity);
   }
-  geo.finalize();
-};
 
-AtomsTextGroup.prototype.updateToFrame = function(frameData) {
-  // TODO This method looks like a copy paste. However, it
-  // was decided to postpone animation refactoring until GFX is fixed.
-  var opts = this._mode.getLabelOpts();
-  // TODO is it correct to filter atoms here?
-  var atomsIdc  = this._selection.chunks;
-  var atoms = this._selection.atoms;
-  var colorer = this._colorer;
-  var geo = this._geo;
-  var updateColor = frameData.needsColorUpdate(colorer);
-  for (var i = 0, n = atomsIdc.length; i < n; ++i) {
-    var atom = atoms[atomsIdc[i]];
-    var text = opts.template ? parseTemplate(atom, opts.template) : getAtomText(atom);
-    if (!text) {
-      continue;
-    }
-    var color = frameData.getAtomColor(colorer, atom);
-    var fgColor =  parseInt(propagateColor(color, opts.fg).substring(1), 16);
-    var bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
-    geo.setItem(i, frameData.getAtomPos(atomsIdc[i]), text);
-    if (updateColor) {
+  _makeGeoArgs(selection, mode, _colorer, _polyComplexity) {
+    var opts = mode.getLabelOpts();
+    return [selection.chunks.length, opts];
+  }
+
+  _build() {
+    var opts = this._mode.getLabelOpts();
+    // TODO is it correct to filter atoms here?
+    var atomsIdc = this._selection.chunks;
+    var atoms = this._selection.atoms;
+    var parent = this._selection.parent;
+    var colorer = this._colorer;
+    var geo = this._geo;
+    for (var i = 0, n = atomsIdc.length; i < n; ++i) {
+      var atom = atoms[atomsIdc[i]];
+      var text = opts.template ? parseTemplate(atom, opts.template) : getAtomText(atom);
+      if (!text) {
+        continue;
+      }
+      var color = colorer.getAtomColor(atom, parent);
+      var fgColor = parseInt(propagateColor(color, opts.fg).substring(1), 16);
+      var bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
+      geo.setItem(i, atom.getPosition(), text);
       geo.setColor(i, fgColor, bgColor);
     }
+    geo.finalize();
   }
 
-  geo.finalize();
-};
+  updateToFrame(frameData) {
+    // TODO This method looks like a copy paste. However, it
+    // was decided to postpone animation refactoring until GFX is fixed.
+    var opts = this._mode.getLabelOpts();
+    // TODO is it correct to filter atoms here?
+    var atomsIdc = this._selection.chunks;
+    var atoms = this._selection.atoms;
+    var colorer = this._colorer;
+    var geo = this._geo;
+    var updateColor = frameData.needsColorUpdate(colorer);
+    for (var i = 0, n = atomsIdc.length; i < n; ++i) {
+      var atom = atoms[atomsIdc[i]];
+      var text = opts.template ? parseTemplate(atom, opts.template) : getAtomText(atom);
+      if (!text) {
+        continue;
+      }
+      var color = frameData.getAtomColor(colorer, atom);
+      var fgColor = parseInt(propagateColor(color, opts.fg).substring(1), 16);
+      var bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
+      geo.setItem(i, frameData.getAtomPos(atomsIdc[i]), text);
+      if (updateColor) {
+        geo.setColor(i, fgColor, bgColor);
+      }
+    }
+
+    geo.finalize();
+  }
+}
 
 export default AtomsTextGroup;
 
