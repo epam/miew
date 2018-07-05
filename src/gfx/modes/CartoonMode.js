@@ -11,11 +11,11 @@ class CartoonMode extends Mode {
   }
 
   getResidueStartRadius(residue) {
-    var second = residue.getSecondary();
+    const second = residue.getSecondary();
     if (!second || !second.generic) {
       return this.TUBE_RADIUS;
     }
-    var secOpts = this.secCache[second.generic];
+    const secOpts = this.secCache[second.generic];
     if (!secOpts) {
       return this.TUBE_RADIUS;
     }
@@ -26,11 +26,11 @@ class CartoonMode extends Mode {
   }
 
   getResidueEndRadius(residue) {
-    var second = residue.getSecondary();
+    const second = residue.getSecondary();
     if (second === null || !second.generic) {
       return this.TUBE_RADIUS;
     }
-    var secOpts = this.secCache[second.generic];
+    const secOpts = this.secCache[second.generic];
     if (!secOpts) {
       return this.TUBE_RADIUS;
     }
@@ -41,12 +41,12 @@ class CartoonMode extends Mode {
   }
 
   getResidueRadius(residue, val) {
-    var startRad = this.getResidueStartRadius(residue);
+    const startRad = this.getResidueStartRadius(residue);
     if (val === 0) {
       return startRad;
     }
 
-    var endRad = this.getResidueEndRadius(residue);
+    const endRad = this.getResidueEndRadius(residue);
     if (val === 2) {
       return endRad;
     }
@@ -69,13 +69,13 @@ class CartoonMode extends Mode {
   }
 
   buildGeometry(complex, colorer, mask, material) {
-    var tubeRad = this.opts.radius;
-    var secHeight = this.opts.depth;
+    const tubeRad = this.opts.radius;
+    const secHeight = this.opts.depth;
 
     this.TUBE_RADIUS = new THREE.Vector2(tubeRad, tubeRad);
     this.ARROW_END = new THREE.Vector2(secHeight, tubeRad);
-    var secCache = {};
-    var secData = this.opts.ss;
+    const secCache = {};
+    const secData = this.opts.ss;
     /* eslint-disable guard-for-in */
     for (var prop in secData) {
       secCache[prop] = {

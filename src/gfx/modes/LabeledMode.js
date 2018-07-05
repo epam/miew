@@ -12,7 +12,7 @@ class LabeledMode extends Mode {
   }
 
   update() {
-    var statGroups = this._staticGroups;
+    const statGroups = this._staticGroups;
     if (this.settings.now.labels === 'no') {
       this.depGroups = this.depGroups.slice(0, statGroups);
     } else {

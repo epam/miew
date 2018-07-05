@@ -11,8 +11,8 @@ function getRenderParams() {
 class LinesMode extends LabeledMode {
   constructor(opts) {
     super(opts);
-    var groups = this.depGroups;
-    for (var i = 0, n = groups.length; i < n; ++i) {
+    const groups = this.depGroups;
+    for (let i = 0, n = groups.length; i < n; ++i) {
       groups[i] = [groups[i], getRenderParams];
     }
   }
