@@ -2,9 +2,9 @@ import * as THREE from 'three';
 import utils from '../../utils';
 import RaycastableBufferGeometry from './RaycastableBufferGeometry';
 
-var POS_RAD_SIZE = 4;
-var COLOR_SIZE = 3;
-var tmpColor = new THREE.Color();
+const POS_RAD_SIZE = 4;
+const COLOR_SIZE = 3;
+const tmpColor = new THREE.Color();
 
 /**
  * This is a base class for isosurface algorithms.
@@ -25,8 +25,8 @@ IsoSurfaceGeometry.prototype = Object.create(RaycastableBufferGeometry.prototype
 IsoSurfaceGeometry.prototype.constructor = IsoSurfaceGeometry;
 
 IsoSurfaceGeometry.prototype.setItem = function(chunkIdx, pos, radius) {
-  var posRad = this._posRad;
-  var idx = POS_RAD_SIZE * chunkIdx;
+  const posRad = this._posRad;
+  let idx = POS_RAD_SIZE * chunkIdx;
   posRad[idx++] = pos.x;
   posRad[idx++] = pos.y;
   posRad[idx++] = pos.z;
@@ -35,8 +35,8 @@ IsoSurfaceGeometry.prototype.setItem = function(chunkIdx, pos, radius) {
 
 IsoSurfaceGeometry.prototype.setColor = function(chunkIdx, colorVal) {
   tmpColor.set(colorVal);
-  var colors = this._colors;
-  var idx = COLOR_SIZE * chunkIdx;
+  const colors = this._colors;
+  let idx = COLOR_SIZE * chunkIdx;
   colors[idx++] = tmpColor.r;
   colors[idx++] = tmpColor.g;
   colors[idx] = tmpColor.b;

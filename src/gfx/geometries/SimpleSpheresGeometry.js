@@ -6,10 +6,10 @@ import utils from '../../utils';
 import ChunkedObjectsGeometry from './ChunkedObjectsGeometry';
 import SphereCollisionGeo from './SphereCollisionGeo';
 
-var VEC_SIZE = 3;
+const VEC_SIZE = 3;
 
 function SimpleSpheresGeometry(spheresCount, sphereComplexity) {
-  var sphGeometry = new THREE.SphereBufferGeometry(
+  const sphGeometry = new THREE.SphereBufferGeometry(
     1, sphereComplexity * 2, sphereComplexity,
     0, Math.PI * 2, 0, Math.PI
   );
@@ -17,12 +17,12 @@ function SimpleSpheresGeometry(spheresCount, sphereComplexity) {
   SphereCollisionGeo.call(this, spheresCount);
 
 
-  var normals = this._normals;
-  var geoNormals = sphGeometry.attributes.normal.array;
-  var chunkSize = this._chunkSize;
+  const normals = this._normals;
+  const geoNormals = sphGeometry.attributes.normal.array;
+  const chunkSize = this._chunkSize;
   this._chunkPos = this._chunkGeo.attributes.position.array;
   this._tmpPositions = utils.allocateTyped(Float32Array, chunkSize * VEC_SIZE);
-  for (var i = 0; i < spheresCount; ++i) {
+  for (let i = 0; i < spheresCount; ++i) {
     normals.set(geoNormals, chunkSize * VEC_SIZE * i);
   }
 }
@@ -32,12 +32,12 @@ _.mixin(SimpleSpheresGeometry.prototype, SphereCollisionGeo.prototype);
 SimpleSpheresGeometry.prototype.constructor = SimpleSpheresGeometry;
 
 SimpleSpheresGeometry.prototype.setItem = function(itemIdx, itemPos, itemRad) {
-  var tmpPos = this._tmpPositions;
-  var chunkSize = this._chunkSize;
-  var geoPos = this._chunkPos;
+  const tmpPos = this._tmpPositions;
+  const chunkSize = this._chunkSize;
+  const geoPos = this._chunkPos;
 
-  for (var i = 0; i < chunkSize; ++i) {
-    var idx = i * 3;
+  for (let i = 0; i < chunkSize; ++i) {
+    const idx = i * 3;
     tmpPos[idx] = itemPos.x + geoPos[idx] * itemRad;
     tmpPos[idx + 1] = itemPos.y + geoPos[idx + 1] * itemRad;
     tmpPos[idx + 2] = itemPos.z + geoPos[idx + 2] * itemRad;

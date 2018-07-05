@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import LinesGeometry from './LinesGeometry';
 import Simple2CCylindersGeometry from './Simple2CCylindersGeometry';
 
-var COLLISION_RAD = 0.3;
-var tmpVector = new THREE.Vector3();
+const COLLISION_RAD = 0.3;
+const tmpVector = new THREE.Vector3();
 
 function TwoColorLinesGeometry(segmentsCount) {
   LinesGeometry.call(this, segmentsCount * 2);
@@ -21,20 +21,20 @@ TwoColorLinesGeometry.prototype.raycast = function(raycaster, intersects) {
 
 TwoColorLinesGeometry.prototype.setItem = function(itemIdx, botPos, topPos) {
   this._collisionGeo.setItem(itemIdx, botPos, topPos, COLLISION_RAD);
-  var offset = 2 * itemIdx;// there are two points per segment
+  const offset = 2 * itemIdx;// there are two points per segment
   tmpVector.lerpVectors(botPos, topPos, 0.5);
   this.parent.setSegment.call(this, offset, botPos, tmpVector);
   this.parent.setSegment.call(this, offset + 1, tmpVector, topPos);
 };
 
 TwoColorLinesGeometry.prototype.setColor = function(itemIdx, colorVal1, colorVal2) {
-  var offset = 2 * itemIdx;// there are two points per segment
+  const offset = 2 * itemIdx;// there are two points per segment
   this.parent.setColor.call(this, offset, colorVal1);
   this.parent.setColor.call(this, offset + 1, colorVal2);
 };
 
 TwoColorLinesGeometry.prototype.raycast = function(raycaster, intersects) {
-  var collisionGeo = this._collisionGeo;
+  const collisionGeo = this._collisionGeo;
   if (!collisionGeo)  {
     return;
   }
@@ -42,10 +42,10 @@ TwoColorLinesGeometry.prototype.raycast = function(raycaster, intersects) {
 };
 
 TwoColorLinesGeometry.prototype.getSubset = function(segmentIndices) {
-  var instanceCount = segmentIndices.length;
-  var subset = new TwoColorLinesGeometry(instanceCount, false);
-  for (var i = 0, n = instanceCount; i < n; ++i) {
-    var startSegIdx = segmentIndices[i];
+  const instanceCount = segmentIndices.length;
+  const subset = new TwoColorLinesGeometry(instanceCount, false);
+  for (let i = 0, n = instanceCount; i < n; ++i) {
+    const startSegIdx = segmentIndices[i];
     subset.setSegments(i, this.getSubsetSegments(startSegIdx, 1));
     subset.setColors(i, this.getSubsetColors(startSegIdx, 1));
   }

@@ -16,17 +16,17 @@ RaycastableBufferGeometry.prototype.constructor = RaycastableBufferGeometry;
 
 RaycastableBufferGeometry.prototype.raycast = (function() {
   // This method was copied from three.js
-  var vA = new THREE.Vector3();
-  var vB = new THREE.Vector3();
-  var vC = new THREE.Vector3();
+  const vA = new THREE.Vector3();
+  const vB = new THREE.Vector3();
+  const vC = new THREE.Vector3();
 
-  var uvA = new THREE.Vector2();
-  var uvB = new THREE.Vector2();
-  var uvC = new THREE.Vector2();
+  const uvA = new THREE.Vector2();
+  const uvB = new THREE.Vector2();
+  const uvC = new THREE.Vector2();
 
-  var barycoord = new THREE.Vector3();
+  const barycoord = new THREE.Vector3();
 
-  var intersectionPoint = new THREE.Vector3();
+  const intersectionPoint = new THREE.Vector3();
 
   function uvIntersection(point, p1, p2, p3, uv1, uv2, uv3) {
     THREE.Triangle.barycoordFromPoint(point, p1, p2, p3, barycoord);
@@ -40,8 +40,8 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
   }
 
   function checkIntersection(object, raycaster, ray, pA, pB, pC, point) {
-    var intersect;
-    intersect = ray.intersectTriangle(pA, pB, pC, false, point);
+    //let intersect;
+    const intersect = ray.intersectTriangle(pA, pB, pC, false, point);
 
     if (intersect === null) {
       return null;
@@ -57,7 +57,7 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
     vB.fromBufferAttribute(position, b);
     vC.fromBufferAttribute(position, c);
 
-    var intersection = checkIntersection(object, raycaster, ray, vA, vB, vC, intersectionPoint);
+    const intersection = checkIntersection(object, raycaster, ray, vA, vB, vC, intersectionPoint);
     if (intersection) {
       if (uv) {
         uvA.fromBufferAttribute(uv, a);
@@ -75,7 +75,7 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
   }
 
   return function(raycaster, intersects) {
-    var ray = raycaster.ray;
+    const ray = raycaster.ray;
     if (this.boundingSphere === null) {
       this.computeBoundingSphere();
     }
@@ -90,11 +90,11 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
       }
     }
 
-    var a, b, c;
-    var index = this.index;
-    var position = this.attributes.position;
-    var uv = this.attributes.uv;
-    var i, l;
+    let a, b, c;
+    const index = this.index;
+    const position = this.attributes.position;
+    const uv = this.attributes.uv;
+    let i, l;
 
     if (index === null) {
       return;
@@ -105,7 +105,7 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
       b = index.getX(i + 1);
       c = index.getX(i + 2);
 
-      var intersection = checkBufferGeometryIntersection(this, raycaster, ray, position, uv, a, b, c);
+      const intersection = checkBufferGeometryIntersection(this, raycaster, ray, position, uv, a, b, c);
 
       if (intersection) {
         intersection.faceIndex = Math.floor(i / 3); // triangle number in indices buffer semantics

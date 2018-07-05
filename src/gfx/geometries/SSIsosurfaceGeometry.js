@@ -10,9 +10,9 @@ import IsoSurfaceGeo from './IsoSurfaceGeo';
 import chem from '../../chem';
 import utils from '../../utils';
 
-var COLOR_SIZE = 3;
-var HASH_SIZE = 32768;
-var Element = chem.Element;
+const COLOR_SIZE = 3;
+const HASH_SIZE = 32768;
+const Element = chem.Element;
 
 /**
  * This class implements 'quick' isosurface geometry generation algorithm.
@@ -31,21 +31,21 @@ SSIsosurfaceGeometry.prototype.constructor = SSIsosurfaceGeometry;
 SSIsosurfaceGeometry.prototype._build = function() {
   // convert geoOut into arrays of positions, indices, normals
   this._innerBuild();
-  var geoOut = this.getGeo();
+  const geoOut = this.getGeo();
   this.destroy();
   this._fromGeo(geoOut);
 };
 
 SSIsosurfaceGeometry.prototype._fromGeo = function(geoOut) {
-  var colors = null;
-  var positions   = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
-  var normals     = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
+  let colors = null;
+  const positions   = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
+  const normals     = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
   if (geoOut._colors !== null) {
     colors = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
   }
-  var indices = utils.allocateTyped(Uint32Array, (1 + 2) * geoOut._numTriangles);
+  const indices = utils.allocateTyped(Uint32Array, (1 + 2) * geoOut._numTriangles);
 
-  var i, j = 0;
+  let i, j = 0;
   for (i = 0; i < geoOut._numVertices; i++) {
     positions[j + 0] = (geoOut._vertices[i].x);
     positions[j + 1] = (geoOut._vertices[i].y);
@@ -63,7 +63,7 @@ SSIsosurfaceGeometry.prototype._fromGeo = function(geoOut) {
     }
   }
 
-  var numTri3 = geoOut._numTriangles * (1 + 2);
+  const numTri3 = geoOut._numTriangles * (1 + 2);
   for (i = 0; i < numTri3; i++) {
     indices[i] = geoOut._indices[i];
   }
@@ -79,15 +79,15 @@ SSIsosurfaceGeometry.prototype._fromGeo = function(geoOut) {
 };
 
 SSIsosurfaceGeometry.prototype.convertToAtomsColored = function(packedArrays, atomsColored) {
-  var atoms = packedArrays.atoms;
-  var colors = packedArrays.colors;
-  for (var i = 0, numAtoms = atoms.length; i < numAtoms; i++) {
-    var vCenter = atoms[i].getPosition();
-    var radius = atoms[i].element.radius;
+  const atoms = packedArrays.atoms;
+  const colors = packedArrays.colors;
+  for (let i = 0, numAtoms = atoms.length; i < numAtoms; i++) {
+    const vCenter = atoms[i].getPosition();
+    const radius = atoms[i].element.radius;
     atomsColored[i] = new IsoSurfaceAtomColored(vCenter, radius);
-    var nm = atoms[i].element.number;
+    const nm = atoms[i].element.number;
     atomsColored[i].atomType = this.getType(nm);
-    var cIdx = COLOR_SIZE * i;
+    let cIdx = COLOR_SIZE * i;
     atomsColored[i].colorX = colors[cIdx++];
     atomsColored[i].colorY = colors[cIdx++];
     atomsColored[i].colorZ = colors[cIdx];
@@ -114,16 +114,16 @@ SSIsosurfaceGeometry.prototype.destroy = function() {
  * @param {Vector3} vBoxMax    Bounding box max point
  */
 SSIsosurfaceGeometry.prototype.getBoundingBox = function(atoms, vBoxMin, vBoxMax) {
-  var bigNum = 10000000.0;
+  const bigNum = 10000000.0;
 
   vBoxMin.x = vBoxMin.y = vBoxMin.z = bigNum;
   vBoxMax.x = vBoxMax.y = vBoxMax.z = 0 - bigNum;
 
-  var probeRadius2 = this.probeRadius * this.atomRadiusScale;
-  var radMax = 0.0;
-  for (var i = 0, num = atoms.length; i < num; i++) {
-    var vCenter = atoms[i].coord;
-    var rad = atoms[i].radius + probeRadius2;
+  const probeRadius2 = this.probeRadius * this.atomRadiusScale;
+  let radMax = 0.0;
+  for (let i = 0, num = atoms.length; i < num; i++) {
+    const vCenter = atoms[i].coord;
+    const rad = atoms[i].radius + probeRadius2;
     radMax = (rad > radMax) ? rad : radMax;
     if (vCenter.x - rad < vBoxMin.x) {
       vBoxMin.x = vCenter.x - rad;
@@ -164,10 +164,10 @@ SSIsosurfaceGeometry.prototype.getBoundingBox = function(atoms, vBoxMin, vBoxMax
  * @param {Vector3} vOut Output vector
  */
 SSIsosurfaceGeometry.prototype.getCornerCoord = function(vBoxMin, vBoxMax, x, y, z, numPoints, vOut) {
-  var invNP = 1.0 / (numPoints - 1.0);
-  var tx = x * invNP;
-  var ty = y * invNP;
-  var tz = z * invNP;
+  const invNP = 1.0 / (numPoints - 1.0);
+  const tx = x * invNP;
+  const ty = y * invNP;
+  const tz = z * invNP;
 
   vOut.x = vBoxMin.x * (1.0 - tx) + vBoxMax.x * tx;
   vOut.y = vBoxMin.y * (1.0 - ty) + vBoxMax.y * ty;
@@ -187,16 +187,16 @@ SSIsosurfaceGeometry.prototype.getCornerCoord = function(vBoxMin, vBoxMax, x, y,
  */
 SSIsosurfaceGeometry.prototype.buildEdgePoint = function(indexA, indexB, sign, cube, indexPointValue, vOut) {
   if (sign[indexA] ^ sign[indexB]) {
-    var cTwentyFour = 24;
-    var t = (0 - cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]) /
+    const cTwentyFour = 24;
+    const t = (0 - cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]) /
         (cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexB] -
         cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]);
-    var xa = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 0];
-    var ya = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 1];
-    var za = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 2];
-    var xb = cube.pointsValuesLinear[indexPointValue + indexB * (2 + 1) + 0];
-    var yb = cube.pointsValuesLinear[indexPointValue + indexB * (2 + 1) + 1];
-    var zb = cube.pointsValuesLinear[indexPointValue + indexB * (2 + 1) + 2];
+    const xa = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 0];
+    const ya = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 1];
+    const za = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 2];
+    const xb = cube.pointsValuesLinear[indexPointValue + indexB * (2 + 1) + 0];
+    const yb = cube.pointsValuesLinear[indexPointValue + indexB * (2 + 1) + 1];
+    const zb = cube.pointsValuesLinear[indexPointValue + indexB * (2 + 1) + 2];
 
     vOut.x = xa * (1.0 - t) + xb * t;
     vOut.y = ya * (1.0 - t) + yb * t;
@@ -213,9 +213,9 @@ SSIsosurfaceGeometry.prototype.buildEdgePoint = function(indexA, indexB, sign, c
  * @returns {boolean} true if triangle is visible
  */
 SSIsosurfaceGeometry.prototype.isTriangleVisible = function(v0, v1, v2) {
-  var a0 = this.voxelWorld.getClosestAtom(v0);
-  var a1 = this.voxelWorld.getClosestAtom(v1);
-  var a2 = this.voxelWorld.getClosestAtom(v2);
+  const a0 = this.voxelWorld.getClosestAtom(v0);
+  const a1 = this.voxelWorld.getClosestAtom(v1);
+  const a2 = this.voxelWorld.getClosestAtom(v2);
   if (a0 === null || a1 === null || a2 === null ||
       a0.srcAtom === null || a1.srcAtom === null || a2.srcAtom === null) {
     return false;
@@ -239,21 +239,21 @@ SSIsosurfaceGeometry.prototype.addTriangle = function(v0, v1, v2) {
     return true;
   }
 
-  var geo = this.geoOut;
+  const geo = this.geoOut;
 
   if (geo._numTriangles >= this.maxNumTriangles) {
     return false;
   }
 
   // Add vertex with optimize
-  var indInGeo0 = this.addVertexToGeo(geo, v0);
-  var indInGeo1 = this.addVertexToGeo(geo, v1);
-  var indInGeo2 = this.addVertexToGeo(geo, v2);
+  const indInGeo0 = this.addVertexToGeo(geo, v0);
+  const indInGeo1 = this.addVertexToGeo(geo, v1);
+  const indInGeo2 = this.addVertexToGeo(geo, v2);
   if ((indInGeo0 | indInGeo1 | indInGeo2) < 0) {
     return false;
   }
 
-  var itr = 3 * geo._numTriangles;
+  const itr = 3 * geo._numTriangles;
   geo._indices[itr + 0] = indInGeo0;
   geo._indices[itr + 1] = indInGeo1;
   geo._indices[itr + 2] = indInGeo2;
@@ -273,41 +273,41 @@ SSIsosurfaceGeometry.prototype.addTriangle = function(v0, v1, v2) {
  * @returns {number} 0, if success (<0) is error
  */
 SSIsosurfaceGeometry.prototype.buildGeoFromCorners = function(meshRes, vBoxMin, vBoxMax, corners, vCellStep, cube) {
-  var i, j;
-  var arrSize = 12;
-  var cNumVerts = 8;
-  var numCells = meshRes - 1;
-  var side = meshRes;
-  var side2 = meshRes * meshRes;
+  let i, j;
+  const arrSize = 12;
+  const cNumVerts = 8;
+  const numCells = meshRes - 1;
+  const side = meshRes;
+  const side2 = meshRes * meshRes;
   //side3 = meshRes * meshRes * meshRes;
 
-  var vaEdges = new Array(arrSize);
+  const vaEdges = new Array(arrSize);
   for (i = 0; i < arrSize; i++) {
     vaEdges[i] = new THREE.Vector3();
   }
-  var sign = [];
+  const sign = [];
   for (i = 0; i < cNumVerts; i++) {
     sign[i] = 1.0;
   }
-  // var numCellsIntersected   = 0;
-  // var numTrianglesGenerated = 0;
-  var vCorner = new THREE.Vector3();
-  var indCell = 0;
-  var indY = 0;
-  for (var y = 0; y < numCells; y++, indY += side2) {
-    var indZ = 0;
-    for (var z = 0; z < numCells; z++, indZ += side) {
-      for (var x = 0; x < numCells; x++) {
+  // const numCellsIntersected   = 0;
+  // const numTrianglesGenerated = 0;
+  const vCorner = new THREE.Vector3();
+  let indCell = 0;
+  let indY = 0;
+  for (let y = 0; y < numCells; y++, indY += side2) {
+    let indZ = 0;
+    for (let z = 0; z < numCells; z++, indZ += side) {
+      for (let x = 0; x < numCells; x++) {
         if (!cube.hasIntersection[indCell]) {
           // next cell
           indCell++;
           continue;
         }
-        var bitsInside = cube.bitsInside[indCell];
+        const bitsInside = cube.bitsInside[indCell];
 
         this.getCornerCoord(vBoxMin, vBoxMax, x, y, z, meshRes, vCorner);
 
-        var indPointValues = indCell * (2 << (2 + 2));
+        const indPointValues = indCell * (2 << (2 + 2));
         for (i = 0, j = 0; i < cNumVerts; i++) {
           cube.pointsValuesLinear[indPointValues + j] = vCorner.x; j++;
           cube.pointsValuesLinear[indPointValues + j] = vCorner.y; j++;
@@ -343,7 +343,7 @@ SSIsosurfaceGeometry.prototype.buildGeoFromCorners = function(meshRes, vBoxMin, 
 
 
         // now current cell has intersections (from -x to +x) on some cube edges
-        var indValues = indPointValues + 24;
+        const indValues = indPointValues + 24;
         for (i = 0; i < cNumVerts; ++i) {
           sign[i] = (cube.pointsValuesLinear[indValues + i] < 0.0) ? 1 : 0;
         }
@@ -363,15 +363,15 @@ SSIsosurfaceGeometry.prototype.buildGeoFromCorners = function(meshRes, vBoxMin, 
         this.buildEdgePoint(2, 6, sign, cube, indPointValues, vaEdges[10]);
         this.buildEdgePoint(3, 7, sign, cube, indPointValues, vaEdges[11]);
 
-        var offs = bitsInside * (2 << (1 + 2));
-        for (var numTri = 0, indTri = 0; numTri < (2 + 2 + 2); numTri++, indTri += 3) {
+        const offs = bitsInside * (2 << (1 + 2));
+        for (let numTri = 0, indTri = 0; numTri < (2 + 2 + 2); numTri++, indTri += 3) {
           // s_triIndicesMarchCube is external array, defined in mold_ind.js
-          var i0 = cube.striIndicesMarchCube[offs + indTri];
+          const i0 = cube.striIndicesMarchCube[offs + indTri];
           if (i0 < 0) {
             break;
           }
-          var i1 = cube.striIndicesMarchCube[offs + indTri + 1];
-          var i2 = cube.striIndicesMarchCube[offs + indTri + 2];
+          const i1 = cube.striIndicesMarchCube[offs + indTri + 1];
+          const i2 = cube.striIndicesMarchCube[offs + indTri + 2];
 
           if (!this.addTriangle(vaEdges[i0], vaEdges[i1], vaEdges[i2])) {
             return 0 - 2;
@@ -401,18 +401,18 @@ SSIsosurfaceGeometry.prototype.buildGeoFromCorners = function(meshRes, vBoxMin, 
  * @returns {number} numIntersectedCells
  */
 SSIsosurfaceGeometry.prototype.getNumIntersectedCells = function(side, numCells, corners, cube) {
-  var side2 = side * side;
-  var cNumVerts = 8;
-  var numIntersectedCells  = 0;
+  const side2 = side * side;
+  const cNumVerts = 8;
+  let numIntersectedCells  = 0;
 
-  var indCell = 0;
-  var indY = 0;
-  for (var y = 0; y < numCells; y++, indY += side2) {
-    var indZ = 0;
-    for (var z = 0; z < numCells; z++, indZ += side) {
-      for (var x = 0; x < numCells; x++) {
-        var cubeValuesIndex = indCell * (2 << (2 + 2)) + 24;
-        var indCorner = x + indZ + indY;
+  let indCell = 0;
+  let indY = 0;
+  for (let y = 0; y < numCells; y++, indY += side2) {
+    let indZ = 0;
+    for (let z = 0; z < numCells; z++, indZ += side) {
+      for (let x = 0; x < numCells; x++) {
+        const cubeValuesIndex = indCell * (2 << (2 + 2)) + 24;
+        const indCorner = x + indZ + indY;
 
         cube.pointsValuesLinear[cubeValuesIndex] = corners[indCorner];
         cube.pointsValuesLinear[cubeValuesIndex + 1] = corners[indCorner + 1];
@@ -427,8 +427,8 @@ SSIsosurfaceGeometry.prototype.getNumIntersectedCells = function(side, numCells,
         //assert(side2 + indCorner + side + 1 < side3);
 
         // get bit flags inside
-        var bitsInside = 0;
-        for (var i = 0; i < cNumVerts; ++i) {
+        let bitsInside = 0;
+        for (let i = 0; i < cNumVerts; ++i) {
           if (cube.pointsValuesLinear[cubeValuesIndex + i] < 0.0) {
             bitsInside |= (1 << i);
           }
@@ -451,8 +451,8 @@ SSIsosurfaceGeometry.prototype.getNumIntersectedCells = function(side, numCells,
 
 SSIsosurfaceGeometry.prototype.getType = function(letter) {
   /* eslint-disable no-magic-numbers */
-  var atomT = [0, 0, 1, 1, 2, 6, 3, 6, 4, 6, 5, 6, 6, 0, 7, 3, 8, 2, 9, 6, 10, 6, 11, 6, 12, 6, 13, 6, 14, 6, 15, 4, 16,
-    5, 17, 6, 18, 6, 19, 6, 20, 6, 21, 6, 22, 6, 23, 6, 24, 6, 25, 6, 26, 6, 27, 6, 28, 6, 29, 6, 30, 6, 31, 6, 32,
+  const atomT = [0, 0, 1, 1, 2, 6, 3, 6, 4, 6, 5, 6, 6, 0, 7, 3, 8, 2, 9, 6, 10, 6, 11, 6, 12, 6, 13, 6, 14, 6, 15, 4,
+    16, 5, 17, 6, 18, 6, 19, 6, 20, 6, 21, 6, 22, 6, 23, 6, 24, 6, 25, 6, 26, 6, 27, 6, 28, 6, 29, 6, 30, 6, 31, 6, 32,
     6, 33, 6, 34, 6, 35, 6, 36, 6, 37, 6, 38, 6, 39, 6, 40, 6, 41, 6, 42, 6, 43, 6, 44, 6, 45, 6, 46, 6, 47, 6, 48,
     6, 49, 6, 50, 6, 51, 6, 52, 6, 53, 6, 54, 6, 55, 6, 56, 6, 57, 6, 58, 6, 59, 6, 60, 6, 61, 6, 62, 6, 63, 6, 64,
     6, 65, 6, 66, 6, 67, 6, 68, 6, 69, 6, 70, 6, 71, 6, 72, 6, 73, 6, 74, 6, 75, 6, 76, 6, 77, 6, 78, 6, 79, 6, 80,
@@ -480,37 +480,37 @@ SSIsosurfaceGeometry.prototype.getType = function(letter) {
  * @param {number} probeRad radius for atom probing
  */
 SSIsosurfaceGeometry.prototype.calculateGridCorners = function(corners, side, vBoxMin, vBoxMax, atoms, probeRad) {
-  var side2 = side * side;
-  var side3 = side2 * side;
-  var vCorner = new THREE.Vector3();
-  var vDif = new THREE.Vector3();
+  const side2 = side * side;
+  const side3 = side2 * side;
+  const vCorner = new THREE.Vector3();
+  const vDif = new THREE.Vector3();
   /* eslint-disable no-magic-numbers */
-  var aLot = +1.0e12;
+  const aLot = +1.0e12;
   /* eslint-enable no-magic-numbers */
 
-  for (var i = 0; i < side3; i++) {
+  for (let i = 0; i < side3; i++) {
     corners[i] = aLot;          // to large value
   }
 
-  var xScale = (side - 1) / (vBoxMax.x - vBoxMin.x);
-  var yScale = (side - 1) / (vBoxMax.y - vBoxMin.y);
-  var zScale = (side - 1) / (vBoxMax.z - vBoxMin.z);
+  const xScale = (side - 1) / (vBoxMax.x - vBoxMin.x);
+  const yScale = (side - 1) / (vBoxMax.y - vBoxMin.y);
+  const zScale = (side - 1) / (vBoxMax.z - vBoxMin.z);
 
-  for (var s = 0, numAtoms = atoms.length; s < numAtoms; s++) {
-    var atom = atoms[s];
-    var radius = atom.radius + probeRad;
+  for (let s = 0, numAtoms = atoms.length; s < numAtoms; s++) {
+    const atom = atoms[s];
+    const radius = atom.radius + probeRad;
 
-    var fx = ((atom.coord.x - radius) - vBoxMin.x) * xScale;
-    var fy = ((atom.coord.y - radius) - vBoxMin.y) * yScale;
-    var fz = ((atom.coord.z - radius) - vBoxMin.z) * zScale;
+    const fx = ((atom.coord.x - radius) - vBoxMin.x) * xScale;
+    const fy = ((atom.coord.y - radius) - vBoxMin.y) * yScale;
+    const fz = ((atom.coord.z - radius) - vBoxMin.z) * zScale;
 
-    var indXMin = Math.floor(fx);
-    var indYMin = Math.floor(fy);
-    var indZMin = Math.floor(fz);
+    const indXMin = Math.floor(fx);
+    const indYMin = Math.floor(fy);
+    const indZMin = Math.floor(fz);
 
-    var indXMax = Math.floor(((atom.coord.x + radius) - vBoxMin.x) * xScale);
-    var indYMax = Math.floor(((atom.coord.y + radius) - vBoxMin.y) * yScale);
-    var indZMax = Math.floor(((atom.coord.z + radius) - vBoxMin.z) * zScale);
+    let indXMax = Math.floor(((atom.coord.x + radius) - vBoxMin.x) * xScale);
+    let indYMax = Math.floor(((atom.coord.y + radius) - vBoxMin.y) * yScale);
+    let indZMax = Math.floor(((atom.coord.z + radius) - vBoxMin.z) * zScale);
 
     indXMax++;
     indYMax++;
@@ -519,20 +519,20 @@ SSIsosurfaceGeometry.prototype.calculateGridCorners = function(corners, side, vB
     indYMax = (indYMax <= (side - 1)) ? indYMax : (side - 1);
     indZMax = (indZMax <= (side - 1)) ? indZMax : (side - 1);
 
-    for (var y = indYMin; y <= indYMax; y++) {
-      var indY = y * side2;
-      for (var z = indZMin; z <= indZMax; z++) {
-        var indZ = z * side;
-        for (var x = indXMin; x <= indXMax; x++) {
-          var ind = indY + indZ + x;
+    for (let y = indYMin; y <= indYMax; y++) {
+      const indY = y * side2;
+      for (let z = indZMin; z <= indZMax; z++) {
+        const indZ = z * side;
+        for (let x = indXMin; x <= indXMax; x++) {
+          const ind = indY + indZ + x;
           this.getCornerCoord(vBoxMin, vBoxMax, x, y, z, side, vCorner);
           vDif.x = vCorner.x - atom.coord.x;
           vDif.y = vCorner.y - atom.coord.y;
           vDif.z = vCorner.z - atom.coord.z;
-          var distToSphere = Math.sqrt(vDif.x * vDif.x + vDif.y * vDif.y + vDif.z * vDif.z);
+          const distToSphere = Math.sqrt(vDif.x * vDif.x + vDif.y * vDif.y + vDif.z * vDif.z);
           // val: < 0, if inside sphere
           // val: > 0, if outside sphere
-          var val = distToSphere - radius;
+          const val = distToSphere - radius;
           if (val < corners[ind]) {
             corners[ind] = val;
           }
@@ -550,7 +550,7 @@ SSIsosurfaceGeometry.prototype.calculateGridCorners = function(corners, side, vB
  * @returns {number} 0, if success. (<0) is non memory
  */
 SSIsosurfaceGeometry.prototype.createVertexHash = function(maxNumVertices, maxNumTriangles) {
-  var i, j;
+  let i, j;
 
   this.hashLines = utils.allocateTyped(Int32Array, HASH_SIZE * 2);
   if (this.hashLines === null) {
@@ -584,7 +584,7 @@ SSIsosurfaceGeometry.prototype.createVertexHash = function(maxNumVertices, maxNu
  */
 SSIsosurfaceGeometry.prototype.getNewHashEntry = function() {
   if (this.numHashEntryIndex < this.numHashEtriesAllocated) {
-    var i = this.numHashEntryIndex;
+    const i = this.numHashEntryIndex;
     this.numHashEntryIndex++;
     return i;
   }
@@ -600,32 +600,32 @@ SSIsosurfaceGeometry.prototype.getNewHashEntry = function() {
  * @returns {number} index of added (or existing) vertex in geometry.
  */
 SSIsosurfaceGeometry.prototype.addVertexToGeo = function(geoOut, vAdd) {
-  var entry;
-  var oneHynberes = 0.01;
-  var n815851 = 815851;
-  var n37633 = 37633;
-  var n2453543 = 2453543;
-  var r106 = 1.0e-6;
+  let entry;
+  const oneHynberes = 0.01;
+  const n815851 = 815851;
+  const n37633 = 37633;
+  const n2453543 = 2453543;
+  const r106 = 1.0e-6;
 
-  var hashResolution = this.marCubeResoultion << 2;
-  var v = new THREE.Vector3();
-  var ix = Math.floor(hashResolution * (vAdd.x - this.vBoxMin.x) / (this.vBoxMax.x + oneHynberes - this.vBoxMin.x));
-  var iy = Math.floor(hashResolution * (vAdd.y - this.vBoxMin.y) / (this.vBoxMax.y + oneHynberes - this.vBoxMin.y));
-  var iz = Math.floor(hashResolution * (vAdd.z - this.vBoxMin.z) / (this.vBoxMax.z + oneHynberes - this.vBoxMin.z));
-  var iHash = ix * n815851 + iz * n37633 + iy * n2453543;
+  const hashResolution = this.marCubeResoultion << 2;
+  const v = new THREE.Vector3();
+  const ix = Math.floor(hashResolution * (vAdd.x - this.vBoxMin.x) / (this.vBoxMax.x + oneHynberes - this.vBoxMin.x));
+  const iy = Math.floor(hashResolution * (vAdd.y - this.vBoxMin.y) / (this.vBoxMax.y + oneHynberes - this.vBoxMin.y));
+  const iz = Math.floor(hashResolution * (vAdd.z - this.vBoxMin.z) / (this.vBoxMax.z + oneHynberes - this.vBoxMin.z));
+  let iHash = ix * n815851 + iz * n37633 + iy * n2453543;
   iHash &= (HASH_SIZE - 1);
-  var hLineIndex = iHash + iHash;
+  const hLineIndex = iHash + iHash;
 
   // search vertex via hash
   // search in hash list
   if (this.vBoxMin !== null && this.vBoxMax !== null) {
     for (entry = this.hashLines[hLineIndex + 1]; entry >= 0; entry = this.hashEntries[entry * 2 + 1]) {
-      var ind = this.hashEntries[entry * 2 + 0];  // vertex index
+      const ind = this.hashEntries[entry * 2 + 0];  // vertex index
       v.copy(geoOut._vertices[ind]);
       v.x -= vAdd.x;
       v.y -= vAdd.y;
       v.z -= vAdd.z;
-      var dot2 = v.x * v.x + v.y * v.y + v.z * v.z;
+      const dot2 = v.x * v.x + v.y * v.y + v.z * v.z;
       if (dot2 < r106) {
         return ind;
       }   // if (found)
@@ -637,7 +637,7 @@ SSIsosurfaceGeometry.prototype.addVertexToGeo = function(geoOut, vAdd) {
     return 0 - 1;
   }
 
-  var iVertAdd = geoOut._numVertices;
+  const iVertAdd = geoOut._numVertices;
   geoOut._vertices[iVertAdd].copy(vAdd);
 
   // add to hash
@@ -646,7 +646,7 @@ SSIsosurfaceGeometry.prototype.addVertexToGeo = function(geoOut, vAdd) {
     if (entry < 0) {
       return 0 - 1;
     }
-    var entryFirst = this.hashLines[hLineIndex + 1];
+    const entryFirst = this.hashLines[hLineIndex + 1];
     this.hashLines[hLineIndex + 1] = entry;
     this.hashEntries[entry * 2 + 0] = iVertAdd;
     this.hashEntries[entry * 2 + 1] = entryFirst;
@@ -672,9 +672,9 @@ SSIsosurfaceGeometry.prototype.modifyExcludedFromGeo = function(
   vBoxMin, vBoxMax,
   geoOut, corners
 ) {
-  var ind;
-  var distToSphere, distToBorder;
-  var r11 = 1.1;
+  let ind;
+  let distToSphere, distToBorder;
+  const r11 = 1.1;
 
   function innerBlockWorkAround() {
     if (distToBorder > 0.0) {
@@ -690,26 +690,26 @@ SSIsosurfaceGeometry.prototype.modifyExcludedFromGeo = function(
     }
   }
 
-  var side2 = side * side;
-  var xScale = (side - 1) / (vBoxMax.x - vBoxMin.x);
-  var yScale = (side - 1) / (vBoxMax.y - vBoxMin.y);
-  var zScale = (side - 1) / (vBoxMax.z - vBoxMin.z);
+  const side2 = side * side;
+  const xScale = (side - 1) / (vBoxMax.x - vBoxMin.x);
+  const yScale = (side - 1) / (vBoxMax.y - vBoxMin.y);
+  const zScale = (side - 1) / (vBoxMax.z - vBoxMin.z);
 
-  var probeSpRad2 = (probeSphereRadius * 2) * (probeSphereRadius * 2);
-  var sideInv = 1.0 / (side - 1);
+  const probeSpRad2 = (probeSphereRadius * 2) * (probeSphereRadius * 2);
+  const sideInv = 1.0 / (side - 1);
 
-  for (var i = 0; i < geoOut._numVertices; i++) {
-    var vCenter = geoOut._vertices[i];
+  for (let i = 0; i < geoOut._numVertices; i++) {
+    const vCenter = geoOut._vertices[i];
 
-    var radEst = probeSphereRadius * r11;
+    const radEst = probeSphereRadius * r11;
 
-    var indXMin = Math.floor(((vCenter.x - radEst) - vBoxMin.x) * xScale);
-    var indYMin = Math.floor(((vCenter.y - radEst) - vBoxMin.y) * yScale);
-    var indZMin = Math.floor(((vCenter.z - radEst) - vBoxMin.z) * zScale);
+    let indXMin = Math.floor(((vCenter.x - radEst) - vBoxMin.x) * xScale);
+    let indYMin = Math.floor(((vCenter.y - radEst) - vBoxMin.y) * yScale);
+    let indZMin = Math.floor(((vCenter.z - radEst) - vBoxMin.z) * zScale);
 
-    var indXMax = Math.floor(((vCenter.x + radEst) - vBoxMin.x) * xScale);
-    var indYMax = Math.floor(((vCenter.y + radEst) - vBoxMin.y) * yScale);
-    var indZMax = Math.floor(((vCenter.z + radEst) - vBoxMin.z) * zScale);
+    let indXMax = Math.floor(((vCenter.x + radEst) - vBoxMin.x) * xScale);
+    let indYMax = Math.floor(((vCenter.y + radEst) - vBoxMin.y) * yScale);
+    let indZMax = Math.floor(((vCenter.z + radEst) - vBoxMin.z) * zScale);
 
     indXMin = (indXMin >= 0) ? indXMin : 0;
     indYMin = (indYMin >= 0) ? indYMin : 0;
@@ -718,24 +718,24 @@ SSIsosurfaceGeometry.prototype.modifyExcludedFromGeo = function(
     indYMax = (indYMax <= (side - 1)) ? indYMax : (side - 1);
     indZMax = (indZMax <= (side - 1)) ? indZMax : (side - 1);
 
-    for (var iy = indYMin; iy <= indYMax; iy++) {
-      var indY = iy * side2;
-      for (var iz = indZMin; iz <= indZMax; iz++) {
-        var indZ = iz * side;
-        for (var ix = indXMin; ix <= indXMax; ix++) {
+    for (let iy = indYMin; iy <= indYMax; iy++) {
+      const indY = iy * side2;
+      for (let iz = indZMin; iz <= indZMax; iz++) {
+        const indZ = iz * side;
+        for (let ix = indXMin; ix <= indXMax; ix++) {
           ind = indY + indZ + ix;
           //getCornerCoord(vBoxMin, vBoxMax, ix, iy, iz, side, &vCorner);
-          var t = ix * sideInv;
-          var xCorner = vBoxMin.x * (1.0 - t) + vBoxMax.x * t;
+          let t = ix * sideInv;
+          const xCorner = vBoxMin.x * (1.0 - t) + vBoxMax.x * t;
           t = iy * sideInv;
-          var yCorner = vBoxMin.y * (1.0 - t) + vBoxMax.y * t;
+          const yCorner = vBoxMin.y * (1.0 - t) + vBoxMax.y * t;
           t = iz * sideInv;
-          var zCorner = vBoxMin.z * (1.0 - t) + vBoxMax.z * t;
+          const zCorner = vBoxMin.z * (1.0 - t) + vBoxMax.z * t;
 
-          var dx = xCorner - vCenter.x;
-          var dy = yCorner - vCenter.y;
-          var dz = zCorner - vCenter.z;
-          var dist2 = dx * dx + dy * dy + dz * dz;
+          const dx = xCorner - vCenter.x;
+          const dy = yCorner - vCenter.y;
+          const dz = zCorner - vCenter.z;
+          const dist2 = dx * dx + dy * dy + dz * dz;
           if (dist2 < probeSpRad2) {
             distToSphere = Math.sqrt(dist2);
             distToBorder = -(distToSphere - probeSphereRadius);
@@ -749,16 +749,16 @@ SSIsosurfaceGeometry.prototype.modifyExcludedFromGeo = function(
 };
 
 SSIsosurfaceGeometry.prototype._innerBuild = function() {
-  var ok;
-  var oneHundered = 100;
-  var r35 = 3.5;
-  var r12 = 1.2;
+  let ok;
+  const oneHundered = 100;
+  const r35 = 3.5;
+  const r12 = 1.2;
 
   // performance test
   //this.performanceTest();
 
   // Create temporary atoms (but colored)
-  var packedArrays = {
+  const packedArrays = {
     posRad: this._posRad,
     colors: this._colors,
     atoms: this._opts.atoms,
@@ -783,39 +783,39 @@ SSIsosurfaceGeometry.prototype._innerBuild = function() {
   this.maxNumVertices = 0;
   this.maxNumTriangles = 0;
 
-  var atomsColored = new Array(this.atoms.length);
+  const atomsColored = new Array(this.atoms.length);
   this.convertToAtomsColored(packedArrays, atomsColored);
 
   // find bbox for spheres scene
-  var vBoxMin = this.vBoxMin = new THREE.Vector3();
-  var vBoxMax = this.vBoxMax = new THREE.Vector3();
+  const vBoxMin = this.vBoxMin = new THREE.Vector3();
+  const vBoxMax = this.vBoxMax = new THREE.Vector3();
   this.getBoundingBox(atomsColored, vBoxMin, vBoxMax);
 
-  var marCubeResoultion = this.marCubeResoultion = this.meshResolution * (2 + 2);
+  const marCubeResoultion = this.marCubeResoultion = this.meshResolution * (2 + 2);
 
   // build grid corners for Marching cube algorithm
-  var side = marCubeResoultion;
-  var side2 = side * side;
-  var side3 = side2 * side;
-  var corners = utils.allocateTyped(Float32Array, side3);
+  const side = marCubeResoultion;
+  const side2 = side * side;
+  const side3 = side2 * side;
+  const corners = utils.allocateTyped(Float32Array, side3);
 
   // settings for Clusterization
-  var numVoxels = this.meshResolution;
+  let numVoxels = this.meshResolution;
 
   // Fix number of voxels (for clusterization) if too much
-  var numIdealVoxels = 4;
-  var numAtomsSrc = this.atoms.length;
+  let numIdealVoxels = 4;
+  const numAtomsSrc = this.atoms.length;
   if (numAtomsSrc >= oneHundered) {
     numIdealVoxels = Math.floor(Math.pow(numAtomsSrc * 2, 1.0 / (1 + 2)));
   }
   if (numVoxels > numIdealVoxels) {
     numVoxels = numIdealVoxels;
   }
-  var rProbeRadius = this.probeRadius * this.atomRadiusScale;
+  const rProbeRadius = this.probeRadius * this.atomRadiusScale;
 
   // build clustered atoms
-  var clusterBuilder = null;
-  var atomsClustered = null;
+  let clusterBuilder = null;
+  let atomsClustered = null;
   if (this.clusterizationType > 0) {
     clusterBuilder = new IsoSurfaceCluster(
       this.complex, this.atoms, atomsColored, vBoxMin, vBoxMax,
@@ -839,21 +839,21 @@ SSIsosurfaceGeometry.prototype._innerBuild = function() {
     this.calculateGridCorners(corners, side, vBoxMin, vBoxMax, atomsColored, rProbeRadius);
   }
 
-  var numCells = marCubeResoultion - 1;
-  var cube = new IsoSurfaceMarchCube();
+  const numCells = marCubeResoultion - 1;
+  const cube = new IsoSurfaceMarchCube();
   ok = cube.create(numCells);
   if (ok < 0) {
     return ok;
   }
   // copy corners to cells
-  var vCellStep = new THREE.Vector3();
+  const vCellStep = new THREE.Vector3();
   vCellStep.x = (vBoxMax.x - vBoxMin.x) / numCells;
   vCellStep.y = (vBoxMax.y - vBoxMin.y) / numCells;
   vCellStep.z = (vBoxMax.z - vBoxMin.z) / numCells;
 
-  var numIntersectedCellsEstim = this.getNumIntersectedCells(side, numCells, corners, cube);
-  var maxNumVertices = Math.floor(numIntersectedCellsEstim * r12);
-  var maxNumTriangles = Math.floor(numIntersectedCellsEstim * r12 * 2);
+  let numIntersectedCellsEstim = this.getNumIntersectedCells(side, numCells, corners, cube);
+  let maxNumVertices = Math.floor(numIntersectedCellsEstim * r12);
+  let maxNumTriangles = Math.floor(numIntersectedCellsEstim * r12 * 2);
 
   this.geoOut = new IsoSurfaceGeo(maxNumVertices, maxNumTriangles, this.useVertexColors);
 
@@ -863,7 +863,7 @@ SSIsosurfaceGeometry.prototype._innerBuild = function() {
   }
 
   // build voxel world (used to check triangle-to-atom tie and to calculate normals and colors)
-  var probeRadForNormalsColors = rProbeRadius;
+  let probeRadForNormalsColors = rProbeRadius;
   if (this.excludeProbe) {
     probeRadForNormalsColors = 0.01;
   }
@@ -916,7 +916,7 @@ SSIsosurfaceGeometry.prototype._innerBuild = function() {
     this.voxelWorld.buildNormals(this.geoOut._vertices.length, this.geoOut._vertices, this.geoOut._normals);
     // More value : more smooth color mixing
     // value about 0.7: very rough colors borders
-    var radiusColorSmoothness = 6.5;
+    let radiusColorSmoothness = 6.5;
     if (this.excludeProbe) {
       radiusColorSmoothness -= 1.5;
     }

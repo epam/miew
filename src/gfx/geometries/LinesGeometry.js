@@ -19,21 +19,21 @@ LinesGeometry.prototype.startUpdate = function() {
 };
 
 LinesGeometry.prototype.computeBoundingSphere = function() {
-  var boundingBox = this.boundingBox;
+  const boundingBox = this.boundingBox;
   // Build bounding sphere
-  var radiusSquared = 0.0;
-  var center = new THREE.Vector3();
+  let radiusSquared = 0.0;
+  const center = new THREE.Vector3();
   if (boundingBox) {
     boundingBox.getCenter(center);
   }
-  var positions = this._positions;
-  var sphere = this.boundingSphere || new THREE.Sphere();
-  var size = this._positions.length;
-  var pos = new THREE.Vector3();
-  var posSize = this.getPositionSize();
-  for (var i = 0; i < size; i += posSize) {
+  const positions = this._positions;
+  const sphere = this.boundingSphere || new THREE.Sphere();
+  const size = this._positions.length;
+  const pos = new THREE.Vector3();
+  const posSize = this.getPositionSize();
+  for (let i = 0; i < size; i += posSize) {
     pos.set(positions[i], positions[i + 1], positions[i + 2]);
-    var lengthSquared = center.distanceToSquared(pos);
+    const lengthSquared = center.distanceToSquared(pos);
     if (radiusSquared < lengthSquared) {
       radiusSquared = lengthSquared;
     }
@@ -43,12 +43,12 @@ LinesGeometry.prototype.computeBoundingSphere = function() {
 };
 
 LinesGeometry.prototype.computeBoundingBox = function() {
-  var positions = this._positions;
-  var box = new THREE.Box3();
-  var size = this._positions.length;
-  var tmpVec = new THREE.Vector3();
-  var posSize = this.getPositionSize();
-  for (var i = 0; i < size; i += posSize) {
+  const positions = this._positions;
+  const box = new THREE.Box3();
+  const size = this._positions.length;
+  const tmpVec = new THREE.Vector3();
+  const posSize = this.getPositionSize();
+  for (let i = 0; i < size; i += posSize) {
     tmpVec.set(positions[i], positions[i + 1], positions[i + 2]);
     box.expandByPoint(tmpVec);
   }

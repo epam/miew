@@ -7,12 +7,12 @@ import gfxutils from '../gfxutils';
 import Simple2CCylindersGeometry from './Simple2CCylindersGeometry';
 import CylinderBufferGeometry from './CylinderBufferGeometry';
 
-var tmpColor = new THREE.Color();
-var invMatrix = new THREE.Matrix4();
+const tmpColor = new THREE.Color();
+const invMatrix = new THREE.Matrix4();
 
-var OFFSET_SIZE = 4;
-var COLOR_SIZE = 3;
-var copySubArrays = utils.copySubArrays;
+const OFFSET_SIZE = 4;
+const COLOR_SIZE = 3;
+const copySubArrays = utils.copySubArrays;
 
 function setArrayXYZ(arr, idx, x, y, z) {
   arr[idx]     = x;
@@ -33,12 +33,12 @@ function sortNumber(a, b) {
 
 function _prepareCylinderInfo(chunkIndices) {
   chunkIndices.sort(sortNumber);
-  var chunksIdx = [];
-  var cylinderInfo = [];
-  for (var i = 0, n = chunkIndices.length; i < n; ++i) {
-    var val = chunkIndices[i];
-    var even = (val | 0) % 2 === 0;
-    var newPar = {
+  const chunksIdx = [];
+  const cylinderInfo = [];
+  for (let i = 0, n = chunkIndices.length; i < n; ++i) {
+    const val = chunkIndices[i];
+    const even = (val | 0) % 2 === 0;
+    const newPar = {
       first: false,
       second: false
     };
@@ -58,8 +58,8 @@ function _prepareCylinderInfo(chunkIndices) {
 }
 
 function _assignOpacity(cylinderInfo, color1, color2) {
-  for (var i = 0, n = cylinderInfo.length; i < n; ++i) {
-    var info = cylinderInfo[i];
+  for (let i = 0, n = cylinderInfo.length; i < n; ++i) {
+    const info = cylinderInfo[i];
     if (!info.first) {
       color1[COLOR_SIZE * i] = -0.5;
     }
@@ -83,9 +83,9 @@ Instanced2CCylindersGeometry.prototype = Object.create(THREE.InstancedBufferGeom
 Instanced2CCylindersGeometry.prototype.constructor = Instanced2CCylindersGeometry;
 
 Instanced2CCylindersGeometry.prototype.setItem = function(itemIdx, botPos, topPos, itemRad) {
-  var matrix = gfxutils.calcCylinderMatrix(botPos, topPos, itemRad);
-  var me = matrix.elements;
-  var mtxOffset = itemIdx * OFFSET_SIZE;
+  const matrix = gfxutils.calcCylinderMatrix(botPos, topPos, itemRad);
+  let me = matrix.elements;
+  const mtxOffset = itemIdx * OFFSET_SIZE;
 
   this._collisionGeo.setItem(itemIdx, botPos, topPos, itemRad);
   setArrayXYZW(this._matVector1, mtxOffset, me[0], me[4], me[8], me[12]);
@@ -102,7 +102,7 @@ Instanced2CCylindersGeometry.prototype.setItem = function(itemIdx, botPos, topPo
 };
 
 Instanced2CCylindersGeometry.prototype.setColor = function(itemIdx, colorVal1, colorVal2) {
-  var colorIdx = itemIdx * COLOR_SIZE;
+  const colorIdx = itemIdx * COLOR_SIZE;
   tmpColor.set(colorVal1);
   setArrayXYZ(this._color1, colorIdx, tmpColor.r, tmpColor.g, tmpColor.b);
   tmpColor.set(colorVal2);
@@ -150,18 +150,18 @@ Instanced2CCylindersGeometry.prototype.finalize = function() {
 };
 
 Instanced2CCylindersGeometry.prototype.setOpacity = function(chunkIndices, value) {
-  var alphaArr = this._alpha;
-  for (var i = 0, n = chunkIndices.length; i < n; ++i) {
+  const alphaArr = this._alpha;
+  for (let i = 0, n = chunkIndices.length; i < n; ++i) {
     alphaArr[Math.floor(chunkIndices[i] / 2)] = value;
   }
   this.getAttribute('alphaColor').needsUpdate = true;
 };
 
 Instanced2CCylindersGeometry.prototype.getSubset = function(chunkIndices) {
-  var info = _prepareCylinderInfo(chunkIndices);
-  var cylinderIndices = info.indices;
-  var instanceCount = cylinderIndices.length;
-  var geom = new THREE.InstancedBufferGeometry();
+  const info = _prepareCylinderInfo(chunkIndices);
+  const cylinderIndices = info.indices;
+  const instanceCount = cylinderIndices.length;
+  const geom = new THREE.InstancedBufferGeometry();
   this._init.call(geom, instanceCount, this._cylGeometry, this._useZSprites);
 
   copySubArrays(this._matVector1, geom._matVector1, cylinderIndices, OFFSET_SIZE);
@@ -189,7 +189,7 @@ Instanced2CCylindersGeometry.prototype._init = function(instanceCount, cylinderG
   this._matVector3 = utils.allocateTyped(Float32Array, instanceCount * OFFSET_SIZE);
   this._color1 = utils.allocateTyped(Float32Array, instanceCount * COLOR_SIZE);
   this._color2 = utils.allocateTyped(Float32Array, instanceCount * COLOR_SIZE);
-  var alpha = this._alpha = utils.allocateTyped(Float32Array, instanceCount);
+  const alpha = this._alpha = utils.allocateTyped(Float32Array, instanceCount);
   _.fill(alpha, 1.0);
 
   this.addAttribute('matVector1', new THREE.InstancedBufferAttribute(this._matVector1, OFFSET_SIZE, 1));

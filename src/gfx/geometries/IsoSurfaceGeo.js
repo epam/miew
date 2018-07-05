@@ -23,7 +23,7 @@ function IsoSurfaceGeo(maxNumVertices, maxNumTriangles, needVertexColors) {
   this._numVertices = 0;
   this._numTriangles = 0;
 
-  var i;
+  let i;
   for (i = 0; i < maxNumVertices; i++) {
     this._vertices[i] = new THREE.Vector3();
     this._normals[i] = new THREE.Vector3();

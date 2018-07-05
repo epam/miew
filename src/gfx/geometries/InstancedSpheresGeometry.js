@@ -5,11 +5,11 @@ import * as THREE from 'three';
 import utils from '../../utils';
 import SphereCollisionGeo from './SphereCollisionGeo';
 
-var tmpColor = new THREE.Color();
+const tmpColor = new THREE.Color();
 
-var OFFSET_SIZE = 4;
-var COLOR_SIZE = 3;
-var copySubArrays = utils.copySubArrays;
+const OFFSET_SIZE = 4;
+const COLOR_SIZE = 3;
+const copySubArrays = utils.copySubArrays;
 
 function setArrayXYZ(arr, idx, x, y, z) {
   arr[idx]     = x;
@@ -62,16 +62,16 @@ InstancedSpheresGeometry.prototype.finalize = function() {
 };
 
 InstancedSpheresGeometry.prototype.setOpacity = function(chunkIndices, value) {
-  var alphaArr = this._alpha;
-  for (var i = 0, n = chunkIndices.length; i < n; ++i) {
+  const alphaArr = this._alpha;
+  for (let i = 0, n = chunkIndices.length; i < n; ++i) {
     alphaArr[chunkIndices[i]] = value;
   }
   this.getAttribute('alphaColor').needsUpdate = true;
 };
 
 InstancedSpheresGeometry.prototype.getSubset = function(chunkIndices) {
-  var instanceCount = chunkIndices.length;
-  var geom = new THREE.InstancedBufferGeometry();
+  const instanceCount = chunkIndices.length;
+  const geom = new THREE.InstancedBufferGeometry();
   this._init.call(geom, instanceCount, this._sphGeometry);
 
   copySubArrays(this._offsets, geom._offsets, chunkIndices, OFFSET_SIZE);
@@ -86,7 +86,7 @@ InstancedSpheresGeometry.prototype._init = function(spheresCount, sphereGeo) {
 
   this._offsets = utils.allocateTyped(Float32Array, spheresCount * OFFSET_SIZE);
   this._colors = utils.allocateTyped(Float32Array, spheresCount * COLOR_SIZE);
-  var alpha = this._alpha = utils.allocateTyped(Float32Array, spheresCount);
+  const alpha = this._alpha = utils.allocateTyped(Float32Array, spheresCount);
   _.fill(alpha, 1.0);
 
   this.addAttribute('offset', new THREE.InstancedBufferAttribute(this._offsets, OFFSET_SIZE, 1));

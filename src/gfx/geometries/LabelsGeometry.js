@@ -4,17 +4,17 @@ import * as THREE from 'three';
 import EventDispatcher from '../../utils/EventDispatcher';
 
 function createLabel(fieldTxt, className) {
-  var text = document.createElement('div');
+  const text = document.createElement('div');
   text.className = className;
 
   if (typeof fieldTxt === 'string') {
-    var spanText = document.createElement('span');
+    const spanText = document.createElement('span');
     spanText.style.fontSize = '150%';
-    var strings = fieldTxt.split('\n');
+    const strings = fieldTxt.split('\n');
 
-    for (var i = 0, n = strings.length; i < n; ++i) {
-      var spanNodeP = document.createElement('span');
-      var spanNodeText = document.createTextNode(strings[i]);
+    for (let i = 0, n = strings.length; i < n; ++i) {
+      const spanNodeP = document.createElement('span');
+      const spanNodeText = document.createTextNode(strings[i]);
       spanNodeP.appendChild(spanNodeText);
       spanText.appendChild(spanNodeP);
       if (i < n - 1) {
@@ -37,8 +37,8 @@ function LabelsGeometry(instanceCount, opts) {
   this.items = [];
   this.needsUpdate = false;
 
-  var xTranslation = -50;
-  var yTranslation = -50;
+  let xTranslation = -50;
+  let yTranslation = -50;
   switch (opts.horizontalAlign) {
   case 'left':
     xTranslation = 0;
@@ -62,7 +62,7 @@ function LabelsGeometry(instanceCount, opts) {
   }
 
   // TODO is code above OK?
-  var deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
+  const deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
   this.userData = {
     translation: 'translate(' + xTranslation + '%, ' + yTranslation + '%)',
     offset: deltaPos,
@@ -73,9 +73,9 @@ LabelsGeometry.prototype = Object.create(EventDispatcher.prototype);
 LabelsGeometry.prototype.constructor = LabelsGeometry;
 
 LabelsGeometry.prototype.setItem = function(itemIdx, itemPos, fieldTxt) {
-  var opts = this._opts;
-  var labels = opts.labels;
-  var text = this.items[itemIdx] || createLabel(fieldTxt, 'label label-' + labels);
+  const opts = this._opts;
+  const labels = opts.labels;
+  const text = this.items[itemIdx] || createLabel(fieldTxt, 'label label-' + labels);
 
   text.worldPos.copy(itemPos);
   text.style.textAlign = opts.horizontalAlign;
@@ -84,7 +84,7 @@ LabelsGeometry.prototype.setItem = function(itemIdx, itemPos, fieldTxt) {
 };
 
 LabelsGeometry.prototype.setColor = function(itemIdx, fColor, bColor) {
-  var text = this.items[itemIdx];
+  const text = this.items[itemIdx];
   text.opts = {
     color: fColor,
     background: bColor,

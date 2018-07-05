@@ -16,8 +16,8 @@ function IsoSurfaceMarchCube() {
 }
 
 IsoSurfaceMarchCube.prototype.create = function(numCellsPerSide) {
-  var vx7000000 = 0x7000000;
-  var n3 = numCellsPerSide * numCellsPerSide * numCellsPerSide;
+  const vx7000000 = 0x7000000;
+  const n3 = numCellsPerSide * numCellsPerSide * numCellsPerSide;
   if (n3 > vx7000000) {
     throw new Error('Too large cube dimension: lead to memory huge uasge');
   }

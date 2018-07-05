@@ -3,7 +3,7 @@
 import VolumeSurfaceGeometry from './VolumeSurfaceGeometry';
 import chem from '../../chem';
 
-var Volume = chem.Volume;
+const Volume = chem.Volume;
 
 /**
  * This class implements 'quick' isosurface geometry generation algorithm.
@@ -22,7 +22,7 @@ QuickSurfGeometry.prototype._computeSurface = function(packedArrays, box, bounda
   // FIXME beware of shifting this multiple times!
   this._shiftByOrigin(packedArrays.posRad);
 
-  var surface = {
+  const surface = {
     volMap: new Volume(Float32Array, this.numVoxels, box),
     volTexMap: new Volume(Float32Array, this.numVoxels, box, 3),
   };
@@ -37,73 +37,73 @@ QuickSurfGeometry.prototype._computeSurface = function(packedArrays, box, bounda
 };
 
 QuickSurfGeometry.prototype.gaussdensity = function(surface, packedArrays, atomicNum, params) {
-  var numAtoms = packedArrays.posRad.length / 4;
-  var posRad = packedArrays.posRad;
-  var colors = packedArrays.colors;
-  var numVoxels = this.numVoxels;
-  var radScale = params.radScale;
-  var gaussLim = params.gaussLim;
-  var gridSpacing = params.gridSpacing;
-  var invIsoValue = 1.0 / params.isoValue;
-  var invGridSpacing = 1.0 / gridSpacing;
-  var maxVoxelX = numVoxels[0] - 1;
-  var maxVoxelY = numVoxels[1] - 1;
-  var maxVoxelZ = numVoxels[2] - 1;
+  const numAtoms = packedArrays.posRad.length / 4;
+  const posRad = packedArrays.posRad;
+  const colors = packedArrays.colors;
+  const numVoxels = this.numVoxels;
+  const radScale = params.radScale;
+  const gaussLim = params.gaussLim;
+  const gridSpacing = params.gridSpacing;
+  const invIsoValue = 1.0 / params.isoValue;
+  const invGridSpacing = 1.0 / gridSpacing;
+  const maxVoxelX = numVoxels[0] - 1;
+  const maxVoxelY = numVoxels[1] - 1;
+  const maxVoxelZ = numVoxels[2] - 1;
   //TODO is densityMap and volTexMap initialized?
 
-  var volMap = surface.volMap;
-  var volTexMap = surface.volTexMap;
-  var volData = volMap.getData();
-  var strideX = volMap.getStrideX();
+  const volMap = surface.volMap;
+  const volTexMap = surface.volTexMap;
+  const volData = volMap.getData();
+  const strideX = volMap.getStrideX();
 
-  var volTexData = volTexMap.getData();
-  var texStrideX = volTexMap.getStrideX();
+  const volTexData = volTexMap.getData();
+  const texStrideX = volTexMap.getStrideX();
 
-  var atomWeightData;
+  let atomWeightData;
   if (this._visibilitySelector != null) {
     atomWeightData = surface.atomWeightMap.getData();
   }
 
-  var atomMap = surface.atomMap;
+  const atomMap = surface.atomMap;
 
-  for (var i = 0; i < numAtoms; ++i) {
-    var ind = i * 4;
-    var scaledRad = posRad[ind + 3] * radScale;
-    var atomicNumFactor = atomicNum === null ? 1.0 : atomicNum[i];
-    var radInv = 1 / (2 * scaledRad * scaledRad);
-    var radLim = gaussLim * scaledRad;
-    var radLim2 = radLim * radLim;
+  for (let i = 0; i < numAtoms; ++i) {
+    const ind = i * 4;
+    const scaledRad = posRad[ind + 3] * radScale;
+    const atomicNumFactor = atomicNum === null ? 1.0 : atomicNum[i];
+    const radInv = 1 / (2 * scaledRad * scaledRad);
+    let radLim = gaussLim * scaledRad;
+    const radLim2 = radLim * radLim;
     radLim *= invGridSpacing;
 
-    var tmp = posRad[ind] * invGridSpacing;
-    var xMin = Math.max((tmp - radLim) | 0, 0);
-    var xMax = Math.min((tmp + radLim) | 0, maxVoxelX);
+    let tmp = posRad[ind] * invGridSpacing;
+    const xMin = Math.max((tmp - radLim) | 0, 0);
+    const xMax = Math.min((tmp + radLim) | 0, maxVoxelX);
     tmp = posRad[ind + 1] * invGridSpacing;
-    var yMin = Math.max((tmp - radLim) | 0, 0);
-    var yMax = Math.min((tmp + radLim) | 0, maxVoxelY);
+    const yMin = Math.max((tmp - radLim) | 0, 0);
+    const yMax = Math.min((tmp + radLim) | 0, maxVoxelY);
     tmp = posRad[ind + 2] * invGridSpacing;
-    var zMin = Math.max((tmp - radLim) | 0, 0);
-    var zMax = Math.min((tmp + radLim) | 0, maxVoxelZ);
+    const zMin = Math.max((tmp - radLim) | 0, 0);
+    const zMax = Math.min((tmp + radLim) | 0, maxVoxelZ);
 
-    var dz = zMin * gridSpacing - posRad[ind + 2];
-    for (var z = zMin; z <= zMax; ++z, dz += gridSpacing) {
-      var dy = yMin * gridSpacing - posRad[ind + 1];
-      for (var y = yMin; y <= yMax; ++y, dy += gridSpacing) {
-        var dy2dz2 = dy * dy + dz * dz;
+    let dz = zMin * gridSpacing - posRad[ind + 2];
+    for (let z = zMin; z <= zMax; ++z, dz += gridSpacing) {
+      let dy = yMin * gridSpacing - posRad[ind + 1];
+      for (let y = yMin; y <= yMax; ++y, dy += gridSpacing) {
+        const dy2dz2 = dy * dy + dz * dz;
 
         if (dy2dz2 >= radLim2) {
           continue;
         }
 
-        var addr = volMap.getDirectIdx(xMin, y, z);
-        var texAddr = volTexMap.getDirectIdx(xMin, y, z);
-        var dx = xMin * gridSpacing - posRad[ind];
-        for (var x = xMin; x <= xMax; ++x, dx += gridSpacing, addr += strideX, texAddr += texStrideX) {
-          var r2 = dx * dx + dy2dz2;
-          var expVal = -r2 * radInv;
+        let addr = volMap.getDirectIdx(xMin, y, z);
+        let texAddr = volTexMap.getDirectIdx(xMin, y, z);
+        let dx = xMin * gridSpacing - posRad[ind];
+        for (let x = xMin; x <= xMax; ++x, dx += gridSpacing, addr += strideX, texAddr += texStrideX) {
+          const r2 = dx * dx + dy2dz2;
+          const expVal = -r2 * radInv;
 
           // TODO use faster exp?
-          var density = Math.exp(expVal) * atomicNumFactor;
+          let density = Math.exp(expVal) * atomicNumFactor;
 
           // store most relevant atom (with highest density)
           if (this._visibilitySelector != null &&
@@ -117,7 +117,7 @@ QuickSurfGeometry.prototype.gaussdensity = function(surface, packedArrays, atomi
 
           // TODO check for volTexMap routine?
           density *= invIsoValue;
-          var colInd = i * 3;
+          const colInd = i * 3;
           volTexData[texAddr] += density * colors[colInd];
           volTexData[texAddr + 1] += density * colors[colInd + 1];
           volTexData[texAddr + 2] += density * colors[colInd + 2];
@@ -128,14 +128,14 @@ QuickSurfGeometry.prototype.gaussdensity = function(surface, packedArrays, atomi
 };
 
 QuickSurfGeometry.prototype._shiftByOrigin = function(posRadArray) {
-  var originX = this.origin.x;
-  var originY = this.origin.y;
-  var originZ = this.origin.z;
+  const originX = this.origin.x;
+  const originY = this.origin.y;
+  const originZ = this.origin.z;
 
-  var itemSize = 4;
-  var itemsCount = posRadArray.length / itemSize;
-  for (var i = 0; i < itemsCount; ++i) {
-    var ind = i * itemSize;
+  const itemSize = 4;
+  const itemsCount = posRadArray.length / itemSize;
+  for (let i = 0; i < itemsCount; ++i) {
+    const ind = i * itemSize;
 
     posRadArray[ind] -= originX;
     posRadArray[ind + 1] -= originY;

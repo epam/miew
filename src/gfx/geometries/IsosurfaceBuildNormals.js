@@ -30,27 +30,27 @@ function IsosurfaceBuildNormals(numAtoms, atoms, vBoxMin, vBoxMax, probeRadius) 
 }
 
 IsosurfaceBuildNormals.prototype.createVoxels = function() {
-  var numAtomsRefs;
-  var rad;
-  var ATOM_VOXEL_REF_SCALE = 4.5;
+  let numAtomsRefs;
+  let rad;
+  const ATOM_VOXEL_REF_SCALE = 4.5;
 
-  var numAtoms = this._numAtoms | 0;
-  var atoms = this._atoms;
-  var dx = this._vBoxMax.x - this._vBoxMin.x;
-  var dy = this._vBoxMax.y - this._vBoxMin.y;
-  var dz = this._vBoxMax.z - this._vBoxMin.z;
-  var w = (dx < dy) ? dx : dy;
+  const numAtoms = this._numAtoms | 0;
+  const atoms = this._atoms;
+  const dx = this._vBoxMax.x - this._vBoxMin.x;
+  const dy = this._vBoxMax.y - this._vBoxMin.y;
+  const dz = this._vBoxMax.z - this._vBoxMin.z;
+  let w = (dx < dy) ? dx : dy;
   w = (dz < w) ? dz : w;
-  var maxRad = 0.0;
-  var aveRad = 0.0;
+  let maxRad = 0.0;
+  let aveRad = 0.0;
 
-  var i;
+  let i;
   for (i = 0; i < numAtoms; i++) {
     rad = (atoms[i].radius + this._probeRadius) * 2.0;
     maxRad = (rad > maxRad) ? rad : maxRad;
     aveRad += rad;
   }
-  var numCells = Math.floor(w / maxRad);
+  let numCells = Math.floor(w / maxRad);
   if (numCells < 2) {
     numCells = 2;
   }
@@ -60,27 +60,27 @@ IsosurfaceBuildNormals.prototype.createVoxels = function() {
   this._aveRad = aveRad;
   this._maxRad = maxRad;
 
-  var side = numCells;
-  var side2 = numCells * numCells;
-  var side3 = numCells * numCells * numCells;
+  const side = numCells;
+  const side2 = numCells * numCells;
+  const side3 = numCells * numCells * numCells;
 
-  var xScale = this._xScale = 1.0 / (this._vBoxMax.x - this._vBoxMin.x);
-  var yScale = this._yScale = 1.0 / (this._vBoxMax.y - this._vBoxMin.y);
-  var zScale = this._zScale = 1.0 / (this._vBoxMax.z - this._vBoxMin.z);
+  const xScale = this._xScale = 1.0 / (this._vBoxMax.x - this._vBoxMin.x);
+  const yScale = this._yScale = 1.0 / (this._vBoxMax.y - this._vBoxMin.y);
+  const zScale = this._zScale = 1.0 / (this._vBoxMax.z - this._vBoxMin.z);
 
   // estimate number of individual atom refs in each voxel list
-  var maxAtomsRefs = 0;
+  let maxAtomsRefs = 0;
 
-  var xNumVoxMult = xScale * numCells;
-  var yNumVoxMult = yScale * numCells;
-  var zNumVoxMult = zScale * numCells;
+  const xNumVoxMult = xScale * numCells;
+  const yNumVoxMult = yScale * numCells;
+  const zNumVoxMult = zScale * numCells;
 
   for (i = 0; i < numAtoms; i++) {
-    var radAffect = (atoms[i].radius + this._probeRadius) * ATOM_VOXEL_REF_SCALE;
-    var diaAffect = radAffect * 2.0;
-    var numVoxX = Math.floor(xNumVoxMult * diaAffect + 0.8);
-    var numVoxY = Math.floor(yNumVoxMult * diaAffect + 0.8);
-    var numVoxZ = Math.floor(zNumVoxMult * diaAffect + 0.8);
+    const radAffect = (atoms[i].radius + this._probeRadius) * ATOM_VOXEL_REF_SCALE;
+    const diaAffect = radAffect * 2.0;
+    let numVoxX = Math.floor(xNumVoxMult * diaAffect + 0.8);
+    let numVoxY = Math.floor(yNumVoxMult * diaAffect + 0.8);
+    let numVoxZ = Math.floor(zNumVoxMult * diaAffect + 0.8);
     // avoid case numVox? == 0
     // also use loop i <=
     numVoxX++;
@@ -92,7 +92,7 @@ IsosurfaceBuildNormals.prototype.createVoxels = function() {
 
 
   this._voxelList = utils.allocateTyped(Int32Array, side3);
-  var atomsList = [];
+  const atomsList = [];
   atomsList.length = maxAtomsRefs;
   if ((this._voxelList === null) || (atomsList === null)) {
     return 0 - 1;
@@ -107,12 +107,12 @@ IsosurfaceBuildNormals.prototype.createVoxels = function() {
   for (i = 0; i < numAtoms; i++) {
     // use multiplier 4 to locate this atom in different voxels
     rad = (atoms[i].radius + this._probeRadius) * ATOM_VOXEL_REF_SCALE;
-    var xIndMin = Math.floor((atoms[i].coord.x - this._vBoxMin.x - rad) * numCells * xScale);
-    var yIndMin = Math.floor((atoms[i].coord.y - this._vBoxMin.y - rad) * numCells * yScale);
-    var zIndMin = Math.floor((atoms[i].coord.z - this._vBoxMin.z - rad) * numCells * zScale);
-    var xIndMax = Math.floor((atoms[i].coord.x - this._vBoxMin.x + rad) * numCells * xScale);
-    var yIndMax = Math.floor((atoms[i].coord.y - this._vBoxMin.y + rad) * numCells * yScale);
-    var zIndMax = Math.floor((atoms[i].coord.z - this._vBoxMin.z + rad) * numCells * zScale);
+    let xIndMin = Math.floor((atoms[i].coord.x - this._vBoxMin.x - rad) * numCells * xScale);
+    let yIndMin = Math.floor((atoms[i].coord.y - this._vBoxMin.y - rad) * numCells * yScale);
+    let zIndMin = Math.floor((atoms[i].coord.z - this._vBoxMin.z - rad) * numCells * zScale);
+    let xIndMax = Math.floor((atoms[i].coord.x - this._vBoxMin.x + rad) * numCells * xScale);
+    let yIndMax = Math.floor((atoms[i].coord.y - this._vBoxMin.y + rad) * numCells * yScale);
+    let zIndMax = Math.floor((atoms[i].coord.z - this._vBoxMin.z + rad) * numCells * zScale);
 
     xIndMin = (xIndMin >= 0) ? xIndMin : 0;
     yIndMin = (yIndMin >= 0) ? yIndMin : 0;
@@ -122,11 +122,11 @@ IsosurfaceBuildNormals.prototype.createVoxels = function() {
     yIndMax = (yIndMax < numCells) ? yIndMax : (numCells - 1);
     zIndMax = (zIndMax < numCells) ? zIndMax : (numCells - 1);
 
-    for (var z = zIndMin; z <= zIndMax; z++) {
-      for (var y = yIndMin; y <= yIndMax; y++) {
-        for (var x = xIndMin; x <= xIndMax; x++) {
+    for (let z = zIndMin; z <= zIndMax; z++) {
+      for (let y = yIndMin; y <= yIndMax; y++) {
+        for (let x = xIndMin; x <= xIndMax; x++) {
           // add atom with index "i" to this voxel list
-          var indVoxel = x + y * side + z * side2;
+          const indVoxel = x + y * side + z * side2;
           //assert(indVoxel >= 0);
           //assert(indVoxel < side3);
 
@@ -140,7 +140,7 @@ IsosurfaceBuildNormals.prototype.createVoxels = function() {
             continue;
           }
           // insert into head of list
-          var indexNext = this._voxelList[indVoxel];
+          const indexNext = this._voxelList[indVoxel];
           this._voxelList[indVoxel] = numAtomsRefs;
           atomsList[numAtomsRefs * 2 + 0] = i;
           atomsList[numAtomsRefs * 2 + 1] = indexNext;
@@ -174,15 +174,15 @@ IsosurfaceBuildNormals.prototype.destroyVoxels = function() {
  */
 IsosurfaceBuildNormals.prototype.forEachRelatedAtom = function(point, process) {
   // find corresponding voxel
-  var xInd = Math.floor((point.x - this._vBoxMin.x) * this._numCells * this._xScale);
-  var yInd = Math.floor((point.y - this._vBoxMin.y) * this._numCells * this._yScale);
-  var zInd = Math.floor((point.z - this._vBoxMin.z) * this._numCells * this._zScale);
-  var indVoxel = xInd + yInd * this._numCells + zInd * this._numCells * this._numCells;
+  const xInd = Math.floor((point.x - this._vBoxMin.x) * this._numCells * this._xScale);
+  const yInd = Math.floor((point.y - this._vBoxMin.y) * this._numCells * this._yScale);
+  const zInd = Math.floor((point.z - this._vBoxMin.z) * this._numCells * this._zScale);
+  const indVoxel = xInd + yInd * this._numCells + zInd * this._numCells * this._numCells;
 
   // run through atoms affecting this voxel
-  var atoms = this._atoms;
-  for (var ref = this._voxelList[indVoxel]; ref >= 0; ref = this._atomsList[ref * 2 + 1]) {
-    var indexAtom = this._atomsList[ref * 2];
+  const atoms = this._atoms;
+  for (let ref = this._voxelList[indVoxel]; ref >= 0; ref = this._atomsList[ref * 2 + 1]) {
+    const indexAtom = this._atomsList[ref * 2];
     process(atoms[indexAtom]);
   }
 };
@@ -195,11 +195,11 @@ IsosurfaceBuildNormals.prototype.forEachRelatedAtom = function(point, process) {
  * @returns {IsoSurfaceAtomColored} atom, or null if not found
  */
 IsosurfaceBuildNormals.prototype.getClosestAtom = function(point) {
-  var closest = null;
-  var minDist2 = Number.MAX_VALUE;
+  let closest = null;
+  let minDist2 = Number.MAX_VALUE;
 
   this.forEachRelatedAtom(point, function(atom) {
-    var dist2 = point.distanceToSquared(atom.coord);
+    const dist2 = point.distanceToSquared(atom.coord);
     if (dist2 < minDist2) {
       minDist2 = dist2;
       closest = atom;
@@ -219,33 +219,33 @@ IsosurfaceBuildNormals.prototype.getClosestAtom = function(point) {
  * @returns {number} 0, if success
  */
 IsosurfaceBuildNormals.prototype.buildNormals = function(numVertices, vertices, normals) {
-  var self = this;
-  var numCloseAtoms = 0;
-  var vx = 0, vy = 0, vz = 0;
-  var dist2;
-  var vNormalX = 0, vNormalY = 0, vNormalZ = 0;
-  var koef = 0, w = 0;
-  var r25 = 2.5;
-  var r01 = 0.1;
+  const self = this;
+  let numCloseAtoms = 0;
+  let vx = 0, vy = 0, vz = 0;
+  let dist2;
+  let vNormalX = 0, vNormalY = 0, vNormalZ = 0;
+  let koef = 0, w = 0;
+  const r25 = 2.5;
+  const r01 = 0.1;
 
-  var maxRadAffect = this._aveRad * r25;
-  var maxRadAffect2 = maxRadAffect * maxRadAffect;
-  var expScale = -this._aveRad * r01;
+  const maxRadAffect = this._aveRad * r25;
+  const maxRadAffect2 = maxRadAffect * maxRadAffect;
+  const expScale = -this._aveRad * r01;
 
   // some stats
   //numSlowAtoms = 0;
 
-  var gatherNormals = function(atom) {
-    var dx = vx - atom.coord.x;
-    var dy = vy - atom.coord.y;
-    var dz = vz - atom.coord.z;
+  const gatherNormals = function(atom) {
+    const dx = vx - atom.coord.x;
+    const dy = vy - atom.coord.y;
+    const dz = vz - atom.coord.z;
     dist2 = dx * dx + dy * dy + dz * dz;
     if (dist2 > maxRadAffect2) {
       return;
     }
 
     // get weight for gaussian smoothing
-    var rad = atom.radius + self._probeRadius;
+    const rad = atom.radius + self._probeRadius;
     koef = dist2 - (rad * rad);
     if (koef < 0.0) {
       koef = -koef;
@@ -258,9 +258,9 @@ IsosurfaceBuildNormals.prototype.buildNormals = function(numVertices, vertices, 
     numCloseAtoms++;
   };
 
-  var maxClosedAtoms = 0;
+  let maxClosedAtoms = 0;
   // process all vertices, one by one
-  for (var i = 0; i < numVertices; i++) {
+  for (let i = 0; i < numVertices; i++) {
     vx = vertices[i].x;
     vy = vertices[i].y;
     vz = vertices[i].z;
@@ -299,32 +299,32 @@ IsosurfaceBuildNormals.prototype.buildNormals = function(numVertices, vertices, 
  * @returns {number} 0, if success
  */
 IsosurfaceBuildNormals.prototype.buildColors = function(numVertices, vertices, colors, radiusColorSmoothness) {
-  var self = this;
-  var vx = 0.0, vy = 0.0, vz = 0.0;
-  var koef = 0.0, w = 0.0;
-  //var KOEF_ALPHA = 1.0;
-  var KOEF_ADD = 0.8;
+  const self = this;
+  let vx = 0.0, vy = 0.0, vz = 0.0;
+  let koef = 0.0, w = 0.0;
+  //const KOEF_ALPHA = 1.0;
+  const KOEF_ADD = 0.8;
 
-  var maxRadAffect = radiusColorSmoothness;
-  var maxRadAffect2 = maxRadAffect * maxRadAffect;
+  const maxRadAffect = radiusColorSmoothness;
+  const maxRadAffect2 = maxRadAffect * maxRadAffect;
 
   //koefAlpha = 4.4 / radiusColorSmoothness;
 
-  var colorsClose = [];
-  var weights = [];
-  var weightsSum = 0;
+  let colorsClose = [];
+  let weights = [];
+  let weightsSum = 0;
 
-  var gatherColors = function(atom) {
-    var dx = vx - atom.coord.x;
-    var dy = vy - atom.coord.y;
-    var dz = vz - atom.coord.z;
-    var dist2 = dx * dx + dy * dy + dz * dz;
+  const gatherColors = function(atom) {
+    const dx = vx - atom.coord.x;
+    const dy = vy - atom.coord.y;
+    const dz = vz - atom.coord.z;
+    const dist2 = dx * dx + dy * dy + dz * dz;
     if (dist2 > maxRadAffect2) {
       return;
     }
 
     // get weight for gaussian smoothing
-    var rad = atom.radius + self._probeRadius;
+    const rad = atom.radius + self._probeRadius;
     koef = dist2 - (rad * rad);
     if (koef < 0.0) {
       koef = -koef;
@@ -339,7 +339,7 @@ IsosurfaceBuildNormals.prototype.buildColors = function(numVertices, vertices, c
   };
 
     // process all vertices, one by one
-  for (var i = 0; i < numVertices; i++) {
+  for (let i = 0; i < numVertices; i++) {
     vx = vertices[i].x;
     vy = vertices[i].y;
     vz = vertices[i].z;
@@ -351,8 +351,8 @@ IsosurfaceBuildNormals.prototype.buildColors = function(numVertices, vertices, c
     this.forEachRelatedAtom(vertices[i], gatherColors);
 
     // normalized weighted sum of colors
-    for (var j = 0; j < colorsClose.length; ++j) {
-      var weightNormalized = weights[j] / weightsSum;
+    for (let j = 0; j < colorsClose.length; ++j) {
+      const weightNormalized = weights[j] / weightsSum;
       colors[i].x += colorsClose[j][0] * weightNormalized;
       colors[i].y += colorsClose[j][1] * weightNormalized;
       colors[i].z += colorsClose[j][2] * weightNormalized;

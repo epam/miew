@@ -66,21 +66,21 @@ IsoSurfaceCluster.prototype.destroy = function() {
 };
 
 IsoSurfaceCluster.prototype.buildSimple = function(complex, colorer) {
-  var atomsClustered = [];
-  var i, j, indVoxel, indAtomRef;
-  var atom;
-  var vColorX = 0, vColorY = 0, vColorZ = 0;
-  var ind = 0;
+  const atomsClustered = [];
+  let i, j, indVoxel, indAtomRef;
+  let atom;
+  let vColorX = 0, vColorY = 0, vColorZ = 0;
+  let ind = 0;
 
-  var cNumNeighbours = 8;
-  var cMask = 7;
-  var histTypes = [];
+  const cNumNeighbours = 8;
+  const cMask = 7;
+  const histTypes = [];
   histTypes.length = cNumNeighbours;
 
-  var numVoxels = this.numVoxels;
-  var n3 = numVoxels * numVoxels * numVoxels;
+  const numVoxels = this.numVoxels;
+  const n3 = numVoxels * numVoxels * numVoxels;
 
-  var numAtoms = this.atoms.length;
+  const numAtoms = this.atoms.length;
 
   this.voxelsRefs = utils.allocateTyped(Int32Array, numAtoms * 2);
   this.voxels = utils.allocateTyped(Int32Array, n3);
@@ -95,14 +95,14 @@ IsoSurfaceCluster.prototype.buildSimple = function(complex, colorer) {
     this.voxels[i] = -1;
   }
   // build atom list for each voxel
-  var xScale = 1.0 / (this.vBoxMax.x - this.vBoxMin.x);
-  var yScale = 1.0 / (this.vBoxMax.y - this.vBoxMin.y);
-  var zScale = 1.0 / (this.vBoxMax.z - this.vBoxMin.z);
+  const xScale = 1.0 / (this.vBoxMax.x - this.vBoxMin.x);
+  const yScale = 1.0 / (this.vBoxMax.y - this.vBoxMin.y);
+  const zScale = 1.0 / (this.vBoxMax.z - this.vBoxMin.z);
   for (i = 0; i < numAtoms; i++) {
-    var v = this.atoms[i].coord;
-    var xVox = Math.floor((v.x - this.vBoxMin.x) * numVoxels * xScale);
-    var yVox = Math.floor((v.y - this.vBoxMin.y) * numVoxels * yScale);
-    var zVox = Math.floor((v.z - this.vBoxMin.z) * numVoxels * zScale);
+    const v = this.atoms[i].coord;
+    const xVox = Math.floor((v.x - this.vBoxMin.x) * numVoxels * xScale);
+    const yVox = Math.floor((v.y - this.vBoxMin.y) * numVoxels * yScale);
+    const zVox = Math.floor((v.z - this.vBoxMin.z) * numVoxels * zScale);
     indVoxel = xVox + yVox * numVoxels + zVox * numVoxels * numVoxels;
     //assert(indVoxel >= 0);
     //assert(indVoxel < n3);
@@ -124,24 +124,24 @@ IsoSurfaceCluster.prototype.buildSimple = function(complex, colorer) {
   }       // for (i) all source atoms
 
   // build Output atoms (clustered)
-  var numSpheres = 0;
-  var maxNumAtomsInVoxel = 0;
-  for (var z = 0; z < numVoxels; z++) {
-    var indVoxelZ = z * numVoxels * numVoxels;
-    for (var y = 0; y < numVoxels; y++) {
-      var indVoxelY = y * numVoxels;
-      for (var x = 0; x < numVoxels; x++) {
+  let numSpheres = 0;
+  let maxNumAtomsInVoxel = 0;
+  for (let z = 0; z < numVoxels; z++) {
+    const indVoxelZ = z * numVoxels * numVoxels;
+    for (let y = 0; y < numVoxels; y++) {
+      const indVoxelY = y * numVoxels;
+      for (let x = 0; x < numVoxels; x++) {
         indVoxel = x + indVoxelY + indVoxelZ;
         indAtomRef = this.voxels[indVoxel];
         if (indAtomRef < 0) {
           continue;
         }
         // get ave position
-        var vCenterX = 0.0;
-        var vCenterY = 0.0;
-        var vCenterZ = 0.0;
+        let vCenterX = 0.0;
+        let vCenterY = 0.0;
+        let vCenterZ = 0.0;
         // get num atoms in voxel
-        var numAtomsInVoxel = 0;
+        let numAtomsInVoxel = 0;
 
         while (indAtomRef >= 0) {
           atom = this.atoms[indAtomRef];
@@ -161,14 +161,14 @@ IsoSurfaceCluster.prototype.buildSimple = function(complex, colorer) {
           histTypes[i] = 0;
         }
 
-        var rad = 0.0;
+        let rad = 0.0;
         indAtomRef = this.voxels[indVoxel];
         while (indAtomRef >= 0) {
           atom = this.atoms[indAtomRef];
-          var vx = atom.coord.x - vCenterX;
-          var vy = atom.coord.y - vCenterY;
-          var vz = atom.coord.z - vCenterZ;
-          var dist = Math.sqrt(vx * vx + vy * vy + vz * vz) + atom.radius;
+          const vx = atom.coord.x - vCenterX;
+          const vy = atom.coord.y - vCenterY;
+          const vz = atom.coord.z - vCenterZ;
+          const dist = Math.sqrt(vx * vx + vy * vy + vz * vz) + atom.radius;
           if (dist > rad) {
             rad = dist;
           }
@@ -182,7 +182,7 @@ IsoSurfaceCluster.prototype.buildSimple = function(complex, colorer) {
           indAtomRef = this.voxelsRefs[indAtomRef * 2 + 1];
         }
         // find maximum in histogram => this is most prevalent atom type in cluster
-        var indMax = 0;
+        let indMax = 0;
         for (i = 1; i < cNumNeighbours; i++) {
           if (histTypes[i] > histTypes[indMax]) {
             indMax = i;
@@ -190,14 +190,14 @@ IsoSurfaceCluster.prototype.buildSimple = function(complex, colorer) {
         }
 
         //TODO: Earnol
-        var vCenter = new THREE.Color(colorer.getAtomColor(complex, this.atoms[indMax]));
+        const vCenter = new THREE.Color(colorer.getAtomColor(complex, this.atoms[indMax]));
         if (this.colorMode === 0) {
           vColorX = this.atomColors[indMax].x;
           vColorY = this.atomColors[indMax].y;
           vColorZ = this.atomColors[indMax].z;
         }
         if (this.colorMode === 1) {
-          var colRGB = this.complex.monomerTypeArray[ind].color; // FIXME: the array is missing
+          const colRGB = this.complex.monomerTypeArray[ind].color; // FIXME: the array is missing
           vColorX = colRGB.r;
           vColorY = colRGB.g;
           vColorZ = colRGB.b;
