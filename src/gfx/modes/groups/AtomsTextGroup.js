@@ -162,10 +162,8 @@ class AtomsTextGroup extends AtomsGroup {
         geo.setColor(i, fgColor, bgColor);
       }
     }
-
     geo.finalize();
   }
 }
 
 export default AtomsTextGroup;
-

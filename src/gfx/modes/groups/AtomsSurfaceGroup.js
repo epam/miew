@@ -21,4 +21,3 @@ class AtomsSurfaceGroup extends AtomsSphereGroup {
   }
 }
 export default AtomsSurfaceGroup;
-

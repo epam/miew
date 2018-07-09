@@ -8,7 +8,6 @@ class AtomsSphereGroup extends AtomsGroup {
     this._geoArgs = this._makeGeoArgs(selection, mode, colorer, polyComplexity);
   }
 
-
   _makeGeoArgs(selection, mode, colorer, polyComplexity) {
     return [selection.chunks.length, polyComplexity];
   }

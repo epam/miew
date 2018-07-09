@@ -15,7 +15,6 @@ function _createShape(rad, parts) {
 const calcChunkMatrix = gfxutils.calcChunkMatrix;
 
 function AromaticTorusGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-
   const self = this;
   const segmentsHeight = self._segmentsHeight = polyComplexity;
   const torusRad = mode.getAromRadius();
