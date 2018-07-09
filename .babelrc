@@ -1,6 +1,6 @@
 {
   "presets": ["env"],
-  "plugins": ["syntax-dynamic-import"],
+  "plugins": ["syntax-dynamic-import", "transform-class-properties"],
   "env": {
     "coverage": {
       "plugins": ["istanbul"]
