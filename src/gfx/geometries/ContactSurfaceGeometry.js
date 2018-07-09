@@ -12,26 +12,25 @@ const Volume = chem.Volume;
  * @param opts - geometry specific options
  * @constructor
  */
-function ContactSurfaceGeometry(spheresCount, opts) {
-  VolumeSurfaceGeometry.call(this, spheresCount, opts);
-}
 
-ContactSurfaceGeometry.prototype = Object.create(VolumeSurfaceGeometry.prototype);
-ContactSurfaceGeometry.prototype.constructor = ContactSurfaceGeometry;
+class ContactSurfaceGeometry extends VolumeSurfaceGeometry {
+  constructor(spheresCount, opts) {
+    super(spheresCount, opts);
+  }
 
-ContactSurfaceGeometry.prototype._computeSurface = function(packedArrays, box, boundaries, params) {
-  const contactSurface = new ContactSurface(packedArrays, boundaries, params);
-  contactSurface.build();
+  _computeSurface = function(packedArrays, box, boundaries, params) {
+    const contactSurface = new ContactSurface(packedArrays, boundaries, params);
+    contactSurface.build();
 
-  const surface = {
-    volMap: new Volume(Float32Array, this.numVoxels, box, 1, contactSurface.volMap),
-    volTexMap: new Volume(Float32Array, this.numVoxels, box, 3, contactSurface.volTexMap),
-    atomMap: contactSurface.atomMap,
-    atomWeightMap: new Volume(Float32Array, this.numVoxels, box, 1, contactSurface.weightsMap),
+    const surface = {
+      volMap: new Volume(Float32Array, this.numVoxels, box, 1, contactSurface.volMap),
+      volTexMap: new Volume(Float32Array, this.numVoxels, box, 3, contactSurface.volTexMap),
+      atomMap: contactSurface.atomMap,
+      atomWeightMap: new Volume(Float32Array, this.numVoxels, box, 1, contactSurface.weightsMap),
+    };
+    return surface;
   };
-  return surface;
-};
-
+}
 
 export default ContactSurfaceGeometry;
 

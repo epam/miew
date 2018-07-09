@@ -30,91 +30,89 @@ function createLabel(fieldTxt, className) {
   text.worldPos = new THREE.Vector3();
   return text;
 }
+class LabelsGeometry extends EventDispatcher {
+  constructor(instanceCount, opts) {
+    super();
+    this._opts = opts;
+    this.items = [];
+    this.needsUpdate = false;
 
-function LabelsGeometry(instanceCount, opts) {
-  EventDispatcher.call(this);
-  this._opts = opts;
-  this.items = [];
-  this.needsUpdate = false;
+    let xTranslation = -50;
+    let yTranslation = -50;
+    switch (opts.horizontalAlign) {
+    case 'left':
+      xTranslation = 0;
+      break;
+    case 'right':
+      xTranslation = -100;
+      break;
+    default:
+      break;
+    }
 
-  let xTranslation = -50;
-  let yTranslation = -50;
-  switch (opts.horizontalAlign) {
-  case 'left':
-    xTranslation = 0;
-    break;
-  case 'right':
-    xTranslation = -100;
-    break;
-  default:
-    break;
+    switch (opts.verticalAlign) {
+    case 'top':
+      yTranslation = -100;
+      break;
+    case 'bottom':
+      yTranslation = 0;
+      break;
+    default:
+      break;
+    }
+
+    // TODO is code above OK?
+    const deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
+    this.userData = {
+      translation: 'translate(' + xTranslation + '%, ' + yTranslation + '%)',
+      offset: deltaPos,
+    };
   }
 
-  switch (opts.verticalAlign) {
-  case 'top':
-    yTranslation = -100;
-    break;
-  case 'bottom':
-    yTranslation = 0;
-    break;
-  default:
-    break;
+  setItem(itemIdx, itemPos, fieldTxt) {
+    const opts = this._opts;
+    const labels = opts.labels;
+    const text = this.items[itemIdx] || createLabel(fieldTxt, 'label label-' + labels);
+
+    text.worldPos.copy(itemPos);
+    text.style.textAlign = opts.horizontalAlign;
+    text.style.verticalAlign = opts.verticalAlign;
+    this.items[itemIdx] = text;
   }
 
-  // TODO is code above OK?
-  const deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
-  this.userData = {
-    translation: 'translate(' + xTranslation + '%, ' + yTranslation + '%)',
-    offset: deltaPos,
-  };
+  setColor(itemIdx, fColor, bColor) {
+    const text = this.items[itemIdx];
+    text.opts = {
+      color: fColor,
+      background: bColor,
+    };
+  }
+
+  startUpdate() {
+    return true;
+  }
+
+  finishUpdate() {
+    this.needsUpdate = true;
+    this.dispatchEvent({type: 'update'});
+  }
+
+  finalize() {
+    this.finishUpdate();
+  }
+
+  // unimplemented functions
+  raycast() {
+  }
+
+  setOpacity() {
+
+  }
+
+  getSubset() {
+    return [];
+  }
 }
-
-LabelsGeometry.prototype = Object.create(EventDispatcher.prototype);
-LabelsGeometry.prototype.constructor = LabelsGeometry;
-
-LabelsGeometry.prototype.setItem = function(itemIdx, itemPos, fieldTxt) {
-  const opts = this._opts;
-  const labels = opts.labels;
-  const text = this.items[itemIdx] || createLabel(fieldTxt, 'label label-' + labels);
-
-  text.worldPos.copy(itemPos);
-  text.style.textAlign = opts.horizontalAlign;
-  text.style.verticalAlign = opts.verticalAlign;
-  this.items[itemIdx] = text;
-};
-
-LabelsGeometry.prototype.setColor = function(itemIdx, fColor, bColor) {
-  const text = this.items[itemIdx];
-  text.opts = {
-    color: fColor,
-    background: bColor,
-  };
-};
-
-LabelsGeometry.prototype.startUpdate = function() {
-  return true;
-};
-
-LabelsGeometry.prototype.finishUpdate = function() {
-  this.needsUpdate = true;
-  this.dispatchEvent({type: 'update'});
-};
-
-LabelsGeometry.prototype.finalize = function() {
-  this.finishUpdate();
-};
-
-// unimplemented functions
-LabelsGeometry.prototype.raycast = function() {
-};
-
-LabelsGeometry.prototype.setOpacity = function() {
-
-};
-
-LabelsGeometry.prototype.getSubset = function() {
-  return [];
-};
 
 export default LabelsGeometry;
 

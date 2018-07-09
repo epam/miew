@@ -47,60 +47,59 @@ function _createExtrudedChunkGeometry(shape, ringsCount) {
   return geo;
 }
 
-function ExtrudedObjectsGeometry(shape, ringsCount, chunksCount) {
-  const chunkGeo = _createExtrudedChunkGeometry(shape, ringsCount);
-  ChunkedObjectsGeometry.call(this, chunkGeo, chunksCount);
-  this._ringsCount = ringsCount;
+class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
+  constructor(shape, ringsCount, chunksCount) {
+    const chunkGeo = _createExtrudedChunkGeometry(shape, ringsCount);
+    super(chunkGeo, chunksCount);
+    this._ringsCount = ringsCount;
 
-  const tmpShape = this._tmpShape = [];
-  for (let i = 0; i < shape.length; ++i) {
-    tmpShape[i] = new THREE.Vector3();
+    const tmpShape = this._tmpShape = [];
+    for (let i = 0; i < shape.length; ++i) {
+      tmpShape[i] = new THREE.Vector3();
+    }
+  }
+
+  setItem(itemIdx, matrices) {
+    const shape = this._chunkGeo._positions;
+    const ptsCount = shape.length;
+    let innerPtIdx = 0;
+    const chunkStartIdx = ptsCount * this._ringsCount * itemIdx * VEC_SIZE;
+
+    const positions = this._positions;
+    const normals = this._normals;
+
+    const tmpShape = this._tmpShape;
+    for (let i = 0, n = matrices.length; i < n; ++i) {
+      const mtx = matrices[i];
+
+      let j = 0;
+      for (; j < ptsCount; ++j) {
+        tmpShape[j].copy(shape[j]).applyMatrix4(mtx);
+      }
+
+      for (j = 0; j < ptsCount; ++j) {
+        const point = tmpShape[j];
+        const nextPt = tmpShape[(j + 1) % ptsCount];
+        const prevPt = tmpShape[(j + ptsCount - 1) % ptsCount];
+
+        const vtxIdx = chunkStartIdx + innerPtIdx;
+
+        positions[vtxIdx] = point.x;
+        positions[vtxIdx + 1] = point.y;
+        positions[vtxIdx + 2] = point.z;
+
+        tmpPrev.subVectors(point, prevPt).normalize();
+        tmpNext.subVectors(point, nextPt).normalize();
+        tmpPrev.add(tmpNext).normalize();
+
+        normals[vtxIdx] = tmpPrev.x;
+        normals[vtxIdx + 1] = tmpPrev.y;
+        normals[vtxIdx + 2] = tmpPrev.z;
+        innerPtIdx += VEC_SIZE;
+      }
+    }
   }
 }
-
-ExtrudedObjectsGeometry.prototype = Object.create(ChunkedObjectsGeometry.prototype);
-ExtrudedObjectsGeometry.prototype.constructor = ExtrudedObjectsGeometry;
-
-ExtrudedObjectsGeometry.prototype.setItem = function(itemIdx, matrices) {
-  const shape = this._chunkGeo._positions;
-  const ptsCount = shape.length;
-  let innerPtIdx = 0;
-  const chunkStartIdx  = ptsCount * this._ringsCount * itemIdx * VEC_SIZE;
-
-  const positions = this._positions;
-  const normals = this._normals;
-
-  const tmpShape = this._tmpShape;
-  for (let i = 0, n = matrices.length; i < n; ++i) {
-    const mtx = matrices[i];
-
-    let j = 0;
-    for (; j < ptsCount; ++j) {
-      tmpShape[j].copy(shape[j]).applyMatrix4(mtx);
-    }
-
-    for (j = 0; j < ptsCount; ++j) {
-      const point = tmpShape[j];
-      const nextPt = tmpShape[(j + 1) % ptsCount];
-      const prevPt = tmpShape[(j + ptsCount - 1) % ptsCount];
-
-      const vtxIdx = chunkStartIdx + innerPtIdx;
-
-      positions[vtxIdx] = point.x;
-      positions[vtxIdx + 1] = point.y;
-      positions[vtxIdx + 2] = point.z;
-
-      tmpPrev.subVectors(point, prevPt).normalize();
-      tmpNext.subVectors(point, nextPt).normalize();
-      tmpPrev.add(tmpNext).normalize();
-
-      normals[vtxIdx] = tmpPrev.x;
-      normals[vtxIdx + 1] = tmpPrev.y;
-      normals[vtxIdx + 2] = tmpPrev.z;
-      innerPtIdx += VEC_SIZE;
-    }
-  }
-};
 
 export default ExtrudedObjectsGeometry;
 
