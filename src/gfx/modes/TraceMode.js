@@ -1,24 +1,22 @@
 
 
-import utils from '../../utils';
 import Mode from './Mode';
 
-function TraceMode(opts) {
-  Mode.call(this, opts);
+class TraceMode extends Mode {
+  constructor(opts) {
+    super(opts);
+  }
+
+  calcStickRadius() {
+    return this.opts.radius;
+  }
 }
 
-utils.deriveClass(TraceMode, Mode, {
-  id: 'TR',
-  name: 'Trace',
-  shortName: 'Trace',
-  depGroups: ['TraceChains'],
-}, {
-  id: 'TR',
-});
-
-TraceMode.prototype.calcStickRadius = function() {
-  return this.opts.radius;
-};
+TraceMode.id = 'TR';
+TraceMode.prototype.id = 'TR';
+TraceMode.prototype.name = 'Trace';
+TraceMode.prototype.shortName = 'Trace';
+TraceMode.prototype.depGroups = ['TraceChains'];
 
 export default TraceMode;
 
