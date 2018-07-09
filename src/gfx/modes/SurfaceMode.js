@@ -3,7 +3,7 @@
 import chem from '../../chem';
 import Mode from './Mode';
 
-var selectors = chem.selectors;
+const selectors = chem.selectors;
 
 function getRenderParams() {
   return {
@@ -16,9 +16,9 @@ class SurfaceMode extends Mode {
   constructor(opts) {
     super(opts);
     this.depGroups = this.depGroups.slice(0); // clone depGroups to prevent prototype edits
-    var surfaces = this.surfaceNames;
-    var groups = this.depGroups;
-    for (var i = 0, n = surfaces.length; i < n; ++i) {
+    const surfaces = this.surfaceNames;
+    const groups = this.depGroups;
+    for (let i = 0, n = surfaces.length; i < n; ++i) {
       groups[groups.length] = [surfaces[i], getRenderParams];
     }
   }
@@ -28,9 +28,9 @@ class SurfaceMode extends Mode {
   }
 
   getVisibilitySelector() {
-    var visibilitySelector = null;
+    let visibilitySelector = null;
     if (this.opts.subset !== '') {
-      var res = selectors.parse(this.opts.subset);
+      const res = selectors.parse(this.opts.subset);
       if (!res.error) {
         visibilitySelector = res.selector;
       }

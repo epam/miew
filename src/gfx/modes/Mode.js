@@ -40,7 +40,7 @@ class Mode {
    * Options are returned if they were changed during or after the mode creation.
    */
   identify() {
-    var diff = utils.objectsDiff(this.opts, this.settings.now.modes[this.id]);
+    const diff = utils.objectsDiff(this.opts, this.settings.now.modes[this.id]);
     if (!_.isEmpty(diff)) {
       return [this.id, diff];
     }
@@ -48,20 +48,20 @@ class Mode {
   }
 
   buildGeometry(complex, colorer, mask, material) {
-    var polyComplexity = this.opts.polyComplexity ? this.opts.polyComplexity[this.settings.now.resolution] : 0;
-    var groupList = this.depGroups;
-    var groupCount = groupList.length;
-    var group = new gfxutils.RCGroup();
-    var self = this;
-    for (var i = 0; i < groupCount; ++i) {
-      var currGroup = groupList[i];
-      var renderParams = {};
+    const polyComplexity = this.opts.polyComplexity ? this.opts.polyComplexity[this.settings.now.resolution] : 0;
+    const groupList = this.depGroups;
+    const groupCount = groupList.length;
+    const group = new gfxutils.RCGroup();
+    const self = this;
+    for (let i = 0; i < groupCount; ++i) {
+      let currGroup = groupList[i];
+      let renderParams = {};
       if (_.isArray(currGroup)) {
         renderParams = currGroup[1].call(this);
         currGroup = currGroup[0];
       }
-      var Group = factory[currGroup](null, this.settings, renderParams);
-      var newGroup = new Group(complex, colorer, self, polyComplexity, mask, material);
+      const Group = factory[currGroup](null, this.settings, renderParams);
+      const newGroup = new Group(complex, colorer, self, polyComplexity, mask, material);
       if (newGroup.children.length > 0) {
         group.add(newGroup);
       }

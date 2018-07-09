@@ -21,7 +21,7 @@ class TubeMode extends Mode {
   }
 
   buildGeometry(complex, colorer, mask, material) {
-    var rad = this.opts.radius;
+    const rad = this.opts.radius;
     this.TUBE_RADIUS = new THREE.Vector2(rad, rad);
 
     return Mode.prototype.buildGeometry.call(this, complex, colorer, mask, material);
