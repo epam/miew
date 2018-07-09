@@ -162,6 +162,10 @@ class AtomsTextGroup extends AtomsGroup {
         geo.setColor(i, fgColor, bgColor);
       }
     }
+<<<<<<< HEAD
+
+=======
+>>>>>>> 49150c4... Support ES2015 for modes(groups)
     geo.finalize();
   }
 }
