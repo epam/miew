@@ -74,70 +74,69 @@ function _createIsoSurfaceGeoTriplet(geoClass, caps, settings, renderParams) {
   };
 }
 
-function MeshCreator() {
-
-}
-
-MeshCreator.createSpheres = function(caps, settings) {
-  const useZSprites = settings.now.zSprites;
-  return {
-    Geometry: function(a, b) {
-      return new geometries.InstancedSpheresGeometry(a, b, useZSprites);
-    },
-    Object: meshes.ZSprite,
-    initMaterial: setMatParams({
-      instancedPos: true,
-      attrColor: true,
-      attrAlphaColor: true,
-      sphereSprite: useZSprites,
-    }),
-  };
-};
+class MeshCreator {
+  static createSpheres(caps, settings) {
+    const useZSprites = settings.now.zSprites;
+    return {
+      Geometry: function(a, b) {
+        return new geometries.InstancedSpheresGeometry(a, b, useZSprites);
+      },
+      Object: meshes.ZSprite,
+      initMaterial: setMatParams({
+        instancedPos: true,
+        attrColor: true,
+        attrAlphaColor: true,
+        sphereSprite: useZSprites,
+      }),
+    };
+  }
 
 // TODO thisnk about interface and responsibilities
-MeshCreator.create2CClosedCylinders = function(_caps, _settings) {
-  return _createInstancedCylinders(false, false);
-};
+  static create2CClosedCylinders(_caps, _settings) {
+    return _createInstancedCylinders(false, false);
+  }
 
-MeshCreator.create2CCylinders = function(caps, settings) {
-  return _createInstancedCylinders(settings.now.zSprites, true);
-};
+  static create2CCylinders(caps, settings) {
+    return _createInstancedCylinders(settings.now.zSprites, true);
+  }
 
-MeshCreator.create2CLines = function(_caps, _settings, renderParams) {
-  return _createLineSegmentsGeoTriplet(geometries.TwoColorLinesGeometry, renderParams);
-};
+  static create2CLines(_caps, _settings, renderParams) {
+    return _createLineSegmentsGeoTriplet(geometries.TwoColorLinesGeometry, renderParams);
+  }
 
-MeshCreator.createCrosses = function(_caps, _settings, renderParams) {
-  return _createLineSegmentsGeoTriplet(geometries.CrossGeometry, renderParams);
-};
+  static createCrosses(_caps, _settings, renderParams) {
+    return _createLineSegmentsGeoTriplet(geometries.CrossGeometry, renderParams);
+  }
 
-MeshCreator.createExtrudedChains = function(_caps, _settings) {
-  return _createSimpleGeoTriplet(geometries.ExtrudedObjectsGeometry);
-};
+  static createExtrudedChains(_caps, _settings) {
+    return _createSimpleGeoTriplet(geometries.ExtrudedObjectsGeometry);
+  }
 
-MeshCreator.createChunkedLines = function(_caps, _settings, renderParams) {
-  return _createLineSegmentsGeoTriplet(geometries.ChunkedLinesGeometry, renderParams);
-};
+  static createChunkedLines(_caps, _settings, renderParams) {
+    return _createLineSegmentsGeoTriplet(geometries.ChunkedLinesGeometry, renderParams);
+  }
 
-MeshCreator.createQuickSurface = function(caps, settings, renderParams) {
-  return _createIsoSurfaceGeoTriplet(geometries.QuickSurfGeometry, caps, settings, renderParams);
-};
+  static createQuickSurface(caps, settings, renderParams) {
+    return _createIsoSurfaceGeoTriplet(geometries.QuickSurfGeometry, caps, settings, renderParams);
+  }
 
-MeshCreator.createContactSurface = function(caps, settings, renderParams) {
-  return _createIsoSurfaceGeoTriplet(geometries.ContactSurfaceGeometry, caps, settings, renderParams);
-};
+  static createContactSurface(caps, settings, renderParams) {
+    return _createIsoSurfaceGeoTriplet(geometries.ContactSurfaceGeometry, caps, settings, renderParams);
+  }
 
-MeshCreator.createSASSES = function(caps, settings, renderParams) {
-  return _createIsoSurfaceGeoTriplet(geometries.SSIsosurfaceGeometry, caps, settings, renderParams);
-};
+  static createSASSES(caps, settings, renderParams) {
+    return _createIsoSurfaceGeoTriplet(geometries.SSIsosurfaceGeometry, caps, settings, renderParams);
+  }
 
-MeshCreator.createLabels = function(_caps, _settings) {
-  return {
-    Geometry: geometries.LabelsGeometry,
-    Object: meshes.Text,
-    initMaterial: function() {},
-  };
-};
+  static createLabels(_caps, _settings) {
+    return {
+      Geometry: geometries.LabelsGeometry,
+      Object: meshes.Text,
+      initMaterial: function() {
+      },
+    };
+  }
+}
 
 export default MeshCreator;
 
