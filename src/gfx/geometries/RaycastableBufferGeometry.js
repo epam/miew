@@ -7,39 +7,45 @@ import * as THREE from 'three';
  * THREE.BufferGeometry.
  * @constructor
  */
-function RaycastableBufferGeometry() {
-  THREE.BufferGeometry.call(this);
-}
 
-RaycastableBufferGeometry.prototype = Object.create(THREE.BufferGeometry.prototype);
-RaycastableBufferGeometry.prototype.constructor = RaycastableBufferGeometry;
+class RaycastableBufferGeometry extends THREE.BufferGeometry {
+  constructor() {
+    super();
+  }
 
-RaycastableBufferGeometry.prototype.raycast = (function() {
   // This method was copied from three.js
-  const vA = new THREE.Vector3();
-  const vB = new THREE.Vector3();
-  const vC = new THREE.Vector3();
 
-  const uvA = new THREE.Vector2();
-  const uvB = new THREE.Vector2();
-  const uvC = new THREE.Vector2();
+  static vA = new THREE.Vector3();
 
-  const barycoord = new THREE.Vector3();
+  static vB = new THREE.Vector3();
 
-  const intersectionPoint = new THREE.Vector3();
+  static vC = new THREE.Vector3();
 
-  function uvIntersection(point, p1, p2, p3, uv1, uv2, uv3) {
-    THREE.Triangle.barycoordFromPoint(point, p1, p2, p3, barycoord);
 
-    uv1.multiplyScalar(barycoord.x);
-    uv2.multiplyScalar(barycoord.y);
-    uv3.multiplyScalar(barycoord.z);
+  static uvA = new THREE.Vector2();
+
+  static uvB = new THREE.Vector2();
+
+  static uvC = new THREE.Vector2();
+
+
+  static barycoord = new THREE.Vector3();
+
+
+  static intersectionPoint = new THREE.Vector3();
+
+  uvIntersection(point, p1, p2, p3, uv1, uv2, uv3) {
+    THREE.Triangle.barycoordFromPoint(point, p1, p2, p3, RaycastableBufferGeometry.barycoord);
+
+    uv1.multiplyScalar(RaycastableBufferGeometry.barycoord.x);
+    uv2.multiplyScalar(RaycastableBufferGeometry.barycoord.y);
+    uv3.multiplyScalar(RaycastableBufferGeometry.barycoord.z);
 
     uv1.add(uv2).add(uv3);
     return uv1.clone();
   }
 
-  function checkIntersection(object, raycaster, ray, pA, pB, pC, point) {
+  checkIntersection(object, raycaster, ray, pA, pB, pC, point) {
     //let intersect;
     const intersect = ray.intersectTriangle(pA, pB, pC, false, point);
 
@@ -52,21 +58,40 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
     };
   }
 
-  function checkBufferGeometryIntersection(object, raycaster, ray, position, uv, a, b, c) {
-    vA.fromBufferAttribute(position, a);
-    vB.fromBufferAttribute(position, b);
-    vC.fromBufferAttribute(position, c);
+  checkBufferGeometryIntersection(object, raycaster, ray, position, uv, a, b, c) {
+    RaycastableBufferGeometry.vA.fromBufferAttribute(position, a);
+    RaycastableBufferGeometry.vB.fromBufferAttribute(position, b);
+    RaycastableBufferGeometry.vC.fromBufferAttribute(position, c);
 
-    const intersection = checkIntersection(object, raycaster, ray, vA, vB, vC, intersectionPoint);
+    const intersection = this.checkIntersection(
+      object, raycaster, ray,
+      RaycastableBufferGeometry.vA,
+      RaycastableBufferGeometry.vB,
+      RaycastableBufferGeometry.vC,
+      RaycastableBufferGeometry.intersectionPoint
+    );
     if (intersection) {
       if (uv) {
-        uvA.fromBufferAttribute(uv, a);
-        uvB.fromBufferAttribute(uv, b);
-        uvC.fromBufferAttribute(uv, c);
-        intersection.uv = uvIntersection(intersectionPoint, vA, vB, vC, uvA, uvB, uvC);
+        RaycastableBufferGeometry.uvA.fromBufferAttribute(uv, a);
+        RaycastableBufferGeometry.uvB.fromBufferAttribute(uv, b);
+        RaycastableBufferGeometry.uvC.fromBufferAttribute(uv, c);
+        intersection.uv = this.uvIntersection(
+          RaycastableBufferGeometry.intersectionPoint,
+          RaycastableBufferGeometry.vA,
+          RaycastableBufferGeometry.vB,
+          RaycastableBufferGeometry.vC,
+          RaycastableBufferGeometry.uvA,
+          RaycastableBufferGeometry.uvB,
+          RaycastableBufferGeometry.uvC
+        );
       }
       const normal = new THREE.Vector3();
-      THREE.Triangle.getNormal(vA, vB, vC, normal);
+      THREE.Triangle.getNormal(
+        RaycastableBufferGeometry.vA,
+        RaycastableBufferGeometry.vB,
+        RaycastableBufferGeometry.vC,
+        normal
+      );
       intersection.face = new THREE.Face3(a, b, c, normal);
       intersection.faceIndex = a;
     }
@@ -74,7 +99,7 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
     return intersection;
   }
 
-  return function(raycaster, intersects) {
+  raycast(raycaster, intersects) {
     const ray = raycaster.ray;
     if (this.boundingSphere === null) {
       this.computeBoundingSphere();
@@ -105,15 +130,15 @@ RaycastableBufferGeometry.prototype.raycast = (function() {
       b = index.getX(i + 1);
       c = index.getX(i + 2);
 
-      const intersection = checkBufferGeometryIntersection(this, raycaster, ray, position, uv, a, b, c);
+      const intersection = this.checkBufferGeometryIntersection(this, raycaster, ray, position, uv, a, b, c);
 
       if (intersection) {
         intersection.faceIndex = Math.floor(i / 3); // triangle number in indices buffer semantics
         intersects.push(intersection);
       }
     }
-  };
-}());
+  }
+}
 
 export default RaycastableBufferGeometry;
 
