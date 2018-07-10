@@ -100,7 +100,6 @@ BondsCylinderGroup.prototype.updateToFrame = function(frameData) {
       currBondIdx++;
     }
   }
-
   geo.finalize();
 };
 

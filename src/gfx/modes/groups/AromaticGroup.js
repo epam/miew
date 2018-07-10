@@ -40,11 +40,8 @@ class AromaticGroup extends AtomsGroup {
       let currPos = cycAtoms[i]._position;
       prevVector.subVectors(prevPos, center);
       currVector.subVectors(currPos, center);
-<<<<<<< HEAD
       const upDir = currVector.clone().cross(prevVector).normalize();
-=======
-      var upDir = currVector.clone().cross(prevVector).normalize();
->>>>>>> 49150c4... Support ES2015 for modes(groups)
+
 
       for (; i < n; ++i) {
         const omega = prevVector.angleTo(currVector);
@@ -71,10 +68,6 @@ class AromaticGroup extends AtomsGroup {
         currAtomIdx = chunksToIdx[chunkIdx];
       }
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 49150c4... Support ES2015 for modes(groups)
   }
 }
 
