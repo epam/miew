@@ -1,8 +1,8 @@
-
-
 import Colorer from './Colorer';
 
 class UniformColorer extends Colorer {
+  static id = 'UN';
+
   constructor(opts) {
     super(opts);
   }
@@ -16,7 +16,6 @@ class UniformColorer extends Colorer {
   }
 }
 
-UniformColorer.id = 'UN';
 UniformColorer.prototype.id = 'UN';
 UniformColorer.prototype.name = 'Uniform';
 UniformColorer.prototype.shortName = 'Uniform';

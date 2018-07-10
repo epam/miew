@@ -1,5 +1,3 @@
-
-
 import Colorer from './Colorer';
 
 /**
@@ -11,6 +9,8 @@ import Colorer from './Colorer';
  * @constructor
  */
 class ResidueTypeColorer extends Colorer {
+  static id = 'RT';
+
   constructor(opts) {
     super(opts);
   }
@@ -24,7 +24,6 @@ class ResidueTypeColorer extends Colorer {
   }
 }
 
-ResidueTypeColorer.id = 'RT';
 ResidueTypeColorer.prototype.id = 'RT';
 ResidueTypeColorer.prototype.name = 'Residue Type';
 ResidueTypeColorer.prototype.shortName = 'Residue';

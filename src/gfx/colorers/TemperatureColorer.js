@@ -1,5 +1,3 @@
-
-
 import Colorer from './Colorer';
 
 /**
@@ -15,6 +13,8 @@ import Colorer from './Colorer';
  * @classdesc Coloring algorithm based on temperature of chemical element.
  */
 class TemperatureColorer extends Colorer {
+  static id = 'TM';
+
   constructor(opts) {
     super(opts);
   }
@@ -51,7 +51,6 @@ class TemperatureColorer extends Colorer {
   }
 }
 
-TemperatureColorer.id = 'TM';
 TemperatureColorer.prototype.id = 'TM'; // [T]e[M]perature
 TemperatureColorer.prototype.name = 'Temperature';
 TemperatureColorer.prototype.shortName = 'Temperature';

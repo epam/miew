@@ -1,5 +1,3 @@
-
-
 import chem from '../../chem';
 import Mode from './Mode';
 
@@ -43,4 +41,3 @@ SurfaceMode.prototype.isSurface = true;
 SurfaceMode.prototype.surfaceNames = [];
 
 export default SurfaceMode;
-

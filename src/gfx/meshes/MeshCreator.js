@@ -1,5 +1,3 @@
-
-
 import geometries from '../geometries/geometries';
 import meshes from './meshes';
 import ThickLinesGeometry from '../geometries/ThickLinesGeometry';
@@ -91,7 +89,7 @@ class MeshCreator {
     };
   }
 
-// TODO thisnk about interface and responsibilities
+  // TODO thisnk about interface and responsibilities
   static create2CClosedCylinders(_caps, _settings) {
     return _createInstancedCylinders(false, false);
   }
@@ -139,4 +137,3 @@ class MeshCreator {
 }
 
 export default MeshCreator;
-

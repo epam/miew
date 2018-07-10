@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import UberObject from './UberObject';
 const Mesh = UberObject(THREE.Mesh);
@@ -22,4 +20,3 @@ class ThickLineMesh extends Mesh {
 }
 
 export default ThickLineMesh;
-

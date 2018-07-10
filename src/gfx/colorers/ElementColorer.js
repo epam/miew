@@ -1,5 +1,3 @@
-
-
 import Colorer from './Colorer';
 
 /**
@@ -15,6 +13,8 @@ import Colorer from './Colorer';
  * @classdesc Coloring algorithm based on chemical element.
  */
 class ElementColorer extends Colorer {
+  static id = ['EL', 'AT']; // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
+
   constructor(opts) {
     super(opts);
   }
@@ -32,8 +32,6 @@ class ElementColorer extends Colorer {
   }
 }
 
-ElementColorer.id = ['EL', 'AT']; // 'AT' is @deprecated backward compatibility
-// after renaming [A]tom [T]ype -> [EL]ement
 ElementColorer.prototype.id = 'EL';
 ElementColorer.prototype.aliases = ['AT']; // @deprecated
 ElementColorer.prototype.name = 'Element';

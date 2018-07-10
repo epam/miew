@@ -1,8 +1,8 @@
-
-
 import Colorer from './Colorer';
 
 class ChainColorer extends Colorer {
+  static id = 'CH';
+
   constructor(opts) {
     super(opts);
   }
@@ -16,7 +16,6 @@ class ChainColorer extends Colorer {
   }
 }
 
-ChainColorer.id = 'CH';
 ChainColorer.prototype.id = 'CH';
 ChainColorer.prototype.name = 'Chain';
 ChainColorer.prototype.shortName = 'Chain';

@@ -1,5 +1,3 @@
-
-
 import _ from 'lodash';
 import * as THREE from 'three';
 import CSS2DObject from '../CSS2DObject';
@@ -19,15 +17,13 @@ class TextMesh extends THREE.Group {
 
   init() {
     const children = this.children;
-    let i = children.length - 1;
-    for (; i >= 0; --i) {
+    for (let i = 0, n = children.length; i < n; ++i) {
       this.remove(children[i]);
     }
 
     const items = this.geometry.items;
     const userData = this.geometry.userData;
-    const n = items.length;
-    for (i = 0; i < n; ++i) {
+    for (let i = 0, n = items.length; i < n; ++i) {
       const srcItem = items[i];
       if (!srcItem) {
         continue;
@@ -64,4 +60,3 @@ class TextMesh extends THREE.Group {
 }
 
 export default TextMesh;
-

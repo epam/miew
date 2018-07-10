@@ -1,9 +1,9 @@
-
-
 import * as THREE from 'three';
 import Mode from './Mode';
 
 class CartoonMode extends Mode {
+  static id = 'CA';
+
   constructor(opts) {
     super(opts);
     // cache for secondary structure options
@@ -77,7 +77,7 @@ class CartoonMode extends Mode {
     const secCache = {};
     const secData = this.opts.ss;
     /* eslint-disable guard-for-in */
-    for (var prop in secData) {
+    for (let prop in secData) {
       secCache[prop] = {
         center: new THREE.Vector2(secHeight, secData[prop].width),
         start: new THREE.Vector2(secHeight, secData[prop].arrow)
@@ -90,7 +90,6 @@ class CartoonMode extends Mode {
   }
 }
 
-CartoonMode.id = 'CA';
 CartoonMode.prototype.id = 'CA';
 CartoonMode.prototype.name = 'Cartoon';
 CartoonMode.prototype.shortName = 'Cartoon';
@@ -101,4 +100,3 @@ CartoonMode.prototype.depGroups = [
 ];
 
 export default CartoonMode;
-

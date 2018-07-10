@@ -1,8 +1,8 @@
-
-
 import Colorer from './Colorer';
 
 class SequenceColorer extends Colorer {
+  static id = ['SQ', 'RI']; // 'RI' is @deprecated backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
+
   constructor(opts) {
     super(opts);
   }
@@ -22,8 +22,6 @@ class SequenceColorer extends Colorer {
   }
 }
 
-SequenceColorer.id = ['SQ', 'RI']; // 'RI' is @deprecated backward compatibility
-// after renaming [R]esidue [I]d -> [S]e[Q]uence
 SequenceColorer.prototype.id = 'SQ';
 SequenceColorer.prototype.aliases = ['RI']; // @deprecated;
 SequenceColorer.prototype.name = 'Sequence';

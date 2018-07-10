@@ -1,5 +1,3 @@
-
-
 /* eslint-disable no-magic-numbers */
 import Mode from './Mode';
 
@@ -28,4 +26,3 @@ class LabeledMode extends Mode {
 }
 
 export default LabeledMode;
-

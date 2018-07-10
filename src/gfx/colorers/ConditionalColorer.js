@@ -1,5 +1,3 @@
-
-
 import Colorer from './Colorer';
 import selectors from '../../chem/selectors';
 
@@ -15,6 +13,8 @@ import selectors from '../../chem/selectors';
  * @classdesc Bicolor coloring algorithm based on a selector string used as a condition.
  */
 class ConditionalColorer extends Colorer {
+  static id = 'CO';
+
   constructor(opts) {
     super(opts);
     const parsed = selectors.parse(this.opts.subset);
@@ -36,7 +36,6 @@ class ConditionalColorer extends Colorer {
   }
 }
 
-ConditionalColorer.id = 'CO';
 ConditionalColorer.prototype.id = 'CO';
 ConditionalColorer.prototype.name = 'Conditional';
 ConditionalColorer.prototype.shortName = 'Conditional';

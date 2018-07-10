@@ -1,5 +1,3 @@
-
-
 import LabeledMode from './LabeledMode';
 
 function getRenderParams() {
@@ -9,6 +7,8 @@ function getRenderParams() {
 }
 
 class LinesMode extends LabeledMode {
+  static id = 'LN';
+
   constructor(opts) {
     super(opts);
     const groups = this.depGroups;
@@ -52,7 +52,6 @@ class LinesMode extends LabeledMode {
   }
 }
 
-LinesMode.id = 'LN';
 LinesMode.prototype.id = 'LN';
 LinesMode.prototype.name = 'Lines';
 LinesMode.prototype.shortName = 'Lines';
@@ -63,4 +62,3 @@ LinesMode.prototype.depGroups = [
 ];
 
 export default LinesMode;
-

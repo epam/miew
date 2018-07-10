@@ -1,8 +1,8 @@
-
-
 import SurfaceMode from './SurfaceMode';
 
 class QuickSurfaceMode extends SurfaceMode {
+  static id = 'QS';
+
   constructor(opts) {
     super(opts);
   }
@@ -20,11 +20,9 @@ class QuickSurfaceMode extends SurfaceMode {
   }
 }
 
-QuickSurfaceMode.id = 'QS';
 QuickSurfaceMode.prototype.id = 'QS';
 QuickSurfaceMode.prototype.name = 'Quick Surface';
 QuickSurfaceMode.prototype.shortName = 'Quick Surf';
 QuickSurfaceMode.prototype.surfaceNames = ['QuickSurfGeo'];
 
 export default QuickSurfaceMode;
-

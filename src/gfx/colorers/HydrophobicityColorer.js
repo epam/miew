@@ -1,8 +1,8 @@
-
-
 import Colorer from './Colorer';
 
 class HydrophobicityColorer extends Colorer {
+  static id = 'HY';
+
   constructor(opts) {
     super(opts);
   }
@@ -23,7 +23,6 @@ class HydrophobicityColorer extends Colorer {
   }
 }
 
-HydrophobicityColorer.id = 'HY';
 HydrophobicityColorer.prototype.id = 'HY';
 HydrophobicityColorer.prototype.name = 'Hydrophobicity';
 HydrophobicityColorer.prototype.shortName = 'Hydrophobicity';

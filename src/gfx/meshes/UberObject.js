@@ -1,5 +1,3 @@
-
-
 import UberMaterial from '../shaders/UberMaterial';
 export default function(SuperClass) {
   class NewObjectType extends SuperClass {
@@ -31,4 +29,3 @@ export default function(SuperClass) {
 
   return NewObjectType;
 }
-

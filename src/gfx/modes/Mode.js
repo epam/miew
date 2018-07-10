@@ -1,5 +1,3 @@
-
-
 import _ from 'lodash';
 import makeContextDependent from '../../utils/makeContextDependent';
 import utils from '../../utils';
@@ -85,4 +83,3 @@ Mode.prototype.id = '__';
 Mode.prototype.depGroups = [];
 
 export default Mode;
-

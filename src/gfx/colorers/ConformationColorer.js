@@ -1,8 +1,8 @@
-
-
 import Colorer from './Colorer';
 
 class ConformationColorer extends Colorer {
+  static id = 'CF';
+
   constructor(opts) {
     super(opts);
   }
@@ -16,7 +16,6 @@ class ConformationColorer extends Colorer {
   }
 }
 
-ConformationColorer.id = 'CF';
 ConformationColorer.prototype.id = 'CF';
 ConformationColorer.prototype.name = 'Conformation';
 ConformationColorer.prototype.shortName = 'Conformation';

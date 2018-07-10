@@ -1,8 +1,8 @@
-
-
 import SurfaceMode from './SurfaceMode';
 
 class ContactSurfaceMode extends SurfaceMode {
+  static id = 'CS';
+
   constructor(opts) {
     super(opts);
   }
@@ -21,7 +21,6 @@ class ContactSurfaceMode extends SurfaceMode {
   }
 }
 
-ContactSurfaceMode.id = 'CS';
 ContactSurfaceMode.prototype.id = 'CS';
 ContactSurfaceMode.prototype.name = 'Contact Surface';
 ContactSurfaceMode.prototype.shortName = 'Contact Surf';
@@ -29,4 +28,3 @@ ContactSurfaceMode.prototype.isSurface = true;
 ContactSurfaceMode.prototype.surfaceNames = ['ContactSurfaceGeo'];
 
 export default ContactSurfaceMode;
-

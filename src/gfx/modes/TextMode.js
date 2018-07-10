@@ -1,9 +1,9 @@
-
-
 import _ from 'lodash';
 import Mode from './Mode';
 
 class TextMode extends Mode {
+  static id = 'TX';
+
   constructor(opts) {
     super(opts);
   }
@@ -22,11 +22,9 @@ class TextMode extends Mode {
   }
 }
 
-TextMode.id = 'TX';
 TextMode.prototype.id = 'TX';
 TextMode.prototype.name = 'Text mode';
 TextMode.prototype.shortName = 'Text';
 TextMode.prototype.depGroups = ['TextLabelsGeo'];
 
 export default TextMode;
-

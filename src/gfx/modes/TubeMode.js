@@ -1,9 +1,9 @@
-
-
 import * as THREE from 'three';
 import Mode from './Mode';
 
 class TubeMode extends Mode {
+  static id = 'TU';
+
   constructor(opts) {
     super(opts);
   }
@@ -28,11 +28,9 @@ class TubeMode extends Mode {
   }
 }
 
-TubeMode.id = 'TU';
 TubeMode.prototype.id = 'TU';
 TubeMode.prototype.name = 'Tube';
 TubeMode.prototype.shortName = 'Tube';
 TubeMode.prototype.depGroups = ['CartoonChains'];
 
 export default TubeMode;
-

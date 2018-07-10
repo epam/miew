@@ -1,5 +1,3 @@
-
-
 import _ from 'lodash';
 import settings from '../../settings';
 import utils from '../../utils';

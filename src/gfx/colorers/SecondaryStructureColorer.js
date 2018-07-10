@@ -1,9 +1,9 @@
-
-
 import Colorer from './Colorer';
 import ResidueType from '../../chem/ResidueType';
 
 class SecondaryStructureColorer extends Colorer {
+  static id = 'SS';
+
   constructor(opts) {
     super(opts);
   }
@@ -30,7 +30,6 @@ class SecondaryStructureColorer extends Colorer {
   }
 }
 
-SecondaryStructureColorer.id = 'SS';
 SecondaryStructureColorer.prototype.id = 'SS';
 SecondaryStructureColorer.prototype.name = 'Secondary Structure';
 SecondaryStructureColorer.prototype.shortName = 'Structure';

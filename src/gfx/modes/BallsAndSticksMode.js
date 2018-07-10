@@ -1,9 +1,9 @@
-
-
 /* eslint-disable no-magic-numbers */
 import LabeledMode from './LabeledMode';
 
 class BallsAndSticksMode extends LabeledMode {
+  static id = 'BS';
+
   constructor(opts) {
     super(opts);
   }
@@ -47,7 +47,6 @@ class BallsAndSticksMode extends LabeledMode {
   }
 }
 
-BallsAndSticksMode.id = 'BS';
 BallsAndSticksMode.prototype.id = 'BS';
 BallsAndSticksMode.prototype.name = 'Balls and Sticks';
 BallsAndSticksMode.prototype.shortName = 'Balls';
@@ -58,4 +57,3 @@ BallsAndSticksMode.prototype.depGroups = [
 ];
 
 export default BallsAndSticksMode;
-

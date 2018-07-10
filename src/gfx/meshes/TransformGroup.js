@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 
 class TransformGroup extends THREE.Object3D {
@@ -22,15 +20,17 @@ class TransformGroup extends THREE.Object3D {
   }
 
   raycast(raycaster, intersects) {
+    const ray = TransformGroup._ray;
+    const inverseMatrix = TransformGroup._inverseMatrix;
     const children = this.children;
-    TransformGroup._ray.copy(raycaster.ray);
+    ray.copy(raycaster.ray);
     for (let i = 0, n = children.length; i < n; ++i) {
       const child = children[i];
       child.updateMatrixWorld();
       const mtx = child.matrixWorld;
       // TODO check near / far?
-      TransformGroup._inverseMatrix.getInverse(mtx);
-      raycaster.ray.copy(TransformGroup._ray).applyMatrix4(TransformGroup._inverseMatrix);
+      inverseMatrix.getInverse(mtx);
+      raycaster.ray.copy(ray).applyMatrix4(inverseMatrix);
       const childIntersects = [];
       this._geometry.raycast(raycaster, childIntersects);
 
@@ -38,14 +38,14 @@ class TransformGroup extends THREE.Object3D {
         const inters = childIntersects[j];
         if (inters.point) {
           inters.point.applyMatrix4(mtx);
-          inters.distance = TransformGroup._ray.origin.distanceTo(inters.point);
+          inters.distance = ray.origin.distanceTo(inters.point);
         }
         inters.object = child;
         // TODO: check raycaster near/far?
         intersects[intersects.length] = inters;
       }
     }
-    raycaster.ray.copy(TransformGroup._ray);
+    raycaster.ray.copy(ray);
   }
 
   getSubset(chunkIndices) {
@@ -80,4 +80,3 @@ class TransformGroup extends THREE.Object3D {
 }
 
 export default TransformGroup;
-

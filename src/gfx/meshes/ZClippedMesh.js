@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import UberObject from './UberObject';
 const Mesh = UberObject(THREE.Mesh);
@@ -30,4 +28,3 @@ class ZClippedMesh extends Mesh {
 }
 
 export default ZClippedMesh;
-

@@ -1,8 +1,8 @@
-
-
 /* eslint-disable no-magic-numbers */
 import LabeledMode from './LabeledMode';
 class LicoriceMode extends LabeledMode {
+  static id = 'LC';
+
   constructor(opts) {
     super(opts);
   }
@@ -46,7 +46,6 @@ class LicoriceMode extends LabeledMode {
   }
 }
 
-LicoriceMode.id = 'LC';
 LicoriceMode.prototype.id = 'LC';
 LicoriceMode.prototype.hortName = 'Licorice';
 LicoriceMode.prototype.shortName = 'Licorice';
@@ -57,4 +56,3 @@ LicoriceMode.prototype.depGroups = [
 ];
 
 export default LicoriceMode;
-

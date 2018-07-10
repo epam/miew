@@ -1,5 +1,3 @@
-
-
 import SurfaceMode from './SurfaceMode';
 
 class IsoSurfaceMode extends SurfaceMode {
@@ -39,4 +37,3 @@ IsoSurfaceMode.prototype._clusterViaKMeans = 0; // 0: no cluster, 1: KMeans, 2: 
 IsoSurfaceMode.prototype._excludeProbe = false;
 
 export default IsoSurfaceMode;
-

@@ -1,5 +1,3 @@
-
-
 import Colorer from './Colorer';
 
 /**
@@ -15,6 +13,8 @@ import Colorer from './Colorer';
  * @classdesc Coloring algorithm based on occupancy of chemical element.
  */
 class OccupancyColorer extends Colorer {
+  static id = 'OC';
+
   constructor(opts) {
     super(opts);
   }
@@ -41,7 +41,6 @@ class OccupancyColorer extends Colorer {
   }
 }
 
-OccupancyColorer.id = 'OC';
 OccupancyColorer.prototype.id = 'OC';  //[OC]cupancy
 OccupancyColorer.prototype.name = 'Occupancy';
 OccupancyColorer.prototype.shortName = 'Occupancy';

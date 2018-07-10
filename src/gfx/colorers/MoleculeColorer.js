@@ -1,8 +1,8 @@
-
-
 import Colorer from './Colorer';
 
 class MoleculeColorer extends Colorer {
+  static id = 'MO';
+
   constructor(opts) {
     super(opts);
   }
@@ -21,7 +21,6 @@ class MoleculeColorer extends Colorer {
   }
 }
 
-MoleculeColorer.id = 'MO';
 MoleculeColorer.prototype.id = 'MO';
 MoleculeColorer.prototype.name = 'Molecule';
 MoleculeColorer.prototype.shortName = 'Molecule';
