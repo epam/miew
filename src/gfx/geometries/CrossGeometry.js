@@ -19,30 +19,11 @@ class CrossGeometry extends SphereCollisionGeo(ChunkedLinesGeometry) {
   constructor(chunksCount) {
     super(chunksCount, chunksCount, (vecCount / 2) | 0, false);
   }
-  /*
-  computeBoundingSphere() {
-    this._collisionGeo.computeBoundingSphere();
-    //this.boundingSphere = this._collisionGeo.boundingSphere;
-    this.boundingSphere = this._collisionGeo.boundingSphere;
-  }
-  */
-  /*
-  computeBoundingBox() {
-    this._collisionGeo.computeBoundingBox();
-    //this.boundingBox = this._collisionGeo.boundingBox;
-    this.boundingBox = this._collisionGeo.boundingBox;
-  }
-  */
-  /*
-  raycast(raycaster, intersects) {
-    this._collisionGeo.raycast(raycaster, intersects);
-  }
-  */
 
   setItem(itemIdx, itemPos, itemRad) {
     this.setSphere(itemIdx, itemPos, itemRad);
 
-    const offset = itemIdx * this._chunkSize;
+    //const offset = itemIdx * this._chunkSize;
     for (let i = 0; i < vecCount / 2; ++i) {
       const first = i * 2;
       tempPos1.x = itemPos.x + vectors[first].x * itemRad;
@@ -52,7 +33,7 @@ class CrossGeometry extends SphereCollisionGeo(ChunkedLinesGeometry) {
       tempPos2.x = itemPos.x + vectors[second].x * itemRad;
       tempPos2.y = itemPos.y + vectors[second].y * itemRad;
       tempPos2.z = itemPos.z + vectors[second].z * itemRad;
-      super.setSegment.call(this, offset + i, tempPos1, tempPos2);
+      this.setSegment(itemIdx, i, tempPos1, tempPos2);
     }
   }
 }
