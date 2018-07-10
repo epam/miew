@@ -1,5 +1,3 @@
-
-
 import AtomsGroup from './AtomsGroup';
 import utils from '../../../utils';
 

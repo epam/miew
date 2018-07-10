@@ -1,5 +1,3 @@
-
-
 import NucleicItemGroup from './NucleicItemGroup';
 
 class NucleicCylindersGroup extends NucleicItemGroup {

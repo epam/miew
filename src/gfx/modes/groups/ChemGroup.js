@@ -1,5 +1,3 @@
-
-
 import RCGroup from '../../RCGroup';
 import TransformGroup from '../../meshes/TransformGroup';
 

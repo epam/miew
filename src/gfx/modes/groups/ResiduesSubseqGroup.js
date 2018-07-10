@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import ResiduesGroup from './ResiduesGroup';
 import CartoonHelper from './CartoonHelper';

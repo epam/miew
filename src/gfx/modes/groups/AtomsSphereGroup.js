@@ -1,5 +1,3 @@
-
-
 import AtomsGroup from './AtomsGroup';
 
 class AtomsSphereGroup extends AtomsGroup {
@@ -48,4 +46,3 @@ class AtomsSphereGroup extends AtomsGroup {
 }
 
 export default AtomsSphereGroup;
-

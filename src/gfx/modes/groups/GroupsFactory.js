@@ -1,5 +1,3 @@
-
-
 import MeshCreator from '../../meshes/MeshCreator';
 import groups from './groups';
 import processors from '../processors/processors';

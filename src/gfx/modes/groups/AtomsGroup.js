@@ -1,5 +1,3 @@
-
-
 import ChemGroup from './ChemGroup';
 
 class AtomsGroup extends ChemGroup {

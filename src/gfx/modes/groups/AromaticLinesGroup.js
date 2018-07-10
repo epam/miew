@@ -1,5 +1,3 @@
-
-
 import AromaticGroup from './AromaticGroup';
 
 function AromaticLinesGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
@@ -28,4 +26,3 @@ AromaticLinesGroup.prototype = Object.create(AromaticGroup.prototype);
 AromaticLinesGroup.prototype.constructor = AromaticLinesGroup;
 
 export default AromaticLinesGroup;
-

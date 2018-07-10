@@ -1,5 +1,3 @@
-
-
 import ChemGroup from './ChemGroup';
 
 class ResiduesGroup extends ChemGroup {
@@ -40,4 +38,3 @@ class ResiduesGroup extends ChemGroup {
 }
 
 export default ResiduesGroup;
-

@@ -1,7 +1,4 @@
-
-
 import ChemGroup from './ChemGroup';
-
 
 class ResiduesTraceGroup extends ChemGroup {
   constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
@@ -123,4 +120,3 @@ class ResiduesTraceGroup extends ChemGroup {
 }
 
 export default ResiduesTraceGroup;
-

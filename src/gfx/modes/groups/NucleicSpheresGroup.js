@@ -1,5 +1,3 @@
-
-
 import NucleicItemGroup from './NucleicItemGroup';
 
 class NucleicSpheresGroup extends  NucleicItemGroup {

@@ -1,5 +1,3 @@
-
-
 import AtomsSphereGroup from './AtomsSphereGroup';
 
 class AtomsSurfaceGroup extends AtomsSphereGroup {

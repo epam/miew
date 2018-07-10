@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import gfxutils from '../../gfxutils';
 import AromaticGroup from './AromaticGroup';
@@ -46,4 +44,3 @@ AromaticTorusGroup.prototype = Object.create(AromaticGroup.prototype);
 AromaticTorusGroup.prototype.constructor = AromaticTorusGroup;
 
 export default AromaticTorusGroup;
-

@@ -1,5 +1,3 @@
-
-
 /* This is a stub class keep it until SAS/SES is refactored */
 
 import AtomsSphereGroup from './AtomsSphereGroup';
@@ -26,4 +24,3 @@ class AtomsSASSESGroupStub extends AtomsSphereGroup {
 }
 
 export default AtomsSASSESGroupStub;
-

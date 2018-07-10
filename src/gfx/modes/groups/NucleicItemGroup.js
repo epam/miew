@@ -1,5 +1,3 @@
-
-
 import ResiduesGroup from './ResiduesGroup';
 
 class NucleicItemGroup extends ResiduesGroup {
@@ -78,4 +76,3 @@ class NucleicItemGroup extends ResiduesGroup {
 }
 
 export default NucleicItemGroup;
-

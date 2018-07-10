@@ -1,5 +1,3 @@
-
-
 import ChemGroup from './ChemGroup';
 import Bond from '../../../chem/Bond';
 
