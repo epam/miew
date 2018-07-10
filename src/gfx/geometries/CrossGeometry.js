@@ -15,31 +15,32 @@ const tempPos1 = new THREE.Vector3();
 const tempPos2 = new THREE.Vector3();
 // const VEC_SIZE = 3;
 
-class CrossGeometry extends ChunkedLinesGeometry {
+class CrossGeometry extends SphereCollisionGeo(ChunkedLinesGeometry) {
   constructor(chunksCount) {
-    super(chunksCount, (vecCount / 2) | 0, false);
-
-    this._collisionGeo = new SphereCollisionGeo(chunksCount);
+    super(chunksCount, chunksCount, (vecCount / 2) | 0, false);
   }
-
+  /*
   computeBoundingSphere() {
     this._collisionGeo.computeBoundingSphere();
     //this.boundingSphere = this._collisionGeo.boundingSphere;
     this.boundingSphere = this._collisionGeo.boundingSphere;
   }
-
+  */
+  /*
   computeBoundingBox() {
     this._collisionGeo.computeBoundingBox();
     //this.boundingBox = this._collisionGeo.boundingBox;
     this.boundingBox = this._collisionGeo.boundingBox;
   }
-
+  */
+  /*
   raycast(raycaster, intersects) {
     this._collisionGeo.raycast(raycaster, intersects);
   }
+  */
 
   setItem(itemIdx, itemPos, itemRad) {
-    this._collisionGeo.setSphere(itemIdx, itemPos, itemRad);
+    this.setSphere(itemIdx, itemPos, itemRad);
 
     const offset = itemIdx * this._chunkSize;
     for (let i = 0; i < vecCount / 2; ++i) {
@@ -51,7 +52,7 @@ class CrossGeometry extends ChunkedLinesGeometry {
       tempPos2.x = itemPos.x + vectors[second].x * itemRad;
       tempPos2.y = itemPos.y + vectors[second].y * itemRad;
       tempPos2.z = itemPos.z + vectors[second].z * itemRad;
-      this.parent.setSegment.call(this, offset + i, tempPos1, tempPos2);
+      super.setSegment.call(this, offset + i, tempPos1, tempPos2);
     }
   }
 }
