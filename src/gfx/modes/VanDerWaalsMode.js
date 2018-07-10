@@ -1,24 +1,20 @@
-
-
-import utils from '../../utils';
 import Mode from './Mode';
 
-function VanDerWaalsMode(opts) {
-  Mode.call(this, opts);
+class VanDerWaalsMode extends Mode {
+  static id = 'VW';
+
+  constructor(opts) {
+    super(opts);
+  }
+
+  calcAtomRadius(atom) {
+    return atom.element.radius;
+  }
 }
 
-utils.deriveClass(VanDerWaalsMode, Mode, {
-  id: 'VW',
-  name: 'Van der Waals',
-  shortName: 'VDW',
-  depGroups: ['AtomsSpheres'],
-}, {
-  id: 'VW',
-});
-
-VanDerWaalsMode.prototype.calcAtomRadius = function(atom) {
-  return atom.element.radius;
-};
+VanDerWaalsMode.prototype.id = 'VW';
+VanDerWaalsMode.prototype.name = 'Van der Waals';
+VanDerWaalsMode.prototype.shortName = 'VDW';
+VanDerWaalsMode.prototype.depGroups = ['AtomsSpheres'];
 
 export default VanDerWaalsMode;
-

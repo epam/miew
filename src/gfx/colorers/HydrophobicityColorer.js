@@ -1,34 +1,30 @@
-
-
-import utils from '../../utils';
 import Colorer from './Colorer';
 
-function HydrophobicityColorer(opts) {
-  Colorer.call(this, opts);
+class HydrophobicityColorer extends Colorer {
+  static id = 'HY';
+
+  constructor(opts) {
+    super(opts);
+  }
+
+  getAtomColor(atom, complex) {
+    return this.getResidueColor(atom._residue, complex);
+  }
+
+  getResidueColor(residue, _complex) {
+    let color = this.palette.defaultResidueColor;
+    if (residue._type.hydrophobicity) {
+      //Kyte Doolitle hydro [-4.5,4.5]->[0.1]
+      const min = -4.5;
+      const max = 4.5;
+      color = this.palette.getGradientColor((residue._type.hydrophobicity - min) / (max - min), this.opts.gradient);
+    }
+    return color;
+  }
 }
 
-utils.deriveClass(HydrophobicityColorer, Colorer, {
-  id: 'HY',
-  name: 'Hydrophobicity',
-  shortName: 'Hydrophobicity',
-}, {
-  id: 'HY',
-});
-
-HydrophobicityColorer.prototype.getAtomColor = function(atom, complex) {
-  return this.getResidueColor(atom._residue, complex);
-};
-
-HydrophobicityColorer.prototype.getResidueColor = function(residue, _complex) {
-  var color = this.palette.defaultResidueColor;
-  if (residue._type.hydrophobicity) {
-    //Kyte Doolitle hydro [-4.5,4.5]->[0.1]
-    var min = -4.5;
-    var max = 4.5;
-    color = this.palette.getGradientColor((residue._type.hydrophobicity - min) / (max - min), this.opts.gradient);
-  }
-  return color;
-};
+HydrophobicityColorer.prototype.id = 'HY';
+HydrophobicityColorer.prototype.name = 'Hydrophobicity';
+HydrophobicityColorer.prototype.shortName = 'Hydrophobicity';
 
 export default HydrophobicityColorer;
-

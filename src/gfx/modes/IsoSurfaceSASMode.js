@@ -1,19 +1,15 @@
-
-
-import utils from '../../utils';
 import IsoSurfaceMode from './IsoSurfaceMode';
 
-function IsoSurfaceSASMode(opts) {
-  IsoSurfaceMode.call(this, false, opts);
+class IsoSurfaceSASMode extends IsoSurfaceMode {
+  static id = 'SA';
+
+  constructor(opts) {
+    super(false, opts);
+  }
 }
 
-utils.deriveClass(IsoSurfaceSASMode, IsoSurfaceMode, {
-  id: 'SA',
-  name: 'Solvent Accessible Surface',
-  shortName: 'SAS',
-}, {
-  id: 'SA',
-});
+IsoSurfaceSASMode.prototype.id = 'SA';
+IsoSurfaceSASMode.prototype.name = 'Solvent Accessible Surface';
+IsoSurfaceSASMode.prototype.shortName = 'SAS';
 
 export default IsoSurfaceSASMode;
-

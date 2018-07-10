@@ -1,6 +1,3 @@
-
-
-import utils from '../../utils';
 import LabeledMode from './LabeledMode';
 
 function getRenderParams() {
@@ -9,59 +6,59 @@ function getRenderParams() {
   };
 }
 
-function LinesMode(opts) {
-  LabeledMode.call(this, opts);
-  var groups = this.depGroups;
-  for (var i = 0, n = groups.length; i < n; ++i) {
-    groups[i] = [groups[i], getRenderParams];
+class LinesMode extends LabeledMode {
+  static id = 'LN';
+
+  constructor(opts) {
+    super(opts);
+    const groups = this.depGroups;
+    for (let i = 0, n = groups.length; i < n; ++i) {
+      groups[i] = [groups[i], getRenderParams];
+    }
+  }
+
+  drawMultiorderBonds() {
+    return this.opts.multibond;
+  }
+
+  calcAtomRadius() {
+    return this.opts.atom;
+  }
+
+  getAromaticOffset() {
+    return this.opts.offsarom;
+  }
+
+  getAromaticArcChunks() {
+    return this.opts.chunkarom;
+  }
+
+  showAromaticLoops() {
+    return this.opts.showarom;
+  }
+
+  /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
+
+  getLabelOpts() {
+    return {
+      fg: 'none',
+      bg: '0x202020',
+      showBg: true,
+      labels: this.settings.now.labels,
+      colors: true,
+      adjustColor: true,
+      transparent: true,
+    };
   }
 }
 
-utils.deriveClass(LinesMode, LabeledMode, {
-  id: 'LN',
-  name: 'Lines',
-  shortName: 'Lines',
-  depGroups: [
-    'ALoopsLines',
-    'BondsLines',
-    'OrphanedAtomsCrosses',
-  ],
-}, {
-  id: 'LN',
-});
-
-LinesMode.prototype.drawMultiorderBonds = function() {
-  return this.opts.multibond;
-};
-
-LinesMode.prototype.calcAtomRadius = function() {
-  return this.opts.atom;
-};
-
-LinesMode.prototype.getAromaticOffset = function() {
-  return this.opts.offsarom;
-};
-
-LinesMode.prototype.getAromaticArcChunks = function() {
-  return this.opts.chunkarom;
-};
-
-LinesMode.prototype.showAromaticLoops = function() {
-  return this.opts.showarom;
-};
-
-/** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-LinesMode.prototype.getLabelOpts = function() {
-  return {
-    fg: 'none',
-    bg: '0x202020',
-    showBg: true,
-    labels: this.settings.now.labels,
-    colors: true,
-    adjustColor: true,
-    transparent: true,
-  };
-};
+LinesMode.prototype.id = 'LN';
+LinesMode.prototype.name = 'Lines';
+LinesMode.prototype.shortName = 'Lines';
+LinesMode.prototype.depGroups = [
+  'ALoopsLines',
+  'BondsLines',
+  'OrphanedAtomsCrosses',
+];
 
 export default LinesMode;
-

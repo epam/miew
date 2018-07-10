@@ -1,34 +1,30 @@
-
-
-import utils from '../../utils';
 import SurfaceMode from './SurfaceMode';
 
-function ContactSurfaceMode(opts) {
-  SurfaceMode.call(this, opts);
+class ContactSurfaceMode extends SurfaceMode {
+  static id = 'CS';
+
+  constructor(opts) {
+    super(opts);
+  }
+
+  getSurfaceOpts() {
+    return {
+      probeRadius: this.opts.probeRadius,
+      radScale: this.opts.polyComplexity[this.settings.now.resolution],
+      scaleFactor: this.opts.polyComplexity[this.settings.now.resolution], // TODO rename all params
+      gridSpacing: 1.0 / this.opts.polyComplexity[this.settings.now.resolution], // TODO rename all params
+      isoValue: this.opts.isoValue,
+      probePositions: this.opts.probePositions,
+      zClip: this.opts.zClip,
+      visibilitySelector: this.getVisibilitySelector(),
+    };
+  }
 }
 
-utils.deriveClass(ContactSurfaceMode, SurfaceMode, {
-  id: 'CS',
-  name: 'Contact Surface',
-  shortName: 'Contact Surf',
-  isSurface: true,
-  surfaceNames: ['ContactSurfaceGeo'],
-}, {
-  id: 'CS',
-});
-
-ContactSurfaceMode.prototype.getSurfaceOpts = function() {
-  return {
-    probeRadius: this.opts.probeRadius,
-    radScale: this.opts.polyComplexity[this.settings.now.resolution],
-    scaleFactor: this.opts.polyComplexity[this.settings.now.resolution], // TODO rename all params
-    gridSpacing: 1.0 / this.opts.polyComplexity[this.settings.now.resolution], // TODO rename all params
-    isoValue: this.opts.isoValue,
-    probePositions: this.opts.probePositions,
-    zClip: this.opts.zClip,
-    visibilitySelector: this.getVisibilitySelector(),
-  };
-};
+ContactSurfaceMode.prototype.id = 'CS';
+ContactSurfaceMode.prototype.name = 'Contact Surface';
+ContactSurfaceMode.prototype.shortName = 'Contact Surf';
+ContactSurfaceMode.prototype.isSurface = true;
+ContactSurfaceMode.prototype.surfaceNames = ['ContactSurfaceGeo'];
 
 export default ContactSurfaceMode;
-

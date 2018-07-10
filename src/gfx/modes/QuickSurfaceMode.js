@@ -1,32 +1,28 @@
-
-
-import utils from '../../utils';
 import SurfaceMode from './SurfaceMode';
 
-function QuickSurfaceMode(opts) {
-  SurfaceMode.call(this, opts);
+class QuickSurfaceMode extends SurfaceMode {
+  static id = 'QS';
+
+  constructor(opts) {
+    super(opts);
+  }
+
+  getSurfaceOpts() {
+    return {
+      useBeads: false,
+      isoValue: this.opts.isoValue,
+      gaussLim: this.opts.gaussLim[this.settings.now.resolution],
+      radScale: this.opts.scale,
+      gridSpacing: this.opts.gridSpacing[this.settings.now.resolution],
+      zClip: this.opts.zClip,
+      visibilitySelector: this.getVisibilitySelector(),
+    };
+  }
 }
 
-utils.deriveClass(QuickSurfaceMode, SurfaceMode, {
-  id: 'QS',
-  name: 'Quick Surface',
-  shortName: 'Quick Surf',
-  surfaceNames: ['QuickSurfGeo'],
-}, {
-  id: 'QS',
-});
-
-QuickSurfaceMode.prototype.getSurfaceOpts = function() {
-  return {
-    useBeads: false,
-    isoValue: this.opts.isoValue,
-    gaussLim: this.opts.gaussLim[this.settings.now.resolution],
-    radScale: this.opts.scale,
-    gridSpacing: this.opts.gridSpacing[this.settings.now.resolution],
-    zClip: this.opts.zClip,
-    visibilitySelector: this.getVisibilitySelector(),
-  };
-};
+QuickSurfaceMode.prototype.id = 'QS';
+QuickSurfaceMode.prototype.name = 'Quick Surface';
+QuickSurfaceMode.prototype.shortName = 'Quick Surf';
+QuickSurfaceMode.prototype.surfaceNames = ['QuickSurfGeo'];
 
 export default QuickSurfaceMode;
-

@@ -1,8 +1,6 @@
-
-
-import utils from '../../utils';
 import Colorer from './Colorer';
 import selectors from '../../chem/selectors';
+
 
 /**
  * Create new colorer.
@@ -14,33 +12,32 @@ import selectors from '../../chem/selectors';
  * @constructor
  * @classdesc Bicolor coloring algorithm based on a selector string used as a condition.
  */
-function ConditionalColorer(opts) {
-  Colorer.call(this, opts);
-  var parsed = selectors.parse(this.opts.subset);
-  this._subsetCached = parsed.error ? selectors.none() : parsed.selector;
+class ConditionalColorer extends Colorer {
+  static id = 'CO';
+
+  constructor(opts) {
+    super(opts);
+    const parsed = selectors.parse(this.opts.subset);
+    this._subsetCached = parsed.error ? selectors.none() : parsed.selector;
+  }
+
+  getAtomColor(atom, _complex) {
+    return this._subsetCached.includesAtom(atom) ? this.opts.color : this.opts.baseColor;
+  }
+
+  getResidueColor(residue, _complex) {
+    const subset = this._subsetCached;
+    let includes = true;
+    const atoms = residue._atoms;
+    for (let i = 0, n = atoms.length; i < n; ++i) {
+      includes = includes && subset.includesAtom(atoms[i]);
+    }
+    return includes ? this.opts.color : this.opts.baseColor;
+  }
 }
 
-utils.deriveClass(ConditionalColorer, Colorer, {
-  id: 'CO',
-  name: 'Conditional',
-  shortName: 'Conditional',
-}, {
-  id: 'CO',
-});
-
-ConditionalColorer.prototype.getAtomColor = function(atom, _complex) {
-  return this._subsetCached.includesAtom(atom) ? this.opts.color : this.opts.baseColor;
-};
-
-ConditionalColorer.prototype.getResidueColor = function(residue, _complex) {
-  var subset = this._subsetCached;
-  var includes = true;
-  var atoms = residue._atoms;
-  for (var i = 0, n = atoms.length; i < n; ++i) {
-    includes = includes && subset.includesAtom(atoms[i]);
-  }
-  return includes ? this.opts.color : this.opts.baseColor;
-};
+ConditionalColorer.prototype.id = 'CO';
+ConditionalColorer.prototype.name = 'Conditional';
+ConditionalColorer.prototype.shortName = 'Conditional';
 
 export default ConditionalColorer;
-
