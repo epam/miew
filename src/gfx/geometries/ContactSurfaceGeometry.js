@@ -18,7 +18,7 @@ class ContactSurfaceGeometry extends VolumeSurfaceGeometry {
     super(spheresCount, opts);
   }
 
-  _computeSurface = function(packedArrays, box, boundaries, params) {
+  _computeSurface(packedArrays, box, boundaries, params) {
     const contactSurface = new ContactSurface(packedArrays, boundaries, params);
     contactSurface.build();
 
@@ -29,7 +29,7 @@ class ContactSurfaceGeometry extends VolumeSurfaceGeometry {
       atomWeightMap: new Volume(Float32Array, this.numVoxels, box, 1, contactSurface.weightsMap),
     };
     return surface;
-  };
+  }
 }
 
 export default ContactSurfaceGeometry;

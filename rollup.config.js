@@ -53,7 +53,7 @@ export default {
       babelrc: false,
       runtimeHelpers: true,
       presets: [['env', {modules: false}]],
-      plugins: ['external-helpers'],
+      plugins: ['external-helpers', 'transform-class-properties'],
       exclude: [
         './node_modules/**',
         './vendor/js/**',
