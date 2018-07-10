@@ -33,7 +33,7 @@ class ChunkedLinesGeometry extends LinesGeometry {
       this.boundingSphere = collisionGeo.boundingSphere;
       return;
     }
-    this.parent.computeBoundingSphere.call(this);
+    super.computeBoundingSphere.call(this);
   }
 
   computeBoundingBox() {
@@ -66,14 +66,14 @@ class ChunkedLinesGeometry extends LinesGeometry {
   setColor(chunkIdx, colorVal) {
     const chunkSize = this._chunkSize;
     for (let i = chunkIdx * chunkSize, end = i + chunkSize; i < end; ++i) {
-      this.parent.setColor.call(this, i, colorVal);
+      super.setColor.call(this, i, colorVal);
     }
   }
 
   setSegment(chunkIdx, segIdx, pos1, pos2) {
     const chunkSize = this._chunkSize;
     const idx = chunkIdx * chunkSize + segIdx;
-    this.parent.setSegment.call(this, idx, pos1, pos2);
+    super.setSegment.call(this, idx, pos1, pos2);
     if (this._collisionGeo) {
       this._collisionGeo.setItem(chunkIdx * chunkSize + segIdx, pos1, pos2, COLLISION_RAD);
     }
@@ -89,7 +89,7 @@ class ChunkedLinesGeometry extends LinesGeometry {
     const chunkSize = this._chunkSize;
     for (let i = 0, n = chunkIndices.length; i < n; ++i) {
       const left = chunkIndices[i] * chunkSize;
-      this.parent.setOpacity.call(this, left, left + chunkSize - 1, value);
+      super.setOpacity.call(this, left, left + chunkSize - 1, value);
     }
   }
 
