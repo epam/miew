@@ -17,7 +17,7 @@ class TextMesh extends THREE.Group {
 
   init() {
     const children = this.children;
-    for (let i = 0, n = children.length; i < n; ++i) {
+    for (let i = children.length - 1; i >= 0; --i) {
       this.remove(children[i]);
     }
 
