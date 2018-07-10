@@ -135,7 +135,7 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   }
 
   // main loop
-  for (var idx = firstIdx; idx <= lastIdx; ++idx) {
+  for (let idx = firstIdx; idx <= lastIdx; ++idx) {
     _addPoints(centerPoints, topPoints, arrIdx++, residues[idx]);
   }
 

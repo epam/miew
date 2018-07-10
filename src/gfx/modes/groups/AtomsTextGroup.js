@@ -49,11 +49,11 @@ const colorMappings = {
 };
 
 function propagateColor(color, rule) {
-  var result;
+  let result;
   if (colorMappings.hasOwnProperty(rule)) {
     result = utils.hexColor(colorMappings[rule](color));
   } else {
-    var val = parseInt(rule, 16);
+    const val = parseInt(rule, 16);
     if (!Number.isNaN(val) && rule.toLowerCase().startsWith('0x')) {
       result = utils.hexColor(val);
     } else {
