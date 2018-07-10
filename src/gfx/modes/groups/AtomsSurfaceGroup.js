@@ -1,10 +1,6 @@
 import AtomsSphereGroup from './AtomsSphereGroup';
 
 class AtomsSurfaceGroup extends AtomsSphereGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   _makeGeoArgs(selection, mode, _colorer, _polyComplexity) {
     const selectedAtoms = [];
     const atoms = selection.atoms;
@@ -18,4 +14,5 @@ class AtomsSurfaceGroup extends AtomsSphereGroup {
     return [n, opts];
   }
 }
+
 export default AtomsSurfaceGroup;

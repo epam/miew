@@ -4,10 +4,6 @@ import BondsGroup from './BondsGroup';
 const STEP_SIZE = 0.15;
 
 class BondsLinesGroup extends BondsGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   _build() {
     const bondsIdc = this._selection.chunks;
     const bonds = this._selection.bonds;

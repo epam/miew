@@ -7,10 +7,6 @@ function _slerp(omega, v1, v2, t) {
 }
 
 class AromaticGroup extends AtomsGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   _buildInner(radOffset, addChunk) {
     const chunksToIdx = this._selection.chunks;
 

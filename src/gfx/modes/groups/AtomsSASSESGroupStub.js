@@ -3,10 +3,6 @@
 import AtomsSphereGroup from './AtomsSphereGroup';
 
 class AtomsSASSESGroupStub extends AtomsSphereGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   _makeGeoArgs(selection, mode, colorer, _polyComplexity) {
     const selectedAtoms = [];
     const atoms = selection.atoms;

@@ -1,10 +1,6 @@
 import ChemGroup from './ChemGroup';
 
 class ResiduesGroup extends ChemGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   raycast(raycaster, intersects) {
     const residues = this._selection.residues;
     const inters = [];

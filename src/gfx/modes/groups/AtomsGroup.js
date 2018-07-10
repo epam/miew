@@ -1,10 +1,6 @@
 import ChemGroup from './ChemGroup';
 
 class AtomsGroup extends ChemGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   raycast(raycaster, intersects) {
     const atoms = this._selection.atoms;
     const inters = [];

@@ -1,10 +1,6 @@
 import ResiduesGroup from './ResiduesGroup';
 
 class NucleicItemGroup extends ResiduesGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   raycast(raycaster, intersects) {
     const residues = this._selection.residues;
     const inters = [];
