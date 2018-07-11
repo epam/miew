@@ -117,6 +117,23 @@ var materialList = [
       depthWrite: false,
       transparent: false,
     }
+  }, {
+    id: 'TN',
+    name: 'Toon',
+    shortName: 'Toon',
+    uberOptions: {
+      diffuse: neutralColor(1.0),
+      specular: neutralColor(0.0),
+      shininess: 1,
+      opacity: 1.0
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: false,
+      toonShading: true
+    }
   }
 ];
 
