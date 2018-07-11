@@ -43,6 +43,6 @@ AromaticTorusGroup.prototype.constructor = AromaticTorusGroup;
 
 AromaticTorusGroup.prototype._makeGeoArgs = function(polyComplexity) {
   return [_createShape(1.0, polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length];
-}
+};
 
 export default AromaticTorusGroup;

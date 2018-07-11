@@ -5,6 +5,7 @@ class AtomsProcessor extends RCGroup {
     super();
     const self = this;
     this._complex = complex;
+    this._mode = mode;
     const atoms = complex.getAtoms();
     const transforms = complex.getTransforms();
 

@@ -2,9 +2,9 @@ import AtomsGroup from './AtomsGroup';
 import utils from '../../../utils';
 
 function adjustColor(color) {
-  var r = (color >> 16) & 255;
-  var g = (color >> 8) & 255;
-  var b = color & 255;
+  let r = (color >> 16) & 255;
+  let g = (color >> 8) & 255;
+  let b = color & 255;
 
   if (0.2126 * r + 0.7152 * g + 0.0722 * b > 127) {
     r = r * 3 / 10;
@@ -20,9 +20,9 @@ function adjustColor(color) {
 }
 
 function inverseColor(color) {
-  var r = (color >> 16) & 255;
-  var g = (color >> 8) & 255;
-  var b = color & 255;
+  const r = (color >> 16) & 255;
+  const g = (color >> 8) & 255;
+  const b = color & 255;
 
   return ((255 - r) << 16) | ((255 - g) << 8) | (255 - b);
 }
@@ -39,7 +39,7 @@ function getAtomText(atom) {
   return atom.getVisualName();
 }
 
-var colorMappings = {
+const colorMappings = {
   none: function(c) {
     return c;
   },
@@ -48,11 +48,11 @@ var colorMappings = {
 };
 
 function propagateColor(color, rule) {
-  var result;
+  let result;
   if (colorMappings.hasOwnProperty(rule)) {
     result = utils.hexColor(colorMappings[rule](color));
   } else {
-    var val = parseInt(rule, 16);
+    const val = parseInt(rule, 16);
     if (!Number.isNaN(val) && rule.toLowerCase().startsWith('0x')) {
       result = utils.hexColor(val);
     } else {
@@ -62,7 +62,7 @@ function propagateColor(color, rule) {
   return result;
 }
 
-var templateMappings = {
+const templateMappings = {
   serial: function(a) {
     return a.getSerial();
   },
@@ -89,9 +89,9 @@ var templateMappings = {
   },
 };
 
-var parseTemplate = function(atom, str) {
+const parseTemplate = function(atom, str) {
   return str.replace(/\{\{(\s*\w+\s*)\}\}/g, function(m) {
-    var key = m.replace(/\s+/g, '');
+    let key = m.replace(/\s+/g, '');
     key = key.substring(2, key.length - 2).toLowerCase();
 
     if (templateMappings.hasOwnProperty(key)) {
@@ -103,7 +103,7 @@ var parseTemplate = function(atom, str) {
 
 class AtomsTextGroup extends AtomsGroup {
   _makeGeoArgs(_polyComplexity) {
-    const opts = mode.getLabelOpts();
+    const opts = this._mode.getLabelOpts();
     return [this._selection.chunks.length, opts];
   }
 

@@ -9,7 +9,7 @@ class AtomsSurfaceGroup extends AtomsSphereGroup {
     for (; i < n; ++i) {
       selectedAtoms[i] = atoms[chunks[i]];
     }
-    const opts = mode.getSurfaceOpts();
+    const opts = this._mode.getSurfaceOpts();
     opts.atoms = selectedAtoms;
     return [n, opts];
   }
