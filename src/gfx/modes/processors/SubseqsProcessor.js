@@ -25,7 +25,7 @@ class SubseqsProcessor extends RCGroup {
       if (chunksCount === 0) {
         return;
       }
-      var residuesGroup = new ResidueGroup(geoParams, {
+      const residuesGroup = new ResidueGroup(geoParams, {
         residues: residues,
         chunks: resIdc,
         subdivs: subDivs,

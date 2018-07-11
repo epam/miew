@@ -6,10 +6,6 @@ function getCylinderCount(bondOrder) {
 }
 
 class BondsGroup extends ChemGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   _makeGeoArgs(polyComplexity) {
     const drawMultiple = this._mode.drawMultiorderBonds();
     const showAromatic = this._mode.showAromaticLoops();
@@ -20,19 +16,6 @@ class BondsGroup extends ChemGroup {
       bondsCount += this.getBondOrder(bonds[bondsIdc[i]], drawMultiple, showAromatic);
     }
     return [bondsCount, polyComplexity];
-  }
-
-  BondsGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    const drawMultiple = mode.drawMultiorderBonds();
-    const showAromatic = mode.showAromaticLoops();
-    const bondsIdc = selection.chunks;
-    const bonds = selection.bonds;
-    let bondsCount = 1;
-    for (let i = 0, n = bondsIdc.length; i < n; ++i) {
-      bondsCount += this.getBondOrder(bonds[bondsIdc[i]], drawMultiple, showAromatic);
-    }
-    this._geoArgs = [bondsCount, polyComplexity];
-    ChemGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
   }
 
   getBondOrder(bond, drawMultiple, showAromatic) {

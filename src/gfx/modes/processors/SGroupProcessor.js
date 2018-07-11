@@ -43,13 +43,13 @@ class SGroupProcessor extends RCGroup {
   constructor(AtomsGroup, geoParams, complex, _colorer, _mode, _polyComplexity, _mask, _material) {
     super();
 
-    var markColor = 0xFFFF00;
-    var groupLetters = new RCGroup();
+    const markColor = 0xFFFF00;
+    const groupLetters = new RCGroup();
 
-    for (var i = 0; i < complex.getSGroupCount(); i++) {
-      var sGroup = complex.getSGroups()[i];
+    for (let i = 0; i < complex.getSGroupCount(); i++) {
+      const sGroup = complex.getSGroups()[i];
       if (sGroup._center !== null) {
-        var actPos = (new THREE.Vector3()).copy(sGroup._position);
+        const actPos = (new THREE.Vector3()).copy(sGroup._position);
         actPos.add(sGroup._center);
         groupLetters.add(_buildLabel2D(actPos, markColor, sGroup._name));
       } else {

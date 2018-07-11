@@ -40,57 +40,56 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
   }
 }
 
-function ResiduesSubseqGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-  ResiduesGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
+class ResiduesSubseqGroup extends ResiduesGroup {
+  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
+    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
+  }
+
+  _makeGeoArgs(polyComplexity) {
+    const cmpMultiplier = this._mode.getHeightSegmentsRatio();
+    this._segmentsHeight = polyComplexity * cmpMultiplier | 0;
+    return [_createShape(1.0, polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length * 2];
+  }
+
+  _build() {
+    const residues = this._selection.residues;
+    const parent = this._selection.parent;
+    const mode = this._mode;
+    const colorer = this._colorer;
+    const tension = mode.getTension();
+    const geo = this._geo;
+    let chunkIdx = 0;
+    const chunkIdc = [];
+    _loopThrough(this._selection.subdivs, residues, this._segmentsHeight, tension, mode, function(currRes, mtc) {
+      const color = colorer.getResidueColor(currRes, parent);
+      chunkIdc[chunkIdx] = currRes._index;
+      geo.setItem(chunkIdx, mtc);
+      geo.setColor(chunkIdx++, color);
+    });
+    this._chunksIdc = chunkIdc;
+    geo.finalize();
+  }
+
+  updateToFrame(frameData) {
+    // TODO This method looks like a copy paste. However, it
+    // was decided to postpone animation refactoring until GFX is fixed.
+    const parent = this._selection.parent;
+    const mode = this._mode;
+    const colorer = this._colorer;
+    const tension = mode.getTension();
+    const geo = this._geo;
+    const frameRes = frameData.getResidues();
+    let chunkIdx = 0;
+    const updateColor = frameData.needsColorUpdate(colorer);
+    _loopThrough(this._selection.subdivs, frameRes, this._segmentsHeight, tension, mode, function(currRes, mtc) {
+      geo.setItem(chunkIdx, mtc);
+      if (updateColor) {
+        geo.setColor(chunkIdx, colorer.getResidueColor(currRes, parent));
+      }
+      chunkIdx++;
+    });
+    geo.finalize();
+  }
 }
-
-ResiduesSubseqGroup.prototype = Object.create(ResiduesGroup.prototype);
-ResiduesSubseqGroup.prototype.constructor = ResiduesSubseqGroup;
-
-ResiduesSubseqGroup.prototype._makeGeoArgs = function(polyComplexity) {
-  const cmpMultiplier = this._mode.getHeightSegmentsRatio();
-  this._segmentsHeight = polyComplexity * cmpMultiplier | 0;
-  return [_createShape(1.0, polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length * 2];
-};
-
-ResiduesSubseqGroup.prototype._build = function() {
-  const residues = this._selection.residues;
-  const parent = this._selection.parent;
-  const mode = this._mode;
-  const colorer = this._colorer;
-  const tension = mode.getTension();
-  const geo = this._geo;
-  let chunkIdx = 0;
-  const chunkIdc = [];
-  _loopThrough(this._selection.subdivs, residues, this._segmentsHeight, tension, mode, function(currRes, mtc) {
-    const color = colorer.getResidueColor(currRes, parent);
-    chunkIdc[chunkIdx] = currRes._index;
-    geo.setItem(chunkIdx, mtc);
-    geo.setColor(chunkIdx++, color);
-  });
-  this._chunksIdc = chunkIdc;
-  geo.finalize();
-};
-
-ResiduesSubseqGroup.prototype.updateToFrame = function(frameData) {
-  // TODO This method looks like a copy paste. However, it
-  // was decided to postpone animation refactoring until GFX is fixed.
-  const parent = this._selection.parent;
-  const mode = this._mode;
-  const colorer = this._colorer;
-  const tension = mode.getTension();
-  const geo = this._geo;
-  const frameRes = frameData.getResidues();
-  let chunkIdx = 0;
-  const updateColor = frameData.needsColorUpdate(colorer);
-  _loopThrough(this._selection.subdivs, frameRes, this._segmentsHeight, tension, mode, function(currRes, mtc) {
-    geo.setItem(chunkIdx, mtc);
-    if (updateColor) {
-      geo.setColor(chunkIdx, colorer.getResidueColor(currRes, parent));
-    }
-    chunkIdx++;
-  });
-  geo.finalize();
-};
 
 export default ResiduesSubseqGroup;
