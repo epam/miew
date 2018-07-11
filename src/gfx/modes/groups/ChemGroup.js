@@ -2,7 +2,7 @@ import RCGroup from '../../RCGroup';
 import TransformGroup from '../../meshes/TransformGroup';
 
 function wrapper(Name, args) {
-  const params = [Name].concat(args);
+  var params = [Name].concat(args);
   return Name.bind.apply(Name, params);
 }
 
@@ -13,13 +13,17 @@ class ChemGroup extends RCGroup {
       throw new Error('Can not instantiate abstract class!');
     }
     this._selection = selection;
-    this._geo = new (wrapper(geoParams.Geometry, this._geoArgs))();
-    this._chunksIdc = selection.chunks;
-    this._mesh = new TransformGroup(this._geo, geoParams, material, transforms);
-    this.add(this._mesh);
     this._mode = mode;
     this._colorer = colorer;
+    this._chunksIdc = selection.chunks;
+    this._geo = new (wrapper(geoParams.Geometry, this._makeGeoArgs(polyComplexity)))();
+    this._mesh = new TransformGroup(this._geo, geoParams, material, transforms);
+    this.add(this._mesh);
     this._build();
+  }
+
+  _makeGeoArgs() {
+    throw new Error('ChemGroup subclass must override _makeGeoArgs() method');
   }
 
   /**

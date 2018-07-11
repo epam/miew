@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import RCGroup from '../../RCGroup';
 import CSS2DObject from '../../CSS2DObject';

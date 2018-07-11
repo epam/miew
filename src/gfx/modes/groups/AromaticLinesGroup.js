@@ -1,11 +1,18 @@
 import AromaticGroup from './AromaticGroup';
 
 function AromaticLinesGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
+  AromaticGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
+}
+
+AromaticLinesGroup.prototype = Object.create(AromaticGroup.prototype);
+AromaticLinesGroup.prototype.constructor = AromaticLinesGroup;
+
+AromaticLinesGroup.prototype._makeGeoArgs = function(_polyComplexity) {
   const self = this;
-  const segmentsHeight = this._segmentsHeight = mode.getAromaticArcChunks();
+  const segmentsHeight = this._segmentsHeight = this._mode.getAromaticArcChunks();
   self._build = function() {
     const geo = self._geo;
-    const radOffset = mode.getAromaticOffset();
+    const radOffset = this._mode.getAromaticOffset();
     self._buildInner(radOffset, function(chunkIdx, color, points) {
       let prevPt = points[0];//do not replace with start
       for (let j = 1; j <= segmentsHeight; ++j) {
@@ -18,11 +25,7 @@ function AromaticLinesGroup(geoParams, selection, colorer, mode, transforms, pol
     geo.finalize();
   };
 
-  this._geoArgs = [selection.chunks.length, segmentsHeight, true];
-  AromaticGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-}
-
-AromaticLinesGroup.prototype = Object.create(AromaticGroup.prototype);
-AromaticLinesGroup.prototype.constructor = AromaticLinesGroup;
+  return [this._selection.chunks.length, segmentsHeight, true];
+};
 
 export default AromaticLinesGroup;

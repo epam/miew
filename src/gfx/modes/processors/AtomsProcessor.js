@@ -1,7 +1,4 @@
-
-
 import RCGroup from '../../RCGroup';
-
 
 class AtomsProcessor extends RCGroup {
   constructor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {

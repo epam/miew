@@ -1,11 +1,10 @@
 import AtomsGroup from './AtomsGroup';
 import utils from '../../../utils';
 
-/* Functions wasn't encapsulated to the class to be visible only to this class */
 function adjustColor(color) {
-  let r = (color >> 16) & 255;
-  let g = (color >> 8) & 255;
-  let b = color & 255;
+  var r = (color >> 16) & 255;
+  var g = (color >> 8) & 255;
+  var b = color & 255;
 
   if (0.2126 * r + 0.7152 * g + 0.0722 * b > 127) {
     r = r * 3 / 10;
@@ -21,9 +20,9 @@ function adjustColor(color) {
 }
 
 function inverseColor(color) {
-  const r = (color >> 16) & 255;
-  const g = (color >> 8) & 255;
-  const b = color & 255;
+  var r = (color >> 16) & 255;
+  var g = (color >> 8) & 255;
+  var b = color & 255;
 
   return ((255 - r) << 16) | ((255 - g) << 8) | (255 - b);
 }
@@ -40,7 +39,7 @@ function getAtomText(atom) {
   return atom.getVisualName();
 }
 
-const colorMappings = {
+var colorMappings = {
   none: function(c) {
     return c;
   },
@@ -49,11 +48,11 @@ const colorMappings = {
 };
 
 function propagateColor(color, rule) {
-  let result;
+  var result;
   if (colorMappings.hasOwnProperty(rule)) {
     result = utils.hexColor(colorMappings[rule](color));
   } else {
-    const val = parseInt(rule, 16);
+    var val = parseInt(rule, 16);
     if (!Number.isNaN(val) && rule.toLowerCase().startsWith('0x')) {
       result = utils.hexColor(val);
     } else {
@@ -63,7 +62,7 @@ function propagateColor(color, rule) {
   return result;
 }
 
-const templateMappings = {
+var templateMappings = {
   serial: function(a) {
     return a.getSerial();
   },
@@ -90,9 +89,9 @@ const templateMappings = {
   },
 };
 
-const parseTemplate = function(atom, str) {
+var parseTemplate = function(atom, str) {
   return str.replace(/\{\{(\s*\w+\s*)\}\}/g, function(m) {
-    let key = m.replace(/\s+/g, '');
+    var key = m.replace(/\s+/g, '');
     key = key.substring(2, key.length - 2).toLowerCase();
 
     if (templateMappings.hasOwnProperty(key)) {
@@ -103,14 +102,9 @@ const parseTemplate = function(atom, str) {
 };
 
 class AtomsTextGroup extends AtomsGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-    this._geoArgs = this._makeGeoArgs(selection, mode, colorer, polyComplexity);
-  }
-
-  _makeGeoArgs(selection, mode, _colorer, _polyComplexity) {
+  _makeGeoArgs(_polyComplexity) {
     const opts = mode.getLabelOpts();
-    return [selection.chunks.length, opts];
+    return [this._selection.chunks.length, opts];
   }
 
   _build() {

@@ -1,5 +1,3 @@
-
-
 import ResidueProcessor from './ResiduesProcessor';
 
 class NucleicProcessor extends ResidueProcessor {

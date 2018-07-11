@@ -4,7 +4,10 @@ class NucleicCylindersGroup extends NucleicItemGroup {
   constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
     super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
     this._stickRad = mode.calcStickRadius();
-    this._geoArgs = [selection.chunks.length, polyComplexity];
+  }
+
+  _makeGeoArgs(polyComplexity) {
+    return [this._selection.chunks.length, polyComplexity];
   }
 
   _processItem(chunkIdx, cyl1, cyl2, color) {

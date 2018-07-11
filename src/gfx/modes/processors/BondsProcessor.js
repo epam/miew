@@ -1,5 +1,3 @@
-
-
 import RCGroup from '../../RCGroup';
 
 class BondsProcessor extends RCGroup {

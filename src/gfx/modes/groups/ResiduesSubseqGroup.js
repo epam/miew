@@ -41,14 +41,18 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
 }
 
 function ResiduesSubseqGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-  const cmpMultiplier = mode.getHeightSegmentsRatio();
-  this._segmentsHeight = polyComplexity * cmpMultiplier | 0;
-  this._geoArgs = [_createShape(1.0, polyComplexity), this._segmentsHeight + 1, selection.chunks.length * 2];
   ResiduesGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
 }
 
 ResiduesSubseqGroup.prototype = Object.create(ResiduesGroup.prototype);
 ResiduesSubseqGroup.prototype.constructor = ResiduesSubseqGroup;
+
+ResiduesSubseqGroup.prototype._makeGeoArgs = function(polyComplexity) {
+  const cmpMultiplier = this._mode.getHeightSegmentsRatio();
+  this._segmentsHeight = polyComplexity * cmpMultiplier | 0;
+  return [_createShape(1.0, polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length * 2];
+};
+
 ResiduesSubseqGroup.prototype._build = function() {
   const residues = this._selection.residues;
   const parent = this._selection.parent;

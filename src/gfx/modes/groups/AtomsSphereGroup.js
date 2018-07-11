@@ -1,13 +1,8 @@
 import AtomsGroup from './AtomsGroup';
 
 class AtomsSphereGroup extends AtomsGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-    this._geoArgs = this._makeGeoArgs(selection, mode, colorer, polyComplexity);
-  }
-
-  _makeGeoArgs(selection, mode, colorer, polyComplexity) {
-    return [selection.chunks.length, polyComplexity];
+  _makeGeoArgs(polyComplexity) {
+    return [this._selection.chunks.length, polyComplexity];
   }
 
   _build() {

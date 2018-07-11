@@ -1,5 +1,3 @@
-
-
 import AtomsProcessor from './AtomsProcessor';
 
 class OrphanAtomsProcessor extends AtomsProcessor {

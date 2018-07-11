@@ -1,9 +1,8 @@
 import ChemGroup from './ChemGroup';
 
 class ResiduesTraceGroup extends ChemGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-    const subDiv = selection.subdivs;
+  _makeGeoArgs(polyComplexity) {
+    const subDiv = this._selection.subdivs;
     let chunksCount = 0;
     for (let subDivI = 0, subDivN = subDiv.length; subDivI < subDivN; ++subDivI) {
       const subs = subDiv[subDivI].arr;
@@ -11,8 +10,7 @@ class ResiduesTraceGroup extends ChemGroup {
         chunksCount += subs[i].end - subs[i].start;
       }
     }
-    this._geoArgs = [chunksCount, polyComplexity];
-
+    return [chunksCount, polyComplexity];
   }
 
   _build() {
