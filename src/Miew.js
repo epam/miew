@@ -3159,14 +3159,14 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('stereo', () => {
-    if (changes.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
+    if (settings.now.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
       this.webVR = new WebVRPoC(() => {
         this._needRender = true;
         this._onResize();
       });
     }
     if (this.webVR) {
-      this.webVR.toggle(changes.stereo === 'WEBVR', this._gfx);
+      this.webVR.toggle(settings.now.stereo === 'WEBVR', this._gfx);
     }
   });
 
