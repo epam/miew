@@ -22,6 +22,7 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      toonShading: false
     }
   }, {
     id: 'SF',
@@ -38,6 +39,7 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      toonShading: false
     }
   }, {
     id: 'PL',
@@ -54,6 +56,7 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      toonShading: false
     }
   }, {
     id: 'ME',
@@ -70,6 +73,7 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      toonShading: false
     }
   }, {
     id: 'TR',
@@ -86,6 +90,7 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: true,
+      toonShading: false
     }
   }, {
     id: 'GL',
@@ -103,6 +108,7 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: true,
+      toonShading: false
     }
   }, {
     id: 'BA',
@@ -116,6 +122,24 @@ var materialList = [
       fog: false,
       depthWrite: false,
       transparent: false,
+      toonShading: false
+    }
+  }, {
+    id: 'TN',
+    name: 'Toon',
+    shortName: 'Toon',
+    uberOptions: {
+      diffuse: neutralColor(1.0),
+      specular: neutralColor(0.0),
+      shininess: 1,
+      opacity: 1.0
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: false,
+      toonShading: true
     }
   }
 ];
