@@ -32,6 +32,7 @@ import meshes from './gfx/meshes/meshes';
 import LinesObject from './gfx/objects/LinesObj';
 import UberMaterial from './gfx/shaders/UberMaterial';
 import OutlineMaterial from './gfx/shaders/OutlineMaterial';
+import OutlineDepthMaterial from './gfx/shaders/OutlineDepthMaterial';
 import FXAAMaterial from './gfx/shaders/FXAAMaterial';
 import ao from './gfx/shaders/AO';
 import AnaglyphMaterial from './gfx/shaders/AnaglyphMaterial';
@@ -1057,17 +1058,19 @@ Miew.prototype._renderScene = (function() {
     var dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     var srcBuffer = gfx.offscreenBuf;
 
-    if (bHaveComplexes && settings.now.ao) {
+    /*if (bHaveComplexes && settings.now.ao) {
       this._performAO(srcBuffer, gfx.offscreenBuf.depthTexture, dstBuffer, gfx.offscreenBuf3, gfx.offscreenBuf2);
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
-    }
+    }*/
 
     // render selected part with outline material
-    this._renderSelection(camera, srcBuffer, dstBuffer);
+    //this._renderSelection(camera, srcBuffer, dstBuffer);
+    //TRY_DEPTH
+    this._renderDepth(camera, gfx.offscreenBuf, target);
 
-    if (volume) {
+    /*if (volume) {
       // copy current picture to the buffer that retains depth-data of the original molecule render
       // so that volume renderer could use depth-test
       gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, gfx.offscreenBuf);
@@ -1091,7 +1094,7 @@ Miew.prototype._renderScene = (function() {
     if (distortion) {
       dstBuffer = target;
       this._performDistortion(srcBuffer, dstBuffer, true);
-    }
+    }*/
   };
 })();
 
@@ -1139,6 +1142,27 @@ Miew.prototype._performDistortion = (function() {
     }
   };
 }());
+
+Miew.prototype._renderDepth = (function() {
+
+  var _outlineMaterial = new OutlineDepthMaterial();
+
+  return function(camera, srcBuffer, targetBuffer) {
+
+    var self = this;
+    var gfx = self._gfx;
+
+    // clear offscreen buffer (leave z-buffer intact)
+    //gfx.renderer.setClearColor('black', 0);
+    //gfx.renderer.clearTarget(tagretBuffer, true, false, false);
+
+    // apply Sobel filter -- draw outline
+    _outlineMaterial.uniforms.srcTex.value = srcBuffer.depthTexture;
+    _outlineMaterial.uniforms.srcTexSize.value.set(srcBuffer.width, srcBuffer.height);
+    gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
+  };
+
+})();
 
 Miew.prototype._renderSelection = (function() {
 
