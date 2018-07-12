@@ -61,4 +61,3 @@ class LinesGeometry extends BaseLinesGeometry {
 }
 
 export default LinesGeometry;
-

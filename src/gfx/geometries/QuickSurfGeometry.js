@@ -1,5 +1,3 @@
-
-
 import VolumeSurfaceGeometry from './VolumeSurfaceGeometry';
 import chem from '../../chem';
 
@@ -144,4 +142,3 @@ class QuickSurfGeometry extends VolumeSurfaceGeometry {
 }
 
 export default QuickSurfGeometry;
-

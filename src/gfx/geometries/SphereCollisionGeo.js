@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 
 //////////////////////////////////////////////////////////////////////////////
@@ -15,9 +13,10 @@ class CollisionSphere {
 
   raycast(raycaster) {
 
-    CollisionSphere._sphere.set(this._position, this._radius);
+    const sphere = CollisionSphere._sphere;
+    sphere.set(this._position, this._radius);
 
-    const p = raycaster.ray.intersectSphere(CollisionSphere._sphere);
+    const p = raycaster.ray.intersectSphere(sphere);
     if (p) {
       return {
         distance: raycaster.ray.origin.distanceTo(p),

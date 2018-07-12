@@ -1,5 +1,3 @@
-
-
 import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
@@ -69,7 +67,7 @@ class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
 
   raycast(raycaster, intersects) {
     const inters = [];
-    RaycastableBufferGeometry.prototype.raycast.call(this, raycaster, inters);
+    super.raycast(raycaster, inters);
     // TODO faceIdx to chunkIdx
     const facesPerChunk = this._chunkGeo.index.count / 3;
     for (let i = 0, n = inters.length; i < n; ++i) {
@@ -141,4 +139,3 @@ class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
   }
 }
 export default ChunkedObjectsGeometry;
-

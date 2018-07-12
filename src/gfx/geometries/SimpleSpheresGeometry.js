@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 import ChunkedObjectsGeometry from './ChunkedObjectsGeometry';
@@ -42,4 +40,3 @@ class SimpleSpheresGeometry extends SphereCollisionGeo(ChunkedObjectsGeometry) {
   }
 }
 export default SimpleSpheresGeometry;
-

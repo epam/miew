@@ -1,5 +1,3 @@
-
-
 import utils from '../../utils';
 
 /**
@@ -297,4 +295,3 @@ IsoSurfaceMarchCube.prototype.striIndicesMarchCube = [
 /* eslint-enable no-magic-numbers */
 
 export default IsoSurfaceMarchCube;
-

@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import IsoSurfaceMarchCube from './IsoSurfaceMarchCube';
 import utils from '../../utils';
@@ -45,11 +43,11 @@ function _voxelGradientFast(v, point, grad) {
 // Helper class GridCell
 class GridCell {
   constructor() {
-    this._arrSize = 8;
-    this.p = new Array(this._arrSize);
-    this.g = new Array(this._arrSize);
-    this.val = new Array(this._arrSize);
-    for (let i = 0; i < this._arrSize; ++i) {
+    this.__arrSize = 8;
+    this.p = new Array(this.__arrSize);
+    this.g = new Array(this.__arrSize);
+    this.val = new Array(this.__arrSize);
+    for (let i = 0; i < this.__arrSize; ++i) {
       this.p[i] = new THREE.Vector3();
       this.g[i] = new THREE.Vector3();
     }
@@ -77,10 +75,10 @@ class Triangle {
   }
 }
 
-function createArray(arrSize) {
+function createArray(_arrSize) {
 
-  const arr = new Array(arrSize);
-  for (let i = 0; i < arrSize; ++i) {
+  const arr = new Array(_arrSize);
+  for (let i = 0; i < _arrSize; ++i) {
     arr[i] = new THREE.Vector3();
   }
 
@@ -170,51 +168,52 @@ class IsoSurface {
     normal.lerpVectors(n1, n2, mu);
   }
 
-  static triTable = IsoSurfaceMarchCube.prototype.striIndicesMarchCube;
+  static _triTable = IsoSurfaceMarchCube.prototype.striIndicesMarchCube;
 
-  static arrSize = 12;
+  static _arrSize = 12;
 
-  static firstIndices = [0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3];
+  static _firstIndices = [0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3];
 
-  static secondIndices = [1, 2, 3, 0, 5, 6, 7, 4, 4, 5, 6, 7];
+  static _secondIndices = [1, 2, 3, 0, 5, 6, 7, 4, 4, 5, 6, 7];
 
-  static vertexList = createArray(IsoSurface.arrSize);
+  static _vertexList = createArray(IsoSurface._arrSize);
 
-  static normalList = createArray(IsoSurface.arrSize);
+  static _normalList = createArray(IsoSurface._arrSize);
 
-  /*
-  let i = 0;
-  for (; i < arrSize; ++i) {
-    vertexList[i] = new THREE.Vector3();
-    normalList[i] = new THREE.Vector3();
-  }
-  */
   _polygonize(grid, isoLevel, triangles) {
     const cubeIndex = grid.cubeIndex;
     let i = 0;
-    for (; i < IsoSurface.arrSize; ++i) {
+    const arrSize = IsoSurface._arrSize;
+    const firstIndices = IsoSurface._firstIndices;
+    const secondIndices = IsoSurface._secondIndices;
+    const vertexList = IsoSurface._vertexList;
+    const normalList = IsoSurface._normalList;
+
+    for (; i < arrSize; ++i) {
       if (edgeTable[cubeIndex] & (1 << i)) {
         this._vertexInterp(
           isoLevel, grid,
-          IsoSurface.firstIndices[i],
-          IsoSurface.secondIndices[i],
-          IsoSurface.vertexList[i],
-          IsoSurface.normalList[i]
+          firstIndices[i],
+          secondIndices[i],
+          vertexList[i],
+          normalList[i]
         );
       }
     }
 
     let triCount = 0;
     const triTblIdx = cubeIndex * 16;
-    for (i = 0; IsoSurface.triTable[triTblIdx + i] !== -1; i += 3) {
-      triangles[triCount].a.p.copy(IsoSurface.vertexList[IsoSurface.triTable[triTblIdx + i]]);
-      triangles[triCount].a.n.copy(IsoSurface.normalList[IsoSurface.triTable[triTblIdx + i]]);
+    const triTable = IsoSurface._triTable;
 
-      triangles[triCount].b.p.copy(IsoSurface.vertexList[IsoSurface.triTable[triTblIdx + i + 1]]);
-      triangles[triCount].b.n.copy(IsoSurface.normalList[IsoSurface.triTable[triTblIdx + i + 1]]);
+    for (i = 0; triTable[triTblIdx + i] !== -1; i += 3) {
+      triangles[triCount].a.p.copy(vertexList[triTable[triTblIdx + i]]);
+      triangles[triCount].a.n.copy(normalList[triTable[triTblIdx + i]]);
 
-      triangles[triCount].c.p.copy(IsoSurface.vertexList[IsoSurface.triTable[triTblIdx + i + 2]]);
-      triangles[triCount].c.n.copy(IsoSurface.normalList[IsoSurface.triTable[triTblIdx + i + 2]]);
+      triangles[triCount].b.p.copy(vertexList[triTable[triTblIdx + i + 1]]);
+      triangles[triCount].b.n.copy(normalList[triTable[triTblIdx + i + 1]]);
+
+      triangles[triCount].c.p.copy(vertexList[triTable[triTblIdx + i + 2]]);
+      triangles[triCount].c.n.copy(normalList[triTable[triTblIdx + i + 2]]);
       ++triCount;
     }
 
@@ -623,4 +622,3 @@ class IsoSurface {
   }
 }
 export default IsoSurface;
-

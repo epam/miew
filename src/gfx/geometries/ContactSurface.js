@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 
@@ -632,4 +630,3 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
 }
 export default ContactSurface;
-

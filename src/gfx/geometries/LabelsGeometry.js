@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import EventDispatcher from '../../utils/EventDispatcher';
 
@@ -115,4 +113,3 @@ class LabelsGeometry extends EventDispatcher {
 }
 
 export default LabelsGeometry;
-

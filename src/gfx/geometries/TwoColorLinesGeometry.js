@@ -21,14 +21,14 @@ class TwoColorLinesGeometry extends LinesGeometry {
     this._collisionGeo.setItem(itemIdx, botPos, topPos, COLLISION_RAD);
     const offset = 2 * itemIdx;// there are two points per segment
     tmpVector.lerpVectors(botPos, topPos, 0.5);
-    super.setSegment.call(this, offset, botPos, tmpVector);
-    super.setSegment.call(this, offset + 1, tmpVector, topPos);
+    super.setSegment(offset, botPos, tmpVector);
+    super.setSegment(offset + 1, tmpVector, topPos);
   }
 
   setColor(itemIdx, colorVal1, colorVal2) {
     const offset = 2 * itemIdx;// there are two points per segment
-    super.setColor.call(this, offset, colorVal1);
-    super.setColor.call(this, offset + 1, colorVal2);
+    super.setColor(offset, colorVal1);
+    super.setColor(offset + 1, colorVal2);
   }
 
   raycast(raycaster, intersects) {
@@ -60,4 +60,3 @@ class TwoColorLinesGeometry extends LinesGeometry {
 //(???)parent = LinesGeometry.prototype;
 
 export default TwoColorLinesGeometry;
-

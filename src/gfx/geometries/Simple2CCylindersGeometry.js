@@ -1,12 +1,9 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 import gfxutils from '../gfxutils';
 import ChunkedObjectsGeometry from './ChunkedObjectsGeometry';
 
 const VEC_SIZE = 3;
-const parentSetColor = ChunkedObjectsGeometry.prototype.setColor;
 const centerPos = new THREE.Vector3();
 const tmpVector = new THREE.Vector3();
 const normMtx = new THREE.Matrix3();
@@ -37,9 +34,8 @@ class Simple2CCylindersGeometry extends ChunkedObjectsGeometry {
     const mtx1 = gfxutils.calcCylinderMatrix(botPos, centerPos, itemRad);
     normMtx.getNormalMatrix(mtx1);
 
-    let i = 0;
     let idx;
-    for (; i < chunkSize; ++i) {
+    for (let i = 0; i < chunkSize; ++i) {
       idx = i * VEC_SIZE;
       tmpVector.fromArray(geoPos, idx);
       tmpVector.applyMatrix4(mtx1);
@@ -49,7 +45,7 @@ class Simple2CCylindersGeometry extends ChunkedObjectsGeometry {
 
     // now shift center to get another part of the cylinder
     centerPos.sub(botPos);
-    for (i = 0; i < chunkSize; ++i) {
+    for (let i = 0; i < chunkSize; ++i) {
       idx = i * VEC_SIZE;
       tmpArray[idx] += centerPos.x;
       tmpArray[idx + 1] += centerPos.y;
@@ -57,7 +53,7 @@ class Simple2CCylindersGeometry extends ChunkedObjectsGeometry {
     }
     this._positions.set(tmpArray, secondOffset);
 
-    for (i = 0; i < chunkSize; ++i) {
+    for (let i = 0; i < chunkSize; ++i) {
       idx = i * VEC_SIZE;
       tmpVector.fromArray(geoNorm, idx);
       tmpVector.applyMatrix3(normMtx);
@@ -70,13 +66,12 @@ class Simple2CCylindersGeometry extends ChunkedObjectsGeometry {
 
   setColor(itemIdx, colorVal1, colorVal2) {
     const first = 2 * itemIdx;
-    parentSetColor.call(this, first, colorVal1);
+    super.setColor(first, colorVal1);
 
     const second = first + 1;
-    parentSetColor.call(this, second, colorVal2);
+    super.setColor(second, colorVal2);
   }
 
 }
 
 export default Simple2CCylindersGeometry;
-

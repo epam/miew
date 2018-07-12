@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 
@@ -172,4 +170,3 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
 }
 
 export default CylinderBufferGeometry;
-

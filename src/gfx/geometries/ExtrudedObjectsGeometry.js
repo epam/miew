@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 import ChunkedObjectsGeometry from './ChunkedObjectsGeometry';
@@ -72,12 +70,11 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
     for (let i = 0, n = matrices.length; i < n; ++i) {
       const mtx = matrices[i];
 
-      let j = 0;
-      for (; j < ptsCount; ++j) {
+      for (let j = 0; j < ptsCount; ++j) {
         tmpShape[j].copy(shape[j]).applyMatrix4(mtx);
       }
 
-      for (j = 0; j < ptsCount; ++j) {
+      for (let j = 0; j < ptsCount; ++j) {
         const point = tmpShape[j];
         const nextPt = tmpShape[(j + 1) % ptsCount];
         const prevPt = tmpShape[(j + ptsCount - 1) % ptsCount];
@@ -102,4 +99,3 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
 }
 
 export default ExtrudedObjectsGeometry;
-

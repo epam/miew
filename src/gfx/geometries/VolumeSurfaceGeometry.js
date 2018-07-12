@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import IsoSurfaceGeometry from './IsoSurfaceGeometry';
 import IsoSurface from './IsoSurface';
@@ -122,4 +120,3 @@ class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
 }
 
 export default VolumeSurfaceGeometry;
-

@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import IsoSurfaceGeometry from './IsoSurfaceGeometry';
 import IsoSurfaceAtomColored from './IsoSurfaceAtomColored';
@@ -43,8 +41,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     }
     const indices = utils.allocateTyped(Uint32Array, (1 + 2) * geoOut._numTriangles);
 
-    let i, j = 0;
-    for (i = 0; i < geoOut._numVertices; i++) {
+    for (let i = 0, j = 0; i < geoOut._numVertices; i++) {
       positions[j + 0] = (geoOut._vertices[i].x);
       positions[j + 1] = (geoOut._vertices[i].y);
       positions[j + 2] = (geoOut._vertices[i].z);
@@ -54,7 +51,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       j += 3;
     }
     if (colors !== null) {
-      for (i = 0, j = 0; i < geoOut._numVertices; i++, j += 3) {
+      for (let i = 0, j = 0; i < geoOut._numVertices; i++, j += 3) {
         colors[j + 0] = geoOut._colors[i].x;
         colors[j + 1] = geoOut._colors[i].y;
         colors[j + 2] = geoOut._colors[i].z;
@@ -62,7 +59,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     }
 
     const numTri3 = geoOut._numTriangles * (1 + 2);
-    for (i = 0; i < numTri3; i++) {
+    for (let i = 0; i < numTri3; i++) {
       indices[i] = geoOut._indices[i];
     }
 
@@ -271,7 +268,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
    * @returns {number} 0, if success (<0) is error
    */
   buildGeoFromCorners(meshRes, vBoxMin, vBoxMax, corners, vCellStep, cube) {
-    let i, j;
     const arrSize = 12;
     const cNumVerts = 8;
     const numCells = meshRes - 1;
@@ -280,11 +276,11 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     //side3 = meshRes * meshRes * meshRes;
 
     const vaEdges = new Array(arrSize);
-    for (i = 0; i < arrSize; i++) {
+    for (let i = 0; i < arrSize; i++) {
       vaEdges[i] = new THREE.Vector3();
     }
     const sign = [];
-    for (i = 0; i < cNumVerts; i++) {
+    for (let i = 0; i < cNumVerts; i++) {
       sign[i] = 1.0;
     }
     // const numCellsIntersected   = 0;
@@ -306,7 +302,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
           this.getCornerCoord(vBoxMin, vBoxMax, x, y, z, meshRes, vCorner);
 
           const indPointValues = indCell * (2 << (2 + 2));
-          for (i = 0, j = 0; i < cNumVerts; i++) {
+          for (let i = 0, j = 0; i < cNumVerts; i++) {
             cube.pointsValuesLinear[indPointValues + j] = vCorner.x; j++;
             cube.pointsValuesLinear[indPointValues + j] = vCorner.y; j++;
             cube.pointsValuesLinear[indPointValues + j] = vCorner.z; j++;
@@ -342,7 +338,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
           // now current cell has intersections (from -x to +x) on some cube edges
           const indValues = indPointValues + 24;
-          for (i = 0; i < cNumVerts; ++i) {
+          for (let i = 0; i < cNumVerts; ++i) {
             sign[i] = (cube.pointsValuesLinear[indValues + i] < 0.0) ? 1 : 0;
           }
 
@@ -548,13 +544,12 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
    * @returns {number} 0, if success. (<0) is non memory
    */
   createVertexHash(maxNumVertices, maxNumTriangles) {
-    let i, j;
 
     this.hashLines = utils.allocateTyped(Int32Array, HASH_SIZE * 2);
     if (this.hashLines === null) {
       return 0 - 1;
     }
-    for (i = 0, j = 0; i < HASH_SIZE; i++) {
+    for (let i = 0, j = 0; i < HASH_SIZE; i++) {
       this.hashLines[j++] = 0;    // num vertices in this hash line
       this.hashLines[j++] = 0 - 1;    // index of the first entry
     }
@@ -567,7 +562,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     if (this.hashEntries === null) {
       return 0 - 1;
     }
-    for (i = 0, j = 0; i < this.numHashEtriesAllocated; i++) {
+    for (let i = 0, j = 0; i < this.numHashEtriesAllocated; i++) {
       this.hashEntries[j++] = 0 - 1;   // index of vertex
       this.hashEntries[j++] = 0 - 1;   // next hash entry index
     }
@@ -942,4 +937,3 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 // All code below must be erased from every device and each developer's memory
 
 export default SSIsosurfaceGeometry;
-

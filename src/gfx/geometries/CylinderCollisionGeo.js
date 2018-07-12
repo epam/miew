@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 import gfxutils from '../gfxutils';
@@ -30,9 +28,8 @@ class CylinderCollisionGeo extends ChunkedObjectsGeometry {
 
     const mtx1 = gfxutils.calcCylinderMatrix(botPos, topPos, itemRad);
     normMtx.getNormalMatrix(mtx1);
-    let i = 0;
     let idx;
-    for (; i < chunkSize; ++i) {
+    for (let i = 0; i < chunkSize; ++i) {
       idx = i * VEC_SIZE;
       tmpVector.fromArray(geoPos, idx);
       tmpVector.applyMatrix4(mtx1);
@@ -40,7 +37,7 @@ class CylinderCollisionGeo extends ChunkedObjectsGeometry {
     }
     this._positions.set(tmpArray, itemOffset);
 
-    for (i = 0; i < chunkSize; ++i) {
+    for (let i = 0; i < chunkSize; ++i) {
       idx = i * VEC_SIZE;
       tmpVector.fromArray(geoNorm, idx);
       tmpVector.applyMatrix3(normMtx);
@@ -50,4 +47,3 @@ class CylinderCollisionGeo extends ChunkedObjectsGeometry {
   }
 }
 export default CylinderCollisionGeo;
-

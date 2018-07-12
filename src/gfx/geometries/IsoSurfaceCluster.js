@@ -1,5 +1,3 @@
-
-
 // suppress some JSHint warnings
 /*jshint bitwise: false*/
 
@@ -32,7 +30,7 @@ class IsoSurfaceCluster {
 
   buildSimple(complex, colorer) {
     const atomsClustered = [];
-    let i, j, indVoxel, indAtomRef;
+    let indVoxel, indAtomRef;
     let atom;
     let vColorX = 0, vColorY = 0, vColorZ = 0;
     let ind = 0;
@@ -51,19 +49,19 @@ class IsoSurfaceCluster {
     this.voxels = utils.allocateTyped(Int32Array, n3);
 
     // init atoms list
-    for (i = 0, j = 0; i < numAtoms; i++, j += 2) {
+    for (let i = 0, j = 0; i < numAtoms; i++, j += 2) {
       this.voxelsRefs[j + 0] = i;
       this.voxelsRefs[j + 1] = 0 - 1;
     }
     // init voxel references (-1 means no atom)
-    for (i = 0; i < n3; i++) {
+    for (let i = 0; i < n3; i++) {
       this.voxels[i] = -1;
     }
     // build atom list for each voxel
     const xScale = 1.0 / (this.vBoxMax.x - this.vBoxMin.x);
     const yScale = 1.0 / (this.vBoxMax.y - this.vBoxMin.y);
     const zScale = 1.0 / (this.vBoxMax.z - this.vBoxMin.z);
-    for (i = 0; i < numAtoms; i++) {
+    for (let i = 0; i < numAtoms; i++) {
       const v = this.atoms[i].coord;
       const xVox = Math.floor((v.x - this.vBoxMin.x) * numVoxels * xScale);
       const yVox = Math.floor((v.y - this.vBoxMin.y) * numVoxels * yScale);
@@ -122,7 +120,7 @@ class IsoSurfaceCluster {
           vCenterZ *= (1.0 / numAtomsInVoxel);
 
           // find best color (most of in histogram)
-          for (i = 0; i < cNumNeighbours; i++) {
+          for (let i = 0; i < cNumNeighbours; i++) {
             histTypes[i] = 0;
           }
 
@@ -148,7 +146,7 @@ class IsoSurfaceCluster {
           }
           // find maximum in histogram => this is most prevalent atom type in cluster
           let indMax = 0;
-          for (i = 1; i < cNumNeighbours; i++) {
+          for (let i = 1; i < cNumNeighbours; i++) {
             if (histTypes[i] > histTypes[indMax]) {
               indMax = i;
             }
@@ -228,4 +226,3 @@ IsoSurfaceCluster.prototype.chainColors = [
 ];
 /* eslint-enable no-magic-numbers */
 export default IsoSurfaceCluster;
-

@@ -38,4 +38,3 @@ class CrossGeometry extends SphereCollisionGeo(ChunkedLinesGeometry) {
   }
 }
 export default CrossGeometry;
-

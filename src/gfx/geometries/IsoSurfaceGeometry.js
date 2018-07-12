@@ -22,7 +22,7 @@ class IsoSurfaceGeometry extends RaycastableBufferGeometry {
     this._colors = utils.allocateTyped(Float32Array, spheresCount * COLOR_SIZE);
   }
 
-  setItem = function(chunkIdx, pos, radius) {
+  setItem(chunkIdx, pos, radius) {
     const posRad = this._posRad;
     let idx = POS_RAD_SIZE * chunkIdx;
     posRad[idx++] = pos.x;
@@ -31,7 +31,7 @@ class IsoSurfaceGeometry extends RaycastableBufferGeometry {
     posRad[idx] = radius;
   }
 
-  setColor = function(chunkIdx, colorVal) {
+  setColor(chunkIdx, colorVal) {
     tmpColor.set(colorVal);
     const colors = this._colors;
     let idx = COLOR_SIZE * chunkIdx;
@@ -40,26 +40,25 @@ class IsoSurfaceGeometry extends RaycastableBufferGeometry {
     colors[idx] = tmpColor.b;
   }
 
-  finalize = function() {
+  finalize() {
     this.finishUpdate();
     // TODO compute bounding box?
     this.computeBoundingSphere();
-  };
+  }
 
-  finishUpdate = function() {
+  finishUpdate() {
     this._build();
   }
 
-  setOpacity = function() {
+  setOpacity() {
     // not implemented
   }
 
-  raycast = function() {
+  raycast() {
   }
 
-  getSubset = function() {
+  getSubset() {
     return [];
   }
 }
 export default IsoSurfaceGeometry;
-

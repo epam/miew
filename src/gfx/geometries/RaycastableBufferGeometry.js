@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 
 /**
@@ -15,31 +13,32 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
 
   // This method was copied from three.js
 
-  static vA = new THREE.Vector3();
+  static _vA = new THREE.Vector3();
 
-  static vB = new THREE.Vector3();
+  static _vB = new THREE.Vector3();
 
-  static vC = new THREE.Vector3();
-
-
-  static uvA = new THREE.Vector2();
-
-  static uvB = new THREE.Vector2();
-
-  static uvC = new THREE.Vector2();
+  static _vC = new THREE.Vector3();
 
 
-  static barycoord = new THREE.Vector3();
+  static _uvA = new THREE.Vector2();
+
+  static _uvB = new THREE.Vector2();
+
+  static _uvC = new THREE.Vector2();
 
 
-  static intersectionPoint = new THREE.Vector3();
+  static _barycoord = new THREE.Vector3();
+
+
+  static _intersectionPoint = new THREE.Vector3();
 
   uvIntersection(point, p1, p2, p3, uv1, uv2, uv3) {
-    THREE.Triangle.barycoordFromPoint(point, p1, p2, p3, RaycastableBufferGeometry.barycoord);
+    const barycoord = RaycastableBufferGeometry._barycoord;
+    THREE.Triangle.barycoordFromPoint(point, p1, p2, p3, barycoord);
 
-    uv1.multiplyScalar(RaycastableBufferGeometry.barycoord.x);
-    uv2.multiplyScalar(RaycastableBufferGeometry.barycoord.y);
-    uv3.multiplyScalar(RaycastableBufferGeometry.barycoord.z);
+    uv1.multiplyScalar(barycoord.x);
+    uv2.multiplyScalar(barycoord.y);
+    uv3.multiplyScalar(barycoord.z);
 
     uv1.add(uv2).add(uv3);
     return uv1.clone();
@@ -59,39 +58,33 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
   }
 
   checkBufferGeometryIntersection(object, raycaster, ray, position, uv, a, b, c) {
-    RaycastableBufferGeometry.vA.fromBufferAttribute(position, a);
-    RaycastableBufferGeometry.vB.fromBufferAttribute(position, b);
-    RaycastableBufferGeometry.vC.fromBufferAttribute(position, c);
+    const vA = RaycastableBufferGeometry._vA;
+    const vB = RaycastableBufferGeometry._vB;
+    const vC = RaycastableBufferGeometry._vC;
+    const intersectionPoint = RaycastableBufferGeometry._intersectionPoint;
+
+    vA.fromBufferAttribute(position, a);
+    vB.fromBufferAttribute(position, b);
+    vC.fromBufferAttribute(position, c);
 
     const intersection = this.checkIntersection(
-      object, raycaster, ray,
-      RaycastableBufferGeometry.vA,
-      RaycastableBufferGeometry.vB,
-      RaycastableBufferGeometry.vC,
-      RaycastableBufferGeometry.intersectionPoint
+      object, raycaster, ray, vA, vB, vC, intersectionPoint
     );
     if (intersection) {
       if (uv) {
-        RaycastableBufferGeometry.uvA.fromBufferAttribute(uv, a);
-        RaycastableBufferGeometry.uvB.fromBufferAttribute(uv, b);
-        RaycastableBufferGeometry.uvC.fromBufferAttribute(uv, c);
+        const uvA = RaycastableBufferGeometry._uvA;
+        const uvB = RaycastableBufferGeometry._uvB;
+        const uvC = RaycastableBufferGeometry._uvC;
+
+        uvA.fromBufferAttribute(uv, a);
+        uvB.fromBufferAttribute(uv, b);
+        uvC.fromBufferAttribute(uv, c);
         intersection.uv = this.uvIntersection(
-          RaycastableBufferGeometry.intersectionPoint,
-          RaycastableBufferGeometry.vA,
-          RaycastableBufferGeometry.vB,
-          RaycastableBufferGeometry.vC,
-          RaycastableBufferGeometry.uvA,
-          RaycastableBufferGeometry.uvB,
-          RaycastableBufferGeometry.uvC
+          intersectionPoint, vA, vB, vC, uvA, uvB, uvC
         );
       }
       const normal = new THREE.Vector3();
-      THREE.Triangle.getNormal(
-        RaycastableBufferGeometry.vA,
-        RaycastableBufferGeometry.vB,
-        RaycastableBufferGeometry.vC,
-        normal
-      );
+      THREE.Triangle.getNormal(vA, vB, vC, normal);
       intersection.face = new THREE.Face3(a, b, c, normal);
       intersection.faceIndex = a;
     }
@@ -119,13 +112,12 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
     const index = this.index;
     const position = this.attributes.position;
     const uv = this.attributes.uv;
-    let i, l;
 
     if (index === null) {
       return;
     }
     // indexed buffer geometry
-    for (i = 0, l = index.count; i < l; i += 3) {
+    for (let i = 0, l = index.count; i < l; i += 3) {
       a = index.getX(i);
       b = index.getX(i + 1);
       c = index.getX(i + 2);
@@ -141,4 +133,3 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
 }
 
 export default RaycastableBufferGeometry;
-

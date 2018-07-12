@@ -1,5 +1,3 @@
-
-
 import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
@@ -113,4 +111,3 @@ class ThinLinesGeometry extends THREE.BufferGeometry {
 }
 
 export default ThinLinesGeometry;
-

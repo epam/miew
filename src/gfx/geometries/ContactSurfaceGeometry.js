@@ -1,5 +1,3 @@
-
-
 import VolumeSurfaceGeometry from './VolumeSurfaceGeometry';
 import ContactSurface from './ContactSurface';
 import chem from '../../chem';
@@ -33,4 +31,3 @@ class ContactSurfaceGeometry extends VolumeSurfaceGeometry {
 }
 
 export default ContactSurfaceGeometry;
-

@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 
 /**
@@ -21,4 +19,3 @@ class IsoSurfaceAtomColored {
   }
 }
 export default IsoSurfaceAtomColored;
-

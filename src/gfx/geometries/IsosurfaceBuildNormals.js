@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 
@@ -363,4 +361,3 @@ class IsosurfaceBuildNormals {
   }
 }
 export default IsosurfaceBuildNormals;
-

@@ -1,5 +1,3 @@
-
-
 import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
@@ -211,4 +209,3 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
 }
 
 export default Instanced2CCylindersGeometry;
-

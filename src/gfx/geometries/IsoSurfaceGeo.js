@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 
 /**
@@ -46,4 +44,3 @@ class IsoSurfaceGeo {
   }
 }
 export default IsoSurfaceGeo;
-
