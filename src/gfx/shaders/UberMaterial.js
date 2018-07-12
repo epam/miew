@@ -88,6 +88,8 @@ function UberMaterial(params) {
   this.thickLine = false;
   // makes fog begin transparency (required for transparent background)
   this.fogTransparent = false;
+  // used to render surface normals
+  this.normalFromPos = false;
 
   // uber options of "root" materials are inherited from single uber-options object that resides in prototype
   this.uberOptions = Object.create(UberMaterial.prototype.uberOptions);
@@ -149,6 +151,7 @@ UberMaterial.prototype.uberOptions = {
     this.projMatrixInv = source.projMatrixInv;
     this.viewport = source.viewport;
     this.lineWidth = source.lineWidth; // used for thick lines only
+
   }
 };
 
@@ -173,6 +176,7 @@ UberMaterial.prototype.copy = function(source) {
   this.dashedLine = source.dashedLine;
   this.thickLine = source.thickLine;
   this.fogTransparent = source.fogTransparent;
+  this.normalFromPos = source.normalFromPos;
 
   this.uberOptions.copy(source.uberOptions);
 
@@ -198,6 +202,8 @@ UberMaterial.prototype.setValues = function(values) {
 
   var defines = {};
   var extensions = {};
+
+  //this.normalFromPos = true;
 
   if (this.fog) {
     defines.USE_FOG = 1;
@@ -254,6 +260,9 @@ UberMaterial.prototype.setValues = function(values) {
   }
   if (this.fogTransparent) {
     defines.FOG_TRANSPARENT = 1;
+  }
+  if (this.normalFromPos) {
+    defines.NORMAL_FROM_POS = 1;
   }
   // set dependent values
   this.defines = defines;

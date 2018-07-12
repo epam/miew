@@ -26,6 +26,10 @@ uniform float opacity;
 uniform float zClipValue;
 uniform float clipPlaneValue;
 
+varying vec3 viewNormal;
+
+//varying vec3 normalExt; // it is test. normal from uber_vert
+
 #define PI 3.14159265359
 #define RECIPROCAL_PI 0.31830988618
 #define saturate(a) clamp( a, 0.0, 1.0 )
@@ -401,6 +405,13 @@ void main() {
 
   diffuseColor.rgb *= vertexColor;
 
+#ifdef NORMAL_FROM_POS
+  // [-1, 1] -> [0, 1]
+  vec3 viewNormaInColor = 0.5*viewNormal+0.5;
+  gl_FragColor = vec4(viewNormaInColor, 1.0);
+  return;
+#endif
+
 #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
   GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
   BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
@@ -415,7 +426,7 @@ void main() {
   #ifdef OVERRIDE_COLOR
     gl_FragColor = vec4(fixedColor, diffuseColor.a);
   #else
-    gl_FragColor = vec4(outgoingLight, diffuseColor.a);
+    gl_FragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);
   #endif
 
   #ifdef USE_FOG
@@ -426,6 +437,7 @@ void main() {
       gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
     #endif
   #endif
+
 #endif
 
 #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)

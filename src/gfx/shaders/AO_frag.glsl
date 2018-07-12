@@ -5,6 +5,7 @@ uniform sampler2D noiseTexture;
 uniform vec2      noiseTexelSize;
 uniform sampler2D diffuseTexture;
 uniform sampler2D depthTexture;
+uniform sampler2D normalsTexture;
 uniform vec2      srcTexelSize;
 uniform vec2      camNearFar;
 uniform mat4      projMatrix;
@@ -67,8 +68,11 @@ void main() {
   vec3 viewPos = ViewPosFromDepth(vUv);
   // remap coordinates to prevent noise exture rescale
   vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;
-  // restore normal from depth buffer
-  vec3 normal = RestoreNormalFromDepth(vUv, viewPos);
+  //[0, 1] -> [-1, 1]
+  vec3 normal = (texture2D(normalsTexture, vUv).rgb * 2.0 - 1.0);
+  gl_FragColor = vec4(normal, 1.0);
+  return;
+  //vec3 normal = RestoreNormalFromDepth(vUv, viewPos);
   // get random vector for sampling sphere rotation
   vec3 randN = texture2D(noiseTexture, vUvNoise).rgb * 2.0 - 1.0;
   randN = normalize(randN);

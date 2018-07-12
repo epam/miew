@@ -3,8 +3,8 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import vertexScreenQuadShader from './ScreenQuad_vert.glsl';
-import fragmentSSAOShader from './AO_frag.glsl';
+import vertexScreenQuadShader from './ScreenQuad_vert.glsl';                     //
+import fragmentSSAOShader from './AO_frag.glsl';                                 //
 import fragmentHorBilateralBlur5Shader from './AOHBlur_frag.glsl';
 import fragmentVertBilateralBlur5Shader from './AOVBlur_frag.glsl';
 var SSAOUniforms = THREE.UniformsUtils.merge([
@@ -12,6 +12,7 @@ var SSAOUniforms = THREE.UniformsUtils.merge([
     noiseTexture:   {type: 't', value: null},
     noiseTexelSize: {type: 'v2', value: new THREE.Vector2(1.0 / 512.0, 1.0 / 512.0)}, // FIXME calc uvs in vshader
     diffuseTexture: {type: 't', value: null},
+    normalsTexture: {type: 't', value: null},
     depthTexture:   {type: 't', value: null},
     srcTexelSize:   {type: 'v2', value: new THREE.Vector2(1.0 / 512.0, 1.0 / 512.0)},
     camNearFar:     {type: 'v2', value: new THREE.Vector2(1.0, 10.0)},

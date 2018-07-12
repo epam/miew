@@ -1,9 +1,11 @@
 float INSTANCED_SPRITE_OVERSCALE = 1.3;
 
 attribute vec3 normal;
+varying vec3 viewNormal; //test stuff/ normal for uberFrag
 #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
   varying vec3 vNormal;
 #endif
+
 
 #ifdef THICK_LINE
   attribute vec4 position; // W contains vert pos or neg offset
@@ -115,6 +117,8 @@ void main() {
   vNormal = normalize(transformedNormal);
 #endif
 
+viewNormal = normalize(mat3(modelViewMatrix) * objectNormal);
+//normalExt = vNormal;
   vec4 localPos = vec4(position.xyz, 1.0);
   vec4 worldPos = modelMatrix * localPos;
   vec4 mvPosition = modelViewMatrix * localPos;
