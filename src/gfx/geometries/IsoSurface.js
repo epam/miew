@@ -43,11 +43,11 @@ function _voxelGradientFast(v, point, grad) {
 // Helper class GridCell
 class GridCell {
   constructor() {
-    this.__arrSize = 8;
-    this.p = new Array(this.__arrSize);
-    this.g = new Array(this.__arrSize);
-    this.val = new Array(this.__arrSize);
-    for (let i = 0; i < this.__arrSize; ++i) {
+    this._arrSize = 8;
+    this.p = new Array(this._arrSize);
+    this.g = new Array(this._arrSize);
+    this.val = new Array(this._arrSize);
+    for (let i = 0; i < this._arrSize; ++i) {
       this.p[i] = new THREE.Vector3();
       this.g[i] = new THREE.Vector3();
     }
@@ -75,10 +75,10 @@ class Triangle {
   }
 }
 
-function createArray(_arrSize) {
+function createArray(arrSize) {
 
-  const arr = new Array(_arrSize);
-  for (let i = 0; i < _arrSize; ++i) {
+  const arr = new Array(arrSize);
+  for (let i = 0; i < arrSize; ++i) {
     arr[i] = new THREE.Vector3();
   }
 
