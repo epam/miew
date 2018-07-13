@@ -45,10 +45,10 @@ class ResiduesSubseqGroup extends ResiduesGroup {
     super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
   }
 
-  _makeGeoArgs(polyComplexity) {
+  _makeGeoArgs() {
     const cmpMultiplier = this._mode.getHeightSegmentsRatio();
-    this._segmentsHeight = polyComplexity * cmpMultiplier | 0;
-    return [_createShape(1.0, polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length * 2];
+    this._segmentsHeight = this._polyComplexity * cmpMultiplier | 0;
+    return [_createShape(1.0, this._polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length * 2];
   }
 
   _build() {

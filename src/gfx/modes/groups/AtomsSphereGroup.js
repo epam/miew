@@ -1,8 +1,8 @@
 import AtomsGroup from './AtomsGroup';
 
 class AtomsSphereGroup extends AtomsGroup {
-  _makeGeoArgs(polyComplexity) {
-    return [this._selection.chunks.length, polyComplexity];
+  _makeGeoArgs() {
+    return [this._selection.chunks.length, this._polyComplexity];
   }
 
   _build() {

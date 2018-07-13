@@ -3,7 +3,7 @@
 import AtomsSphereGroup from './AtomsSphereGroup';
 
 class AtomsSASSESGroupStub extends AtomsSphereGroup {
-  _makeGeoArgs(selection, mode, colorer, _polyComplexity) {
+  _makeGeoArgs() {
     const selectedAtoms = [];
     const atoms = this._selection.atoms;
     const chunks = this._selection.chunks;
@@ -13,8 +13,8 @@ class AtomsSASSESGroupStub extends AtomsSphereGroup {
     }
     const opts = this._mode.getSurfaceOpts();
     opts.atoms = selectedAtoms;
-    opts.selection = selection;
-    opts.colorMode = colorer;
+    opts.selection = this._selection;
+    opts.colorMode = this._colorer;
     return [n, opts];
   }
 }

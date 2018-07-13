@@ -102,7 +102,7 @@ const parseTemplate = function(atom, str) {
 };
 
 class AtomsTextGroup extends AtomsGroup {
-  _makeGeoArgs(_polyComplexity) {
+  _makeGeoArgs() {
     const opts = this._mode.getLabelOpts();
     return [this._selection.chunks.length, opts];
   }

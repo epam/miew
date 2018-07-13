@@ -1,7 +1,7 @@
 import AtomsSphereGroup from './AtomsSphereGroup';
 
 class AtomsSurfaceGroup extends AtomsSphereGroup {
-  _makeGeoArgs(_polyComplexity) {
+  _makeGeoArgs() {
     const selectedAtoms = [];
     const atoms = this._selection.atoms;
     const chunks = this._selection.chunks;

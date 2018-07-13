@@ -16,7 +16,8 @@ class ChemGroup extends RCGroup {
     this._mode = mode;
     this._colorer = colorer;
     this._chunksIdc = selection.chunks;
-    this._geo = new (wrapper(geoParams.Geometry, this._makeGeoArgs(polyComplexity)))();
+    this._polyComplexity = polyComplexity;
+    this._geo = new (wrapper(geoParams.Geometry, this._makeGeoArgs()))();
     this._mesh = new TransformGroup(this._geo, geoParams, material, transforms);
     this.add(this._mesh);
     this._build();

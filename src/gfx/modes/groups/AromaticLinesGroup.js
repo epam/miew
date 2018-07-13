@@ -1,7 +1,7 @@
 import AromaticGroup from './AromaticGroup';
 
 class AromaticLinesGroup extends AromaticGroup {
-  _makeGeoArgs(_polyComplexity) {
+  _makeGeoArgs() {
     const segmentsHeight = this._segmentsHeight = this._mode.getAromaticArcChunks();
     this._build = function() {
       const geo = this._geo;

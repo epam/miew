@@ -12,18 +12,16 @@ function _createShape(rad, parts) {
 }
 const calcChunkMatrix = gfxutils.calcChunkMatrix;
 
-function AromaticTorusGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-  const self = this;
-  const segmentsHeight = self._segmentsHeight = polyComplexity;
-  const torusRad = mode.getAromRadius();
-  const radiusV = new THREE.Vector2(torusRad, torusRad);
-  const radOffset = mode.calcStickRadius() + 2 * torusRad;
-  const lookAtVector = new THREE.Vector3();
-  const mtc = [];
-
-  self._build = function() {
-    const geo = self._geo;
-    self._buildInner(radOffset, function(chunkIdx, color, points, center, upDir) {
+class AromaticTorusGroup extends AromaticGroup {
+  _build() {
+    const segmentsHeight = this._segmentsHeight = this._polyComplexity;
+    const torusRad = this._mode.getAromRadius();
+    const radiusV = new THREE.Vector2(torusRad, torusRad);
+    const radOffset = this._mode.calcStickRadius() + 2 * torusRad;
+    const lookAtVector = new THREE.Vector3();
+    const mtc = [];
+    const geo = this._geo;
+    this._buildInner(radOffset, function(chunkIdx, color, points, center, upDir) {
       for (let j = 0; j <= segmentsHeight; ++j) {
         const currPoint = points[j];
         const currDir = currPoint.clone().sub(center).cross(upDir);
@@ -34,15 +32,11 @@ function AromaticTorusGroup(geoParams, selection, colorer, mode, transforms, pol
       geo.setColor(chunkIdx, color);
     });
     geo.finalize();
-  };
-  AromaticGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
+  }
+
+  _makeGeoArgs() {
+    return [_createShape(1.0, this._polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length];
+  }
 }
-
-AromaticTorusGroup.prototype = Object.create(AromaticGroup.prototype);
-AromaticTorusGroup.prototype.constructor = AromaticTorusGroup;
-
-AromaticTorusGroup.prototype._makeGeoArgs = function(polyComplexity) {
-  return [_createShape(1.0, polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length];
-};
 
 export default AromaticTorusGroup;
