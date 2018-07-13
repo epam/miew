@@ -1,16 +1,12 @@
 import NucleicItemGroup from './NucleicItemGroup';
 
 class NucleicSpheresGroup extends  NucleicItemGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-    this._stickRad = mode.calcStickRadius();
-  }
-
   _makeGeoArgs() {
     return [this._selection.chunks.length * 2, this._polyComplexity];
   }
 
   _processItem(chunkIdx, cyl1, cyl2, color) {
+    this._stickRad = this._mode.calcStickRadius();
     const geo = this._geo;
     const stickRad = this._stickRad;
     let idx = chunkIdx * 2;

@@ -41,10 +41,6 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
 }
 
 class ResiduesSubseqGroup extends ResiduesGroup {
-  constructor(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-    super(geoParams, selection, colorer, mode, transforms, polyComplexity, material);
-  }
-
   _makeGeoArgs() {
     const cmpMultiplier = this._mode.getHeightSegmentsRatio();
     this._segmentsHeight = this._polyComplexity * cmpMultiplier | 0;

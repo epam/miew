@@ -14,7 +14,7 @@ const calcChunkMatrix = gfxutils.calcChunkMatrix;
 
 class AromaticTorusGroup extends AromaticGroup {
   _build() {
-    const segmentsHeight = this._segmentsHeight = this._polyComplexity;
+    const segmentsHeight = this._segmentsHeight;
     const torusRad = this._mode.getAromRadius();
     const radiusV = new THREE.Vector2(torusRad, torusRad);
     const radOffset = this._mode.calcStickRadius() + 2 * torusRad;
@@ -35,6 +35,7 @@ class AromaticTorusGroup extends AromaticGroup {
   }
 
   _makeGeoArgs() {
+    this._segmentsHeight = this._polyComplexity;
     return [_createShape(1.0, this._polyComplexity), this._segmentsHeight + 1, this._selection.chunks.length];
   }
 }
