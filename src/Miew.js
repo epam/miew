@@ -1053,24 +1053,32 @@ Miew.prototype._renderScene = (function() {
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
     // otherwise we render to canvas
+    var outline = bHaveComplexes && settings.now.outline;
     var fxaa = bHaveComplexes && settings.now.fxaa;
     var volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
-    var dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
+    var dstBuffer = (outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     var srcBuffer = gfx.offscreenBuf;
 
-    /*if (bHaveComplexes && settings.now.ao) {
+    if (bHaveComplexes && settings.now.ao) {
       this._performAO(srcBuffer, gfx.offscreenBuf.depthTexture, dstBuffer, gfx.offscreenBuf3, gfx.offscreenBuf2);
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
-    }*/
+    }
+
+    //outline
+    if (outline) {
+      srcBuffer = dstBuffer;
+      dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf3 : target;
+      if (srcBuffer != null) {
+        this._renderOutline(camera, gfx.offscreenBuf, srcBuffer, dstBuffer);
+      }
+    }
 
     // render selected part with outline material
-    //this._renderSelection(camera, srcBuffer, dstBuffer);
-    //TRY_DEPTH
-    this._renderDepth(camera, gfx.offscreenBuf, target);
+    this._renderSelection(camera, gfx.offscreenBuf, dstBuffer);
 
-    /*if (volume) {
+    if (volume) {
       // copy current picture to the buffer that retains depth-data of the original molecule render
       // so that volume renderer could use depth-test
       gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, gfx.offscreenBuf);
@@ -1086,7 +1094,7 @@ Miew.prototype._renderScene = (function() {
     srcBuffer = dstBuffer;
 
     if (fxaa) {
-      dstBuffer = distortion ? gfx.offscreenBuf3 : target;
+      dstBuffer = distortion ? gfx.offscreenBuf2 : target;
       this._performFXAA(srcBuffer, dstBuffer);
       srcBuffer = dstBuffer;
     }
@@ -1094,7 +1102,7 @@ Miew.prototype._renderScene = (function() {
     if (distortion) {
       dstBuffer = target;
       this._performDistortion(srcBuffer, dstBuffer, true);
-    }*/
+    }
   };
 })();
 
@@ -1143,22 +1151,23 @@ Miew.prototype._performDistortion = (function() {
   };
 }());
 
-Miew.prototype._renderDepth = (function() {
+Miew.prototype._renderOutline = (function() {
 
   var _outlineMaterial = new OutlineDepthMaterial();
 
-  return function(camera, srcBuffer, targetBuffer) {
+  return function(camera, srcDepthsBuffer, srcColorBuffer, targetBuffer) {
 
     var self = this;
     var gfx = self._gfx;
 
-    // clear offscreen buffer (leave z-buffer intact)
-    //gfx.renderer.setClearColor('black', 0);
-    //gfx.renderer.clearTarget(tagretBuffer, true, false, false);
-
     // apply Sobel filter -- draw outline
-    _outlineMaterial.uniforms.srcTex.value = srcBuffer.depthTexture;
-    _outlineMaterial.uniforms.srcTexSize.value.set(srcBuffer.width, srcBuffer.height);
+    _outlineMaterial.uniforms.srcTex.value = srcColorBuffer.texture;
+    _outlineMaterial.uniforms.srcDepthTex.value = srcDepthsBuffer.depthTexture;
+    _outlineMaterial.uniforms.srcTexSize.value.set(srcDepthsBuffer.width, srcDepthsBuffer.height);
+    _outlineMaterial.uniforms.color.value = [0.0, 0.0, 0.0];
+    _outlineMaterial.uniforms.saturation.value = 10.0;
+    _outlineMaterial.uniforms.threshold.value = 0.1;
+
     gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
   };
 

@@ -703,6 +703,12 @@ var defaults = {
    * @instance
    */
   fxaa: true,
+  /**
+   * Outline depths
+   * @type {boolean}
+   * @instance
+   */
+  outline: false,
 
   /**
    * Ambient Occlusion special effect.
