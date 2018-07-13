@@ -31,7 +31,7 @@ VolumeVisual.prototype.buildFarPlane = function() {
   this._plane.doubleSided = true;
   const matWorldToVolume = new THREE.Matrix4();
 
-  this._plane._onBeforeRender = function(_renderer, _scene, camera) {
+  this._plane._onBeforeRender = function(_renderer, _scene, camera, _geometry, _material, _group) {
     const volume = this.parent.getObjectByName('VolumeMesh');
     const material = this.material;
     if (!volume  || !material) {

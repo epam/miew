@@ -11,8 +11,7 @@ export default function(SuperClass) {
       this._update();
     }
 
-    _onBeforeRender() {
-
+    _onBeforeRender(_renderer, _scene, _camera, _geometry, _material, _group) {
     }
 
     _update() {

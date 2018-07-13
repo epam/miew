@@ -7,7 +7,7 @@ class ZClippedMesh extends Mesh {
     super(geometry, material);
   }
 
-  _onBeforeRender(renderer, scene, camera) {
+  _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
     const geo = this.geometry;
     const material = this.material;
     if (!geo.zClip || !material.uberOptions) {

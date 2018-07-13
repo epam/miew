@@ -7,7 +7,7 @@ class ThickLineMesh extends Mesh {
     super(geometry, material);
   }
 
-  _onBeforeRender(renderer, scene, camera) {
+  _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
     const material = this.material;
     if (!material.uberOptions) {
       return;
