@@ -1,5 +1,3 @@
-
-
 import utils from '../../utils';
 
 /**
@@ -9,29 +7,31 @@ import utils from '../../utils';
  * Int values for bits flags - in integer32 linear array
  *
  */
-function IsoSurfaceMarchCube() {
-  this.pointsValuesLinear = null;
-  this.hasIntersection = null;
-  this.bitsInside = null;
-}
-
-IsoSurfaceMarchCube.prototype.create = function(numCellsPerSide) {
-  var vx7000000 = 0x7000000;
-  var n3 = numCellsPerSide * numCellsPerSide * numCellsPerSide;
-  if (n3 > vx7000000) {
-    throw new Error('Too large cube dimension: lead to memory huge uasge');
+class IsoSurfaceMarchCube {
+  constructor() {
+    this.pointsValuesLinear = null;
+    this.hasIntersection = null;
+    this.bitsInside = null;
   }
-  this.pointsValuesLinear = utils.allocateTyped(Float32Array, (2 << (2 + 2)) * n3);
-  this.hasIntersection = utils.allocateTyped(Int32Array, n3);
-  this.bitsInside = utils.allocateTyped(Int32Array, n3);
-  return 0;
-};
 
-IsoSurfaceMarchCube.prototype.destroy = function() {
-  this.bitsInside = null;
-  this.hasIntersection = null;
-  this.pointsValuesLinear = null;
-};
+  create(numCellsPerSide) {
+    const vx7000000 = 0x7000000;
+    const n3 = numCellsPerSide * numCellsPerSide * numCellsPerSide;
+    if (n3 > vx7000000) {
+      throw new Error('Too large cube dimension: lead to memory huge uasge');
+    }
+    this.pointsValuesLinear = utils.allocateTyped(Float32Array, (2 << (2 + 2)) * n3);
+    this.hasIntersection = utils.allocateTyped(Int32Array, n3);
+    this.bitsInside = utils.allocateTyped(Int32Array, n3);
+    return 0;
+  }
+
+  destroy() {
+    this.bitsInside = null;
+    this.hasIntersection = null;
+    this.pointsValuesLinear = null;
+  }
+}
 
 /* eslint-disable no-magic-numbers */
 IsoSurfaceMarchCube.prototype.striIndicesMarchCube = [
@@ -295,4 +295,3 @@ IsoSurfaceMarchCube.prototype.striIndicesMarchCube = [
 /* eslint-enable no-magic-numbers */
 
 export default IsoSurfaceMarchCube;
-
