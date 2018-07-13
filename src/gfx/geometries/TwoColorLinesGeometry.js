@@ -13,10 +13,6 @@ class TwoColorLinesGeometry extends LinesGeometry {
     this._collisionGeo = new Simple2CCylindersGeometry(segmentsCount, 3);
   }
 
-  raycast(raycaster, intersects) {
-    this._collisionGeo.raycast(raycaster, intersects);
-  }
-
   setItem(itemIdx, botPos, topPos) {
     this._collisionGeo.setItem(itemIdx, botPos, topPos, COLLISION_RAD);
     const offset = 2 * itemIdx;// there are two points per segment
@@ -32,11 +28,9 @@ class TwoColorLinesGeometry extends LinesGeometry {
   }
 
   raycast(raycaster, intersects) {
-    const collisionGeo = this._collisionGeo;
-    if (!collisionGeo)  {
-      return;
+    if (this._collisionGeo)  {
+      this._collisionGeo.raycast(raycaster, intersects);
     }
-    this._collisionGeo.raycast(raycaster, intersects);
   }
 
   getSubset(segmentIndices) {
