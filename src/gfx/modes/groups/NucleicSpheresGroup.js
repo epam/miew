@@ -5,10 +5,8 @@ class NucleicSpheresGroup extends  NucleicItemGroup {
     return [this._selection.chunks.length * 2, this._polyComplexity];
   }
 
-  _processItem(chunkIdx, cyl1, cyl2, color) {
-    this._stickRad = this._mode.calcStickRadius();
+  _processItem(chunkIdx, cyl1, cyl2, stickRad, color) {
     const geo = this._geo;
-    const stickRad = this._stickRad;
     let idx = chunkIdx * 2;
     geo.setItem(idx, cyl1, stickRad);
     geo.setColor(idx, color);

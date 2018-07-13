@@ -24,13 +24,14 @@ class NucleicItemGroup extends ResiduesGroup {
     const parent = this._selection.parent;
     const colorer = this._colorer;
     const geo = this._geo;
+    const stickRad = this._mode.calcStickRadius();
     let chunkIdx = 0;
 
     const resIdc = this._selection.chunks;
     for (let i = 0, n = resIdc.length; i < n; ++i) {
       const res = residues[resIdc[i]];
       const color = colorer.getResidueColor(res, parent);
-      this._processItem(chunkIdx++, res._cylinders[0], res._cylinders[1], color);
+      this._processItem(chunkIdx++, res._cylinders[0], res._cylinders[1], stickRad, color);
     }
     geo.finalize();
   }
@@ -58,6 +59,7 @@ class NucleicItemGroup extends ResiduesGroup {
     const parent = this._selection.parent;
     const colorer = this._colorer;
     const geo = this._geo;
+    const stickRad = this._mode.calcStickRadius();
     let chunkIdx = 0;
 
     const resIdc = this._selection.chunks;
@@ -65,7 +67,7 @@ class NucleicItemGroup extends ResiduesGroup {
       const res = residues[resIdc[i]];
       const color = colorer.getResidueColor(res, parent);
       // TODO Pass color only when it has been changed?
-      this._processItem(chunkIdx++, res._cylinders[0], res._cylinders[1], color);
+      this._processItem(chunkIdx++, res._cylinders[0], res._cylinders[1], stickRad, color);
     }
     geo.finishUpdate();
   }
