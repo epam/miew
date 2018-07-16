@@ -32,7 +32,6 @@ import meshes from './gfx/meshes/meshes';
 import LinesObject from './gfx/objects/LinesObj';
 import UberMaterial from './gfx/shaders/UberMaterial';
 import OutlineMaterial from './gfx/shaders/OutlineMaterial';
-import OutlineDepthMaterial from './gfx/shaders/OutlineDepthMaterial';
 import FXAAMaterial from './gfx/shaders/FXAAMaterial';
 import ao from './gfx/shaders/AO';
 import AnaglyphMaterial from './gfx/shaders/AnaglyphMaterial';
@@ -1153,7 +1152,7 @@ Miew.prototype._performDistortion = (function() {
 
 Miew.prototype._renderOutline = (function() {
 
-  var _outlineMaterial = new OutlineDepthMaterial();
+  var _outlineMaterial = new OutlineMaterial({depth: true});
 
   return function(camera, srcDepthsBuffer, srcColorBuffer, targetBuffer) {
 
