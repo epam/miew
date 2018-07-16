@@ -357,6 +357,8 @@ Miew.prototype._initGfx = function() {
     width:  this._container.clientWidth,
     height: this._container.clientHeight
   };
+  var shadowMapWidth = gfx.width;
+  var shadowMapHeight = gfx.height;
 
   var webGLOptions = {preserveDrawingBuffer: true, alpha: true, premultipliedAlpha: false};
   if (settings.now.antialias) {
@@ -366,6 +368,8 @@ Miew.prototype._initGfx = function() {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
+  gfx.renderer.shadowMap.enabled = true;
+  gfx.renderer.shadowMap.type = THREE.PCFBasicShadowMap;
   capabilities.init(gfx.renderer);
 
   // z-sprites and ambient occlusion possibility
@@ -422,6 +426,11 @@ Miew.prototype._initGfx = function() {
   var light12 = new THREE.DirectionalLight(0xffffff, 0.45);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
+  light12.castshadow = true;
+  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(50, 1, 1200, 2500));
+  light12.shadow.bias = 0.0001;
+  light12.shadow.mapSize.width = shadowMapWidth;
+  light12.shadow.mapSize.height = shadowMapHeight;
   gfx.scene.add(light12);
 
   var light3 = new THREE.AmbientLight(0x666666);

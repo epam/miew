@@ -60,7 +60,15 @@ Representation.prototype.buildGeometry = function(complex) {
   }
   // console.timeEnd('buildGeometry');
   this.geo.visible = this.visible;
-
+  this.geo.traverse(function(object) {
+    if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
+      object.geo.castshadow = true;
+      object.geo.recieveshadow = true;
+    }
+    if (object.material instanceof UberMaterial) {
+      object.material.setValues({colorFromDepth:true});
+    }
+  });
   return this.geo;
 };
 
