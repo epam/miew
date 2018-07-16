@@ -409,6 +409,13 @@ void main() {
   vec3 outgoingLight = diffuseColor.rgb;
 #endif
 
+#ifdef COLOR_FROM_DEPTH
+  float depth = vViewPosition.z/19.5;
+  gl_FragColor = vec4(depth, depth, depth, 1.0);
+  return;
+#endif
+
+
 #ifdef COLOR_FROM_POS
   gl_FragColor = world2colorMatrix * pixelPosWorld;
 #else

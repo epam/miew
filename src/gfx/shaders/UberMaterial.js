@@ -80,6 +80,8 @@ function UberMaterial(params) {
   this.prepassTransparancy = false;
   // used to render pixel positions
   this.colorFromPos = false;
+  // used to render pixel view deph
+  this.colorFromDepth = false;
   // used to render dashed line
   this.dashedLine = false;
   // mark as transparent
@@ -169,6 +171,7 @@ UberMaterial.prototype.copy = function(source) {
   this.clipPlane = source.clipPlane;
   this.fakeOpacity = source.fakeOpacity;
   this.colorFromPos = source.colorFromPos;
+  this.colorFromDepth = source.colorFromDepth;
   this.prepassTransparancy = source.prepassTransparancy;
   this.dashedLine = source.dashedLine;
   this.thickLine = source.thickLine;
@@ -242,6 +245,9 @@ UberMaterial.prototype.setValues = function(values) {
   }
   if (this.colorFromPos) {
     defines.COLOR_FROM_POS = 1;
+  }
+  if (this.colorFromDepth) {
+    defines.COLOR_FROM_DEPTH = 1;
   }
   if (this.prepassTransparancy) {
     defines.PREPASS_TRANSP = 1;
