@@ -47,7 +47,7 @@ class LicoriceMode extends LabeledMode {
 }
 
 LicoriceMode.prototype.id = 'LC';
-LicoriceMode.prototype.hortName = 'Licorice';
+LicoriceMode.prototype.name = 'Licorice';
 LicoriceMode.prototype.shortName = 'Licorice';
 LicoriceMode.prototype.depGroups = [
   'AtomsSpheres',
