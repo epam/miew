@@ -4,7 +4,6 @@ uniform vec2 srcTexSize;
 varying vec2 vUv;
 
 uniform vec3 color;
-uniform float saturation;
 uniform float threshold;
 
 void main() {
@@ -23,10 +22,10 @@ void main() {
   float horizEdge = - c00 - 2.0 * c01 - c02 + c20 + 2.0 * c21 + c22;
   float vertEdge  = - c00 - 2.0 * c10 - c20 + c02 + 2.0 * c12 + c22;
 
-  float grad = saturation * sqrt(horizEdge * horizEdge + vertEdge * vertEdge);
+  float grad = sqrt(horizEdge * horizEdge + vertEdge * vertEdge);
 
   if(grad > threshold){
-    gl_FragColor = vec4(color.rgb * grad, 1.0);
+    gl_FragColor = vec4(color.rgb, 1.0);
   } else{
     gl_FragColor = texture2D(srcTex, vUv);
   }

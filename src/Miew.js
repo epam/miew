@@ -1053,7 +1053,7 @@ Miew.prototype._renderScene = (function() {
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
     // otherwise we render to canvas
-    var outline = bHaveComplexes && settings.now.outline;
+    var outline = bHaveComplexes && settings.now.outline.on;
     var fxaa = bHaveComplexes && settings.now.fxaa;
     var volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
     var dstBuffer = (outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
@@ -1164,9 +1164,8 @@ Miew.prototype._renderOutline = (function() {
     _outlineMaterial.uniforms.srcTex.value = srcColorBuffer.texture;
     _outlineMaterial.uniforms.srcDepthTex.value = srcDepthsBuffer.depthTexture;
     _outlineMaterial.uniforms.srcTexSize.value.set(srcDepthsBuffer.width, srcDepthsBuffer.height);
-    _outlineMaterial.uniforms.color.value = [0.0, 0.0, 0.0];
-    _outlineMaterial.uniforms.saturation.value = 10.0;
-    _outlineMaterial.uniforms.threshold.value = 0.1;
+    _outlineMaterial.uniforms.color.value = new THREE.Color(settings.now.outline.color);
+    _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold;
 
     gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
   };

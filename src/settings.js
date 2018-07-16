@@ -708,7 +708,11 @@ var defaults = {
    * @type {boolean}
    * @instance
    */
-  outline: false,
+  outline: {
+    on : false,
+    color : 0x000000,
+    threshold : 0.1
+  },
 
   /**
    * Ambient Occlusion special effect.
