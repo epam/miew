@@ -99,7 +99,7 @@
     ]
   },
   "devDependencies": {
-    "autoprefixer": "^8.6.3",
+    "autoprefixer": "^9.0.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.1.4",
@@ -146,7 +146,7 @@
     "postcss-import": "^11.1.0",
     "postcss-loader": "^2.1.5",
     "postcss-nested": "^3.0.0",
-    "postcss-scss": "^1.0.5",
+    "postcss-scss": "^2.0.0",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.2",
     "rollup": "^0.62.0",
