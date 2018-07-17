@@ -1,7 +1,10 @@
 float INSTANCED_SPRITE_OVERSCALE = 1.3;
 
 attribute vec3 normal;
-varying vec3 viewNormal; //test stuff/ normal for uberFrag
+
+#ifdef NORMAL_FROM_POS
+  varying vec3 viewNormal;
+#endif
 #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
   varying vec3 vNormal;
 #endif
@@ -117,8 +120,10 @@ void main() {
   vNormal = normalize(transformedNormal);
 #endif
 
-viewNormal = normalize(mat3(modelViewMatrix) * objectNormal);
-//normalExt = vNormal;
+#ifdef NORMAL_FROM_POS
+  viewNormal = normalize(mat3(modelViewMatrix)*objectNormal);
+#endif
+
   vec4 localPos = vec4(position.xyz, 1.0);
   vec4 worldPos = modelMatrix * localPos;
   vec4 mvPosition = modelViewMatrix * localPos;

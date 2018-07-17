@@ -501,21 +501,20 @@ Miew.prototype._initGfx = function() {
       }
     );
 
-    gfx.offscreenBuf8 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
-      {
-        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, type: THREE.FloatType,
-        depthBuffer: true
-      }
-    );
-
     gfx.volBFTex = gfx.offscreenBuf5;
     gfx.volFFTex = gfx.offscreenBuf6;
     gfx.volWFFTex = gfx.offscreenBuf7;
   } else {
     this.logger.warn('Device doesn\'t support OES_texture_float extension');
   }
+
+  gfx.offscreenBuf8 = new THREE.WebGLRenderTarget(
+    gfx.width * window.devicePixelRatio,
+    gfx.height * window.devicePixelRatio,
+    {
+      minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, depthBuffer: true
+    }
+  );
 
   gfx.stereoBufL = new THREE.WebGLRenderTarget(
     gfx.width * window.devicePixelRatio,
@@ -1448,8 +1447,8 @@ Miew.prototype._performAO = (function() {
     }
     _aoMaterial.transparent = false;
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
-    gfx.renderer.renderScreenQuad(_aoMaterial, targetBuffer);
-/*
+    gfx.renderer.renderScreenQuad(_aoMaterial, tempBuffer1);
+
     _horBlurMaterial.uniforms.aoMap.value = tempBuffer1.texture;
     _horBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer1.width, 1.0 / tempBuffer1.height);
     _horBlurMaterial.uniforms.depthTexture.value = srcDepthBuffer;
@@ -1462,7 +1461,6 @@ Miew.prototype._performAO = (function() {
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthBuffer;
     _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.renderScreenQuad(_vertBlurMaterial, targetBuffer);
-    */
   };
 
 })();

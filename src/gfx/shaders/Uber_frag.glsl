@@ -26,7 +26,9 @@ uniform float opacity;
 uniform float zClipValue;
 uniform float clipPlaneValue;
 
-varying vec3 viewNormal;
+#ifdef NORMAL_FROM_POS
+  varying vec3 viewNormal;
+#endif
 
 //varying vec3 normalExt; // it is test. normal from uber_vert
 
@@ -289,6 +291,7 @@ void main() {
 
 #ifdef SPHERE_SPRITE
 
+  vec3 viewNormalSprites;
   vec3 normal;
 
 /* quick-and-dirty method
@@ -314,12 +317,16 @@ void main() {
        modelViewMatrix[1][2] * p.y +
        modelViewMatrix[2][2] * p.z);
     normal = normalize(normalMatrix * p);
+    #ifdef NORMAL_FROM_POS
+      viewNormalSprites = normalize(mat3(modelViewMatrix)*p);
+    #endif
   }
 
 #endif
 
 #ifdef CYLINDER_SPRITE
   vec3 normal;
+  vec3 viewNormalSprites;
   float cylinderY = 0.0;
 
   // ray-trace cylinder surface
@@ -339,6 +346,9 @@ void main() {
       dot(localNormal, matVec1.xyz),
       dot(localNormal, matVec2.xyz),
       dot(localNormal, matVec3.xyz));
+    #ifdef NORMAL_FROM_POS
+      viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
+    #endif
     normal = normalize(normalMatrix * normal);
   }
 #endif
@@ -405,9 +415,17 @@ void main() {
 
   diffuseColor.rgb *= vertexColor;
 
+#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+  gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+#endif
+
 #ifdef NORMAL_FROM_POS
+  #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
+    vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;
+  #else
+    vec3 viewNormaInColor = 0.5*viewNormal+0.5;
+  #endif
   // [-1, 1] -> [0, 1]
-  vec3 viewNormaInColor = 0.5*viewNormal+0.5;
   gl_FragColor = vec4(viewNormaInColor, 1.0);
   return;
 #endif
@@ -438,9 +456,5 @@ void main() {
     #endif
   #endif
 
-#endif
-
-#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-  gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
 #endif
 }
