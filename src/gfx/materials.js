@@ -117,6 +117,22 @@ var materialList = [
       depthWrite: false,
       transparent: false,
     }
+  }, {
+    id: 'FL',
+    name: 'Flat',
+    shortName: 'Flat',
+    uberOptions: {
+      diffuse: neutralColor(1.0),
+      specular: neutralColor(0.0),
+      shininess: 0,
+      opacity: 1.0
+    },
+    values: {
+      lights: false,
+      fog: true,
+      depthWrite: true,
+      transparent: false,
+    }
   }
 ];
 
