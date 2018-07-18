@@ -157,6 +157,7 @@ UberMaterial.prototype.uberOptions = {
 
 UberMaterial.prototype.copy = function(source) {
 
+  //TODO Why not RawShaderMaterial?
   THREE.ShaderMaterial.prototype.copy.call(this, source);
 
   this.fog = source.fog;
