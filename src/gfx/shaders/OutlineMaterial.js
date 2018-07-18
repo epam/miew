@@ -40,7 +40,7 @@ function OutlineMaterial(params) {
     depthWrite: false
   };
 
-  THREE.RawShaderMaterial.prototype.setValues.call(this, settings);
+  THREE.ShaderMaterial.prototype.setValues.call(this, settings);
   this.setValues(params);
 }
 

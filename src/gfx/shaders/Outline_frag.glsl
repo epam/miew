@@ -3,9 +3,9 @@ uniform vec2 srcTexSize;
 varying vec2 vUv;
 
 #ifdef DEPTH_OUTLINE
-uniform sampler2D srcDepthTex; //depthTexture
-uniform vec3 color;
-uniform float threshold;
+  uniform sampler2D srcDepthTex; //depthTexture
+  uniform vec3 color;
+  uniform float threshold;
 #endif
 
 void main() {
@@ -27,11 +27,8 @@ void main() {
 
     float grad = sqrt(horizEdge * horizEdge + vertEdge * vertEdge);
 
-    if(grad > threshold){
-      gl_FragColor = vec4(color.rgb, 1.0);
-    } else{
-      gl_FragColor = texture2D(srcTex, vUv);
-    }
+    gl_FragColor = ( grad > threshold ) ? vec4(color.rgb, 1.0) : gl_FragColor = texture2D(srcTex, vUv);
+
   #else
     vec4 c00 = texture2D(srcTex, vUv + vec2(-pixelSize.x,-pixelSize.y));
     vec4 c01 = texture2D(srcTex, vUv + vec2(0,-pixelSize.y));

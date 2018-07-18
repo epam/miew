@@ -1154,15 +1154,15 @@ Miew.prototype._renderOutline = (function() {
 
   var _outlineMaterial = new OutlineMaterial({depth: true});
 
-  return function(camera, srcDepthsBuffer, srcColorBuffer, targetBuffer) {
+  return function(camera, srcDepthBuffer, srcColorBuffer, targetBuffer) {
 
     var self = this;
     var gfx = self._gfx;
 
     // apply Sobel filter -- draw outline
     _outlineMaterial.uniforms.srcTex.value = srcColorBuffer.texture;
-    _outlineMaterial.uniforms.srcDepthTex.value = srcDepthsBuffer.depthTexture;
-    _outlineMaterial.uniforms.srcTexSize.value.set(srcDepthsBuffer.width, srcDepthsBuffer.height);
+    _outlineMaterial.uniforms.srcDepthTex.value = srcDepthBuffer.depthTexture;
+    _outlineMaterial.uniforms.srcTexSize.value.set(srcDepthBuffer.width, srcDepthBuffer.height);
     _outlineMaterial.uniforms.color.value = new THREE.Color(settings.now.outline.color);
     _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold;
 
