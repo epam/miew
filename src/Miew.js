@@ -2685,11 +2685,11 @@ Miew.prototype.benchmarkGfx = function(force) {
 Miew.prototype.screenshot = function(width, height) {
   const gfx = this._gfx;
 
-  function Fov2Tan(fov) {
+  function fov2Tan(fov) {
     return Math.tan(THREE.Math.degToRad(0.5 * fov));
   }
 
-  function Tan2Fov(tan) {
+  function tan2Fov(tan) {
     return THREE.Math.radToDeg(Math.atan(tan)) * 2.0;
   }
 
@@ -2705,7 +2705,7 @@ Miew.prototype.screenshot = function(width, height) {
 
     const originalAspect = gfx.camera.aspect;
     const originalFov = gfx.camera.fov;
-    const originalTanFov2 = Fov2Tan(gfx.camera.fov);
+    const originalTanFov2 = fov2Tan(gfx.camera.fov);
 
     // screenshot should contain the principal area of interest (a centered square touching screen sides)
     const areaOfInterestSize = Math.min(gfx.width, gfx.height);
@@ -2714,11 +2714,11 @@ Miew.prototype.screenshot = function(width, height) {
     // set appropriate camera aspect & FOV
     const shotAspect = width / height;
     gfx.camera.aspect = shotAspect;
-    gfx.camera.fov = Tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
+    gfx.camera.fov = tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
     gfx.camera.updateProjectionMatrix();
 
     // resize canvas to the required size of screenshot
-    gfx.renderer.setSize(width, height);
+    gfx.renderer.setDrawingBufferSize(width, height, 1);
 
     // make screenshot
     this._renderFrame(settings.now.stereo);
@@ -2728,7 +2728,7 @@ Miew.prototype.screenshot = function(width, height) {
     gfx.camera.aspect = originalAspect;
     gfx.camera.fov = originalFov;
     gfx.camera.updateProjectionMatrix();
-    gfx.renderer.setSize(gfx.width, gfx.height);
+    gfx.renderer.setDrawingBufferSize(gfx.width, gfx.height, window.devicePixelRatio);
     this._needRender = true;
   }
 
