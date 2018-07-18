@@ -91,6 +91,10 @@ function reportProgress(log, action, percent) {
   }
 }
 
+function chooseFogColor() {
+  return settings.now.fogColorEnable ? settings.now.fogColor : settings.now.bg.color;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -399,11 +403,7 @@ Miew.prototype._initGfx = function() {
 
   gfx.scene = new THREE.Scene();
 
-  var color = settings.now.bg.color;
-  if (settings.now.fogColorEnable) {
-    color = settings.now.fogColor;
-  }
-
+  var color = chooseFogColor();
   gfx.scene.fog = new THREE.Fog(color, settings.now.camNear, settings.now.camFar);
 
   gfx.root = new gfxutils.RCGroup();
@@ -878,10 +878,7 @@ Miew.prototype._updateFog = function() {
 
   if (settings.now.fog) {
     if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
-      var color = settings.now.bg.color;
-      if (settings.now.fogColorEnable) {
-        color = settings.now.fogColor;
-      }
+      var color = chooseFogColor();
       gfx.scene.fog = new THREE.Fog(color);
       this._setUberMaterialValues({fog: settings.now.fog});
     }
@@ -1007,39 +1004,28 @@ Miew.prototype._onThemeChanged = (function() {
   };
 })();
 
-Miew.prototype._onBgColorChanged  = (function() {
-  return function() {
-    const gfx = this._gfx;
-    let color = settings.now.bg.color;
-    if (settings.now.fogColorEnable) {
-      color = settings.now.fogColor;
+Miew.prototype._onBgColorChanged  = function() {
+  const gfx = this._gfx;
+  const color = chooseFogColor();
+  if (gfx) {
+    if (gfx.scene.fog) {
+      gfx.scene.fog.color.set(color);
     }
-    if (gfx) {
-      if (gfx.scene.fog) {
-        gfx.scene.fog.color.set(color);
-      }
-      gfx.renderer.setClearColor(color,  Number(!settings.now.bg.transparent));
-    }
-    this._needRender = true;
-  };
-})();
+    gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
+  }
+  this._needRender = true;
+};
 
-Miew.prototype._onFogColorChanged  = (function() {
-  return function() {
-    const gfx = this._gfx;
-    let color = settings.now.bg.color;
-    if (settings.now.fogColorEnable) {
-      color = settings.now.fogColor;
-    }
-    if (gfx) {
-      if (gfx.scene.fog) {
-        gfx.scene.fog.color.set(color);
-      }
-      gfx.renderer.setClearColor(color,  Number(!settings.now.bg.transparent));
-    }
-    this._needRender = true;
-  };
-})();
+Miew.prototype._onFogColorChanged = function() {
+  const gfx = this._gfx;
+  const color = chooseFogColor();
+  if (gfx && gfx.scene.fog) {
+    gfx.scene.fog.color.set(color);
+  }
+  this._needRender = true;
+};
+
+Miew.prototype._onFogColorEnableChanged = Miew.prototype._onFogColorChanged;
 
 Miew.prototype._setUberMaterialValues = function(values) {
   this._gfx.root.traverse(function(obj) {
@@ -3143,7 +3129,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('fogColorEnable', () => {
-    this._onFogColorChanged();
+    this._onFogColorEnableChanged();
   });
 
   on('bg.transparent', (evt) => {
