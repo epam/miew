@@ -558,7 +558,8 @@ var defaults = {
    * @instance
    */
   fogFarFactor: 1, //[0, 1]
-
+  fogColor: 0x000000,
+  fogColorEnable: false,
   /*
      * Palette used for molecule coloring.
      * @type {string}

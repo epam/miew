@@ -398,10 +398,13 @@ Miew.prototype._initGfx = function() {
   gfx.stereoCam = new THREE.StereoCamera();
 
   gfx.scene = new THREE.Scene();
-  gfx.scene.fog = new THREE.Fog(
-    settings.now.bg.color,
-    settings.now.camNear, settings.now.camFar
-  );
+
+  var color = settings.now.bg.color;
+  if (settings.now.fogColorEnable) {
+    color = settings.now.fogColor;
+  }
+
+  gfx.scene.fog = new THREE.Fog(color, settings.now.camNear, settings.now.camFar);
 
   gfx.root = new gfxutils.RCGroup();
   gfx.scene.add(gfx.root);
@@ -875,7 +878,11 @@ Miew.prototype._updateFog = function() {
 
   if (settings.now.fog) {
     if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
-      gfx.scene.fog = new THREE.Fog(settings.now.bg.color);
+      var color = settings.now.bg.color;
+      if (settings.now.fogColorEnable) {
+        color = settings.now.fogColor;
+      }
+      gfx.scene.fog = new THREE.Fog(color);
       this._setUberMaterialValues({fog: settings.now.fog});
     }
     updateFogRange(gfx.scene.fog, gfx.camera.position.z, this._getBSphereRadius());
@@ -1003,7 +1010,27 @@ Miew.prototype._onThemeChanged = (function() {
 Miew.prototype._onBgColorChanged  = (function() {
   return function() {
     const gfx = this._gfx;
-    const color = settings.now.bg.color;
+    let color = settings.now.bg.color;
+    if (settings.now.fogColorEnable) {
+      color = settings.now.fogColor;
+    }
+    if (gfx) {
+      if (gfx.scene.fog) {
+        gfx.scene.fog.color.set(color);
+      }
+      gfx.renderer.setClearColor(color,  Number(!settings.now.bg.transparent));
+    }
+    this._needRender = true;
+  };
+})();
+
+Miew.prototype._onFogColorChanged  = (function() {
+  return function() {
+    const gfx = this._gfx;
+    let color = settings.now.bg.color;
+    if (settings.now.fogColorEnable) {
+      color = settings.now.fogColor;
+    }
     if (gfx) {
       if (gfx.scene.fog) {
         gfx.scene.fog.color.set(color);
@@ -3109,6 +3136,14 @@ Miew.prototype._initOnSettingsChanged = function() {
 
   on('bg.color', () => {
     this._onBgColorChanged();
+  });
+
+  on('fogColor', () => {
+    this._onFogColorChanged();
+  });
+
+  on('fogColorEnable', () => {
+    this._onFogColorChanged();
   });
 
   on('bg.transparent', (evt) => {
