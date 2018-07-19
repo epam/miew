@@ -1025,8 +1025,6 @@ Miew.prototype._onFogColorChanged = function() {
   this._needRender = true;
 };
 
-Miew.prototype._onFogColorEnableChanged = Miew.prototype._onFogColorChanged;
-
 Miew.prototype._setUberMaterialValues = function(values) {
   this._gfx.root.traverse(function(obj) {
     if ((obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments || obj instanceof THREE.Line) &&
@@ -3129,7 +3127,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('fogColorEnable', () => {
-    this._onFogColorEnableChanged();
+    this._onFogColorChanged();
   });
 
   on('bg.transparent', (evt) => {
