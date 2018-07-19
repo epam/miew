@@ -13,6 +13,7 @@ import TemperatureColorer from './colorers/TemperatureColorer';
 import OccupancyColorer from './colorers/OccupancyColorer';
 import HydrophobicityColorer from './colorers/HydrophobicityColorer';
 import MoleculeColorer from './colorers/MoleculeColorer';
+import CarbonColorer from './colorers/CarbonColorer';
 
 const colorers = new EntityList([
   ElementColorer,
@@ -27,6 +28,7 @@ const colorers = new EntityList([
   OccupancyColorer,
   HydrophobicityColorer,
   MoleculeColorer,
+  CarbonColorer,
 ]);
 
 /** @deprecated */
