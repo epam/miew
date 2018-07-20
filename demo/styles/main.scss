@@ -340,6 +340,18 @@ $selection-panel-row-height: 42px;
         border-color: #337ab7;
       }
     }
+
+    [data-toggle=carboncolor] {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    [data-toggle=carboncolor].active {
+      a {
+        border-width: 2px;
+        border-color: #337ab7;
+      }
+    }
   }
 
   .panel-dark {
@@ -371,6 +383,10 @@ $selection-panel-row-height: 42px;
   }
 
   .panel-menu[data-panel-type=miew-menu-panel-uniform-color] .row {
+    align-content: flex-start;
+  }
+
+  .panel-menu[data-panel-type=miew-menu-panel-carbon-color] .row {
     align-content: flex-start;
   }
 
@@ -524,6 +540,12 @@ $selection-panel-row-height: 42px;
     }
 
     [data-value=miew-menu-panel-uniform-color] {
+      span.pull-right {
+        display: flex;
+      }
+    }
+
+    [data-value=miew-menu-panel-carbon-color] {
       span.pull-right {
         display: flex;
       }
