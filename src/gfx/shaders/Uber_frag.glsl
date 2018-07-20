@@ -6,6 +6,13 @@
   uniform mat4 world2colorMatrix;
 #endif
 
+#ifdef SHADOWMAP
+	#if NUM_DIR_LIGHTS > 0
+		uniform sampler2D directionalShadowMap;//[ NUM_DIR_LIGHTS ];
+		varying vec4 vDirectionalShadowCoord;//[ NUM_DIR_LIGHTS ];
+	#endif
+#endif
+
 #ifdef ATTR_COLOR
   varying vec3 vColor;
 #endif
@@ -190,6 +197,10 @@ varying vec3 vViewPosition;
   struct DirectionalLight {
     vec3 direction;
     vec3 color;
+    float shadow;
+    vec2 shadowMapSize;
+    float shadowBias;
+    float shadowRadius;
   };
 
   uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -260,6 +271,73 @@ varying vec3 vViewPosition;
 
     return reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;
   }
+#endif
+
+/////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
+#ifdef SHADOWMAP
+
+  /*float chess(vec2 uv) {
+      float step = 0.25;
+      float indX = ceil(uv.x/step);
+      float indY = ceil(uv.y/step);
+      float signX = (mod(indX, 2.0) == 0.0) ? 1.0 : -1.0;
+      float signY = (mod(indY, 2.0) == 0.0) ? 1.0 : -1.0;
+
+      float color = (signX * signY > 0.0) ? 1.0 : 0.0;
+
+      return color;
+    }
+
+  float texture2DCompare( sampler2D map,  vec2 uv, float compare ) {
+		return step( compare, chess(uv));
+		return chess(uv);
+  }*/
+
+	float texture2DCompare( sampler2D depths, vec2 uv/*, float compare*/ ) {
+		return texture2D( depths, uv ).r;
+		//return 0.1;
+	}
+
+  vec4 getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+	  float shadow = 1.0;
+    shadow = texture2DCompare( shadowMap, shadowCoord.xy/*, shadowCoord.z */);
+		return vec4(shadow, shadow, shadow, 1.0);
+
+    //return vec4(0.46, 0.79, 0.26, 1.0);
+/*
+		shadowCoord.xyz /= shadowCoord.w;
+		shadowCoord.z += shadowBias;
+
+		// if ( something && something ) breaks ATI OpenGL shader compiler
+		// if ( all( something, something ) ) using this instead
+
+		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
+		bool inFrustum = all( inFrustumVec );
+		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
+		bool frustumTest = all( frustumTestVec );
+
+		if ( frustumTest ) {
+			shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
+		}
+		return shadowCoord;*/
+		//return vec4(shadow, shadow, shadow, 1.0);
+	}
+
+	vec4 getShadowMask() {
+  	vec4 shadow = vec4(1.0);// = 1.0;
+  	#if NUM_DIR_LIGHTS > 0
+  	  DirectionalLight directionalLight;
+  	//#pragma unroll_loop
+  	  //for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+  		  //directionalLight = directionalLights[ i ];
+  		  //shadow = bool( directionalLight.shadow ) ? getShadow( directionalShadowMap/*[ i ]*/, directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord/*[ i ]*/ ) : vec4(1.0);
+  		  shadow =  getShadow( directionalShadowMap/*[ i ]*/, directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord/*[ i ]*/ );
+  	  //}
+   // }
+    #endif
+  	return shadow;
+    //return vec4(fract(vDirectionalShadowCoord.xy), 0.0, 1.0);//shadow/2.0;
+    }
 #endif
 
 /////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////
@@ -410,11 +488,10 @@ void main() {
 #endif
 
 #ifdef COLOR_FROM_DEPTH
-  float depth = vViewPosition.z/19.5;
+  float depth = vViewPosition.z;
   gl_FragColor = vec4(depth, depth, depth, 1.0);
   return;
 #endif
-
 
 #ifdef COLOR_FROM_POS
   gl_FragColor = world2colorMatrix * pixelPosWorld;
@@ -432,6 +509,10 @@ void main() {
     #else
       gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
     #endif
+  #endif
+  #ifdef SHADOWMAP
+  //gl_FragColor = vec4(0.13, 0.75, 0.95, 1.0);
+  gl_FragColor.rgb = getShadowMask().rgb;
   #endif
 #endif
 

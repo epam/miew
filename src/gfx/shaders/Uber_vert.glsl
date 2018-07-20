@@ -19,6 +19,13 @@ varying vec3 vViewPosition;
   varying float alphaCol;
 #endif
 
+#ifdef SHADOWMAP
+	#if NUM_DIR_LIGHTS > 0
+		uniform mat4 dirShadowMatrix;//[ NUM_DIR_LIGHTS ];
+		varying vec4 vDirectionalShadowCoord;//[ NUM_DIR_LIGHTS ];
+	#endif
+#endif
+
 #ifdef ATTR_COLOR
   attribute vec3 color;
   varying vec3 vColor;
@@ -196,11 +203,21 @@ void main() {
   #endif
 #endif
 
-
   gl_Position = projectionMatrix * mvPosition;
 
   vWorldPosition = worldPos.xyz;
   vViewPosition = - mvPosition.xyz;
+
+#ifdef SHADOWMAP
+	#if NUM_DIR_LIGHTS > 0
+	//#pragma unroll_loop
+	//for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+	  vec4 worldPosition = vec4(vWorldPosition, 1.0);
+		vDirectionalShadowCoord/*[ i ]*/ = dirShadowMatrix/*[ i ]*/ * worldPosition;
+		//vDirectionalShadowCoord/*[ i ]*/ =  worldPosition;
+	//}
+	#endif
+#endif
 
 #ifdef ATTR_COLOR
   vColor = color.xyz;
