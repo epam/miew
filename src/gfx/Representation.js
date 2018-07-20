@@ -62,11 +62,15 @@ Representation.prototype.buildGeometry = function(complex) {
   this.geo.visible = this.visible;
   this.geo.traverse(function(object) {
     if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
-      object.geo.castshadow = true;
-      object.geo.recieveshadow = true;
+      object.castShadow = true;
+      object.recieveShadow = true;
     }
     if (object.material instanceof UberMaterial) {
-      object.material.setValues({colorFromDepth:true});
+      const depthMaterial = new UberMaterial();
+      depthMaterial.copy(object.material);
+      depthMaterial.setValues({colorFromDepth: true});
+      object.material.customDepthMaterial = depthMaterial;
+      object.material.setValues({shadowmap:true});
     }
   });
   return this.geo;

@@ -1,6 +1,7 @@
 
 
 import UberMaterial from '../shaders/UberMaterial';
+import * as THREE from "three";
 export default function(SuperClass) {
   function NewObjectType() {
     SuperClass.apply(this, arguments);
@@ -15,8 +16,31 @@ export default function(SuperClass) {
     this._update();
   };
 
-  NewObjectType.prototype._onBeforeRender = function() {
+  NewObjectType.prototype._onBeforeRender = function(renderer, scene/*, camera*/) {
+    var material = this.material;
+    if (!material.uberOptions) {
+      return;
+    }
 
+    // TODO remove these instantiations
+    //var modelView = new THREE.Matrix4().multiplyMatrices(this.matrixWorld, camera.matrixWorldInverse);
+    //var scale = new THREE.Vector3().setFromMatrixColumn(modelView, 0);
+    //var s = scale.length();
+
+     //material.uberOptions.dirShadowMatrix.copy(scene.children[1].shadow.matrix);
+    //material.uberOptions.dirShadowMatrix.copy(scene.children[1].shadow.camera);
+    // const mat = new THREE.Matrix4();
+    // mat.multiply(camera.projectionMatrix);
+    // mat.multiply(camera.matrixWorldInverse);
+    const mat = new THREE.Matrix4();
+    //TODO cleanup
+    const shadowCam = scene.children[1].shadow.camera;
+    shadowCam.updateMatrix();
+    shadowCam.updateProjectionMatrix();
+    mat.multiply(shadowCam.matrixWorldInverse);
+    mat.multiply(shadowCam.projectionMatrix);
+    material.uberOptions.dirShadowMatrix.copy(scene.children[1].shadow.matrix);
+    material.uberOptions.directionalShadowMap = scene.children[1].shadow.map.texture;
   };
 
   NewObjectType.prototype._update = function() {

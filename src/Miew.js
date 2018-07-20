@@ -424,10 +424,14 @@ Miew.prototype._initGfx = function() {
 
   // TODO: Either stay with a single light or revert this commit
   var light12 = new THREE.DirectionalLight(0xffffff, 0.45);
+  //light12.position.set(0, 0, gfx.camera.position.z);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
-  light12.castshadow = true;
-  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(50, 1, 1200, 2500));
+  light12.castShadow = true;
+  var horizontalSize = 1.3946 * gfx.width / gfx.height;
+  var verticalSize = 1.3946;
+  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-horizontalSize, horizontalSize, verticalSize, -verticalSize, 0.5, 100));
+  //light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-1, 1, 1, -1, 0.5, 100));
   light12.shadow.bias = 0.0001;
   light12.shadow.mapSize.width = shadowMapWidth;
   light12.shadow.mapSize.height = shadowMapHeight;
