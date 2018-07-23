@@ -489,7 +489,8 @@ void main() {
 
 #ifdef COLOR_FROM_DEPTH
   float depth = vViewPosition.z;
-  gl_FragColor = vec4(depth, depth, depth, 1.0);
+ // gl_FragColor = vec4(depth, depth, depth, 1.0);
+  gl_FragColor = vec4(0.5, 0.5, 0.0, 1.0);
   return;
 #endif
 
