@@ -85,7 +85,8 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function() {
     vertexShader: 'varying vec2 vUv; ' +
       'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
     fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform float opacity;' +
-      'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, color.a * opacity); }',
+     // 'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, color.a * opacity); }',
+     'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, 1.0); }',
     transparent: true,
     depthTest: false,
     depthWrite: false

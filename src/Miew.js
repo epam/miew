@@ -1059,6 +1059,9 @@ Miew.prototype._renderScene = (function() {
     } else if (settings.now.transparency === 'standard') {
       gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
     }
+    gfx.renderer.renderScreenQuadFromTex(gfx.scene.children[1].shadow.map.texture, 1.0, null);
+    return;
+
 
     var bHaveComplexes = (this._getComplexVisual() !== null);
     var volumeVisual = this._getVolumeVisual();
