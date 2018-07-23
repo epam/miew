@@ -1092,21 +1092,20 @@ Miew.prototype._renderScene = (function() {
 
       gl.framebufferTexture2D(
         gl.FRAMEBUFFER,
-        gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT0_WEBGL,
+        gl.COLOR_ATTACHMENT0,
         gl.TEXTURE_2D, tx, 0
       );
-      // gl.framebufferTexture2D(
-      //   gl.FRAMEBUFFER,
-      //   gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL,
-      //   gl.TEXTURE_2D, tx8, 0
-      // );
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL,
+        gl.TEXTURE_2D, tx8, 0
+      );
 
       const ext = gl.getExtension('WEBGL_draw_buffers');
       ext.drawBuffersWEBGL([
-        gl.COLOR_ATTACHMENT0_WEBGL
+        gl.COLOR_ATTACHMENT0,
+        gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL
       ]);
-
-      //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     }
 
@@ -1122,10 +1121,6 @@ Miew.prototype._renderScene = (function() {
       gl.clearColor(1, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT);
 */
-      gl.getExtension('WEBGL_draw_buffers').drawBuffersWEBGL(/*[
-        gl.COLOR_ATTACHMENT0_WEBGL
-      ]*/);
-
     }
 
     var bHaveComplexes = (this._getComplexVisual() !== null);
@@ -1138,10 +1133,8 @@ Miew.prototype._renderScene = (function() {
     var dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     var srcBuffer = gfx.offscreenBuf;
 
-    dstBuffer = null;
     if (bHaveComplexes && settings.now.ao) {
       //gl.getExtension('WEBGL_draw_buffers').drawBuffersWEBGL([gl.NONE]);
-      this._setUberMaterialValues({normalFromPos: true});
       //gfx.renderer.setClearColor(0, 1);
       //gfx.renderer.clearTarget(gfx.offscreenBuf8);
       //gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf8);
@@ -1158,7 +1151,7 @@ Miew.prototype._renderScene = (function() {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
     }
-/*
+
     // render selected part with outline material
     this._renderSelection(camera, srcBuffer, dstBuffer);
 
@@ -1187,7 +1180,6 @@ Miew.prototype._renderScene = (function() {
       dstBuffer = target;
       this._performDistortion(srcBuffer, dstBuffer, true);
     }
-    */
   };
 })();
 
@@ -1522,6 +1514,8 @@ Miew.prototype._performAO = (function() {
     }
     _aoMaterial.transparent = false;
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
+   // gfx.renderer.renderScreenQuad(_aoMaterial, targetBuffer);
+
     gfx.renderer.renderScreenQuad(_aoMaterial, tempBuffer1);
 
     _horBlurMaterial.uniforms.aoMap.value = tempBuffer1.texture;
@@ -1536,6 +1530,7 @@ Miew.prototype._performAO = (function() {
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthBuffer;
     _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.renderScreenQuad(_vertBlurMaterial, targetBuffer);
+
   };
 
 })();
