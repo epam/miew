@@ -262,6 +262,7 @@ UberMaterial.prototype.setValues = function(values) {
     defines.FOG_TRANSPARENT = 1;
   }
   if (this.normalFromPos) {
+    extensions.drawBuffers = 1;
     defines.NORMAL_FROM_POS = 1;
   }
   // set dependent values

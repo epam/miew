@@ -372,7 +372,10 @@ Miew.prototype._initGfx = function() {
   if (!gfx.renderer.getContext().getExtension('EXT_frag_depth')) {
     settings.set('zSprites', false);
   }
-  if (!gfx.renderer.getContext().getExtension('WEBGL_depth_texture')) {
+  if (
+    !gfx.renderer.getContext().getExtension('WEBGL_depth_texture') ||
+    !gfx.renderer.getContext().getExtension('WEBGL_draw_buffers')
+  ) {
     settings.set('ao', false);
   }
 
@@ -1046,13 +1049,83 @@ Miew.prototype._renderScene = (function() {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.clearTarget(gfx.offscreenBuf);
-    // FIXME clean up targets in render selection
+    gfx.renderer.clearTarget(gfx.offscreenBuf);    // FIXME clean up targets in render selection
+    //gfx.renderer.clear(gfx.offscreenBuf8);
+
+    const gl = gfx.renderer.getContext();
+
+    if (settings.now.ao) {
+      this._setUberMaterialValues({normalFromPos: true});
+
+      let properties = gfx.renderer.properties;
+
+      gfx.renderer.setRenderTarget(gfx.offscreenBuf8);
+      const tx8 = properties.get(gfx.offscreenBuf8.texture).__webglTexture;
+
+      gl.bindTexture(gl.TEXTURE_2D, tx8);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        gfx.offscreenBuf8.width,
+        gfx.offscreenBuf8.height,
+        0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+     /* gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);*/
+
+      //gfx.renderer.setRenderTarget(gfx.offscreenBuf);
+      const fb = properties.get(gfx.offscreenBuf).__webglFramebuffer;
+      const tx = properties.get(gfx.offscreenBuf.texture).__webglTexture;
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+      gl.viewport(0, 0, gfx.offscreenBuf.width, gfx.offscreenBuf.height);
+
+      gl.bindTexture(gl.TEXTURE_2D, tx);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        gfx.offscreenBuf.width,
+        gfx.offscreenBuf.height,
+        0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+     /* gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);*/
+
+
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT0_WEBGL,
+        gl.TEXTURE_2D, tx, 0
+      );
+      // gl.framebufferTexture2D(
+      //   gl.FRAMEBUFFER,
+      //   gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL,
+      //   gl.TEXTURE_2D, tx8, 0
+      // );
+
+      const ext = gl.getExtension('WEBGL_draw_buffers');
+      ext.drawBuffersWEBGL([
+        gl.COLOR_ATTACHMENT0_WEBGL
+      ]);
+
+      //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    }
 
     if (settings.now.transparency === 'prepass') {
       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
       gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
+/*
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+      gl.getExtension('WEBGL_draw_buffers').drawBuffersWEBGL([
+        gl.COLOR_ATTACHMENT0_WEBGL,
+        gl.COLOR_ATTACHMENT1_WEBGL]);
+      gl.clearColor(1, 0, 0, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+*/
+      gl.getExtension('WEBGL_draw_buffers').drawBuffersWEBGL(/*[
+        gl.COLOR_ATTACHMENT0_WEBGL
+      ]*/);
+
     }
 
     var bHaveComplexes = (this._getComplexVisual() !== null);
@@ -1065,12 +1138,13 @@ Miew.prototype._renderScene = (function() {
     var dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     var srcBuffer = gfx.offscreenBuf;
 
-
+    dstBuffer = null;
     if (bHaveComplexes && settings.now.ao) {
+      //gl.getExtension('WEBGL_draw_buffers').drawBuffersWEBGL([gl.NONE]);
       this._setUberMaterialValues({normalFromPos: true});
-      gfx.renderer.setClearColor(0, 1);
-      gfx.renderer.clearTarget(gfx.offscreenBuf8);
-      gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf8);
+      //gfx.renderer.setClearColor(0, 1);
+      //gfx.renderer.clearTarget(gfx.offscreenBuf8);
+      //gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf8);
       this._setUberMaterialValues({normalFromPos: false});
       this._performAO(
         srcBuffer,
@@ -1084,7 +1158,7 @@ Miew.prototype._renderScene = (function() {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
     }
-
+/*
     // render selected part with outline material
     this._renderSelection(camera, srcBuffer, dstBuffer);
 
@@ -1113,6 +1187,7 @@ Miew.prototype._renderScene = (function() {
       dstBuffer = target;
       this._performDistortion(srcBuffer, dstBuffer, true);
     }
+    */
   };
 })();
 

@@ -1,3 +1,9 @@
+#if defined (NORMAL_FROM_POS)
+  #define fragColor gl_FragData[0]
+#else
+  #define fragColor gl_FragColor
+#endif
+
 #ifdef ATTR_ALPHA_COLOR
   varying float alphaCol;
 #endif
@@ -378,7 +384,7 @@ void main() {
 
 // transparency prepass writes only z, so we don't need to calc the color
 #ifdef PREPASS_TRANSP
-  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  fragColor = vec4(1.0, 1.0, 1.0, 1.0);
   #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
     gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
   #endif
@@ -426,8 +432,7 @@ void main() {
     vec3 viewNormaInColor = 0.5*viewNormal+0.5;
   #endif
   // [-1, 1] -> [0, 1]
-  gl_FragColor = vec4(viewNormaInColor, 1.0);
-  return;
+  gl_FragData[1] = vec4(viewNormaInColor, 1.0);
 #endif
 
 #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
@@ -439,20 +444,20 @@ void main() {
 #endif
 
 #ifdef COLOR_FROM_POS
-  gl_FragColor = world2colorMatrix * pixelPosWorld;
+  fragColor = world2colorMatrix * pixelPosWorld;
 #else
   #ifdef OVERRIDE_COLOR
-    gl_FragColor = vec4(fixedColor, diffuseColor.a);
+    fragColor = vec4(fixedColor, diffuseColor.a);
   #else
-    gl_FragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);
+    fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);
   #endif
 
   #ifdef USE_FOG
     float fogFactor = smoothstep( fogNear, fogFar, vViewPosition.z );
     #ifdef FOG_TRANSPARENT
-      gl_FragColor.a = gl_FragColor.a * (1.0 - fogFactor);
+      fragColor.a = fragColor.a * (1.0 - fogFactor);
     #else
-      gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+      fragColor.rgb = mix( fragColor.rgb, fogColor, fogFactor );
     #endif
   #endif
 
