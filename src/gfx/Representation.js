@@ -69,8 +69,8 @@ Representation.prototype.buildGeometry = function(complex) {
       const depthMaterial = new UberMaterial();
       depthMaterial.copy(object.material);
       depthMaterial.setValues({colorFromDepth: true});
-      object.material.customDepthMaterial = depthMaterial;
       object.material.setValues({shadowmap:true});
+      object.customDepthMaterial = depthMaterial;
     }
   });
   return this.geo;

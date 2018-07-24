@@ -85,8 +85,7 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function() {
     vertexShader: 'varying vec2 vUv; ' +
       'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
     fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform float opacity;' +
-     // 'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, color.a * opacity); }',
-     'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, 1.0); }',
+     'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, color.a * opacity); }',
     transparent: true,
     depthTest: false,
     depthWrite: false
@@ -100,6 +99,42 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function() {
     _material.uniforms.opacity.value = opacity;
     this.renderScreenQuad(_material, renderTarget);
 
+  };
+})();
+
+// render texture with depth packed in RGBA (packing is from threejs)
+THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function() {
+
+  var _material = new THREE.ShaderMaterial({
+    uniforms: {
+      srcTex: {type: 't', value: null},
+      opacity: {type: 'f', value: 1.0}
+    },
+    vertexShader: 'varying vec2 vUv; ' +
+    'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+    fragmentShader: '' +
+    'const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1);\n' +
+    'const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. )\n;' +
+    'const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. )\n;' +
+    'float unpackRGBAToDepth( const in vec4 v ) {\n' +
+    '  return dot( v, UnpackFactors );\n' +
+    '}\n' +
+    'varying vec2 vUv; uniform sampler2D srcTex; uniform float opacity;\n' +
+    'void main() { \n' +
+    '  vec4 color = texture2D(srcTex, vUv); \n' +
+    '  float depth = unpackRGBAToDepth(color);\n' +
+    '  gl_FragColor = vec4(depth, depth, depth, opacity);\n ' +
+    '}\n',
+    transparent: true,
+    depthTest: false,
+    depthWrite: false
+  });
+
+  return function(srcTex, opacity, renderTarget) {
+    _material.uniforms.srcTex.value = srcTex;
+    _material.transparent = (opacity < 1.0);
+    _material.uniforms.opacity.value = opacity;
+    this.renderScreenQuad(_material, renderTarget);
   };
 })();
 

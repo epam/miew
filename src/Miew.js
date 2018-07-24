@@ -357,8 +357,6 @@ Miew.prototype._initGfx = function() {
     width:  this._container.clientWidth,
     height: this._container.clientHeight
   };
-  var shadowMapWidth = gfx.width;
-  var shadowMapHeight = gfx.height;
 
   var webGLOptions = {preserveDrawingBuffer: true, alpha: true, premultipliedAlpha: false};
   if (settings.now.antialias) {
@@ -424,15 +422,15 @@ Miew.prototype._initGfx = function() {
 
   // TODO: Either stay with a single light or revert this commit
   var light12 = new THREE.DirectionalLight(0xffffff, 0.45);
-  //light12.position.set(0, 0, gfx.camera.position.z);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light12.castShadow = true;
   var horizontalSize = 1.3946 * gfx.width / gfx.height;
   var verticalSize = 1.3946;
-  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-horizontalSize, horizontalSize, verticalSize, -verticalSize, 0.5, 100));
-  //light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-1, 1, 1, -1, 0.5, 100));
-  light12.shadow.bias = 0.0001;
+  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-horizontalSize, horizontalSize, verticalSize, -verticalSize, 0.1, 100));
+  light12.shadow.bias = -0.001; //TODO should depends on zoom
+  var shadowMapWidth = gfx.width * window.devicePixelRatio;
+  var shadowMapHeight = gfx.height * window.devicePixelRatio;
   light12.shadow.mapSize.width = shadowMapWidth;
   light12.shadow.mapSize.height = shadowMapHeight;
   gfx.scene.add(light12);
@@ -1055,13 +1053,10 @@ Miew.prototype._renderScene = (function() {
     // FIXME clean up targets in render selection
 
     if (settings.now.transparency === 'prepass') {
-      this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
+       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
-      gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
+       gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
     }
-    gfx.renderer.renderScreenQuadFromTex(gfx.scene.children[1].shadow.map.texture, 1.0, null);
-    return;
-
 
     var bHaveComplexes = (this._getComplexVisual() !== null);
     var volumeVisual = this._getVolumeVisual();
