@@ -274,6 +274,25 @@ varying vec3 vViewPosition;
 #endif
 
 /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
+const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
+const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
+
+const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
+
+
+const float ShiftRight8 = 1. / 256.;
+
+vec4 packDepthToRGBA( const in float v ) {
+  vec4 r = vec4( fract( v * PackFactors ), v );
+  r.yzw -= r.xyz * ShiftRight8; // tidy overflow
+  return r * PackUpscale;
+}
+
+float unpackRGBAToDepth( const in vec4 v ) {
+  return dot( v, UnpackFactors );
+}
+
 #ifdef SHADOWMAP
 
   /*float chess(vec2 uv) {
@@ -293,23 +312,17 @@ varying vec3 vViewPosition;
 		return chess(uv);
   }*/
 
-	float texture2DCompare( sampler2D depths, vec2 uv/*, float compare*/ ) {
-		return texture2D( depths, uv ).r;
-		//return 0.1;
+
+	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
+		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
 	}
 
   vec4 getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
-	  float shadow = 1.0;
-    shadow = texture2DCompare( shadowMap, shadowCoord.xy/*, shadowCoord.z */);
-		return vec4(shadow, shadow, shadow, 1.0);
+ 	  float shadow = 1.0;
 
-    //return vec4(0.46, 0.79, 0.26, 1.0);
-/*
+
 		shadowCoord.xyz /= shadowCoord.w;
 		shadowCoord.z += shadowBias;
-
-		// if ( something && something ) breaks ATI OpenGL shader compiler
-		// if ( all( something, something ) ) using this instead
 
 		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
 		bool inFrustum = all( inFrustumVec );
@@ -319,8 +332,7 @@ varying vec3 vViewPosition;
 		if ( frustumTest ) {
 			shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
 		}
-		return shadowCoord;*/
-		//return vec4(shadow, shadow, shadow, 1.0);
+		return vec4(shadow, shadow, shadow, 1.0);
 	}
 
 	vec4 getShadowMask() {
@@ -329,7 +341,7 @@ varying vec3 vViewPosition;
   	  DirectionalLight directionalLight;
   	//#pragma unroll_loop
   	  //for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-  		  //directionalLight = directionalLights[ i ];
+  		  directionalLight = directionalLights[ 0 ];
   		  //shadow = bool( directionalLight.shadow ) ? getShadow( directionalShadowMap/*[ i ]*/, directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord/*[ i ]*/ ) : vec4(1.0);
   		  shadow =  getShadow( directionalShadowMap/*[ i ]*/, directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord/*[ i ]*/ );
   	  //}
@@ -339,6 +351,10 @@ varying vec3 vViewPosition;
     //return vec4(fract(vDirectionalShadowCoord.xy), 0.0, 1.0);//shadow/2.0;
     }
 #endif
+
+
+
+
 
 /////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////
 #ifdef DASHED_LINE
@@ -488,9 +504,7 @@ void main() {
 #endif
 
 #ifdef COLOR_FROM_DEPTH
-  float depth = vViewPosition.z;
- // gl_FragColor = vec4(depth, depth, depth, 1.0);
-  gl_FragColor = vec4(0.5, 0.5, 0.0, 1.0);
+  gl_FragColor = packDepthToRGBA(gl_FragCoord.z);
   return;
 #endif
 
@@ -512,8 +526,7 @@ void main() {
     #endif
   #endif
   #ifdef SHADOWMAP
-  //gl_FragColor = vec4(0.13, 0.75, 0.95, 1.0);
-  gl_FragColor.rgb = getShadowMask().rgb;
+    gl_FragColor.rgb *= getShadowMask().rgb;
   #endif
 #endif
 

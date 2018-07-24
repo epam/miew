@@ -22,23 +22,6 @@ export default function(SuperClass) {
       return;
     }
 
-    // TODO remove these instantiations
-    //var modelView = new THREE.Matrix4().multiplyMatrices(this.matrixWorld, camera.matrixWorldInverse);
-    //var scale = new THREE.Vector3().setFromMatrixColumn(modelView, 0);
-    //var s = scale.length();
-
-     //material.uberOptions.dirShadowMatrix.copy(scene.children[1].shadow.matrix);
-    //material.uberOptions.dirShadowMatrix.copy(scene.children[1].shadow.camera);
-    // const mat = new THREE.Matrix4();
-    // mat.multiply(camera.projectionMatrix);
-    // mat.multiply(camera.matrixWorldInverse);
-    const mat = new THREE.Matrix4();
-    //TODO cleanup
-    const shadowCam = scene.children[1].shadow.camera;
-    shadowCam.updateMatrix();
-    shadowCam.updateProjectionMatrix();
-    mat.multiply(shadowCam.matrixWorldInverse);
-    mat.multiply(shadowCam.projectionMatrix);
     material.uberOptions.dirShadowMatrix.copy(scene.children[1].shadow.matrix);
     material.uberOptions.directionalShadowMap = scene.children[1].shadow.map.texture;
   };
