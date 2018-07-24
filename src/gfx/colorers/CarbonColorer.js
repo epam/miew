@@ -1,5 +1,4 @@
 import Colorer from './Colorer';
-import selectors from '../../chem/selectors';
 import Atom from '../../chem/Atom';
 
 function scaleColor(c, factor) {
@@ -19,24 +18,22 @@ function scaleColor(c, factor) {
  *
  * @param {object=} opts - Options to override defaults with. See {@link Colorer}.
  *
- * @exports ConditionalColorer
+ * @exports CarbonColorer
  * @augments Colorer
  * @constructor
- * @classdesc Bicolor coloring algorithm based on a selector string used as a condition.
+ * @classdesc Bicolor coloring algorithm based on selection carbon atoms.
  */
 class CarbonColorer extends Colorer {
   static id = 'CB';
 
   constructor(opts) {
     super(opts);
-    const parsed = selectors.parse(this.opts.subset);
-    this._subsetCached = parsed.error ? selectors.none() : parsed.selector;
   }
 
   getAtomColor(atom, _complex) {
     var colorCarbon = this.opts.color;
     var colorNotCarbon = scaleColor(colorCarbon, this.opts.factor);
-    return (atom.flags === Atom.Flags.CARBON) ? colorCarbon : colorNotCarbon;
+    return (atom.flags & Atom.Flags.CARBON) ? colorCarbon : colorNotCarbon;
   }
 
   getResidueColor(_residue, _complex) {

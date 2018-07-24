@@ -2900,8 +2900,7 @@ Menu.prototype._updateReprList = function() {
   var modeItem = null;
   var colorerItem = null;
   var matPresetItem = null;
-  var uniColorItem = null;
-  var cbColorItem = null;
+  var ucColorItem = null;
   var modeId = null;
   var colorerId = null;
   var matPresetId = null;
@@ -2911,8 +2910,7 @@ Menu.prototype._updateReprList = function() {
   var zClip = null;
   var isoValue = null;
   var radScale = null;
-  var uniColor = null;
-  var cbColor = null;
+  var ucColor = null;
   var repr = null;
 
   function _fillModeOptionsFromMenu() {
@@ -2946,13 +2944,11 @@ Menu.prototype._updateReprList = function() {
       modeItem = $(element).find('[data-value=miew-menu-panel-mode]')[0];
       colorerItem = $(element).find('[data-value=miew-menu-panel-color]')[0];
       matPresetItem = $(element).find('[data-value=miew-menu-panel-matpreset]')[0];
-      uniColorItem = $(element).find('[data-value=miew-menu-panel-select-color]')[0];
-      cbColorItem = $(element).find('[data-value=miew-menu-panel-select-color]')[0];
+      ucColorItem = $(element).find('[data-value=miew-menu-panel-select-color]')[0];
       modeId = modeItem.firstElementChild.firstElementChild.getAttribute('data-id');
       colorerId = colorerItem.firstElementChild.firstElementChild.getAttribute('data-id');
       matPresetId = matPresetItem.firstElementChild.firstElementChild.getAttribute('data-id');
-      uniColor = stringColorToHex(uniColorItem.lastChild.firstElementChild.getAttribute('data-id'));
-      cbColor = stringColorToHex(cbColorItem.lastChild.firstElementChild.getAttribute('data-id'));
+      ucColor = stringColorToHex(ucColorItem.lastChild.firstElementChild.getAttribute('data-id'));
 
       zClip = $(element).find('[type=checkbox][data-toggle=zClip]')[0].checked;
       radScale = parseFloat($(element).find('[data-type=rad]').val());
@@ -2971,13 +2967,8 @@ Menu.prototype._updateReprList = function() {
 
           _fillModeOptionsFromMenu();
 
-          if (colorerId === 'UN') {
-            repr.colorer.opts.color = uniColor;
-          }
-          repr.setMaterialPreset(materials.get(matPresetId));
-
-          if (colorerId === 'CB') {
-            repr.colorer.opts.color = cbColor;
+          if (colorerId === 'UN' || colorerId === 'CB') {
+            repr.colorer.opts.color = ucColor;
           }
           repr.setMaterialPreset(materials.get(matPresetId));
 
@@ -2997,19 +2988,11 @@ Menu.prototype._updateReprList = function() {
 
         repr = self._viewer.repGet();
         // change uniform colorer's color if applicable
-        if (colorerId === 'UN') {
-          if (repr.colorer.opts.color !== uniColor) {
+        if (colorerId === 'UN' || colorerId === 'CB') {
+          if (repr.colorer.opts.color !== ucColor) {
             // FIXME: set color through shader uniform without rebuild
             repr.needsRebuild = true;
-            repr.colorer.opts.color = uniColor;
-          }
-        }
-
-        if (colorerId === 'CB') {
-          if (repr.colorer.opts.color !== cbColor) {
-            // FIXME: set color through shader uniform without rebuild
-            repr.needsRebuild = true;
-            repr.colorer.opts.color = cbColor;
+            repr.colorer.opts.color = ucColor;
           }
         }
 
