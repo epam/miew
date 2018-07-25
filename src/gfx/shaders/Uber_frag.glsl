@@ -36,8 +36,6 @@ uniform float clipPlaneValue;
   varying vec3 viewNormal;
 #endif
 
-//varying vec3 normalExt; // it is test. normal from uber_vert
-
 #define PI 3.14159265359
 #define RECIPROCAL_PI 0.31830988618
 #define saturate(a) clamp( a, 0.0, 1.0 )

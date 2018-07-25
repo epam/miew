@@ -81,7 +81,7 @@ void main() {
   // add fog to the AO value
   AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);
   // calc result AO-map color
-  AO = 1.0 - max(0.0, AO / MAX_SAMPLES_COUNT * factor); // TODO use MAX_SAMPLES_COUNT
+  AO = 1.0 - max(0.0, AO / 32.0 * factor); // TODO use MAX_SAMPLES_COUNT
   // write value to AO-map
   gl_FragColor = vec4(AO, AO, AO, 1.0);
 }

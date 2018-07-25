@@ -88,7 +88,7 @@ function UberMaterial(params) {
   this.thickLine = false;
   // makes fog begin transparency (required for transparent background)
   this.fogTransparent = false;
-  // used to render surface normals
+  // used to render surface normals to G buffer for ssao effect
   this.normalsToGBuffer = false;
 
   // uber options of "root" materials are inherited from single uber-options object that resides in prototype
@@ -202,8 +202,6 @@ UberMaterial.prototype.setValues = function(values) {
 
   var defines = {};
   var extensions = {};
-
-  //this.normalsToGBuffer = true;
 
   if (this.fog) {
     defines.USE_FOG = 1;
