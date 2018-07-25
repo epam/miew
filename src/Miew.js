@@ -1032,22 +1032,18 @@ Miew.prototype._setMRT = function(renderBuffer, TextureBuffer) {
   const gfx = this._gfx;
   const gl = gfx.renderer.getContext();
   const properties = gfx.renderer.properties;
-
   //take extra texture from Texture Buffer
   gfx.renderer.setRenderTarget(TextureBuffer);
   const tx8 = properties.get(TextureBuffer.texture).__webglTexture;
   gl.bindTexture(gl.TEXTURE_2D, tx8);
-
   //take texture and farmebuffer fromm renderbuffer
   gfx.renderer.setRenderTarget(renderBuffer);
   const fb = properties.get(renderBuffer).__webglFramebuffer;
   const tx = properties.get(renderBuffer.texture).__webglTexture;
-
   //set framebuffer
   gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
   fb.width = renderBuffer.width;
   fb.height = renderBuffer.height;
-  gl.viewport(0, 0, renderBuffer.width, renderBuffer.height);//does it nesessery?
 
   gl.framebufferTexture2D(
     gl.FRAMEBUFFER,
@@ -1059,7 +1055,6 @@ Miew.prototype._setMRT = function(renderBuffer, TextureBuffer) {
     gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL,
     gl.TEXTURE_2D, tx8, 0
   );
-
   //mapping textures
   const ext = gl.getExtension('WEBGL_draw_buffers');
   ext.drawBuffersWEBGL([
@@ -1440,13 +1435,7 @@ Miew.prototype._performAO = (function() {
 
   return function(srcColorBuffer, srcDepthBuffer, targetBuffer, tempBuffer, tempBuffer1, normalsBuffer) {
 
-    if (typeof srcColorBuffer === 'undefined' ||
-          typeof srcDepthBuffer === 'undefined' ||
-          typeof targetBuffer === 'undefined' ||
-          typeof tempBuffer === 'undefined' ||
-          typeof tempBuffer1 === 'undefined' ||
-          typeof normalsBuffer === 'undefined'
-    ) {
+    if (!srcColorBuffer || !srcDepthBuffer || !targetBuffer || !tempBuffer || !tempBuffer1 || !normalsBuffer) {
       return;
     }
 
@@ -1480,7 +1469,6 @@ Miew.prototype._performAO = (function() {
     }
     _aoMaterial.transparent = false;
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
-    //gfx.renderer.renderScreenQuad(_aoMaterial, targetBuffer);
 
     gfx.renderer.renderScreenQuad(_aoMaterial, tempBuffer1);
 
