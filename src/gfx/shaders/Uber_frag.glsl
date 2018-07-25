@@ -1,4 +1,4 @@
-#if defined (NORMAL_FROM_POS)
+#if defined (NORMALS_TO_G_BUFFER)
   #define fragColor gl_FragData[0]
 #else
   #define fragColor gl_FragColor
@@ -32,7 +32,7 @@ uniform float opacity;
 uniform float zClipValue;
 uniform float clipPlaneValue;
 
-#ifdef NORMAL_FROM_POS
+#ifdef NORMALS_TO_G_BUFFER
   varying vec3 viewNormal;
 #endif
 
@@ -323,7 +323,7 @@ void main() {
        modelViewMatrix[1][2] * p.y +
        modelViewMatrix[2][2] * p.z);
     normal = normalize(normalMatrix * p);
-    #ifdef NORMAL_FROM_POS
+    #ifdef NORMALS_TO_G_BUFFER
       viewNormalSprites = normalize(mat3(modelViewMatrix)*p);
     #endif
   }
@@ -352,7 +352,7 @@ void main() {
       dot(localNormal, matVec1.xyz),
       dot(localNormal, matVec2.xyz),
       dot(localNormal, matVec3.xyz));
-    #ifdef NORMAL_FROM_POS
+    #ifdef NORMALS_TO_G_BUFFER
       viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
     #endif
     normal = normalize(normalMatrix * normal);
@@ -425,7 +425,7 @@ void main() {
   gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
 #endif
 
-#ifdef NORMAL_FROM_POS
+#ifdef NORMALS_TO_G_BUFFER
   #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
     vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;
   #else

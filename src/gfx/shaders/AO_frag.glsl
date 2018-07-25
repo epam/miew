@@ -49,9 +49,6 @@ void main() {
   vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;
   //[0, 1] -> [-1, 1]
   vec3 normal = (texture2D(normalsTexture, vUv).rgb * 2.0 - 1.0);
-
-  //gl_FragColor = vec4(normal, 1.0);
-  //return;
   // get random vector for sampling sphere rotation
   vec3 randN = texture2D(noiseTexture, vUvNoise).rgb * 2.0 - 1.0;
   randN = normalize(randN);

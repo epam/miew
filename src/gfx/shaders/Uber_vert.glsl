@@ -2,7 +2,7 @@ float INSTANCED_SPRITE_OVERSCALE = 1.3;
 
 attribute vec3 normal;
 
-#ifdef NORMAL_FROM_POS
+#ifdef NORMALS_TO_G_BUFFER
   varying vec3 viewNormal;
 #endif
 #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
@@ -120,7 +120,7 @@ void main() {
   vNormal = normalize(transformedNormal);
 #endif
 
-#ifdef NORMAL_FROM_POS
+#ifdef NORMALS_TO_G_BUFFER
   viewNormal = normalize(mat3(modelViewMatrix)*objectNormal);
 #endif
 

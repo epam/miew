@@ -511,14 +511,6 @@ Miew.prototype._initGfx = function() {
     this.logger.warn('Device doesn\'t support OES_texture_float extension');
   }
 
-  gfx.offscreenBuf8 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
-    {
-      minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, depthBuffer: true
-    }
-  );
-
   gfx.stereoBufL = new THREE.WebGLRenderTarget(
     gfx.width * window.devicePixelRatio,
     gfx.height * window.devicePixelRatio,
@@ -834,6 +826,7 @@ Miew.prototype._resizeOffscreenBuffers = function(width, height, stereo) {
   gfx.offscreenBuf.setSize(multi * width, height);
   gfx.offscreenBuf2.setSize(multi * width, height);
   gfx.offscreenBuf3.setSize(multi * width, height);
+  gfx.offscreenBuf4.setSize(multi * width, height);
   if (gfx.offscreenBuf5) {
     gfx.offscreenBuf5.setSize(multi * width, height);
   }
@@ -1035,6 +1028,46 @@ Miew.prototype._setUberMaterialValues = function(values) {
   });
 };
 
+Miew.prototype._setMRT = function(renderBuffer, TextureBuffer) {
+  const gfx = this._gfx;
+  const gl = gfx.renderer.getContext();
+  const properties = gfx.renderer.properties;
+
+  //take extra texture from Texture Buffer
+  gfx.renderer.setRenderTarget(TextureBuffer);
+  const tx8 = properties.get(TextureBuffer.texture).__webglTexture;
+  gl.bindTexture(gl.TEXTURE_2D, tx8);
+
+  //take texture and farmebuffer fromm renderbuffer
+  gfx.renderer.setRenderTarget(renderBuffer);
+  const fb = properties.get(renderBuffer).__webglFramebuffer;
+  const tx = properties.get(renderBuffer.texture).__webglTexture;
+
+  //set framebuffer
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+  fb.width = renderBuffer.width;
+  fb.height = renderBuffer.height;
+  gl.viewport(0, 0, renderBuffer.width, renderBuffer.height);//does it nesessery?
+
+  gl.framebufferTexture2D(
+    gl.FRAMEBUFFER,
+    gl.COLOR_ATTACHMENT0,
+    gl.TEXTURE_2D, tx, 0
+  );
+  gl.framebufferTexture2D(
+    gl.FRAMEBUFFER,
+    gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL,
+    gl.TEXTURE_2D, tx8, 0
+  );
+
+  //mapping textures
+  const ext = gl.getExtension('WEBGL_draw_buffers');
+  ext.drawBuffersWEBGL([
+    gl.COLOR_ATTACHMENT0,
+    gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL
+  ]);
+};
+
 Miew.prototype._renderScene = (function() {
   return function(camera, distortion, target) {
     distortion = distortion || false;
@@ -1050,81 +1083,19 @@ Miew.prototype._renderScene = (function() {
       return;
     }
     gfx.renderer.clearTarget(gfx.offscreenBuf);    // FIXME clean up targets in render selection
-    //gfx.renderer.clear(gfx.offscreenBuf8);
 
-    const gl = gfx.renderer.getContext();
+    var bHaveComplexes = (this._getComplexVisual() !== null);
+    var volumeVisual = this._getVolumeVisual();
 
-    if (settings.now.ao) {
-      this._setUberMaterialValues({normalFromPos: true});
-
-      let properties = gfx.renderer.properties;
-
-      gfx.renderer.setRenderTarget(gfx.offscreenBuf8);
-      const tx8 = properties.get(gfx.offscreenBuf8.texture).__webglTexture;
-
-      gl.bindTexture(gl.TEXTURE_2D, tx8);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        gfx.offscreenBuf8.width,
-        gfx.offscreenBuf8.height,
-        0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-     /* gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);*/
-
-      //gfx.renderer.setRenderTarget(gfx.offscreenBuf);
-      const fb = properties.get(gfx.offscreenBuf).__webglFramebuffer;
-      const tx = properties.get(gfx.offscreenBuf.texture).__webglTexture;
-
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-      gl.viewport(0, 0, gfx.offscreenBuf.width, gfx.offscreenBuf.height);
-
-      gl.bindTexture(gl.TEXTURE_2D, tx);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        gfx.offscreenBuf.width,
-        gfx.offscreenBuf.height,
-        0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-     /* gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);*/
-
-
-      gl.framebufferTexture2D(
-        gl.FRAMEBUFFER,
-        gl.COLOR_ATTACHMENT0,
-        gl.TEXTURE_2D, tx, 0
-      );
-      gl.framebufferTexture2D(
-        gl.FRAMEBUFFER,
-        gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL,
-        gl.TEXTURE_2D, tx8, 0
-      );
-
-      const ext = gl.getExtension('WEBGL_draw_buffers');
-      ext.drawBuffersWEBGL([
-        gl.COLOR_ATTACHMENT0,
-        gl.getExtension('WEBGL_draw_buffers').COLOR_ATTACHMENT1_WEBGL
-      ]);
-
+    if (bHaveComplexes && settings.now.ao) {
+      this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
     if (settings.now.transparency === 'prepass') {
       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
       gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
-/*
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-      gl.getExtension('WEBGL_draw_buffers').drawBuffersWEBGL([
-        gl.COLOR_ATTACHMENT0_WEBGL,
-        gl.COLOR_ATTACHMENT1_WEBGL]);
-      gl.clearColor(1, 0, 0, 1);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-*/
     }
-
-    var bHaveComplexes = (this._getComplexVisual() !== null);
-    var volumeVisual = this._getVolumeVisual();
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
     // otherwise we render to canvas
@@ -1134,18 +1105,13 @@ Miew.prototype._renderScene = (function() {
     var srcBuffer = gfx.offscreenBuf;
 
     if (bHaveComplexes && settings.now.ao) {
-      //gl.getExtension('WEBGL_draw_buffers').drawBuffersWEBGL([gl.NONE]);
-      //gfx.renderer.setClearColor(0, 1);
-      //gfx.renderer.clearTarget(gfx.offscreenBuf8);
-      //gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf8);
-      this._setUberMaterialValues({normalFromPos: false});
       this._performAO(
         srcBuffer,
         gfx.offscreenBuf.depthTexture,
         dstBuffer,
         gfx.offscreenBuf3,
         gfx.offscreenBuf2,
-        gfx.offscreenBuf8
+        gfx.offscreenBuf4
       );
     } else {
       // just copy color buffer to dst buffer
@@ -1514,7 +1480,7 @@ Miew.prototype._performAO = (function() {
     }
     _aoMaterial.transparent = false;
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
-   // gfx.renderer.renderScreenQuad(_aoMaterial, targetBuffer);
+    //gfx.renderer.renderScreenQuad(_aoMaterial, targetBuffer);
 
     gfx.renderer.renderScreenQuad(_aoMaterial, tempBuffer1);
 
@@ -1530,7 +1496,6 @@ Miew.prototype._performAO = (function() {
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthBuffer;
     _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.renderScreenQuad(_vertBlurMaterial, targetBuffer);
-
   };
 
 })();
@@ -2517,7 +2482,7 @@ Miew.prototype._onKeyDown = function(event) {
   case 'S'.charCodeAt(0):
     event.preventDefault();
     event.stopPropagation();
-    settings.now.ao = !settings.now.ao;
+    settings.set('ao', !settings.now.ao);
     this._needRender = true;
     break;
   case 107:
@@ -3203,6 +3168,10 @@ Miew.prototype._initOnSettingsChanged = function() {
 
   on('bg.color', () => {
     this._onBgColorChanged();
+  });
+
+  on('ao', () => {
+    this._setUberMaterialValues({normalsToGBuffer: settings.now.ao});
   });
 
   on('bg.transparent', (evt) => {
