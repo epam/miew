@@ -45,6 +45,7 @@ set_save              return 'SET_SAVE'
 set_restore           return 'SET_RESTORE'
 set_reset             return 'SET_RESET'
 preset                return 'PRESET'
+motm                  return 'MOTM'
 
 add                   return 'ADD'
 rep                   return 'REP'
@@ -150,6 +151,7 @@ Command
     | BUILD ALL                           -> yy.miew.rebuildAll(); yy.miew.rebuild()
     | HELP                                -> yy.echo(yy.utils.help().toString())
     | HELP Path                           -> yy.echo(yy.utils.help($2).toString())
+    | MOTM                                -> yy.miew.motm()
     | OneArgCommand
     | GET Path                            -> yy.utils.propagateProp($2); yy.echo(yy.miew.get($2).toString())
     | GET STRING                          -> yy.utils.propagateProp($2); yy.echo(yy.miew.get($2).toString())
