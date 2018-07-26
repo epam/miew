@@ -1,3 +1,9 @@
+#if defined (NORMALS_TO_G_BUFFER)
+  #define fragColor gl_FragData[0]
+#else
+  #define fragColor gl_FragColor
+#endif
+
 #ifdef ATTR_ALPHA_COLOR
   varying float alphaCol;
 #endif
@@ -25,6 +31,10 @@ uniform vec3 fixedColor;
 uniform float opacity;
 uniform float zClipValue;
 uniform float clipPlaneValue;
+
+#ifdef NORMALS_TO_G_BUFFER
+  varying vec3 viewNormal;
+#endif
 
 #define PI 3.14159265359
 #define RECIPROCAL_PI 0.31830988618
@@ -305,6 +315,7 @@ void main() {
 
 #ifdef SPHERE_SPRITE
 
+  vec3 viewNormalSprites;
   vec3 normal;
 
 /* quick-and-dirty method
@@ -330,12 +341,16 @@ void main() {
        modelViewMatrix[1][2] * p.y +
        modelViewMatrix[2][2] * p.z);
     normal = normalize(normalMatrix * p);
+    #ifdef NORMALS_TO_G_BUFFER
+      viewNormalSprites = normalize(mat3(modelViewMatrix)*p);
+    #endif
   }
 
 #endif
 
 #ifdef CYLINDER_SPRITE
   vec3 normal;
+  vec3 viewNormalSprites;
   float cylinderY = 0.0;
 
   // ray-trace cylinder surface
@@ -355,6 +370,9 @@ void main() {
       dot(localNormal, matVec1.xyz),
       dot(localNormal, matVec2.xyz),
       dot(localNormal, matVec3.xyz));
+    #ifdef NORMALS_TO_G_BUFFER
+      viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
+    #endif
     normal = normalize(normalMatrix * normal);
   }
 #endif
@@ -384,7 +402,7 @@ void main() {
 
 // transparency prepass writes only z, so we don't need to calc the color
 #ifdef PREPASS_TRANSP
-  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  fragColor = vec4(1.0, 1.0, 1.0, 1.0);
   #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
     gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
   #endif
@@ -421,6 +439,20 @@ void main() {
 
   diffuseColor.rgb *= vertexColor;
 
+#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+  gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+#endif
+
+#ifdef NORMALS_TO_G_BUFFER
+  #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
+    vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;
+  #else
+    vec3 viewNormaInColor = 0.5*viewNormal+0.5;
+  #endif
+  // [-1, 1] -> [0, 1]
+  gl_FragData[1] = vec4(viewNormaInColor, 1.0);
+#endif
+
 #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
   GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
   BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
@@ -430,25 +462,22 @@ void main() {
 #endif
 
 #ifdef COLOR_FROM_POS
-  gl_FragColor = world2colorMatrix * pixelPosWorld;
+  fragColor = world2colorMatrix * pixelPosWorld;
 #else
   #ifdef OVERRIDE_COLOR
-    gl_FragColor = vec4(fixedColor, diffuseColor.a);
+    fragColor = vec4(fixedColor, diffuseColor.a);
   #else
-    gl_FragColor = vec4(outgoingLight, diffuseColor.a);
+    fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);
   #endif
 
   #ifdef USE_FOG
     float fogFactor = smoothstep( fogNear, fogFar, vViewPosition.z );
     #ifdef FOG_TRANSPARENT
-      gl_FragColor.a = gl_FragColor.a * (1.0 - fogFactor);
+      fragColor.a = fragColor.a * (1.0 - fogFactor);
     #else
-      gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+      fragColor.rgb = mix( fragColor.rgb, fogColor, fogFactor );
     #endif
   #endif
-#endif
 
-#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-  gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
 #endif
 }

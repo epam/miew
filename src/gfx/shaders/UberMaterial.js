@@ -88,6 +88,8 @@ function UberMaterial(params) {
   this.thickLine = false;
   // makes fog begin transparency (required for transparent background)
   this.fogTransparent = false;
+  // used to render surface normals to G buffer for ssao effect
+  this.normalsToGBuffer = false;
   //used for toon material
   this.toonShading = false;
 
@@ -177,7 +179,9 @@ UberMaterial.prototype.copy = function(source) {
   this.dashedLine = source.dashedLine;
   this.thickLine = source.thickLine;
   this.fogTransparent = source.fogTransparent;
+  this.normalsToGBuffer = source.normalsToGBuffer;
   this.toonShading = source.toonShading;
+
   this.uberOptions.copy(source.uberOptions);
 
   return this;
@@ -258,6 +262,10 @@ UberMaterial.prototype.setValues = function(values) {
   }
   if (this.fogTransparent) {
     defines.FOG_TRANSPARENT = 1;
+  }
+  if (this.normalsToGBuffer) {
+    extensions.drawBuffers = 1;
+    defines.NORMALS_TO_G_BUFFER = 1;
   }
   if (this.toonShading) {
     defines.TOON_SHADING = 1;
