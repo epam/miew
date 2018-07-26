@@ -3865,4 +3865,31 @@ _.assign(Miew, /** @lends Miew */ {
   },
 });
 
+Miew.prototype.motm = function() {
+  settings.set('theme', 'light');
+  settings.set({
+    fogColorEnable: true,
+    fogColor: 0x000000,
+    outline: {on:true, threshold: 0.01},
+    bg: {color: 0xffffff},
+  });
+
+  this._forEachComplexVisual((visual) => {
+    var rep = [];
+    var complex = visual.getComplex();
+    var palette = palettes.get(settings.now.palette);
+    for (let i = 0; i < complex.getChainCount(); i++) {
+      var curChainName = complex._chains[i]._name;
+      var curChainColor = palette.getChainColor(curChainName);
+      rep[i] = {
+        selector: 'chain ' + curChainName,
+        mode: 'VW',
+        colorer: ['CB', {color: curChainColor, factor: 0.9}],
+        material: 'FL'
+      };
+    }
+    visual.resetReps(rep);
+  });
+};
+
 export default Miew;
