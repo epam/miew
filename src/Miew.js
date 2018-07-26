@@ -211,6 +211,8 @@ Miew.prototype.init = function() {
   var elem = utils.createElement('div', {'class': 'miew-canvas'});
   _setContainerContents(container, elem);
   this._container = elem;
+  var themeRE = /\s*theme-\w+\b/g;
+  var theme = settings.now.theme;
 
   var frag = document.createDocumentFragment();
   frag.appendChild(this._msgMode = createElement(
@@ -281,7 +283,8 @@ Miew.prototype.init = function() {
       self._onDblClick(event);
     });
 
-    this._onThemeChanged();
+    var div = this._containerRoot;
+    div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
 
   } catch (error) {
     // FIXME: THREE.WebGLRenderer throws error AND catches it, so we receive different one. Some random crash.
