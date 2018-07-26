@@ -9,7 +9,6 @@ attribute vec3 normal;
   varying vec3 vNormal;
 #endif
 
-
 #ifdef THICK_LINE
   attribute vec4 position; // W contains vert pos or neg offset
 #else

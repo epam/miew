@@ -5,7 +5,7 @@ uniform sampler2D noiseTexture;
 uniform vec2      noiseTexelSize;
 uniform sampler2D diffuseTexture;
 uniform sampler2D depthTexture;
-uniform sampler2D normalsTexture;
+uniform sampler2D normalTexture;
 uniform vec2      srcTexelSize;
 uniform vec2      camNearFar;
 uniform mat4      projMatrix;
@@ -48,7 +48,7 @@ void main() {
   // remap coordinates to prevent noise exture rescale
   vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;
   //[0, 1] -> [-1, 1]
-  vec3 normal = (texture2D(normalsTexture, vUv).rgb * 2.0 - 1.0);
+  vec3 normal = (texture2D(normalTexture, vUv).rgb * 2.0 - 1.0);
   // get random vector for sampling sphere rotation
   vec3 randN = texture2D(noiseTexture, vUvNoise).rgb * 2.0 - 1.0;
   randN = normalize(randN);
@@ -82,6 +82,11 @@ void main() {
   AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);
   // calc result AO-map color
   AO = 1.0 - max(0.0, AO / 32.0 * factor); // TODO use MAX_SAMPLES_COUNT
+  // check if the fragment doesn't belong to background(?)
+  if (abs(- viewPos.z - camNearFar.y) < 0.1) { // FIXME remove temporal fix for background darkening
+    gl_FragColor = vec4(1.0);
+    return;
+  }
   // write value to AO-map
   gl_FragColor = vec4(AO, AO, AO, 1.0);
 }
