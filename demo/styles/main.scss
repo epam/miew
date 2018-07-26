@@ -329,12 +329,12 @@ $selection-panel-row-height: 42px;
       padding: 0;
     }
 
-    [data-toggle=uniformcolor] {
+    [data-toggle=selectcolor] {
       padding-left: 5px;
       padding-right: 5px;
     }
 
-    [data-toggle=uniformcolor].active {
+    [data-toggle=selectcolor].active {
       a {
         border-width: 2px;
         border-color: #337ab7;
@@ -370,7 +370,7 @@ $selection-panel-row-height: 42px;
     display: none;
   }
 
-  .panel-menu[data-panel-type=miew-menu-panel-uniform-color] .row {
+  .panel-menu[data-panel-type=miew-menu-panel-select-color] .row {
     align-content: flex-start;
   }
 
@@ -516,14 +516,14 @@ $selection-panel-row-height: 42px;
       max-height: $titlebar-height;
 
       .thumbnail {
-        width: $selection-panel-row-height / 2;
-        height: $selection-panel-row-height / 2;
+        width: calc($selection-panel-row-height / 2);
+        height: calc($selection-panel-row-height / 2);
         margin: 0;
         padding: 0;
       }
     }
 
-    [data-value=miew-menu-panel-uniform-color] {
+    [data-value=miew-menu-panel-select-color] {
       span.pull-right {
         display: flex;
       }

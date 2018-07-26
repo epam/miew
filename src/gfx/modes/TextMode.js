@@ -1,32 +1,30 @@
 import _ from 'lodash';
-import utils from '../../utils';
 import Mode from './Mode';
 
-function TextMode(opts) {
-  Mode.call(this, opts);
+class TextMode extends Mode {
+  static id = 'TX';
+
+  constructor(opts) {
+    super(opts);
+  }
+
+  getTemplateOptions() {
+    return this.opts.template;
+  }
+
+  getLabelOpts() {
+    return _.merge(this.opts, {
+      labels: this.settings.now.labels,
+      colors: true,
+      adjustColor: true,
+      transparent: true,
+    });
+  }
 }
 
-utils.deriveClass(TextMode, Mode, {
-  id: 'TX',
-  name: 'Text mode',
-  shortName: 'Text',
-  depGroups: ['TextLabelsGeo']
-}, {
-  id: 'TX',
-});
-
-TextMode.prototype.getTemplateOptions = function() {
-  return this.opts.template;
-};
-
-TextMode.prototype.getLabelOpts = function() {
-  return _.merge(this.opts, {
-    labels: this.settings.now.labels,
-    colors: true,
-    adjustColor: true,
-    transparent: true,
-  });
-};
+TextMode.prototype.id = 'TX';
+TextMode.prototype.name = 'Text mode';
+TextMode.prototype.shortName = 'Text';
+TextMode.prototype.depGroups = ['TextLabelsGeo'];
 
 export default TextMode;
-

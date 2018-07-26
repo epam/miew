@@ -7,59 +7,57 @@ import BaseLinesGeometry from './ThickLinesGeometry';
  *
  * @param {number}  segmentsCount   Number of segments per chunk.
  */
-function LinesGeometry(segmentsCount) {
-  BaseLinesGeometry.call(this, segmentsCount);
+class LinesGeometry extends BaseLinesGeometry {
+  constructor(segmentsCount) {
+    super(segmentsCount);
+  }
+
+  startUpdate() {
+    return true;
+  }
+
+  computeBoundingSphere() {
+    const boundingBox = this.boundingBox;
+    // Build bounding sphere
+    let radiusSquared = 0.0;
+    const center = new THREE.Vector3();
+    if (boundingBox) {
+      boundingBox.getCenter(center);
+    }
+    const positions = this._positions;
+    const sphere = this.boundingSphere || new THREE.Sphere();
+    const size = this._positions.length;
+    const pos = new THREE.Vector3();
+    const posSize = this.getPositionSize();
+    for (let i = 0; i < size; i += posSize) {
+      pos.set(positions[i], positions[i + 1], positions[i + 2]);
+      const lengthSquared = center.distanceToSquared(pos);
+      if (radiusSquared < lengthSquared) {
+        radiusSquared = lengthSquared;
+      }
+    }
+    sphere.set(center, Math.sqrt(radiusSquared));
+    this.boundingSphere = sphere;
+  }
+
+  computeBoundingBox() {
+    const positions = this._positions;
+    const box = new THREE.Box3();
+    const size = this._positions.length;
+    const tmpVec = new THREE.Vector3();
+    const posSize = this.getPositionSize();
+    for (let i = 0; i < size; i += posSize) {
+      tmpVec.set(positions[i], positions[i + 1], positions[i + 2]);
+      box.expandByPoint(tmpVec);
+    }
+    this.boundingBox = box;
+  }
+
+  finalize() {
+    this.finishUpdate();
+    // TODO compute bounding box?
+    this.computeBoundingSphere();
+  }
 }
 
-LinesGeometry.prototype = Object.create(BaseLinesGeometry.prototype);
-LinesGeometry.prototype.constructor = LinesGeometry;
-
-LinesGeometry.prototype.startUpdate = function() {
-  return true;
-};
-
-LinesGeometry.prototype.computeBoundingSphere = function() {
-  var boundingBox = this.boundingBox;
-  // Build bounding sphere
-  var radiusSquared = 0.0;
-  var center = new THREE.Vector3();
-  if (boundingBox) {
-    boundingBox.getCenter(center);
-  }
-  var positions = this._positions;
-  var sphere = this.boundingSphere || new THREE.Sphere();
-  var size = this._positions.length;
-  var pos = new THREE.Vector3();
-  var posSize = this.getPositionSize();
-  for (var i = 0; i < size; i += posSize) {
-    pos.set(positions[i], positions[i + 1], positions[i + 2]);
-    var lengthSquared = center.distanceToSquared(pos);
-    if (radiusSquared < lengthSquared) {
-      radiusSquared = lengthSquared;
-    }
-  }
-  sphere.set(center, Math.sqrt(radiusSquared));
-  this.boundingSphere = sphere;
-};
-
-LinesGeometry.prototype.computeBoundingBox = function() {
-  var positions = this._positions;
-  var box = new THREE.Box3();
-  var size = this._positions.length;
-  var tmpVec = new THREE.Vector3();
-  var posSize = this.getPositionSize();
-  for (var i = 0; i < size; i += posSize) {
-    tmpVec.set(positions[i], positions[i + 1], positions[i + 2]);
-    box.expandByPoint(tmpVec);
-  }
-  this.boundingBox = box;
-};
-
-LinesGeometry.prototype.finalize = function() {
-  this.finishUpdate();
-  // TODO compute bounding box?
-  this.computeBoundingSphere();
-};
-
 export default LinesGeometry;
-

@@ -451,6 +451,20 @@ var defaults = {
       baseColor: 0xFFFFFF,
     },
 
+    ////////////////////          CARBON         //////////////////////////
+    /**
+     * Carbon colorer options.
+     *
+     * @typedef CarbonColorerOptions
+     *
+     * @property {number} color - Single color to paint carbons
+     * @property {number} factor - Color factor for not carbon atoms.
+     */
+    CB: {
+      color: 0x909090,
+      factor: 0.6,
+    },
+
     ////////////////////         SEQUENCE         //////////////////////////
     /**
      * Sequence colorer options.
@@ -558,7 +572,8 @@ var defaults = {
    * @instance
    */
   fogFarFactor: 1, //[0, 1]
-
+  fogColor: 0x000000,
+  fogColorEnable: false,
   /*
      * Palette used for molecule coloring.
      * @type {string}
@@ -703,6 +718,16 @@ var defaults = {
    * @instance
    */
   fxaa: true,
+  /**
+   * Outline depths
+   * @type {boolean}
+   * @instance
+   */
+  outline: {
+    on : false,
+    color : 0x000000,
+    threshold : 0.1
+  },
 
   /**
    * Ambient Occlusion special effect.

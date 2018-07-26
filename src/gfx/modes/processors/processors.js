@@ -1,5 +1,3 @@
-
-
 import AtomsProcessor from './AtomsProcessor';
 import OrphanAtomsProcessor from './OrphanAtomsProcessor';
 import ResiduesProcessor from './ResiduesProcessor';

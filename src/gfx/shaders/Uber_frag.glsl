@@ -179,6 +179,14 @@ varying vec3 vViewPosition;
 #endif
 
 /////////////////////////////////////////// Lighting ////////////////////////////////////////////////
+#ifdef TOON_SHADING
+  #define LOW_TOON_BORDER 0.0
+  #define MEDIUM_TOON_BORDER 0.7
+  #define HIGH_TOON_BORDER 1.0
+
+  #define MEDIUM_TOON_RANGE 0.5
+  #define HIGH_TOON_RANGE 0.95
+#endif
 #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
   struct ReflectedLight {
     vec3 directDiffuse;
@@ -241,6 +249,18 @@ varying vec3 vViewPosition;
   void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
 
     float dotNL = saturate( dot( geometry.normal, directLight.direction ));
+    #ifdef TOON_SHADING
+      if(dotNL < MEDIUM_TOON_RANGE){
+        dotNL = LOW_TOON_BORDER;
+      }
+      else if(dotNL < HIGH_TOON_RANGE){
+        dotNL = MEDIUM_TOON_BORDER;
+      }
+      else{
+        dotNL = HIGH_TOON_BORDER;
+      }
+    #endif
+
     vec3 irradiance = dotNL * directLight.color * PI;
     reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
     reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );

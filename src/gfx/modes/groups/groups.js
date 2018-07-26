@@ -1,5 +1,3 @@
-
-
 import AtomsSphereGroup from './AtomsSphereGroup';
 import AtomsSurfaceGroup from './AtomsSurfaceGroup';
 import AtomsSASSESGroupStub from './AtomsSASSESGroupStub';
@@ -26,4 +24,3 @@ export default {
   BondsCylinderGroup: BondsCylinderGroup,
   BondsLinesGroup: BondsLinesGroup
 };
-

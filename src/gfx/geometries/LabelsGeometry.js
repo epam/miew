@@ -1,20 +1,18 @@
-
-
 import * as THREE from 'three';
 import EventDispatcher from '../../utils/EventDispatcher';
 
 function createLabel(fieldTxt, className) {
-  var text = document.createElement('div');
+  const text = document.createElement('div');
   text.className = className;
 
   if (typeof fieldTxt === 'string') {
-    var spanText = document.createElement('span');
+    const spanText = document.createElement('span');
     spanText.style.fontSize = '150%';
-    var strings = fieldTxt.split('\n');
+    const strings = fieldTxt.split('\n');
 
-    for (var i = 0, n = strings.length; i < n; ++i) {
-      var spanNodeP = document.createElement('span');
-      var spanNodeText = document.createTextNode(strings[i]);
+    for (let i = 0, n = strings.length; i < n; ++i) {
+      const spanNodeP = document.createElement('span');
+      const spanNodeText = document.createTextNode(strings[i]);
       spanNodeP.appendChild(spanNodeText);
       spanText.appendChild(spanNodeP);
       if (i < n - 1) {
@@ -30,91 +28,88 @@ function createLabel(fieldTxt, className) {
   text.worldPos = new THREE.Vector3();
   return text;
 }
+class LabelsGeometry extends EventDispatcher {
+  constructor(instanceCount, opts) {
+    super();
+    this._opts = opts;
+    this.items = [];
+    this.needsUpdate = false;
 
-function LabelsGeometry(instanceCount, opts) {
-  EventDispatcher.call(this);
-  this._opts = opts;
-  this.items = [];
-  this.needsUpdate = false;
+    let xTranslation = -50;
+    let yTranslation = -50;
+    switch (opts.horizontalAlign) {
+    case 'left':
+      xTranslation = 0;
+      break;
+    case 'right':
+      xTranslation = -100;
+      break;
+    default:
+      break;
+    }
 
-  var xTranslation = -50;
-  var yTranslation = -50;
-  switch (opts.horizontalAlign) {
-  case 'left':
-    xTranslation = 0;
-    break;
-  case 'right':
-    xTranslation = -100;
-    break;
-  default:
-    break;
+    switch (opts.verticalAlign) {
+    case 'top':
+      yTranslation = -100;
+      break;
+    case 'bottom':
+      yTranslation = 0;
+      break;
+    default:
+      break;
+    }
+
+    // TODO is code above OK?
+    const deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
+    this.userData = {
+      translation: 'translate(' + xTranslation + '%, ' + yTranslation + '%)',
+      offset: deltaPos,
+    };
   }
 
-  switch (opts.verticalAlign) {
-  case 'top':
-    yTranslation = -100;
-    break;
-  case 'bottom':
-    yTranslation = 0;
-    break;
-  default:
-    break;
+  setItem(itemIdx, itemPos, fieldTxt) {
+    const opts = this._opts;
+    const labels = opts.labels;
+    const text = this.items[itemIdx] || createLabel(fieldTxt, 'label label-' + labels);
+
+    text.worldPos.copy(itemPos);
+    text.style.textAlign = opts.horizontalAlign;
+    text.style.verticalAlign = opts.verticalAlign;
+    this.items[itemIdx] = text;
   }
 
-  // TODO is code above OK?
-  var deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
-  this.userData = {
-    translation: 'translate(' + xTranslation + '%, ' + yTranslation + '%)',
-    offset: deltaPos,
-  };
+  setColor(itemIdx, fColor, bColor) {
+    const text = this.items[itemIdx];
+    text.opts = {
+      color: fColor,
+      background: bColor,
+    };
+  }
+
+  startUpdate() {
+    return true;
+  }
+
+  finishUpdate() {
+    this.needsUpdate = true;
+    this.dispatchEvent({type: 'update'});
+  }
+
+  finalize() {
+    this.finishUpdate();
+  }
+
+  // unimplemented functions
+  raycast() {
+  }
+
+  setOpacity() {
+
+  }
+
+  getSubset() {
+    return [];
+  }
 }
 
-LabelsGeometry.prototype = Object.create(EventDispatcher.prototype);
-LabelsGeometry.prototype.constructor = LabelsGeometry;
-
-LabelsGeometry.prototype.setItem = function(itemIdx, itemPos, fieldTxt) {
-  var opts = this._opts;
-  var labels = opts.labels;
-  var text = this.items[itemIdx] || createLabel(fieldTxt, 'label label-' + labels);
-
-  text.worldPos.copy(itemPos);
-  text.style.textAlign = opts.horizontalAlign;
-  text.style.verticalAlign = opts.verticalAlign;
-  this.items[itemIdx] = text;
-};
-
-LabelsGeometry.prototype.setColor = function(itemIdx, fColor, bColor) {
-  var text = this.items[itemIdx];
-  text.opts = {
-    color: fColor,
-    background: bColor,
-  };
-};
-
-LabelsGeometry.prototype.startUpdate = function() {
-  return true;
-};
-
-LabelsGeometry.prototype.finishUpdate = function() {
-  this.needsUpdate = true;
-  this.dispatchEvent({type: 'update'});
-};
-
-LabelsGeometry.prototype.finalize = function() {
-  this.finishUpdate();
-};
-
-// unimplemented functions
-LabelsGeometry.prototype.raycast = function() {
-};
-
-LabelsGeometry.prototype.setOpacity = function() {
-
-};
-
-LabelsGeometry.prototype.getSubset = function() {
-  return [];
-};
-
 export default LabelsGeometry;
-

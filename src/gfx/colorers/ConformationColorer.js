@@ -1,27 +1,23 @@
-
-
-import utils from '../../utils';
 import Colorer from './Colorer';
 
-function ConformationColorer(opts) {
-  Colorer.call(this, opts);
+class ConformationColorer extends Colorer {
+  static id = 'CF';
+
+  constructor(opts) {
+    super(opts);
+  }
+
+  getAtomColor(atom, _complex) {
+    return this.palette.getChainColor(String.fromCharCode(atom._location));
+  }
+
+  getResidueColor(_residue, _complex) {
+    return this.palette.defaultResidueColor;
+  }
 }
 
-utils.deriveClass(ConformationColorer, Colorer, {
-  id: 'CF', // [C]on[F]ormation
-  name: 'Conformation',
-  shortName: 'Conformation',
-}, {
-  id: 'CF',
-});
-
-ConformationColorer.prototype.getAtomColor = function(atom, _complex) {
-  return this.palette.getChainColor(String.fromCharCode(atom._location));
-};
-
-ConformationColorer.prototype.getResidueColor = function(_residue, _complex) {
-  return this.palette.defaultResidueColor;
-};
+ConformationColorer.prototype.id = 'CF';
+ConformationColorer.prototype.name = 'Conformation';
+ConformationColorer.prototype.shortName = 'Conformation';
 
 export default ConformationColorer;
-

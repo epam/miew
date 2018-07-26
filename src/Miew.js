@@ -91,6 +91,10 @@ function reportProgress(log, action, percent) {
   }
 }
 
+function chooseFogColor() {
+  return settings.now.fogColorEnable ? settings.now.fogColor : settings.now.bg.color;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -401,10 +405,9 @@ Miew.prototype._initGfx = function() {
   gfx.stereoCam = new THREE.StereoCamera();
 
   gfx.scene = new THREE.Scene();
-  gfx.scene.fog = new THREE.Fog(
-    settings.now.bg.color,
-    settings.now.camNear, settings.now.camFar
-  );
+
+  var color = chooseFogColor();
+  gfx.scene.fog = new THREE.Fog(color, settings.now.camNear, settings.now.camFar);
 
   gfx.root = new gfxutils.RCGroup();
   gfx.scene.add(gfx.root);
@@ -879,7 +882,8 @@ Miew.prototype._updateFog = function() {
 
   if (settings.now.fog) {
     if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
-      gfx.scene.fog = new THREE.Fog(settings.now.bg.color);
+      var color = chooseFogColor();
+      gfx.scene.fog = new THREE.Fog(color);
       this._setUberMaterialValues({fog: settings.now.fog});
     }
     updateFogRange(gfx.scene.fog, gfx.camera.position.z, this._getBSphereRadius());
@@ -1004,19 +1008,26 @@ Miew.prototype._onThemeChanged = (function() {
   };
 })();
 
-Miew.prototype._onBgColorChanged  = (function() {
-  return function() {
-    const gfx = this._gfx;
-    const color = settings.now.bg.color;
-    if (gfx) {
-      if (gfx.scene.fog) {
-        gfx.scene.fog.color.set(color);
-      }
-      gfx.renderer.setClearColor(color,  Number(!settings.now.bg.transparent));
+Miew.prototype._onBgColorChanged  = function() {
+  const gfx = this._gfx;
+  const color = chooseFogColor();
+  if (gfx) {
+    if (gfx.scene.fog) {
+      gfx.scene.fog.color.set(color);
     }
-    this._needRender = true;
-  };
-})();
+    gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
+  }
+  this._needRender = true;
+};
+
+Miew.prototype._onFogColorChanged = function() {
+  const gfx = this._gfx;
+  const color = chooseFogColor();
+  if (gfx && gfx.scene.fog) {
+    gfx.scene.fog.color.set(color);
+  }
+  this._needRender = true;
+};
 
 Miew.prototype._setUberMaterialValues = function(values) {
   this._gfx.root.traverse(function(obj) {
@@ -1086,9 +1097,10 @@ Miew.prototype._renderScene = (function() {
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
     // otherwise we render to canvas
+    var outline = bHaveComplexes && settings.now.outline.on;
     var fxaa = bHaveComplexes && settings.now.fxaa;
     var volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
-    var dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
+    var dstBuffer = (outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     var srcBuffer = gfx.offscreenBuf;
 
     if (bHaveComplexes && settings.now.ao) {
@@ -1105,8 +1117,17 @@ Miew.prototype._renderScene = (function() {
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
     }
 
+    //outline
+    if (outline) {
+      srcBuffer = dstBuffer;
+      dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf3 : target;
+      if (srcBuffer != null) {
+        this._renderOutline(camera, gfx.offscreenBuf, srcBuffer, dstBuffer);
+      }
+    }
+
     // render selected part with outline material
-    this._renderSelection(camera, srcBuffer, dstBuffer);
+    this._renderSelection(camera, gfx.offscreenBuf, dstBuffer);
 
     if (volume) {
       // copy current picture to the buffer that retains depth-data of the original molecule render
@@ -1124,7 +1145,7 @@ Miew.prototype._renderScene = (function() {
     srcBuffer = dstBuffer;
 
     if (fxaa) {
-      dstBuffer = distortion ? gfx.offscreenBuf3 : target;
+      dstBuffer = distortion ? gfx.offscreenBuf2 : target;
       this._performFXAA(srcBuffer, dstBuffer);
       srcBuffer = dstBuffer;
     }
@@ -1180,6 +1201,27 @@ Miew.prototype._performDistortion = (function() {
     }
   };
 }());
+
+Miew.prototype._renderOutline = (function() {
+
+  var _outlineMaterial = new OutlineMaterial({depth: true});
+
+  return function(camera, srcDepthBuffer, srcColorBuffer, targetBuffer) {
+
+    var self = this;
+    var gfx = self._gfx;
+
+    // apply Sobel filter -- draw outline
+    _outlineMaterial.uniforms.srcTex.value = srcColorBuffer.texture;
+    _outlineMaterial.uniforms.srcDepthTex.value = srcDepthBuffer.depthTexture;
+    _outlineMaterial.uniforms.srcTexSize.value.set(srcDepthBuffer.width, srcDepthBuffer.height);
+    _outlineMaterial.uniforms.color.value = new THREE.Color(settings.now.outline.color);
+    _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold;
+
+    gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
+  };
+
+})();
 
 Miew.prototype._renderSelection = (function() {
 
@@ -2693,11 +2735,11 @@ Miew.prototype.benchmarkGfx = function(force) {
 Miew.prototype.screenshot = function(width, height) {
   const gfx = this._gfx;
 
-  function Fov2Tan(fov) {
+  function fov2Tan(fov) {
     return Math.tan(THREE.Math.degToRad(0.5 * fov));
   }
 
-  function Tan2Fov(tan) {
+  function tan2Fov(tan) {
     return THREE.Math.radToDeg(Math.atan(tan)) * 2.0;
   }
 
@@ -2713,7 +2755,7 @@ Miew.prototype.screenshot = function(width, height) {
 
     const originalAspect = gfx.camera.aspect;
     const originalFov = gfx.camera.fov;
-    const originalTanFov2 = Fov2Tan(gfx.camera.fov);
+    const originalTanFov2 = fov2Tan(gfx.camera.fov);
 
     // screenshot should contain the principal area of interest (a centered square touching screen sides)
     const areaOfInterestSize = Math.min(gfx.width, gfx.height);
@@ -2722,11 +2764,11 @@ Miew.prototype.screenshot = function(width, height) {
     // set appropriate camera aspect & FOV
     const shotAspect = width / height;
     gfx.camera.aspect = shotAspect;
-    gfx.camera.fov = Tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
+    gfx.camera.fov = tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
     gfx.camera.updateProjectionMatrix();
 
     // resize canvas to the required size of screenshot
-    gfx.renderer.setSize(width, height);
+    gfx.renderer.setDrawingBufferSize(width, height, 1);
 
     // make screenshot
     this._renderFrame(settings.now.stereo);
@@ -2736,7 +2778,7 @@ Miew.prototype.screenshot = function(width, height) {
     gfx.camera.aspect = originalAspect;
     gfx.camera.fov = originalFov;
     gfx.camera.updateProjectionMatrix();
-    gfx.renderer.setSize(gfx.width, gfx.height);
+    gfx.renderer.setDrawingBufferSize(gfx.width, gfx.height, window.devicePixelRatio);
     this._needRender = true;
   }
 
@@ -3154,6 +3196,14 @@ Miew.prototype._initOnSettingsChanged = function() {
     this._setUberMaterialValues({normalsToGBuffer: settings.now.ao});
   });
 
+  on('fogColor', () => {
+    this._onFogColorChanged();
+  });
+
+  on('fogColorEnable', () => {
+    this._onFogColorChanged();
+  });
+
   on('bg.transparent', (evt) => {
     const gfx = this._gfx;
     if (gfx) {
@@ -3202,14 +3252,14 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('stereo', () => {
-    if (changes.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
+    if (settings.now.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
       this.webVR = new WebVRPoC(() => {
         this._needRender = true;
         this._onResize();
       });
     }
     if (this.webVR) {
-      this.webVR.toggle(changes.stereo === 'WEBVR', this._gfx);
+      this.webVR.toggle(settings.now.stereo === 'WEBVR', this._gfx);
     }
   });
 

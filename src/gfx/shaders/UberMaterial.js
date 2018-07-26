@@ -90,6 +90,8 @@ function UberMaterial(params) {
   this.fogTransparent = false;
   // used to render surface normals to G buffer for ssao effect
   this.normalsToGBuffer = false;
+  //used for toon material
+  this.toonShading = false;
 
   // uber options of "root" materials are inherited from single uber-options object that resides in prototype
   this.uberOptions = Object.create(UberMaterial.prototype.uberOptions);
@@ -151,12 +153,13 @@ UberMaterial.prototype.uberOptions = {
     this.projMatrixInv = source.projMatrixInv;
     this.viewport = source.viewport;
     this.lineWidth = source.lineWidth; // used for thick lines only
-
+    this.toonShading = source.toonShading;
   }
 };
 
 UberMaterial.prototype.copy = function(source) {
 
+  //TODO Why not RawShaderMaterial?
   THREE.ShaderMaterial.prototype.copy.call(this, source);
 
   this.fog = source.fog;
@@ -177,6 +180,7 @@ UberMaterial.prototype.copy = function(source) {
   this.thickLine = source.thickLine;
   this.fogTransparent = source.fogTransparent;
   this.normalsToGBuffer = source.normalsToGBuffer;
+  this.toonShading = source.toonShading;
 
   this.uberOptions.copy(source.uberOptions);
 
@@ -262,6 +266,9 @@ UberMaterial.prototype.setValues = function(values) {
   if (this.normalsToGBuffer) {
     extensions.drawBuffers = 1;
     defines.NORMALS_TO_G_BUFFER = 1;
+  }
+  if (this.toonShading) {
+    defines.TOON_SHADING = 1;
   }
   // set dependent values
   this.defines = defines;
