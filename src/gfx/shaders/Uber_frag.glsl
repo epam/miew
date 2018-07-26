@@ -439,7 +439,13 @@ void main() {
   #endif
 
   #ifdef USE_FOG
-    float fogFactor = smoothstep( fogNear, fogFar, vViewPosition.z );
+    float viewDistance;
+    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+      viewDistance = abs(pixelPosEye.z);
+    #else
+      viewDistance = vViewPosition.z;
+    #endif
+    float fogFactor = smoothstep( fogNear, fogFar, viewDistance);
     #ifdef FOG_TRANSPARENT
       gl_FragColor.a = gl_FragColor.a * (1.0 - fogFactor);
     #else
