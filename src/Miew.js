@@ -1053,9 +1053,9 @@ Miew.prototype._renderScene = (function() {
     // FIXME clean up targets in render selection
 
     if (settings.now.transparency === 'prepass') {
-       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
+      this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
-       gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
+      gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
     }
 
     var bHaveComplexes = (this._getComplexVisual() !== null);

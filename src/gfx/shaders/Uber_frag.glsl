@@ -294,25 +294,6 @@ float unpackRGBAToDepth( const in vec4 v ) {
 }
 
 #ifdef SHADOWMAP
-
-  /*float chess(vec2 uv) {
-      float step = 0.25;
-      float indX = ceil(uv.x/step);
-      float indY = ceil(uv.y/step);
-      float signX = (mod(indX, 2.0) == 0.0) ? 1.0 : -1.0;
-      float signY = (mod(indY, 2.0) == 0.0) ? 1.0 : -1.0;
-
-      float color = (signX * signY > 0.0) ? 1.0 : 0.0;
-
-      return color;
-    }
-
-  float texture2DCompare( sampler2D map,  vec2 uv, float compare ) {
-		return step( compare, chess(uv));
-		return chess(uv);
-  }*/
-
-
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
 	}
