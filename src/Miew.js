@@ -211,8 +211,6 @@ Miew.prototype.init = function() {
   var elem = utils.createElement('div', {'class': 'miew-canvas'});
   _setContainerContents(container, elem);
   this._container = elem;
-  var themeRE = /\s*theme-\w+\b/g;
-  var theme = settings.now.theme;
 
   var frag = document.createDocumentFragment();
   frag.appendChild(this._msgMode = createElement(
@@ -283,9 +281,9 @@ Miew.prototype.init = function() {
       self._onDblClick(event);
     });
 
-    var div = this._containerRoot;
-    div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
-
+    if (!settings._changed['bg.color']) {
+      settings.set('bg.color', settings.now.themes[settings.now.theme]);
+    }
   } catch (error) {
     // FIXME: THREE.WebGLRenderer throws error AND catches it, so we receive different one. Some random crash.
     if (error.name === 'TypeError' && error.message === 'Cannot read property \'getExtension\' of null') {
@@ -996,15 +994,15 @@ Miew.prototype._renderFrame = (function() {
 })();
 /** @deprecated - use _onBgColorChanged */
 Miew.prototype._onThemeChanged = (function() {
-  var themeRE = /\s*theme-\w+\b/g;
-  return function() {
-    var theme = settings.now.theme;
-    var div = this._containerRoot;
-    div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
+    var themeRE = /\s*theme-\w+\b/g;
+    return function() {
+      var theme = settings.now.theme;
+      var div = this._containerRoot;
+      div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
 
-    settings.set('bg.color', settings.now.themes[theme]);
-    this._needRender = true;
-  };
+      settings.set('bg.color', settings.now.themes[theme]);
+      this._needRender = true;
+    };
 })();
 
 Miew.prototype._onBgColorChanged  = function() {
