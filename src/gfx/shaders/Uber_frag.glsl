@@ -42,6 +42,7 @@ uniform float clipPlaneValue;
 
 #ifdef USE_FOG
   uniform vec3 fogColor;
+  uniform float fogAlpha;
   uniform float fogNear;
   uniform float fogFar;
 #endif
@@ -477,7 +478,7 @@ void main() {
     #else
       viewDistance = vViewPosition.z;
     #endif
-    float fogFactor = smoothstep( fogNear, fogFar, viewDistance);
+    float fogFactor = smoothstep( fogNear, fogFar, viewDistance) * fogAlpha;
     #ifdef FOG_TRANSPARENT
       fragColor.a = fragColor.a * (1.0 - fogFactor);
     #else
