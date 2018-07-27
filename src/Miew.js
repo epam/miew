@@ -376,7 +376,10 @@ Miew.prototype._initGfx = function() {
   if (!gfx.renderer.getContext().getExtension('EXT_frag_depth')) {
     settings.set('zSprites', false);
   }
-  if (!gfx.renderer.getContext().getExtension('WEBGL_depth_texture')) {
+  if (
+    !gfx.renderer.getContext().getExtension('WEBGL_depth_texture') ||
+    !gfx.renderer.getContext().getExtension('WEBGL_draw_buffers')
+  ) {
     settings.set('ao', false);
   }
 
@@ -826,6 +829,7 @@ Miew.prototype._resizeOffscreenBuffers = function(width, height, stereo) {
   gfx.offscreenBuf.setSize(multi * width, height);
   gfx.offscreenBuf2.setSize(multi * width, height);
   gfx.offscreenBuf3.setSize(multi * width, height);
+  gfx.offscreenBuf4.setSize(multi * width, height);
   if (gfx.offscreenBuf5) {
     gfx.offscreenBuf5.setSize(multi * width, height);
   }
@@ -1035,6 +1039,33 @@ Miew.prototype._setUberMaterialValues = function(values) {
   });
 };
 
+Miew.prototype._setMRT = function(renderBuffer, textureBuffer) {
+  const gfx = this._gfx;
+  const gl = gfx.renderer.getContext();
+  const ext =  gl.getExtension('WEBGL_draw_buffers');
+  const properties = gfx.renderer.properties;
+
+  //take extra texture from Texture Buffer
+  gfx.renderer.setRenderTarget(textureBuffer);
+  const tx8 = properties.get(textureBuffer.texture).__webglTexture;
+  gl.bindTexture(gl.TEXTURE_2D, tx8);
+
+  //take texture and farmebuffer from renderbuffer
+  gfx.renderer.setRenderTarget(renderBuffer);
+  const fb = properties.get(renderBuffer).__webglFramebuffer;
+  const tx = properties.get(renderBuffer.texture).__webglTexture;
+
+  //set framebuffer
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+  fb.width = renderBuffer.width;
+  fb.height = renderBuffer.height;
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tx, 0);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, tx8, 0);
+
+  //mapping textures
+  ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
+};
+
 Miew.prototype._renderScene = (function() {
   return function(camera, distortion, target) {
     distortion = distortion || false;
@@ -1049,17 +1080,20 @@ Miew.prototype._renderScene = (function() {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.clearTarget(gfx.offscreenBuf);
-    // FIXME clean up targets in render selection
+    gfx.renderer.clearTarget(gfx.offscreenBuf);    // FIXME clean up targets in render selection
+
+    var bHaveComplexes = (this._getComplexVisual() !== null);
+    var volumeVisual = this._getVolumeVisual();
+
+    if (bHaveComplexes && settings.now.ao) {
+      this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
+    }
 
     if (settings.now.transparency === 'prepass') {
       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
       gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
     }
-
-    var bHaveComplexes = (this._getComplexVisual() !== null);
-    var volumeVisual = this._getVolumeVisual();
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
     // otherwise we render to canvas
@@ -1070,7 +1104,14 @@ Miew.prototype._renderScene = (function() {
     var srcBuffer = gfx.offscreenBuf;
 
     if (bHaveComplexes && settings.now.ao) {
-      this._performAO(srcBuffer, gfx.offscreenBuf.depthTexture, dstBuffer, gfx.offscreenBuf3, gfx.offscreenBuf2);
+      this._performAO(
+        srcBuffer,
+        gfx.offscreenBuf4,
+        gfx.offscreenBuf.depthTexture,
+        dstBuffer,
+        gfx.offscreenBuf3,
+        gfx.offscreenBuf2
+      );
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
@@ -1426,13 +1467,9 @@ Miew.prototype._performAO = (function() {
   // var _kernelOffsets = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0];
   var _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
 
-  return function(srcColorBuffer, srcDepthBuffer, targetBuffer, tempBuffer, tempBuffer1) {
+  return function(srcColorBuffer, normalBuffer, srcDepthTexture, targetBuffer, tempBuffer, tempBuffer1) {
 
-    if (typeof srcColorBuffer === 'undefined' ||
-          typeof srcDepthBuffer === 'undefined' ||
-          typeof targetBuffer === 'undefined' ||
-          typeof tempBuffer === 'undefined' ||
-          typeof tempBuffer1 === 'undefined') {
+    if (!srcColorBuffer || !normalBuffer || !srcDepthTexture || !targetBuffer || !tempBuffer || !tempBuffer1) {
       return;
     }
 
@@ -1445,7 +1482,8 @@ Miew.prototype._performAO = (function() {
 
     // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
-    _aoMaterial.uniforms.depthTexture.value = srcDepthBuffer;
+    _aoMaterial.uniforms.depthTexture.value = srcDepthTexture;
+    _aoMaterial.uniforms.normalTexture.value = normalBuffer.texture;
     _aoMaterial.uniforms.srcTexelSize.value.set(1.0 / srcColorBuffer.width, 1.0 / srcColorBuffer.height);
     _aoMaterial.uniforms.camNearFar.value.set(gfx.camera.near, gfx.camera.far);
     _aoMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
@@ -1469,14 +1507,14 @@ Miew.prototype._performAO = (function() {
 
     _horBlurMaterial.uniforms.aoMap.value = tempBuffer1.texture;
     _horBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer1.width, 1.0 / tempBuffer1.height);
-    _horBlurMaterial.uniforms.depthTexture.value = srcDepthBuffer;
+    _horBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _horBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.renderScreenQuad(_horBlurMaterial, tempBuffer);
 
     _vertBlurMaterial.uniforms.aoMap.value = tempBuffer.texture;
     _vertBlurMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _vertBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer.width, 1.0 / tempBuffer.height);
-    _vertBlurMaterial.uniforms.depthTexture.value = srcDepthBuffer;
+    _vertBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.renderScreenQuad(_vertBlurMaterial, targetBuffer);
   };
@@ -2465,7 +2503,7 @@ Miew.prototype._onKeyDown = function(event) {
   case 'S'.charCodeAt(0):
     event.preventDefault();
     event.stopPropagation();
-    settings.now.ao = !settings.now.ao;
+    settings.set('ao', !settings.now.ao);
     this._needRender = true;
     break;
   case 107:
@@ -3161,6 +3199,10 @@ Miew.prototype._initOnSettingsChanged = function() {
     this._onBgColorChanged();
   });
 
+  on('ao', () => {
+    this._setUberMaterialValues({normalsToGBuffer: settings.now.ao});
+  });
+
   on('fogColor', () => {
     this._onFogColorChanged();
   });
@@ -3833,6 +3875,39 @@ Miew.prototype.exportCML = function() {
 
   return null;
 };
+
+/**
+ * Reproduce the RCSB PDB Molecule of the Month style by David S. Goodsell
+ *
+ * @see http://pdb101.rcsb.org/motm/motm-about
+ */
+Miew.prototype.motm = function() {
+  settings.set('theme', 'light');
+  settings.set({
+    fogColorEnable: true,
+    fogColor: 0x000000,
+    outline: {on:true, threshold: 0.01},
+    bg: {color: 0xffffff},
+  });
+
+  this._forEachComplexVisual((visual) => {
+    var rep = [];
+    var complex = visual.getComplex();
+    var palette = palettes.get(settings.now.palette);
+    for (let i = 0; i < complex.getChainCount(); i++) {
+      var curChainName = complex._chains[i]._name;
+      var curChainColor = palette.getChainColor(curChainName);
+      rep[i] = {
+        selector: 'chain ' + curChainName,
+        mode: 'VW',
+        colorer: ['CB', {color: curChainColor, factor: 0.9}],
+        material: 'FL'
+      };
+    }
+    visual.resetReps(rep);
+  });
+};
+
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 

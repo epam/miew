@@ -5,6 +5,7 @@ uniform sampler2D noiseTexture;
 uniform vec2      noiseTexelSize;
 uniform sampler2D diffuseTexture;
 uniform sampler2D depthTexture;
+uniform sampler2D normalTexture;
 uniform vec2      srcTexelSize;
 uniform vec2      camNearFar;
 uniform mat4      projMatrix;
@@ -25,7 +26,7 @@ float CalcViewZ(vec2 screenPos)
   // [0, 1]->[-1, 1]
   float clipedZ = 2.0 * depth - 1.0;
   // see THREE.js camera.makeFrustum for projection details
-  return (- projMatrix[3][2] / (clipedZ + projMatrix[2][2]));
+  return (-projMatrix[3][2] / (clipedZ + projMatrix[2][2]));
 }
 
 vec3 ViewPosFromDepth(vec2 screenPos)
@@ -34,41 +35,20 @@ vec3 ViewPosFromDepth(vec2 screenPos)
   viewPos.z = CalcViewZ(screenPos);
   //[0, 1]->[-1, 1]
   vec2 projPos = 2.0 * screenPos - 1.0;
-  vec2 viewRay = vec2(projPos.x * aspectRatio * tanHalfFOV, projPos.y * tanHalfFOV); // TODO mode to vs
-  // reconstruct viewposition in right-handed sc with z from viewer
-  viewPos.xy = vec2(viewRay.x * viewPos.z, viewRay.y * viewPos.z);
+  // reconstruct viewposition in right-handed sc with z to viewer
+  viewPos.xy = vec2(
+                    projPos.x * aspectRatio * tanHalfFOV * abs(viewPos.z),
+                    projPos.y * tanHalfFOV * abs(viewPos.z)
+                   );
   return viewPos;
-}
-
-vec3 GetDerivative( vec3 p0, vec3 p1, vec3 p2 )
-{
-  vec3 v1 = p1 - p0;
-  vec3 v2 = p0 - p2;
-  return ( dot( v1, v1 ) < dot( v2, v2 ) ) ? v1 : v2;
-}
-
-vec3 RestoreNormalFromDepth(vec2 texcoords, vec3 p) {
-
-  vec2 offset1 = vec2(srcTexelSize.x, 0.0);
-  vec2 offset2 = vec2(0.0, srcTexelSize.y);
-
-  vec3 p1 = ViewPosFromDepth(texcoords + offset1);
-  vec3 p2 = ViewPosFromDepth(texcoords + offset2);
-  vec3 p3 = ViewPosFromDepth(texcoords - offset1);
-  vec3 p4 = ViewPosFromDepth(texcoords - offset2);
-
-  vec3 dx = GetDerivative(p, p3, p1);
-  vec3 dy = GetDerivative(p, p4, p2);
-  vec3 normal = cross(dx, dy);
-  return normalize(normal);
 }
 
 void main() {
   vec3 viewPos = ViewPosFromDepth(vUv);
   // remap coordinates to prevent noise exture rescale
   vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;
-  // restore normal from depth buffer
-  vec3 normal = RestoreNormalFromDepth(vUv, viewPos);
+  //[0, 1] -> [-1, 1]
+  vec3 normal = (texture2D(normalTexture, vUv).rgb * 2.0 - 1.0);
   // get random vector for sampling sphere rotation
   vec3 randN = texture2D(noiseTexture, vUvNoise).rgb * 2.0 - 1.0;
   randN = normalize(randN);
@@ -83,13 +63,18 @@ void main() {
     vec3 reflectedSample = TBN * samplesKernel[i];
     // get sample
     vec3 samplePos = viewPos + reflectedSample * kernelRadius;
+
     // project sample to screen to get sample's screen pos
-    vec4 offset = vec4(samplePos, 1.0);
-    offset = projMatrix * offset;
-    offset.xy /= offset.w;
-    offset.xy = (-offset.xy + vec2(1.0)) * 0.5;
+    vec4 SampleScrPos = vec4(samplePos, 1.0);
+    // eye -> clip
+    SampleScrPos = projMatrix * SampleScrPos;
+    // normalize
+    SampleScrPos.xy /= SampleScrPos.w;
+    //[-1, 1] -> [0, 1]
+    SampleScrPos.xy = (SampleScrPos.xy + vec2(1.0)) * 0.5;
+
     // get view z for sample projected to the objct surface
-    float sampleDepth = CalcViewZ(offset.xy);
+    float sampleDepth = CalcViewZ(SampleScrPos.xy);
     // calc occlusion made by object surface at the sample
     AO += step(samplePos.z, sampleDepth);
   }
@@ -97,7 +82,7 @@ void main() {
   AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);
   // calc result AO-map color
   AO = 1.0 - max(0.0, AO / 32.0 * factor); // TODO use MAX_SAMPLES_COUNT
-  // check if the fragment doesn't belong to background
+  // check if the fragment doesn't belong to background(?)
   if (abs(- viewPos.z - camNearFar.y) < 0.1) { // FIXME remove temporal fix for background darkening
     gl_FragColor = vec4(1.0);
     return;

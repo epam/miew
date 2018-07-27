@@ -54,6 +54,11 @@ Representation.prototype.buildGeometry = function(complex) {
   // console.time('buildGeometry');
   this.reset();
   this.needsRebuild = false;
+
+  if (settings.now.ao) {
+    this.material.setValues({normalsToGBuffer:settings.now.ao});
+  }
+
   this.geo = this.mode.buildGeometry(complex, this.colorer, 1 << this.index, this.material);
 
   if (this.material.uberOptions.opacity < 0.99 && settings.now.transparency === 'prepass') {
