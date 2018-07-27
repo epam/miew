@@ -11,7 +11,9 @@ function ZSpriteMesh(geometry, material) {
 ZSpriteMesh.prototype = Object.create(Mesh.prototype);
 ZSpriteMesh.prototype.constructor = ZSpriteMesh;
 
-ZSpriteMesh.prototype._onBeforeRender = function(_renderer, _scene, camera, _geometry, _material, _group) {
+ZSpriteMesh.prototype._onBeforeRender = function(renderer, scene, camera, _geometry, _material, _group) {
+  Mesh.prototype._onBeforeRender.call(this, renderer, scene, camera);
+
   var material = this.material;
   if (!material) {
     return;

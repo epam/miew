@@ -214,7 +214,6 @@ void main() {
 	//for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 	  vec4 worldPosition = vec4(vWorldPosition, 1.0);
 		vDirectionalShadowCoord/*[ i ]*/ = dirShadowMatrix/*[ i ]*/ * worldPosition;
-		//vDirectionalShadowCoord/*[ i ]*/ =  worldPosition;
 	//}
 	#endif
 #endif
