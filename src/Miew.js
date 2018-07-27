@@ -994,15 +994,15 @@ Miew.prototype._renderFrame = (function() {
 })();
 /** @deprecated - use _onBgColorChanged */
 Miew.prototype._onThemeChanged = (function() {
-    var themeRE = /\s*theme-\w+\b/g;
-    return function() {
-      var theme = settings.now.theme;
-      var div = this._containerRoot;
-      div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
+  var themeRE = /\s*theme-\w+\b/g;
+  return function() {
+    var theme = settings.now.theme;
+    var div = this._containerRoot;
+    div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
 
-      settings.set('bg.color', settings.now.themes[theme]);
-      this._needRender = true;
-    };
+    settings.set('bg.color', settings.now.themes[theme]);
+    this._needRender = true;
+  };
 })();
 
 Miew.prototype._onBgColorChanged  = function() {
