@@ -29,6 +29,8 @@ var defaultUniforms = THREE.UniformsUtils.merge([
     'projMatrixInv': {type: '4fv', value: new THREE.Matrix4()},
     'viewport': {type: 'v2', value: new THREE.Vector2()},
     'lineWidth': {type: 'f', value: 2.0},
+    //default value must be the same as settings
+    'fogAlpha': {type: 'f', value: 1.0}
   }
 
 ]);
@@ -49,6 +51,7 @@ var uberOptionNames = [
   'projMatrixInv',
   'viewport',
   'lineWidth',
+  'fogAlpha'
 ];
 
 function UberMaterial(params) {
@@ -134,6 +137,7 @@ UberMaterial.prototype.uberOptions = {
   projMatrixInv: new THREE.Matrix4(),
   viewport: new THREE.Vector2(800, 600),
   lineWidth: 2.0,
+  fogAlpha: 1.0,
 
   copy: function(source) {
     this.diffuse.copy(source.diffuse);
@@ -152,6 +156,7 @@ UberMaterial.prototype.uberOptions = {
     this.viewport = source.viewport;
     this.lineWidth = source.lineWidth; // used for thick lines only
     this.toonShading = source.toonShading;
+    this.fogAlpha = source.fogAlpha;
   }
 };
 

@@ -15,6 +15,7 @@ function Representation(index, mode, colorer, selector) {
   this.count = 0;
   this.material = new UberMaterial();
   this.material.setValues({clipPlane: settings.now.draft.clipPlane, fogTransparent: settings.now.bg.transparent});
+  this.material.setUberOptions({fogAlpha: settings.now.fogAlpha});
   this.materialPreset = materials.first;
   this.needsRebuild = true;
   this.visible = true;

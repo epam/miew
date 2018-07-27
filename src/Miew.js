@@ -3136,6 +3136,14 @@ Miew.prototype._fogFarUpdateValue = function() {
   }
 };
 
+Miew.prototype._fogAlphaChanged = function() {
+  this._forEachComplexVisual(function(visual) {
+    visual.setUberOptions({
+      fogAlpha: settings.now.fogAlpha
+    });
+  });
+};
+
 Miew.prototype._initOnSettingsChanged = function() {
   const on = (props, func) => {
     props = _.isArray(props) ? props : [props];
@@ -3199,6 +3207,10 @@ Miew.prototype._initOnSettingsChanged = function() {
 
   on(['fog', 'fogNearFactor', 'fogFarFactor'], () => {
     this._updateFog();
+  });
+
+  on('fogAlpha', () => {
+    this._fogAlphaChanged();
   });
 
   on('autoResolution', (evt) => {

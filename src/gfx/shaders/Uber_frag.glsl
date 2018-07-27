@@ -32,6 +32,7 @@ uniform float clipPlaneValue;
 
 #ifdef USE_FOG
   uniform vec3 fogColor;
+  uniform float fogAlpha;
   uniform float fogNear;
   uniform float fogFar;
 #endif
@@ -443,7 +444,7 @@ void main() {
     #ifdef FOG_TRANSPARENT
       gl_FragColor.a = gl_FragColor.a * (1.0 - fogFactor);
     #else
-      gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+      gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor * fogAlpha);
     #endif
   #endif
 #endif
