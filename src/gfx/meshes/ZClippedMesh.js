@@ -12,6 +12,8 @@ ZClippedMesh.prototype = Object.create(Mesh.prototype);
 ZClippedMesh.prototype.constructor = ZClippedMesh;
 
 ZClippedMesh.prototype._onBeforeRender = function(renderer, scene, camera) {
+  Mesh.prototype._onBeforeRender.call(this, renderer, scene, camera);
+
   var geo = this.geometry;
   var material = this.material;
   if (!geo.zClip || !material.uberOptions) {
