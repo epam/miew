@@ -504,7 +504,16 @@ void main() {
 #endif
 
 #ifdef COLOR_FROM_DEPTH
-  gl_FragColor = packDepthToRGBA(gl_FragCoord.z);
+  float depth = 0.0;
+  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+    depth = gl_FragDepthEXT;
+    depth = 0.0;
+  #else
+    depth = gl_FragCoord.z;
+  #endif
+  gl_FragColor = packDepthToRGBA(depth);
+  gl_FragColor  = vec4(1.0, 0.0, 1.0, 1.0);
   return;
 #endif
 
