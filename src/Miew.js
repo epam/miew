@@ -281,8 +281,9 @@ Miew.prototype.init = function() {
       self._onDblClick(event);
     });
 
-    this._onThemeChanged();
-
+    if (!settings._changed['bg.color']) {
+      settings.set('bg.color', settings.now.themes[settings.now.theme]);
+    }
   } catch (error) {
     // FIXME: THREE.WebGLRenderer throws error AND catches it, so we receive different one. Some random crash.
     if (error.name === 'TypeError' && error.message === 'Cannot read property \'getExtension\' of null') {

@@ -37,9 +37,12 @@ function unarray(x) {
 }
 
 function Menu(/** Node */ container, /** Miew */ viewer) {
+  var themeRE = /\s*theme-\w+\b/g;
+  var theme = settings.now.theme;
   // Add proper DOM elements
   _.forEach($.parseHTML(menuHtml), (element) => container.parentNode.appendChild(element));
 
+  container.className = container.className.replace(themeRE, '') + ' theme-' + theme;
   // Save some objects for future reference
   this._viewer = viewer;
   this._menuId = '#miew-menu';
