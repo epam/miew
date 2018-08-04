@@ -143,7 +143,7 @@
     "postcss-advanced-variables": "^2.3.3",
     "postcss-calc": "^6.0.1",
     "postcss-cli": "^6.0.0",
-    "postcss-import": "^11.1.0",
+    "postcss-import": "^12.0.0",
     "postcss-loader": "^2.1.6",
     "postcss-nested": "^3.0.0",
     "postcss-scss": "^2.0.0",
