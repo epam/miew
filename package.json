@@ -149,7 +149,7 @@
     "postcss-scss": "^2.0.0",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.2",
-    "rollup": "^0.63.4",
+    "rollup": "^0.64.0",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-commonjs": "^9.1.4",
     "rollup-plugin-node-resolve": "^3.3.0",
