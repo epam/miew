@@ -1,0 +1,47 @@
+export default class PDBResult {
+  constructor() {
+    this._resultArray = [];
+    this._currentStr = -1;
+    //this._result = null;
+  }
+
+  getResult() {
+    return this._resultArray.join('');
+  }
+
+  newString() {
+    this._currentStr++;
+    this._resultArray.push('');
+  }
+
+  writeString(string, begin, end) {
+    let curStr = this._resultArray[this._currentStr];
+    let str = string;
+
+    if (string.length > Math.abs(begin - end) + 1) {
+      str = string.substr(0, Math.abs(begin - end));
+    }
+
+    //spaces before
+    if (curStr) {
+      const start = begin < end ? begin : end;
+      if (start > curStr.length + 1) {
+        this._resultArray[this._currentStr] += ' '.repeat(start - curStr.length - 1);
+      }
+    }
+
+    //if reverse order
+    if (end < begin) {
+      const len = begin - end + 1;
+      this._resultArray[this._currentStr] += ' '.repeat(len - string.length);
+    }
+
+    this._resultArray[this._currentStr] += str;
+    curStr = this._resultArray[this._currentStr];
+
+    const finish = begin < end ? end : begin;
+    if (finish > curStr.length) {
+      this._resultArray[this._currentStr] += ' '.repeat(end - curStr.length);
+    }
+  }
+}

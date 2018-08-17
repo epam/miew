@@ -1,5 +1,9 @@
 import EntityList from '../../utils/EntityList';
 
+/**
+ * A list of available exporters.
+ * @extends EntityList
+ */
 class ExporterList extends EntityList {
   /**
    * Create a list of exporters.
