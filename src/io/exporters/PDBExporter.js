@@ -47,8 +47,8 @@ export default class PDBExporter extends Exporter {
       return;
     }
     const metadata = this._source.metadata;
+    result.newTag('HEADER');
     result.newString();
-    result.writeString('HEADER', 1, 6);
     result.writeString(metadata.classification, 11, 50);
     result.writeString(metadata.date, 51, 59);
     result.writeString(metadata.id, 63, 66);
@@ -60,16 +60,10 @@ export default class PDBExporter extends Exporter {
       return;
     }
     const metadata = this._source.metadata;
+    result.newTag('TITLE', true);
     for (let i = 0; i < metadata.title.length; i++) {
       result.newString();
-      result.writeString('TITLE', 1, 6);
-      if (i === 0) {
-        result.writeString(metadata.title[i], 11, 80);
-      } else {
-        result.writeString((i + 1).toString(), 10, 8);
-        result.writeString(metadata.title[i], 12, 80);
-      }
-      //result.writeString('\n', 81, 81);
+      result.writeString(metadata.title[i], 11, 80);
     }
   }
 
@@ -79,27 +73,20 @@ export default class PDBExporter extends Exporter {
   _extractATOM() {
   }
 
-  //dat shit
   _extractCOMPND(result) {
     if (!this._source._molecules || !this._source._chains) {
       return;
     }
     const molecules = this._source._molecules;
-    //const chains = this._getChainsNamesArray();
+    result.newTag('COMPND', true);
     for (let i = 0; i < molecules.length; i++) {
-      //let count = 1;
       const chains = this._getMoleculeChains(molecules[i]);
       result.newString();
-      result.writeString('COMPND', 1, 6);
       result.writeString('MOL_ID: ' + molecules[i]._index + ';', 11, 80);
       result.newString();
-      result.writeString('COMPND', 1, 6);
-      //result.writeString((++count).toString(), 10, 9);
-      result.writeString('MOLECULE: ' + molecules[i]._name + ';', 12, 80);
+      result.writeString('MOLECULE: ' + molecules[i]._name + ';', 11, 80);
       result.newString();
-      result.writeString('COMPND', 1, 6);
-      //result.writeString((++count).toString(), 10, 9);
-      result.writeString('CHAIN: ', 12, 17);
+      result.writeString('CHAIN: ', 11, 17);
       result.writeString(chains.join(', ') + ';', 18, 80);
     }
   }
