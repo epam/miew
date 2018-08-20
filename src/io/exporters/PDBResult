@@ -2,6 +2,8 @@ export default class PDBResult {
   constructor() {
     this._resultArray = [];
     this._currentStr = -1;
+    this._tag = null;
+    this._count = false;
     //this._result = null;
   }
 
@@ -9,7 +11,13 @@ export default class PDBResult {
     return this._resultArray.join('');
   }
 
+  //newTag(tag, count) {
+    //this._tag = tag;
+   // this._count = count;
+  //}
+
   newString() {
+    this.writeString('\n', 81, 81);
     this._currentStr++;
     this._resultArray.push('');
   }

@@ -1570,6 +1570,17 @@ Miew.prototype.resetView = function() {
   });
 };
 
+Miew.prototype.exp = function() {
+  const TheExporter = _.head(io.exporters.find({format: 'pdb'}));
+  //let result;
+  if (!TheExporter) {
+    this.logger.error('Could not find suitable exporter for this source');
+    return Promise.reject(new Error('Could not find suitable exporter for this source'));
+  }
+  const exporter = new TheExporter(this._dataSuse, {binary: true});
+  return exporter.export().then((data) => { return data; });
+};
+
 /**
  * Load molecule asynchronously.
  * @param {string|File} source - Molecule source to load (e.g. PDB ID, URL or File object).
@@ -1793,6 +1804,7 @@ Miew.prototype._stopAnimation = function() {
 Miew.prototype._onLoad = function(dataSource, opts) {
   var gfx = this._gfx;
   var visualName = null;
+  this._dataSuse = dataSource;
 
   if (opts.animation) {
     this._refreshTitle();
