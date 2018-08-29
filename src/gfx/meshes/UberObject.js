@@ -1,7 +1,6 @@
 
 
 import UberMaterial from '../shaders/UberMaterial';
-import * as THREE from "three";
 export default function(SuperClass) {
   function NewObjectType() {
     SuperClass.apply(this, arguments);

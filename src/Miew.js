@@ -427,7 +427,12 @@ Miew.prototype._initGfx = function() {
   light12.castShadow = true;
   var horizontalSize = 1.3946 * gfx.width / gfx.height;
   var verticalSize = 1.3946;
-  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-horizontalSize, horizontalSize, verticalSize, -verticalSize, 0.1, 100));
+  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(
+    -horizontalSize,
+    horizontalSize,
+    verticalSize,
+    -verticalSize, 0.1, 100
+  ));
   light12.shadow.bias = -0.001; //TODO should depends on zoom
   var shadowMapWidth = gfx.width * window.devicePixelRatio;
   var shadowMapHeight = gfx.height * window.devicePixelRatio;

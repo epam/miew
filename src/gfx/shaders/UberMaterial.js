@@ -6,7 +6,6 @@ import * as THREE from 'three';
 import vertexShader from './Uber_vert.glsl';
 import fragmentShader from './Uber_frag.glsl';
 import capabilities from './../capabilities';
-import ZClippedMesh from "../meshes/ZClippedMesh";
 
 //  var INSTANCED_SPRITE_OVERSCALE = 1.3;
 
