@@ -494,7 +494,6 @@ void main() {
     depth = gl_FragCoord.z;
   #endif
   gl_FragColor = packDepthToRGBA(depth);
-  gl_FragColor  = vec4(1.0, 0.0, 1.0, 1.0);
   return;
 #endif
 
