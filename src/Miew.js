@@ -422,22 +422,14 @@ Miew.prototype._initGfx = function() {
 
   // TODO: Either stay with a single light or revert this commit
   var light12 = new THREE.DirectionalLight(0xffffff, 0.45);
-  light12.position.set(0, 0.414, 1);
+  light12.position.set(gfx.camera.position.x * 10, gfx.camera.position.y * 10 || 5.4, gfx.camera.position.z * 10 || 10);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light12.castShadow = true;
-  var horizontalSize = 1.3946 * gfx.width / gfx.height;
-  var verticalSize = 1.3946;
-  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(
-    -horizontalSize,
-    horizontalSize,
-    verticalSize,
-    -verticalSize, 0.1, 100
-  ));
+  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 100));
   light12.shadow.bias = -0.001; //TODO should depends on zoom
-  var shadowMapWidth = gfx.width * window.devicePixelRatio;
-  var shadowMapHeight = gfx.height * window.devicePixelRatio;
-  light12.shadow.mapSize.width = shadowMapWidth;
-  light12.shadow.mapSize.height = shadowMapHeight;
+  var shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
+  light12.shadow.mapSize.width = shadowMapSize;
+  light12.shadow.mapSize.height = shadowMapSize;
   gfx.scene.add(light12);
 
   var light3 = new THREE.AmbientLight(0x666666);
@@ -937,6 +929,7 @@ Miew.prototype._onRender = function() {
   gfx.camera.updateMatrixWorld();
 
   this._clipPlaneUpdateValue(this._getBSphereRadius());
+  this._updateShadow(this._getBSphereRadius());
   this._fogFarUpdateValue();
 
   gfx.renderer.clearTarget(null);
@@ -3077,6 +3070,27 @@ Miew.prototype.getState = function(opts) {
  */
 Miew.prototype.get = function(param, value) {
   return settings.get(param, value);
+};
+
+Miew.prototype._updateShadow = function(radius) {
+  for (var i = 0; i < this._gfx.scene.children.length; i++) {
+    if (this._gfx.scene.children[i].shadow !== undefined) {
+      var light = this._gfx.scene.children[i];
+
+      light.shadow.camera.bottom = -radius;
+      light.shadow.camera.top = radius;
+      light.shadow.camera.left = -radius;
+      light.shadow.camera.right = radius;
+
+      var distToOrigin = light.position.length();
+      var extraShift = 10;  // if it's smaller there are artefacts in shadow
+      light.shadow.camera.far = distToOrigin + radius + extraShift;
+      light.shadow.camera.near = distToOrigin - radius - extraShift;
+      light.shadow.camera.near = light.shadow.camera.near > 0.1 ? light.shadow.camera.near : 0.1;
+
+      light.shadow.camera.updateProjectionMatrix();
+    }
+  }
 };
 
 Miew.prototype._clipPlaneUpdateValue = function(radius) {
