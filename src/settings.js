@@ -712,6 +712,12 @@ var defaults = {
   ao: false,
 
   /**
+   * @type {boolean}
+   * @instance
+   */
+  shadowMap: false,
+
+  /**
    * Auto-rotation with constant speed.
    * @type {number}
    * @instance

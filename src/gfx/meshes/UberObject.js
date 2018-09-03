@@ -21,11 +21,13 @@ export default function(SuperClass) {
       return;
     }
 
-    for (var i = 0; i < scene.children.length; i++) { //FIXME add something for more than one light source with shadows
-      if (scene.children[i].shadow !== undefined) {
-        material.uberOptions.dirShadowMatrix.copy(scene.children[i].shadow.matrix);
-        material.uberOptions.directionalShadowMap = scene.children[i].shadow.map.texture;
-        break;
+    if (renderer.shadowMap.enabled) {
+      for (var i = 0; i < scene.children.length; i++) { //FIXME add something for more than one light source with shadows
+        if (scene.children[i].shadow !== undefined) {
+          material.uberOptions.dirShadowMatrix.copy(scene.children[i].shadow.matrix);
+          material.uberOptions.directionalShadowMap = scene.children[i].shadow.map.texture;
+          break;
+        }
       }
     }
   };

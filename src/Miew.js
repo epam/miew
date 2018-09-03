@@ -366,7 +366,7 @@ Miew.prototype._initGfx = function() {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
-  gfx.renderer.shadowMap.enabled = true;
+  gfx.renderer.shadowMap.enabled = false;
   gfx.renderer.shadowMap.type = THREE.PCFBasicShadowMap;
   capabilities.init(gfx.renderer);
 
@@ -425,6 +425,7 @@ Miew.prototype._initGfx = function() {
   light12.position.set(gfx.camera.position.x * 10, gfx.camera.position.y * 10 || 5.4, gfx.camera.position.z * 10 || 10);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light12.castShadow = true;
+  //FIXME DirectionalLightShadow
   light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 100));
   light12.shadow.bias = -0.001; //TODO should depends on zoom
   var shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
@@ -3162,6 +3163,24 @@ Miew.prototype._initOnSettingsChanged = function() {
   on('draft.clipPlane', (evt) => {
     // TODO: update materials
     const values = {clipPlane: evt.value};
+    this._forEachComplexVisual(visual => visual.setMaterialValues(values));
+    for (let i = 0, n = this._objects.length; i < n; ++i) {
+      const obj = this._objects[i];
+      if (obj._line) {
+        obj._line.material.setValues(values);
+        obj._line.material.needsUpdate = true;
+      }
+    }
+    this.rebuildAll();
+  });
+
+  on('shadowMap', (evt) => {
+    // TODO: update materials
+    const values = {shadowmap: evt.value};
+    const gfx = this._gfx;
+    if (gfx) {
+      gfx.renderer.shadowMap.enabled = values.shadowmap;
+    }
     this._forEachComplexVisual(visual => visual.setMaterialValues(values));
     for (let i = 0, n = this._objects.length; i < n; ++i) {
       const obj = this._objects[i];

@@ -66,11 +66,12 @@ Representation.prototype.buildGeometry = function(complex) {
       object.recieveShadow = true;
     }
     if (object.material instanceof UberMaterial) {
-      const depthMaterial = new UberMaterial();
-      depthMaterial.copy(object.material);
-      depthMaterial.setValues({colorFromDepth: true});
-      object.material.setValues({shadowmap:true});
-      object.customDepthMaterial = depthMaterial;
+      if (object.material.shadowmap) {
+        const depthMaterial = new UberMaterial();
+        depthMaterial.copy(object.material);
+        depthMaterial.setValues({colorFromDepth: true});
+        object.customDepthMaterial = depthMaterial;
+      }
     }
   });
   return this.geo;
