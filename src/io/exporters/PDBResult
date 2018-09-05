@@ -83,11 +83,11 @@ export default class PDBResult {
       this.writeString((j+1).toString(), 19, 19);
       this.writeString(matrixIndx.toString(), 23, 20);
       for (let k = 0; k < 3; k++) {
-        const numb = parseFloat(matrix.elements[j*4 + k]).toPrecision(7);
+        const numb = parseFloat(matrix.elements[j*4 + k]).toFixed(6);
         this.writeString(numb.toString(), 32 + k*10, 23 + k*10);
       }
 
-      const numb = parseFloat(matrix.elements[j*4 + 3]).toPrecision(6);
+      const numb = parseFloat(matrix.elements[j*4 + 3]).toFixed(5);
       this.writeString(numb.toString(), 67, 53);
     }
   }
