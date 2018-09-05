@@ -91,7 +91,36 @@ export default class PDBExporter extends Exporter {
     }
   }
 
-  _extractREMARK() {
+  _extractREMARK(result) {
+    this._Remark290(result);
+    this._Remark350(result);
+  }
+
+  _Remark290(result) {
+    const matrices = this._source.symmetry;
+    result.newTag('REMARK', 290);
+    result.newString();
+    result.newString();
+    result.writeString('CRYSTALLOGRAPHIC SYMMETRY TRANSFORMATIONS', 11, 80);
+    result.newString();
+    result.writeString('THE FOLLOWING TRANSFORMATIONS OPERATE ON THE ATOM/HETATM', 11, 80);
+    result.newString();
+    result.writeString('RECORDS IN THIS ENTRY TO PRODUCE CRYSTALLOGRAPHICALLY', 11, 80);
+    result.newString();
+    result.writeString('RELATED MOLECULES.', 11, 80);
+    for (let i = 0; i < matrices.length; i++) {
+      const matrix = matrices[i].transpose();
+      result.writeMatrix(matrix, i+1, '  SMTRY');
+    }
+
+    result.newString();
+    result.newString();
+    result.writeString('REMARK: NULL', 11, 80);
+  }
+
+  _Remark350(result) {
+    const assemblies = this._source.assemblies;
+    
   }
 
   _getMoleculeChains(molecule) {

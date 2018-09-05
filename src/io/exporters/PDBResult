@@ -4,7 +4,6 @@ export default class PDBResult {
     this._currentStr = -1;
     this._tag = null;
     this._haveCount = false;
-    this._count;
     //this._result = null;
   }
 
@@ -12,11 +11,17 @@ export default class PDBResult {
     return this._resultArray.join('');
   }
 
+  //is it krivo?
   newTag(tag, count) {
+    this._haveCount = false;
     this._tag = tag;
-    this._haveCount = count;
     if (count) {
-      this._count = 1;
+      if (_.isNumber(count)) {
+        this._count = count;
+      } else {
+        this._count = 1;
+        this._haveCount = count;
+      }
     }
   }
 
@@ -29,11 +34,14 @@ export default class PDBResult {
       this.writeString(this._tag, 1, 6);
     }
 
-    if (this._haveCount) {
+    //is it krivo?
+    if (this._count) {
       if (this._count !== 1) {
         this.writeString(this._count.toString() + ' ', 11, 8);
       }
-      this._count++;
+      if (this._haveCount) {
+        this._count++;
+      }
     }
   }
 
@@ -42,7 +50,7 @@ export default class PDBResult {
     let str = string;
 
     if (string.length > Math.abs(begin - end) + 1) {
-      str = string.substr(0, Math.abs(begin - end));
+      str = string.substr(0, Math.abs(begin - end - 1));
     }
 
     //spaces before
@@ -65,6 +73,22 @@ export default class PDBResult {
     const finish = begin < end ? end : begin;
     if (finish > curStr.length) {
       this._resultArray[this._currentStr] += ' '.repeat(end - curStr.length);
+    }
+  }
+
+  writeMatrix(matrix, matrixIndx, tag) {
+    for (let j = 0; j < 3; j++) {
+      this.newString();
+      this.writeString(tag, 12, 18);
+      this.writeString((j+1).toString(), 19, 19);
+      this.writeString(matrixIndx.toString(), 23, 20);
+      for (let k = 0; k < 3; k++) {
+        const numb = parseFloat(matrix.elements[j*4 + k]).toPrecision(7);
+        this.writeString(numb.toString(), 32 + k*10, 23 + k*10);
+      }
+
+      const numb = parseFloat(matrix.elements[j*4 + 3]).toPrecision(6);
+      this.writeString(numb.toString(), 67, 53);
     }
   }
 }
