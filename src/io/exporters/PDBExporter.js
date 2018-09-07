@@ -7,14 +7,14 @@ import BiologicalUnit from "../../chem/BiologicalUnit";
 export default class PDBExporter extends Exporter {
   constructor(source, options) {
     super(source, options);
-    this._tags = ['HEADER', 'TITLE ', 'COMPND', 'REMARK', 'ATOM  ', 'HETATM', 'ENDMDL', 'CONECT', 'HELIX ', 'SHEET '];
+    this._tags = ['HEADER', 'TITLE ', 'COMPND', 'REMARK', 'ATOM and HETATM', 'ENDMDL', 'CONECT', 'HELIX ', 'SHEET '];
     this._result = null;
     this._resultArray = [];
     this._tagExtractors = {
       'HEADER': this._extractHEADER,
       'TITLE ': this._extractTITLE,
-      'ATOM  ': this._extractATOM,
-      'HETATM': this._extractATOM,
+      'ATOM and HETATM': this._extractATOM,
+      //'HETATM': this._extractATOM,
       //'ENDMDL': this._extractENDMDL,
       'CONECT': this._extractCONECT,
       'COMPND': this._extractCOMPND,
@@ -81,7 +81,37 @@ export default class PDBExporter extends Exporter {
   _extractCONECT() {
   }
 
-  _extractATOM() {
+  _extractATOM(result) {
+    if (!this._source._molecules) {
+      return;
+    }
+
+    const atoms = this._source._atoms;
+
+    for (let i = 0; i < atoms.length; i++) {
+      if (atoms[i]._het && result.currentTag() !== 'HETATM') {
+        result.newTag('HETATM');
+      } else if (!atoms[i]._het && result.currentTag() !== 'ATOM') {
+        result.newTag('ATOM');
+      }
+      result.newString();
+      result.writeString(atoms[i]._serial.toString(), 11, 7);
+      result.writeString(atoms[i]._name._name, 13, 16);
+      result.writeString(String.fromCharCode(atoms[i]._location), 17, 17);
+      result.writeString(atoms[i]._residue._type._name, 18, 20);
+      result.writeString(atoms[i]._residue._chain._name, 22, 22);
+      result.writeString(atoms[i]._residue._sequence.toString(), 26, 23);
+      result.writeString(atoms[i]._residue._icode, 27, 27);
+      result.writeString(atoms[i]._position.x.toFixed(3).toString(), 38, 31);
+      result.writeString(atoms[i]._position.y.toFixed(3).toString(), 46, 39);
+      result.writeString(atoms[i]._position.z.toFixed(3).toString(), 54, 47);
+      result.writeString(atoms[i]._occupancy.toFixed(2).toString(), 60, 55);
+      result.writeString(atoms[i]._temperature.toFixed(2).toString(), 66, 61);
+      result.writeString(atoms[i].element.name, 78, 77);
+      if (atoms[i]._charge) {
+        result.writeString(atoms[i]._charge, 79, 80);
+      }
+    }
   }
 
   _extractCOMPND(result) {
@@ -165,6 +195,7 @@ export default class PDBExporter extends Exporter {
           for (let j = 0; j <Math.ceil(chains.length/size); j++) {
             chainArrays[j] = chains.slice((j*size), (j*size) + size);
           }
+
           result.newString();
           result.writeString("APPLY THE FOLLOWING TO CHAINS: " + chainArrays[0], 11, 80);
           for (let j = 1; j < chainArrays.length; j++) {

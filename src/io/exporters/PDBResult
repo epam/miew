@@ -4,6 +4,7 @@ export default class PDBResult {
     this._currentStr = -1;
     this._tag = null;
     this._haveCount = false;
+    this._count = null;
     //this._result = null;
   }
 
@@ -11,10 +12,16 @@ export default class PDBResult {
     return this._resultArray.join('');
   }
 
+  currentTag() {
+    return this._tag;
+  }
+
+
   //is it krivo?
   newTag(tag, count) {
     this._haveCount = false;
     this._tag = tag;
+    this._count = null;
     if (count) {
       if (_.isNumber(count)) {
         this._count = count;
@@ -49,6 +56,8 @@ export default class PDBResult {
     let curStr = this._resultArray[this._currentStr];
     let str = string;
 
+    const finish = begin < end ? end : begin;
+
     if (string.length > Math.abs(begin - end) + 1) {
       str = string.substr(0, Math.abs(begin - end - 1));
     }
@@ -58,19 +67,21 @@ export default class PDBResult {
       const start = begin < end ? begin : end;
       if (start > curStr.length + 1) {
         this._resultArray[this._currentStr] += ' '.repeat(start - curStr.length - 1);
+      } else if (start <= curStr.length) {
+        let cStr = this._resultArray[this._currentStr];
+        this._resultArray[this._currentStr] = cStr.slice(0, start - 1);
       }
     }
 
     //if reverse order
     if (end < begin) {
       const len = begin - end + 1;
-      this._resultArray[this._currentStr] += ' '.repeat(len - string.length);
+      str = ' '.repeat(len - string.length) + string;
     }
 
     this._resultArray[this._currentStr] += str;
     curStr = this._resultArray[this._currentStr];
 
-    const finish = begin < end ? end : begin;
     if (finish > curStr.length) {
       this._resultArray[this._currentStr] += ' '.repeat(end - curStr.length);
     }
