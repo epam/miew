@@ -3,8 +3,8 @@ export default class PDBResult {
     this._resultArray = [];
     this._currentStr = -1;
     this._tag = null;
-    this._haveCount = false;
-    this._count = null;
+    this._fixedNumeration = false;
+    this._numeration = null;
     //this._result = null;
   }
 
@@ -18,16 +18,16 @@ export default class PDBResult {
 
 
   //is it krivo?
-  newTag(tag, count) {
-    this._haveCount = false;
+  newTag(tag, numeration) {
+    this._fixedNumeration = false;
     this._tag = tag;
-    this._count = null;
-    if (count) {
-      if (_.isNumber(count)) {
-        this._count = count;
+    this._numeration = null;
+    if (numeration) {
+      if (_.isNumber(numeration)) {
+        this._numeration = numeration;
       } else {
-        this._count = 1;
-        this._haveCount = count;
+        this._numeration = 1;
+        this._fixedNumeration = numeration;
       }
     }
   }
@@ -42,12 +42,12 @@ export default class PDBResult {
     }
 
     //is it krivo?
-    if (this._count) {
-      if (this._count !== 1) {
-        this.writeString(this._count.toString() + ' ', 11, 8);
+    if (this._numeration) {
+      if (this._numeration !== 1) {
+        this.writeString(this._numeration.toString() + ' ', 11, 8);
       }
-      if (this._haveCount) {
-        this._count++;
+      if (this._fixedNumeration) {
+        this._numeration++;
       }
     }
   }
@@ -56,7 +56,10 @@ export default class PDBResult {
     let curStr = this._resultArray[this._currentStr];
     let str = string;
 
+
+    // change onle str pls/ i can't read this
     const finish = begin < end ? end : begin;
+    const start = begin < end ? begin : end;
 
     if (string.length > Math.abs(begin - end) + 1) {
       str = string.substr(0, Math.abs(begin - end - 1));
@@ -64,9 +67,8 @@ export default class PDBResult {
 
     //spaces before
     if (curStr) {
-      const start = begin < end ? begin : end;
       if (start > curStr.length + 1) {
-        this._resultArray[this._currentStr] += ' '.repeat(start - curStr.length - 1);
+        str = ' '.repeat(start - curStr.length - 1) + string;
       } else if (start <= curStr.length) {
         let cStr = this._resultArray[this._currentStr];
         this._resultArray[this._currentStr] = cStr.slice(0, start - 1);
@@ -76,7 +78,12 @@ export default class PDBResult {
     //if reverse order
     if (end < begin) {
       const len = begin - end + 1;
-      str = ' '.repeat(len - string.length) + string;
+      str = ' '.repeat(len - string.length) + str;
+    }
+
+    //daaaam! that hardcode!                 pls change numeration/fixedNumeration to something understandable
+    if (start === 11 && this._numeration) {
+      str = ' ' + str;
     }
 
     this._resultArray[this._currentStr] += str;
