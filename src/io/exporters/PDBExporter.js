@@ -89,6 +89,8 @@ export default class PDBExporter extends Exporter {
     const atoms = this._source._atoms;
 
     for (let i = 0; i < atoms.length; i++) {
+      const elementName = atoms[i].element.name;
+      const atomName = atoms[i]._name._name;
       if (atoms[i]._het && result.currentTag() !== 'HETATM') {
         result.newTag('HETATM');
       } else if (!atoms[i]._het && result.currentTag() !== 'ATOM') {
@@ -96,7 +98,13 @@ export default class PDBExporter extends Exporter {
       }
       result.newString();
       result.writeString(atoms[i]._serial.toString(), 11, 7);
-      result.writeString(atoms[i]._name._name, 13, 16);
+
+      if (elementName.length > 1 || atomName.length > 3) {
+        result.writeString(atomName, 13, 16);
+      } else {
+        result.writeString(atomName, 14, 16);
+      }
+
       result.writeString(String.fromCharCode(atoms[i]._location), 17, 17);
       result.writeString(atoms[i]._residue._type._name, 18, 20);
       result.writeString(atoms[i]._residue._chain._name, 22, 22);
@@ -107,7 +115,9 @@ export default class PDBExporter extends Exporter {
       result.writeString(atoms[i]._position.z.toFixed(3).toString(), 54, 47);
       result.writeString(atoms[i]._occupancy.toFixed(2).toString(), 60, 55);
       result.writeString(atoms[i]._temperature.toFixed(2).toString(), 66, 61);
+
       result.writeString(atoms[i].element.name, 78, 77);
+
       if (atoms[i]._charge) {
         result.writeString(atoms[i]._charge, 79, 80);
       }
