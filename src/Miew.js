@@ -1570,15 +1570,23 @@ Miew.prototype.resetView = function() {
   });
 };
 
-Miew.prototype.exp = function() {
-  const TheExporter = _.head(io.exporters.find({format: 'pdb'}));
+Miew.prototype._export = function(format) {
+  const TheExporter = _.head(io.exporters.find({format: format}));
   //let result;
   if (!TheExporter) {
     this.logger.error('Could not find suitable exporter for this source');
     return Promise.reject(new Error('Could not find suitable exporter for this source'));
   }
-  const exporter = new TheExporter(this._dataSuse, {binary: true});
-  return exporter.export().then((data) => { return data; });
+
+  if (this._visuals[this._curVisualName] instanceof  ComplexVisual) {
+     const dataSource = this._visuals[this._curVisualName]._complex;
+    const exporter = new TheExporter(dataSource, {binary: true});
+    return exporter.export().then((data) => { return data; });
+  } else if (this._visuals[this._curVisualName] instanceof  VolumeVisual) {
+    return Promise.reject(new Error('Sorry, exporter for volume data not implemented yet'));
+  } else {
+    return Promise.reject(new Error('Unexpected format of data'));
+  }
 };
 
 /**
