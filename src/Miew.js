@@ -428,6 +428,7 @@ Miew.prototype._initGfx = function() {
   //FIXME DirectionalLightShadow
   light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 100));
   light12.shadow.bias = -0.001; //TODO should depends on zoom
+  light12.shadow.radius = 5.0;
   var shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
   light12.shadow.mapSize.width = shadowMapSize;
   light12.shadow.mapSize.height = shadowMapSize;
@@ -3125,6 +3126,17 @@ Miew.prototype._fogFarUpdateValue = function() {
   }
 };
 
+Miew.prototype._updateMaterials = function(values) {
+  this._forEachComplexVisual(visual => visual.setMaterialValues(values));
+  for (let i = 0, n = this._objects.length; i < n; ++i) {
+    const obj = this._objects[i];
+    if (obj._line) {
+      obj._line.material.setValues(values);
+      obj._line.material.needsUpdate = true;
+    }
+  }
+};
+
 Miew.prototype._initOnSettingsChanged = function() {
   const on = (props, func) => {
     props = _.isArray(props) ? props : [props];
@@ -3174,22 +3186,42 @@ Miew.prototype._initOnSettingsChanged = function() {
     this.rebuildAll();
   });
 
-  on('shadowMap', (evt) => {
-    // TODO: update materials
-    const values = {shadowmap: evt.value};
+  on('shadow.shadowMap', (evt) => {
+    // TODO: update materials and rebuild all
+    const values = {shadowmap: evt.value, pcf: settings.now.shadow.pcf, soft: settings.now.shadow.soft};
     const gfx = this._gfx;
     if (gfx) {
       gfx.renderer.shadowMap.enabled = values.shadowmap;
     }
-    this._forEachComplexVisual(visual => visual.setMaterialValues(values));
-    for (let i = 0, n = this._objects.length; i < n; ++i) {
-      const obj = this._objects[i];
-      if (obj._line) {
-        obj._line.material.setValues(values);
-        obj._line.material.needsUpdate = true;
+    this._updateMaterials(values);
+    this.rebuildAll();
+  });
+
+  on('shadow.pcf', (evt) => {
+    // TODO: update materials and rebuild all if shadowmap are enable
+    if (settings.now.shadow.shadowMap) {
+      const values = {pcf: evt.value};
+      this._updateMaterials(values);
+      this.rebuildAll();
+    }
+  });
+
+  on('shadow.soft', (evt) => {
+    // TODO: update materials and rebuild all if shadowmap and pcf are enable
+    if (settings.now.shadow.shadowMap && settings.now.shadow.pcf) {
+      const values = {soft: evt.value};
+      this._updateMaterials(values);
+      this.rebuildAll();
+    }
+  });
+
+  on('shadow.radius', (evt) => {
+    for (var i = 0; i < this._gfx.scene.children.length; i++) {
+      if (this._gfx.scene.children[i].shadow !== undefined) {
+        var light = this._gfx.scene.children[i];
+        light.shadow.radius = evt.value;
       }
     }
-    this.rebuildAll();
   });
 
   on('fps', () => {

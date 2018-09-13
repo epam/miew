@@ -1,6 +1,7 @@
 
 
 import UberMaterial from '../shaders/UberMaterial';
+
 export default function(SuperClass) {
   function NewObjectType() {
     SuperClass.apply(this, arguments);
@@ -22,7 +23,7 @@ export default function(SuperClass) {
     }
 
     if (renderer.shadowMap.enabled) {
-      for (var i = 0; i < scene.children.length; i++) { //FIXME add something for more than one light source with shadows
+      for (var i = 0; i < scene.children.length; i++) { //FIXME add sth for more than one light source with shadows
         if (scene.children[i].shadow !== undefined) {
           material.uberOptions.dirShadowMatrix.copy(scene.children[i].shadow.matrix);
           material.uberOptions.directionalShadowMap = scene.children[i].shadow.map.texture;

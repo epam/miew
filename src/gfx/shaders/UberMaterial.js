@@ -86,6 +86,9 @@ function UberMaterial(params) {
   this.colorFromPos = false;
   // used to render shadowmap
   this.shadowmap = false;
+  // used to describe shadowmap type
+  this.pcf = true;
+  this.soft = true;
   // used to render pixel view deph
   this.colorFromDepth = false;
   // used to render dashed line
@@ -182,6 +185,8 @@ UberMaterial.prototype.copy = function(source) {
   this.fakeOpacity = source.fakeOpacity;
   this.colorFromPos = source.colorFromPos;
   this.shadowmap = source.shadowmap;
+  this.pcf = source.pcf;
+  this.soft = source.soft;
   this.colorFromDepth = source.colorFromDepth;
   this.prepassTransparancy = source.prepassTransparancy;
   this.dashedLine = source.dashedLine;
@@ -259,6 +264,15 @@ UberMaterial.prototype.setValues = function(values) {
   }
   if (this.shadowmap) {
     defines.SHADOWMAP = 1;
+  }
+  if (this.pcf) {
+    if (this.soft) {
+      defines.SHADOWMAP_PCF_SOFT = 1;
+    } else {
+      defines.SHADOWMAP_PCF_SHARP = 1;
+    }
+  } else {
+    defines.SHADOWMAP_BASIC = 1;
   }
   if (this.colorFromDepth) {
     defines.COLOR_FROM_DEPTH = 1;
