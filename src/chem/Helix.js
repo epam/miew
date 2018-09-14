@@ -2,7 +2,7 @@ import StructuralElement from './StructuralElement';
 
 const StructuralElementType = StructuralElement.Type;
 
-const typeByPDBHelixClass = {
+export const typeByPDBHelixClass = {
   1: StructuralElementType.HELIX_ALPHA,
   3: StructuralElementType.HELIX_PI,
   5: StructuralElementType.HELIX_310,
