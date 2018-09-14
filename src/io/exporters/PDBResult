@@ -65,7 +65,7 @@ export default class PDBResult {
     const start = begin < end ? begin : end;
 
     if (string.length > Math.abs(begin - end) + 1) {
-      str = string.substr(0, Math.abs(begin - end - 1));
+      str = string.substr(0, Math.abs(begin - end + 1));
     }
 
     //spaces before
@@ -81,7 +81,7 @@ export default class PDBResult {
     //if reverse order
     if (end < begin) {
       const len = begin - end + 1;
-      str = ' '.repeat(len - string.length) + str;
+      str = ' '.repeat(len - str.length) + str;
     }
 
     //daaaam! that hardcode!                 pls change numeration/fixedNumeration to something understandable
@@ -109,7 +109,7 @@ export default class PDBResult {
       }
 
       const numb = parseFloat(matrix.elements[j*4 + 3]).toFixed(5);
-      this.writeString(numb.toString(), 68, 62);
+      this.writeString(numb.toString(), 68, 55);
     }
   }
 }
