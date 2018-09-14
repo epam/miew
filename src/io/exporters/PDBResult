@@ -5,6 +5,7 @@ export default class PDBResult {
     this._tag = null;
     this._fixedNumeration = false;
     this._numeration = null;
+    this._strNumb = 0;
     //this._result = null;
   }
 
@@ -19,15 +20,17 @@ export default class PDBResult {
 
   //is it krivo?
   newTag(tag, numeration) {
-    this._fixedNumeration = false;
     this._tag = tag;
     this._numeration = null;
     if (numeration) {
       if (_.isNumber(numeration)) {
-        this._numeration = numeration;
+        this._strNumb = numeration;
+        this._numeration = true;
+        this._fixedNumeration = true;
       } else {
-        this._numeration = 1;
-        this._fixedNumeration = numeration;
+        this._strNumb = 0;
+        this._numeration = true;
+        this._fixedNumeration = false;
       }
     }
   }
@@ -43,11 +46,11 @@ export default class PDBResult {
 
     //is it krivo?
     if (this._numeration) {
-      if (this._numeration !== 1) {
-        this.writeString(this._numeration.toString() + ' ', 11, 8);
+      if (!this._fixedNumeration) {
+        this._strNumb++;
       }
-      if (this._fixedNumeration) {
-        this._numeration++;
+      if (this._strNumb !== 1) {
+        this.writeString(this._strNumb.toString(), 10, 8);
       }
     }
   }
@@ -68,7 +71,7 @@ export default class PDBResult {
     //spaces before
     if (curStr) {
       if (start > curStr.length + 1) {
-        str = ' '.repeat(start - curStr.length - 1) + string;
+        this._resultArray[this._currentStr] += ' '.repeat(start - curStr.length - 1);
       } else if (start <= curStr.length) {
         let cStr = this._resultArray[this._currentStr];
         this._resultArray[this._currentStr] = cStr.slice(0, start - 1);
@@ -82,7 +85,7 @@ export default class PDBResult {
     }
 
     //daaaam! that hardcode!                 pls change numeration/fixedNumeration to something understandable
-    if (start === 11 && this._numeration) {
+    if (start === 11 && this._numeration && this._strNumb !== 1) {
       str = ' ' + str;
     }
 
@@ -90,7 +93,7 @@ export default class PDBResult {
     curStr = this._resultArray[this._currentStr];
 
     if (finish > curStr.length) {
-      this._resultArray[this._currentStr] += ' '.repeat(end - curStr.length);
+      this._resultArray[this._currentStr] += ' '.repeat(finish - curStr.length);
     }
   }
 
@@ -102,11 +105,11 @@ export default class PDBResult {
       this.writeString(matrixIndx.toString(), 23, 20);
       for (let k = 0; k < 3; k++) {
         const numb = parseFloat(matrix.elements[j*4 + k]).toFixed(6);
-        this.writeString(numb.toString(), 32 + k*10, 23 + k*10);
+        this.writeString(numb.toString(), 33 + k*10, 24 + k*10);
       }
 
       const numb = parseFloat(matrix.elements[j*4 + 3]).toFixed(5);
-      this.writeString(numb.toString(), 67, 53);
+      this.writeString(numb.toString(), 68, 62);
     }
   }
 }
