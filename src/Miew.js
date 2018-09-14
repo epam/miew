@@ -1579,7 +1579,7 @@ Miew.prototype._export = function(format) {
   }
 
   if (this._visuals[this._curVisualName] instanceof  ComplexVisual) {
-     const dataSource = this._visuals[this._curVisualName]._complex;
+    const dataSource = this._visuals[this._curVisualName]._complex;
     const exporter = new TheExporter(dataSource, {binary: true});
     return exporter.export().then((data) => { return data; });
   } else if (this._visuals[this._curVisualName] instanceof  VolumeVisual) {
@@ -1812,7 +1812,7 @@ Miew.prototype._stopAnimation = function() {
 Miew.prototype._onLoad = function(dataSource, opts) {
   var gfx = this._gfx;
   var visualName = null;
-  this._dataSuse = dataSource;
+  this._dataSource2 = dataSource;
 
   if (opts.animation) {
     this._refreshTitle();
@@ -2816,6 +2816,13 @@ Miew.prototype.screenshot = function(width, height) {
 Miew.prototype.screenshotSave = function(filename, width, height) {
   var uri = this.screenshot(width, height);
   utils.shotDownload(uri, filename);
+};
+
+Miew.prototype.savePDB = function() {
+  this._export('pdb').then((dataString) => {
+    const filename = this._visuals[this._curVisualName]._complex.name + '.pdb';
+    utils.PDBDownload(filename, dataString);
+  });
 };
 
 Miew.prototype._tweakResolution = function() {
