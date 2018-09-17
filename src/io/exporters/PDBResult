@@ -57,8 +57,25 @@ export default class PDBResult {
 
   writeString(string, begin, end) {
     let curStr = this._resultArray[this._currentStr];
-    let str = string;
+    let str;
 
+    if (_.isUndefined(string)) {
+      return;
+    }
+
+    if (!_.isNumber(begin)) {
+      begin = curStr.length + 1;
+    }
+
+    if (!_.isNumber(end)) {
+      end = curStr.length + string.length;
+    }
+
+    if (!_.isString(string)) {
+      str = string.toString();
+    } else {
+      str = string;
+    }
 
     // change onle str pls/ i can't read this
     const finish = begin < end ? end : begin;
