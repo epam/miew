@@ -10,7 +10,7 @@ import _ from 'lodash';
 export default class PDBExporter extends Exporter {
   constructor(source, options) {
     super(source, options);
-    this._tags = ['HEADER', 'TITLE ', 'COMPND', 'REMARK', 'HELIX ', 'ATOM and HETATM', 'ENDMDL', 'CONECT', 'SHEET '];
+    this._tags = ['HEADER', 'TITLE ', 'COMPND', 'REMARK', 'HELIX', 'SHEET ', 'ATOM and HETATM', 'ENDMDL', 'CONECT'];
     this._result = null;
     this._resultArray = [];
     this._tagExtractors = {
@@ -22,8 +22,8 @@ export default class PDBExporter extends Exporter {
       'CONECT': this._extractCONECT,
       'COMPND': this._extractCOMPND,
       'REMARK': this._extractREMARK,
-      'HELIX ': this._extractHELIX,
-      //'SHEET ': this._extractSHEET,
+      'HELIX': this._extractHELIX,
+      'SHEET ': this._extractSHEET,
     };
   }
 
@@ -84,8 +84,36 @@ export default class PDBExporter extends Exporter {
   _extractCONECT() {
   }
 
+  _extractSHEET(result) {
+    if (!this._source._sheets) {
+      return;
+    }
+
+    result.newTag('SHEET');
+    const sheets = this._source._sheets;
+    for (let i = 0; i < sheets.length; i++) {
+      const strands = sheets[i]._strands;
+      for (let j = 0; j < strands.length; j++) {
+        result.newString();
+        result.writeString(j, 10, 8);
+        result.writeString(sheets[i]._name, 14, 12);
+        result.writeString(strands.length, 16, 15);
+        result.writeString(strands[j].init._type._name, 18, 20);
+        result.writeString(strands[j].init._chain._name, 22, 22);
+        result.writeString(strands[j].init._sequence, 26, 23);
+        result.writeString(strands[j].init._icode, 27, 27);
+        result.writeString(strands[j].term._type._name, 29, 31);
+        result.writeString(strands[j].init._chain._name, 33, 33);
+        result.writeString(strands[j].term._sequence, 34, 37);
+        result.writeString(strands[j].term._icode, 38, 38);
+        result.writeString(strands[j].sense, 40, 39);
+        result.writeString(strands[j].sense, 40, 39);
+      }
+    }
+  }
+
 _extractHELIX(result) {
-    if (!this._source.structures) {
+    if (!this._source._helices) {
       return;
     }
 
@@ -95,7 +123,7 @@ _extractHELIX(result) {
       const helix = helices[i];
       const helixClass = _.invert(typeByPDBHelixClass);
       result.newString();
-      result.writeString(helix.serial.toString(), 10, 8);
+      result.writeString(helix.serial, 10, 8);
       result.writeString(helix.name, 14, 12);
       result.writeString(helix.init._chain._name, 20, 20);
       result.writeString(helix.init._sequence, 25, 22);
@@ -126,7 +154,7 @@ _extractHELIX(result) {
         result.newTag('ATOM');
       }
       result.newString();
-      result.writeString(atoms[i]._serial.toString(), 11, 7);
+      result.writeString(atoms[i]._serial, 11, 7);
 
       if (elementName.length > 1 || atomName.length > 3) {
         result.writeString(atomName, 13, 16);
@@ -137,13 +165,13 @@ _extractHELIX(result) {
       result.writeString(String.fromCharCode(atoms[i]._location), 17, 17);
       result.writeString(atoms[i]._residue._type._name, 18, 20);
       result.writeString(atoms[i]._residue._chain._name, 22, 22);
-      result.writeString(atoms[i]._residue._sequence.toString(), 26, 23);
+      result.writeString(atoms[i]._residue._sequence, 26, 23);
       result.writeString(atoms[i]._residue._icode, 27, 27);
-      result.writeString(atoms[i]._position.x.toFixed(3).toString(), 38, 31);
-      result.writeString(atoms[i]._position.y.toFixed(3).toString(), 46, 39);
-      result.writeString(atoms[i]._position.z.toFixed(3).toString(), 54, 47);
-      result.writeString(atoms[i]._occupancy.toFixed(2).toString(), 60, 55);
-      result.writeString(atoms[i]._temperature.toFixed(2).toString(), 66, 61);
+      result.writeString(atoms[i]._position.x.toFixed(3), 38, 31);
+      result.writeString(atoms[i]._position.y.toFixed(3), 46, 39);
+      result.writeString(atoms[i]._position.z.toFixed(3), 54, 47);
+      result.writeString(atoms[i]._occupancy.toFixed(2), 60, 55);
+      result.writeString(atoms[i]._temperature.toFixed(2), 66, 61);
 
       result.writeString(atoms[i].element.name, 78, 77);
 
