@@ -1,10 +1,8 @@
 import Exporter from './Exporter';
-import chem from '../../chem';
 import PDBResult from './PDBResult';
-import Assembly from "../../chem/Assembly";
-import BiologicalUnit from "../../chem/BiologicalUnit";
-import {Matrix4} from "three";
-import {typeByPDBHelixClass} from "../../chem/Helix";
+import Assembly from '../../chem/Assembly';
+import {Matrix4} from 'three';
+import {typeByPDBHelixClass} from '../../chem/Helix';
 import _ from 'lodash';
 
 export default class PDBExporter extends Exporter {
@@ -81,7 +79,33 @@ export default class PDBExporter extends Exporter {
     }
   }
 
-  _extractCONECT() {
+  _extractCONECT(result) {
+    if (!this._source._atoms) {
+      return;
+    }
+
+    const atoms = this._source._atoms;
+    result.newTag('CONECT');
+
+    for (let i = 0; i < atoms.length; i++) {
+      const fixedBonds = atoms[i]._bonds.filter(this._fixedBond);
+      if (fixedBonds.length !== 0) {
+        result.newString();
+        result.writeString(atoms[i]._serial, 11, 7);
+        for (let j = 0; j < fixedBonds.length; j++) {
+          const serial = (fixedBonds[j]._left._serial === atoms[i]._serial) ?
+            fixedBonds[j]._right._serial : fixedBonds[j]._left._serial;
+          result.writeString(serial, 16 + 5 * j, 12 + 5 * j);
+        }
+      }
+    }
+  }
+
+  _fixedBond(bond) {
+    if (bond._fixed) {
+      return true;
+    }
+    return false;
   }
 
   _extractSHEET(result) {
@@ -95,7 +119,7 @@ export default class PDBExporter extends Exporter {
       const strands = sheets[i]._strands;
       for (let j = 0; j < strands.length; j++) {
         result.newString();
-        result.writeString(j, 10, 8);
+        result.writeString(j + 1, 10, 8);
         result.writeString(sheets[i]._name, 14, 12);
         result.writeString(strands.length, 16, 15);
         result.writeString(strands[j].init._type._name, 18, 20);
@@ -106,7 +130,6 @@ export default class PDBExporter extends Exporter {
         result.writeString(strands[j].init._chain._name, 33, 33);
         result.writeString(strands[j].term._sequence, 34, 37);
         result.writeString(strands[j].term._icode, 38, 38);
-        result.writeString(strands[j].sense, 40, 39);
         result.writeString(strands[j].sense, 40, 39);
       }
     }
