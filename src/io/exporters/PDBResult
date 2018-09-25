@@ -4,9 +4,8 @@ export default class PDBResult {
     this._currentStr = -1;
     this._tag = null;
     this._fixedNumeration = false;
-    this._numeration = null;
-    this._strNumb = 0;
-    //this._result = null;
+    this._numeration = false;
+    this._tagStrNum = 0;
   }
 
   getResult() {
@@ -17,18 +16,29 @@ export default class PDBResult {
     return this._tag;
   }
 
+  //numeration can be number or boolean
+  //if numeration is number then just put this number to 8-10 pos in string
+  //if numeration is boolean then increase number for all new strings
   newTag(tag, numeration) {
-    this._tag = tag;
-    if (numeration) {
+    if (!tag) {
+      this._tag = null;
+    } else {
+      this._tag = tag;
+    }
+    if (!_.isUndefined(numeration)) {
       if (_.isNumber(numeration)) {
-        this._strNumb = numeration;
+        this._tagStrNum = numeration;
         this._numeration = true;
         this._fixedNumeration = true;
-      } else {
-        this._strNumb = 0;
-        this._numeration = true;
+      } else if (_.isBoolean(numeration)) {
+        this._tagStrNum = 0;
+        this._numeration = numeration;
         this._fixedNumeration = false;
       }
+    } else {
+      this._numeration = false;
+      this._fixedNumeration = false;
+      this._tagStrNum = 0;
     }
   }
 
@@ -41,13 +51,12 @@ export default class PDBResult {
       this.writeString(this._tag, 1, 6);
     }
 
-    //is it krivo?
     if (this._numeration) {
       if (!this._fixedNumeration) {
-        this._strNumb++;
+        this._tagStrNum++;
       }
-      if (this._strNumb !== 1) {
-        this.writeString(this._strNumb.toString(), 10, 8);
+      if (this._tagStrNum !== 1) {
+        this.writeString(this._tagStrNum.toString(), 10, 8);
       }
     }
   }
@@ -56,16 +65,18 @@ export default class PDBResult {
     let curStr = this._resultArray[this._currentStr];
     let str;
 
+    const curStrLength = curStr ? curStr.length : 0;
+
     if (_.isUndefined(string)) {
       return;
     }
 
     if (!_.isNumber(begin)) {
-      begin = curStr.length + 1;
+      begin = curStrLength + 1;
     }
 
     if (!_.isNumber(end)) {
-      end = curStr.length + string.length;
+      end = curStrLength + string.length;
     }
 
     if (!_.isString(string)) {
@@ -81,8 +92,7 @@ export default class PDBResult {
       str = str.substr(0, Math.abs(begin - end + 1));
     }
 
-    const curStrLength = curStr ? curStr.length : 0;
-    //spaces before
+    //spaces before start of new data
     if (start > curStrLength + 1) {
       this._resultArray[this._currentStr] += ' '.repeat(start - curStrLength - 1);
     } else if (start <= curStrLength) {
@@ -91,16 +101,19 @@ export default class PDBResult {
     }
 
     //if reverse order
+    //reverse order of end and begin means that user wants to align text right
     if (end < begin) {
       const len = begin - end + 1;
       str = ' '.repeat(len - str.length) + str;
     }
 
-    //daaaam! that hardcode!                 pls change numeration/fixedNumeration to something understandable
-    if (start === 11 && this._numeration && this._strNumb !== 1) {
+    //some hardcode fix for space between string numeration and data
+    //(see pdb file format description)
+    if (start === 11 && this._numeration && this._tagStrNum !== 1) {
       str = ' ' + str;
     }
 
+    //append new data to string
     this._resultArray[this._currentStr] += str;
     curStr = this._resultArray[this._currentStr];
 
@@ -109,18 +122,20 @@ export default class PDBResult {
     }
   }
 
+  //function for writing matrix in Remark290 and Remark350 tags
+  //(see pdb file description)
   writeMatrix(matrix, matrixIndx, tag) {
     for (let j = 0; j < 3; j++) {
       this.newString();
       this.writeString(tag, 12, 18);
-      this.writeString((j+1).toString(), 19, 19);
+      this.writeString((j + 1).toString(), 19, 19);
       this.writeString(matrixIndx.toString(), 23, 20);
       for (let k = 0; k < 3; k++) {
-        const numb = parseFloat(matrix.elements[j*4 + k]).toFixed(6);
-        this.writeString(numb.toString(), 33 + k*10, 24 + k*10);
+        const numb = parseFloat(matrix.elements[j * 4 + k]).toFixed(6);
+        this.writeString(numb.toString(), 33 + k * 10, 24 + k * 10);
       }
 
-      const numb = parseFloat(matrix.elements[j*4 + 3]).toFixed(5);
+      const numb = parseFloat(matrix.elements[j * 4 + 3]).toFixed(5);
       this.writeString(numb.toString(), 68, 55);
     }
   }

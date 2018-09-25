@@ -4,19 +4,18 @@ import Assembly from '../../chem/Assembly';
 import {Matrix4} from 'three';
 import {typeByPDBHelixClass} from '../../chem/Helix';
 import _ from 'lodash';
+import Atom from "../../chem/Atom";
 
 export default class PDBExporter extends Exporter {
   constructor(source, options) {
     super(source, options);
-    this._tags = ['HEADER', 'TITLE ', 'COMPND', 'REMARK', 'HELIX', 'SHEET ', 'ATOM and HETATM', 'ENDMDL', 'CONECT'];
+    this._tags = ['HEADER', 'TITLE ', 'COMPND', 'REMARK', 'HELIX', 'SHEET ', 'ATOM and HETATM', 'CONECT'];
     this._result = null;
     this._resultArray = [];
     this._tagExtractors = {
       'HEADER': this._extractHEADER,
       'TITLE ': this._extractTITLE,
       'ATOM and HETATM': this._extractATOM,
-      //'HETATM': this._extractATOM,
-      //'ENDMDL': this._extractEND
       'CONECT': this._extractCONECT,
       'COMPND': this._extractCOMPND,
       'REMARK': this._extractREMARK,
@@ -39,9 +38,10 @@ export default class PDBExporter extends Exporter {
       }
     }
 
+    result.writeString('\n', 81, 81);
     this._result = result.getResult();
 
-    console.log(this._result);
+    //console.log(this._result);
     return this._result;
   }
 
@@ -61,7 +61,6 @@ export default class PDBExporter extends Exporter {
     if (metadata.id) {
       result.writeString(metadata.id, 63, 66);
     }
-    //result.writeString('\n', 67, 67);
   }
 
   _extractTITLE(result) {
@@ -88,17 +87,28 @@ export default class PDBExporter extends Exporter {
     result.newTag('CONECT');
 
     for (let i = 0; i < atoms.length; i++) {
-      const fixedBonds = atoms[i]._bonds.filter(this._fixedBond);
+      const fixedBonds = (atoms[i]._bonds.filter(this._fixedBond)).reverse();
       if (fixedBonds.length !== 0) {
-        result.newString();
-        result.writeString(atoms[i]._serial, 11, 7);
-        for (let j = 0; j < fixedBonds.length; j++) {
-          const serial = (fixedBonds[j]._left._serial === atoms[i]._serial) ?
-            fixedBonds[j]._right._serial : fixedBonds[j]._left._serial;
-          result.writeString(serial, 16 + 5 * j, 12 + 5 * j);
+        const bondsGroups = this._getSubArrays(fixedBonds, 4);
+        for (let k = 0; k < bondsGroups.length; k++) {
+          result.newString();
+          result.writeString(atoms[i]._serial, 11, 7);
+          for (let j = 0; j < bondsGroups[k].length; j++) {
+            const serial = (bondsGroups[k][j]._left._serial === atoms[i]._serial) ?
+              bondsGroups[k][j]._right._serial : bondsGroups[k][j]._left._serial;
+            result.writeString(serial, 16 + 5 * j, 12 + 5 * j);
+          }
         }
       }
     }
+  }
+
+  _getSubArrays (arr, subArraySize) {
+    const subArrays = [];
+    for (let i = 0; i < arr.length; i += subArraySize) {
+      subArrays.push(arr.slice(i, i + subArraySize));
+    }
+    return subArrays;
   }
 
   _fixedBond(bond) {
@@ -116,21 +126,23 @@ export default class PDBExporter extends Exporter {
     result.newTag('SHEET');
     const sheets = this._source._sheets;
     for (let i = 0; i < sheets.length; i++) {
-      const strands = sheets[i]._strands;
-      for (let j = 0; j < strands.length; j++) {
-        result.newString();
-        result.writeString(j + 1, 10, 8);
-        result.writeString(sheets[i]._name, 14, 12);
-        result.writeString(strands.length, 16, 15);
-        result.writeString(strands[j].init._type._name, 18, 20);
-        result.writeString(strands[j].init._chain._name, 22, 22);
-        result.writeString(strands[j].init._sequence, 26, 23);
-        result.writeString(strands[j].init._icode, 27, 27);
-        result.writeString(strands[j].term._type._name, 29, 31);
-        result.writeString(strands[j].init._chain._name, 33, 33);
-        result.writeString(strands[j].term._sequence, 34, 37);
-        result.writeString(strands[j].term._icode, 38, 38);
-        result.writeString(strands[j].sense, 40, 39);
+      if (sheets[i]._strands) {
+        const strands = sheets[i]._strands;
+        for (let j = 0; j < strands.length; j++) {
+          result.newString();
+          result.writeString(j + 1, 10, 8);
+          result.writeString(sheets[i]._name, 14, 12);
+          result.writeString(strands.length, 16, 15);
+          result.writeString(strands[j].init._type._name, 18, 20);
+          result.writeString(strands[j].init._chain._name, 22, 22);
+          result.writeString(strands[j].init._sequence, 26, 23);
+          result.writeString(strands[j].init._icode, 27, 27);
+          result.writeString(strands[j].term._type._name, 29, 31);
+          result.writeString(strands[j].init._chain._name, 33, 33);
+          result.writeString(strands[j].term._sequence, 37, 34);
+          result.writeString(strands[j].term._icode, 38, 38);
+          result.writeString(strands[j].sense, 40, 39);
+        }
       }
     }
   }
@@ -148,6 +160,7 @@ _extractHELIX(result) {
       result.newString();
       result.writeString(helix.serial, 10, 8);
       result.writeString(helix.name, 14, 12);
+      result.writeString(helix.init._type._name, 16, 18);
       result.writeString(helix.init._chain._name, 20, 20);
       result.writeString(helix.init._sequence, 25, 22);
       result.writeString(helix.init._icode, 26, 26);
@@ -162,7 +175,7 @@ _extractHELIX(result) {
   }
 
   _extractATOM(result) {
-    if (!this._source._molecules) {
+    if (!this._source._atoms) {
       return;
     }
 
@@ -186,7 +199,7 @@ _extractHELIX(result) {
       }
 
       result.writeString(String.fromCharCode(atoms[i]._location), 17, 17);
-      result.writeString(atoms[i]._residue._type._name, 18, 20);
+      result.writeString(atoms[i]._residue._type._name, 20, 18);
       result.writeString(atoms[i]._residue._chain._name, 22, 22);
       result.writeString(atoms[i]._residue._sequence, 26, 23);
       result.writeString(atoms[i]._residue._icode, 27, 27);
@@ -217,8 +230,8 @@ _extractHELIX(result) {
       result.newString();
       result.writeString('MOLECULE: ' + molecules[i]._name + ';', 11, 80);
       result.newString();
-      result.writeString('CHAIN: ', 11, 17);
-      result.writeString(chains.join(', ') + ';', 18, 80);
+      result.writeString('CHAIN: ', 11, 18);
+      result.writeString(chains.join(', ') + ';', 19, 80);
     }
   }
 
@@ -246,7 +259,7 @@ _extractHELIX(result) {
     const matrix = new Matrix4();
     for (let i = 0; i < matrices.length; i++) {
       matrix.copy(matrices[i]).transpose();
-      result.writeMatrix(matrix, i+1, '  SMTRY');
+      result.writeMatrix(matrix, i + 1, '  SMTRY');
     }
 
     result.newString();
@@ -319,8 +332,9 @@ _extractHELIX(result) {
     });
   }
 
-  _finalize() {
-    this._result = this._resultArray.join('');
+  _finalize(result) {
+    result.writeString('\n', 81, 81);
+    return result.getResult();
   }
 }
 
