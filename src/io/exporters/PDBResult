@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default class PDBResult {
   constructor() {
     this._resultArray = [];
@@ -14,6 +16,11 @@ export default class PDBResult {
 
   currentTag() {
     return this._tag;
+  }
+
+  currentStrLength() {
+    let curStr = this._resultArray[this._currentStr];
+    return curStr ? curStr.length : 0;
   }
 
   //numeration can be number or boolean

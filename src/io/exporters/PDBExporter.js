@@ -4,7 +4,6 @@ import Assembly from '../../chem/Assembly';
 import {Matrix4} from 'three';
 import {typeByPDBHelixClass} from '../../chem/Helix';
 import _ from 'lodash';
-import Atom from "../../chem/Atom";
 
 export default class PDBExporter extends Exporter {
   constructor(source, options) {
@@ -13,14 +12,14 @@ export default class PDBExporter extends Exporter {
     this._result = null;
     this._resultArray = [];
     this._tagExtractors = {
-      'HEADER': this._extractHEADER,
-      'TITLE ': this._extractTITLE,
+      'HEADER'         : this._extractHEADER,
+      'TITLE '         : this._extractTITLE,
       'ATOM and HETATM': this._extractATOM,
-      'CONECT': this._extractCONECT,
-      'COMPND': this._extractCOMPND,
-      'REMARK': this._extractREMARK,
-      'HELIX': this._extractHELIX,
-      'SHEET ': this._extractSHEET,
+      'CONECT'         : this._extractCONECT,
+      'COMPND'         : this._extractCOMPND,
+      'REMARK'         : this._extractREMARK,
+      'HELIX'          : this._extractHELIX,
+      'SHEET '         : this._extractSHEET,
     };
   }
 
@@ -93,9 +92,11 @@ export default class PDBExporter extends Exporter {
         for (let k = 0; k < bondsGroups.length; k++) {
           result.newString();
           result.writeString(atoms[i]._serial, 11, 7);
+
           for (let j = 0; j < bondsGroups[k].length; j++) {
             const serial = (bondsGroups[k][j]._left._serial === atoms[i]._serial) ?
               bondsGroups[k][j]._right._serial : bondsGroups[k][j]._left._serial;
+
             result.writeString(serial, 16 + 5 * j, 12 + 5 * j);
           }
         }
@@ -184,6 +185,7 @@ _extractHELIX(result) {
     for (let i = 0; i < atoms.length; i++) {
       const elementName = atoms[i].element.name;
       const atomName = atoms[i]._name._name;
+
       if (atoms[i]._het && result.currentTag() !== 'HETATM') {
         result.newTag('HETATM');
       } else if (!atoms[i]._het && result.currentTag() !== 'ATOM') {
@@ -231,7 +233,13 @@ _extractHELIX(result) {
       result.writeString('MOLECULE: ' + molecules[i]._name + ';', 11, 80);
       result.newString();
       result.writeString('CHAIN: ', 11, 18);
-      result.writeString(chains.join(', ') + ';', 19, 80);
+      const chainsString = chains.join(', ') + ';';
+      for (let j = 0; j < chainsString.length; j++) {
+        if (result.currentStrLength() === 81) {
+          result.newString();
+        }
+        result.writeString(chainsString[j]);
+      }
     }
   }
 
@@ -244,27 +252,30 @@ _extractHELIX(result) {
     if (!this._source.symmetry) {
       return;
     }
-    const matrices = this._source.symmetry;
-    result.newTag('REMARK', 290);
-    result.newString();
-    result.newString();
-    result.writeString('CRYSTALLOGRAPHIC SYMMETRY TRANSFORMATIONS', 11, 80);
-    result.newString();
-    result.writeString('THE FOLLOWING TRANSFORMATIONS OPERATE ON THE ATOM/HETATM', 11, 80);
-    result.newString();
-    result.writeString('RECORDS IN THIS ENTRY TO PRODUCE CRYSTALLOGRAPHICALLY', 11, 80);
-    result.newString();
-    result.writeString('RELATED MOLECULES.', 11, 80);
 
-    const matrix = new Matrix4();
-    for (let i = 0; i < matrices.length; i++) {
-      matrix.copy(matrices[i]).transpose();
-      result.writeMatrix(matrix, i + 1, '  SMTRY');
+    if (this._source.symmetry.length !== 0) {
+      const matrices = this._source.symmetry;
+      result.newTag('REMARK', 290);
+      result.newString();
+      result.newString();
+      result.writeString('CRYSTALLOGRAPHIC SYMMETRY TRANSFORMATIONS', 11, 80);
+      result.newString();
+      result.writeString('THE FOLLOWING TRANSFORMATIONS OPERATE ON THE ATOM/HETATM', 11, 80);
+      result.newString();
+      result.writeString('RECORDS IN THIS ENTRY TO PRODUCE CRYSTALLOGRAPHICALLY', 11, 80);
+      result.newString();
+      result.writeString('RELATED MOLECULES.', 11, 80);
+
+      const matrix = new Matrix4();
+      for (let i = 0; i < matrices.length; i++) {
+        matrix.copy(matrices[i]).transpose();
+        result.writeMatrix(matrix, i + 1, '  SMTRY');
+      }
+
+      result.newString();
+      result.newString();
+      result.writeString('REMARK: NULL', 11, 80);
     }
-
-    result.newString();
-    result.newString();
-    result.writeString('REMARK: NULL', 11, 80);
   }
 
   _Remark350(result) {
@@ -273,8 +284,8 @@ _extractHELIX(result) {
     }
     const units = this._source.units;
     const matrix = new Matrix4();
-
     let biomolIndx = 0;
+
     result.newTag('REMARK', 350);
     result.newString();
     result.newString();
@@ -296,18 +307,14 @@ _extractHELIX(result) {
         result.writeString('BIOMOLECULE: ' + biomolIndx, 11, 80);
         if (units[i].chains) {
           const chains = units[i].chains.join(', ');
-
-          let size = 30;
-          let chainArrays = [];
-          for (let j = 0; j < Math.ceil(chains.length / size); j++) {
-            chainArrays[j] = chains.slice((j * size), (j * size) + size);
-          }
-
           result.newString();
-          result.writeString("APPLY THE FOLLOWING TO CHAINS: " + chainArrays[0], 11, 80);
-          for (let j = 1; j < chainArrays.length; j++) {
-            result.newString();
-            result.writeString("AND CHAINS: " + chainArrays[j], 31, 80);
+          result.writeString('APPLY THE FOLLOWING TO CHAINS: ');
+          for (let j = 0; j < chains.length; j++) {
+            if (result.currentStrLength() === 69 && j !== chains.length - 1) {
+              result.newString();
+              result.writeString('AND CHAINS: ', 31, 42);
+            }
+            result.writeString(chains[j]);
           }
         }
 
