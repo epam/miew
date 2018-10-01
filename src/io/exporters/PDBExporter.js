@@ -8,18 +8,18 @@ import _ from 'lodash';
 export default class PDBExporter extends Exporter {
   constructor(source, options) {
     super(source, options);
-    this._tags = ['HEADER', 'TITLE ', 'COMPND', 'REMARK', 'HELIX', 'SHEET ', 'ATOM and HETATM', 'CONECT'];
+    this._tags = ['HEADER', 'TITLE', 'COMPND', 'REMARK', 'HELIX', 'SHEET', 'ATOM and HETATM', 'CONECT'];
     this._result = null;
     this._resultArray = [];
     this._tagExtractors = {
       'HEADER'         : this._extractHEADER,
-      'TITLE '         : this._extractTITLE,
+      'TITLE'         : this._extractTITLE,
       'ATOM and HETATM': this._extractATOM,
       'CONECT'         : this._extractCONECT,
       'COMPND'         : this._extractCOMPND,
       'REMARK'         : this._extractREMARK,
       'HELIX'          : this._extractHELIX,
-      'SHEET '         : this._extractSHEET,
+      'SHEET'         : this._extractSHEET,
     };
   }
 
@@ -37,10 +37,8 @@ export default class PDBExporter extends Exporter {
       }
     }
 
-    result.writeString('\n', 81, 81);
     this._result = result.getResult();
 
-    //console.log(this._result);
     return this._result;
   }
 
@@ -86,16 +84,16 @@ export default class PDBExporter extends Exporter {
     result.newTag('CONECT');
 
     for (let i = 0; i < atoms.length; i++) {
-      const fixedBonds = (atoms[i]._bonds.filter(this._fixedBond)).reverse();
+      const fixedBonds = (atoms[i]._bonds.filter(bond => { return bond._fixed; })).reverse();
       if (fixedBonds.length !== 0) {
-        const bondsGroups = this._getSubArrays(fixedBonds, 4);
-        for (let k = 0; k < bondsGroups.length; k++) {
+        const bondsArrays = this._getSubArrays(fixedBonds, 4);
+        for (let k = 0; k < bondsArrays.length; k++) {
           result.newString();
           result.writeString(atoms[i]._serial, 11, 7);
 
-          for (let j = 0; j < bondsGroups[k].length; j++) {
-            const serial = (bondsGroups[k][j]._left._serial === atoms[i]._serial) ?
-              bondsGroups[k][j]._right._serial : bondsGroups[k][j]._left._serial;
+          for (let j = 0; j < bondsArrays[k].length; j++) {
+            const serial = (bondsArrays[k][j]._left._serial === atoms[i]._serial) ?
+              bondsArrays[k][j]._right._serial : bondsArrays[k][j]._left._serial;
 
             result.writeString(serial, 16 + 5 * j, 12 + 5 * j);
           }
@@ -104,19 +102,12 @@ export default class PDBExporter extends Exporter {
     }
   }
 
-  _getSubArrays (arr, subArraySize) {
+  _getSubArrays(arr, subArraySize) {
     const subArrays = [];
     for (let i = 0; i < arr.length; i += subArraySize) {
       subArrays.push(arr.slice(i, i + subArraySize));
     }
     return subArrays;
-  }
-
-  _fixedBond(bond) {
-    if (bond._fixed) {
-      return true;
-    }
-    return false;
   }
 
   _extractSHEET(result) {
@@ -337,11 +328,6 @@ _extractHELIX(result) {
     return chainNames.filter(function(item, pos) {
       return chainNames.indexOf(item) === pos;
     });
-  }
-
-  _finalize(result) {
-    result.writeString('\n', 81, 81);
-    return result.getResult();
   }
 }
 

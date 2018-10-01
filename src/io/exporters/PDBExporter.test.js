@@ -1,10 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import _ from 'lodash';
 import chai, {expect} from 'chai';
-import dirtyChai from 'dirty-chai';
 import PDBExporter from './PDBExporter';
-import PDBParser from "../parsers/PDBParser";
+import PDBParser from '../parsers/PDBParser';
 
 const pathToFiles = path.join(__dirname, '../../../test/functional/data');
 

@@ -11,6 +11,7 @@ export default class PDBResult {
   }
 
   getResult() {
+    this.writeString('\n', 81, 81);
     return this._resultArray.join('');
   }
 
