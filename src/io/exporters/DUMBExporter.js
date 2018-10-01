@@ -1,5 +1,4 @@
 import Exporter from './Exporter';
-import chem from '../../chem';
 
 export default class DUMBExporter extends Exporter {
   constructor(source, options) {

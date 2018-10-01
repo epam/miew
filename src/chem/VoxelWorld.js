@@ -410,7 +410,7 @@ VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function(forEachAtom, dis
     }
   };
 
-    // for each marked voxel
+  // for each marked voxel
   for (voxel in voxels) {
     if (voxels.hasOwnProperty(voxel)) {
       self._forEachAtomInVoxel(voxel, processIfWithin);

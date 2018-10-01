@@ -1,8 +1,15 @@
 import fs from 'fs';
 import path from 'path';
-import chai, {expect} from 'chai';
 import PDBExporter from './PDBExporter';
 import PDBParser from '../parsers/PDBParser';
+import chai, {expect} from 'chai';
+import dirtyChai from 'dirty-chai';
+import sinonChai from 'sinon-chai';
+import chaiAsPromised from 'chai-as-promised';
+
+chai.use(dirtyChai);
+chai.use(sinonChai);
+chai.use(chaiAsPromised);
 
 const pathToFiles = path.join(__dirname, '../../../test/functional/data');
 

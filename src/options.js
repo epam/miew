@@ -17,7 +17,7 @@ var adapters = {
   'boolean': asBoolean,
 };
 
-  // Level 1 assignment symbol
+// Level 1 assignment symbol
 var cL1Ass = '=';
 
 var cOptsSep = '!';

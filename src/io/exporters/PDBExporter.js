@@ -139,7 +139,7 @@ export default class PDBExporter extends Exporter {
     }
   }
 
-_extractHELIX(result) {
+  _extractHELIX(result) {
     if (!this._source._helices) {
       return;
     }
@@ -257,11 +257,7 @@ _extractHELIX(result) {
       result.newString();
       result.writeString('RELATED MOLECULES.', 11, 80);
 
-      const matrix = new Matrix4();
-      for (let i = 0; i < matrices.length; i++) {
-        matrix.copy(matrices[i]).transpose();
-        result.writeMatrix(matrix, i + 1, '  SMTRY');
-      }
+      this._writeMatrix(result, matrices, '  SMTRY');
 
       result.newString();
       result.newString();
@@ -274,7 +270,6 @@ _extractHELIX(result) {
       return;
     }
     const units = this._source.units;
-    const matrix = new Matrix4();
     let biomolIndx = 0;
 
     result.newTag('REMARK', 350);
@@ -311,12 +306,17 @@ _extractHELIX(result) {
 
         const matrices = units[i].matrices;
         if (matrices) {
-          for (let j = 0; j < matrices.length; j++) {
-            matrix.copy(matrices[j]).transpose();
-            result.writeMatrix(matrix, j + 1, '  BIOMT');
-          }
+          this._writeMatrix(result, matrices, '  BIOMT');
         }
       }
+    }
+  }
+
+  _writeMatrix(result, matrices, string) {
+    const matrix = new Matrix4();
+    for (let j = 0; j < matrices.length; j++) {
+      matrix.copy(matrices[j]).transpose();
+      result.writeMatrix(matrix, j + 1, string);
     }
   }
 
