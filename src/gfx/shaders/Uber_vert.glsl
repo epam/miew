@@ -210,9 +210,10 @@ void main() {
 
 #ifdef SHADOWMAP
 	#if NUM_DIR_LIGHTS > 0
+	vec4 worldPosition;
 	//#pragma unroll_loop
 	//for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-	  vec4 worldPosition = vec4(vWorldPosition, 1.0);
+	  worldPosition = vec4(vWorldPosition, 1.0);
 		vDirectionalShadowCoord/*[ i ]*/ = dirShadowMatrix/*[ i ]*/ * worldPosition;
 	//}
 	#endif

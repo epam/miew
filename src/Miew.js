@@ -3159,7 +3159,7 @@ Miew.prototype._initOnSettingsChanged = function() {
     if (gfx) {
       gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     }
-    // TODO: update materials
+    // update materials
     const values = {fogTransparent: evt.value};
     this._forEachComplexVisual(visual => visual.setMaterialValues(values));
     for (let i = 0, n = this._objects.length; i < n; ++i) {
@@ -3173,7 +3173,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('draft.clipPlane', (evt) => {
-    // TODO: update materials
+    // update materials
     const values = {clipPlane: evt.value};
     this._forEachComplexVisual(visual => visual.setMaterialValues(values));
     for (let i = 0, n = this._objects.length; i < n; ++i) {
@@ -3187,7 +3187,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('shadow.shadowMap', (evt) => {
-    // TODO: update materials and rebuild all
+    // update materials and rebuild all
     const values = {shadowmap: evt.value, pcf: settings.now.shadow.pcf, soft: settings.now.shadow.soft};
     const gfx = this._gfx;
     if (gfx) {
@@ -3198,7 +3198,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('shadow.pcf', (evt) => {
-    // TODO: update materials and rebuild all if shadowmap are enable
+    // update materials and rebuild all if shadowmap are enable
     if (settings.now.shadow.shadowMap) {
       const values = {pcf: evt.value};
       this._updateMaterials(values);
@@ -3207,7 +3207,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('shadow.soft', (evt) => {
-    // TODO: update materials and rebuild all if shadowmap and pcf are enable
+    // update materials and rebuild all if shadowmap and pcf are enable
     if (settings.now.shadow.shadowMap && settings.now.shadow.pcf) {
       const values = {soft: evt.value};
       this._updateMaterials(values);
