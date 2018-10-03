@@ -268,6 +268,10 @@ Miew.prototype.init = function() {
       self._needRender = true;
     });
 
+    this.addEventListener('zoom', function(event) {
+      self._onChangeZoom(event.factor);
+    });
+
     var gfx = this._gfx;
     this._picker = new Picker(gfx.root, gfx.camera, gfx.renderer.domElement);
     this._picker.addEventListener('newpick', function(event) {
@@ -421,12 +425,12 @@ Miew.prototype._initGfx = function() {
   gfx.selectionRoot.add(gfx.selectionPivot);
 
   // TODO: Either stay with a single light or revert this commit
-  var light1 = new THREE.DirectionalLight(0xffffff, 0.45);
+  var light1 = new THREE.DirectionalLight(0x00ffff, 0.95);
   light1.position.set(gfx.camera.position.x * 10, gfx.camera.position.y * 10 || 5.4, gfx.camera.position.z * 10 || 10);
   light1.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light1.castShadow = true;
   light1.shadow = new THREE.DirectionalLightShadow();
-  light1.shadow.bias = -0.001; //TODO should depends on zoom
+  light1.shadow.bias = -0.0005;
   light1.shadow.radius = 5.0;
   var shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
   light1.shadow.mapSize.width = shadowMapSize;
@@ -438,8 +442,8 @@ Miew.prototype._initGfx = function() {
   light2.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light2.castShadow = true;
   light2.shadow = new THREE.DirectionalLightShadow();
-  light2.shadow.bias = -0.001; //TODO should depends on zoom
-  light2.shadow.radius = 10.0;
+  light2.shadow.bias = -0.0005;
+  light2.shadow.radius = 5.0;
   light2.shadow.mapSize.width = shadowMapSize;
   light2.shadow.mapSize.height = shadowMapSize;
   gfx.scene.add(light2);
@@ -857,6 +861,18 @@ Miew.prototype._resizeOffscreenBuffers = function(width, height, stereo) {
     gfx.stereoBufR.setSize(width, height);
   }
 };
+
+
+Miew.prototype._onChangeZoom = function(factor) {
+  for (var i = 0; i < this._gfx.scene.children.length; i++) {
+    if (this._gfx.scene.children[i].shadow !== undefined) {
+      var light = this._gfx.scene.children[i];
+
+      light.shadow.bias *= factor;
+    }
+  }
+  this._needRender = true;
+}
 
 /**
  * Callback which processes update/render frames.
