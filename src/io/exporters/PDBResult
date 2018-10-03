@@ -16,11 +16,7 @@ export default class PDBResult {
     return this._resultArray.join('');
   }
 
-  currentTag() {
-    return this._tag;
-}
-
-  currentStrLength() {
+  _currentStrLength() {
     let curStr = this._resultArray[this._currentStr];
     return curStr ? curStr.length : 0;
   }
@@ -77,10 +73,10 @@ export default class PDBResult {
       maxStrPos = 81;
     }
     for (let j = 0; j < string.length; j++) {
-      if (this.currentStrLength() === maxStrPos && j !== string.length - 1) {
+      if (this._currentStrLength() === maxStrPos && j !== string.length - 1) {
         this.newString();
-        if (concat) {
-          this.writeString(concat, 31, 42);
+        if (concat) {                         //pretty hardcoddy
+          this.writeString(concat.tag, concat.begin, concat.end);
         }
       }
       if (string[j] === '\n') {
@@ -152,12 +148,36 @@ export default class PDBResult {
     }
   }
 
+  writeBondsArray(bonds, atom) {
+    const bondsArrays = this._getSubArrays(bonds, 4);
+
+    for (let k = 0; k < bondsArrays.length; k++) {
+      this.newString();
+      this.writeString(atom._serial, 11, 7);
+
+      for (let j = 0; j < bondsArrays[k].length; j++) {
+        const serial = (bondsArrays[k][j]._left._serial === atom._serial) ?
+          bondsArrays[k][j]._right._serial : bondsArrays[k][j]._left._serial;
+
+        this.writeString(serial, 16 + 5 * j, 12 + 5 * j);
+      }
+    }
+  }
+
+  _getSubArrays(arr, subArraySize) {
+    const subArrays = [];
+    for (let i = 0; i < arr.length; i += subArraySize) {
+      subArrays.push(arr.slice(i, i + subArraySize));
+    }
+    return subArrays;
+  }
+
   //function for writing matrix in Remark290 and Remark350 tags
   //(see pdb file description)
   writeMatrix(matrix, matrixIndx, tag) {
     for (let j = 0; j < 3; j++) {
       this.newString();
-      this.writeString(tag, 12, 18);
+      this.writeString(tag, 14, 18);
       this.writeString((j + 1).toString(), 19, 19);
       this.writeString(matrixIndx.toString(), 23, 20);
       for (let k = 0; k < 3; k++) {
@@ -170,7 +190,7 @@ export default class PDBResult {
     }
   }
 
-  _writeMatrices(matrices, string) {
+  writeMatrices(matrices, string) {
     if (!matrices) {
       return;
     }

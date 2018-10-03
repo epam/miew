@@ -92,33 +92,11 @@ export default class PDBExporter extends Exporter {
     result.newTag('CONECT');
 
     for (let i = 0; i < atoms.length; i++) {
-
-      const fixedBonds = (atoms[i]._bonds.filter(bond => { return bond._fixed; })).reverse();
-
+      const fixedBonds = atoms[i]._bonds.filter(bond => { return bond._fixed; });
       if (fixedBonds.length !== 0) {
-        const bondsArrays = this._getSubArrays(fixedBonds, 4);
-
-        for (let k = 0; k < bondsArrays.length; k++) {
-          result.newString();
-          result.writeString(atoms[i]._serial, 11, 7);
-
-          for (let j = 0; j < bondsArrays[k].length; j++) {
-            const serial = (bondsArrays[k][j]._left._serial === atoms[i]._serial) ?
-              bondsArrays[k][j]._right._serial : bondsArrays[k][j]._left._serial;
-
-            result.writeString(serial, 16 + 5 * j, 12 + 5 * j);
-          }
-        }
+        result.writeBondsArray(fixedBonds.reverse(), atoms[i]);
       }
     }
-  }
-
-  _getSubArrays(arr, subArraySize) {
-    const subArrays = [];
-    for (let i = 0; i < arr.length; i += subArraySize) {
-      subArrays.push(arr.slice(i, i + subArraySize));
-    }
-    return subArrays;
   }
 
   _extractSHEET(result) {
@@ -187,8 +165,8 @@ export default class PDBExporter extends Exporter {
     for (let i = 0; i < atoms.length; i++) {
       const tag = atoms[i]._het ? 'HETATM' : 'ATOM';
       result.newString(tag);
-      result.writeString(atoms[i]._serial, 11, 7);
       const startIndx = (atoms[i].element.name.length > 1 || atoms[i]._name._name.length > 3) ? 13 : 14;
+      result.writeString(atoms[i]._serial, 11, 7);
       result.writeString(atoms[i]._name._name, startIndx, 16);
       result.writeString(String.fromCharCode(atoms[i]._location), 17, 17);
       result.writeString(atoms[i]._residue._type._name, 20, 18);
@@ -243,7 +221,7 @@ export default class PDBExporter extends Exporter {
       result.newString();
       result.newString();
       result.writeEntireString(this._stringForRemark290);
-      result._writeMatrices(matrices, '  SMTRY');
+      result.writeMatrices(matrices, 'SMTRY');
       result.newString();
       result.newString();
       result.writeString('REMARK: NULL', 11, 80);
@@ -274,10 +252,10 @@ export default class PDBExporter extends Exporter {
       const chains = assemblies[i].chains.join(', ');
       result.newString();
       result.writeString('APPLY THE FOLLOWING TO CHAINS: ');
-      result.writeEntireString(chains, 69, 'AND CHAINS: ');
+      result.writeEntireString(chains, 69, {tag: 'AND CHAINS: ', begin: 31, end: 42});
 
       const matrices = assemblies[i].matrices;
-      result._writeMatrices(matrices, '  BIOMT');
+      result.writeMatrices(matrices, 'BIOMT');
     }
   }
 
