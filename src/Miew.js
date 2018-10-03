@@ -425,8 +425,7 @@ Miew.prototype._initGfx = function() {
   light1.position.set(gfx.camera.position.x * 10, gfx.camera.position.y * 10 || 5.4, gfx.camera.position.z * 10 || 10);
   light1.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light1.castShadow = true;
-  //FIXME DirectionalLightShadow
-  light1.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 100));
+  light1.shadow = new THREE.DirectionalLightShadow();
   light1.shadow.bias = -0.001; //TODO should depends on zoom
   light1.shadow.radius = 5.0;
   var shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
@@ -438,7 +437,7 @@ Miew.prototype._initGfx = function() {
   light2.position.set(gfx.camera.position.x * 10 || 10.4, gfx.camera.position.y * 10, gfx.camera.position.z * 5 || 10);
   light2.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light2.castShadow = true;
-  light2.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 100));
+  light2.shadow = new THREE.DirectionalLightShadow();
   light2.shadow.bias = -0.001; //TODO should depends on zoom
   light2.shadow.radius = 10.0;
   light2.shadow.mapSize.width = shadowMapSize;
