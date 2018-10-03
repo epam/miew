@@ -49,6 +49,14 @@ Representation.prototype.reset = function() {
   this.selectionGeo = null;
 };
 
+const depthShadomapMaterialValues = {
+  colorFromDepth: true,
+  lights: false,
+  shadowmap: false,
+  fog: false
+};
+
+
 Representation.prototype.buildGeometry = function(complex) {
   // console.time('buildGeometry');
   this.reset();
@@ -69,7 +77,7 @@ Representation.prototype.buildGeometry = function(complex) {
       if (object.material.shadowmap) {
         const depthMaterial = new UberMaterial();
         depthMaterial.copy(object.material);
-        depthMaterial.setValues({colorFromDepth: true});
+        depthMaterial.setValues(depthShadomapMaterialValues);
         object.customDepthMaterial = depthMaterial;
       }
     }

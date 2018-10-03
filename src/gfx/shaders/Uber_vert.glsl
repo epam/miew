@@ -21,8 +21,8 @@ varying vec3 vViewPosition;
 
 #ifdef SHADOWMAP
 	#if NUM_DIR_LIGHTS > 0
-		uniform mat4 dirShadowMatrix;//[ NUM_DIR_LIGHTS ];
-		varying vec4 vDirectionalShadowCoord;//[ NUM_DIR_LIGHTS ];
+		uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];
+		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
 	#endif
 #endif
 
@@ -211,11 +211,11 @@ void main() {
 #ifdef SHADOWMAP
 	#if NUM_DIR_LIGHTS > 0
 	vec4 worldPosition;
-	//#pragma unroll_loop
-	//for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+	#pragma unroll_loop
+	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 	  worldPosition = vec4(vWorldPosition, 1.0);
-		vDirectionalShadowCoord/*[ i ]*/ = dirShadowMatrix/*[ i ]*/ * worldPosition;
-	//}
+		vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;
+	}
 	#endif
 #endif
 

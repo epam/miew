@@ -16,22 +16,7 @@ export default function(SuperClass) {
     this._update();
   };
 
-  NewObjectType.prototype._onBeforeRender = function(renderer, scene/*, camera*/) {
-    var material = this.material;
-    if (!material.uberOptions) {
-      return;
-    }
-
-    if (renderer.shadowMap.enabled) {
-      for (var i = 0; i < scene.children.length; i++) { //FIXME add sth for more than one light source with shadows
-        if (scene.children[i].shadow !== undefined) {
-          material.uberOptions.dirShadowMatrix.copy(scene.children[i].shadow.matrix);
-          material.uberOptions.directionalShadowMap = scene.children[i].shadow.map.texture;
-          break;
-        }
-      }
-    }
-  };
+  NewObjectType.prototype._onBeforeRender = function() {};
 
   NewObjectType.prototype._update = function() {
     var material = this.material;

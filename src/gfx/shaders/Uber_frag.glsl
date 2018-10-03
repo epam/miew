@@ -8,8 +8,8 @@
 
 #ifdef SHADOWMAP
 	#if NUM_DIR_LIGHTS > 0
-		uniform sampler2D directionalShadowMap;//[ NUM_DIR_LIGHTS ];
-		varying vec4 vDirectionalShadowCoord;//[ NUM_DIR_LIGHTS ];
+		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
+		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
 	#endif
 #endif
 
@@ -385,11 +385,11 @@ float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare )
   	float shadow = 1.0;
   	#if NUM_DIR_LIGHTS > 0
   	  DirectionalLight directionalLight;
-  	//#pragma unroll_loop
-  	  //for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-  		  directionalLight = directionalLights[ 0 ];
-  		  shadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap/*[ i ]*/, directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord/*[ i ]*/ ) : 1.0;
-  		//}
+  	#pragma unroll_loop
+  	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+  		  directionalLight = directionalLights[ i ];
+  		  shadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+  		}
     #endif
   	return shadow;
     //return vec4(fract(vDirectionalShadowCoord.xy), 0.0, 1.0);//shadow/2.0;

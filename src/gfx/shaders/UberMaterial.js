@@ -13,7 +13,7 @@ var defaultUniforms = THREE.UniformsUtils.merge([
 
   THREE.UniformsLib.common, //FIXME is it needed
   THREE.UniformsLib.fog,
-  THREE.UniformsLib.lights, //FIXME simplify use only directional
+  THREE.UniformsLib.lights,
 
   {
     'specular' :  {type: 'c', value: new THREE.Color(0x111111)},
@@ -24,8 +24,6 @@ var defaultUniforms = THREE.UniformsUtils.merge([
     'clipPlaneValue': {type: 'f', value: 0.0},
     'invModelViewMatrix': {type: '4fv', value: new THREE.Matrix4()},
     'world2colorMatrix': {type: '4fv', value: new THREE.Matrix4()},
-    'dirShadowMatrix': {type: '4fv', value: new THREE.Matrix4()},
-    'directionalShadowMap' : {type: 't', value: null},
     'dashedLineSize': {type: 'f', value: 0.1},
     'dashedLinePeriod': {type: 'f', value: 0.2},
     'projMatrixInv': {type: '4fv', value: new THREE.Matrix4()},
@@ -46,8 +44,6 @@ var uberOptionNames = [
   'zClipValue',
   'clipPlaneValue',
   'world2colorMatrix',
-  'dirShadowMatrix',
-  'directionalShadowMap',
   'dashedLineSize',
   'dashedLinePeriod',
   'projMatrixInv',
@@ -138,8 +134,6 @@ UberMaterial.prototype.uberOptions = {
   zClipValue: 0.0, //  value to clip Surfs in shader  (see ZCLIP)
   clipPlaneValue: 0.0, // value to clip scene globally (see CLIPPLANE)
   world2colorMatrix: new THREE.Matrix4(),
-  dirShadowMatrix : new THREE.Matrix4(),
-  directionalShadowMap : null,
   dashedLineSize: 0.1,
   dashedLinePeriod: 0.3,
   projMatrixInv: new THREE.Matrix4(),
@@ -157,8 +151,6 @@ UberMaterial.prototype.uberOptions = {
     this.zClipValue = source.zClipValue;
     this.clipPlaneValue = source.clipPlaneValue;
     this.world2colorMatrix.copy(source.world2colorMatrix);
-    this.dirShadowMatrix.copy(source.dirShadowMatrix);
-    this.directionalShadowMap = source.directionalShadowMap;
     this.dashedLineSize = source.dashedLineSize;
     this.dashedLinePeriod = source.dashedLinePeriod;
     this.projMatrixInv = source.projMatrixInv;
@@ -264,15 +256,15 @@ UberMaterial.prototype.setValues = function(values) {
   }
   if (this.shadowmap) {
     defines.SHADOWMAP = 1;
-  }
-  if (this.pcf) {
-    if (this.soft) {
-      defines.SHADOWMAP_PCF_SOFT = 1;
+    if (this.pcf) {
+      if (this.soft) {
+        defines.SHADOWMAP_PCF_SOFT = 1;
+      } else {
+        defines.SHADOWMAP_PCF_SHARP = 1;
+      }
     } else {
-      defines.SHADOWMAP_PCF_SHARP = 1;
+      defines.SHADOWMAP_BASIC = 1;
     }
-  } else {
-    defines.SHADOWMAP_BASIC = 1;
   }
   if (this.colorFromDepth) {
     defines.COLOR_FROM_DEPTH = 1;

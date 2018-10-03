@@ -421,18 +421,29 @@ Miew.prototype._initGfx = function() {
   gfx.selectionRoot.add(gfx.selectionPivot);
 
   // TODO: Either stay with a single light or revert this commit
-  var light12 = new THREE.DirectionalLight(0xffffff, 0.45);
-  light12.position.set(gfx.camera.position.x * 10, gfx.camera.position.y * 10 || 5.4, gfx.camera.position.z * 10 || 10);
-  light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
-  light12.castShadow = true;
+  var light1 = new THREE.DirectionalLight(0xffffff, 0.45);
+  light1.position.set(gfx.camera.position.x * 10, gfx.camera.position.y * 10 || 5.4, gfx.camera.position.z * 10 || 10);
+  light1.layers.enable(gfxutils.LAYERS.TRANSPARENT);
+  light1.castShadow = true;
   //FIXME DirectionalLightShadow
-  light12.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 100));
-  light12.shadow.bias = -0.001; //TODO should depends on zoom
-  light12.shadow.radius = 5.0;
+  light1.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 100));
+  light1.shadow.bias = -0.001; //TODO should depends on zoom
+  light1.shadow.radius = 5.0;
   var shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
-  light12.shadow.mapSize.width = shadowMapSize;
-  light12.shadow.mapSize.height = shadowMapSize;
-  gfx.scene.add(light12);
+  light1.shadow.mapSize.width = shadowMapSize;
+  light1.shadow.mapSize.height = shadowMapSize;
+  gfx.scene.add(light1);
+
+  var light2 = new THREE.DirectionalLight(0xff0000, 0.95);
+  light2.position.set(gfx.camera.position.x * 10 || 10.4, gfx.camera.position.y * 10, gfx.camera.position.z * 5 || 10);
+  light2.layers.enable(gfxutils.LAYERS.TRANSPARENT);
+  light2.castShadow = true;
+  light2.shadow = new THREE.LightShadow(new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.1, 100));
+  light2.shadow.bias = -0.001; //TODO should depends on zoom
+  light2.shadow.radius = 10.0;
+  light2.shadow.mapSize.width = shadowMapSize;
+  light2.shadow.mapSize.height = shadowMapSize;
+  gfx.scene.add(light2);
 
   var light3 = new THREE.AmbientLight(0x666666);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
