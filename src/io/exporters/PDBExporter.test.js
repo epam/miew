@@ -46,7 +46,7 @@ describe('PDBExporter test', () => {
   for (let i = 0; i < filesForTest.length; i++) {
     it('exported and initial string comparison', () => {
       getInitialString(filesForTest[i]).then((data) => {
-        expect(getExportedString(data)).to.deep.include(data);
+        expect(getExportedString(data)).to.equal(data);
       });
     });
   }

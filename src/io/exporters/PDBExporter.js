@@ -4,13 +4,13 @@ import Assembly from '../../chem/Assembly';
 import {Matrix4} from 'three';
 import {typeByPDBHelixClass} from '../../chem/Helix';
 import _ from 'lodash';
+import Strand from '../../chem/Strand';
 
 export default class PDBExporter extends Exporter {
   constructor(source, options) {
     super(source, options);
     this._tags = ['HEADER', 'TITLE', 'COMPND', 'REMARK', 'HELIX', 'SHEET', 'ATOM and HETATM', 'CONECT'];
     this._result = null;
-    this._resultArray = [];
     this._tagExtractors = {
       'HEADER'         : this._extractHEADER,
       'TITLE'         : this._extractTITLE,
@@ -116,6 +116,7 @@ export default class PDBExporter extends Exporter {
     }
 
     result.newTag('SHEET');
+
     const sheets = this._source._sheets;
     for (let i = 0; i < sheets.length; i++) {
       if (sheets[i]._strands) {
@@ -177,20 +178,11 @@ export default class PDBExporter extends Exporter {
       const elementName = atoms[i].element.name;
       const atomName = atoms[i]._name._name;
 
-      if (atoms[i]._het && result.currentTag() !== 'HETATM') {
-        result.newTag('HETATM');
-      } else if (!atoms[i]._het && result.currentTag() !== 'ATOM') {
-        result.newTag('ATOM');
-      }
-      result.newString();
+      const tag = atoms[i]._het ? 'HETATM' : 'ATOM';
+      result.newString(tag);
       result.writeString(atoms[i]._serial, 11, 7);
-
-      if (elementName.length > 1 || atomName.length > 3) {
-        result.writeString(atomName, 13, 16);
-      } else {
-        result.writeString(atomName, 14, 16);
-      }
-
+      const startIndx = (elementName.length > 1 || atomName.length > 3) ? 13 : 14;
+      result.writeString(atomName, startIndx, 16);
       result.writeString(String.fromCharCode(atoms[i]._location), 17, 17);
       result.writeString(atoms[i]._residue._type._name, 20, 18);
       result.writeString(atoms[i]._residue._chain._name, 22, 22);
@@ -201,9 +193,7 @@ export default class PDBExporter extends Exporter {
       result.writeString(atoms[i]._position.z.toFixed(3), 54, 47);
       result.writeString(atoms[i]._occupancy.toFixed(2), 60, 55);
       result.writeString(atoms[i]._temperature.toFixed(2), 66, 61);
-
       result.writeString(atoms[i].element.name, 78, 77);
-
       if (atoms[i]._charge) {
         result.writeString(atoms[i]._charge, 79, 80);
       }
@@ -216,6 +206,7 @@ export default class PDBExporter extends Exporter {
     }
     const molecules = this._source._molecules;
     result.newTag('COMPND', true);
+
     for (let i = 0; i < molecules.length; i++) {
       const chains = this._getMoleculeChains(molecules[i]);
       result.newString();
@@ -225,12 +216,7 @@ export default class PDBExporter extends Exporter {
       result.newString();
       result.writeString('CHAIN: ', 11, 18);
       const chainsString = chains.join(', ') + ';';
-      for (let j = 0; j < chainsString.length; j++) {
-        if (result.currentStrLength() === 81) {
-          result.newString();
-        }
-        result.writeString(chainsString[j]);
-      }
+      result.writeEntireString(chainsString, 81);
     }
   }
 
@@ -256,9 +242,7 @@ export default class PDBExporter extends Exporter {
       result.writeString('RECORDS IN THIS ENTRY TO PRODUCE CRYSTALLOGRAPHICALLY', 11, 80);
       result.newString();
       result.writeString('RELATED MOLECULES.', 11, 80);
-
-      this._writeMatrix(result, matrices, '  SMTRY');
-
+      result._writeMatrices(matrices, '  SMTRY');
       result.newString();
       result.newString();
       result.writeString('REMARK: NULL', 11, 80);
@@ -285,38 +269,22 @@ export default class PDBExporter extends Exporter {
     result.newString();
     result.writeString('CRYSTALLOGRAPHIC OPERATIONS ARE GIVEN.', 11, 80);
 
-    for (let i = 0; i < units.length; i++) {
-      if (units[i] instanceof Assembly) {
-        result.newString();
-        result.newString();
-        biomolIndx++;
-        result.writeString('BIOMOLECULE: ' + biomolIndx, 11, 80);
-        if (units[i].chains) {
-          const chains = units[i].chains.join(', ');
-          result.newString();
-          result.writeString('APPLY THE FOLLOWING TO CHAINS: ');
-          for (let j = 0; j < chains.length; j++) {
-            if (result.currentStrLength() === 69 && j !== chains.length - 1) {
-              result.newString();
-              result.writeString('AND CHAINS: ', 31, 42);
-            }
-            result.writeString(chains[j]);
-          }
-        }
+    const assemblies = units.filter(unit => {
+      return unit instanceof Assembly;
+    });
 
-        const matrices = units[i].matrices;
-        if (matrices) {
-          this._writeMatrix(result, matrices, '  BIOMT');
-        }
-      }
-    }
-  }
+    for (let i = 0; i < assemblies.length; i++) {
+      result.newString();
+      result.newString();
+      biomolIndx++;
+      result.writeString('BIOMOLECULE: ' + biomolIndx, 11, 80);
+      const chains = assemblies[i].chains.join(', ');
+      result.newString();
+      result.writeString('APPLY THE FOLLOWING TO CHAINS: ');
+      result.writeEntireString(chains, 69, 'AND CHAINS: ');
 
-  _writeMatrix(result, matrices, string) {
-    const matrix = new Matrix4();
-    for (let j = 0; j < matrices.length; j++) {
-      matrix.copy(matrices[j]).transpose();
-      result.writeMatrix(matrix, j + 1, string);
+      const matrices = assemblies[i].matrices;
+      result._writeMatrices(matrices, '  BIOMT');
     }
   }
 

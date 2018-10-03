@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import {Matrix4} from "three";
 
 export default class PDBResult {
   constructor() {
@@ -50,12 +51,14 @@ export default class PDBResult {
     }
   }
 
-  newString() {
+  newString(tag) {
     this.writeString('\n', 81, 81);
     this._currentStr++;
     this._resultArray.push('');
 
-    if (this._tag) {
+    if (tag) {
+      this.writeString(tag, 1, 6);
+    } else if (this._tag) {
       this.writeString(this._tag, 1, 6);
     }
 
@@ -66,6 +69,18 @@ export default class PDBResult {
       if (this._tagStrNum !== 1) {
         this.writeString(this._tagStrNum.toString(), 10, 8);
       }
+    }
+  }
+
+  writeEntireString(string, maxStrPos, concat) {
+    for (let j = 0; j < string.length; j++) {
+      if (this.currentStrLength() === maxStrPos && j !== string.length - 1) {
+        this.newString();
+        if (concat) {
+          this.writeString(concat, 31, 42);
+        }
+      }
+      this.writeString(string[j]);
     }
   }
 
@@ -145,6 +160,17 @@ export default class PDBResult {
 
       const numb = parseFloat(matrix.elements[j * 4 + 3]).toFixed(5);
       this.writeString(numb.toString(), 68, 55);
+    }
+  }
+
+  _writeMatrices(matrices, string) {
+    if (!matrices) {
+      return;
+    }
+    const matrix = new Matrix4();
+    for (let j = 0; j < matrices.length; j++) {
+      matrix.copy(matrices[j]).transpose();
+      this.writeMatrix(matrix, j + 1, string);
     }
   }
 }
