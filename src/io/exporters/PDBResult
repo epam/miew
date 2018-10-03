@@ -18,7 +18,7 @@ export default class PDBResult {
 
   currentTag() {
     return this._tag;
-  }
+}
 
   currentStrLength() {
     let curStr = this._resultArray[this._currentStr];
@@ -73,6 +73,9 @@ export default class PDBResult {
   }
 
   writeEntireString(string, maxStrPos, concat) {
+    if (!maxStrPos) {
+      maxStrPos = 81;
+    }
     for (let j = 0; j < string.length; j++) {
       if (this.currentStrLength() === maxStrPos && j !== string.length - 1) {
         this.newString();
@@ -80,7 +83,11 @@ export default class PDBResult {
           this.writeString(concat, 31, 42);
         }
       }
-      this.writeString(string[j]);
+      if (string[j] === '\n') {
+        this.newString();
+      } else {
+        this.writeString(string[j]);
+      }
     }
   }
 
