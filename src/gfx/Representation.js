@@ -6,7 +6,14 @@ import UberMaterial from './shaders/UberMaterial';
 import gfxutils from './gfxutils';
 import settings from '../settings';
 
-function Representation(index, mode, colorer, selector) {
+  function Representation(index, mode, colorer, selector) {
+  const startMaterialValues = {
+    clipPlane: settings.now.draft.clipPlane,
+    fogTransparent: settings.now.bg.transparent,
+    shadowmap: settings.now.shadow.shadowMap,
+    pcf: settings.now.shadow.pcf,
+    soft: settings.now.shadow.soft
+  };
   this.index = index;
   this.mode = mode;
   this.colorer = colorer;
@@ -14,7 +21,7 @@ function Representation(index, mode, colorer, selector) {
   this.selectorString = ''; // FIXME
   this.count = 0;
   this.material = new UberMaterial();
-  this.material.setValues({clipPlane: settings.now.draft.clipPlane, fogTransparent: settings.now.bg.transparent});
+  this.material.setValues(startMaterialValues);
   this.materialPreset = materials.first;
   this.needsRebuild = true;
   this.visible = true;
