@@ -268,10 +268,6 @@ Miew.prototype.init = function() {
       self._needRender = true;
     });
 
-    this.addEventListener('zoom', function(event) {
-      self._onChangeZoom(event.factor);
-    });
-
     var gfx = this._gfx;
     this._picker = new Picker(gfx.root, gfx.camera, gfx.renderer.domElement);
     this._picker.addEventListener('newpick', function(event) {
@@ -425,7 +421,7 @@ Miew.prototype._initGfx = function() {
   gfx.selectionRoot.add(gfx.selectionPivot);
 
   // TODO: Either stay with a single light or revert this commit
-  var light1 = new THREE.DirectionalLight(0x00ffff, 0.95);
+  var light1 = new THREE.DirectionalLight(0xffffff, 0.95);
   light1.position.set(gfx.camera.position.x * 10, gfx.camera.position.y * 10 || 5.4, gfx.camera.position.z * 10 || 10);
   light1.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light1.castShadow = true;
@@ -437,7 +433,7 @@ Miew.prototype._initGfx = function() {
   light1.shadow.mapSize.height = shadowMapSize;
   gfx.scene.add(light1);
 
-  var light2 = new THREE.DirectionalLight(0xff0000, 0.95);
+  /*var light2 = new THREE.DirectionalLight(0xff0000, 0.95);
   light2.position.set(gfx.camera.position.x * 10 || 10.4, gfx.camera.position.y * 10, gfx.camera.position.z * 5 || 10);
   light2.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light2.castShadow = true;
@@ -446,7 +442,7 @@ Miew.prototype._initGfx = function() {
   light2.shadow.radius = 5.0;
   light2.shadow.mapSize.width = shadowMapSize;
   light2.shadow.mapSize.height = shadowMapSize;
-  gfx.scene.add(light2);
+  gfx.scene.add(light2);*/
 
   var light3 = new THREE.AmbientLight(0x666666);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
@@ -861,18 +857,6 @@ Miew.prototype._resizeOffscreenBuffers = function(width, height, stereo) {
     gfx.stereoBufR.setSize(width, height);
   }
 };
-
-
-Miew.prototype._onChangeZoom = function(factor) {
-  for (var i = 0; i < this._gfx.scene.children.length; i++) {
-    if (this._gfx.scene.children[i].shadow !== undefined) {
-      var light = this._gfx.scene.children[i];
-
-      light.shadow.bias *= factor;
-    }
-  }
-  this._needRender = true;
-}
 
 /**
  * Callback which processes update/render frames.
@@ -3104,6 +3088,8 @@ Miew.prototype._updateShadow = function(radius) {
   for (var i = 0; i < this._gfx.scene.children.length; i++) {
     if (this._gfx.scene.children[i].shadow !== undefined) {
       var light = this._gfx.scene.children[i];
+
+      light.shadow.bias = -0.0005 * radius;
 
       light.shadow.camera.bottom = -radius;
       light.shadow.camera.top = radius;
