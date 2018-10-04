@@ -16,7 +16,7 @@ expectations. Please contact us at [miew@epam.com] or via [GitHub Issues].
 We adhere to the [Semantic Versioning] scheme. The major version number changes when the external
 API changes. While there is no external API specified yet it stays at zero for now.
 
-According to the Continuous Integration principles all the development occurs inside
+According to the Continuous Integration principles, all the development occurs inside
 the `master` branch, and we use the `latest` branch _for tagging_ released versions only.
 We rarely use public feature branches as they [go against CI/CD].
 
@@ -36,7 +36,7 @@ own subdirectory on the server, e.g. [`master`] or [`v0.7.10`].
 > Please **do not report sensitive / security issues** via public channels, try to contact
 > maintainers privately first (e.g. at [miew@epam.com]).
 
-We use [GitHub Issues] to keep track of tasks, enhancements, and bugs. For your convenience
+We use [GitHub Issues] to keep track of tasks, enhancements, and bugs. For your convenience,
 there is [an issue template] available.
 
 It is always good to know the version of the project where the issue appears. You may learn the
