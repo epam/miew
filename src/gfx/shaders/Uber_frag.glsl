@@ -299,7 +299,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
 		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
 	}
 
-float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) {
+  float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) {
 		const vec2 offset = vec2( 0.0, 1.0 );
 
 		vec2 texelSize = vec2( 1.0 ) / size;
@@ -322,7 +322,6 @@ float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare )
   float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
  	  float shadow = 1.0;
 
-
 		shadowCoord.xyz /= shadowCoord.w;
 		shadowCoord.z += shadowBias;
 
@@ -337,24 +336,24 @@ float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare )
 			#endif
 
 			#ifdef SHADOWMAP_PCF_SHARP
-			vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+			  vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
 
-        float dx0 = - texelSize.x * shadowRadius;
-        float dy0 = - texelSize.y * shadowRadius;
-        float dx1 = + texelSize.x * shadowRadius;
-        float dy1 = + texelSize.y * shadowRadius;
+          float dx0 = - texelSize.x * shadowRadius;
+          float dy0 = - texelSize.y * shadowRadius;
+          float dx1 = + texelSize.x * shadowRadius;
+          float dy1 = + texelSize.y * shadowRadius;
 
-        shadow = (
-        	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
-        	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
-        	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
-        	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
-        	texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +
-        	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
-        	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
-        	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
-        	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
-        ) * ( 1.0 / 9.0 );
+          shadow = (
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+          ) * ( 1.0 / 9.0 );
       #endif
 
       #ifdef SHADOWMAP_PCF_SOFT
@@ -396,10 +395,6 @@ float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare )
     }
 #endif
 
-
-
-
-
 /////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////
 #ifdef DASHED_LINE
   uniform float dashedLineSize;
@@ -410,181 +405,180 @@ float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare )
 /////////////////////////////////////////// Main ///////////////////////////////////////////////
 void main() {
 
-#ifdef CLIP_PLANE
-  if (vViewPosition.z < clipPlaneValue) discard;
-#endif
-
-#ifdef ZCLIP
-  if (vViewPosition.z < zClipValue) discard;
-#endif
-
-  vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);
-  vec4 pixelPosEye;
-
-#ifdef SPHERE_SPRITE
-
-  vec3 normal;
-
-/* quick-and-dirty method
-  normal.xy = ' + INSTANCED_SPRITE_OVERSCALE + ' * (2.0 * vUv - 1.0);
-  float r2 = dot(normal.xy, normal.xy);
-  if (r2 > 1.0) discard;
-  float normalZ = sqrt(1.0 - r2);
-  normal.z = normalZ;
-  normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );
-  pixelPosEye = vec4(spritePosEye.xyz, 1.0);
-  pixelPosEye.z += spritePosEye.w * normalZ;
-*/
-
-  // ray-trace sphere surface
-  {
-    vec3 p;
-    if (get_sphere_point(-vViewPosition, p) < 0.0) discard;
-    pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
-    // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
-    pixelPosEye = vec4(spritePosEye.xyz, 1.0);
-    pixelPosEye.z += instOffset.w *
-      (modelViewMatrix[0][2] * p.x +
-       modelViewMatrix[1][2] * p.y +
-       modelViewMatrix[2][2] * p.z);
-    normal = normalize(normalMatrix * p);
-  }
-
-#endif
-
-#ifdef CYLINDER_SPRITE
-  vec3 normal;
-  float cylinderY = 0.0;
-
-  // ray-trace cylinder surface
-  {
-    vec3 p;
-    if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;
-
-    cylinderY = 0.5 * (p.y + 1.0);
-
-    vec4 v = vec4(p, 1.0);
-    v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);
-    pixelPosWorld = modelMatrix * v;
-    pixelPosEye = modelViewMatrix * v;
-
-    vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));
-    normal = vec3(
-      dot(localNormal, matVec1.xyz),
-      dot(localNormal, matVec2.xyz),
-      dot(localNormal, matVec3.xyz));
-    normal = normalize(normalMatrix * normal);
-  }
-#endif
-
-#ifdef ATTR_COLOR
-  vec3 vertexColor = vColor;
-#else
-  vec3 vertexColor = vec3(1.0, 1.0, 1.0);
-#endif
-
-#ifdef ATTR_COLOR2
-  #ifdef CYLINDER_SPRITE
-    float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing
-  #else
-    float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord
+  #ifdef CLIP_PLANE
+    if (vViewPosition.z < clipPlaneValue) discard;
   #endif
-    // choose either color or color2
-  vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));
-#endif
+
+  #ifdef ZCLIP
+    if (vViewPosition.z < zClipValue) discard;
+  #endif
+
+    vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);
+    vec4 pixelPosEye;
+
+  #ifdef SPHERE_SPRITE
+
+    vec3 normal;
+
+  /* quick-and-dirty method
+    normal.xy = ' + INSTANCED_SPRITE_OVERSCALE + ' * (2.0 * vUv - 1.0);
+    float r2 = dot(normal.xy, normal.xy);
+    if (r2 > 1.0) discard;
+    float normalZ = sqrt(1.0 - r2);
+    normal.z = normalZ;
+    normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );
+    pixelPosEye = vec4(spritePosEye.xyz, 1.0);
+    pixelPosEye.z += spritePosEye.w * normalZ;
+  */
+
+    // ray-trace sphere surface
+    {
+      vec3 p;
+      if (get_sphere_point(-vViewPosition, p) < 0.0) discard;
+      pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
+      // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
+      pixelPosEye = vec4(spritePosEye.xyz, 1.0);
+      pixelPosEye.z += instOffset.w *
+        (modelViewMatrix[0][2] * p.x +
+         modelViewMatrix[1][2] * p.y +
+         modelViewMatrix[2][2] * p.z);
+      normal = normalize(normalMatrix * p);
+    }
+  #endif
+
+  #ifdef CYLINDER_SPRITE
+    vec3 normal;
+    float cylinderY = 0.0;
+
+    // ray-trace cylinder surface
+    {
+      vec3 p;
+      if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;
+
+      cylinderY = 0.5 * (p.y + 1.0);
+
+      vec4 v = vec4(p, 1.0);
+      v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);
+      pixelPosWorld = modelMatrix * v;
+      pixelPosEye = modelViewMatrix * v;
+
+      vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));
+      normal = vec3(
+        dot(localNormal, matVec1.xyz),
+        dot(localNormal, matVec2.xyz),
+        dot(localNormal, matVec3.xyz));
+      normal = normalize(normalMatrix * normal);
+    }
+  #endif
+
+  #ifdef ATTR_COLOR
+    vec3 vertexColor = vColor;
+  #else
+    vec3 vertexColor = vec3(1.0, 1.0, 1.0);
+  #endif
+
+  #ifdef ATTR_COLOR2
+    #ifdef CYLINDER_SPRITE
+      float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing
+    #else
+      float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord
+    #endif
+      // choose either color or color2
+    vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));
+  #endif
 
   // negative red component is a special condition
   if (vertexColor.x < 0.0) discard;
 
-#ifdef DASHED_LINE
-  if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;
-#endif
-
-// transparency prepass writes only z, so we don't need to calc the color
-#ifdef PREPASS_TRANSP
-  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+  #ifdef DASHED_LINE
+    if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;
   #endif
-  return;
-#endif
 
-  float totalOpacity = opacity;
+  // transparency prepass writes only z, so we don't need to calc the color
+  #ifdef PREPASS_TRANSP
+    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+    #endif
+    return;
+  #endif
 
-#ifdef ATTR_ALPHA_COLOR
-  totalOpacity *= alphaCol;
-#endif
+    float totalOpacity = opacity;
+
+  #ifdef ATTR_ALPHA_COLOR
+    totalOpacity *= alphaCol;
+  #endif
 
   // discard fully transparent pixels
   if (totalOpacity == 0.0) discard;
 
-#ifdef FAKE_OPACITY
-  // discard pixels in checker pattern
-  vec2 dm_coord = floor(gl_FragCoord.xy);
-  dm_coord = fract(dm_coord * 0.5);
-  if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;
-  vec4 diffuseColor = vec4(diffuse, 1.0);
-#else
-  vec4 diffuseColor = vec4(diffuse, totalOpacity);
-#endif
-
-#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
-  #ifdef DOUBLE_SIDED
-    float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+  #ifdef FAKE_OPACITY
+    // discard pixels in checker pattern
+    vec2 dm_coord = floor(gl_FragCoord.xy);
+    dm_coord = fract(dm_coord * 0.5);
+    if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;
+    vec4 diffuseColor = vec4(diffuse, 1.0);
   #else
-    float flipNormal = 1.0;
-  #endif
-  vec3 normal = normalize( vNormal ) * flipNormal;
-#endif
-
-  diffuseColor.rgb *= vertexColor;
-
-#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
-  GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
-  BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
-  vec3 outgoingLight = calcLighting(geometry, material);
-#else
-  vec3 outgoingLight = diffuseColor.rgb;
-#endif
-
-#ifdef COLOR_FROM_DEPTH
-  float depth = 0.0;
-  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
-    depth = gl_FragDepthEXT;
-    depth = 0.0;
-  #else
-    depth = gl_FragCoord.z;
-  #endif
-  gl_FragColor = packDepthToRGBA(depth);
-  return;
-#endif
-
-#ifdef COLOR_FROM_POS
-  gl_FragColor = world2colorMatrix * pixelPosWorld;
-#else
-  #ifdef OVERRIDE_COLOR
-    gl_FragColor = vec4(fixedColor, diffuseColor.a);
-  #else
-    gl_FragColor = vec4(outgoingLight, diffuseColor.a);
+    vec4 diffuseColor = vec4(diffuse, totalOpacity);
   #endif
 
-  #ifdef SHADOWMAP
-      //gl_FragColor.rgb *= getShadowMask().rgb;
-      gl_FragColor.a *= getShadowMask();// in three.js: opacity * ( 1.0 - getShadowMask() )
-  #endif
-
-  #ifdef USE_FOG
-    float fogFactor = smoothstep( fogNear, fogFar, vViewPosition.z );
-    #ifdef FOG_TRANSPARENT
-      gl_FragColor.a = gl_FragColor.a * (1.0 - fogFactor);
+  #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
+    #ifdef DOUBLE_SIDED
+      float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
     #else
-      gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+      float flipNormal = 1.0;
+    #endif
+    vec3 normal = normalize( vNormal ) * flipNormal;
+  #endif
+
+    diffuseColor.rgb *= vertexColor;
+
+  #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
+    GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
+    BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
+    vec3 outgoingLight = calcLighting(geometry, material);
+  #else
+    vec3 outgoingLight = diffuseColor.rgb;
+  #endif
+
+  #ifdef COLOR_FROM_DEPTH
+    float depth = 0.0;
+    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+      depth = gl_FragDepthEXT;
+      depth = 0.0;
+    #else
+      depth = gl_FragCoord.z;
+    #endif
+    gl_FragColor = packDepthToRGBA(depth);
+    return;
+  #endif
+
+  #ifdef COLOR_FROM_POS
+    gl_FragColor = world2colorMatrix * pixelPosWorld;
+  #else
+    #ifdef OVERRIDE_COLOR
+      gl_FragColor = vec4(fixedColor, diffuseColor.a);
+    #else
+      gl_FragColor = vec4(outgoingLight, diffuseColor.a);
+    #endif
+
+    #ifdef SHADOWMAP
+        //gl_FragColor.rgb *= getShadowMask().rgb;
+        gl_FragColor.a *= getShadowMask();
+    #endif
+
+    #ifdef USE_FOG
+      float fogFactor = smoothstep( fogNear, fogFar, vViewPosition.z );
+      #ifdef FOG_TRANSPARENT
+        gl_FragColor.a = gl_FragColor.a * (1.0 - fogFactor);
+      #else
+        gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+      #endif
     #endif
   #endif
-#endif
 
-#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-  gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
-#endif
+  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+  #endif
 }

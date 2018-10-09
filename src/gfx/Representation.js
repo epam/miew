@@ -63,7 +63,6 @@ const depthShadomapMaterialValues = {
   fog: false
 };
 
-
 Representation.prototype.buildGeometry = function(complex) {
   // console.time('buildGeometry');
   this.reset();
@@ -80,13 +79,11 @@ Representation.prototype.buildGeometry = function(complex) {
       object.castShadow = true;
       object.recieveShadow = true;
     }
-    if (object.material instanceof UberMaterial) {
-      if (object.material.shadowmap) {
-        const depthMaterial = new UberMaterial();
-        depthMaterial.copy(object.material);
-        depthMaterial.setValues(depthShadomapMaterialValues);
-        object.customDepthMaterial = depthMaterial;
-      }
+    if ((object.material instanceof UberMaterial) && object.material.shadowmap){
+      const depthMaterial = new UberMaterial();
+      depthMaterial.copy(object.material);
+      depthMaterial.setValues(depthShadomapMaterialValues);
+      object.customDepthMaterial = depthMaterial;
     }
   });
   return this.geo;

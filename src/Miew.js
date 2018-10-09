@@ -433,17 +433,6 @@ Miew.prototype._initGfx = function() {
   light1.shadow.mapSize.height = shadowMapSize;
   gfx.scene.add(light1);
 
-  /*var light2 = new THREE.DirectionalLight(0xff0000, 0.95);
-  light2.position.set(gfx.camera.position.x * 10 || 10.4, gfx.camera.position.y * 10, gfx.camera.position.z * 5 || 10);
-  light2.layers.enable(gfxutils.LAYERS.TRANSPARENT);
-  light2.castShadow = true;
-  light2.shadow = new THREE.DirectionalLightShadow();
-  light2.shadow.bias = -0.0005;
-  light2.shadow.radius = 5.0;
-  light2.shadow.mapSize.width = shadowMapSize;
-  light2.shadow.mapSize.height = shadowMapSize;
-  gfx.scene.add(light2);*/
-
   var light3 = new THREE.AmbientLight(0x666666);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   gfx.scene.add(light3);
