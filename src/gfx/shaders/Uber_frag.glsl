@@ -546,7 +546,6 @@ void main() {
     #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
       gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
       depth = gl_FragDepthEXT;
-      depth = 0.0;
     #else
       depth = gl_FragCoord.z;
     #endif

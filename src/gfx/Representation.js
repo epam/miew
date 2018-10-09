@@ -6,7 +6,7 @@ import UberMaterial from './shaders/UberMaterial';
 import gfxutils from './gfxutils';
 import settings from '../settings';
 
-  function Representation(index, mode, colorer, selector) {
+function Representation(index, mode, colorer, selector) {
   const startMaterialValues = {
     clipPlane: settings.now.draft.clipPlane,
     fogTransparent: settings.now.bg.transparent,
@@ -79,7 +79,7 @@ Representation.prototype.buildGeometry = function(complex) {
       object.castShadow = true;
       object.recieveShadow = true;
     }
-    if ((object.material instanceof UberMaterial) && object.material.shadowmap){
+    if ((object.material instanceof UberMaterial) && object.material.shadowmap) {
       const depthMaterial = new UberMaterial();
       depthMaterial.copy(object.material);
       depthMaterial.setValues(depthShadomapMaterialValues);
