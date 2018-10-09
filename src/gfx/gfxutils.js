@@ -377,7 +377,7 @@ function processTransparentMaterial(root, material) {
     prepassMat.setValues({prepassTransparancy: true, fakeOpacity: false});
     var prepassMesh = new mesh.constructor(mesh.geometry, prepassMat);
     prepassMesh.material.transparent = false;
-    prepassMesh.material.colorFromDepth = true;
+    prepassMesh.material.colorFromDepth = false;
     prepassMesh.material.lights = false;
     prepassMesh.material.shadowmap = false;
     prepassMesh.material.fog = false;
