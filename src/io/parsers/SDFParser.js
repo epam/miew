@@ -1,7 +1,9 @@
 import Parser from './Parser';
 import chem from '../../chem';
 import * as THREE from 'three';
+import SDFStream from './SDFStream';
 import Atom from '../../chem/Atom';
+import Assembly from '../../chem/Assembly';
 
 const
   Complex = chem.Complex,
@@ -17,12 +19,14 @@ const chargeMap = [0, 3, 2, 1, 0, -1, -2, -3];
 export default class SDFParser extends Parser {
   constructor(data, options) {
     super(data, options);
-    this._currentString = -1;
     this._complex = null;
-    this._strings = null;
     this._chain = null;
     this._residue = null;
     this._moleculeIndx = 0;
+    this._assemblies = [];
+    //dat kolxoz
+    this._atomsParsed = 0;
+    //
   }
 
   canProbablyParse(data) {
@@ -61,6 +65,19 @@ export default class SDFParser extends Parser {
     }
   }
 
+  buildAssemblies() {
+    const chains = this._complex._chains;
+    const assemblies = [];
+
+    for (let i = 0; i < chains.length; i++) {
+      const assembly = new Assembly(this._complex);
+      assembly.addChain(chains[i]._name)
+      assemblies.push(assembly);
+    }
+
+    return assemblies;
+  }
+
   finalize() {
     const serialAtomMap = this._serialAtomMap = {};
     const atoms = this._complex._atoms;
@@ -72,6 +89,9 @@ export default class SDFParser extends Parser {
 
     this._complex._finalizeBonds();
     this._fixBondsArray();
+    this._assemblies = this.buildAssemblies();
+
+    //this._complex.units = this._complex.units.concat(this._assemblies);
 
     this._complex.finalize({
       needAutoBonding: true,
@@ -81,23 +101,27 @@ export default class SDFParser extends Parser {
     });
   }
 
-  _parseMOL(start) {
+  _parseMOL(stream) {
+    this._moleculeIndx++;
     let parsedStrings = 0;
-    let strIndx = start;
-    let curStr = this._strings[strIndx];
+    let curStr;
 
     let serial = 0;
-    strIndx += 3;
-    const countsLine = this._strings[strIndx];
-    strIndx++;
+    //kolxoz
+    let trueSerial;
+    //
+    const countsLine = stream.getStringFromStart(3);
     const atomsNum = parseInt(countsLine.substr(0, 3), 10);
     const bondsNum = parseInt(countsLine.substr(3, 3), 10);
+
+    parsedStrings += 4;
 
     const complex = this._complex;
 
     for (let i = 0; i < atomsNum; i++) {
-      curStr = this._strings[strIndx];
+      curStr = stream.getNextString();
       serial++;
+      trueSerial = this._atomsParsed + serial;
       const occupancy = 1.0;
       const x = parseFloat(curStr.substr(0, 10));
       const y = parseFloat(curStr.substr(10, 10));
@@ -106,8 +130,8 @@ export default class SDFParser extends Parser {
       let xyz = new THREE.Vector3(x, y, z);
       let name = curStr.substr(31, 3).trim().toUpperCase();
       const type = Element.getByName(name);
-      name += serial;
-      var role = Element.Role[name]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
+      name += trueSerial;
+      const role = Element.Role[name];
 
       // NOTE: Residues of a particular chain are not required to be listed next to each other.
       // https://github.com/biasmv/pv/commit/7319b898b7473ba380c26699e3b028b2b1a7e1a1
@@ -127,15 +151,15 @@ export default class SDFParser extends Parser {
         this._residue = residue = chain.addResidue(resName, resSeq, iCode);
       }
 
-      // TODO: optimize atom positions storage? what for? (and occupancy? tempFactor?)
-      residue.addAtom(name, type, xyz, role, false, serial, '', occupancy, 0.0, charge);
-      strIndx++;
+      residue.addAtom(name, type, xyz, role, false, trueSerial, '', occupancy, 0.0, charge);
+
+      parsedStrings++;
     }
 
     for (let i = 0; i < bondsNum; i++) {
-      curStr = this._strings[strIndx];
-      const atom1 = parseInt(curStr.substr(0, 3), 10);
-      const atom2 = parseInt(curStr.substr(3, 3), 10);
+      curStr = stream.getNextString();
+      const atom1 = parseInt(curStr.substr(0, 3), 10) + this._atomsParsed;
+      const atom2 = parseInt(curStr.substr(3, 3), 10) + this._atomsParsed;
       //const bondType = Bond.BondType.UNKNOWN;//parseInt(curStr.substr(6, 3), 10);
 
       //dat kolxoz
@@ -144,53 +168,39 @@ export default class SDFParser extends Parser {
       } else {
         complex.addBond(atom1, atom2, 0, 1, true);
       }
-      strIndx++;
-    }
 
-    parsedStrings = strIndx;
-    curStr = this._strings[start + parsedStrings];         //dat double kolxoz
-    while (curStr !== 'M  END' && !_.isUndefined(curStr)) {
-      curStr = this._strings[start + parsedStrings];
       parsedStrings++;
     }
 
-    return parsedStrings;
+    this._atomsParsed += serial;
   }
 
-  _parseDataItems(start) {
+  _parseDataItems(stream) {
     let parsedStrings = 0;
-    let curStr = this._strings[start];
+    let curStr = stream.getNextString();
     while (curStr !== '$$$$' && !_.isUndefined(curStr)) {
-      curStr = this._strings[start + parsedStrings];
+      curStr = stream.getNextString();
       parsedStrings++;
     }
 
     return parsedStrings;
   }
 
-  _isBlankString(string) {
-    return !string ||  /^\s*$/.test(string);
-  }
-
-  _parseCompound(start) {
+  _parseCompound(stream) {
     let strParsed = 0;
-    strParsed += this._parseMOL(start);
-    strParsed += this._parseDataItems(start);
+    strParsed += this._parseMOL(stream);
+    //strParsed += this._parseDataItems(stream);
     return strParsed;
   }
 
   parseSync() {
     const result = this._complex = new Complex();
-    this._strings = this._data.split(/\r?\n|\r/);
-    this._currentString = 0;
-    let cmpndStart = 0;
-    let stringsParsed = 0;
-    do {
-      this._moleculeIndx++;
-      stringsParsed = this._parseCompound(cmpndStart);
-      console.log(stringsParsed);
-      cmpndStart += stringsParsed;
-    } while (stringsParsed < this._strings.length);
+    const stream = new SDFStream(this._data);
+
+    while (stream.haveStrings()) {
+      this._parseCompound(stream);
+      stream.findNextCompoundStart();
+    }
 
     this.finalize();
 
