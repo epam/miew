@@ -141,7 +141,7 @@
     "nyc": "^11.8.0",
     "open": "^0.0.5",
     "postcss-advanced-variables": "^2.3.3",
-    "postcss-calc": "^6.0.1",
+    "postcss-calc": "^7.0.0",
     "postcss-cli": "^6.0.0",
     "postcss-import": "^11.1.0",
     "postcss-loader": "^2.1.6",
