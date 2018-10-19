@@ -70,8 +70,6 @@ function _getCircleSliceRadiusRange(center, radius, yMin, yMax) {
  * @param {Vector3} vCellSizeHint - target voxel size (actual voxel size may differ from this)
  */
 function VoxelWorld(box, vCellSizeHint) {
-  var i;
-
   this._box = box.clone();
   const size = new THREE.Vector3();
   box.getSize(size);
@@ -82,9 +80,9 @@ function VoxelWorld(box, vCellSizeHint) {
   this._cellOuterR = 0.5 * Math.sqrt(this._cellSize.dot(this._cellSize));
 
   // array of voxels, each element contains index of first atom in voxel
-  var numVoxels = this._count.x * this._count.y * this._count.z;
+  const numVoxels = this._count.x * this._count.y * this._count.z;
   this._voxels = utils.allocateTyped(Int32Array, numVoxels);
-  for (i = 0; i < numVoxels; ++i) {
+  for (let i = 0; i < numVoxels; ++i) {
     this._voxels[i] = -1;
   }
 
@@ -99,16 +97,16 @@ function VoxelWorld(box, vCellSizeHint) {
  * @param {Complex} complex - complex
  */
 VoxelWorld.prototype.addAtoms = function(complex) {
-  var self = this;
+  const self = this;
 
-  var idx = this._atoms.length;
+  let idx = this._atoms.length;
 
   // resize array of atoms
   this._atoms.length = this._atoms.length + 2 * complex.getAtomCount();
 
   complex.forEachAtom(function(atom) {
     // find which voxel contains this atom
-    var voxelIdx = self._findVoxel(atom._position);
+    const voxelIdx = self._findVoxel(atom._position);
 
     // push current atom to the head of voxel's atom list
     self._atoms[idx] = atom;
@@ -126,8 +124,8 @@ VoxelWorld.prototype.addAtoms = function(complex) {
  * @returns {number} - index of voxel
  */
 VoxelWorld.prototype._findVoxel = (function() {
-  var zero = new THREE.Vector3(0, 0, 0);
-  var voxel = new THREE.Vector3();
+  const zero = new THREE.Vector3(0, 0, 0);
+  const voxel = new THREE.Vector3();
 
   return function(point) {
     voxel.copy(point)
@@ -146,7 +144,7 @@ VoxelWorld.prototype._findVoxel = (function() {
  * @param {function(Atom)} process - function to call
  */
 VoxelWorld.prototype._forEachAtomInVoxel = function(voxel, process) {
-  for (var i = this._voxels[voxel]; i >= 0; i = this._atoms[i + 1]) {
+  for (let i = this._voxels[voxel]; i >= 0; i = this._atoms[i + 1]) {
     process(this._atoms[i]);
   }
 };
@@ -298,8 +296,8 @@ VoxelWorld.prototype._forEachVoxelWithinRadiusSimple = (function() {
  * @param {function(Atom)} process - function to call
  */
 VoxelWorld.prototype.forEachAtomWithinRadius = function(center, radius, process) {
-  var self = this;
-  var r2 = radius * radius;
+  const self = this;
+  const r2 = radius * radius;
 
   self._forEachVoxelWithinRadius(center, radius, function(voxel, isInside) {
     if (isInside) {
@@ -358,12 +356,12 @@ VoxelWorld.prototype.forEachAtomWithinDistFromSelected = function(complex, selec
  * @param {function(Atom)} process - function to call
  */
 VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function(forEachAtom, dist, process) {
-  var self = this;
-  var r2 = dist * dist;
+  const self = this;
+  const r2 = dist * dist;
 
-  var voxels = [];
-  var atoms = [];
-  var idx = 0;
+  const voxels = [];
+  const atoms = [];
+  let idx = 0;
 
   // build "within radius" atom list for each voxel
   forEachAtom(function(atom) {
@@ -387,9 +385,9 @@ VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function(forEachAtom, dis
     });
   });
 
-  var voxel;
+  let voxel;
 
-  var processIfWithin = function(atom) {
+  const processIfWithin = function(atom) {
     if (typeof voxels[voxel] === 'undefined') {
       return;
     }
@@ -410,7 +408,7 @@ VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function(forEachAtom, dis
     }
   };
 
-    // for each marked voxel
+  // for each marked voxel
   for (voxel in voxels) {
     if (voxels.hasOwnProperty(voxel)) {
       self._forEachAtomInVoxel(voxel, processIfWithin);

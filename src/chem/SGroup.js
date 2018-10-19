@@ -44,15 +44,15 @@ SGroup.prototype.getCentralPoint = function() {
 };
 
 SGroup.prototype._rebuildSGroupOnAtomChange = function() {
-  var nLimon = 100000000;
+  const nLimon = 100000000;
   if (this._center === null) {
     return;  //nothing to do if we are not relative
   }
 
-  var bLow = new THREE.Vector3(nLimon, nLimon, nLimon);
-  var bHight = new THREE.Vector3(-nLimon, -nLimon, -nLimon);
-  for (var j = 0, n = this._atoms.length; j < n; j++) {
-    var aPos = this._atoms[j].getPosition();
+  const bLow = new THREE.Vector3(nLimon, nLimon, nLimon);
+  const bHight = new THREE.Vector3(-nLimon, -nLimon, -nLimon);
+  for (let j = 0, n = this._atoms.length; j < n; j++) {
+    const aPos = this._atoms[j].getPosition();
     bLow.set(Math.min(bLow.x, aPos.x), Math.min(bLow.y, aPos.y), Math.min(bLow.z, aPos.z));
     bHight.set(Math.max(bHight.x, aPos.x), Math.max(bHight.y, aPos.y), Math.max(bHight.z, aPos.z));
   }
@@ -61,13 +61,13 @@ SGroup.prototype._rebuildSGroupOnAtomChange = function() {
 };
 
 SGroup.prototype.buildChemicalFormula = function(complex, part) {
-  var calcCharge = 0;
-  var atomsCount = 0;
-  var formula = complex._buildFormulaSimple(part, function(l, c) {
+  let calcCharge = 0;
+  let atomsCount = 0;
+  let formula = complex._buildFormulaSimple(part, function(l, c) {
     atomsCount = l;
     calcCharge = c;
   });
-  var finalCharge = this._charge + calcCharge;
+  const finalCharge = this._charge + calcCharge;
   if (finalCharge !== 0) {
     if (this._repeat > 1) {
       if (atomsCount > 1) {

@@ -19,21 +19,20 @@ function BiologicalUnit(complex) {
 BiologicalUnit.prototype.constructor = BiologicalUnit;
 
 BiologicalUnit.prototype.computeBoundaries = function() {
-  var atoms = this._complex._atoms;
-  var n = atoms.length;
-  var selector = this._selector;
-  var i;
+  const atoms = this._complex._atoms;
+  const n = atoms.length;
+  const selector = this._selector;
 
-  var boundingBox = this._boundaries.boundingBox;
+  const boundingBox = this._boundaries.boundingBox;
   boundingBox.makeEmpty();
   if (n === 1) {
     boundingBox.expandByPoint(atoms[0]._position);
     const bbc = new THREE.Vector3();
     boundingBox.getCenter(bbc);
-    var s = 2 * atoms[0].element.radius; //*settings.now.modes.BS.atom; FIXME N: hack commented
+    const s = 2 * atoms[0].element.radius; //*settings.now.modes.BS.atom; FIXME N: hack commented
     boundingBox.setFromCenterAndSize(bbc, new THREE.Vector3(s, s, s));
   } else {
-    for (i = 0; i < n; ++i) {
+    for (let i = 0; i < n; ++i) {
       if (selector.includesAtom(atoms[i])) {
         boundingBox.expandByPoint(atoms[i]._position);
       }
@@ -41,19 +40,19 @@ BiologicalUnit.prototype.computeBoundaries = function() {
   }
 
   // Build bounding sphere
-  var radiusSquared = 0.0;
+  let radiusSquared = 0.0;
   const center = new THREE.Vector3();
   boundingBox.getCenter(center);
   if (n === 1) {
     // * settings.now.modes.BS.atom); FIXME N: hack commented
     this._boundaries.boundingSphere.set(center, atoms[0].element.radius);
   } else {
-    for (i = 0; i < n; ++i) {
+    for (let i = 0; i < n; ++i) {
       if (!selector.includesAtom(atoms[i])) {
         continue;
       }
-      var pos = atoms[i]._position;
-      var lengthSquared = center.distanceToSquared(pos);
+      const pos = atoms[i]._position;
+      const lengthSquared = center.distanceToSquared(pos);
       if (radiusSquared < lengthSquared) {
         radiusSquared = lengthSquared;
       }

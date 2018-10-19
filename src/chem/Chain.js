@@ -47,10 +47,10 @@ Chain.prototype.getResidues = function() {
  * @returns {*} Residue or null if not found
  */
 Chain.prototype.findResidue = function(seqNum, iCode) {
-  var residues = this._residues;
+  const residues = this._residues;
 
-  for (var i = 0, n = residues.length; i < n; ++i) {
-    var res = residues[i];
+  for (let i = 0, n = residues.length; i < n; ++i) {
+    const res = residues[i];
     if (res._sequence === seqNum && res._icode === iCode) {
       return [res, i];
     }
@@ -60,12 +60,12 @@ Chain.prototype.findResidue = function(seqNum, iCode) {
 };
 
 Chain.prototype._finalize = function() {
-  var residues = this._residues;
+  const residues = this._residues;
 
-  var prev = null;
-  for (var i = 0, n = residues.length; i < n; ++i) {
-    var next = (i + 1 < n) ? residues[i + 1] : null;
-    var curr = residues[i];
+  let prev = null;
+  for (let i = 0, n = residues.length; i < n; ++i) {
+    const next = (i + 1 < n) ? residues[i + 1] : null;
+    const curr = residues[i];
     // TODO: skip invalid residues
     if (1 /* curr._isValid */) { // eslint-disable-line no-constant-condition
       curr._finalize2(prev, next);
@@ -75,7 +75,7 @@ Chain.prototype._finalize = function() {
 
   //fix very first wing
   if (residues.length > 1) {
-    var p = residues[1]._wingVector;
+    const p = residues[1]._wingVector;
     residues[0]._wingVector = new THREE.Vector3(p.x, p.y, p.z);
   } else if (residues.length > 0) {
     residues[0]._wingVector = new THREE.Vector3(1, 0, 0);
@@ -84,19 +84,19 @@ Chain.prototype._finalize = function() {
 };
 
 Chain.prototype.updateToFrame = function(frameData) {
-  var residues = this._residues;
-  var prev = null;
-  var prevData = null;
-  var frameRes = frameData._residues;
-  var n = residues.length;
+  const residues = this._residues;
+  let prev = null;
+  let prevData = null;
+  const frameRes = frameData._residues;
+  const n = residues.length;
   function getAtomPos(atom) {
     return frameData.getAtomPos(atom._index);
   }
 
-  for (var i = 0; i < n; ++i) {
-    var curr = residues[i];
-    var currData = frameRes[curr._index];
-    var nextRes = (i + 1 < n) ? residues[i + 1] : null;
+  for (let i = 0; i < n; ++i) {
+    const curr = residues[i];
+    const currData = frameRes[curr._index];
+    const nextRes = (i + 1 < n) ? residues[i + 1] : null;
     curr._innerFinalize(prev, prevData, nextRes, currData, getAtomPos);
     prev = curr;
     prevData = currData;
@@ -115,11 +115,11 @@ Chain.prototype.updateToFrame = function(frameData) {
  * @returns {Residue} - Newly created residue instance.
  */
 Chain.prototype.addResidue = function(name, sequence, iCode) {
-  var type = this._complex.getResidueType(name);
+  let type = this._complex.getResidueType(name);
   if (type === null) {
     type = this._complex.addResidueType(name);
   }
-  var residue = new Residue(this, type, sequence, iCode);
+  const residue = new Residue(this, type, sequence, iCode);
   this._complex.addResidue(residue);
   this._residues.push(residue); // TODO: change to range
 
@@ -140,16 +140,16 @@ Chain.prototype.getResidueCount = function() {
 };
 
 Chain.prototype.forEachResidue = function(process) {
-  var residues = this._residues;
-  for (var i = 0, n = residues.length; i < n; ++i) {
+  const residues = this._residues;
+  for (let i = 0, n = residues.length; i < n; ++i) {
     process(residues[i]);
   }
 };
 
 Chain.prototype.collectMask = function() {
-  var mask = 0xffffffff;
-  var residues = this._residues;
-  for (var i = 0, n = residues.length; i < n; ++i) {
+  let mask = 0xffffffff;
+  const residues = this._residues;
+  for (let i = 0, n = residues.length; i < n; ++i) {
     mask &= residues[i]._mask;
   }
   this._mask = mask;

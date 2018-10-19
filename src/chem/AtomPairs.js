@@ -12,16 +12,14 @@ var cInvalidVal = -1;
 var cBigPrime = 89237;
 
 function AtomPairs(maxPairsEstimate) {
-  var i = 0;
-
   this.numPairs = 0;
   this.numMaxPairs = maxPairsEstimate;
   this.intBuffer = utils.allocateTyped(Int32Array, maxPairsEstimate * cNumbersPerPair);
-  for (; i < maxPairsEstimate * cNumbersPerPair; i++) {
+  for (let i = 0; i < maxPairsEstimate * cNumbersPerPair; i++) {
     this.intBuffer[i] = cInvalidVal;
   }
   this.hashBuffer = utils.allocateTyped(Int32Array, cHashTableSize * cMaxPairsForHashCode);
-  for (i = 0; i < cHashTableSize * cMaxPairsForHashCode; i++) {
+  for (let i = 0; i < cHashTableSize * cMaxPairsForHashCode; i++) {
     this.hashBuffer[i] = cInvalidVal;
   }
 }
@@ -40,15 +38,15 @@ AtomPairs.prototype.destroy = function() {
  * @param {number} indexB - Index of the 2nd vertex.
  */
 AtomPairs.prototype.addPair = function(indexA, indexB) {
-  var ia = (indexA < indexB) ? indexA : indexB;
-  var ib = (indexA > indexB) ? indexA : indexB;
-  var codeToAdd = ia + (ib << cMaxNeighbours);
+  const ia = (indexA < indexB) ? indexA : indexB;
+  const ib = (indexA > indexB) ? indexA : indexB;
+  const codeToAdd = ia + (ib << cMaxNeighbours);
 
-  var hashCode = (ia + (ib * cBigPrime)) & (cHashTableSize - 1);
-  var j = hashCode * cMaxPairsForHashCode;
-  var apI = 0;
+  const hashCode = (ia + (ib * cBigPrime)) & (cHashTableSize - 1);
+  let j = hashCode * cMaxPairsForHashCode;
+  let apI = 0;
   for (; apI < cMaxPairsForHashCode; apI++) {
-    var code = this.hashBuffer[j + apI];
+    const code = this.hashBuffer[j + apI];
     if (code === cInvalidVal) {
       break;
     }

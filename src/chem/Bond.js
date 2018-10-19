@@ -61,15 +61,16 @@ Bond.prototype.calcLength = function() {
 };
 
 Bond.prototype._forEachNeighbour = function(currAtom, process) {
-  var bonds = currAtom._bonds;
-  for (var i = 0, n = bonds.length; i < n; ++i) {
+
+  const bonds = currAtom._bonds;
+  for (let i = 0, n = bonds.length; i < n; ++i) {
     process(bonds[i]._left !== currAtom ? bonds[i]._left : bonds[i]._right);
   }
 };
 
 Bond.prototype.forEachLevelOne = function(process) {
-  var left = this._left;
-  var right = this._right;
+  const left = this._left;
+  const right = this._right;
   this._forEachNeighbour(left, function(atom) {
     if (atom === right) {
       return;
@@ -86,9 +87,9 @@ Bond.prototype.forEachLevelOne = function(process) {
 
 Bond.prototype.forEachLevelTwo = function(process) {
   // TODO refactor this piece of an art?
-  var left = this._left;
-  var right = this._right;
-  var self = this;
+  const left = this._left;
+  const right = this._right;
+  const self = this;
   self._forEachNeighbour(left, function(atom) {
     if (atom === right) {
       return;
@@ -115,13 +116,13 @@ Bond.prototype.forEachLevelTwo = function(process) {
 
 Bond.prototype._fixDir = function(refPoint, currDir, posGetter) {
   // count atoms to the right and to the left of the current plane
-  var rightCount = 0;
-  var leftCount = 0;
-  var tmpVec = refPoint.clone();
+  let rightCount = 0;
+  let leftCount = 0;
+  const tmpVec = refPoint.clone();
   function checkDir(atom) {
     tmpVec.copy(posGetter(atom));
     tmpVec.sub(refPoint);
-    var dotProd = currDir.dot(tmpVec);
+    const dotProd = currDir.dot(tmpVec);
     if (dotProd > 0) {
       ++rightCount;
     } else {
@@ -134,14 +135,14 @@ Bond.prototype._fixDir = function(refPoint, currDir, posGetter) {
     }
   }
   // count all atoms to the left and right of our plane, start from level 1 and carbons
-  var stages = [
+  const stages = [
     [this.forEachLevelOne, checkCarbon],
     [this.forEachLevelOne, checkDir],
     [this.forEachLevelTwo, checkCarbon],
     [this.forEachLevelTwo, checkDir],
   ];
 
-  for (var stageId = 0; stageId < stages.length; ++stageId) {
+  for (let stageId = 0; stageId < stages.length; ++stageId) {
     stages[stageId][0].call(this, stages[stageId][1]);
     if (leftCount > rightCount) {
       return currDir.multiplyScalar(-1);
@@ -153,20 +154,20 @@ Bond.prototype._fixDir = function(refPoint, currDir, posGetter) {
 };
 
 Bond.prototype.calcNormalDir = function(posGetter) {
-  var left = this._left;
-  var right = this._right;
-  var first = left;
-  var second = right;
+  const left = this._left;
+  const right = this._right;
+  let first = left;
+  let second = right;
   posGetter = posGetter === undefined ? getAtomPos : posGetter;
   if (left._bonds.length > right._bonds.length) {
     first = right;
     second = left;
   }
-  var third = first;
-  var maxNeibs = 0;
-  var bonds = second._bonds;
-  for (var i = 0, n = bonds.length; i < n; ++i) {
-    var another = bonds[i]._left;
+  let third = first;
+  let maxNeibs = 0;
+  const bonds = second._bonds;
+  for (let i = 0, n = bonds.length; i < n; ++i) {
+    let another = bonds[i]._left;
     if (bonds[i]._left === second) {
       another = bonds[i]._right;
     }
@@ -175,9 +176,9 @@ Bond.prototype.calcNormalDir = function(posGetter) {
       maxNeibs = another._bonds.length;
     }
   }
-  var secondPos = posGetter(second);
-  var firstV = posGetter(first).clone().sub(secondPos);
-  var secondV = posGetter(third).clone().sub(secondPos);
+  const secondPos = posGetter(second);
+  const firstV = posGetter(first).clone().sub(secondPos);
+  const secondV = posGetter(third).clone().sub(secondPos);
   secondV.crossVectors(firstV, secondV);
   if (secondV.lengthSq() < 0.0001) {
     secondV.set(0, 1, 0);

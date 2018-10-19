@@ -49,18 +49,18 @@ function Volume(type, dimensions, box, vecSize, data) {
 
   case 2:
     this.getValue = function(x, y, z) {
-      var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+      const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
       return [this._data[idx], this._data[idx + 1]];
     };
 
     this.setValue = function(x, y, z) {
-      var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+      const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
       this._data[idx] = arguments[3];
       this._data[idx + 1] = arguments[4];
     };
 
     this.addValue = function(x, y, z) {
-      var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+      const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
       this._data[idx] += arguments[3];
       this._data[idx + 1] += arguments[4];
     };
@@ -68,19 +68,19 @@ function Volume(type, dimensions, box, vecSize, data) {
 
   case 3:
     this.getValue = function(x, y, z) {
-      var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+      const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
       return [this._data[idx], this._data[idx + 1], this._data[idx + 2]];
     };
 
     this.setValue = function(x, y, z) {
-      var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+      const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
       this._data[idx] = arguments[3];
       this._data[idx + 1] = arguments[4];
       this._data[idx + 2] = arguments[5];
     };
 
     this.addValue = function(x, y, z) {
-      var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+      const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
       this._data[idx] += arguments[3];
       this._data[idx + 1] += arguments[4];
       this._data[idx + 2] += arguments[5];
@@ -120,9 +120,9 @@ Volume.prototype.getBox = function() {
 };
 
 Volume.prototype.getCellSize = function() {
-  var boxSize = new THREE.Vector3();
+  const boxSize = new THREE.Vector3();
   this._box.getSize(boxSize);
-  var res = new THREE.Vector3();
+  const res = new THREE.Vector3();
   res.x = this._dimX > 1 ? boxSize.x / (this._dimX - 1) : 0;
   res.y = this._dimY > 1 ? boxSize.y / (this._dimY - 1) : 0;
   res.z = this._dimZ > 1 ? boxSize.z / (this._dimZ - 1) : 0;
@@ -136,40 +136,40 @@ Volume.prototype.computeGradient = function() {
   }
 
   // create a 3D vector field of gradients
-  var gradient = new Volume(Float32Array, [this._dimX, this._dimY, this._dimZ], this._box, 3);
+  const gradient = new Volume(Float32Array, [this._dimX, this._dimY, this._dimZ], this._box, 3);
 
   // calculate cell side lengths
-  var vl = this.getCellSize();
+  const vl = this.getCellSize();
 
   // gradient axis scaling values and averaging factors, to correctly
   // calculate the gradient for volumes with irregular cell spacing
-  var vs = new THREE.Vector3(-0.5 / vl.x, -0.5 / vl.y, -0.5 / vl.z);
+  const vs = new THREE.Vector3(-0.5 / vl.x, -0.5 / vl.y, -0.5 / vl.z);
 
   // TODO Check for intended bug in VMD (min is zero)
   function clamp(val, min, max) {
     return Math.min(max, Math.max(min, val));
   }
 
-  var xSize = this._dimX;
-  var ySize = this._dimY;
-  var zSize = this._dimZ;
-  var volMap = this._data;
+  const xSize = this._dimX;
+  const ySize = this._dimY;
+  const zSize = this._dimZ;
+  const volMap = this._data;
 
   function _voxelValue(x, y, z) {
     return volMap[z * xSize * ySize + y * xSize + x];
   }
 
-  for (var zi = 0; zi < zSize; ++zi) {
-    var zm = clamp(zi - 1, 0, zSize - 1);
-    var zp = clamp(zi + 1, 0, zSize - 1);
+  for (let zi = 0; zi < zSize; ++zi) {
+    const zm = clamp(zi - 1, 0, zSize - 1);
+    const zp = clamp(zi + 1, 0, zSize - 1);
 
-    for (var yi = 0; yi < ySize; ++yi) {
-      var ym = clamp(yi - 1, 0, ySize - 1);
-      var yp = clamp(yi + 1, 0, ySize - 1);
+    for (let yi = 0; yi < ySize; ++yi) {
+      const ym = clamp(yi - 1, 0, ySize - 1);
+      const yp = clamp(yi + 1, 0, ySize - 1);
 
-      for (var xi = 0; xi < xSize; ++xi) {
-        var xm = clamp(xi - 1, 0, xSize - 1);
-        var xp = clamp(xi + 1, 0, xSize - 1);
+      for (let xi = 0; xi < xSize; ++xi) {
+        const xm = clamp(xi - 1, 0, xSize - 1);
+        const xp = clamp(xi + 1, 0, xSize - 1);
 
         // Calculate the volume gradient at each grid cell.
         // Gradients are now stored unnormalized, since we need them in pure
@@ -195,30 +195,29 @@ Volume.prototype.computeGradient = function() {
 };
 
 Volume.prototype.normalize = function() {
-  var data = this._data;
-  var i;
+  const data = this._data;
 
   // get min/max
-  var min = data[0];
-  var max = data[0];
-  for (i = 1; i < data.length; ++i) {
+  let min = data[0];
+  let max = data[0];
+  for (let i = 1; i < data.length; ++i) {
     min = Math.min(min, data[i]);
     max = Math.max(max, data[i]);
   }
 
-  var d = 1.0 / (max - min);
+  const d = 1.0 / (max - min);
   if (d === 0) {
     return;
   }
 
   // normalize
-  for (i = 0; i < data.length; ++i) {
+  for (let i = 0; i < data.length; ++i) {
     data[i] = d * (data[i] - min);
   }
 };
 
 function pow2ceil(v) {
-  var p = 2;
+  let p = 2;
   v = (v - 1) >> 1;
   while (v) {
     p <<= 1;
@@ -232,28 +231,28 @@ Volume.prototype.getTiledTextureStride = function() {
 };
 
 Volume.prototype.buildTiledTexture = function() {
-  var tilesX = Math.ceil(Math.sqrt(this._dimZ * this._dimY / this._dimX));
+  let tilesX = Math.ceil(Math.sqrt(this._dimZ * this._dimY / this._dimX));
 
-  var width = tilesX * (this._dimX + 2) - 1;
+  let width = tilesX * (this._dimX + 2) - 1;
   width = pow2ceil(width);
   tilesX = Math.floor(width / (this._dimX + 2));
 
-  var tilesY = Math.ceil(this._dimZ / tilesX);
-  var height = tilesY * (this._dimY + 2) - 1;
+  const tilesY = Math.ceil(this._dimZ / tilesX);
+  let height = tilesY * (this._dimY + 2) - 1;
   height = pow2ceil(height);
 
-  var data = new Uint8Array(width * height);
+  const data = new Uint8Array(width * height);
 
-  var src, dst, tileRow, row, t, x;
-  for (tileRow = 0; tileRow < tilesY; ++tileRow) {
+  let src, dst;
+  for (let tileRow = 0; tileRow < tilesY; ++tileRow) {
     // process each pixel row of this tile row
-    for (row = 0; row < this._dimY; ++row) {
+    for (let row = 0; row < this._dimY; ++row) {
       src = tileRow * tilesX * this._planeElements + row * this._rowElements;
       dst = width * (tileRow * (this._dimY + 2) + row);
       // copy a series of rows through several XY planes
-      for (t = 0; t < tilesX; ++t) {
+      for (let t = 0; t < tilesX; ++t) {
         // copy one row of one XY plane
-        for (x = 0; x < this._dimX; ++x) {
+        for (let x = 0; x < this._dimX; ++x) {
           data[dst++] = 255.0 * this._data[src++];
         }
 
@@ -271,24 +270,24 @@ Volume.prototype.buildTiledTexture = function() {
   }
 
   // fill pixels between tile rows with copy of edge pixels
-  for (tileRow = 0; tileRow < tilesY; ++tileRow) {
+  for (let tileRow = 0; tileRow < tilesY; ++tileRow) {
     // copy last pixel row of this tile row to the following pixel row of the texture
     src = width * (tileRow * (this._dimY + 2) + this._dimY - 1);
     dst = src + width;
-    for (x = 0; x < width; ++x) {
+    for (let x = 0; x < width; ++x) {
       data[dst++] = data[src++];
     }
     if (tileRow < tilesY - 1) {
       // copy first pixel row of next tile row to the preceding pixel row of the texture
       src = width * (tileRow + 1) * (this._dimY + 2);
       dst = src - width;
-      for (x = 0; x < width; ++x) {
+      for (let x = 0; x < width; ++x) {
         data[dst++] = data[src++];
       }
     }
   }
 
-  var texture = new THREE.DataTexture(
+  const texture = new THREE.DataTexture(
     data, width, height, THREE.LuminanceFormat, THREE.UnsignedByteType,
     THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter
   );

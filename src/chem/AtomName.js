@@ -9,6 +9,7 @@
  * @exports Atom
  * @constructor
  */
+
 function AtomName(name, node) {
   this._node = node || null;
   this._name = name || null;

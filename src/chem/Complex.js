@@ -57,19 +57,19 @@ utils.deriveClass(Complex, DataSource, {
 Complex.prototype.name = '';
 
 Complex.prototype.addAtom = function(atom) {
-  var index = this._atoms.length;
+  const index = this._atoms.length;
   this._atoms.push(atom);
   return index;
 };
 
 Complex.prototype.addSheet = function(sheet) {
-  var index = this._sheets.length;
+  const index = this._sheets.length;
   this._sheets.push(sheet);
   return index;
 };
 
 Complex.prototype.addHelix = function(helix) {
-  var index = this._helices.length;
+  const index = this._helices.length;
   this._helices.push(helix);
   return index;
 };
@@ -87,7 +87,7 @@ Complex.prototype.getAtomCount = function() {
 };
 
 Complex.prototype.addResidue = function(residue) {
-  var index = this._residues.length;
+  const index = this._residues.length;
   this._residues.push(residue);
   return index;
 };
@@ -99,7 +99,7 @@ Complex.prototype.updateToFrame = function(frameData) {
 };
 
 Complex.prototype.addResidueType = function(resName) {
-  var rt = this._residueTypes[resName] = new ResidueType(resName, 'Unknown', '');
+  const rt = this._residueTypes[resName] = new ResidueType(resName, 'Unknown', '');
   return rt;
 };
 
@@ -123,19 +123,19 @@ Complex.prototype.getSGroups = function() {
    Extract atom by its fullname: #chainName#.#residueId#.#atomName#
    */
 Complex.prototype.getAtomByFullname = function(fullName) {
-  var parts = fullName.split('.');
+  const parts = fullName.split('.');
   if (parts.length !== 3) {
     return null;
   }
 
-  var chainName = parts[0];
-  var resId = parseInt(parts[1], 10);
+  const chainName = parts[0];
+  const resId = parseInt(parts[1], 10);
   if (Number.isNaN(resId)) {
     return null;
   }
-  var atomName = parts[2].toUpperCase();
+  const atomName = parts[2].toUpperCase();
 
-  var currAtom = null;
+  let currAtom = null;
   this.forEachChain(function(chain) {
     if (currAtom) {
       return;
@@ -169,14 +169,14 @@ Complex.prototype.getAtomByFullname = function(fullName) {
  * @returns {Chain} - Newly created chain.
  */
 Complex.prototype.addChain = function(name) {
-  var result = new Chain(this, name);
+  const result = new Chain(this, name);
   this._chains.push(result); // TODO: keep chains in dictionary with an (ordered?) array of keys
   return result;
 };
 
 Complex.prototype.getChain = function(name) {
-  for (var i = 0, n = this._chains.length; i < n; ++i) {
-    var chain = this._chains[i];
+  for (let i = 0, n = this._chains.length; i < n; ++i) {
+    const chain = this._chains[i];
     if (chain.getName() === name) {
       return chain;
     }
@@ -197,29 +197,29 @@ Complex.prototype.getMoleculeCount = function() {
 };
 
 Complex.prototype.forEachAtom = function(process) {
-  var atoms = this._atoms;
-  for (var i = 0, n = atoms.length; i < n; ++i) {
+  const atoms = this._atoms;
+  for (let i = 0, n = atoms.length; i < n; ++i) {
     process(atoms[i]);
   }
 };
 
 Complex.prototype.forEachBond = function(process) {
-  var bonds = this._bonds;
-  for (var i = 0, n = bonds.length; i < n; ++i) {
+  const bonds = this._bonds;
+  for (let i = 0, n = bonds.length; i < n; ++i) {
     process(bonds[i]);
   }
 };
 
 Complex.prototype.forEachResidue = function(process) {
-  var residues = this._residues;
-  for (var i = 0, n = residues.length; i < n; ++i) {
+  const residues = this._residues;
+  for (let i = 0, n = residues.length; i < n; ++i) {
     process(residues[i]);
   }
 };
 
 Complex.prototype.forEachChain = function(process) {
-  var chains = this._chains;
-  for (var i = 0, n = chains.length; i < n; ++i) {
+  const chains = this._chains;
+  for (let i = 0, n = chains.length; i < n; ++i) {
     process(chains[i]);
   }
 };
@@ -233,28 +233,28 @@ Complex.prototype.forEachMolecule = function(process) {
 };
 
 Complex.prototype.forEachSGroup = function(process) {
-  var groups = this._sgroups;
-  for (var i = 0, n = groups.length; i < n; ++i) {
+  const groups = this._sgroups;
+  for (let i = 0, n = groups.length; i < n; ++i) {
     process(groups[i]);
   }
 };
 
 Complex.prototype.forEachComponent = function(process) {
-  var components = this._components;
-  for (var i = 0, n = components.length; i < n; ++i) {
+  const components = this._components;
+  for (let i = 0, n = components.length; i < n; ++i) {
     process(components[i]);
   }
 };
 
 Complex.prototype.forEachVisibleComponent = function(process) {
-  var components = this._components;
-  for (var i = 0, n = components.length; i < n; ++i) {
+  const components = this._components;
+  for (let i = 0, n = components.length; i < n; ++i) {
     process(components[i]);
   }
 };
 
 Complex.prototype.addBond = function(left, right, order, type, fixed) {
-  var bond = new Bond(left, right, order, type, fixed);
+  const bond = new Bond(left, right, order, type, fixed);
   this._bonds.push(bond);
   return bond;
 };
@@ -268,8 +268,8 @@ Complex.prototype.getResidueType = function(name) {
 };
 
 Complex.prototype._atomNameCompare = function(a, b, hVal) {
-  var hydrogenName = Element.ByName.H.name;
-  var carbideName = Element.ByName.C.name;
+  const hydrogenName = Element.ByName.H.name;
+  const carbideName = Element.ByName.C.name;
 
   function snc(str) {
     if (str === carbideName) {
@@ -281,8 +281,8 @@ Complex.prototype._atomNameCompare = function(a, b, hVal) {
     return str;
   }
 
-  var ca = snc(a);
-  var cb = snc(b);
+  const ca = snc(a);
+  const cb = snc(b);
   if (ca < cb) {
     return -1;
   }
@@ -301,15 +301,15 @@ Complex.prototype._atomNameCompareCWithoutH = function(a, b) {
 };
 
 Complex.prototype._buildFormulaSimple = function(part, charge) {
-  var atoms = part.atoms;
-  var element = null;
-  var hash = {};
-  var out = '';
-  var self = this;
-  var hydrogenName = Element.ByName.H.name;
-  var actualCharge = 0;
+  const atoms = part.atoms;
+  let element = null;
+  const hash = {};
+  let out = '';
+  const self = this;
+  const hydrogenName = Element.ByName.H.name;
+  let actualCharge = 0;
   atoms.forEach(function(a) {
-    var hc = a.getHydrogenCount();
+    const hc = a.getHydrogenCount();
     element = a.element;
     if (hash[element.name]) {
       hash[element.name] += 1;
@@ -325,7 +325,7 @@ Complex.prototype._buildFormulaSimple = function(part, charge) {
     }
     actualCharge += a.getCharge();
   });
-  var k = Object.keys(hash);
+  const k = Object.keys(hash);
   if (hash.C) {
     k.sort(this._atomNameCompareCWithH.bind(this));
   } else {
@@ -334,7 +334,7 @@ Complex.prototype._buildFormulaSimple = function(part, charge) {
     });
   }
   k.forEach(function(e) {
-    var cname = e.substr(0, 1).toUpperCase() + e.substr(1).toLowerCase();
+    const cname = e.substr(0, 1).toUpperCase() + e.substr(1).toLowerCase();
     if (hash[e] > 1) {
       out += cname + hash[e].toString();
     } else {
@@ -384,19 +384,19 @@ Complex.prototype._partCompareFunc = function(a, b) {
 };
 
 Complex.prototype._getCumulativeCharge = function(arr) {
-  var n = arr.length;
-  var cumCharge = 0;
-  for (var i = 0; i < n; i++) {
+  const n = arr.length;
+  let cumCharge = 0;
+  for (let i = 0; i < n; i++) {
     cumCharge += arr[i].getCharge();
   }
   return cumCharge;
 };
 
 Complex.prototype._partCompareFuncInt = function(a, b, skipH) {
-  var self = this;
-  var hydroName = Element.ByName.H.name;
+  const self = this;
+  const hydroName = Element.ByName.H.name;
   function buildAtomArray(atms, skipHydro) {
-    var r = {};
+    const r = {};
     atms.forEach(function(singleAtom) {
       if (r[singleAtom.element.name]) {
         r[singleAtom.element.name] += 1;
@@ -404,7 +404,7 @@ Complex.prototype._partCompareFuncInt = function(a, b, skipH) {
         r[singleAtom.element.name] = 1;
       }
       if (!skipHydro) {
-        var hCount = singleAtom.getHydrogenCount();
+        const hCount = singleAtom.getHydrogenCount();
         if (hCount > 0) {
           if (r[hydroName]) {
             r[hydroName] += hCount;
@@ -414,19 +414,19 @@ Complex.prototype._partCompareFuncInt = function(a, b, skipH) {
         }
       }
     });
-    var k = Object.keys(r);
+    const k = Object.keys(r);
     k.sort(self._atomNameCompareCWithoutH.bind(self));
     return {seq: k, data: r};
   }
-  var skipArr = [skipH, false];
-  var atomDiff;
-  for (var i = 0; i < skipArr.length; i++) {
-    var skipPar = skipArr[i];
+  const skipArr = [skipH, false];
+  let atomDiff;
+  for (let i = 0; i < skipArr.length; i++) {
+    const skipPar = skipArr[i];
 
-    var aData = buildAtomArray(a.atoms, skipPar);
-    var bData = buildAtomArray(b.atoms, skipPar);
+    const aData = buildAtomArray(a.atoms, skipPar);
+    const bData = buildAtomArray(b.atoms, skipPar);
 
-    for (var aIdx = 0, bIdx = 0; aIdx < aData.seq.length && bIdx < bData.seq.length;) {
+    for (let aIdx = 0, bIdx = 0; aIdx < aData.seq.length && bIdx < bData.seq.length;) {
       if (aData.seq[aIdx] === bData.seq[bIdx]) {
         if (aData.data[aData.seq[aIdx]] === bData.data[bData.seq[bIdx]]) {
           aIdx += 1;
@@ -452,11 +452,10 @@ Complex.prototype._partCompareFuncInt = function(a, b, skipH) {
 };
 
 Complex.prototype._checkFormulaBuildable = function() {
-  var atoms = this.getAtoms();
-  var nAtoms = atoms.length;
-  var i = 0;
-  for (; i < nAtoms; i++) {
-    var atom = atoms[i];
+  const atoms = this.getAtoms();
+  const nAtoms = atoms.length;
+  for (let i = 0; i < nAtoms; i++) {
+    const atom = atoms[i];
     if (atom.element.number > Element.ByName.MT.number) {
       return '}\\text{Could not create chemical formula for this structure.}{';
     }
@@ -465,14 +464,14 @@ Complex.prototype._checkFormulaBuildable = function() {
 };
 
 Complex.prototype.buildChemicalFormula = function() {
-  var retDelim = '*';
-  var formulaParts = []; //object array
-  var currPart = null;
-  var pAtoms = null;
-  var atomsHash = {};
-  var hEntry = null;
-  var self = this;
-  var formula = this._checkFormulaBuildable();
+  const retDelim = '*';
+  const formulaParts = []; //object array
+  let currPart = null;
+  let pAtoms = null;
+  const atomsHash = {};
+  let hEntry = null;
+  const self = this;
+  let formula = this._checkFormulaBuildable();
   if (formula !== '') {
     return formula;
   }
@@ -525,7 +524,7 @@ Complex.prototype.buildChemicalFormula = function() {
     currPart = null;
   });
   //collect main part
-  var atomKeys = Object.keys(atomsHash);
+  const atomKeys = Object.keys(atomsHash);
   atomKeys.forEach(function(a) {
     if (a.taken === null) {
       if (currPart === null) {
@@ -546,11 +545,11 @@ Complex.prototype.buildChemicalFormula = function() {
     return self._partCompareFunc(a, b);
   });
   //now join the same parts
-  var i = formulaParts.length - 1;
-  var j = formulaParts.length - 2;
+  let i = formulaParts.length - 1;
+  let j = formulaParts.length - 2;
   while (i >= 0 && j >= 0) {
-    var pi = formulaParts[i];
-    var pj = formulaParts[j];
+    const pi = formulaParts[i];
+    const pj = formulaParts[j];
     if (!((pi.owner instanceof Complex) || (pi.owner instanceof Component))) {
       i--;
       if (i === j) {
@@ -573,7 +572,7 @@ Complex.prototype.buildChemicalFormula = function() {
 
   //build formula for each part individually
   formulaParts.forEach(function(p) {
-    var pf = self._buildPartFormula(p);
+    const pf = self._buildPartFormula(p);
     if (pf.length > 0) {
       if (formula.length > 0) {
         formula += retDelim;
@@ -586,46 +585,46 @@ Complex.prototype.buildChemicalFormula = function() {
 
 Complex.prototype.getUnifiedSerial = function(chain, serial, iCode) {
   /* eslint-disable no-magic-numbers */
-  var maxSerial = 65536;
-  var chainShift = maxSerial * 256;
+  const maxSerial = 65536;
+  const chainShift = maxSerial * 256;
   /* eslint-enable no-magic-numbers */
   return serial + iCode * maxSerial + chain * chainShift;
 };
 
 Complex.prototype.splitUnifiedSerial = function(uniSerial) {
   /* eslint-disable no-magic-numbers */
-  var maxSerial = 65536;
-  var chainShift = maxSerial * 256;
+  const maxSerial = 65536;
+  const chainShift = maxSerial * 256;
   /* eslint-enable no-magic-numbers */
-  var chainId = Math.floor(uniSerial / chainShift);
-  var remnant = uniSerial - chainId * chainShift;
-  var insCode = Math.floor(remnant / maxSerial);
-  var ser =  remnant - insCode * maxSerial;
+  const chainId = Math.floor(uniSerial / chainShift);
+  const remnant = uniSerial - chainId * chainShift;
+  const insCode = Math.floor(remnant / maxSerial);
+  const ser =  remnant - insCode * maxSerial;
   return {chain: chainId, serial: ser, iCode: insCode};
 };
 
 Complex.prototype._fillCmpEdit = function() {
-  var self = this;
-  var components = this._components;
+  const self = this;
+  const components = this._components;
 
   function addComp() {
-    var comp = new Component(self);
+    const comp = new Component(self);
     comp._index = components.length;
     components[comp._index] = comp;
     return comp;
   }
 
   this.forEachChain(function(chain) {
-    var residues = chain._residues;
-    var resCount = residues.length;
+    const residues = chain._residues;
+    const resCount = residues.length;
     if (resCount < 1) {
       return;
     }
-    var comp = addComp();
-    var currStart = residues[0]._index;
+    let comp = addComp();
+    let currStart = residues[0]._index;
 
-    for (var i = 0; i < resCount; ++i) {
-      var currRes = residues[i];
+    for (let i = 0; i < resCount; ++i) {
+      const currRes = residues[i];
       currRes._component = comp;
 
       var nextRes = i === resCount - 1 ? null : residues[i + 1];
@@ -650,22 +649,22 @@ Complex.prototype._fillCmpEdit = function() {
 // This function was added in the moment of despair
 // It was the dark times for miew
 Complex.prototype._fillCmpNoedit = function() {
-  var comp = new Component(this);
+  const comp = new Component(this);
   comp._index = 0;
 
-  var residues = this._residues;
-  var resCount = residues.length;
+  const residues = this._residues;
+  const resCount = residues.length;
   if (resCount === 0) {
     return;
   }
 
-  var currSubDivs = [];
-  var currStart = 0;
-  for (var i = 0; i < resCount; ++i) {
-    var currRes = residues[i];
+  const currSubDivs = [];
+  let currStart = 0;
+  for (let i = 0; i < resCount; ++i) {
+    const currRes = residues[i];
     currRes._component = comp;
 
-    var nextRes = i === resCount - 1 ? null : residues[i + 1];
+    const nextRes = i === resCount - 1 ? null : residues[i + 1];
     if (!nextRes ||
         !currRes.isConnected(nextRes)) {
       // wrap up this interval
@@ -750,8 +749,8 @@ Complex.prototype.resetCurrentStructure = Complex.prototype.resetCurrentUnit;
 Complex.prototype.setCurrentStructure = Complex.prototype.setCurrentUnit;
 
 Complex.prototype._computeBounds = function() {
-  var units = this.units;
-  for (var i = 0, n = units.length; i < n; ++i) {
+  const units = this.units;
+  for (let i = 0, n = units.length; i < n; ++i) {
     units[i].computeBoundaries();
   }
 };
@@ -780,9 +779,9 @@ Complex.prototype.update = function() {
 
 Complex.prototype._finalizeBonds = function() {
 
-  var bonds = this.getBonds();
-  var n = bonds.length;
-  for (var i = 0; i < n; ++i) {
+  const bonds = this.getBonds();
+  const n = bonds.length;
+  for (let i = 0; i < n; ++i) {
     bonds[i]._index = i;
   }
 };
@@ -798,12 +797,12 @@ Complex.prototype._finalizeBonds = function() {
 Complex.prototype.finalize = function(opts) {
   opts = opts || {};
   // Put bonds into atoms
-  var bonds = this._bonds;
-  var i;
-  var n;
+  const bonds = this._bonds;
+  let i;
+  let n;
   //remove invalid bonds
   for (i = bonds.length - 1; i >= 0; i--) {
-    let bond = bonds[i];
+    const bond = bonds[i];
     if (bond._left === null || bond._right === null) {
       bonds.splice(i, 1);
     } else {
@@ -812,7 +811,7 @@ Complex.prototype.finalize = function(opts) {
     }
   }
 
-  var residues = this._residues;
+  const residues = this._residues;
   for (i = 0, n = residues.length; i < n; ++i) {
     residues[i]._finalize();
   }
@@ -822,16 +821,16 @@ Complex.prototype.finalize = function(opts) {
   });
 
   // WARNING! this MUST be done BEFORE computeBounds is called
-  var units = this.units;
+  const units = this.units;
   for (i = 0, n = units.length; i < n; ++i) {
     units[i].finalize();
   }
   // try setting first biomolecule by defaults
   this.setCurrentUnit(1);
 
-  var residueHash = {};
+  const residueHash = {};
   for (i = 0, n = residues.length; i < n; ++i) {
-    var res = residues[i];
+    const res = residues[i];
     // This code is extremely dangerous for non-PDB formats
     residueHash[this.getUnifiedSerial(
       res.getChain().getName().charCodeAt(0),
@@ -839,17 +838,17 @@ Complex.prototype.finalize = function(opts) {
     )] = res;
   }
 
-  var structures = this.structures;
+  const structures = this.structures;
   for (i = 0, n = structures.length; i < n; ++i) {
     structures[i]._finalize(opts.serialAtomMap, residueHash, this);
   }
 
-  var helices = this._helices;
+  const helices = this._helices;
   for (i = 0, n = helices.length; i < n; ++i) {
     helices[i]._finalize(opts.serialAtomMap, residueHash, this);
   }
 
-  var sheets = this._sheets;
+  const sheets = this._sheets;
   for (i = 0, n = sheets.length; i < n; ++i) {
     sheets[i]._finalize(opts.serialAtomMap, residueHash, this);
   }
@@ -857,21 +856,21 @@ Complex.prototype.finalize = function(opts) {
   // Update bounding sphere and box
   this._computeBounds();
 
-  var atoms = this._atoms;
+  const atoms = this._atoms;
   for (i = 0, n = atoms.length; i < n; ++i) {
-    var currAtom = atoms[i];
+    const currAtom = atoms[i];
     currAtom._index = i;
   }
 
   if (opts.needAutoBonding) {
     // console.time('AutoBonding');
-    var autoConnector = new AutoBond(this);
+    const autoConnector = new AutoBond(this);
     autoConnector.build();
     autoConnector.destroy();
     // console.timeEnd('AutoBonding');
   }
 
-  var chains = this._chains;
+  const chains = this._chains;
   for (i = 0, n = chains.length; i < n; ++i) {
     chains[i]._index = i;
   }
@@ -895,7 +894,7 @@ Complex.prototype.finalize = function(opts) {
   this._finalizeBonds();
   this._fillComponents(opts.enableEditing);
 
-  var marker = new AromaticLoopsMarker(this);
+  const marker = new AromaticLoopsMarker(this);
   marker.markCycles();
   if (opts.detectAromaticLoops) { // TODO remove this condition clause, it is for debug purposes only!
     marker.detectCycles(); // TODO add conditional detection
@@ -906,11 +905,11 @@ Complex.prototype.finalize = function(opts) {
 
 Complex.prototype._finalizeMolecules = function() {
   // add reference to molecule into residue
-  for (var i = 0; i < this._molecules.length; i++) {
-    var molecule = this._molecules[i];
-    var count = molecule._residues.length;
-    for (var j = 0; j < count; j++) {
-      var residue = molecule._residues[j];
+  for (let i = 0; i < this._molecules.length; i++) {
+    const molecule = this._molecules[i];
+    const count = molecule._residues.length;
+    for (let j = 0; j < count; j++) {
+      const residue = molecule._residues[j];
       residue._molecule = molecule;
     }
   }
@@ -924,7 +923,7 @@ Complex.prototype.updateStructuresMask = function() {
 };
 
 Complex.prototype.countAtomsByMask = function(mask) {
-  var count = 0;
+  let count = 0;
 
   this.forEachAtom(function(atom) {
     if ((atom._mask & mask) !== 0) {
@@ -936,7 +935,7 @@ Complex.prototype.countAtomsByMask = function(mask) {
 };
 
 Complex.prototype.getNumAtomsBySelector = function(selector) {
-  var count = 0;
+  let count = 0;
 
   this.forEachAtom(function(atom) {
     if (selector.includesAtom(atom)) {
@@ -954,10 +953,10 @@ Complex.prototype.resetAtomMask = function(mask) {
 };
 
 Complex.prototype.markAtoms = function(selector, mask) {
-  var setMask = mask;
-  var clearMask = ~setMask;
-  var count = 0;
-  var totalSelector = selectors.keyword('And')(selector, this.getSelector());
+  const setMask = mask;
+  const clearMask = ~setMask;
+  let count = 0;
+  const totalSelector = selectors.keyword('And')(selector, this.getSelector());
 
   this.forEachAtom(function(atom) {
     if (totalSelector.includesAtom(atom)) {
@@ -973,8 +972,8 @@ Complex.prototype.markAtoms = function(selector, mask) {
 };
 
 Complex.prototype.markAtomsAdditionally = function(selector, mask) {
-  var setMask = mask;
-  var count = 0;
+  const setMask = mask;
+  let count = 0;
 
   this.forEachAtom(function(atom) {
     if (selector.includesAtom(atom) && (atom._mask & mask) !== mask) {
@@ -1002,7 +1001,7 @@ Complex.prototype.getAtomNames = function() {
     return this._atomNames;
   }
 
-  var dict = {};
+  const dict = {};
   this.forEachAtom(function(atom) {
     dict[atom._name._name] = 1;
   });
@@ -1016,7 +1015,7 @@ Complex.prototype.getElements = function() {
     return this._elements;
   }
 
-  var dict = {};
+  const dict = {};
   this.forEachAtom(function(atom) {
     dict[atom.element.name] = 1;
   });
@@ -1030,7 +1029,7 @@ Complex.prototype.getResidueNames = function() {
     return this._residueNames;
   }
 
-  var dict = {};
+  const dict = {};
   this.forEachResidue(function(res) {
     dict[res._type._name] = 1;
   });
@@ -1044,7 +1043,7 @@ Complex.prototype.getChainNames = function() {
     return this._chainNames;
   }
 
-  var dict = {};
+  const dict = {};
   this.forEachChain(function(chain) {
     dict[chain._name] = 1;
   });
@@ -1058,7 +1057,7 @@ Complex.prototype.getAltLocNames = function() {
     return this._altlocNames;
   }
 
-  var dict = {};
+  const dict = {};
   this.forEachAtom(function(atom) {
     dict[String.fromCharCode(atom._location)] = 1;
   });
@@ -1087,7 +1086,7 @@ Complex.prototype.getVoxelWorld = function() {
 // this function joins multiple complexes into one (this)
 // atom, bond, ... objects are reused -- so input complexes are no longer valid
 Complex.prototype.joinComplexes = function(complexes) {
-  var i, j;
+  let i, j;
 
   // clear target complex
   this._chains = [];
@@ -1100,17 +1099,17 @@ Complex.prototype.joinComplexes = function(complexes) {
   this._bonds = [];
   this._sgroups = [];
 
-  var atomBias = 0;
-  var bondBias = 0;
-  var residueBias = 0;
-  var chainBias = 0;
-  var componentBias = 0;
+  let atomBias = 0;
+  let bondBias = 0;
+  let residueBias = 0;
+  let chainBias = 0;
+  let componentBias = 0;
   for (i = 0; i < complexes.length; ++i) {
-    var c = complexes[i];
+    const c = complexes[i];
 
     // add atoms
     for (j = 0; j < c._atoms.length; ++j) {
-      var a = c._atoms[j];
+      const a = c._atoms[j];
       a._serial += atomBias;
       a._index += atomBias;
       this._atoms.push(a);
@@ -1118,21 +1117,21 @@ Complex.prototype.joinComplexes = function(complexes) {
 
     // add bonds
     for (j = 0; j < c._bonds.length; ++j) {
-      var b = c._bonds[j];
+      const b = c._bonds[j];
       b._index += bondBias;
       this._bonds.push(b);
     }
 
     // add residues
     for (j = 0; j < c._residues.length; ++j) {
-      var r = c._residues[j];
+      const r = c._residues[j];
       r._index += residueBias;
       this._residues.push(r);
     }
 
     // add chains
     for (j = 0; j < c._chains.length; ++j) {
-      var chain = c._chains[j];
+      const chain = c._chains[j];
       chain._complex = this;
       chain._index += chainBias;
       this._chains.push(chain);
@@ -1160,14 +1159,14 @@ Complex.prototype.joinComplexes = function(complexes) {
 
     // add components
     for (j = 0; j < c._components.length; ++j) {
-      var comp = c._components[j];
+      const comp = c._components[j];
       comp._complex = this;
       comp._index += componentBias;
       this._components.push(comp);
     }
 
     // merge residue types
-    for (var rt in c._residueTypes) {
+    for (let rt in c._residueTypes) {
       if (c._residueTypes.hasOwnProperty(rt)) {
         this._residueTypes[rt] = c._residueTypes[rt];
       }

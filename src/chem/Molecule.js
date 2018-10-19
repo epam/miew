@@ -39,16 +39,16 @@ Molecule.prototype.getIndex = function() {
 };
 
 Molecule.prototype.forEachResidue = function(process) {
-  var residues = this._residues;
-  for (var i = 0, n = residues.length; i < n; ++i) {
+  const residues = this._residues;
+  for (let i = 0, n = residues.length; i < n; ++i) {
     process(residues[i]);
   }
 };
 
 Molecule.prototype.collectMask = function() {
-  var mask = 0xffffffff;
-  var residues = this._residues;
-  for (var i = 0, n = residues.length; i < n; ++i) {
+  let mask = 0xffffffff;
+  const residues = this._residues;
+  for (let i = 0, n = residues.length; i < n; ++i) {
     mask &= residues[i]._mask;
   }
   this._mask = mask;

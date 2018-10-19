@@ -88,8 +88,8 @@ Residue.prototype.getICode = function() {
 // Other methods
 
 Residue.prototype.addAtom = function(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge) {
-  var atom = new Atom(this, name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
-  var complex = this._chain.getComplex();
+  const atom = new Atom(this, name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
+  const complex = this._chain.getComplex();
   complex.addAtom(atom);
   this._atoms.push(atom); // TODO: change to range
   this._het = this._het || het;
@@ -101,8 +101,8 @@ Residue.prototype.getAtomCount = function() {
 };
 
 Residue.prototype.forEachAtom = function(process) {
-  var atoms = this._atoms;
-  for (var i = 0, n = atoms.length; i < n; ++i) {
+  const atoms = this._atoms;
+  for (let i = 0, n = atoms.length; i < n; ++i) {
     if (process(atoms[i])) {
       break;
     }
@@ -110,7 +110,7 @@ Residue.prototype.forEachAtom = function(process) {
 };
 
 Residue.prototype._findAtomByName = function(name) {
-  var res = null;
+  let res = null;
   this.forEachAtom(function(atom) {
     if (atom._name._name === name) {
       res = atom;
@@ -122,8 +122,8 @@ Residue.prototype._findAtomByName = function(name) {
 };
 
 Residue.prototype._findFirstAtomInList = function(names) {
-  var res = null;
-  for (var i = 0; i < names.length; ++i) {
+  let res = null;
+  for (let i = 0; i < names.length; ++i) {
     res = this._findAtomByName(names[i]);
     if (res !== null) {
       return res;
@@ -133,18 +133,18 @@ Residue.prototype._findFirstAtomInList = function(names) {
 };
 
 Residue.prototype.collectMask = function() {
-  var mask = 0xffffffff;
-  var atoms = this._atoms;
-  for (var i = 0, n = atoms.length; i < n; ++i) {
+  let mask = 0xffffffff;
+  const atoms = this._atoms;
+  for (let i = 0, n = atoms.length; i < n; ++i) {
     mask &= atoms[i]._mask;
   }
   this._mask = mask;
 };
 
 Residue.prototype.getCylinderTargetList = function() {
-  var type = this._type._name;
-  for (var i = 0, n = cCylinderTarget.length; i < n; ++i) {
-    for (var j = 0, m = cCylinderTarget[i].types.length; j < m; ++j) {
+  const type = this._type._name;
+  for (let i = 0, n = cCylinderTarget.length; i < n; ++i) {
+    for (let j = 0, m = cCylinderTarget[i].types.length; j < m; ++j) {
       if (type === cCylinderTarget[i].types[j]) {
         return cCylinderTarget[i].atoms;
       }
@@ -154,9 +154,9 @@ Residue.prototype.getCylinderTargetList = function() {
 };
 
 Residue.prototype._detectLeadWing = function(dst, next, getAtomPosition) {
-  var leadAtom = this._findFirstAtomInList(cNucleicControlNames);
-  var wingStart = this._findFirstAtomInList(cNucleicWing1Names);
-  var wingEnd = this._findFirstAtomInList(cNucleicWing2Names);
+  const leadAtom = this._findFirstAtomInList(cNucleicControlNames);
+  let wingStart = this._findFirstAtomInList(cNucleicWing1Names);
+  let wingEnd = this._findFirstAtomInList(cNucleicWing2Names);
 
   if (wingStart === null && next !== null) {
     wingStart = next._findFirstAtomInList(cNucleicWing1Names);
@@ -175,9 +175,9 @@ Residue.prototype._detectLeadWing = function(dst, next, getAtomPosition) {
   dst._wingVector = getAtomPosition(wingEnd).clone().sub(getAtomPosition(wingStart));
   dst._isValid = true;
 
-  var cylSource = this._findFirstAtomInList(cCylinderSource);
-  var targetList = this.getCylinderTargetList();
-  var cylTarget = targetList !== null ? this._findFirstAtomInList(targetList) : null;
+  const cylSource = this._findFirstAtomInList(cCylinderSource);
+  const targetList = this.getCylinderTargetList();
+  const cylTarget = targetList !== null ? this._findFirstAtomInList(targetList) : null;
   if (cylSource === null || cylTarget === null) {
     return;
   }
@@ -185,8 +185,8 @@ Residue.prototype._detectLeadWing = function(dst, next, getAtomPosition) {
 };
 
 Residue.prototype.calcWing = function(prevLeadPos, currLeadPos, prevWingPos, prevWing) {
-  var vectorA = currLeadPos.clone().sub(prevLeadPos);
-  var vectorB = prevLeadPos.clone().sub(prevWingPos);
+  const vectorA = currLeadPos.clone().sub(prevLeadPos);
+  const vectorB = prevLeadPos.clone().sub(prevWingPos);
   vectorB.crossVectors(vectorA, vectorB);
   vectorB.crossVectors(vectorA, vectorB).normalize();
   if (prevWing !== null && Math.abs(prevWing.angleTo(vectorB)) > Math.PI / 2) {
@@ -196,10 +196,10 @@ Residue.prototype.calcWing = function(prevLeadPos, currLeadPos, prevWingPos, pre
 };
 
 Residue.prototype._innerFinalize = function(prevRes, prev, nextRes, dst, getAtomPosition) {
-  var bFirstInChain = prev === null;
+  const bFirstInChain = prev === null;
 
-  var lp = getAtomPosition(this._leadAtom);
-  var currLeadPos = new THREE.Vector3(lp.x, lp.y, lp.z);
+  const lp = getAtomPosition(this._leadAtom);
+  const currLeadPos = new THREE.Vector3(lp.x, lp.y, lp.z);
   if ((this._type.flags & ResidueType.Flags.NUCLEIC) !== 0) {
     this._detectLeadWing(dst, nextRes, getAtomPosition);
     return;
@@ -207,7 +207,7 @@ Residue.prototype._innerFinalize = function(prevRes, prev, nextRes, dst, getAtom
   if (bFirstInChain) { //for first one in chain
     dst._midPoint = getAtomPosition(this._firstAtom).clone();
   } else {
-    var prevLeadPos = prev._controlPoint; //lead point of previous monomer
+    const prevLeadPos = prev._controlPoint; //lead point of previous monomer
     dst._midPoint = prevLeadPos.clone().lerp(currLeadPos, 0.5);
     dst._wingVector = this.calcWing(prevLeadPos, currLeadPos, getAtomPosition(prevRes._wingAtom), prev._wingVector);
   }
@@ -226,11 +226,11 @@ Residue.prototype.isConnected = function(anotherResidue) {
   if (this === anotherResidue) {
     return true;
   }
-  var res = false;
+  let res = false;
   this.forEachAtom(function(atom) {
-    var bonds = atom._bonds;
-    for (var i = 0, n = bonds.length; i < n; ++i) {
-      var bond = bonds[i];
+    const bonds = atom._bonds;
+    for (let i = 0, n = bonds.length; i < n; ++i) {
+      const bond = bonds[i];
       if (bond._left._residue === anotherResidue || bond._right._residue === anotherResidue) {
         res = true;
         return true;

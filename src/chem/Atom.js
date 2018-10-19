@@ -113,7 +113,7 @@ Atom.prototype.getValence = function() {
 };
 
 Atom.prototype.getVisualName = function() {
-  var name = this.getName();
+  const name = this.getName();
   if (name.getString().length > 0) {
     return name.getString();
   } else {
@@ -122,8 +122,8 @@ Atom.prototype.getVisualName = function() {
 };
 
 Atom.prototype.forEachBond = function(process) {
-  var bonds = this._bonds;
-  for (var i = 0, n = bonds.length; i < n; ++i) {
+  const bonds = this._bonds;
+  for (let i = 0, n = bonds.length; i < n; ++i) {
     process(bonds[i]);
   }
 };
@@ -137,7 +137,7 @@ Atom.prototype.isLabelVisible = function() {
     return false;
   }
   if (this.element.number === Element.ByName.C.number) {
-    var n = this.getVisualName();
+    const n = this.getVisualName();
     if (n === null) {
       return false;
     }
@@ -152,18 +152,18 @@ Atom.prototype.isLabelVisible = function() {
 Atom.prototype.getHydrogenCountBoron = function() {
   //examples
   //BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
-  var valence = 3; //hardcoded as 3
-  var hc = valence - this.getCharge() - this.getAtomBondsCount() - this._radicalCount;
+  const valence = 3; //hardcoded as 3
+  const hc = valence - this.getCharge() - this.getAtomBondsCount() - this._radicalCount;
   return Math.max(0, hc);
 };
 
 Atom.prototype.getHydrogenCountTin = function() {
-  var valence = this._valence;
+  let valence = this._valence;
   if (valence === -1) {
     valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this._radicalCount;
   }
 
-  var defVal = this.findSuitableValence(valence);
+  let defVal = this.findSuitableValence(valence);
   if (this.getCharge() !== 0) {
     defVal = 4;
   }
@@ -176,12 +176,12 @@ Atom.prototype.getHydrogenCountMetal = function() {
 };
 
 Atom.prototype.getHydrogenCountGroup14 = function() {
-  var valence = this._valence;
+  let valence = this._valence;
   if (valence === -1) {
     valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this._radicalCount;
   }
 
-  var defVal = this.findSuitableValence(valence);
+  let defVal = this.findSuitableValence(valence);
   //find default valency for our case
   return Math.max(0, defVal - valence);
 };
@@ -189,11 +189,11 @@ Atom.prototype.getHydrogenCountGroup14 = function() {
 Atom.prototype.getHydrogenCountNonMetal = function() {
   // apply from Reaxys Drawing Guidelines (Version 2.04
   // January 2012) Standard Valence – (Valence + Charge + Number of Radical(s))
-  var valence = this._valence;
+  let valence = this._valence;
   if (valence === -1) {
     valence = this.getAtomBondsCount() - this.getCharge() + this._radicalCount;
   }
-  var defVal = this.findSuitableValence(valence);
+  const defVal = this.findSuitableValence(valence);
 
   //find default valency for our case
   return Math.max(0, defVal - valence);
@@ -213,8 +213,8 @@ Atom.prototype.getHydrogenCount = function() {
     return this._hydrogenCount;
   }
 
-  var element = this.element;
-  var val = element.hydrogenValency;
+  const element = this.element;
+  const val = element.hydrogenValency;
   if (val.length === 1 && val[0] === 0) {
     return 0;
   }
@@ -272,18 +272,18 @@ function getCylinderCount(bondOrder) {
 }
 
 Atom.prototype.getAtomBondsCount = function() {
-  var explicitBonds = this.getBonds();
-  var ebCount = 0;
-  for (var i = 0; i < explicitBonds.length; i++) {
+  const explicitBonds = this.getBonds();
+  let ebCount = 0;
+  for (let i = 0; i < explicitBonds.length; i++) {
     ebCount += getCylinderCount(explicitBonds[i].getOrder());
   }
   return ebCount;
 };
 
 Atom.prototype.findSuitableValence = function(valence) {
-  var val = this.element.hydrogenValency;
-  var defVal = val[val.length - 1];
-  for (var i = 0; i < val.length; i++) {
+  const val = this.element.hydrogenValency;
+  let defVal = val[val.length - 1];
+  for (let i = 0; i < val.length; i++) {
     if (val[i] >= valence) {
       defVal = val[i];
       break;
@@ -301,7 +301,7 @@ Atom.prototype.getLocation = function() {
 };
 
 Atom.prototype.getFullName = function() {
-  var name = '';
+  let name = '';
   if (this._residue !== null) {
     if (this._residue._chain !== null) {
       name += this._residue._chain.getName() + '.';

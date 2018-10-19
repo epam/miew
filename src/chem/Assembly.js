@@ -24,16 +24,16 @@ Assembly.prototype.constructor = Assembly;
 Assembly.prototype.computeBoundaries = function() {
   BiologicalUnit.prototype.computeBoundaries.call(this);
   // fix up the boundaries
-  var matrices = this.matrices;
-  var oldCenter = this._boundaries.boundingSphere.center;
-  var oldRad = this._boundaries.boundingSphere.radius;
-  var boundingBox = this._boundaries.boundingBox = new THREE.Box3();
+  const matrices = this.matrices;
+  const oldCenter = this._boundaries.boundingSphere.center;
+  const oldRad = this._boundaries.boundingSphere.radius;
+  const boundingBox = this._boundaries.boundingBox = new THREE.Box3();
   boundingBox.makeEmpty();
-  for (var i = 0, n = matrices.length; i < n; ++i) {
+  for (let i = 0, n = matrices.length; i < n; ++i) {
     boundingBox.expandByPoint(oldCenter.clone().applyMatrix4(matrices[i]));
   }
 
-  var newRad = boundingBox.max.distanceTo(boundingBox.min) / 2 + oldRad;
+  const newRad = boundingBox.max.distanceTo(boundingBox.min) / 2 + oldRad;
   const center  = new THREE.Vector3();
   boundingBox.getCenter(center);
   this._boundaries.boundingSphere = new THREE.Sphere().set(center, newRad);
