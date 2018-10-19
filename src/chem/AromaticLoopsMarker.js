@@ -57,41 +57,43 @@ function _markAromatic(bond) {
   bond._type = cAromaticType;
 }
 
-function Cycle(atomsList) {
-  this.atoms = atomsList;
-  this.update();
-}
-
-Cycle.prototype.update = function() {
-  const atoms = this.atoms;
-  const center = new THREE.Vector3();
-  const nA = atoms.length;
-  for (let j = 0; j < nA; ++j) {
-    center.add(atoms[j]._position);
+class Cycle {
+  constructor(atomsList) {
+    this.atoms = atomsList;
+    this.update();
   }
-  center.multiplyScalar(1.0 / nA);
-  this.center = center;
-  this.radius = center.distanceTo(atoms[0]._position.clone().lerp(atoms[1]._position, 0.5));
-};
 
-Cycle.prototype.forEachBond = function(process) {
-  const atoms = this.atoms;
-  const nA = atoms.length;
-  let currAtom = atoms[0];
-  let nextAtom;
+  update() {
+    const atoms = this.atoms;
+    const center = new THREE.Vector3();
+    const nA = atoms.length;
+    for (let j = 0; j < nA; ++j) {
+      center.add(atoms[j]._position);
+    }
+    center.multiplyScalar(1.0 / nA);
+    this.center = center;
+    this.radius = center.distanceTo(atoms[0]._position.clone().lerp(atoms[1]._position, 0.5));
+  }
 
-  function checkBond(bond) {
-    if (bond._left === nextAtom || bond._right === nextAtom) {
-      process(bond);
+  forEachBond(process) {
+    const atoms = this.atoms;
+    const nA = atoms.length;
+    let currAtom = atoms[0];
+    let nextAtom;
+
+    function checkBond(bond) {
+      if (bond._left === nextAtom || bond._right === nextAtom) {
+        process(bond);
+      }
+    }
+
+    for (let i = 0; i < nA; ++i) {
+      nextAtom = atoms[(i + 1) % nA];
+      currAtom.forEachBond(checkBond);
+      currAtom = nextAtom;
     }
   }
-
-  for (let i = 0; i < nA; ++i) {
-    nextAtom = atoms[(i + 1) % nA];
-    currAtom.forEachBond(checkBond);
-    currAtom = nextAtom;
-  }
-};
+}
 
 function _isAromatic(bond) {
   return bond._type === cAromaticType;
@@ -115,136 +117,139 @@ function _checkCycleComplex(cycle) {
   return true;
 }
 
-function AromaticLoopsMarker(complex) {
-  this._complex = complex;
-  const bondsData = new Array(complex._bonds.length);
-  const bondMarks = new Array(complex._bonds.length);
-  for (let i = 0, n = bondsData.length; i < n; ++i) {
-    bondsData[i] = [];
-    bondMarks[i] = false;
+class AromaticLoopsMarker {
+  constructor(complex) {
+    this._complex = complex;
+    const bondsData = new Array(complex._bonds.length);
+    const bondMarks = new Array(complex._bonds.length);
+    for (let i = 0, n = bondsData.length; i < n; ++i) {
+      bondsData[i] = [];
+      bondMarks[i] = false;
+    }
+    this._bondsData = bondsData;
+    this._bondMarks = bondMarks;
+    this._resetCycles();
   }
-  this._bondsData = bondsData;
-  this._bondMarks = bondMarks;
-  this._resetCycles();
-}
 
-AromaticLoopsMarker.prototype._resetCycles = function() {
-  this._cycles = [];
-  this._currIdx = -1;
-};
+  _resetCycles() {
+    this._cycles = [];
+    this._currIdx = -1;
+  }
 
-AromaticLoopsMarker.prototype._haveSameCycle = function(bondsData, bond1, bond2) {
-  const arr1 = bondsData[bond1._index];
-  const arr2 = bondsData[bond2._index];
-  const n1 = arr1.length;
-  const n2 = arr2.length;
-  let i1 = 0;
-  let i2 = 0;
-  while (i1 < n1 && i2 < n2) {
-    if (arr1[i1] === arr2[i2]) {
-      return true;
+  _haveSameCycle(bondsData, bond1, bond2) {
+    const arr1 = bondsData[bond1._index];
+    const arr2 = bondsData[bond2._index];
+    const n1 = arr1.length;
+    const n2 = arr2.length;
+    let i1 = 0;
+    let i2 = 0;
+    while (i1 < n1 && i2 < n2) {
+      if (arr1[i1] === arr2[i2]) {
+        return true;
+      }
+      if (arr1[i1] > arr2[i2]) {
+        ++i2;
+      } else {
+        ++i1;
+      }
     }
-    if (arr1[i1] > arr2[i2]) {
-      ++i2;
-    } else {
-      ++i1;
+    return false;
+  }
+
+  _tryBond(prevBond, currRight, currDir) {
+    const bondsOrder = [];
+    const bondsData = this._bondsData;
+    const currLeft = _anotherAtom(prevBond, currRight);
+    const currVec = currRight._position.clone().sub(currLeft._position);
+    const startAtomRef = this._currStart;
+    const self = this;
+    const bondMarks = this._bondMarks;
+    let checkAromatic = this._checkBond;
+    bondMarks[prevBond._index] = true;
+    checkAromatic = checkAromatic === undefined ? _isAromatic : checkAromatic;
+    currRight.forEachBond(function(newBond) {
+      if (!checkAromatic(newBond) ||
+        newBond === prevBond ||
+        bondMarks[newBond._index] ||
+        self._haveSameCycle(bondsData, prevBond, newBond)) {
+        return;
+      }
+      const anotherAtom = _anotherAtom(newBond, currRight);
+      const anotherVec = anotherAtom._position.clone().sub(currRight._position);
+      const val = anotherAtom === startAtomRef ? -2.0 : 1 - _cosBetween(currVec, anotherVec);
+      const newDir = anotherVec.cross(currVec);
+      if (!_coDirVectors(newDir, currDir)) {
+        return;
+      }
+      let idx = 0;
+      while (idx < bondsOrder.length && bondsOrder[idx].val < val) {
+        ++idx;
+      }
+      bondsOrder.splice(idx, 0, {bond: newBond, val: val, dir: newDir});
+    });
+
+    for (let i = 0, n = bondsOrder.length; i < n; ++i) {
+      const bond = bondsOrder[i].bond;
+      const newRight = bond._left === currRight ? bond._right : bond._left;
+      if (newRight === startAtomRef) {
+        ++this._currIdx;
+        this._cycles.push([currRight]);
+        bondMarks[prevBond._index] = false;
+        return true;
+      }
+      if (this._tryBond(bond, newRight, bondsOrder[i].dir)) {
+        _insertAscending(bondsData[bond._index], this._currIdx);
+        this._cycles[this._currIdx].push(currRight);
+        bondMarks[prevBond._index] = false;
+        return true;
+      }
+    }
+    bondMarks[prevBond._index] = false;
+    return false;
+  }
+
+  _startCycle(bond) {
+    // start from left to right
+    this._currStart = bond._left;
+    if (this._tryBond(bond, bond._right, new THREE.Vector3())) {
+      _insertAscending(this._bondsData[bond._index], this._currIdx);
+      this._cycles[this._currIdx].push(bond._left);
     }
   }
-  return false;
-};
 
-AromaticLoopsMarker.prototype._tryBond = function(prevBond, currRight, currDir) {
-  const bondsOrder = [];
-  const bondsData = this._bondsData;
-  const currLeft = _anotherAtom(prevBond, currRight);
-  const currVec = currRight._position.clone().sub(currLeft._position);
-  const startAtomRef = this._currStart;
-  const self = this;
-  const bondMarks = this._bondMarks;
-  let checkAromatic = this._checkBond;
-  bondMarks[prevBond._index] = true;
-  checkAromatic = checkAromatic === undefined ? _isAromatic : checkAromatic;
-  currRight.forEachBond(function(newBond) {
-    if (!checkAromatic(newBond) ||
-          newBond === prevBond ||
-          bondMarks[newBond._index] ||
-          self._haveSameCycle(bondsData, prevBond, newBond)) {
-      return;
-    }
-    const anotherAtom = _anotherAtom(newBond, currRight);
-    const anotherVec = anotherAtom._position.clone().sub(currRight._position);
-    const val = anotherAtom === startAtomRef ? -2.0 : 1 - _cosBetween(currVec, anotherVec);
-    const newDir = anotherVec.cross(currVec);
-    if (!_coDirVectors(newDir, currDir)) {
-      return;
-    }
-    let idx = 0;
-    while (idx < bondsOrder.length && bondsOrder[idx].val < val) {
-      ++idx;
-    }
-    bondsOrder.splice(idx, 0, {bond: newBond, val: val, dir: newDir});
-  });
+  _findLoops(checkBond, checkCycle) {
+    this._checkBond = checkBond;
+    const complex = this._complex;
+    const self = this;
 
-  for (let i = 0, n = bondsOrder.length; i < n; ++i) {
-    const bond = bondsOrder[i].bond;
-    const newRight = bond._left === currRight ? bond._right : bond._left;
-    if (newRight === startAtomRef) {
-      ++this._currIdx;
-      this._cycles.push([currRight]);
-      bondMarks[prevBond._index] = false;
-      return true;
-    }
-    if (this._tryBond(bond, newRight, bondsOrder[i].dir)) {
-      _insertAscending(bondsData[bond._index], this._currIdx);
-      this._cycles[this._currIdx].push(currRight);
-      bondMarks[prevBond._index] = false;
-      return true;
-    }
-  }
-  bondMarks[prevBond._index] = false;
-  return false;
-};
-
-AromaticLoopsMarker.prototype._startCycle = function(bond) {
-  // start from left to right
-  this._currStart = bond._left;
-  if (this._tryBond(bond, bond._right, new THREE.Vector3())) {
-    _insertAscending(this._bondsData[bond._index], this._currIdx);
-    this._cycles[this._currIdx].push(bond._left);
-  }
-};
-
-AromaticLoopsMarker.prototype._findLoops = function(checkBond, checkCycle) {
-  this._checkBond = checkBond;
-  const complex = this._complex;
-  const self = this;
-  complex.forEachComponent(function(component) {
-    self._resetCycles();
-    component.forEachBond(function(bond) {
-      if (checkBond(bond)) {
-        self._startCycle(bond);
+    complex.forEachComponent(function(component) {
+      self._resetCycles();
+      component.forEachBond(function(bond) {
+        if (checkBond(bond)) {
+          self._startCycle(bond);
+        }
+      });
+      const cycles = self._cycles;
+      for (let i = 0, n = cycles.length; i < n; ++i) {
+        const cycle = cycles[i];
+        if (!checkCycle(cycle)) {
+          continue;
+        }
+        let newCycle = new Cycle(cycle);
+        newCycle.forEachBond(_markAromatic);
+        component.addCycle(newCycle);
       }
     });
-    const cycles = self._cycles;
-    for (let i = 0, n = cycles.length; i < n; ++i) {
-      const cycle = cycles[i];
-      if (!checkCycle(cycle)) {
-        continue;
-      }
-      let newCycle = new Cycle(cycle);
-      newCycle.forEachBond(_markAromatic);
-      component.addCycle(newCycle);
-    }
-  });
-};
+  }
 
-AromaticLoopsMarker.prototype.markCycles = function() {
-  this._findLoops(_isAromatic, _checkCycleSimple);
-};
+  markCycles() {
+    this._findLoops(_isAromatic, _checkCycleSimple);
+  }
 
-AromaticLoopsMarker.prototype.detectCycles = function() {
-  this._findLoops(_isPossibleAromatic, _checkCycleComplex);
-};
+  detectCycles() {
+    this._findLoops(_isPossibleAromatic, _checkCycleComplex);
+  }
+}
 
 export default AromaticLoopsMarker;
 

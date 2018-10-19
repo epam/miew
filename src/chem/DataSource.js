@@ -9,9 +9,11 @@
  * @constructor
  * @classdesc Basic class for primary data sources used by displaying engine.
  */
-function DataSource() {
-  if (this.constructor === DataSource) {
-    throw new Error('Can not instantiate abstract class!');
+class DataSource {
+  constructor() {
+    if (this.constructor === DataSource) {
+      throw new Error('Can not instantiate abstract class!');
+    }
   }
 }
 

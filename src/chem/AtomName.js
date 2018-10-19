@@ -10,29 +10,31 @@
  * @constructor
  */
 
-function AtomName(name, node) {
-  this._node = node || null;
-  this._name = name || null;
-  if (this._node === null && this._name === null) {
-    this._name = 'Unknown';
+class AtomName {
+  constructor(name, node) {
+    this._node = node || null;
+    this._name = name || null;
+    if (this._node === null && this._name === null) {
+      this._name = 'Unknown';
+    }
+  }
+
+  /**
+   * Get atom full name.
+   * @returns {string} Atom simple name.
+   */
+  getString() {
+    return this._name || 'unknown';
+  }
+
+  /**
+   * Get atom full pretty name.
+   * @returns {object} Atom simple name.
+   */
+  getNode() {
+    return this._node || null;
   }
 }
-
-/**
- * Get atom full name.
- * @returns {string} Atom simple name.
- */
-AtomName.prototype.getString = function() {
-  return this._name || 'unknown';
-};
-
-/**
- * Get atom full pretty name.
- * @returns {object} Atom simple name.
- */
-AtomName.prototype.getNode = function() {
-  return this._node || null;
-};
 
 export default AtomName;
 
