@@ -1,10 +1,5 @@
-
-
-//////////////////////////////////////////////////////////////////////////////
-import DataSource from './DataSource';
 import * as THREE from 'three';
 import utils from '../utils';
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Volume constructor
@@ -93,17 +88,17 @@ class Volume {
     }
   }
 
-// default getter assumes it's a scalar field
+  // default getter assumes it's a scalar field
   getValue(x, y, z) {
     return this._data[x + y * this._rowElements + z * this._planeElements];
   }
 
-// default setter assumes it's a scalar field
+  // default setter assumes it's a scalar field
   setValue(x, y, z, val) {
     this._data[x + y * this._rowElements + z * this._planeElements] = val;
   }
 
-// default adder assumes it's a scalar field
+  // default adder assumes it's a scalar field
   addValue(x, y, z, val) {
     this._data[x + y * this._rowElements + z * this._planeElements] += val;
   }

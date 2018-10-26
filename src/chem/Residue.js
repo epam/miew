@@ -1,11 +1,7 @@
-
-
-//////////////////////////////////////////////////////////////////////////////
 import Atom from './Atom';
 import Element from './Element';
 import * as THREE from 'three';
 import ResidueType from './ResidueType';
-//////////////////////////////////////////////////////////////////////////////
 
 var cNucleicControlNames = ['C3\'', 'C3*', 'P', 'H5T', 'H3T'];
 var cNucleicWing1Names = ['OP1', 'O1P'];
@@ -86,7 +82,7 @@ class Residue {
     return this._icode;
   }
 
-// Other methods
+  // Other methods
 
   addAtom(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge) {
     const atom = new Atom(this, name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);

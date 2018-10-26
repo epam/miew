@@ -1,5 +1,3 @@
-
-
 /**
  * Atom name: simple and cooked.
  *

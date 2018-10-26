@@ -1,5 +1,3 @@
-
-
 /**
  * Residue type.
  *

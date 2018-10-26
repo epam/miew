@@ -1,5 +1,3 @@
-
-
 /**
  * Create new data source.
  *

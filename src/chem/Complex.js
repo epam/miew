@@ -656,8 +656,8 @@ class Complex {
     });
   }
 
-// This function was added in the moment of despair
-// It was the dark times for miew
+  // This function was added in the moment of despair
+  // It was the dark times for miew
   _fillCmpNoedit() {
     const comp = new Component(this);
     comp._index = 0;
@@ -1093,8 +1093,8 @@ class Complex {
     return this._voxelWorld;
   }
 
-// this function joins multiple complexes into one (this)
-// atom, bond, ... objects are reused -- so input complexes are no longer valid
+  // this function joins multiple complexes into one (this)
+  // atom, bond, ... objects are reused -- so input complexes are no longer valid
   joinComplexes(complexes) {
     let i, j;
 
