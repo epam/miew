@@ -19,9 +19,9 @@ export default class SDFStream {
     return this._strings[++this._currentStringIndx];
   }
 
-  getStringByIndx(indx) {
-    return this._strings[indx];
-  }
+  //getStringByIndx(indx) {
+  //  return this._strings[indx];
+  //}
 
   getCurrentString() {
     return this._strings[this._currentStringIndx];
@@ -47,7 +47,7 @@ export default class SDFStream {
   }
 
   findNextCompoundStart() {
-    let curStr = this.getCurrentString()
+    let curStr = this.getCurrentString();
     let res = false;
     while (curStr !== '$$$$' && !_.isUndefined(curStr)) {
       this._currentStart++;
