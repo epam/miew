@@ -35,12 +35,12 @@ export default class SDFStream {
   findNextDataItem() {
     let curStr = this.getNextString();
     let res = false;
-    while (!_.isUndefined(curStr) && !curStr.match(/>\s+<(.*)>/) && curStr.trim() !== '$$$$') {
+    while (!_.isUndefined(curStr) && curStr.trim() !== '$$$$') {
+      if (curStr.match(/>\s+<(.*)>/)) {
+        res = true;
+        break;
+      }
       curStr = this.getNextString();
-    }
-
-    if (this.probablyHaveDataToParse() && curStr.trim() !== '$$$$') {
-      res = true;
     }
 
     return res;
@@ -50,11 +50,9 @@ export default class SDFStream {
     let curStr = this.getCurrentString();
     let res = false;
     while (curStr !== '$$$$' && !_.isUndefined(curStr)) {
-      this._currentStart++;
       curStr = this.getNextString();
     }
-    this._currentStringIndx++;
-    this.setStart(this._currentStringIndx);
+    this.setStart(++this._currentStringIndx);
 
     if (this.probablyHaveDataToParse()) {
       res = true;
@@ -64,10 +62,6 @@ export default class SDFStream {
   }
 
   probablyHaveDataToParse() {
-    if (this._currentStringIndx >= this._strings.length - 2) {
-      return false;
-    } else {
-      return true;
-    }
+    return this._currentStringIndx < this._strings.length - 2;
   }
 }
