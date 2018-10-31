@@ -275,7 +275,7 @@ MMTFParser.prototype._traverse = function(mmtfData) {
     onBond: function(bondData) { self._onBond(bondData); }
   };
 
-    // temporary variables used during traversal to track secondary structures
+  // temporary variables used during traversal to track secondary structures
   this._ssType = -1;
   this._ssStruct = null;
   this._ssStart = null;
