@@ -24,11 +24,11 @@ const sdfRegExp = /.*($$$$).*|.*>\s+<(.+)>.*/;
 
 const fileFormat = {SDF: 'sdf', MOL: 'mol'};
 
-const possibleNameTags = ['PUBCHEM_IUPAC_TRADITIONAL_NAME', /PUBCHEM_(.+)_NAME/, 'name', 'NAME'];
+const possibleNameTags = ['PUBCHEM_IUPAC_TRADITIONAL_NAME', /PUBCHEM_(.+)_NAME/, /(.+)name/, /(.+)NAME/];
 const possibleIDTags = ['PUBCHEM_COMPOUND_CID', 'id', 'ID', /.*CID/, /.*ID/, /.*id/];
-const possibleTitleTags = ['msg', 'MSG', 'message', 'title', 'description', 'desc', /.*desc.*/];
+const possibleTitleTags = ['msg', 'MSG', 'message', 'title', 'description', 'desc'];
 const tagsNames = ['name', 'id', 'title'];
-const tags = {'name':  possibleNameTags, 'id': possibleIDTags, 'title': possibleTitleTags};
+const tags = {name:  possibleNameTags, id: possibleIDTags, title: possibleTitleTags};
 
 export default class SDFParser extends Parser {
   constructor(data, options) {
@@ -121,8 +121,11 @@ export default class SDFParser extends Parser {
 
   _parseDataItem(stream) {
     const tag = stream.getCurrentString();
+
     let data = [];
     let curStr = stream.getNextString();
+
+    //read data
     while (curStr.trim() !== '') {
       data.push(curStr);
       curStr = stream.getNextString();
@@ -145,6 +148,7 @@ export default class SDFParser extends Parser {
       if (this._currentMolProps.length !== 0) {
         const molecule = this._metadata.molecules[this._compoundIndx];
         molecule.props = this._currentMolProps;
+        this._tryToUpdateMoleculeData(molecule);
       }
     }
   }
@@ -190,29 +194,30 @@ export default class SDFParser extends Parser {
     return this._complex._molecules;
   }
 
-  _tryToFind(tagsList, props) {
+  _searchTag(tag, props) {
     for (let i = 0; i < props.length; i++) {
-      for (let j = 0; j < tagsList.length; j++) {
-        if ((tagsList[j] instanceof RegExp && tagsList[j].test(props[i].tag)) || tagsList[j] === props[i].tag) {
-          return props[i].data;
-        }
+      if ((tag instanceof RegExp && tag.test(props[i].tag)) || tag === props[i].tag) {
+        return props[i].data;
       }
     }
+    return false;
+  }
 
+  _tryToFind(tagsList, props) {
+    for (let j = 0; j < tagsList.length; j++) {
+      const res =  this._searchTag(tagsList[j], props);
+      if (res) {
+        return res;
+      }
+    }
     return false;
   }
 
   _tryToUpdateMoleculeData(molecule) {
-    if (!molecule.props) {
-      return false;
-    }
-
     let res = false;
-    const properties = molecule.props;
-
     for (let i = 0; i < tagsNames.length; i++) {
       const tagPossibleNames = tags[tagsNames[i]];
-      const data = this._tryToFind(tagPossibleNames, properties);
+      const data = this._tryToFind(tagPossibleNames, molecule.props);
       if (data) {
         molecule[tagsNames[i]] = data;
         res = true;
@@ -227,25 +232,10 @@ export default class SDFParser extends Parser {
     return res;
   }
 
-  _tryToParseMolProps() {
-    let res = false;
-    const molecules = this._metadata.molecules;
-
-    for (let j = 0; j < molecules.length; j++) {
-      if (molecules[j].props) {
-        this._tryToUpdateMoleculeData(molecules[j]);
-      }
-    }
-
-    return res;
-  }
-
   _finalizeMetadata() {
     const molecules = this._metadata.molecules;
     const metadata = this._complex.metadata;
     const complex = this._complex;
-
-    this._tryToParseMolProps();
 
     if (molecules.length === 1) {
       complex.name = molecules[0].name;
@@ -283,8 +273,8 @@ export default class SDFParser extends Parser {
     this._buildMolecules();
     this._complex.finalize({
       needAutoBonding: false,
-      detectAromaticLoops: this.settings.now.aromatic,
-      enableEditing: this.settings.now.editing,
+      detectAromaticLoops: false,
+      enableEditing: false,
       serialAtomMap: this._serialAtomMap
     });
   }
