@@ -60,7 +60,6 @@ export default class SDFParser extends Parser {
 
   _parseAtoms(stream, atomsNum) {
     let curStr, Serial = this._atomsParsed;
-    const occupancy = 1.0;
 
     //hack for chains and resudies names. each molecule = chain\residie. sdf files contains only
     //molecules and no chains and residues;
@@ -83,7 +82,7 @@ export default class SDFParser extends Parser {
       const type = Element.getByName(name);
       name += 'A' + Serial; //hack. every atom need to have unique name.
 
-      this._residue.addAtom(name, type, xyz, 0, false, Serial, '', occupancy, 0.0, charge);
+      this._residue.addAtom(name, type, xyz, 0, false, Serial, '', 1.0, 0.0, charge);
     }
   }
 
@@ -246,10 +245,7 @@ export default class SDFParser extends Parser {
       metadata.molecules = [];
       for (let i = 0; i < molecules.length; i++) {
         metadata.molecules.push({
-          name:       molecules[i].name,
-          date:       molecules[i].date,
-          title:      molecules[i].title,
-          properties: molecules[i].props,
+          name: molecules[i].name, date: molecules[i].date, title: molecules[i].title, properties: molecules[i].props,
         });
       }
       metadata.molecules = molecules;
@@ -272,10 +268,7 @@ export default class SDFParser extends Parser {
     this._complex.units = this._complex.units.concat(this._assemblies);
     this._buildMolecules();
     this._complex.finalize({
-      needAutoBonding: false,
-      detectAromaticLoops: false,
-      enableEditing: false,
-      serialAtomMap: this._serialAtomMap
+      needAutoBonding: false, detectAromaticLoops: false, enableEditing: false, serialAtomMap: this._serialAtomMap
     });
   }
 
@@ -296,10 +289,6 @@ export default class SDFParser extends Parser {
 
     this._format = this.defineFormat(this._data);
     result.metadata.format = this._format;
-
-    if (!stream.probablyHaveDataToParse()) {
-      return null;
-    }
 
     do {
       this._parseCompound(stream);
