@@ -3,6 +3,7 @@ import CIFParser from '../../src/io/parsers/CIFParser';
 import MMTFParser from '../../src/io/parsers/MMTFParser';
 import PubChemParser from '../../src/io/parsers/PubChemParser';
 import CCP4Parser from '../../src/io/parsers/CCP4Parser';
+import SDFParser from '../../src/io/parsers/SDFParser';
 
 import fs from 'fs';
 import path from 'path';
@@ -47,6 +48,12 @@ const formats = {
     extension: 'ccp4',
     encoding: null,
     Parser: CCP4Parser,
+  },
+  sdf: {
+    name: 'SDF',
+    extension: 'sdf',
+    encoding: 'ascii',
+    Parser: SDFParser,
   },
 };
 

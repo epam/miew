@@ -170,6 +170,10 @@ export default class SDFParser extends Parser {
   _buildAssemblies() {
     const chains = this._complex._chains;
 
+    if (chains.length === 1) {
+      return this._assemblies;
+    }
+
     for (let i = 0; i < chains.length; i++) {
       const assembly = new Assembly(this._complex);
       let matrix = new THREE.Matrix4();

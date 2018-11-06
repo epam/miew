@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default class SDFStream {
   constructor(data) {
     this._strings = data.split(/\r?\n|\r/);
