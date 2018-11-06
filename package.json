@@ -84,7 +84,7 @@
       "**/*.test.js"
     ],
     "require": [
-      "babel-register"
+      "@babel/register"
     ],
     "reporter": [
       "lcov",
@@ -99,17 +99,17 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-external-helpers": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "autoprefixer": "^9.0.1",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^7.2.3",
-    "babel-loader": "^7.1.5",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-plugin-istanbul": "^4.1.6",
-    "babel-plugin-syntax-dynamic-import": "^6.18.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-register": "^6.26.0",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.0",
+    "babel-plugin-istanbul": "^5.1.0",
     "bootstrap": "^3.3.7",
     "bootstrap-switch": "^3.3.4",
     "browserify": "^16.2.2",
@@ -150,7 +150,7 @@
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.2",
     "rollup": "^0.63.4",
-    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-babel": "^4.0.1",
     "rollup-plugin-commonjs": "^9.1.4",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-replace": "^2.0.0",

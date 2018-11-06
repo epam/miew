@@ -52,8 +52,8 @@ export default {
     rollupPluginBabel({
       babelrc: false,
       runtimeHelpers: true,
-      presets: [['env', {modules: false}]],
-      plugins: ['external-helpers', 'transform-class-properties'],
+      presets: [['@babel/preset-env', {modules: false}]],
+      plugins: ['@babel/plugin-proposal-class-properties'],
       exclude: [
         './node_modules/**',
         './vendor/js/**',
