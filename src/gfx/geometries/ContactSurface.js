@@ -47,7 +47,7 @@ function AVHash(posRad, min, max, maxDistance) {
   };
 
 
-    /* Initial building, could probably be optimized further */
+  /* Initial building, could probably be optimized further */
   const preHash = []; // preHash[ cellID ] = [ atomId1, atomId2 ];
   let i;
   let cid;
