@@ -189,6 +189,7 @@ ComplexVisual.prototype.rep = function(index, rep) {
     colorer:  target.colorer.identify(),
     material: target.materialPreset.id,
   };
+
   // if modification is requested
   if (rep) {
     let changed = false;
