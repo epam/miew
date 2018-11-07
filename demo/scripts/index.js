@@ -4,7 +4,7 @@ import '../../node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch
 import '../../node_modules/toastr/build/toastr.min.css';
 import '../../node_modules/jquery.terminal/css/jquery.terminal.min.css';
 import '../styles/main.scss';
-import 'babel-polyfill';
+import '@babel/polyfill';
 
 import Miew from './Miew.full';
 import Menu from './ui/Menu';
