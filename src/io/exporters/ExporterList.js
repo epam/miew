@@ -22,11 +22,11 @@ class ExporterList extends EntityList {
   /**
    * Find a suitable exporter for data.
    *
-   * @param {Object} specs data specifications.
+   * @param {Object} specs Exporter specifications.
    * @param {string=} specs.format Supported data format.
    * @param {*=} specs.data Data to export.
    */
-  find(specs) {            //specs - complex.metadata or just any structure (?)
+  find(specs) {
     let list = [];
     if (specs.format) {
       list = this._dict.formats[specs.format.toLowerCase()] || [];
