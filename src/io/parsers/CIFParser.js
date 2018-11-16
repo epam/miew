@@ -70,7 +70,79 @@ class AtomDataError extends Error {
     this.message = message;
   }
 }
-//AtomDataError.prototype = Object.create(Error.prototype);
+
+function _getOperations(operList) {
+  if (!operList) {
+    return null;
+  }
+  const idc = arrize(operList.id);
+  const matrix = operList.matrix;
+  const vector = operList.vector;
+  if (!idc || !matrix || !vector) {
+    return null;
+  }
+
+  const ops = [];
+  for (let i = 0, n = idc.length; i < n; ++i) {
+    let mtx = new THREE.Matrix4();
+    const elements = mtx.elements;
+
+    for (let row = 0; row < 3; ++row) {
+      const matrixData = matrix[row + 1];
+      elements[row]      = arrize(matrixData[1])[i];
+      elements[row + 4]  = arrize(matrixData[2])[i];
+      elements[row + 8]  = arrize(matrixData[3])[i];
+      elements[row + 12] = arrize(vector[row + 1])[i];
+    }
+    ops[idc[i]] = mtx;
+  }
+  return ops;
+}
+
+function _extractOperations(assemblyGen, opsDict) {
+  assemblyGen = _.isString(assemblyGen) ? assemblyGen : '' + assemblyGen;
+  const l = assemblyGen.replace(/\)\s*\(/g, '!').replace(/[()']/g, '');
+  const groupStr = l.split('!');
+  const gps = [];
+
+  for (let grIdx = 0, grCount = groupStr.length; grIdx < grCount; ++grIdx) {
+    const gr = groupStr[grIdx].split(',');
+    const gp = [];
+    let idx = 0;
+    for (let i = 0, n = gr.length; i < n; ++i) {
+      const s = gr[i];
+      if (s.includes('-')) {
+        const es = s.split('-');
+        let j = parseInt(es[0], 10);
+        const m = parseInt(es[1], 10);
+        for (; j <= m; ++j) {
+          gp[idx++] = opsDict[j];
+        }
+      } else {
+        gp[idx++] = opsDict[s];
+      }
+    }
+    gps.push(gp);
+  }
+
+  // traverse all groups from the end of array and make all mults
+  const matrices = [];
+  let cnt = 0;
+  function traverse(level, mtx) {
+    for (let ii = 0, nn = gps[level].length; ii < nn; ++ii) {
+      const newMtx = mtx ? mtx.clone() : new THREE.Matrix4();
+      newMtx.multiplyMatrices(gps[level][ii], newMtx);
+      if (level === 0) {
+        matrices[cnt++] = newMtx;
+      } else {
+        traverse(level - 1, newMtx);
+      }
+    }
+
+  }
+  traverse(gps.length - 1);
+  return matrices;
+}
 
 class CIFParser extends Parser {
   constructor(data, options) {
@@ -92,7 +164,7 @@ class CIFParser extends Parser {
     return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'cif');
   }
 
-  canProbablyParse(data) {
+  static canProbablyParse(data) {
     return _.isString(data) && /^\s*data_/i.test(data);
   }
 
@@ -412,80 +484,7 @@ class CIFParser extends Parser {
     }
   }
 
-  static _getOperations(operList) {
-    if (!operList) {
-      return null;
-    }
-    const idc = arrize(operList.id);
-    const matrix = operList.matrix;
-    const vector = operList.vector;
-    if (!idc || !matrix || !vector) {
-      return null;
-    }
 
-    const ops = [];
-    for (let i = 0, n = idc.length; i < n; ++i) {
-      let mtx = new THREE.Matrix4();
-      const elements = mtx.elements;
-
-      for (let row = 0; row < 3; ++row) {
-        const matrixData = matrix[row + 1];
-        elements[row]      = arrize(matrixData[1])[i];
-        elements[row + 4]  = arrize(matrixData[2])[i];
-        elements[row + 8]  = arrize(matrixData[3])[i];
-        elements[row + 12] = arrize(vector[row + 1])[i];
-      }
-      ops[idc[i]] = mtx;
-    }
-
-    return ops;
-  }
-
-  static _extractOperations(assemblyGen, opsDict) {
-    assemblyGen = _.isString(assemblyGen) ? assemblyGen : '' + assemblyGen;
-    const l = assemblyGen.replace(/\)\s*\(/g, '!').replace(/[()']/g, '');
-    const groupStr = l.split('!');
-    const gps = [];
-
-    for (let grIdx = 0, grCount = groupStr.length; grIdx < grCount; ++grIdx) {
-      const gr = groupStr[grIdx].split(',');
-      const gp = [];
-      let idx = 0;
-      for (let i = 0, n = gr.length; i < n; ++i) {
-        const s = gr[i];
-        if (s.includes('-')) {
-          const es = s.split('-');
-          let j = parseInt(es[0], 10);
-          const m = parseInt(es[1], 10);
-          for (; j <= m; ++j) {
-            gp[idx++] = opsDict[j];
-          }
-        } else {
-          gp[idx++] = opsDict[s];
-        }
-      }
-      gps.push(gp);
-    }
-
-    // traverse all groups from the end of array and make all mults
-    const matrices = [];
-    let cnt = 0;
-    function traverse(level, mtx) {
-      for (let ii = 0, nn = gps[level].length; ii < nn; ++ii) {
-        const newMtx = mtx ? mtx.clone() : new THREE.Matrix4();
-        newMtx.multiplyMatrices(gps[level][ii], newMtx);
-        if (level === 0) {
-          matrices[cnt++] = newMtx;
-        } else {
-          traverse(level - 1, newMtx);
-        }
-      }
-
-    }
-
-    traverse(gps.length - 1);
-    return matrices;
-  }
 
   /**
    * Extract biological assemblies information from CIF structure and fill complex
@@ -507,14 +506,14 @@ class CIFParser extends Parser {
       return;
     }
 
-    let operList = CIFParser._getOperations(complexData.pdbx_struct_oper_list);
+    let operList = _getOperations(complexData.pdbx_struct_oper_list);
     if (!operList) {
       return;
     }
 
     for (let i = 0, n = asmIdx.length; i < n; ++i) {
       const asm = new Assembly(complex);
-      const assemblyOps = CIFParser._extractOperations(asmOper[i], operList);
+      const assemblyOps = _extractOperations(asmOper[i], operList);
       const entries = asmList[i].split(',');
       for (let ii = 0, nn = entries.length; ii < nn; ++ii) {
         const chain = entries[ii].trim();

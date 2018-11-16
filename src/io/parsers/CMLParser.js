@@ -34,7 +34,7 @@ class CMLParser extends Parser {
   // Class methods
 
   /** @deprecated */
-  canParse(data, options) {
+  static canParse(data, options) {
     if (!data) {
       return false;
     }
@@ -47,7 +47,7 @@ class CMLParser extends Parser {
     );
   }
 
-  canProbablyParse(data) {
+  static canProbablyParse(data) {
     return _.isString(data) && cmlStartRegexp.test(data);
   }
 

@@ -31,7 +31,7 @@ class Remark350 {
    * @param {PDBStream} stream - stream to parse
    */
 
-  parse = function(stream) {
+  parse(stream) {
     /** @type {?Assembly} */
     let assembly = this._assembly;
     /** @type {?THREE.Matrix4} */
@@ -69,7 +69,7 @@ class Remark350 {
       this._assembly = assembly = new Assembly(this._complex);
       this.assemblies.push(assembly);
     }
-  };
+  }
 }
 
 Remark350.prototype.id = 350;

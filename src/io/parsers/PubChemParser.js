@@ -16,7 +16,7 @@ class PubChemParser extends Parser {
   }
 
   /** @deprecated */
-  canParse(data, options) {
+  static canParse(data, options) {
     if (!data) {
       return false;
     }
@@ -27,7 +27,7 @@ class PubChemParser extends Parser {
     );
   }
 
-  canProbablyParse(data) {
+  static canProbablyParse(data) {
     return _.isString(data) && data[0] === '{';
   }
 

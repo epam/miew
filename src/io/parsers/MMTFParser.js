@@ -75,6 +75,10 @@ const secStructToType = [
   StructuralElementType.COIL,        // 7
 ];
 
+function getFirstByte(buf) {
+  const bytes = new Uint8Array(buf, 0, 1);
+  return bytes[0];
+}
 
 class MMTFParser extends Parser {
   constructor(data, options) {
@@ -86,22 +90,17 @@ class MMTFParser extends Parser {
   // Class methods
 
   /** @deprecated */
-  canParse(data, options) {
+  static canParse(data, options) {
     if (!data) {
       return false;
     }
     return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'mmtf');
   }
 
-  static getFirstByte(buf) {
-    const bytes = new Uint8Array(buf, 0, 1);
-    return bytes[0];
-  }
-
-  canProbablyParse(data) {
+  static canProbablyParse(data) {
     // check if it's binary MessagePack format containing a map (dictionary)
     // see https://github.com/msgpack/msgpack/blob/master/spec.md
-    return _.isArrayBuffer(data) && ((MMTFParser.getFirstByte(data) | 1) === 0xDF);
+    return _.isArrayBuffer(data) && ((getFirstByte(data) | 1) === 0xDF);
   }
 
   _onModel(_modelData) {

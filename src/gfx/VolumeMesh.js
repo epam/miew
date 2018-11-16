@@ -78,7 +78,13 @@ class VolumeMesh extends THREE.Mesh {
     [3, 7, 1, 1, 0]
   ];
 
-  static _edgeIntersections = [];
+  static _edgeIntersections = (function() {
+    const edgeIntersections = [];
+    for (let j = 0; j < 12; ++j) {
+      edgeIntersections.push(new THREE.Vector3());
+    }
+    return edgeIntersections;
+  }());
 
   _updateVertices() {
     // Algorithm:
@@ -88,10 +94,6 @@ class VolumeMesh extends THREE.Mesh {
     const corners = VolumeMesh._corners;
     const edges = VolumeMesh._edges;
     const edgeIntersections = VolumeMesh._edgeIntersections;
-
-    for (let j = 0; j < 12; ++j) {
-      edgeIntersections.push(new THREE.Vector3());
-    }
 
     let i;
 
@@ -104,7 +106,7 @@ class VolumeMesh extends THREE.Mesh {
     const cornerMark = [0, 0, 0, 0, 0, 0, 0, 0];
     const edgeMark = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
-    let curEdge = new THREE.Vector3();
+    const curEdge = new THREE.Vector3();
     let curEdgeInter = null;
 
     function CheckX() {

@@ -26,8 +26,6 @@ class Stats {
     this._count = 0;
   }
 
-  //begin() { this._startTime = now(); }
-
   end() {
     const time = now();
     const delta = time - this._startTime;

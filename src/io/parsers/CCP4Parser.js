@@ -2,7 +2,6 @@ import _ from 'lodash';
 import Parser from './Parser';
 import chem from '../../chem';
 import * as THREE from 'three';
-//import utils from '../../utils';
 
 const Volume = chem.Volume;
 
@@ -123,8 +122,11 @@ class Ccp4Model {
     zaxis.multiplyScalar(header.extent[zIndex] - 1);
 
     if (header.type === 2) {
-      this._data = new Float32Array(buffer, 1024 + header.nsymbt,
-        header.extent[0] * header.extent[1] * header.extent[2]);
+      this._data = new Float32Array(
+        buffer,
+        1024 + header.nsymbt,
+        header.extent[0] * header.extent[1] * header.extent[2]
+      );
     } else {
       throw new Error('CCP4: Unsupported format ' + header.type);
     }

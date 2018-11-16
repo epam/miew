@@ -48,7 +48,8 @@ class PDBParser extends Parser {
   constructor(data, options) {
     super(data, options);
 
-    this._complex = null;  this._chain = null;
+    this._complex = null;
+    this._chain = null;
     this._residue = null;
     this._sheet = null;
     this._serialAtomMap = null;
@@ -73,7 +74,7 @@ class PDBParser extends Parser {
   // Class methods
 
   /** @deprecated */
-  canParse(data, options) {
+  static canParse(data, options) {
     if (!data) {
       return false;
     }
@@ -82,7 +83,7 @@ class PDBParser extends Parser {
   }
 
 
-  canProbablyParse(data) {
+  static canProbablyParse(data) {
     return _.isString(data) && pdbStartRegexp.test(data);
   }
 
