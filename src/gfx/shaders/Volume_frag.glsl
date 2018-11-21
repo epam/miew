@@ -5,6 +5,7 @@ uniform vec3 volumeDim;    // volume dimensions, pixels
 uniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data
 uniform vec2 tileTexSize;  // size of tiled texture, pixels
 uniform vec2 tileStride;   // UV stride between slices in tile tex, pixels
+uniform float alphaLimit; // Threshold for alpha
 
 uniform float _isoLevel0;
 uniform float _flipV;
@@ -113,6 +114,13 @@ vec3 GetCol(float vol, vec3 ad)
   return col;
 }
 
+float GetAlpha(float vol, float alpha)
+{
+  if (vol < alphaLimit)
+    return 0.;
+  return alpha;
+}
+
 vec3 CorrectIso(vec3 left, vec3 right, float tr)
 {
   for (int j = 0; j < 5; j++)
@@ -139,15 +147,15 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   int count = 0, stopMol = 0;
   float a = 0.36, b = 0.44;
   vec3 ad = vec3(1. / (a - _isoLevel0), 1. / (b - a), 1. / (0.52 - b));
-  kd = 140.*tr0*stepSize;
+  kd = 140. * tr0 * stepSize;
   r = 1. - kd;
 
   for (int k = 0; k < 3; k++)
   {
     stepSize = (0.5*float(k) + 1.) / 85.;
-    kd = 140.*tr0*stepSize;
+    kd = 140. * tr0 * stepSize;
     r = 1. - kd;
-    step = stepSize*dir;
+    step = stepSize * dir;
     iso = GetIso1(iterator, back, molDist, dir, tr0, k);
     if (iso.a < 0.1 || length(iso.rgb - start) > molDist)
       break;
@@ -155,7 +163,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     dif = 1.;// CalcColor(iterator, dir);
     colOld = GetCol(tr0, ad);
     curStepSize = stepSize;
-    for (int i=0; i < 200; i++)
+    for (int i = 0; i < 200; i++)
     {
       iterator = iterator + step;
       molD = length(iterator - start);
@@ -164,6 +172,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
       alpha = (1. - r);
+      alpha = GetAlpha(vol, alpha);
       col = GetCol(vol, ad);
       vol = sample3DTexture(iterator - 0.5*step).r;
       vec3 colMid = GetCol(vol, ad);

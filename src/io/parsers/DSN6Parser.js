@@ -76,6 +76,11 @@ class DSN6Parser extends Parser {
     return new THREE.Box3(this._origin.clone(), this._origin.clone().add(this._bboxSize));
   }
 
+  getDensityLimit() {
+    const header = this._header;
+    return (header.dmean + header.sd - header.dmin) / (header.dmax - header.dmin);
+  }
+
   getXYZdim() {
     return [this._header.extent.x,
       this._header.extent.y,
@@ -89,6 +94,7 @@ class DSN6Parser extends Parser {
 
     const blocks = new THREE.Vector3(header.extent.x / 8, header.extent.y / 8, header.extent.z / 8);
 
+    let mean = 0;
     let pos = 512;
 
     for (let zBlock = 0; zBlock < blocks.z; ++zBlock) {
@@ -106,6 +112,8 @@ class DSN6Parser extends Parser {
                   let idx = (x * header.extent.y + y) * header.extent.z + z;
                   xyzData[idx] = (byteBuffer[pos] - header._17) / header._16;
                   ++pos;
+                  mean += xyzData[idx];
+
                 } else {
                   pos += 8 - i;
                   break;
@@ -116,13 +124,39 @@ class DSN6Parser extends Parser {
         }
       }
     }
+
+    this._header.dmean = mean / xyzData.length;
+    let dispersion = 0;
+    let minDensity = xyzData[0];
+    let maxDensity = xyzData[0];
+    for (let j = 0; j < xyzData.length; j++) {
+      dispersion += Math.pow(this._header.dmean - xyzData[j], 2);
+
+      if (xyzData[j] < minDensity) {
+        minDensity = xyzData[j];
+      }
+      if (xyzData[j] > maxDensity) {
+        maxDensity = xyzData[j];
+      }
+    }
+    this._header.sd = Math.sqrt(dispersion / xyzData.length);
+    this._header.dmax = maxDensity;
+    this._header.dmin = minDensity;
+
     return xyzData;
   }
 
   parseSync() {
     this.parseHeader();
     this.setOrigins();
-    return new Volume(Float32Array, this.getXYZdim(), this.getXYZbox(), 1, this.toXYZData());
+    return new Volume(
+      Float32Array,
+      this.getXYZdim(),
+      this.getXYZbox(),
+      1,
+      this.toXYZData(),
+      this.getDensityLimit()
+    );
   }
 
   static canParse(data, options) {

@@ -18,10 +18,12 @@ import utils from '../utils';
  *                        layout: point by point along X,
  *                                row by row along Y,
  *                                plane by plane along Z
+ * @param {Number} meanDensity - volume threshold to filter the noise
  */
-function Volume(type, dimensions, box, vecSize, data) {
+function Volume(type, dimensions, box, vecSize, data, meanDensity) {
   this._box = box.clone();
   this._dimVec = Math.max(Math.floor(vecSize || 1), 1);
+  this._meanDensity = meanDensity;
 
   if (dimensions instanceof Array) {
     this._dimX = dimensions[0];
@@ -117,6 +119,10 @@ Volume.prototype.getDimensions = function() {
 
 Volume.prototype.getBox = function() {
   return this._box;
+};
+
+Volume.prototype.getDensityLimit = function() {
+  return this._meanDensity;
 };
 
 Volume.prototype.getCellSize = function() {

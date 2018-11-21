@@ -354,6 +354,10 @@ VolumeMesh.prototype.setDataSource = function(dataSource) {
   vm.uniforms.tileTex.value = texture;
   vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
   vm.uniforms.tileStride.value.set(stride[0], stride[1]);
+  if (dataSource.getDensityLimit() !== undefined) {
+    vm.uniforms.alphaLimit.value = dataSource.getDensityLimit();
+  }
+
   this.material = vm;
 
   var bbox = dataSource.getBox();
