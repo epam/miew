@@ -101,6 +101,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
   return acc;
 }
 
+/*
 vec3 GetCol(float vol, vec3 ad)
 {
   vec3 col;
@@ -111,6 +112,14 @@ vec3 GetCol(float vol, vec3 ad)
     col = mix(vec3(0., 1., 0.), vec3(0.5, 0.5, 0.), (vol - a)*ad.b); // / (b - a));
   if (vol > b)
     col = mix(vec3(0.5, 0.5, 0.), vec3(1., 0., 0.), (vol - b)*ad.g); // / (0.52 - b));
+  return col;
+}
+*/
+vec3 GetCol(float vol, vec3 ad)
+{
+  vec3 col;
+   col = vec3(0.5, 0.5, 0.5);// / (a - IsoLevel0)));
+
   return col;
 }
 
