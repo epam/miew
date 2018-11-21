@@ -22,6 +22,10 @@ import Element from './Element';
  * @constructor
  */
 
+function getCylinderCount(bondOrder) {
+  return bondOrder < 2 ? 1 : bondOrder;
+}
+
 class Atom {
   constructor(residue, name, type, position, role, het, serial, location, occupancy, temperature, charge) {
     this._index = -1;

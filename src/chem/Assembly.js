@@ -17,8 +17,7 @@ class Assembly extends BiologicalUnit {
   }
 
   computeBoundaries() {
-    //BiologicalUnit.prototype.computeBoundaries.call(this);
-    super.computeBoundaries.call(this);
+    super.computeBoundaries();
     // fix up the boundaries
     const matrices = this.matrices;
     const oldCenter = this._boundaries.boundingSphere.center;
