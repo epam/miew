@@ -32,7 +32,7 @@ _index.html_
   <title>Miew via Global</title>
   
   <link rel="stylesheet" href="Miew.min.css">
-  <script src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
+  <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
   <script src="Miew.min.js"></script>
 </head>
 <body>
@@ -66,7 +66,7 @@ _index.html_
   <title>Miew via Require.js</title>
 
   <link rel="stylesheet" href="Miew.min.css">
-  <script src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
+  <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 </head>
 <body>
@@ -109,7 +109,7 @@ _index.html_
   <title>Miew via Browserify</title>
 
   <link rel="stylesheet" href="Miew.min.css">
-  <script src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
+  <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
   <script src="bundle.js"></script>
 </head>
 <body>
@@ -145,7 +145,7 @@ _index.html_
 <head>
   <meta charset="UTF-8">
   <title>Miew via Webpack</title>
-  <script src="https://unpkg.com/babel-polyfill@6.26.0/dist/polyfill.min.js"></script>
+  <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
   <script src="bundle.js"></script>
 </head>
 <body>
