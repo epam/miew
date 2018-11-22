@@ -1,6 +1,10 @@
 import AtomName from './AtomName';
 import Element from './Element';
 
+function getCylinderCount(bondOrder) {
+  return bondOrder < 2 ? 1 : bondOrder;
+}
+
 /**
  * Atom measurements.
  *
@@ -21,10 +25,6 @@ import Element from './Element';
  * @exports Atom
  * @constructor
  */
-
-function getCylinderCount(bondOrder) {
-  return bondOrder < 2 ? 1 : bondOrder;
-}
 
 class Atom {
   constructor(residue, name, type, position, role, het, serial, location, occupancy, temperature, charge) {
