@@ -61,7 +61,7 @@ class Ccp4Model {
     header.map = new Uint8Array(buffer, idx * 4, 4);
     idx++;
     header.machine = u32[idx++];
-    header.arms = f32[idx++];
+    header.sd = f32[idx++];
     header.nlabel = u32[idx++];
     header.label = new Uint8Array(buffer, idx * 4, 800);
 
@@ -140,9 +140,14 @@ class Ccp4Model {
       this._header.extent[this._xyz2crs[2]]];
   }
 
-  getDensityLimit() {
+  getVolumeInfo() {
     const header = this._header;
-    return (header.dmean + header.arms - header.dmin) / (header.dmax - header.dmin);
+    let volumeInfo = {};
+    volumeInfo.dmean = header.dmean;
+    volumeInfo.dmin = header.dmin;
+    volumeInfo.dmax = header.dmax;
+    volumeInfo.sd = header.sd;
+    return volumeInfo;
   }
 
   getXYZbox() {
@@ -206,7 +211,7 @@ class CCP4Parser extends Parser {
       ccp4.getXYZbox(),
       1,
       ccp4.toXYZData(),
-      ccp4.getDensityLimit()
+      ccp4.getVolumeInfo()
     );
   }
 }

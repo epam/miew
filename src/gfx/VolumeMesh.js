@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import utils from '../utils';
 import VolumeMaterial from './shaders/VolumeMaterial';
+import settings from '../settings';
 
 function VolumeMesh() {
   this.clipPlane = new THREE.Plane();
@@ -354,10 +355,13 @@ VolumeMesh.prototype.setDataSource = function(dataSource) {
   vm.uniforms.tileTex.value = texture;
   vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
   vm.uniforms.tileStride.value.set(stride[0], stride[1]);
-  if (dataSource.getDensityLimit() !== undefined) {
-    vm.uniforms.alphaLimit.value = dataSource.getDensityLimit();
+  if (dataSource.getVolumeInfo() !== undefined) {
+    vm.uniforms.sd.value = dataSource.getVolumeInfo().sd;
+    vm.uniforms.dmean.value = dataSource.getVolumeInfo().dmean;
+    vm.uniforms.dmax.value = dataSource.getVolumeInfo().dmax;
+    vm.uniforms.dmin.value = dataSource.getVolumeInfo().dmin;
   }
-
+  vm.uniforms.kSigma.value = settings.now.modes.VD.kSigma;
   this.material = vm;
 
   var bbox = dataSource.getBox();
@@ -366,7 +370,6 @@ VolumeMesh.prototype.setDataSource = function(dataSource) {
 };
 
 VolumeMesh.prototype.rebuild = (function() {
-
   const nearClipPlaneOffset = 0.2;
   const pos = new THREE.Vector3();
   const norm = new THREE.Vector3();
@@ -375,7 +378,7 @@ VolumeMesh.prototype.rebuild = (function() {
   const clipPlane = new THREE.Plane();
 
   return function(camera) {
-
+    this.material.uniforms.kSigma.value = settings.now.modes.VD.kSigma;
     // get clip plane in local space
     camera.getWorldDirection(norm);
     camera.getWorldPosition(pos);

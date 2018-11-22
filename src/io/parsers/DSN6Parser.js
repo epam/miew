@@ -76,9 +76,14 @@ class DSN6Parser extends Parser {
     return new THREE.Box3(this._origin.clone(), this._origin.clone().add(this._bboxSize));
   }
 
-  getDensityLimit() {
+  getVolumeInfo() {
     const header = this._header;
-    return (header.dmean + header.sd - header.dmin) / (header.dmax - header.dmin);
+    let volumeInfo = {};
+    volumeInfo.dmean = header.dmean;
+    volumeInfo.dmin = header.dmin;
+    volumeInfo.dmax = header.dmax;
+    volumeInfo.sd = header.sd;
+    return volumeInfo;
   }
 
   getXYZdim() {
@@ -155,7 +160,7 @@ class DSN6Parser extends Parser {
       this.getXYZbox(),
       1,
       this.toXYZData(),
-      this.getDensityLimit()
+      this.getVolumeInfo()
     );
   }
 

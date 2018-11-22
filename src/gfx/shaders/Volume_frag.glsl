@@ -5,7 +5,11 @@ uniform vec3 volumeDim;    // volume dimensions, pixels
 uniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data
 uniform vec2 tileTexSize;  // size of tiled texture, pixels
 uniform vec2 tileStride;   // UV stride between slices in tile tex, pixels
-uniform float alphaLimit; // Threshold for alpha
+uniform float kSigma;      // coefficient of standart division
+uniform float sd;          // standart division of  volume density datset
+uniform float dmean;       // expectation of volume density datset
+uniform float dmax;        // maximum of volume density datset
+uniform float dmin;        // minimum of volume density datset
 
 uniform float _isoLevel0;
 uniform float _flipV;
@@ -123,9 +127,9 @@ vec3 GetCol(float vol, vec3 ad)
   return col;
 }
 
-float GetAlpha(float vol, float alpha)
+float GetAlpha(float vol, float alpha, float alphaTreshold)
 {
-  if (vol < alphaLimit)
+  if (vol < alphaTreshold)
     return 0.;
   return alpha;
 }
@@ -158,7 +162,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   vec3 ad = vec3(1. / (a - _isoLevel0), 1. / (b - a), 1. / (0.52 - b));
   kd = 140. * tr0 * stepSize;
   r = 1. - kd;
-
+  float alphaTreshold = (dmean + kSigma * sd - dmin) / (dmax - dmin);
   for (int k = 0; k < 3; k++)
   {
     stepSize = (0.5*float(k) + 1.) / 85.;
@@ -181,7 +185,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
       alpha = (1. - r);
-      alpha = GetAlpha(vol, alpha);
+      alpha = GetAlpha(vol, alpha, alphaTreshold);
       col = GetCol(vol, ad);
       vol = sample3DTexture(iterator - 0.5*step).r;
       vec3 colMid = GetCol(vol, ad);
@@ -205,6 +209,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       vol = tr0;
     }
     alpha = (1. - r)*curStepSize / stepSize;
+    alpha = GetAlpha(vol, alpha, alphaTreshold);
     dif = 1.;// CalcColor(right, dir);
     col = GetCol(vol, ad);
     vol = sample3DTexture(iterator - 0.5*curStepSize / stepSize*step).r;

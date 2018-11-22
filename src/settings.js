@@ -48,6 +48,7 @@ var defaults = {
    * @property {IsoSurfaceSESModeOptions} SE - Solvent Excluded Surface mode options.
    * @property {ContactSurfaceModeOptions} CS - Contact Surface mode options.
    * @property {TextModeOptions} TX - Text mode options.
+   * @property {VolumeDensityModeOptions} VD - Volume Density mode options.
    */
   modes: {
     /////////////////////    BALLS AND STICKS    ///////////////////////////
@@ -386,6 +387,19 @@ var defaults = {
       fg: 'none',
       bg: '0x202020',
       showBg : true,
+    },
+
+    ////////////////////         VOLUME DENSITY         //////////////////////////
+    /**
+     * Volume density mode options.
+     *
+     * @typedef VolumeDensityModeOptions
+     *
+     * @property {number} kSigma - Noise threshold coefficient .
+     *
+     */
+    VD: {
+      kSigma: 1.0
     }
   },
 
