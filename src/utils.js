@@ -467,16 +467,27 @@ function shotDownload(dataUrl, filename) {
   }
 }
 
-function PDBDownload(filename, string) {
+function download(data, type, filename) {
+  const blobData = new Blob([data]);
+
   if (!filename) {
-    filename = 'molecule.pdb';
+    filename = ['data', +new Date()].join('');
   }
 
-  const blobData = new Blob([string]);
+  if (!type) {
+    if (blobData.type) {
+      filename += blobData.type;
+    } else {
+      filename += '.bin';
+    }
+  } else {
+    filename += '.' + type;
+  }
+
   if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveBlob) {
     window.navigator.msSaveBlob(blobData, filename);
   } else if (typeof document !== 'undefined') {
-    var link = document.createElement('a');
+    const link = document.createElement('a');
     link.download = filename;
     link.innerHTML = 'download';
     link.href = window.URL.createObjectURL(blobData);
@@ -548,5 +559,5 @@ export default {
   correctSelectorIdentifier: correctSelectorIdentifier,
   getFileExtension,
   splitFileName,
-  PDBDownload: PDBDownload,
+  download: download,
 };

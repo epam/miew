@@ -1812,7 +1812,6 @@ Miew.prototype._stopAnimation = function() {
 Miew.prototype._onLoad = function(dataSource, opts) {
   var gfx = this._gfx;
   var visualName = null;
-  this._dataSource2 = dataSource;
 
   if (opts.animation) {
     this._refreshTitle();
@@ -2818,10 +2817,13 @@ Miew.prototype.screenshotSave = function(filename, width, height) {
   utils.shotDownload(uri, filename);
 };
 
-Miew.prototype.savePDB = function() {
-  this._export('pdb').then((dataString) => {
-    const filename = this._visuals[this._curVisualName]._complex.name + '.pdb';
-    utils.PDBDownload(filename, dataString);
+Miew.prototype.save = function(opts) {
+  this._export(opts.fileType).then((dataString) => {
+    let filename = this._visuals[this._curVisualName]._complex.name;
+    utils.download(dataString, opts.fileType, filename);
+  }).catch((error) => {
+    this.logger.error('Could not export data');
+    this.logger.debug(error);
   });
 };
 
