@@ -2820,7 +2820,7 @@ Miew.prototype.screenshotSave = function(filename, width, height) {
 Miew.prototype.save = function(opts) {
   this._export(opts.fileType).then((dataString) => {
     let filename = this._visuals[this._curVisualName]._complex.name;
-    utils.download(dataString, opts.fileType, filename);
+    utils.download(dataString, filename, opts.fileType);
   }).catch((error) => {
     this.logger.error('Could not export data');
     this.logger.debug(error);

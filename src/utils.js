@@ -467,7 +467,7 @@ function shotDownload(dataUrl, filename) {
   }
 }
 
-function download(data, type, filename) {
+function download(data, filename, type) {
   const blobData = new Blob([data]);
 
   if (!filename) {
@@ -475,11 +475,7 @@ function download(data, type, filename) {
   }
 
   if (!type) {
-    if (blobData.type) {
-      filename += blobData.type;
-    } else {
-      filename += '.bin';
-    }
+    filename += blobData.type || '.bin';
   } else {
     filename += '.' + type;
   }
