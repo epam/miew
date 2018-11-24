@@ -269,13 +269,13 @@ class Volume {
       }
     }
 
-  var texture = new THREE.DataTexture(
-    data, width, height, THREE.LuminanceFormat, THREE.UnsignedByteType,
-    THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter
-  );
-  texture.needsUpdate = true;
-  return texture;
-};
+    var texture = new THREE.DataTexture(
+      data, width, height, THREE.LuminanceFormat, THREE.UnsignedByteType,
+      THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter
+    );
+    texture.needsUpdate = true;
+    return texture;
+  }
 
   /**********************************************************************************
    *
