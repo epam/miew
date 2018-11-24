@@ -269,11 +269,10 @@ class Volume {
       }
     }
 
-    const texture = new THREE.DataTexture(
+    var texture = new THREE.DataTexture(
       data, width, height, THREE.LuminanceFormat, THREE.UnsignedByteType,
       THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter
     );
-    texture.generateMipmaps = false;
     texture.needsUpdate = true;
     return texture;
   }
