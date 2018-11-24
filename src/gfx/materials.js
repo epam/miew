@@ -22,7 +22,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: false
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'SF',
@@ -39,7 +40,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: false
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'PL',
@@ -56,7 +58,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: false
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'ME',
@@ -73,7 +76,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: false
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'TR',
@@ -90,7 +94,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: true,
-      toonShading: false
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'GL',
@@ -108,7 +113,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: true,
-      toonShading: false
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'BA',
@@ -120,9 +126,10 @@ var materialList = [
     values: {
       lights: false,
       fog: false,
-      depthWrite: false,
+      depthWrite: true,
       transparent: false,
-      toonShading: false
+      toonShading: false,
+      side: THREE.BackSide
     }
   }, {
     id: 'TN',
@@ -139,7 +146,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: true
+      toonShading: true,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'FL',
@@ -156,6 +164,7 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      side: THREE.DoubleSide
     }
   }
 ];

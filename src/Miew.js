@@ -932,7 +932,8 @@ Miew.prototype._onRender = function() {
   this._clipPlaneUpdateValue(this._getBSphereRadius());
   this._fogFarUpdateValue();
 
-  gfx.renderer.clearTarget(null);
+  gfx.renderer.setRenderTarget(null);
+  gfx.renderer.clear();
 
   this._renderFrame(settings.now.stereo);
 };
@@ -1076,12 +1077,14 @@ Miew.prototype._renderScene = (function() {
 
     // render to offscreen buffer
     gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
-    gfx.renderer.clearTarget(target);
+    gfx.renderer.setRenderTarget(target);
+    gfx.renderer.clear();
     if (gfx.renderer.vr.enabled) {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.clearTarget(gfx.offscreenBuf);    // FIXME clean up targets in render selection
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf);   // FIXME clean up targets in render selection
+    gfx.renderer.clear();
 
     var bHaveComplexes = (this._getComplexVisual() !== null);
     var volumeVisual = this._getVolumeVisual();
@@ -1188,7 +1191,8 @@ Miew.prototype._performDistortion = (function() {
 
   return function(srcBuffer, targetBuffer, mesh) {
 
-    this._gfx.renderer.clearTarget(targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.clear();
 
     if (mesh) {
       _material.uniforms.srcTex.value = srcBuffer.texture;
@@ -1235,8 +1239,8 @@ Miew.prototype._renderSelection = (function() {
 
     // clear offscreen buffer (leave z-buffer intact)
     gfx.renderer.setClearColor('black', 0);
-    gfx.renderer.clearTarget(srcBuffer, true, false, false);
-
+    gfx.renderer.setRenderTarget(srcBuffer);
+    gfx.renderer.clear(true, false, false);
 
     // render selection to offscreen buffer
     if (gfx.selectionPivot.children.length > 0) {
@@ -1306,9 +1310,12 @@ Miew.prototype._renderVolume = (function() {
     // use main camera to prepare special textures to be used by volumetric rendering
     // these textures have the size of the window and are stored in offscreen buffers
     gfx.renderer.setClearColor('black', 0);
-    gfx.renderer.clearTarget(tmpBuf1);
-    gfx.renderer.clearTarget(tmpBuf2);
-    gfx.renderer.clearTarget(tmpBuf3);
+    gfx.renderer.setRenderTarget(tmpBuf1);
+    gfx.renderer.clear();
+    gfx.renderer.setRenderTarget(tmpBuf2);
+    gfx.renderer.clear();
+    gfx.renderer.setRenderTarget(tmpBuf3);
+    gfx.renderer.clear();
 
     // draw plane with its own material, because it differs slightly from volumeBFMat
     camera.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
@@ -1390,7 +1397,8 @@ Miew.prototype._performFXAA = (function() {
 
     // clear canvas
     gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
-    gfx.renderer.clearTarget(targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.clear();
 
     // do fxaa processing of offscreen buff2
     _fxaaMaterial.uniforms.srcTex.value = srcBuffer.texture;
@@ -1479,7 +1487,8 @@ Miew.prototype._performAO = (function() {
 
     // clear canvasFMatrix4
     //gfx.renderer.setClearColor(THREE.aliceblue, 1);
-    //gfx.renderer.clearTarget(targetBuffer, true, false);
+    // gfx.renderer.setRenderTarget(targetBuffer);
+    // gfx.renderer.clear(true, false);
 
     // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;

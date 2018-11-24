@@ -292,7 +292,6 @@ Volume.prototype.buildTiledTexture = function() {
     data, width, height, THREE.LuminanceFormat, THREE.UnsignedByteType,
     THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter
   );
-  texture.generateMipmaps = false;
   texture.needsUpdate = true;
   return texture;
 };
