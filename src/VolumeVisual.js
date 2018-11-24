@@ -67,10 +67,12 @@ VolumeVisual.prototype.buildFarPlane = function() {
 
 VolumeVisual.prototype.getBoundaries = function() {
   var box = this._dataSource.getBox();
+  var sphere = new THREE.Sphere();
+  box.getBoundingSphere(sphere);
 
   return {
     boundingBox: box,
-    boundingSphere: box.getBoundingSphere()
+    boundingSphere: sphere
   };
 };
 
