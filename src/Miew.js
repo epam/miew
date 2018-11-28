@@ -421,17 +421,17 @@ Miew.prototype._initGfx = function() {
   gfx.selectionRoot.add(gfx.selectionPivot);
 
   // TODO: Either stay with a single light or revert this commit
-  var light1 = new THREE.DirectionalLight(0xffffff, 0.95);
-  light1.position.set(gfx.camera.position.x * 10, gfx.camera.position.y * 10 || 5.4, gfx.camera.position.z * 10 || 10);
-  light1.layers.enable(gfxutils.LAYERS.TRANSPARENT);
-  light1.castShadow = true;
-  light1.shadow = new THREE.DirectionalLightShadow();
-  light1.shadow.bias = -0.0005;
-  light1.shadow.radius = 5.0;
+  var light12 = new THREE.DirectionalLight(0xffffff, 0.45);
+  light12.position.set(0, 0.414, 1);
+  light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
+  light12.castShadow = true;
+  light12.shadow = new THREE.DirectionalLightShadow();
+  light12.shadow.bias = -0.0005;
+  light12.shadow.radius = 5.0;
   var shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
-  light1.shadow.mapSize.width = shadowMapSize;
-  light1.shadow.mapSize.height = shadowMapSize;
-  gfx.scene.add(light1);
+  light12.shadow.mapSize.width = shadowMapSize;
+  light12.shadow.mapSize.height = shadowMapSize;
+  gfx.scene.add(light12);
 
   var light3 = new THREE.AmbientLight(0x666666);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
