@@ -420,6 +420,31 @@ function processTransparentMaterial(root, material) {
   }
 }
 
+function processMaterialForShadow(root, material) {
+
+  if (!(material instanceof UberMaterial)) {
+    return;
+  }
+
+  root.traverse(function(object) {
+    if (object instanceof THREE.Mesh) {
+      if (object.castShadow) { // add casting material for casters
+        const depthMaterial = object.material.createInstance();
+        depthMaterial.setValues({
+          colorFromDepth: true,
+          lights: false,
+          shadowmap: false,
+          fog: false
+        });
+        object.customDepthMaterial = depthMaterial;
+      }
+      if (!object.receiveShadow && object.material.shadowmap) { // remove shaodow from non-receivers
+        object.material.setValues({shadowmap: false});
+      }
+    }
+  });
+}
+
 /** Traverse tree and make visible only needed meshes*/
 function makeVisibleMeshes(object, checker) {
   if (object && object.traverse) {
@@ -466,6 +491,7 @@ export default {
   destroyObject: destroyObject,
   applyTransformsToMeshes: applyTransformsToMeshes,
   processTransparentMaterial: processTransparentMaterial,
+  processMaterialForShadow: processMaterialForShadow,
   makeVisibleMeshes: makeVisibleMeshes,
   applySelectionMaterial: applySelectionMaterial,
   getMiddlePoint: getMiddlePoint,

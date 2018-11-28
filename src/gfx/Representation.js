@@ -56,12 +56,6 @@ Representation.prototype.reset = function() {
   this.selectionGeo = null;
 };
 
-const depthShadomapMaterialValues = {
-  colorFromDepth: true,
-  lights: false,
-  shadowmap: false,
-  fog: false
-};
 
 Representation.prototype.buildGeometry = function(complex) {
   // console.time('buildGeometry');
@@ -74,18 +68,9 @@ Representation.prototype.buildGeometry = function(complex) {
   }
   // console.timeEnd('buildGeometry');
   this.geo.visible = this.visible;
-  this.geo.traverse(function(object) {
-    if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
-      object.castShadow = true;
-      object.recieveShadow = true;
-    }
-    if ((object.material instanceof UberMaterial) && object.material.shadowmap) {
-      const depthMaterial = new UberMaterial();
-      depthMaterial.copy(object.material);
-      depthMaterial.setValues(depthShadomapMaterialValues);
-      object.customDepthMaterial = depthMaterial;
-    }
-  });
+
+  gfxutils.processMaterialForShadow(this.geo, this.material);
+
   return this.geo;
 };
 
