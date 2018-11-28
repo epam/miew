@@ -1,18 +1,24 @@
 import Parser from './Parser';
 import * as THREE from 'three';
 import Volume from '../../chem/Volume';
+import _ from 'lodash';
 
 class DSN6Parser extends Parser {
   constructor(data, options) {
     super(data, options);
     this._options.fileType = 'dsn6';
     this._header = {};
-    this._header.start = new THREE.Vector3();
-    this._header.extent = new THREE.Vector3();
-    this._header.rate = new THREE.Vector3();
+    this._header.nstart = [];
+    this._header.extent = [];
+    this._header.cellDims = [];
   }
 
   parseHeader() {
+    if (_.isTypedArray(this._data)) {
+      this._data = this._data.buffer;
+    } else if (!_.isArrayBuffer(this._data)) {
+      throw new TypeError('Expected ArrayBuffer or TypedArray');
+    }
     const intBuff = new Uint16Array(this._data);
 
     // check and reverse if big endian
@@ -25,29 +31,37 @@ class DSN6Parser extends Parser {
     if (intBuff[18] !== 100) {
       throw new Error('DSN6: Incorrect format ');
     }
+    const header = this._header;
+    header.scaleFactor = intBuff[17];
 
-    this._header.scaleFactor = intBuff[17];
+    header.nstart.push(intBuff[0]);
+    header.nstart.push(intBuff[1]);
+    header.nstart.push(intBuff[2]);
 
-    this._header.start.x =  intBuff[0];
-    this._header.start.y =  intBuff[1];
-    this._header.start.z =  intBuff[2];
+    header.extent.push(intBuff[3]);
+    header.extent.push(intBuff[4]);
+    header.extent.push(intBuff[5]);
 
-    this._header.extent.x = intBuff[3];
-    this._header.extent.y = intBuff[4];
-    this._header.extent.z = intBuff[5];
+    header.gridX = intBuff[6];
+    header.gridY = intBuff[7];
+    header.gridZ = intBuff[8];
 
-    // edges in angstroms
-    this._header.edgeA = intBuff[9] / intBuff[6] / this._header.scaleFactor;
-    this._header.edgeB = intBuff[10] / intBuff[7] / this._header.scaleFactor;
-    this._header.edgeC = intBuff[11] /  intBuff[8] / this._header.scaleFactor;
+    header.cellDims.push(intBuff[9] / header.scaleFactor);
+    header.cellDims.push(intBuff[10] / header.scaleFactor);
+    header.cellDims.push(intBuff[11] / header.scaleFactor);
 
     // angles in radians
-    this._header.alpha = intBuff[12] * Math.PI / 180.0 / this._header.scaleFactor;
-    this._header.beta = intBuff[13] * Math.PI / 180.0 / this._header.scaleFactor;
-    this._header.gamma = intBuff[14] * Math.PI / 180.0 / this._header.scaleFactor;
+    header.alpha = intBuff[12] * Math.PI / 180.0 / header.scaleFactor;
+    header.beta = intBuff[13] * Math.PI / 180.0 / header.scaleFactor;
+    header.gamma = intBuff[14] * Math.PI / 180.0 / header.scaleFactor;
 
-    this._header._16 = intBuff[15] / 100;
-    this._header._17 = intBuff[16];
+    header.div = intBuff[15] / 100;
+    header.adder = intBuff[16];
+
+    // edges in angstroms
+    header.edgeA = header.cellDims[0] / header.gridX;
+    header.edgeB = header.cellDims[1] / header.gridY;
+    header.edgeC = header.cellDims[2] / header.gridZ;
   }
 
   setOrigins() {
@@ -57,17 +71,17 @@ class DSN6Parser extends Parser {
       Math.cos(header.gamma)) / Math.sin(header.gamma);
     const z3 = Math.sqrt(1.0 - z1 * z1 - z2 * z2);
     let xaxis = new THREE.Vector3(header.edgeA, 0, 0);
-    let yaxis = new THREE.Vector3(Math.cos(header.beta) * header.edgeB, Math.sin(header.beta) * header.edgeB, 0);
+    let yaxis = new THREE.Vector3(Math.cos(header.gamma) * header.edgeB, Math.sin(header.gamma) * header.edgeB, 0);
     let zaxis = new THREE.Vector3(z1 * header.edgeC, z2 * header.edgeC, z3 * header.edgeC);
 
     this._origin = new THREE.Vector3(0, 0, 0);
-    this._origin.addScaledVector(xaxis, header.start.x);
-    this._origin.addScaledVector(yaxis, header.start.y);
-    this._origin.addScaledVector(zaxis, header.start.z);
+    this._origin.addScaledVector(xaxis, header.nstart[0]);
+    this._origin.addScaledVector(yaxis, header.nstart[1]);
+    this._origin.addScaledVector(zaxis, header.nstart[2]);
 
-    xaxis.multiplyScalar(header.extent.x);
-    yaxis.multiplyScalar(header.extent.y);
-    zaxis.multiplyScalar(header.extent.z);
+    xaxis.multiplyScalar(header.extent[0]);
+    yaxis.multiplyScalar(header.extent[1]);
+    zaxis.multiplyScalar(header.extent[2]);
 
     this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
   }
@@ -77,17 +91,17 @@ class DSN6Parser extends Parser {
   }
 
   getXYZdim() {
-    return [this._header.extent.x,
-      this._header.extent.y,
-      this._header.extent.z];
+    return [this._header.extent[0],
+      this._header.extent[1],
+      this._header.extent[2]];
   }
 
   toXYZData() {
     const header = this._header;
     const byteBuffer = new Uint8Array(this._data);
-    const xyzData = new Float32Array(header.extent.x * header.extent.y * header.extent.z);
+    const xyzData = new Float32Array(header.extent[0] * header.extent[1] * header.extent[2]);
 
-    const blocks = new THREE.Vector3(header.extent.x / 8, header.extent.y / 8, header.extent.z / 8);
+    const blocks = new THREE.Vector3(header.extent[0] / 8, header.extent[1] / 8, header.extent[2] / 8);
 
     let pos = 512;
 
@@ -101,10 +115,9 @@ class DSN6Parser extends Parser {
               for (let i = 0; i < 8; ++i) {
                 const x = 8 * xBlock + i;
 
-                // check if remaining slice-part contains data
-                if (x < header.extent.x && y < header.extent.y && z < header.extent.z) {
-                  let idx = (x * header.extent.y + y) * header.extent.z + z;
-                  xyzData[idx] = (byteBuffer[pos] - header._17) / header._16;
+                if (x < header.extent[0] && y < header.extent[1] && z < header.extent[2]) {
+                  let idx = x + header.extent[0] * (y + header.extent[1] * z);
+                  xyzData[idx] = (byteBuffer[pos] - header.adder) / header.div;
                   ++pos;
                 } else {
                   pos += 8 - i;
