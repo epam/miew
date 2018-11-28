@@ -6,6 +6,8 @@ var Mesh = UberObject(THREE.Mesh);
 
 function ZClippedMesh(geometry, material) {
   Mesh.call(this, geometry, material);
+  this.castShadow = true;
+  this.receiveShadow = true;
 }
 
 ZClippedMesh.prototype = Object.create(Mesh.prototype);
