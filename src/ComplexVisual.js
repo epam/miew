@@ -190,7 +190,7 @@ ComplexVisual.prototype.rep = function(index, rep) {
     material: target.materialPreset.id,
   };
 
-    // if modification is requested
+  // if modification is requested
   if (rep) {
     let changed = false;
 
