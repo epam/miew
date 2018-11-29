@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import Volume from '../../chem/Volume';
 
 class VolumeModel {
   constructor() {
@@ -8,11 +9,15 @@ class VolumeModel {
     this._origin = new THREE.Vector3(0, 0, 0);
   }
 
-  parseHeader(_buffer) {}
+  _parseVector(vector, arr, idx) {
+    [vector.x, vector.y, vector.z] = [arr[idx.counter++], arr[idx.counter++], arr[idx.counter++]];
+  }
+
+  _parseHeader(_buffer) {}
 
   _setAxisIndices() {}
 
-  setOrigins() {}
+  _setOrigins() {}
 
   _getAxis() {
     const header = this._header;
@@ -32,17 +37,23 @@ class VolumeModel {
     return [xaxis, yaxis, zaxis];
   }
 
-  getXYZdim() {
+  _getXYZdim() {
     return [this._header.extent[this._xyz2crs[0]],
       this._header.extent[this._xyz2crs[1]],
       this._header.extent[this._xyz2crs[2]]];
   }
 
-  getXYZbox() {
+  _getXYZbox() {
     return new THREE.Box3(this._origin.clone(), this._origin.clone().add(this._bboxSize));
   }
 
-  toXYZData() {}
+  _toXYZData() {}
+
+  parse(data) {
+    this._parseHeader(data);
+    this._setOrigins();
+    return new Volume(Float32Array, this._getXYZdim(), this._getXYZbox(), 1, this._toXYZData());
+  }
 }
 
 export default VolumeModel;

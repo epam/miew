@@ -32,7 +32,7 @@ export default class Parser {
 
   //only for volume Parsers
   getModel() {
-    this.model.parseHeader(this._data);
+    this.model._parseHeader(this._data);
     return this.model;
   }
 

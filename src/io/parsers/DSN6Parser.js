@@ -1,12 +1,11 @@
 import Parser from './Parser';
 import * as THREE from 'three';
-import Volume from '../../chem/Volume';
 import _ from 'lodash';
 import VolumeModel from './VolumeModel';
 
 class DSN6Model extends VolumeModel {
 
-  parseHeader(_buffer) {
+  _parseHeader(_buffer) {
     if (_.isTypedArray(_buffer)) {
       _buffer = _buffer.buffer;
     } else if (!_.isArrayBuffer(_buffer)) {
@@ -66,7 +65,7 @@ class DSN6Model extends VolumeModel {
     this._xyz2crs[2] = 2;
   }
 
-  setOrigins() {
+  _setOrigins() {
     const header = this._header;
     let [xaxis, yaxis, zaxis] = this._getAxis();
     this._setAxisIndices();
@@ -83,7 +82,7 @@ class DSN6Model extends VolumeModel {
     this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
   }
 
-  toXYZData() {
+  _toXYZData() {
     const header = this._header;
     const byteBuffer = new Uint8Array(this._buffer);
     const xyzData = new Float32Array(header.extent[0] * header.extent[1] * header.extent[2]);
@@ -127,13 +126,6 @@ class DSN6Parser extends Parser {
     this.model = new DSN6Model();
   }
 
-  parseSync() {
-    const dsn6 = this.model;
-    dsn6.parseHeader(this._data);
-    dsn6.setOrigins();
-    return new Volume(Float32Array, dsn6.getXYZdim(), dsn6.getXYZbox(), 1, dsn6.toXYZData());
-  }
-
   static canParse(data, options) {
     if (!data) {
       return false;
@@ -141,8 +133,12 @@ class DSN6Parser extends Parser {
     return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'dsn6');
   }
 
-  canProbablyParse(_data) {
+  static canProbablyParse(_data) {
     return false;
+  }
+
+  parseSync() {
+    return this.model.parse(this._data);
   }
 }
 

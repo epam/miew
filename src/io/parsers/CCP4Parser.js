@@ -1,14 +1,12 @@
 import _ from 'lodash';
 import Parser from './Parser';
-import chem from '../../chem';
 import * as THREE from 'three';
 import VolumeModel from './VolumeModel';
 
-const Volume = chem.Volume;
-
 class Ccp4Model extends VolumeModel {
+  counter;
 
-  parseHeader(_buffer) {
+  _parseHeader(_buffer) {
     if (_.isTypedArray(_buffer)) {
       _buffer = _buffer.buffer;
     } else if (!_.isArrayBuffer(_buffer)) {
@@ -29,43 +27,28 @@ class Ccp4Model extends VolumeModel {
     header.origin = new THREE.Vector3();
 
     // read header (http://www.ccp4.ac.uk/html/maplib.html)
-    let idx = 0;
-    header.extent.push(u32[idx++]);
-    header.extent.push(u32[idx++]);
-    header.extent.push(u32[idx++]);
-    header.type = u32[idx++];
-    header.nstart.push(i32[idx++]);
-    header.nstart.push(i32[idx++]);
-    header.nstart.push(i32[idx++]);
-    header.gridX = u32[idx++];
-    header.gridY = u32[idx++];
-    header.gridZ = u32[idx++];
-    header.cellDims.x = f32[idx++];
-    header.cellDims.y = f32[idx++];
-    header.cellDims.z = f32[idx++];
-    header.angles.x = f32[idx++];
-    header.angles.y = f32[idx++];
-    header.angles.z = f32[idx++];
-    header.crs2xyz.push(i32[idx++]);
-    header.crs2xyz.push(i32[idx++]);
-    header.crs2xyz.push(i32[idx++]);
-    header.dmin = f32[idx++];
-    header.dmax = f32[idx++];
-    header.dmean = f32[idx++];
-    header.ispg = u32[idx++];
-    header.nsymbt = u32[idx++];
-    header.lksflg = u32[idx++];
-    header.customData = new Uint8Array(_buffer, idx * 4, 96);
-    idx += 24;
-    header.origin.x = f32[idx++];
-    header.origin.y = f32[idx++];
-    header.origin.z = f32[idx++];
-    header.map = new Uint8Array(_buffer, idx * 4, 4);
-    idx++;
-    header.machine = u32[idx++];
-    header.arms = f32[idx++];
-    header.nlabel = u32[idx++];
-    header.label = new Uint8Array(_buffer, idx * 4, 800);
+    let idx = {};
+    idx.counter = 0;
+    header.extent.push(u32[idx.counter++], u32[idx.counter++], u32[idx.counter++]);
+    header.type = u32[idx.counter++];
+    header.nstart.push(i32[idx.counter++], i32[idx.counter++], i32[idx.counter++]);
+    [header.gridX, header.gridY, header.gridZ] = [u32[idx.counter++], u32[idx.counter++], u32[idx.counter++]];
+    this._parseVector(header.cellDims, f32, idx);
+    this._parseVector(header.angles, f32, idx);
+    header.crs2xyz.push(i32[idx.counter++], i32[idx.counter++], i32[idx.counter++]);
+    [header.dmin, header.dmax, header.dmean] = [f32[idx.counter++], f32[idx.counter++], f32[idx.counter++]];
+    header.ispg = u32[idx.counter++];
+    header.nsymbt = u32[idx.counter++];
+    header.lksflg = u32[idx.counter++];
+    header.customData = new Uint8Array(_buffer, idx.counter * 4, 96);
+    idx.counter += 24;
+    this._parseVector(header.origin, f32, idx);
+    header.map = new Uint8Array(_buffer, idx.counter * 4, 4);
+    idx.counter++;
+    header.machine = u32[idx.counter++];
+    header.arms = f32[idx.counter++];
+    header.nlabel = u32[idx.counter++];
+    header.label = new Uint8Array(_buffer, idx.counter * 4, 800);
 
     // calculate non-orthogonal unit cell coordinates
     header.angles.multiplyScalar(Math.PI / 180.0);
@@ -91,32 +74,27 @@ class Ccp4Model extends VolumeModel {
     xyz2crs[crs2xyz[2] - 1] = 2; // section
   }
 
-  setOrigins() {
+  _setOrigins() {
     let [xaxis, yaxis, zaxis] = this._getAxis();
     this._setAxisIndices();
 
     const header = this._header;
     const xyz2crs = this._xyz2crs;
-    const xIndex = xyz2crs[0];
-    const yIndex = xyz2crs[1];
-    const zIndex = xyz2crs[2];
     // Handle both MRC-2000 and older format maps
     if (header.origin.x === 0.0 && header.origin.y === 0.0 && header.origin.z === 0.0) {
-      this._origin.addScaledVector(xaxis, header.nstart[xIndex]);
-      this._origin.addScaledVector(yaxis, header.nstart[yIndex]);
-      this._origin.addScaledVector(zaxis, header.nstart[zIndex]);
+      this._origin.addScaledVector(xaxis, header.nstart[xyz2crs[0]]);
+      this._origin.addScaledVector(yaxis, header.nstart[xyz2crs[1]]);
+      this._origin.addScaledVector(zaxis, header.nstart[xyz2crs[2]]);
     } else {
       this._origin = header.origin;
       // Use ORIGIN records rather than old n[xyz]start records
       //   http://www2.mrc-lmb.cam.ac.uk/image2000.html
       // XXX the ORIGIN field is only used by the EM community, and
-      //     has undefined meaning for non-orthogonal maps and/or
-      //     non-cubic voxels, etc.
+      // has undefined meaning for non-orthogonal maps and/or non-cubic voxels, etc.
     }
-
-    xaxis.multiplyScalar(header.extent[xIndex] - 1);
-    yaxis.multiplyScalar(header.extent[yIndex] - 1);
-    zaxis.multiplyScalar(header.extent[zIndex] - 1);
+    xaxis.multiplyScalar(header.extent[xyz2crs[0]] - 1);
+    yaxis.multiplyScalar(header.extent[xyz2crs[1]] - 1);
+    zaxis.multiplyScalar(header.extent[xyz2crs[2]] - 1);
 
     if (header.type === 2) {
       this._data = new Float32Array(
@@ -131,13 +109,13 @@ class Ccp4Model extends VolumeModel {
     this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
   }
 
-  toXYZData() {
+  _toXYZData() {
     const header = this._header;
     const data = this._data;
     const xyz2crs = this._xyz2crs;
     const xyzData = new Float32Array(data.length);
 
-    const dim = this.getXYZdim();
+    const dim = this._getXYZdim();
     const xSize = dim[0];
     const ySize = dim[1];
 
@@ -158,6 +136,7 @@ class Ccp4Model extends VolumeModel {
     return xyzData;
   }
 }
+
 class CCP4Parser extends Parser {
   constructor(data, options) {
     super(data, options);
@@ -181,10 +160,7 @@ class CCP4Parser extends Parser {
   }
 
   parseSync() {
-    const ccp4 = this.model;
-    ccp4.parseHeader(this._data);
-    ccp4.setOrigins();
-    return new Volume(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
+    return this.model.parse(this._data);
   }
 }
 
