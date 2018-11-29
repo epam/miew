@@ -12,6 +12,7 @@ class XYZParser extends Parser {
     super(data, options);
 
     this._complex = null;
+    this._atomsInf = null;
 
     this._options.fileType = 'xyz';
   }
@@ -27,20 +28,15 @@ class XYZParser extends Parser {
     return _.isString(data) && /^\s*data_/i.test(data);
   }
 
-  _parse(source) {
-    const het = true;
-    const altLoc = ' ';
-    const occupancy = 1;
-    const tempFactor = 1;
-    const charge = 0;
+  _parseToAtomsInf(source) {
+    const endnAtoms = source.indexOf('\n');
+    const nAtoms = parseInt(source.substring(0, endnAtoms), 10);
+    const endComment = source.indexOf('\n', endnAtoms + 1);
+    const comment = source.slice(endnAtoms + 1, endComment);
 
-    const endAtomsNum = source.indexOf('\n');
-    const nAtoms = parseInt(source.substring(0, endAtomsNum), 10);
-    const endComment = source.indexOf('\n', endAtomsNum + 1);
-    const comment = source.slice(endAtomsNum + 1, endComment);
-
-    let lines = source.substring(endComment + 1).split(/[\s,]*\n[\s,]*/);
-    if (!Number.isNaN(nAtoms) && (lines.length - 1 !== nAtoms)) {
+    const startAtomsInf = endComment + source.substring(endComment).search(/\S/);
+    this._atomsInf = source.substring(startAtomsInf).split(/[\s,]*\n[\s,]*/);
+    if (!Number.isNaN(nAtoms) && (this._atomsInf.length - 1 !== nAtoms)) {
       this._complex.error = {
         message: 'wrong number of atoms'
       };
@@ -49,12 +45,20 @@ class XYZParser extends Parser {
 
     this._complex.metadata.format = 'xyz';
     this._complex.name = comment;
+  }
+
+  _parseAtomsInf() {
+    const het = true;
+    const altLoc = ' ';
+    const occupancy = 1;
+    const tempFactor = 1;
+    const charge = 0;
 
     const chain = this._complex.addChain(' ');
     const residue = chain.addResidue('LIG', 1, ' ');
 
-    for (let i = 0; i < lines.length - 1; i++) {
-      const words = lines[i].split(/[\s,]+/);
+    for (let i = 0; i < this._atomsInf.length - 1; i++) {
+      const words = this._atomsInf[i].split(/[\s,]+/);
 
       if (words.length !== 4) {
         this._complex.error = {
@@ -76,7 +80,8 @@ class XYZParser extends Parser {
   parseSync() {
     const result = this._complex = new Complex();
 
-    this._parse(this._data);
+    this._parseToAtomsInf(this._data);
+    this._parseAtomsInf();
 
     this._complex.finalize({
       needAutoBonding: true,
@@ -86,6 +91,7 @@ class XYZParser extends Parser {
     });
 
     this._complex = null;
+    this._atomsInf = null;
 
     if (result.error) {
       throw new Error(result.error.message);
