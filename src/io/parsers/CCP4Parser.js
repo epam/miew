@@ -55,17 +55,17 @@ class Ccp4Model extends VolumeModel {
     header.ispg = u32[idx++];
     header.nsymbt = u32[idx++];
     header.lksflg = u32[idx++];
-    header.customData = new Uint8Array(buffer, idx * 4, 96);
+    header.customData = new Uint8Array(_buffer, idx * 4, 96);
     idx += 24;
     header.origin.x = f32[idx++];
     header.origin.y = f32[idx++];
     header.origin.z = f32[idx++];
-    header.map = new Uint8Array(buffer, idx * 4, 4);
+    header.map = new Uint8Array(_buffer, idx * 4, 4);
     idx++;
     header.machine = u32[idx++];
     header.arms = f32[idx++];
     header.nlabel = u32[idx++];
-    header.label = new Uint8Array(buffer, idx * 4, 800);
+    header.label = new Uint8Array(_buffer, idx * 4, 800);
 
     // calculate non-orthogonal unit cell coordinates
     header.angles.multiplyScalar(Math.PI / 180.0);
@@ -162,6 +162,7 @@ class CCP4Parser extends Parser {
   constructor(data, options) {
     super(data, options);
     this._options.fileType = 'ccp4';
+    this.model = new Ccp4Model();
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -180,7 +181,7 @@ class CCP4Parser extends Parser {
   }
 
   parseSync() {
-    const ccp4 = new Ccp4Model();
+    const ccp4 = this.model;
     ccp4.parseHeader(this._data);
     ccp4.setOrigins();
     return new Volume(Float32Array, ccp4.getXYZdim(), ccp4.getXYZbox(), 1, ccp4.toXYZData());
@@ -188,7 +189,7 @@ class CCP4Parser extends Parser {
 }
 
 CCP4Parser.formats = ['ccp4'];
-CCP4Parser.extensions = ['.ccp4'];
+CCP4Parser.extensions = ['.ccp4', '.map', '.mrc'];
 CCP4Parser.binary = true;
 
 export default CCP4Parser;

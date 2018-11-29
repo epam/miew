@@ -8,11 +8,11 @@ class DSN6Model extends VolumeModel {
 
   parseHeader(_buffer) {
     if (_.isTypedArray(_buffer)) {
-      _buffer = buffer.buffer;
+      _buffer = _buffer.buffer;
     } else if (!_.isArrayBuffer(_buffer)) {
       throw new TypeError('Expected ArrayBuffer or TypedArray');
     }
-    const intBuff = new Uint16Array(_buffer);
+    const intBuff = new Int16Array(_buffer);
     this._buffer = _buffer;
 
     // check and reverse if big endian
@@ -59,11 +59,13 @@ class DSN6Model extends VolumeModel {
     header.div = intBuff[15] / 100;
     header.adder = intBuff[16];
   }
+
   _setAxisIndices() {
     this._xyz2crs[0] = 0;
     this._xyz2crs[1] = 1;
     this._xyz2crs[2] = 2;
   }
+
   setOrigins() {
     const header = this._header;
     let [xaxis, yaxis, zaxis] = this._getAxis();
@@ -122,10 +124,11 @@ class DSN6Parser extends Parser {
   constructor(data, options) {
     super(data, options);
     this._options.fileType = 'dsn6';
+    this.model = new DSN6Model();
   }
 
   parseSync() {
-    const dsn6 = new DSN6Model();
+    const dsn6 = this.model;
     dsn6.parseHeader(this._data);
     dsn6.setOrigins();
     return new Volume(Float32Array, dsn6.getXYZdim(), dsn6.getXYZbox(), 1, dsn6.toXYZData());
