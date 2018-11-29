@@ -19,7 +19,7 @@ varying vec3 vViewPosition;
   varying float alphaCol;
 #endif
 
-#ifdef SHADOWMAP
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	#if NUM_DIR_LIGHTS > 0
 		uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
@@ -208,7 +208,7 @@ void main() {
   vWorldPosition = worldPos.xyz;
   vViewPosition = - mvPosition.xyz;
 
-#ifdef SHADOWMAP
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	#if NUM_DIR_LIGHTS > 0
 	vec4 worldPosition;
 	#pragma unroll_loop

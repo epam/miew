@@ -6,7 +6,7 @@
   uniform mat4 world2colorMatrix;
 #endif
 
-#ifdef SHADOWMAP
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	#if NUM_DIR_LIGHTS > 0
 		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
@@ -270,6 +270,13 @@ varying vec3 vViewPosition;
       }
     #endif
 
+/*
+    #pragma unroll_loop
+    for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+      RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight);
+      RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
+    }*/
+
     return reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;
   }
 #endif
@@ -294,7 +301,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
   return dot( v, UnpackFactors );
 }
 
-#ifdef SHADOWMAP
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
 		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
 	}
@@ -562,7 +569,7 @@ void main() {
       gl_FragColor = vec4(outgoingLight, diffuseColor.a);
     #endif
 
-    #ifdef SHADOWMAP
+    #if defined(USE_LIGHTS) && defined(SHADOWMAP)
         //gl_FragColor.rgb *= getShadowMask().rgb;
         gl_FragColor.a *= getShadowMask();
     #endif
