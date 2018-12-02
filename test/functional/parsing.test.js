@@ -210,9 +210,9 @@ describe('Model Volume data', () => {
               lookFor('_header.angles.y', entry.angles.y, entry.angles.precision);
               lookFor('_header.angles.z', entry.angles.z, entry.angles.precision);
 
-              lookFor('_header.gridX', entry.grid.x);
-              lookFor('_header.gridY', entry.grid.y);
-              lookFor('_header.gridZ', entry.grid.z);
+              lookFor('_header.grid[0]', entry.grid.x);
+              lookFor('_header.grid[1]', entry.grid.y);
+              lookFor('_header.grid[2]', entry.grid.z);
 
             });
         });

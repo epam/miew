@@ -1,16 +1,47 @@
 import * as THREE from 'three';
 import Volume from '../../chem/Volume';
+import _ from 'lodash';
 
 class VolumeModel {
+  _xyz2crs = [];
+
+  _origin = new THREE.Vector3(0, 0, 0);
+
   constructor() {
     this._header = {};
-    this._xyz2crs = [];
     this._bboxSize = new THREE.Vector3();
-    this._origin = new THREE.Vector3(0, 0, 0);
+    this._header.extent = [];
+    this._header.nstart = [];
+    this._header.grid = [];
+    this._header.crs2xyz = [];
+    this._header.cellDims = new THREE.Vector3();
+    this._header.angles = new THREE.Vector3();
+    this._header.origin = new THREE.Vector3(0, 0, 0);
+    this._header.dmin = 0;
+    this._header.dmean = 0;
+    this._header.dmax = 0;
+  }
+
+  _typedCheck() {
+    if (_.isTypedArray(this._buff)) {
+      this._buff = this._buff.buffer;
+    } else if (!_.isArrayBuffer(this._buff)) {
+      throw new TypeError('Expected ArrayBuffer or TypedArray');
+    }
   }
 
   _parseVector(vector, arr, idx) {
-    [vector.x, vector.y, vector.z] = [arr[idx.counter++], arr[idx.counter++], arr[idx.counter++]];
+    if (vector === undefined) {
+      return [arr[idx.counter++], arr[idx.counter++], arr[idx.counter++]];
+    }
+    if (Array.isArray(vector)) {
+      vector[0] = arr[idx.counter++];
+      vector[1] = arr[idx.counter++];
+      vector[2] = arr[idx.counter++];
+    } else {
+      [vector.x, vector.y, vector.z] = [arr[idx.counter++], arr[idx.counter++], arr[idx.counter++]];
+    }
+    return 0;
   }
 
   _parseHeader(_buffer) {}
@@ -22,9 +53,9 @@ class VolumeModel {
   _getAxis() {
     const header = this._header;
 
-    const xScale = header.cellDims.x / header.gridX;
-    const yScale = header.cellDims.y / header.gridY;
-    const zScale = header.cellDims.z / header.gridZ;
+    const xScale = header.cellDims.x / header.grid[0];
+    const yScale = header.cellDims.y / header.grid[1];
+    const zScale = header.cellDims.z / header.grid[2];
 
     const z1 = Math.cos(header.angles.y);
     const z2 = (Math.cos(header.angles.x) - Math.cos(header.angles.y) *

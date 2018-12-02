@@ -1,64 +1,47 @@
-import _ from 'lodash';
 import Parser from './Parser';
 import * as THREE from 'three';
 import VolumeModel from './VolumeModel';
 
+
 class Ccp4Model extends VolumeModel {
-  counter;
 
+  // read header (http://www.ccp4.ac.uk/html/maplib.html)
   _parseHeader(_buffer) {
-    if (_.isTypedArray(_buffer)) {
-      _buffer = _buffer.buffer;
-    } else if (!_.isArrayBuffer(_buffer)) {
-      throw new TypeError('Expected ArrayBuffer or TypedArray');
-    }
-
-    this._buffer = _buffer;
-    let u32 = new Uint32Array(_buffer);
-    let i32 = new Int32Array(_buffer);
-    let f32 = new Float32Array(_buffer);
-
+    this._buff = _buffer;
+    this._typedCheck();
+    let [u32, i32, f32]  = [new Uint32Array(this._buff), new Int32Array(this._buff), new Float32Array(this._buff)];
     const header = this._header;
-    header.extent = [];
-    header.nstart = [];
-    header.crs2xyz = [];
-    header.cellDims = new THREE.Vector3();
-    header.angles = new THREE.Vector3();
-    header.origin = new THREE.Vector3();
 
-    // read header (http://www.ccp4.ac.uk/html/maplib.html)
     let idx = {};
     idx.counter = 0;
-    header.extent.push(u32[idx.counter++], u32[idx.counter++], u32[idx.counter++]);
+    this._parseVector(header.extent, u32, idx);
     header.type = u32[idx.counter++];
-    header.nstart.push(i32[idx.counter++], i32[idx.counter++], i32[idx.counter++]);
-    [header.gridX, header.gridY, header.gridZ] = [u32[idx.counter++], u32[idx.counter++], u32[idx.counter++]];
+    this._parseVector(header.nstart, i32, idx);
+    this._parseVector(header.grid, u32, idx);
     this._parseVector(header.cellDims, f32, idx);
     this._parseVector(header.angles, f32, idx);
-    header.crs2xyz.push(i32[idx.counter++], i32[idx.counter++], i32[idx.counter++]);
-    [header.dmin, header.dmax, header.dmean] = [f32[idx.counter++], f32[idx.counter++], f32[idx.counter++]];
-    header.ispg = u32[idx.counter++];
-    header.nsymbt = u32[idx.counter++];
-    header.lksflg = u32[idx.counter++];
-    header.customData = new Uint8Array(_buffer, idx.counter * 4, 96);
+    this._parseVector(header.crs2xyz, i32, idx);
+    [header.dmin, header.dmax, header.dmean] = this._parseVector(undefined, f32, idx);
+    [header.ispg, header.nsymbt, header.lksflg] = this._parseVector(undefined, u32, idx);
+    header.customData = new Uint8Array(this._buff, idx.counter * 4, 96);
     idx.counter += 24;
     this._parseVector(header.origin, f32, idx);
-    header.map = new Uint8Array(_buffer, idx.counter * 4, 4);
+    header.map = new Uint8Array(this._buff, idx.counter * 4, 4);
     idx.counter++;
     header.machine = u32[idx.counter++];
     header.arms = f32[idx.counter++];
     header.nlabel = u32[idx.counter++];
-    header.label = new Uint8Array(_buffer, idx.counter * 4, 800);
-
+    header.label = new Uint8Array(this._buff, idx.counter * 4, 800);
     // calculate non-orthogonal unit cell coordinates
     header.angles.multiplyScalar(Math.PI / 180.0);
+  }
+
+  _setAxisIndices() {
+    const header = this._header;
 
     if (header.cellDims.x === 0.0 && header.cellDims.y === 0.0 && header.cellDims.z === 0.0) {
       header.cellDims.set(1.0, 1.0, 1.0);
     }
-  }
-
-  _setAxisIndices() {
     // Apply header conversion
     // Mapping between CCP4 column, row, section and VMD x, y, z.
     const crs2xyz = this._header.crs2xyz;
@@ -98,7 +81,7 @@ class Ccp4Model extends VolumeModel {
 
     if (header.type === 2) {
       this._data = new Float32Array(
-        this._buffer,
+        this._buff,
         1024 + header.nsymbt,
         header.extent[0] * header.extent[1] * header.extent[2]
       );
