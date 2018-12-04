@@ -62,24 +62,32 @@ class DSN6Model extends VolumeModel {
     this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
   }
 
-  _blockCalculate(xyzData, byteBuffer, zBlock, yBlock, xBlock, pos) {
+  _pointCalculate(xyzData, byteBuffer, z, y, x, pos, i) {
     const header = this._header;
+
+    if (x < header.extent[0] && y < header.extent[1] && z < header.extent[2]) {
+      let idx = x + header.extent[0] * (y + header.extent[1] * z);
+      xyzData[idx] = (byteBuffer[pos.counter] - header.adder) / header.div;
+      ++pos.counter;
+    } else {
+      pos.counter += 8 - i;
+      return false;
+    }
+    return true;
+  }
+
+  _blockCalculate(xyzData, byteBuffer, zBlock, yBlock, xBlock, pos) {
 
     for (let k = 0; k < 8; ++k) {
       const z = 8 * zBlock + k;
       for (let j = 0; j < 8; ++j) {
         const y = 8 * yBlock + j;
-        for (let i = 0; i < 8; ++i) {
+        let inRange = true;
+        let i = 0;
+        while (inRange && i < 8) {
           const x = 8 * xBlock + i;
-
-          if (x < header.extent[0] && y < header.extent[1] && z < header.extent[2]) {
-            let idx = x + header.extent[0] * (y + header.extent[1] * z);
-            xyzData[idx] = (byteBuffer[pos.counter] - header.adder) / header.div;
-            ++pos.counter;
-          } else {
-            pos.counter += 8 - i;
-            break;
-          }
+          inRange = this._pointCalculate(xyzData, byteBuffer, z, y, x, pos, i);
+          i++;
         }
       }
     }
