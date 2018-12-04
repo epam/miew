@@ -1,19 +1,13 @@
 import Parser from './Parser';
 import * as THREE from 'three';
-import Volume from '../../chem/Volume';
+import VolumeModel from './VolumeModel';
 
-class DSN6Parser extends Parser {
-  constructor(data, options) {
-    super(data, options);
-    this._options.fileType = 'dsn6';
-    this._header = {};
-    this._header.start = new THREE.Vector3();
-    this._header.extent = new THREE.Vector3();
-    this._header.rate = new THREE.Vector3();
-  }
+class DSN6Model extends VolumeModel {
 
-  parseHeader() {
-    const intBuff = new Uint16Array(this._data);
+  _parseHeader(_buffer) {
+    this._buff = _buffer;
+    this._typedCheck();
+    const intBuff = new Int16Array(this._buff);
 
     // check and reverse if big endian
     if (intBuff[18] !== 100) {
@@ -26,111 +20,101 @@ class DSN6Parser extends Parser {
       throw new Error('DSN6: Incorrect format ');
     }
 
-    this._header.scaleFactor = intBuff[17];
+    const header = this._header;
 
-    this._header.start.x =  intBuff[0];
-    this._header.start.y =  intBuff[1];
-    this._header.start.z =  intBuff[2];
+    let idx = {};
+    idx.counter = 0;
 
-    this._header.extent.x = intBuff[3];
-    this._header.extent.y = intBuff[4];
-    this._header.extent.z = intBuff[5];
+    header.scaleFactor = 1.0 / intBuff[17];
 
-    // edges in angstroms
-    this._header.edgeA = intBuff[9] / intBuff[6] / this._header.scaleFactor;
-    this._header.edgeB = intBuff[10] / intBuff[7] / this._header.scaleFactor;
-    this._header.edgeC = intBuff[11] /  intBuff[8] / this._header.scaleFactor;
-
+    this._parseVector(header.nstart, intBuff, idx);
+    this._parseVector(header.extent, intBuff, idx);
+    this._parseVector(header.grid, intBuff, idx);
+    this._parseVector(header.cellDims, intBuff, idx);
+    header.cellDims.multiplyScalar(header.scaleFactor);
+    this._parseVector(header.angles, intBuff, idx);
     // angles in radians
-    this._header.alpha = intBuff[12] * Math.PI / 180.0 / this._header.scaleFactor;
-    this._header.beta = intBuff[13] * Math.PI / 180.0 / this._header.scaleFactor;
-    this._header.gamma = intBuff[14] * Math.PI / 180.0 / this._header.scaleFactor;
+    header.angles.multiplyScalar(Math.PI / 180.0 * header.scaleFactor);
 
-    this._header._16 = intBuff[15] / 100;
-    this._header._17 = intBuff[16];
+    header.div = intBuff[15] / 100;
+    header.adder = intBuff[16];
   }
 
-  setOrigins() {
+  _setAxisIndices() {
+    this._xyz2crs[0] = 0;
+    this._xyz2crs[1] = 1;
+    this._xyz2crs[2] = 2;
+  }
+
+  _setOrigins() {
     const header = this._header;
-    const z1 = Math.cos(header.beta);
-    const z2 = (Math.cos(header.alpha) - Math.cos(header.beta) *
-      Math.cos(header.gamma)) / Math.sin(header.gamma);
-    const z3 = Math.sqrt(1.0 - z1 * z1 - z2 * z2);
-    let xaxis = new THREE.Vector3(header.edgeA, 0, 0);
-    let yaxis = new THREE.Vector3(Math.cos(header.beta) * header.edgeB, Math.sin(header.beta) * header.edgeB, 0);
-    let zaxis = new THREE.Vector3(z1 * header.edgeC, z2 * header.edgeC, z3 * header.edgeC);
+    let [xaxis, yaxis, zaxis] = this._getAxis();
+    this._setAxisIndices();
 
-    this._origin = new THREE.Vector3(0, 0, 0);
-    this._origin.addScaledVector(xaxis, header.start.x);
-    this._origin.addScaledVector(yaxis, header.start.y);
-    this._origin.addScaledVector(zaxis, header.start.z);
+    this._origin.addScaledVector(xaxis, header.nstart[0]);
+    this._origin.addScaledVector(yaxis, header.nstart[1]);
+    this._origin.addScaledVector(zaxis, header.nstart[2]);
 
-    xaxis.multiplyScalar(header.extent.x);
-    yaxis.multiplyScalar(header.extent.y);
-    zaxis.multiplyScalar(header.extent.z);
+    xaxis.multiplyScalar(header.extent[0]);
+    yaxis.multiplyScalar(header.extent[1]);
+    zaxis.multiplyScalar(header.extent[2]);
 
     this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
   }
 
-  getXYZbox() {
-    return new THREE.Box3(this._origin.clone(), this._origin.clone().add(this._bboxSize));
-  }
-
-  getVolumeInfo() {
+  _pointCalculate(xyzData, byteBuffer, z, y, x, pos, i) {
     const header = this._header;
-    let volumeInfo = {};
-    volumeInfo.dmean = header.dmean;
-    volumeInfo.dmin = header.dmin;
-    volumeInfo.dmax = header.dmax;
-    volumeInfo.sd = header.sd;
-    return volumeInfo;
+
+    if (x < header.extent[0] && y < header.extent[1] && z < header.extent[2]) {
+      let idx = x + header.extent[0] * (y + header.extent[1] * z);
+      xyzData[idx] = (byteBuffer[pos.counter] - header.adder) / header.div;
+      ++pos.counter;
+    } else {
+      pos.counter += 8 - i;
+      return false;
+    }
+    return true;
   }
 
-  getXYZdim() {
-    return [this._header.extent.x,
-      this._header.extent.y,
-      this._header.extent.z];
+  _blockCalculate(xyzData, byteBuffer, zBlock, yBlock, xBlock, pos) {
+    for (let k = 0; k < 8; ++k) {
+      const z = 8 * zBlock + k;
+      for (let j = 0; j < 8; ++j) {
+        const y = 8 * yBlock + j;
+        let inRange = true;
+        let i = 0;
+        while (inRange && i < 8) {
+          const x = 8 * xBlock + i;
+          inRange = this._pointCalculate(xyzData, byteBuffer, z, y, x, pos, i);
+          i++;
+        }
+      }
+    }
   }
 
-  toXYZData() {
+  _toXYZData() {
     const header = this._header;
-    const byteBuffer = new Uint8Array(this._data);
-    const xyzData = new Float32Array(header.extent.x * header.extent.y * header.extent.z);
+    const byteBuffer = new Uint8Array(this._buff);
+    const xyzData = new Float32Array(header.extent[0] * header.extent[1] * header.extent[2]);
 
-    const blocks = new THREE.Vector3(header.extent.x / 8, header.extent.y / 8, header.extent.z / 8);
+    const blocks = new THREE.Vector3(header.extent[0] / 8, header.extent[1] / 8, header.extent[2] / 8);
 
-    let mean = 0;
-    let pos = 512;
+    let pos = {};
+    pos.counter = 512;
 
     for (let zBlock = 0; zBlock < blocks.z; ++zBlock) {
       for (let yBlock = 0; yBlock < blocks.y; ++yBlock) {
         for (let xBlock = 0; xBlock < blocks.x; ++xBlock) {
-          for (let k = 0; k < 8; ++k) {
-            const z = 8 * zBlock + k;
-            for (let j = 0; j < 8; ++j) {
-              const y = 8 * yBlock + j;
-              for (let i = 0; i < 8; ++i) {
-                const x = 8 * xBlock + i;
-
-                // check if remaining slice-part contains data
-                if (x < header.extent.x && y < header.extent.y && z < header.extent.z) {
-                  let idx = (x * header.extent.y + y) * header.extent.z + z;
-                  xyzData[idx] = (byteBuffer[pos] - header._17) / header._16;
-                  ++pos;
-                  mean += xyzData[idx];
-
-                } else {
-                  pos += 8 - i;
-                  break;
-                }
-              }
-            }
-          }
+          this._blockCalculate(xyzData, byteBuffer,  zBlock, yBlock, xBlock, pos);
         }
       }
     }
+    this._calculateInfoParams(xyzData);
+    return xyzData;
+  }
 
-    this._header.dmean = mean / xyzData.length;
+  _calculateInfoParams(xyzData) {
+    this._header.dmean /=  xyzData.length;
     let dispersion = 0;
     let minDensity = xyzData[0];
     let maxDensity = xyzData[0];
@@ -147,21 +131,15 @@ class DSN6Parser extends Parser {
     this._header.sd = Math.sqrt(dispersion / xyzData.length);
     this._header.dmax = maxDensity;
     this._header.dmin = minDensity;
-
-    return xyzData;
   }
 
-  parseSync() {
-    this.parseHeader();
-    this.setOrigins();
-    return new Volume(
-      Float32Array,
-      this.getXYZdim(),
-      this.getXYZbox(),
-      1,
-      this.toXYZData(),
-      this.getVolumeInfo()
-    );
+}
+
+class DSN6Parser extends Parser {
+  constructor(data, options) {
+    super(data, options);
+    this._options.fileType = 'dsn6';
+    this.model = new DSN6Model();
   }
 
   static canParse(data, options) {
@@ -171,8 +149,12 @@ class DSN6Parser extends Parser {
     return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'dsn6');
   }
 
-  canProbablyParse(_data) {
+  static canProbablyParse(_data) {
     return false;
+  }
+
+  parseSync() {
+    return this.model.parse(this._data);
   }
 }
 

@@ -1,9 +1,5 @@
-
-
-//////////////////////////////////////////////////////////////////////////////
 import * as THREE from 'three';
 import utils from '../utils';
-//////////////////////////////////////////////////////////////////////////////
 
 /**
  * Calculate min & max radius of a sphere slice between zMin & zMax
@@ -69,102 +65,108 @@ function _getCircleSliceRadiusRange(center, radius, yMin, yMax) {
  * @param {Box3} box - bounding box of the volume to be partitioned
  * @param {Vector3} vCellSizeHint - target voxel size (actual voxel size may differ from this)
  */
-function VoxelWorld(box, vCellSizeHint) {
-  var i;
+class VoxelWorld {
+  constructor(box, vCellSizeHint) {
+    this._box = box.clone();
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    this._count = size.clone().divide(vCellSizeHint).floor().max(new THREE.Vector3(1, 1, 1));
+    this._last = this._count.clone().subScalar(1);
+    this._cellSize = size.clone().divide(this._count);
+    this._cellInnerR = 0.5 * Math.min(Math.min(this._cellSize.x, this._cellSize.y), this._cellSize.z);
+    this._cellOuterR = 0.5 * Math.sqrt(this._cellSize.dot(this._cellSize));
 
-  this._box = box.clone();
-  const size = new THREE.Vector3();
-  box.getSize(size);
-  this._count = size.clone().divide(vCellSizeHint).floor();
-  this._last = this._count.clone().subScalar(1);
-  this._cellSize = size.clone().divide(this._count);
-  this._cellInnerR = 0.5 * Math.min(Math.min(this._cellSize.x, this._cellSize.y), this._cellSize.z);
-  this._cellOuterR = 0.5 * Math.sqrt(this._cellSize.dot(this._cellSize));
+    // array of voxels, each element contains index of first atom in voxel
+    const numVoxels = this._count.x * this._count.y * this._count.z;
+    this._voxels = utils.allocateTyped(Int32Array, numVoxels);
+    for (let i = 0; i < numVoxels; ++i) {
+      this._voxels[i] = -1;
+    }
 
-  // array of voxels, each element contains index of first atom in voxel
-  var numVoxels = this._count.x * this._count.y * this._count.z;
-  this._voxels = utils.allocateTyped(Int32Array, numVoxels);
-  for (i = 0; i < numVoxels; ++i) {
-    this._voxels[i] = -1;
+    // array of atoms that stores multiple single-linked lists
+    // two elements for each atom: Atom ref, index of next atom (in this array
+    this._atoms = [];
   }
 
-  // array of atoms that stores multiple single-linked lists
-  // two elements for each atom: Atom ref, index of next atom (in this array
-  this._atoms = [];
-}
+  /**
+   * Add all atoms from a complex to voxel world
+   *
+   * @param {Complex} complex - complex
+   */
+  addAtoms(complex) {
+    const self = this;
 
-/**
- * Add all atoms from a complex to voxel world
- *
- * @param {Complex} complex - complex
- */
-VoxelWorld.prototype.addAtoms = function(complex) {
-  var self = this;
+    let idx = this._atoms.length;
 
-  var idx = this._atoms.length;
+    // resize array of atoms
+    this._atoms.length = this._atoms.length + 2 * complex.getAtomCount();
 
-  // resize array of atoms
-  this._atoms.length = this._atoms.length + 2 * complex.getAtomCount();
+    complex.forEachAtom(function(atom) {
+      // find which voxel contains this atom
+      const voxelIdx = self._findVoxel(atom._position);
 
-  complex.forEachAtom(function(atom) {
-    // find which voxel contains this atom
-    var voxelIdx = self._findVoxel(atom._position);
+      // push current atom to the head of voxel's atom list
+      self._atoms[idx] = atom;
+      self._atoms[idx + 1] = self._voxels[voxelIdx];
+      self._voxels[voxelIdx] = idx;
 
-    // push current atom to the head of voxel's atom list
-    self._atoms[idx] = atom;
-    self._atoms[idx + 1] = self._voxels[voxelIdx];
-    self._voxels[voxelIdx] = idx;
+      idx += 2;
+    });
+  }
 
-    idx += 2;
-  });
-};
+  /**
+   * Get voxel that contains specified 3D point (we use clamp at the edges)
+   *
+   * @param {Vector3} point - a point in 3D
+   * @returns {number} - index of voxel
+   */
+  static _zero = new THREE.Vector3(0, 0, 0);
 
-/**
- * Get voxel that contains specified 3D point (we use clamp at the edges)
- *
- * @param {Vector3} point - a point in 3D
- * @returns {number} - index of voxel
- */
-VoxelWorld.prototype._findVoxel = (function() {
-  var zero = new THREE.Vector3(0, 0, 0);
-  var voxel = new THREE.Vector3();
+  static _voxel = new THREE.Vector3();
 
-  return function(point) {
+  _findVoxel(point) {
+    const zero = VoxelWorld._zero;
+    const voxel = VoxelWorld._voxel;
     voxel.copy(point)
       .sub(this._box.min)
       .divide(this._cellSize)
       .floor()
       .clamp(zero, this._last);
     return voxel.x + this._count.x * (voxel.y + this._count.y * voxel.z);
-  };
-})();
-
-/**
- * Call a function for each atom in voxel
- *
- * @param {number} voxel - index of voxel
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype._forEachAtomInVoxel = function(voxel, process) {
-  for (var i = this._voxels[voxel]; i >= 0; i = this._atoms[i + 1]) {
-    process(this._atoms[i]);
   }
-};
 
-/**
- * Call a function for each voxel that is touched by given sphere. Callback also takes flag
- * isInside specifying whether voxel lies inside the sphere entirely.
- *
- * @param {Vector3} center - center of the sphere
- * @param {number} radius  - sphere radius
- * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
- */
-VoxelWorld.prototype._forEachVoxelWithinRadius = (function() {
-  let xRange = new THREE.Vector2();
-  let yRange = new THREE.Vector2();
-  let zRange = new THREE.Vector2();
+  /**
+   * Call a function for each atom in voxel
+   *
+   * @param {number} voxel - index of voxel
+   * @param {function(Atom)} process - function to call
+   */
+  _forEachAtomInVoxel(voxel, process) {
+    for (let i = this._voxels[voxel]; i >= 0; i = this._atoms[i + 1]) {
+      process(this._atoms[i]);
+    }
+  }
 
-  return function(center, radius, process) {
+  /**
+   * Call a function for each voxel that is touched by given sphere. Callback also takes flag
+   * isInside specifying whether voxel lies inside the sphere entirely.
+   *
+   * @param {Vector3} center - center of the sphere
+   * @param {number} radius  - sphere radius
+   * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
+   */
+
+  static _xRange = new THREE.Vector2();
+
+  static _yRange = new THREE.Vector2();
+
+  static _zRange = new THREE.Vector2();
+
+  _forEachVoxelWithinRadius(center, radius, process) {
+    let xRange = VoxelWorld._xRange;
+    let yRange = VoxelWorld._yRange;
+    let zRange = VoxelWorld._zRange;
+
     // switch to a faster method unless cell size is much smaller than sphere radius
     if (radius / this._cellInnerR < 10) {
       this._forEachVoxelWithinRadiusSimple(center, radius, process);
@@ -216,27 +218,28 @@ VoxelWorld.prototype._forEachVoxelWithinRadius = (function() {
         }
       }
     }
-  };
-}());
+  }
 
-/**
- * Call a function for each voxel that is touched by given sphere. Callback also takes flag
- * isInside specifying whether voxel lies inside the sphere entirely.
- * This is a version of method that doesn't try to "calculate" what voxels fall inside radius
- * but instead just checks all voxels inside sphere's bounding box. This should be faster
- * unless cell size is much smaller than sphere radius.
- *
- * @param {Vector3} center - center of the sphere
- * @param {number} radius  - sphere radius
- * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
- */
-VoxelWorld.prototype._forEachVoxelWithinRadiusSimple = (function() {
-  let xRange = new THREE.Vector2();
-  let yRange = new THREE.Vector2();
-  let zRange = new THREE.Vector2();
-  let vCenter = new THREE.Vector3();
+  /**
+   * Call a function for each voxel that is touched by given sphere. Callback also takes flag
+   * isInside specifying whether voxel lies inside the sphere entirely.
+   * This is a version of method that doesn't try to "calculate" what voxels fall inside radius
+   * but instead just checks all voxels inside sphere's bounding box. This should be faster
+   * unless cell size is much smaller than sphere radius.
+   *
+   * @param {Vector3} center - center of the sphere
+   * @param {number} radius  - sphere radius
+   * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
+   */
 
-  return function(center, radius, process) {
+  static _vCenter = new THREE.Vector3();
+
+  _forEachVoxelWithinRadiusSimple(center, radius, process) {
+    let xRange = VoxelWorld._xRange;
+    let yRange = VoxelWorld._yRange;
+    let zRange = VoxelWorld._zRange;
+    let vCenter = VoxelWorld._vCenter;
+
     let distTouch2 = (radius + this._cellOuterR) * (radius + this._cellOuterR);
     let distInside2 = -1.0;
     if (radius > this._cellOuterR) {
@@ -287,136 +290,136 @@ VoxelWorld.prototype._forEachVoxelWithinRadiusSimple = (function() {
         }
       }
     }
-  };
-}());
+  }
 
-/**
- * Call a function for each atom within given sphere
- *
- * @param {Vector3} center - center of the sphere
- * @param {number} radius  - sphere radius
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype.forEachAtomWithinRadius = function(center, radius, process) {
-  var self = this;
-  var r2 = radius * radius;
+  /**
+   * Call a function for each atom within given sphere
+   *
+   * @param {Vector3} center - center of the sphere
+   * @param {number} radius  - sphere radius
+   * @param {function(Atom)} process - function to call
+   */
+  forEachAtomWithinRadius(center, radius, process) {
+    const self = this;
+    const r2 = radius * radius;
 
-  self._forEachVoxelWithinRadius(center, radius, function(voxel, isInside) {
-    if (isInside) {
-      self._forEachAtomInVoxel(voxel, process);
-    } else {
-      self._forEachAtomInVoxel(voxel, function(atom) {
-        if (center.distanceToSquared(atom._position) <= r2) {
-          process(atom);
+    self._forEachVoxelWithinRadius(center, radius, function(voxel, isInside) {
+      if (isInside) {
+        self._forEachAtomInVoxel(voxel, process);
+      } else {
+        self._forEachAtomInVoxel(voxel, function(atom) {
+          if (center.distanceToSquared(atom._position) <= r2) {
+            process(atom);
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Call a function for each atom of given complex within given distance from group of atoms defined by mask
+   *
+   * @param {Complex} complex - complex
+   * @param {number} mask - bit mask
+   * @param {number} dist - distance
+   * @param {function(Atom)} process - function to call
+   */
+  forEachAtomWithinDistFromMasked(complex, mask, dist, process) {
+    this._forEachAtomWithinDistFromGroup(function(atomProc) {
+      complex.forEachAtom(function(atom) {
+        if ((atom._mask & mask) !== 0) {
+          atomProc(atom);
         }
       });
-    }
-  });
-};
+    }, dist, process);
+  }
 
-/**
- * Call a function for each atom of given complex within given distance from group of atoms defined by mask
- *
- * @param {Complex} complex - complex
- * @param {number} mask - bit mask
- * @param {number} dist - distance
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype.forEachAtomWithinDistFromMasked = function(complex, mask, dist, process) {
-  this._forEachAtomWithinDistFromGroup(function(atomProc) {
-    complex.forEachAtom(function(atom) {
-      if ((atom._mask & mask) !== 0) {
-        atomProc(atom);
-      }
+  /**
+   * Call a function for each atom of given complex within given distance from group of atoms defined by selector
+   *
+   * @param {Complex} complex - complex
+   * @param {number} selector - selector
+   * @param {number} dist - distance
+   * @param {function(Atom)} process - function to call
+   */
+  forEachAtomWithinDistFromSelected(complex, selector, dist, process) {
+    this._forEachAtomWithinDistFromGroup(function(atomProc) {
+      complex.forEachAtom(function(atom) {
+        if (selector.includesAtom(atom)) {
+          atomProc(atom);
+        }
+      });
+    }, dist, process);
+  }
+
+  /**
+   * Call a function for each atom of given complex within given distance from group of atoms
+   *
+   * @param {function} forEachAtom - enumerator of atoms in the group
+   * @param {number} dist - distance
+   * @param {function(Atom)} process - function to call
+   */
+  _forEachAtomWithinDistFromGroup(forEachAtom, dist, process) {
+    const self = this;
+    const r2 = dist * dist;
+
+    const voxels = [];
+    const atoms = [];
+    let idx = 0;
+
+    // build "within radius" atom list for each voxel
+    forEachAtom(function(atom) {
+      self._forEachVoxelWithinRadius(atom._position, dist, function(voxel, isInside) {
+        if (isInside) {
+          // this voxel is inside circle -- no check will be required
+          voxels[voxel] = -1;
+        } else if (typeof voxels[voxel] === 'undefined') {
+          // this voxel isn't covered yet -- start building list of atoms
+          atoms.push(atom);
+          atoms.push(-1);
+          voxels[voxel] = idx;
+          idx += 2;
+        } else if (voxels[voxel] !== -1) {
+          // this voxel has a list of atoms required for distance check -- add atom to the list
+          atoms.push(atom);
+          atoms.push(voxels[voxel]);
+          voxels[voxel] = idx;
+          idx += 2;
+        }
+      });
     });
-  }, dist, process);
-};
 
-/**
- * Call a function for each atom of given complex within given distance from group of atoms defined by selector
- *
- * @param {Complex} complex - complex
- * @param {number} selector - selector
- * @param {number} dist - distance
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype.forEachAtomWithinDistFromSelected = function(complex, selector, dist, process) {
-  this._forEachAtomWithinDistFromGroup(function(atomProc) {
-    complex.forEachAtom(function(atom) {
-      if (selector.includesAtom(atom)) {
-        atomProc(atom);
+    let voxel;
+
+    const processIfWithin = function(atom) {
+      if (typeof voxels[voxel] === 'undefined') {
+        return;
       }
-    });
-  }, dist, process);
-};
 
-/**
- * Call a function for each atom of given complex within given distance from group of atoms
- *
- * @param {function} forEachAtom - enumerator of atoms in the group
- * @param {number} dist - distance
- * @param {function(Atom)} process - function to call
- */
-VoxelWorld.prototype._forEachAtomWithinDistFromGroup = function(forEachAtom, dist, process) {
-  var self = this;
-  var r2 = dist * dist;
-
-  var voxels = [];
-  var atoms = [];
-  var idx = 0;
-
-  // build "within radius" atom list for each voxel
-  forEachAtom(function(atom) {
-    self._forEachVoxelWithinRadius(atom._position, dist, function(voxel, isInside) {
-      if (isInside) {
-        // this voxel is inside circle -- no check will be required
-        voxels[voxel] = -1;
-      } else if (typeof voxels[voxel] === 'undefined') {
-        // this voxel isn't covered yet -- start building list of atoms
-        atoms.push(atom);
-        atoms.push(-1);
-        voxels[voxel] = idx;
-        idx += 2;
-      } else if (voxels[voxel] !== -1) {
-        // this voxel has a list of atoms required for distance check -- add atom to the list
-        atoms.push(atom);
-        atoms.push(voxels[voxel]);
-        voxels[voxel] = idx;
-        idx += 2;
-      }
-    });
-  });
-
-  var voxel;
-
-  var processIfWithin = function(atom) {
-    if (typeof voxels[voxel] === 'undefined') {
-      return;
-    }
-
-    idx = voxels[voxel];
-    if (idx === -1) {
-      // this voxel is fully covered
-      process(atom);
-      return;
-    }
-
-    // check distance to each atom within radius from this voxel
-    for (; idx >= 0; idx = atoms[idx + 1]) {
-      if (atom._position.distanceToSquared(atoms[idx]._position) < r2) {
+      idx = voxels[voxel];
+      if (idx === -1) {
+        // this voxel is fully covered
         process(atom);
-        break;
+        return;
       }
-    }
-  };
+
+      // check distance to each atom within radius from this voxel
+      for (; idx >= 0; idx = atoms[idx + 1]) {
+        if (atom._position.distanceToSquared(atoms[idx]._position) < r2) {
+          process(atom);
+          break;
+        }
+      }
+    };
 
     // for each marked voxel
-  for (voxel in voxels) {
-    if (voxels.hasOwnProperty(voxel)) {
-      self._forEachAtomInVoxel(voxel, processIfWithin);
+    for (voxel in voxels) {
+      if (voxels.hasOwnProperty(voxel)) {
+        self._forEachAtomInVoxel(voxel, processIfWithin);
+      }
     }
   }
-};
+}
 
 export default VoxelWorld;
 
