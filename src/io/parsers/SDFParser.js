@@ -51,8 +51,8 @@ export default class SDFParser extends Parser {
   _parseHeader(stream) {
     const molecule = {};
     molecule.name = stream.getStringFromStart(0);
-    const date = parseInt(stream.getStringFromStart(1).substr(10, 6).trim(), 10)
-    molecule.date = date.toString()|| '';
+    const date = parseInt(stream.getStringFromStart(1).substr(10, 6).trim(), 10);
+    molecule.date = date.toString() ||  '';
     molecule.title = stream.getStringFromStart(2);
     this._metadata.molecules.push(molecule);
   }
