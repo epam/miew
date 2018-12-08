@@ -3,6 +3,7 @@ import chem from '../../chem';
 import * as THREE from 'three';
 import SDFStream from './SDFStream';
 import Assembly from '../../chem/Assembly';
+import ResidueType from '../../chem/ResidueType';
 
 const
   Complex = chem.Complex,
@@ -40,6 +41,7 @@ export default class SDFParser extends Parser {
     this._compoundIndx = -1;
     this._assemblies = [];
     this._atomsParsed = 0;
+    this._atomsIndexes = [];
   }
 
   canProbablyParse(data) {
@@ -49,26 +51,27 @@ export default class SDFParser extends Parser {
   _parseHeader(stream) {
     const molecule = {};
     molecule.name = stream.getStringFromStart(0);
-    molecule.date = parseInt(stream.getStringFromStart(1).substr(10, 6).trim(), 10) || '';
+    const date = parseInt(stream.getStringFromStart(1).substr(10, 6).trim(), 10)
+    molecule.date = date.toString()|| '';
     molecule.title = stream.getStringFromStart(2);
     this._metadata.molecules.push(molecule);
   }
 
   _parseAtoms(stream, atomsNum) {
-    let curStr, Serial = this._atomsParsed;
+    let curStr, serial = this._atomsParsed;
 
     //hack for chains and resudies names. each molecule = chain\residie. sdf files contains only
     //molecules and no chains and residues;
     const chainID = 'C' + this._compoundIndx;
-    const resName = 'R' + this._compoundIndx;
-    const resSeq = resName; //that hack, again
+    const resName = ResidueType.StandardTypes.UNK;
+    const resSeq = 1;
 
     this._chain = this._complex.getChain(chainID) || this._complex.addChain(chainID);
-    this._residue = this._chain.addResidue(resName, resSeq, '');
+    this._residue = this._chain.addResidue(resName, resSeq, ' ');
 
     for (let i = 0; i < atomsNum; i++) {
       curStr = stream.getNextString();
-      Serial++;
+      serial++;
       const x = parseFloat(curStr.substr(0, 10));
       const y = parseFloat(curStr.substr(10, 10));
       const z = parseFloat(curStr.substr(20, 10));
@@ -76,9 +79,13 @@ export default class SDFParser extends Parser {
       let xyz = new THREE.Vector3(x, y, z);
       let name = curStr.substr(31, 3).trim().toUpperCase();
       const type = Element.getByName(name);
-      name += 'A' + Serial; //hack. every atom need to have unique name.
+      if (!this._atomsIndexes[name]) {
+        this._atomsIndexes[name] = 0;
+      }
+      this._atomsIndexes[name] += 1;
+      name += this._atomsIndexes[name]; //hack. every atom need to have unique name.
 
-      this._residue.addAtom(name, type, xyz, 0, false, Serial, '', 1.0, 0.0, charge);
+      this._residue.addAtom(name, type, xyz, undefined, true, serial, ' ', 1.0, 0.0, charge);
     }
   }
 
@@ -128,8 +135,7 @@ export default class SDFParser extends Parser {
     if (data.length === 1) {
       data = data[0];
     }
-    const property = {tag: tag.replace(/<|>/g, '').trim(), data: data};
-    this._currentMolProps.push(property);
+    this._currentMolProps[tag.replace(/<|>/g, '').trim()] = data;
   }
 
   _parseCompound(stream) {
@@ -199,7 +205,7 @@ export default class SDFParser extends Parser {
         return props[i].data;
       }
     }
-    return false;
+    return undefined;
   }
 
   _tryToFind(tagsList, props) {
@@ -209,7 +215,7 @@ export default class SDFParser extends Parser {
         return res;
       }
     }
-    return false;
+    return undefined;
   }
 
   _tryToUpdateMoleculeData(molecule) {
@@ -248,7 +254,6 @@ export default class SDFParser extends Parser {
           name: molecules[i].name, date: molecules[i].date, title: molecules[i].title, properties: molecules[i].props,
         });
       }
-      metadata.molecules = molecules;
     }
   }
 
