@@ -16,7 +16,8 @@ class CollisionSphere {
     const sphere = CollisionSphere._sphere;
     sphere.set(this._position, this._radius);
 
-    const p = raycaster.ray.intersectSphere(sphere);
+    const p = new THREE.Vector3();
+    raycaster.ray.intersectSphere(sphere, p);
     if (p) {
       return {
         distance: raycaster.ray.origin.distanceTo(p),
