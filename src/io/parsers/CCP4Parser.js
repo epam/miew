@@ -1,7 +1,30 @@
 import Parser from './Parser';
 import * as THREE from 'three';
 import VolumeModel from './VolumeModel';
+import {valueType} from './VolumeModel';
 
+const CCP4Header = {
+  extent: [valueType.array, 'u32', 0],
+  type:   [valueType.singular, 'u32', 3],
+  nstart: [valueType.array, 'i32', 4],
+  grid:   [valueType.array, 'u32', 7],
+  cellDims: [valueType.vector, 'f32', 10],
+  angles:   [valueType.vector, 'f32', 13],
+  crs2xyz:  [valueType.array, 'i32', 16],
+  dmin:   [valueType.singular, 'f32', 19],
+  dmax:   [valueType.singular, 'f32', 20],
+  dmean:  [valueType.singular, 'f32', 21],
+  ispg:   [valueType.singular, 'u32', 22],
+  nsymbt: [valueType.singular, 'u32', 23],
+  lksflg: [valueType.singular, 'u32', 24],
+  customData: [valueType.buffer, 'buffer', 25, 9],
+  origin: [valueType.vector, 'f32', 34],
+  map: [valueType.buffer, 'buffer', 52, 1],
+  machine: [valueType.singular, 'u32', 53],
+  sd:   [valueType.singular, 'f32', 54],
+  nlabel: [valueType.singular, 'f32', 55],
+  label: [valueType.buffer, 'buffer', 56, 200],
+};
 
 class Ccp4Model extends VolumeModel {
 
@@ -9,29 +32,15 @@ class Ccp4Model extends VolumeModel {
   _parseHeader(_buffer) {
     this._buff = _buffer;
     this._typedCheck();
-    let [u32, i32, f32]  = [new Uint32Array(this._buff), new Int32Array(this._buff), new Float32Array(this._buff)];
+    const arrays = {};
+    arrays.u32 = new Uint32Array(this._buff);
+    arrays.i32 = new Int32Array(this._buff);
+    arrays.f32 = new Float32Array(this._buff);
+    arrays.buffer = this._buff;
     const header = this._header;
 
-    let idx = {};
-    idx.counter = 0;
-    this._parseVector(header.extent, u32, idx);
-    header.type = u32[idx.counter++];
-    this._parseVector(header.nstart, i32, idx);
-    this._parseVector(header.grid, u32, idx);
-    this._parseVector(header.cellDims, f32, idx);
-    this._parseVector(header.angles, f32, idx);
-    this._parseVector(header.crs2xyz, i32, idx);
-    [header.dmin, header.dmax, header.dmean] = this._parseVector(undefined, f32, idx);
-    [header.ispg, header.nsymbt, header.lksflg] = this._parseVector(undefined, u32, idx);
-    header.customData = new Uint8Array(this._buff, idx.counter * 4, 96);
-    idx.counter += 24;
-    this._parseVector(header.origin, f32, idx);
-    header.map = new Uint8Array(this._buff, idx.counter * 4, 4);
-    idx.counter++;
-    header.machine = u32[idx.counter++];
-    header.sd = f32[idx.counter++];
-    header.nlabel = u32[idx.counter++];
-    header.label = new Uint8Array(this._buff, idx.counter * 4, 800);
+
+    this._fillHeader(CCP4Header, arrays);
     // calculate non-orthogonal unit cell coordinates
     header.angles.multiplyScalar(Math.PI / 180.0);
   }

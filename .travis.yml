@@ -13,7 +13,7 @@ addons:
   ssh_known_hosts:
     - "$DEPLOY_SERVER"
 before_install:
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.7.0
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3
   - export PATH="$HOME/.yarn/bin:$PATH"
   - yarn global add greenkeeper-lockfile@1
 before_script:
