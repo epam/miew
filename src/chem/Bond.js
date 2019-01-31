@@ -1,8 +1,3 @@
-
-
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
 var cBondTypes = {
   /** Was generated manually */
   UNKNOWN: 0,
@@ -28,169 +23,171 @@ function getAtomPos(atom) {
  * @exports Bond
  * @constructor
  */
-function Bond(left, right, order, type, fixed) {
-  this._left = left;
-  this._right = right;
-  this._fixed = fixed;
-  this._index = -1;
-  if (left > right) {
-    throw new Error('In a bond atom indices must be in increasing order');
+class Bond {
+  constructor(left, right, order, type, fixed) {
+    this._left = left;
+    this._right = right;
+    this._fixed = fixed;
+    this._index = -1;
+    if (left > right) {
+      throw new Error('In a bond atom indices must be in increasing order');
+    }
+    this._order = order;
+    this._type = type;
   }
-  this._order = order;
-  this._type = type;
+
+  getLeft() {
+    return this._left;
+  }
+
+  getRight() {
+    return this._right;
+  }
+
+  getOrder() {
+    return this._order;
+  }
+
+  calcLength() {
+    return this._left._position.distanceTo(this._right._position);
+  }
+
+  _forEachNeighbour(currAtom, process) {
+    const bonds = currAtom._bonds;
+    for (let i = 0, n = bonds.length; i < n; ++i) {
+      process(bonds[i]._left !== currAtom ? bonds[i]._left : bonds[i]._right);
+    }
+  }
+
+  forEachLevelOne(process) {
+    const left = this._left;
+    const right = this._right;
+    this._forEachNeighbour(left, function(atom) {
+      if (atom === right) {
+        return;
+      }
+      process(atom);
+    });
+    this._forEachNeighbour(right, function(atom) {
+      if (atom === left) {
+        return;
+      }
+      process(atom);
+    });
+  }
+
+  forEachLevelTwo(process) {
+    // TODO refactor this piece of an art?
+    const left = this._left;
+    const right = this._right;
+    const self = this;
+    self._forEachNeighbour(left, function(atom) {
+      if (atom === right) {
+        return;
+      }
+      self._forEachNeighbour(atom, function(l2Atom) {
+        if (l2Atom === left) {
+          return;
+        }
+        process(l2Atom);
+      });
+    });
+    self._forEachNeighbour(right, function(atom) {
+      if (atom === left) {
+        return;
+      }
+      self._forEachNeighbour(atom, function(l2Atom) {
+        if (l2Atom === right) {
+          return;
+        }
+        process(l2Atom);
+      });
+    });
+  }
+
+  _fixDir(refPoint, currDir, posGetter) {
+    // count atoms to the right and to the left of the current plane
+    let rightCount = 0;
+    let leftCount = 0;
+    const tmpVec = refPoint.clone();
+    function checkDir(atom) {
+      tmpVec.copy(posGetter(atom));
+      tmpVec.sub(refPoint);
+      const dotProd = currDir.dot(tmpVec);
+      if (dotProd > 0) {
+        ++rightCount;
+      } else {
+        ++leftCount;
+      }
+    }
+    function checkCarbon(atom) {
+      if (atom.element.name === 'C') {
+        checkDir(atom);
+      }
+    }
+    // count all atoms to the left and right of our plane, start from level 1 and carbons
+    const stages = [
+      [this.forEachLevelOne, checkCarbon],
+      [this.forEachLevelOne, checkDir],
+      [this.forEachLevelTwo, checkCarbon],
+      [this.forEachLevelTwo, checkDir],
+    ];
+
+    for (let stageId = 0; stageId < stages.length; ++stageId) {
+      stages[stageId][0].call(this, stages[stageId][1]);
+      if (leftCount > rightCount) {
+        return currDir.multiplyScalar(-1);
+      } else if (leftCount < rightCount) {
+        return currDir;
+      }
+    }
+    return currDir;
+  }
+
+  calcNormalDir(posGetter) {
+    const left = this._left;
+    const right = this._right;
+    let first = left;
+    let second = right;
+    posGetter = posGetter === undefined ? getAtomPos : posGetter;
+    if (left._bonds.length > right._bonds.length) {
+      first = right;
+      second = left;
+    }
+    let third = first;
+    let maxNeibs = 0;
+    const bonds = second._bonds;
+    for (let i = 0, n = bonds.length; i < n; ++i) {
+      let another = bonds[i]._left;
+      if (bonds[i]._left === second) {
+        another = bonds[i]._right;
+      }
+      if (another._bonds.length > maxNeibs && another !== first) {
+        third = another;
+        maxNeibs = another._bonds.length;
+      }
+    }
+    const secondPos = posGetter(second);
+    const firstV = posGetter(first).clone().sub(secondPos);
+    const secondV = posGetter(third).clone().sub(secondPos);
+    secondV.crossVectors(firstV, secondV);
+    if (secondV.lengthSq() < 0.0001) {
+      secondV.set(0, 1, 0);
+    }
+    firstV.normalize();
+    secondV.normalize();
+    firstV.crossVectors(secondV, firstV);
+    if (firstV.lengthSq() < 0.0001) {
+      firstV.set(0, 1, 0);
+    }
+    firstV.normalize();
+    return this._fixDir(secondPos, firstV, posGetter);
+  }
+
+  static BondType = cBondTypes;
 }
 
-Bond.BondType = cBondTypes;
-
 Bond.prototype.BondType = cBondTypes;
-
-Bond.prototype.getLeft = function() {
-  return this._left;
-};
-
-Bond.prototype.getRight = function() {
-  return this._right;
-};
-
-Bond.prototype.getOrder = function() {
-  return this._order;
-};
-
-Bond.prototype.calcLength = function() {
-  return this._left._position.distanceTo(this._right._position);
-};
-
-Bond.prototype._forEachNeighbour = function(currAtom, process) {
-  var bonds = currAtom._bonds;
-  for (var i = 0, n = bonds.length; i < n; ++i) {
-    process(bonds[i]._left !== currAtom ? bonds[i]._left : bonds[i]._right);
-  }
-};
-
-Bond.prototype.forEachLevelOne = function(process) {
-  var left = this._left;
-  var right = this._right;
-  this._forEachNeighbour(left, function(atom) {
-    if (atom === right) {
-      return;
-    }
-    process(atom);
-  });
-  this._forEachNeighbour(right, function(atom) {
-    if (atom === left) {
-      return;
-    }
-    process(atom);
-  });
-};
-
-Bond.prototype.forEachLevelTwo = function(process) {
-  // TODO refactor this piece of an art?
-  var left = this._left;
-  var right = this._right;
-  var self = this;
-  self._forEachNeighbour(left, function(atom) {
-    if (atom === right) {
-      return;
-    }
-    self._forEachNeighbour(atom, function(l2Atom) {
-      if (l2Atom === left) {
-        return;
-      }
-      process(l2Atom);
-    });
-  });
-  self._forEachNeighbour(right, function(atom) {
-    if (atom === left) {
-      return;
-    }
-    self._forEachNeighbour(atom, function(l2Atom) {
-      if (l2Atom === right) {
-        return;
-      }
-      process(l2Atom);
-    });
-  });
-};
-
-Bond.prototype._fixDir = function(refPoint, currDir, posGetter) {
-  // count atoms to the right and to the left of the current plane
-  var rightCount = 0;
-  var leftCount = 0;
-  var tmpVec = refPoint.clone();
-  function checkDir(atom) {
-    tmpVec.copy(posGetter(atom));
-    tmpVec.sub(refPoint);
-    var dotProd = currDir.dot(tmpVec);
-    if (dotProd > 0) {
-      ++rightCount;
-    } else {
-      ++leftCount;
-    }
-  }
-  function checkCarbon(atom) {
-    if (atom.element.name === 'C') {
-      checkDir(atom);
-    }
-  }
-  // count all atoms to the left and right of our plane, start from level 1 and carbons
-  var stages = [
-    [this.forEachLevelOne, checkCarbon],
-    [this.forEachLevelOne, checkDir],
-    [this.forEachLevelTwo, checkCarbon],
-    [this.forEachLevelTwo, checkDir],
-  ];
-
-  for (var stageId = 0; stageId < stages.length; ++stageId) {
-    stages[stageId][0].call(this, stages[stageId][1]);
-    if (leftCount > rightCount) {
-      return currDir.multiplyScalar(-1);
-    } else if (leftCount < rightCount) {
-      return currDir;
-    }
-  }
-  return currDir;
-};
-
-Bond.prototype.calcNormalDir = function(posGetter) {
-  var left = this._left;
-  var right = this._right;
-  var first = left;
-  var second = right;
-  posGetter = posGetter === undefined ? getAtomPos : posGetter;
-  if (left._bonds.length > right._bonds.length) {
-    first = right;
-    second = left;
-  }
-  var third = first;
-  var maxNeibs = 0;
-  var bonds = second._bonds;
-  for (var i = 0, n = bonds.length; i < n; ++i) {
-    var another = bonds[i]._left;
-    if (bonds[i]._left === second) {
-      another = bonds[i]._right;
-    }
-    if (another._bonds.length > maxNeibs && another !== first) {
-      third = another;
-      maxNeibs = another._bonds.length;
-    }
-  }
-  var secondPos = posGetter(second);
-  var firstV = posGetter(first).clone().sub(secondPos);
-  var secondV = posGetter(third).clone().sub(secondPos);
-  secondV.crossVectors(firstV, secondV);
-  if (secondV.lengthSq() < 0.0001) {
-    secondV.set(0, 1, 0);
-  }
-  firstV.normalize();
-  secondV.normalize();
-  firstV.crossVectors(secondV, firstV);
-  if (firstV.lengthSq() < 0.0001) {
-    firstV.set(0, 1, 0);
-  }
-  firstV.normalize();
-  return this._fixDir(secondPos, firstV, posGetter);
-};
 
 export default Bond;
 
