@@ -398,7 +398,6 @@ float unpackRGBAToDepth( const in vec4 v ) {
   		}
     #endif
   	return shadow;
-    //return vec4(fract(vDirectionalShadowCoord.xy), 0.0, 1.0);//shadow/2.0;
     }
 #endif
 
@@ -570,8 +569,7 @@ void main() {
     #endif
 
     #if defined(USE_LIGHTS) && defined(SHADOWMAP)
-        //gl_FragColor.rgb *= getShadowMask().rgb;
-        gl_FragColor.a *= getShadowMask();
+        gl_FragColor.rgb *= getShadowMask();
     #endif
 
     #ifdef USE_FOG
