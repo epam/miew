@@ -10,9 +10,8 @@ function Representation(index, mode, colorer, selector) {
   const startMaterialValues = {
     clipPlane: settings.now.draft.clipPlane,
     fogTransparent: settings.now.bg.transparent,
-    shadowmap: settings.now.shadow.shadowMap,
-    pcf: settings.now.shadow.pcf,
-    soft: settings.now.shadow.soft
+    shadowmap: settings.now.shadow.on,
+    shadowmapType: settings.now.shadow.type,
   };
   this.index = index;
   this.mode = mode;

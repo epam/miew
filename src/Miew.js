@@ -3171,9 +3171,9 @@ Miew.prototype._initOnSettingsChanged = function() {
     this.rebuildAll();
   });
 
-  on('shadow.shadowMap', (evt) => {
+  on('shadow.on', (evt) => {
     // update materials and rebuild all
-    const values = {shadowmap: evt.value, pcf: settings.now.shadow.pcf, soft: settings.now.shadow.soft};
+    const values = {shadowmap: evt.value, shadowmapType: settings.now.shadow.type};
     const gfx = this._gfx;
     if (gfx) {
       gfx.renderer.shadowMap.enabled = values.shadowmap;
@@ -3182,18 +3182,10 @@ Miew.prototype._initOnSettingsChanged = function() {
     this.rebuildAll();
   });
 
-  on('shadow.pcf', (evt) => {
+  on('shadow.type', (evt) => {
     // update materials and rebuild all if shadowmap are enable
-    if (settings.now.shadow.shadowMap) {
-      this._updateMaterials({pcf: evt.value});
-      this.rebuildAll();
-    }
-  });
-
-  on('shadow.soft', (evt) => {
-    // update materials and rebuild all if shadowmap and pcf are enable
-    if (settings.now.shadow.shadowMap && settings.now.shadow.pcf) {
-      this._updateMaterials({soft: evt.value});
+    if (settings.now.shadow.on) {
+      this._updateMaterials({shadowmapType: evt.value});
       this.rebuildAll();
     }
   });

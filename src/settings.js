@@ -715,14 +715,12 @@ var defaults = {
    * Shadows options.
    *
    * @property {boolean} shadowMap - enable/disable.
-   * @property {boolean} percentage-closer filtering - enable/disable.
-   * @property {boolean} soft shadows - enable/disable (only for percentage-closer filtering).
+   * @property {string} basic/percentage-closer filtering/percentage-closer filtering with bilinear filtering.
    * @property {number} radius for percentage-closer filtering.
    */
   shadow: {
-    shadowMap: false,
-    pcf: true,
-    soft: true,
+    on: false,
+    type: 'pcf'/*basic, pcf4*/,
     radius: 3.0,
   },
 
