@@ -1,43 +1,47 @@
 import Parser from './Parser';
 import * as THREE from 'three';
 import VolumeModel from './VolumeModel';
+import valueType from './VolumeModel';
+
+
+//http://www.uoxray.uoregon.edu/tnt/manual/node104.html
+const DSN6Header = {
+  nstart: [valueType.array, 'i16', 0],
+  extent: [valueType.array, 'i16', 3],
+  grid:   [valueType.array, 'i16', 6],
+  cellDims: [valueType.vector, 'i16', 9],
+  angles: [valueType.vector, 'i16', 12],
+  div:    [valueType.singular, 'i16', 15],
+  adder:  [valueType.singular, 'i16', 16],
+  scaleFactor:  [valueType.singular, 'i16', 17]
+};
 
 class DSN6Model extends VolumeModel {
 
   _parseHeader(_buffer) {
     this._buff = _buffer;
     this._typedCheck();
-    const intBuff = new Int16Array(this._buff);
+
+    const arrays = {};
+    arrays.i16 = new Int16Array(this._buff);
 
     // check and reverse if big endian
-    if (intBuff[18] !== 100) {
-      for (let i = 0, n = intBuff.length; i < n; ++i) {
-        const val = intBuff[i];
-        intBuff[i] = ((val & 0xff) << 8) | ((val >> 8) & 0xff);
+    if (arrays.i16[18] !== 100) {
+      for (let i = 0, n = arrays.i16.length; i < n; ++i) {
+        const val = arrays.i16[i];
+        arrays.i16[i] = ((val & 0xff) << 8) | ((val >> 8) & 0xff);
       }
     }
-    if (intBuff[18] !== 100) {
+    if (arrays.i16[18] !== 100) {
       throw new Error('DSN6: Incorrect format ');
     }
 
     const header = this._header;
 
-    let idx = {};
-    idx.counter = 0;
-
-    header.scaleFactor = 1.0 / intBuff[17];
-
-    this._parseVector(header.nstart, intBuff, idx);
-    this._parseVector(header.extent, intBuff, idx);
-    this._parseVector(header.grid, intBuff, idx);
-    this._parseVector(header.cellDims, intBuff, idx);
-    header.cellDims.multiplyScalar(header.scaleFactor);
-    this._parseVector(header.angles, intBuff, idx);
-    // angles in radians
-    header.angles.multiplyScalar(Math.PI / 180.0 * header.scaleFactor);
-
-    header.div = intBuff[15] / 100;
-    header.adder = intBuff[16];
+    this._fillHeader(DSN6Header, arrays);
+    header.cellDims.multiplyScalar(1.0 / header.scaleFactor);
+    header.angles.multiplyScalar(Math.PI / 180.0 / header.scaleFactor);
+    header.div /= 100;
   }
 
   _setAxisIndices() {

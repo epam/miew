@@ -2,6 +2,13 @@ import * as THREE from 'three';
 import Volume from '../../chem/Volume';
 import _ from 'lodash';
 
+export const valueType = {
+  singular: 0,
+  vector: 1,
+  array: 2,
+  buffer: 3
+};
+
 class VolumeModel {
   _xyz2crs = [];
 
@@ -30,18 +37,46 @@ class VolumeModel {
     }
   }
 
-  _parseVector(vector, arr, idx) {
-    if (vector === undefined) {
-      return [arr[idx.counter++], arr[idx.counter++], arr[idx.counter++]];
+  _fillHeader(headerFormat, arrays) {
+    for (let key in headerFormat) {
+      if (headerFormat.hasOwnProperty(key)) {
+        switch (headerFormat[key][0]) {
+
+        case valueType.singular:
+          this._header[key] = arrays[headerFormat[key][1]][headerFormat[key][2]];
+          break;
+
+        case valueType.array:
+          this._parseArray(this._header[key], arrays[headerFormat[key][1]], headerFormat[key][2]);
+          break;
+
+        case valueType.vector:
+          this._parseVector(this._header[key], arrays[headerFormat[key][1]], headerFormat[key][2]);
+          break;
+
+        case valueType.buffer:
+          this._header[key] = new Uint8Array(
+            arrays[headerFormat[key][1]],
+            [headerFormat[key][2]] * 4,
+            [headerFormat[key][3]] * 4
+          );
+          break;
+
+        default:
+          break;
+        }
+      }
     }
-    if (Array.isArray(vector)) {
-      vector[0] = arr[idx.counter++];
-      vector[1] = arr[idx.counter++];
-      vector[2] = arr[idx.counter++];
-    } else {
-      [vector.x, vector.y, vector.z] = [arr[idx.counter++], arr[idx.counter++], arr[idx.counter++]];
-    }
-    return 0;
+  }
+
+  _parseVector(vector, arr, pos) {
+    [vector.x, vector.y, vector.z] = [arr[pos], arr[pos + 1], arr[pos + 2]];
+  }
+
+  _parseArray(vector, arr, pos) {
+    vector[0] = arr[pos];
+    vector[1] = arr[pos + 1];
+    vector[2] = arr[pos + 2];
   }
 
   _parseHeader(_buffer) {}
