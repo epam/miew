@@ -29,6 +29,8 @@ var defaultUniforms = THREE.UniformsUtils.merge([
     'projMatrixInv': {type: '4fv', value: new THREE.Matrix4()},
     'viewport': {type: 'v2', value: new THREE.Vector2()},
     'lineWidth': {type: 'f', value: 2.0},
+    //default value must be the same as settings
+    'fogAlpha': {type: 'f', value: 1.0}
   }
 
 ]);
@@ -49,6 +51,7 @@ var uberOptionNames = [
   'projMatrixInv',
   'viewport',
   'lineWidth',
+  'fogAlpha'
 ];
 
 function UberMaterial(params) {
@@ -94,6 +97,10 @@ function UberMaterial(params) {
   this.thickLine = false;
   // makes fog begin transparency (required for transparent background)
   this.fogTransparent = false;
+  // used to render surface normals to G buffer for ssao effect
+  this.normalsToGBuffer = false;
+  //used for toon material
+  this.toonShading = false;
 
   // uber options of "root" materials are inherited from single uber-options object that resides in prototype
   this.uberOptions = Object.create(UberMaterial.prototype.uberOptions);
@@ -138,6 +145,7 @@ UberMaterial.prototype.uberOptions = {
   projMatrixInv: new THREE.Matrix4(),
   viewport: new THREE.Vector2(800, 600),
   lineWidth: 2.0,
+  fogAlpha: 1.0,
 
   copy: function(source) {
     this.diffuse.copy(source.diffuse);
@@ -155,11 +163,14 @@ UberMaterial.prototype.uberOptions = {
     this.projMatrixInv = source.projMatrixInv;
     this.viewport = source.viewport;
     this.lineWidth = source.lineWidth; // used for thick lines only
+    this.toonShading = source.toonShading;
+    this.fogAlpha = source.fogAlpha;
   }
 };
 
 UberMaterial.prototype.copy = function(source) {
 
+  //TODO Why not RawShaderMaterial?
   THREE.ShaderMaterial.prototype.copy.call(this, source);
 
   this.fog = source.fog;
@@ -182,6 +193,8 @@ UberMaterial.prototype.copy = function(source) {
   this.dashedLine = source.dashedLine;
   this.thickLine = source.thickLine;
   this.fogTransparent = source.fogTransparent;
+  this.normalsToGBuffer = source.normalsToGBuffer;
+  this.toonShading = source.toonShading;
 
   this.uberOptions.copy(source.uberOptions);
 
@@ -276,6 +289,13 @@ UberMaterial.prototype.setValues = function(values) {
   }
   if (this.fogTransparent) {
     defines.FOG_TRANSPARENT = 1;
+  }
+  if (this.normalsToGBuffer) {
+    extensions.drawBuffers = 1;
+    defines.NORMALS_TO_G_BUFFER = 1;
+  }
+  if (this.toonShading) {
+    defines.TOON_SHADING = 1;
   }
   // set dependent values
   this.defines = defines;

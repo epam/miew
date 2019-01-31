@@ -1,9 +1,3 @@
-
-
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
-
 /**
  * Residue Molecule.
  *
@@ -14,45 +8,47 @@
  * @exports Molecule
  * @constructor
  */
-function Molecule(complex, name, index) {
-  this._complex = complex;
-  this._name = name || '';
-  this._residues = [];
-  this._mask = 1 | 0;
-  this._index = index || -1; // start with 1
+class Molecule {
+  constructor(complex, name, index) {
+    this._complex = complex;
+    this._name = name || '';
+    this._residues = [];
+    this._mask = 1 | 0;
+    this._index = index || -1; // start with 1
+  }
+
+  getComplex() {
+    return this._complex;
+  }
+
+  getName() {
+    return this._name;
+  }
+
+  getResidues() {
+    return this._residues;
+  }
+
+  getIndex() {
+    return this._index;
+  }
+
+  forEachResidue(process) {
+    const residues = this._residues;
+    for (let i = 0, n = residues.length; i < n; ++i) {
+      process(residues[i]);
+    }
+  }
+
+  collectMask() {
+    let mask = 0xffffffff;
+    const residues = this._residues;
+    for (let i = 0, n = residues.length; i < n; ++i) {
+      mask &= residues[i]._mask;
+    }
+    this._mask = mask;
+  }
 }
-
-Molecule.prototype.getComplex = function() {
-  return this._complex;
-};
-
-Molecule.prototype.getName = function() {
-  return this._name;
-};
-
-Molecule.prototype.getResidues = function() {
-  return this._residues;
-};
-
-Molecule.prototype.getIndex = function() {
-  return this._index;
-};
-
-Molecule.prototype.forEachResidue = function(process) {
-  var residues = this._residues;
-  for (var i = 0, n = residues.length; i < n; ++i) {
-    process(residues[i]);
-  }
-};
-
-Molecule.prototype.collectMask = function() {
-  var mask = 0xffffffff;
-  var residues = this._residues;
-  for (var i = 0, n = residues.length; i < n; ++i) {
-    mask &= residues[i]._mask;
-  }
-  this._mask = mask;
-};
 
 export default Molecule;
 

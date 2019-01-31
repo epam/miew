@@ -1,58 +1,56 @@
 
 
 import * as THREE from 'three';
-import utils from '../utils';
+//import utils from '../utils';
 import VolumeMaterial from './shaders/VolumeMaterial';
 
-function VolumeMesh() {
-  this.clipPlane = new THREE.Plane();
-  var size = new THREE.Vector3(0.5, 0.5, 0.5);
-  this.size = size;
+class VolumeMesh extends THREE.Mesh {
+  constructor() {
+    let geo = new THREE.BufferGeometry();
+    super(geo);
+    this.clipPlane = new THREE.Plane();
+    let size = new THREE.Vector3(0.5, 0.5, 0.5);
+    this.size = size;
 
-  this.cullFlag = [
-    true, true, true, true,
-    true, true, true, true,
-    false, false, false, false, false, false
-  ];
+    this.cullFlag = [
+      true, true, true, true,
+      true, true, true, true,
+      false, false, false, false, false, false
+    ];
 
-  this.faces = [
-    {indices: [], norm: new THREE.Vector3(0, 0, -1)},
-    {indices: [], norm: new THREE.Vector3(0, 0, 1)},
-    {indices: [], norm: new THREE.Vector3(0, -1, 0)},
-    {indices: [], norm: new THREE.Vector3(0, 1, 0)},
-    {indices: [], norm: new THREE.Vector3(-1, 0, 0)},
-    {indices: [], norm: new THREE.Vector3(1, 0, 0)},
-    {indices: [], norm: new THREE.Vector3(0, 0, 0)},
-  ];
+    this.faces = [
+      {indices: [], norm: new THREE.Vector3(0, 0, -1)},
+      {indices: [], norm: new THREE.Vector3(0, 0, 1)},
+      {indices: [], norm: new THREE.Vector3(0, -1, 0)},
+      {indices: [], norm: new THREE.Vector3(0, 1, 0)},
+      {indices: [], norm: new THREE.Vector3(-1, 0, 0)},
+      {indices: [], norm: new THREE.Vector3(1, 0, 0)},
+      {indices: [], norm: new THREE.Vector3(0, 0, 0)},
+    ];
 
-  this.vertices = [
-    new THREE.Vector3(-size.x, -size.y, -size.z),
-    new THREE.Vector3(-size.x,  size.y, -size.z),
-    new THREE.Vector3(size.x, -size.y, -size.z),
-    new THREE.Vector3(size.x,  size.y, -size.z),
-    new THREE.Vector3(-size.x, -size.y,  size.z),
-    new THREE.Vector3(-size.x,  size.y,  size.z),
-    new THREE.Vector3(size.x, -size.y,  size.z),
-    new THREE.Vector3(size.x,  size.y,  size.z),
-    new THREE.Vector3(0.0, 0.0, 0.0),    // Placeholder for section
-    new THREE.Vector3(0.0, 0.0, 0.0),
-    new THREE.Vector3(0.0, 0.0, 0.0),
-    new THREE.Vector3(0.0, 0.0, 0.0),
-    new THREE.Vector3(0.0, 0.0, 0.0),
-    new THREE.Vector3(0.0, 0.0, 0.0),
-  ];
+    this.vertices = [
+      new THREE.Vector3(-size.x, -size.y, -size.z),
+      new THREE.Vector3(-size.x,  size.y, -size.z),
+      new THREE.Vector3(size.x, -size.y, -size.z),
+      new THREE.Vector3(size.x,  size.y, -size.z),
+      new THREE.Vector3(-size.x, -size.y,  size.z),
+      new THREE.Vector3(-size.x,  size.y,  size.z),
+      new THREE.Vector3(size.x, -size.y,  size.z),
+      new THREE.Vector3(size.x,  size.y,  size.z),
+      new THREE.Vector3(0.0, 0.0, 0.0),    // Placeholder for section
+      new THREE.Vector3(0.0, 0.0, 0.0),
+      new THREE.Vector3(0.0, 0.0, 0.0),
+      new THREE.Vector3(0.0, 0.0, 0.0),
+      new THREE.Vector3(0.0, 0.0, 0.0),
+      new THREE.Vector3(0.0, 0.0, 0.0),
+    ];
 
-  var geo = new THREE.BufferGeometry();
-  geo.addAttribute('position', new THREE.BufferAttribute(new Float32Array(this.vertices.length * 3), 3));
+    geo.addAttribute('position', new THREE.BufferAttribute(new Float32Array(this.vertices.length * 3), 3));
 
-  THREE.Mesh.call(this, geo);
-  this.name = 'VolumeMesh';
-}
+    this.name = 'VolumeMesh';
+  }
 
-utils.deriveClass(VolumeMesh, THREE.Mesh);
-
-VolumeMesh.prototype._updateVertices = (function() {
-  var corners = [
+  static _corners = [
     // x, y, z, edge1, edge2, edge3
     [-1, -1, -1, 0, 4, 8],
     [1, -1, -1, 0, 5, 9],
@@ -64,7 +62,7 @@ VolumeMesh.prototype._updateVertices = (function() {
     [-1, 1, 1, 3, 6, 11]
   ];
 
-  var edges = [
+  static _edges = [
     // corner1, corner2, center_x, center_y, center_z
     [0, 1, 0, -1, -1],
     [2, 3, 0, 1, -1],
@@ -80,35 +78,40 @@ VolumeMesh.prototype._updateVertices = (function() {
     [3, 7, 1, 1, 0]
   ];
 
-  var edgeIntersections = [];
-  for (var j = 0; j < 12; ++j) {
-    edgeIntersections.push(new THREE.Vector3());
-  }
+  static _edgeIntersections = (function() {
+    const edgeIntersections = [];
+    for (let j = 0; j < 12; ++j) {
+      edgeIntersections.push(new THREE.Vector3());
+    }
+    return edgeIntersections;
+  }());
 
-
-  return function() {
+  _updateVertices() {
     // Algorithm:
     // 1. Get plane parameters
     // 2. Compute culling flags for all vertices
     // 3. If intersection occurs => compute from 3 to 6 intersection points
+    const corners = VolumeMesh._corners;
+    const edges = VolumeMesh._edges;
+    const edgeIntersections = VolumeMesh._edgeIntersections;
 
-    var i;
+    let i;
 
-    var norm = this.clipPlane.normal;
-    var D = this.clipPlane.constant;
+    const norm = this.clipPlane.normal;
+    const D = this.clipPlane.constant;
 
-    var vert = this.vertices;
-    var size = this.size;
+    const vert = this.vertices;
+    const size = this.size;
 
-    var cornerMark = [0, 0, 0, 0, 0, 0, 0, 0];
-    var edgeMark = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+    const cornerMark = [0, 0, 0, 0, 0, 0, 0, 0];
+    const edgeMark = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
     const curEdge = new THREE.Vector3();
     let curEdgeInter = null;
 
     function CheckX() {
       if (norm.x === 0) return 0;
-      var x = -(norm.dot(curEdge) + D) / norm.x;
+      const x = -(norm.dot(curEdge) + D) / norm.x;
       if (-size.x <= x && x <= size.x) {
         curEdgeInter.set(x, curEdge.y, curEdge.z);
         if (x === size.x) return 2;
@@ -120,7 +123,7 @@ VolumeMesh.prototype._updateVertices = (function() {
 
     function CheckY() {
       if (norm.y === 0) return 0;
-      var y = -(norm.dot(curEdge) + D) / norm.y;
+      const y = -(norm.dot(curEdge) + D) / norm.y;
       if (-size.y <= y && y <= size.y) {
         curEdgeInter.set(curEdge.x, y, curEdge.z);
         if (y === size.y) return 2;
@@ -132,7 +135,7 @@ VolumeMesh.prototype._updateVertices = (function() {
 
     function CheckZ() {
       if (norm.z === 0) return 0;
-      var z = -(norm.dot(curEdge) + D) / norm.z;
+      const z = -(norm.dot(curEdge) + D) / norm.z;
       if (-size.z <= z && z <= size.z) {
         curEdgeInter.set(curEdge.x, curEdge.y, z);
         if (z === size.z) return 2;
@@ -151,7 +154,7 @@ VolumeMesh.prototype._updateVertices = (function() {
       curEdge.multiply(size);
 
       // calculate intersection point
-      var flag = 0;
+      let flag = 0;
       if (curEdgeSource[2] === 0) flag = CheckX();
       if (curEdgeSource[3] === 0) flag = CheckY();
       if (curEdgeSource[4] === 0) flag = CheckZ();
@@ -167,12 +170,12 @@ VolumeMesh.prototype._updateVertices = (function() {
       }
     }
 
-    var face = {
+    const face = {
       indices: [],
       norm: norm.clone().negate()
     };
 
-    var nextVertex = 8;
+    let nextVertex = 8;
 
     // for each marked corner
     for (i = 0; i < 8; ++i) {
@@ -198,8 +201,8 @@ VolumeMesh.prototype._updateVertices = (function() {
 
     this.faces[6] = face;
 
-    var diff = new THREE.Vector3();
-    var coplanarPoint = new THREE.Vector3();
+    let diff = new THREE.Vector3();
+    let coplanarPoint = new THREE.Vector3();
     this.clipPlane.coplanarPoint(coplanarPoint);
     for (i = 0; i < vert.length; ++i) {
       this.cullFlag[i] = false;
@@ -214,164 +217,173 @@ VolumeMesh.prototype._updateVertices = (function() {
     }
 
     // write data to vertex buffer
-    var positions = this.geometry.getAttribute('position');
-    var idx = 0;
+    const positions = this.geometry.getAttribute('position');
+    let idx = 0;
     for (i = 0; i < vert.length; ++i) {
       positions.array[idx++] = vert[i].x;
       positions.array[idx++] = vert[i].y;
       positions.array[idx++] = vert[i].z;
     }
     positions.needsUpdate = true;
-  };
-})();
-
-VolumeMesh.prototype._collectVertices = function(face, filter) {
-  var i;
-  var vert = this.vertices;
-  face.indices = [];
-  for (i = 0; i < vert.length; ++i) {
-    if (this.cullFlag[i] && filter(vert[i])) {
-      face.indices.push(i);
-    }
-  }
-};
-
-VolumeMesh.prototype._sortIndices = function(face, right) {
-  var i, j;
-  var vert = this.vertices;
-  var angle = [];
-
-  var dir = new THREE.Vector3();
-  for (i = 1; i < face.indices.length; ++i) {
-    dir.subVectors(vert[face.indices[i]], vert[face.indices[0]]);
-    dir.normalize();
-    dir.cross(right);
-    dir.negate();
-    angle[i] = face.norm.dot(dir);
   }
 
-  // Exchange sort
-  for (i = 1; i < face.indices.length - 1; ++i) {
-    for (j = i + 1; j < face.indices.length; ++j) {
-      if (angle[j] < angle[i]) {
-        // swap
-        var t = angle[i];
-        angle[i] = angle[j];
-        angle[j] = t;
-
-        t = face.indices[i];
-        face.indices[i] = face.indices[j];
-        face.indices[j] = t;
+  _collectVertices(face, filter) {
+    let i;
+    const vert = this.vertices;
+    face.indices = [];
+    for (i = 0; i < vert.length; ++i) {
+      if (this.cullFlag[i] && filter(vert[i])) {
+        face.indices.push(i);
       }
     }
   }
-};
 
-VolumeMesh.prototype._updateIndices = function() {
-  // Algorithm:
-  // 1. Get plane vertices (from 3 to 6 vertices)
-  // 2. Get "right" vector in plane
-  // 3. Sort vertices using Graham-like method
-  // 4. Create indices
+  _sortIndices(face, right) {
+    let i, j;
+    const vert = this.vertices;
+    const angle = [];
 
-  var i, faceIdx, face;
-  var vert = this.vertices;
-  var size = this.size;
-
-  this._collectVertices(this.faces[0], function(vertex) { return vertex.z === -size.z; });
-  this._collectVertices(this.faces[1], function(vertex) { return vertex.z === size.z; });
-  this._collectVertices(this.faces[2], function(vertex) { return vertex.y === -size.y; });
-  this._collectVertices(this.faces[3], function(vertex) { return vertex.y === size.y; });
-  this._collectVertices(this.faces[4], function(vertex) { return vertex.x === -size.x; });
-  this._collectVertices(this.faces[5], function(vertex) { return vertex.x === size.x; });
-
-  var vCenter = new THREE.Vector3();
-  var vRight = new THREE.Vector3();
-  var vDir = new THREE.Vector3();
-
-  for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
-    face = this.faces[faceIdx];
-
-    if (face.indices.length === 0) continue;
-
-    vCenter.set(0, 0, 0);
-    for (i = 0; i < face.indices.length; ++i) {
-      vCenter.add(vert[face.indices[i]]);
-    }
-    vCenter.multiplyScalar(1.0 / face.indices.length);
-    vRight.subVectors(vert[face.indices[0]], vCenter);
-    vRight.normalize();
-
-    var rightProj = [];
-    for (i = 0; i < face.indices.length; ++i) {
-      vDir.subVectors(vert[face.indices[i]], vCenter);
-      rightProj[i] = vDir.dot(vRight);
-    }
+    let dir = new THREE.Vector3();
     for (i = 1; i < face.indices.length; ++i) {
-      if (rightProj[i] < rightProj[0]) {
-        // swap
-        var t = rightProj[0];
-        rightProj[0] = rightProj[i];
-        rightProj[i] = t;
+      dir.subVectors(vert[face.indices[i]], vert[face.indices[0]]);
+      dir.normalize();
+      dir.cross(right);
+      dir.negate();
+      angle[i] = face.norm.dot(dir);
+    }
 
-        t = face.indices[0];
-        face.indices[0] = face.indices[i];
-        face.indices[i] = t;
+    // Exchange sort
+    for (i = 1; i < face.indices.length - 1; ++i) {
+      for (j = i + 1; j < face.indices.length; ++j) {
+        if (angle[j] < angle[i]) {
+          // swap
+          let t = angle[i];
+          angle[i] = angle[j];
+          angle[j] = t;
+
+          t = face.indices[i];
+          face.indices[i] = face.indices[j];
+          face.indices[j] = t;
+        }
+      }
+    }
+  }
+
+  _updateIndices() {
+    // Algorithm:
+    // 1. Get plane vertices (from 3 to 6 vertices)
+    // 2. Get "right" vector in plane
+    // 3. Sort vertices using Graham-like method
+    // 4. Create indices
+
+    let i, faceIdx, face;
+    const vert = this.vertices;
+    const size = this.size;
+
+    this._collectVertices(this.faces[0], function(vertex) { return vertex.z === -size.z; });
+    this._collectVertices(this.faces[1], function(vertex) { return vertex.z === size.z; });
+    this._collectVertices(this.faces[2], function(vertex) { return vertex.y === -size.y; });
+    this._collectVertices(this.faces[3], function(vertex) { return vertex.y === size.y; });
+    this._collectVertices(this.faces[4], function(vertex) { return vertex.x === -size.x; });
+    this._collectVertices(this.faces[5], function(vertex) { return vertex.x === size.x; });
+
+    let vCenter = new THREE.Vector3();
+    let vRight = new THREE.Vector3();
+    let vDir = new THREE.Vector3();
+
+    for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
+      face = this.faces[faceIdx];
+
+      if (face.indices.length === 0) continue;
+
+      vCenter.set(0, 0, 0);
+      for (i = 0; i < face.indices.length; ++i) {
+        vCenter.add(vert[face.indices[i]]);
+      }
+      vCenter.multiplyScalar(1.0 / face.indices.length);
+      vRight.subVectors(vert[face.indices[0]], vCenter);
+      vRight.normalize();
+
+      const rightProj = [];
+      for (i = 0; i < face.indices.length; ++i) {
+        vDir.subVectors(vert[face.indices[i]], vCenter);
+        rightProj[i] = vDir.dot(vRight);
+      }
+      for (i = 1; i < face.indices.length; ++i) {
+        if (rightProj[i] < rightProj[0]) {
+          // swap
+          let t = rightProj[0];
+          rightProj[0] = rightProj[i];
+          rightProj[i] = t;
+
+          t = face.indices[0];
+          face.indices[0] = face.indices[i];
+          face.indices[i] = t;
+        }
+      }
+
+      this._sortIndices(face, vRight);
+    }
+
+    let numIndices = 0;
+    for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
+      face = this.faces[faceIdx];
+      if (face.indices.length >= 3) {
+        numIndices += 3 * (face.indices.length - 2);
+      }
+    }
+    let offset = 0;
+    let indices = new Uint16Array(numIndices);
+    for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
+      face = this.faces[faceIdx];
+      for (i = 0; i < face.indices.length - 2; ++i) {
+        indices[offset + 0] = face.indices[0];
+        indices[offset + 1] = face.indices[i + 1];
+        indices[offset + 2] = face.indices[i + 2];
+        offset += 3;
       }
     }
 
-    this._sortIndices(face, vRight);
+    this.geometry.setIndex(new THREE.BufferAttribute(indices, 1));
   }
 
-  var numIndices = 0;
-  for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
-    face = this.faces[faceIdx];
-    if (face.indices.length >= 3) {
-      numIndices += 3 * (face.indices.length - 2);
-    }
-  }
-  var offset = 0;
-  var indices = new Uint16Array(numIndices);
-  for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
-    face = this.faces[faceIdx];
-    for (i = 0; i < face.indices.length - 2; ++i) {
-      indices[offset + 0] = face.indices[0];
-      indices[offset + 1] = face.indices[i + 1];
-      indices[offset + 2] = face.indices[i + 2];
-      offset += 3;
-    }
+  setDataSource(dataSource) {
+    let vm = new VolumeMaterial.VolumeMaterial();
+    const dim = dataSource.getDimensions();
+    const stride = dataSource.getTiledTextureStride();
+    const texture = dataSource.buildTiledTexture();
+    vm.uniforms.volumeDim.value.set(dim[0], dim[1], dim[2]);
+    vm.uniforms.tileTex.value = texture;
+    vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
+    vm.uniforms.tileStride.value.set(stride[0], stride[1]);
+    this.material = vm;
+
+    const bbox = dataSource.getBox();
+    bbox.getSize(this.scale);
+    bbox.getCenter(this.position);
   }
 
-  this.geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-};
 
-VolumeMesh.prototype.setDataSource = function(dataSource) {
-  var vm = new VolumeMaterial.VolumeMaterial();
-  var dim = dataSource.getDimensions();
-  var stride = dataSource.getTiledTextureStride();
-  var texture = dataSource.buildTiledTexture();
-  vm.uniforms.volumeDim.value.set(dim[0], dim[1], dim[2]);
-  vm.uniforms.tileTex.value = texture;
-  vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
-  vm.uniforms.tileStride.value.set(stride[0], stride[1]);
-  this.material = vm;
+  static _nearClipPlaneOffset = 0.2;
 
-  var bbox = dataSource.getBox();
-  bbox.getSize(this.scale);
-  bbox.getCenter(this.position);
-};
+  static _pos = new THREE.Vector3();
 
-VolumeMesh.prototype.rebuild = (function() {
+  static _norm = new THREE.Vector3();
 
-  const nearClipPlaneOffset = 0.2;
-  const pos = new THREE.Vector3();
-  const norm = new THREE.Vector3();
-  const norm4D = new THREE.Vector4();
-  const matrixWorldToLocal = new THREE.Matrix4();
-  const clipPlane = new THREE.Plane();
+  static _norm4D = new THREE.Vector4();
 
-  return function(camera) {
+  static _matrixWorldToLocal = new THREE.Matrix4();
 
+  static _clipPlane = new THREE.Plane();
+
+  rebuild(camera) {
+
+    const nearClipPlaneOffset = VolumeMesh._nearClipPlaneOffset;
+    const pos = VolumeMesh._pos;
+    const norm = VolumeMesh._norm;
+    const norm4D = VolumeMesh._norm4D;
+    const matrixWorldToLocal = VolumeMesh._matrixWorldToLocal;
+    const clipPlane = VolumeMesh._clipPlane;
     // get clip plane in local space
     camera.getWorldDirection(norm);
     camera.getWorldPosition(pos);
@@ -394,8 +406,9 @@ VolumeMesh.prototype.rebuild = (function() {
       this._updateVertices();
       this._updateIndices();
     }
-  };
-})();
+  }
+}
+
 
 export default VolumeMesh;
 

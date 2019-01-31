@@ -42,18 +42,11 @@ export default {
         './src/utils/SelectionParser.js',
         './src/utils/MiewCLIParser.js',
       ],
-      exclude: [
-        './vendor/js/three.module.js',
-      ],
       namedExports: {
         'vendor/js/Smooth.js': ['Smooth'],
       },
     }),
     rollupPluginBabel({
-      babelrc: false,
-      runtimeHelpers: true,
-      presets: [['env', {modules: false}]],
-      plugins: ['external-helpers'],
       exclude: [
         './node_modules/**',
         './vendor/js/**',

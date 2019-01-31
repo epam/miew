@@ -22,6 +22,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'SF',
@@ -38,6 +40,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'PL',
@@ -54,6 +58,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'ME',
@@ -70,6 +76,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'TR',
@@ -86,6 +94,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: true,
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'GL',
@@ -103,6 +113,8 @@ var materialList = [
       fog: true,
       depthWrite: true,
       transparent: true,
+      toonShading: false,
+      side: THREE.DoubleSide
     }
   }, {
     id: 'BA',
@@ -114,8 +126,45 @@ var materialList = [
     values: {
       lights: false,
       fog: false,
-      depthWrite: false,
+      depthWrite: true,
       transparent: false,
+      toonShading: false,
+      side: THREE.BackSide
+    }
+  }, {
+    id: 'TN',
+    name: 'Toon',
+    shortName: 'Toon',
+    uberOptions: {
+      diffuse: neutralColor(1.0),
+      specular: neutralColor(0.0),
+      shininess: 1,
+      opacity: 1.0
+    },
+    values: {
+      lights: true,
+      fog: true,
+      depthWrite: true,
+      transparent: false,
+      toonShading: true,
+      side: THREE.DoubleSide
+    }
+  }, {
+    id: 'FL',
+    name: 'Flat',
+    shortName: 'Flat',
+    uberOptions: {
+      diffuse: neutralColor(1.0),
+      specular: neutralColor(0.0),
+      shininess: 0,
+      opacity: 1.0
+    },
+    values: {
+      lights: false,
+      fog: true,
+      depthWrite: true,
+      transparent: false,
+      side: THREE.DoubleSide
     }
   }
 ];

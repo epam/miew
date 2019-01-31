@@ -1,5 +1,3 @@
-
-
 import InstancedSpheresGeometry from './InstancedSpheresGeometry';
 import SimpleSpheresGeometry from './SimpleSpheresGeometry';
 import Simple2CCylindersGeometry from './Simple2CCylindersGeometry';
@@ -26,4 +24,3 @@ export default {
   SSIsosurfaceGeometry: SSIsosurfaceGeometry,
   LabelsGeometry: LabelsGeometry,
 };
-

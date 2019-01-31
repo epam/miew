@@ -37,9 +37,12 @@ function unarray(x) {
 }
 
 function Menu(/** Node */ container, /** Miew */ viewer) {
+  var themeRE = /\s*theme-\w+\b/g;
+  var theme = settings.now.theme;
   // Add proper DOM elements
   _.forEach($.parseHTML(menuHtml), (element) => container.parentNode.appendChild(element));
 
+  container.className = container.className.replace(themeRE, '') + ' theme-' + theme;
   // Save some objects for future reference
   this._viewer = viewer;
   this._menuId = '#miew-menu';
@@ -154,18 +157,18 @@ Menu.prototype._initializeTerminal = function() {
   );
 };
 
-Menu.prototype._fillUniformColorCombo = function(paletteID) {
+Menu.prototype._fillSelectionColorCombo = function(paletteID) {
   var self = this;
   var frag = document.createDocumentFragment();
   const palette = palettes.get(paletteID) || palettes.first;
   var colorList = palette.namedColorsArray;
 
-  var comboboxPanel = $(self._menuId + ' [data-panel-type=miew-menu-panel-uniform-color]');
+  var comboboxPanel = $(self._menuId + ' [data-panel-type=miew-menu-panel-select-color]');
   for (var i = 0, n = colorList.length; i < n; i++) {
     var color = hexColor(colorList[i][1]);
     var newItem = createElement('div', {
       'class':       'col-xs-2 col-sm-2',
-      'data-toggle': 'uniformcolor',
+      'data-toggle': 'selectcolor',
       'data-value':  color
     }, [
       createElement(
@@ -188,22 +191,23 @@ Menu.prototype._fillUniformColorCombo = function(paletteID) {
   $(comboboxPanel.get(0).lastElementChild.firstElementChild).empty();
   comboboxPanel.get(0).lastElementChild.firstElementChild.appendChild(frag);
 
-  $(self._menuId + ' [data-toggle=uniformcolor]').on('click', /** @this HTMLSelectElement */ function() {
-    var prevActive = self._getCurReprPropertyId('miew-menu-panel-uniform-color');
+  $(self._menuId + ' [data-toggle=selectcolor]').on('click', /** @this HTMLSelectElement */ function() {
+    var prevActive = self._getCurReprPropertyId('miew-menu-panel-select-color');
     $(self._menuId + ' [data-value="' + prevActive + '"]').removeClass('active');
     comboboxPanel.get(0).firstElementChild.firstElementChild.click();
     var elements = $(self._menuId + ' [data-panel-type=miew-menu-panel-representation] .miew-repr-list ' +
-        '.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-uniform-color]');
+        '.panel.valid:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-select-color]');
     var newColor = this.getAttribute('data-value');
-    elements[0].firstElementChild.firstElementChild.setAttribute('data-id', newColor);
-    elements[0].firstElementChild.firstElementChild.firstElementChild.style.backgroundColor = newColor;
+    elements[0].lastChild.firstElementChild.setAttribute('data-id', newColor);
+    elements[0].lastChild.firstElementChild.firstElementChild.style.backgroundColor = newColor;
   });
 
   comboboxPanel.find('.panel-heading:first-of-type button:first-of-type').on('click', function() {
-    var activeItem = self._getCurReprPropertyId('miew-menu-panel-uniform-color');
-    $(self._menuId + ' [data-toggle=uniformcolor][data-value="' + activeItem + '"]').removeClass('active');
+    var activeItem = self._getCurReprPropertyId('miew-menu-panel-select-color');
+    $(self._menuId + ' [data-toggle=selectcolor][data-value="' + activeItem + '"]').removeClass('active');
   });
 };
+
 
 Menu.prototype._fillCombo = function(type, name, path, entityList) {
   var self = this;
@@ -377,11 +381,11 @@ Menu.prototype._initReprListItemListeners = function(index) {
     }
   );
 
-  reprList.find('.panel:eq(' + index + ') [data-toggle=combobox-panel][data-value=miew-menu-panel-uniform-color]').on(
+  reprList.find('.panel:eq(' + index + ') [data-toggle=combobox-panel][data-value=miew-menu-panel-select-color]').on(
     'click',
     function() {
-      var activeItem = this.firstElementChild.firstElementChild.getAttribute('data-id');
-      $(self._menuId + ' [data-toggle=uniformcolor][data-value="' + activeItem + '"]').addClass('active');
+      var activeItem = this.lastChild.firstElementChild.getAttribute('data-id');
+      $(self._menuId + ' [data-toggle=selectcolor][data-value="' + activeItem + '"]').addClass('active');
     }
   );
 
@@ -459,6 +463,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
               'style' : 'word-break: break-all'
             }, String(repr.selector)),
             createElement('span', {'class' : 'glyphicon glyphicon-menu-right'})])]),
+
         createElement('li', {
           'class' :  'list-group-item col-xs-12 col-sm-12',
           'data-toggle' : 'combobox-panel',
@@ -471,6 +476,7 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
               'data-id': repr.mode.id
             }, repr.mode.shortName),
             createElement('span', {'class' : 'glyphicon glyphicon-menu-right'})])]),
+
         createElement('li', {
           'class' :  'list-group-item col-xs-12 col-sm-12',
           'data-toggle' : 'combobox-panel',
@@ -483,22 +489,24 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
               'data-id': repr.colorer.id
             }, repr.colorer.shortName),
             createElement('span', {'class' : 'glyphicon glyphicon-menu-right'})])]),
+
         createElement('li', {
           'class' :  'list-group-item col-xs-12 col-sm-12',
           'data-toggle' : 'combobox-panel',
-          'data-value' : 'miew-menu-panel-uniform-color'
+          'data-value' : 'miew-menu-panel-select-color'
         }, [
-          'Uniform color',
+          createElement('span', {}, 'Color name'),
           createElement('span', {'class' : 'pull-right'}, [
             createElement('a', {
               'href' : '#ucolor',
               'class' : 'thumbnail',
-              'data-id': hexColor(settings.now.colorers.UN.color)
+              'data-id': hexColor(0xffffff),
             }, createElement('img', {
               'src' : 'images/empty_icon.png',
-              'style' : 'background-color: ' + hexColor(settings.now.colorers.UN.color) + ';'
+              'style' : 'background-color: ' + hexColor(0xffffff) + ';'
             })),
             createElement('span', {'class' : 'glyphicon glyphicon-menu-right'})])]),
+
         createElement('li', {
           'class' :  'list-group-item col-xs-12 col-sm-12',
           'data-toggle' : 'combobox-panel',
@@ -608,14 +616,15 @@ Menu.prototype._addReprListItem = function(panel, index, repr) {
     reprList.find('.panel:eq(' + index + ') .panel-collapse [data-type=surf-param-iso]').hide();
   }
 
-  if (repr.colorer.id === 'UN') {
-    var ucSelector = reprList.find('.panel:eq(' + index + ') [data-value=miew-menu-panel-uniform-color]');
+  if (repr.colorer.id === 'UN' || repr.colorer.id === 'CB') {
+    var ucSelector = reprList.find('.panel:eq(' + index + ') [data-value=miew-menu-panel-select-color]');
     var ucColor = hexColor(repr.colorer.opts.color);
+    ucSelector[0].firstElementChild.innerHTML = repr.colorer.name + ' color';
+    ucSelector[0].lastChild.firstElementChild.setAttribute('data-id', ucColor);
+    ucSelector[0].lastChild.firstElementChild.firstElementChild.style.backgroundColor = ucColor;
     ucSelector.show();
-    ucSelector[0].firstElementChild.firstElementChild.setAttribute('data-id', ucColor);
-    ucSelector[0].firstElementChild.firstElementChild.firstElementChild.style.backgroundColor = ucColor;
   } else {
-    reprList.find('.panel:eq(' + index + ') [data-value=miew-menu-panel-uniform-color]').hide();
+    reprList.find('.panel:eq(' + index + ') [data-value=miew-menu-panel-select-color]').hide();
   }
 
   reprList.find('.panel:eq(' + index + ') input[type=checkbox]').bootstrapSwitch('state', repr.mode.opts.zClip);
@@ -651,7 +660,7 @@ Menu.prototype._getCurReprPropertyId = function(reprPropDataVal) {
   var self = this;
   var reprList = $(self._menuId + ' .panel-menu[data-panel-type=miew-menu-panel-representation] .miew-repr-list');
   var element = reprList.find('.panel.valid:eq(' + self._curReprIdx + ') [data-value="' + reprPropDataVal + '"]');
-  return element[0].firstElementChild.firstElementChild.getAttribute('data-id');
+  return element[0].lastChild.firstElementChild.getAttribute('data-id');
 };
 
 Menu.prototype._getCurReprSelector = function() {
@@ -808,10 +817,16 @@ Menu.prototype._fillReprList = function() {
     elements[0].firstElementChild.firstElementChild.textContent = Colorer.prototype.shortName;
     elements[0].firstElementChild.firstElementChild.setAttribute('data-id', itemID);
 
-    if (itemID === 'UN') {
-      reprList.find('.panel:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-uniform-color]').show();
+    if (itemID === 'UN' || itemID === 'CB') {
+      var ucColorName = (itemID === 'UN') ? 'Uniform color' : 'Carbon color';
+      var ucColor = (itemID === 'UN') ? settings.now.colorers.UN.color : settings.now.colorers.CB.color;
+      var elem = reprList.find('.panel:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-select-color]');
+      elem[0].firstElementChild.innerHTML = ucColorName;
+      elem[0].lastElementChild.firstElementChild.setAttribute('data-id', hexColor(ucColor));
+      elem[0].lastElementChild.firstElementChild.firstElementChild.style.backgroundColor = hexColor(ucColor);
+      elem.show();
     } else {
-      reprList.find('.panel:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-uniform-color]').hide();
+      reprList.find('.panel:eq(' + self._curReprIdx + ') [data-value=miew-menu-panel-select-color]').hide();
     }
   });
 
@@ -2100,7 +2115,9 @@ Menu.prototype._initRenderPanel = function() {
     const palette = palettes.get(itemID);
 
     elements[0].firstElementChild.firstElementChild.textContent = palette ? palette.name : 'Unknown';
-    self._fillUniformColorCombo(itemID);
+
+    self._fillSelectionColorCombo(itemID);
+
     //Here should be palettes colors mapping
     /*var ucSelector = $(self._menuId + ' .panel-menu[data-panel-type=miew-menu-panel-representation]' +
        '.miew-repr-list [data-value=miew-menu-panel-uniform-color]');
@@ -2108,7 +2125,6 @@ Menu.prototype._initRenderPanel = function() {
       ucSelector.find('.thumbnail').attr('data-id', ucColor);
       ucSelector.find('img').css('background-color', ucColor);*/
   });
-
 };
 
 Menu.prototype._initToolsPanel = function() {
@@ -2574,7 +2590,7 @@ Menu.prototype.show = function(panelID, menuItem) {
   settings.checkpoint();
 
   self._updateDisplayOptions('miew-menu-panel-palette', 'palette', palettes);
-  self._fillUniformColorCombo(settings.get('palette'));
+  self._fillSelectionColorCombo(settings.get('palette'));
 
   self._fillSourceList();
   self._initReprList();
@@ -2887,7 +2903,7 @@ Menu.prototype._updateReprList = function() {
   var modeItem = null;
   var colorerItem = null;
   var matPresetItem = null;
-  var uniColorItem = null;
+  var ucColorItem = null;
   var modeId = null;
   var colorerId = null;
   var matPresetId = null;
@@ -2897,7 +2913,7 @@ Menu.prototype._updateReprList = function() {
   var zClip = null;
   var isoValue = null;
   var radScale = null;
-  var uniColor = null;
+  var ucColor = null;
   var repr = null;
 
   function _fillModeOptionsFromMenu() {
@@ -2931,11 +2947,12 @@ Menu.prototype._updateReprList = function() {
       modeItem = $(element).find('[data-value=miew-menu-panel-mode]')[0];
       colorerItem = $(element).find('[data-value=miew-menu-panel-color]')[0];
       matPresetItem = $(element).find('[data-value=miew-menu-panel-matpreset]')[0];
-      uniColorItem = $(element).find('[data-value=miew-menu-panel-uniform-color]')[0];
+      ucColorItem = $(element).find('[data-value=miew-menu-panel-select-color]')[0];
       modeId = modeItem.firstElementChild.firstElementChild.getAttribute('data-id');
       colorerId = colorerItem.firstElementChild.firstElementChild.getAttribute('data-id');
       matPresetId = matPresetItem.firstElementChild.firstElementChild.getAttribute('data-id');
-      uniColor = stringColorToHex(uniColorItem.firstElementChild.firstElementChild.getAttribute('data-id'));
+      ucColor = stringColorToHex(ucColorItem.lastChild.firstElementChild.getAttribute('data-id'));
+
       zClip = $(element).find('[type=checkbox][data-toggle=zClip]')[0].checked;
       radScale = parseFloat($(element).find('[data-type=rad]').val());
       isoValue = parseFloat($(element).find('[data-type=iso]').val());
@@ -2953,8 +2970,8 @@ Menu.prototype._updateReprList = function() {
 
           _fillModeOptionsFromMenu();
 
-          if (colorerId === 'UN') {
-            repr.colorer.opts.color = uniColor;
+          if (colorerId === 'UN' || colorerId === 'CB') {
+            repr.colorer.opts.color = ucColor;
           }
           repr.setMaterialPreset(materials.get(matPresetId));
 
@@ -2974,11 +2991,11 @@ Menu.prototype._updateReprList = function() {
 
         repr = self._viewer.repGet();
         // change uniform colorer's color if applicable
-        if (colorerId === 'UN') {
-          if (repr.colorer.opts.color !== uniColor) {
+        if (colorerId === 'UN' || colorerId === 'CB') {
+          if (repr.colorer.opts.color !== ucColor) {
             // FIXME: set color through shader uniform without rebuild
             repr.needsRebuild = true;
-            repr.colorer.opts.color = uniColor;
+            repr.colorer.opts.color = ucColor;
           }
         }
 

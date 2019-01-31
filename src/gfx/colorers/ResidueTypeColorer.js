@@ -1,6 +1,3 @@
-
-
-import utils from '../../utils';
 import Colorer from './Colorer';
 
 /**
@@ -11,25 +8,24 @@ import Colorer from './Colorer';
  * @exports ResidueTypeColorer
  * @constructor
  */
-function ResidueTypeColorer(opts) {
-  Colorer.call(this, opts);
+class ResidueTypeColorer extends Colorer {
+  static id = 'RT';
+
+  constructor(opts) {
+    super(opts);
+  }
+
+  getAtomColor(atom, complex) {
+    return this.getResidueColor(atom._residue, complex);
+  }
+
+  getResidueColor(residue, _complex) {
+    return this.palette.getResidueColor(residue._type._name);
+  }
 }
 
-utils.deriveClass(ResidueTypeColorer, Colorer, {
-  id: 'RT',
-  name: 'Residue Type',
-  shortName: 'Residue',
-}, {
-  id: 'RT',
-});
-
-ResidueTypeColorer.prototype.getAtomColor = function(atom, complex) {
-  return this.getResidueColor(atom._residue, complex);
-};
-
-ResidueTypeColorer.prototype.getResidueColor = function(residue, _complex) {
-  return this.palette.getResidueColor(residue._type._name);
-};
+ResidueTypeColorer.prototype.id = 'RT';
+ResidueTypeColorer.prototype.name = 'Residue Type';
+ResidueTypeColorer.prototype.shortName = 'Residue';
 
 export default ResidueTypeColorer;
-

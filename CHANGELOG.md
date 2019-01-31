@@ -6,6 +6,35 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.20] - 2018-07-30
+### Added
+- Add a separate setting for fog color (`fogColor`, `fogColorEnable`) and transparency
+  (`fogAlpha`). Now it can be different from the background color and only shade a
+  geometry behind the far plane instead of completely hiding it.
+- Add `ToonMaterial` and depth-based `outline` full-scene effect for nice
+  [cartoon-like rendering][].
+- Add `FlatMaterial`, `CarbonColorer`, together with `miew.motm()` API method and
+  `motm` script command for reproducing the amazing
+  [RCSB PDB Molecule of the Month style][] by [David S. Goodsell][].
+
+### Changed
+- Ambient occlusion (SSAO) now uses a Normal screen buffer for precise per-pixel normals.
+  This requires multiple render targets output (`WEBGL_draw_buffers` extension) .
+
+### Fixed
+- Fix switching WebVR mode on and off.
+- Fix wrong screenshot size on high resolution displays.
+- Fix fog interpolation for sprites.
+- Fix a background color not being restored from URL.
+
+### Internal
+- Migrate parts of code to ES2015 syntax (`modes/`, `colorers/`, `meshes/`, `geometries/`, `groups/`, `processors/`).
+- Update golden images for e2e regression tests.
+
+[cartoon-like rendering]: http://miew.opensource.epam.com/v0.7.20/?l=1CRN&r=0&s=not+hetatm&m=CA&c=SQ&mt=TN&r=1&s=hetatm+and+not+water&m=BS&c=EL&mt=SF&resolution=high&outline.on=true&outline.threshold=0.02
+[RCSB PDB Molecule of the Month style]: http://miew.opensource.epam.com/v0.7.20/?l=pdb:5AT1&r=0&s=not+water+and+chain+C&m=VW&c=CO!subset:elem+C,baseColor:16422548,color:16494255&mt=FL&r=1&s=not+water+and+chain+B&m=VW&c=CO!subset:elem+C,baseColor:8169212,color:9550321&mt=FL&r=2&s=not+water+and+chain+D&m=VW&c=CO!subset:elem+C,baseColor:8112632,color:9888764&mt=FL&r=3&s=not+water+and+hetatm&m=VW&c=CO!subset:elem+C,baseColor:6532453,color:8837511&mt=FL&v=1SuyCwvajDcJvkg3CdGZdPKssNrtig608h/CdPw%3D%3D&fogFarFactor=2&fogColorEnable=true&theme=light&bg.color=13421772&outline.on=true&outline.threshold=0.01
+[David S. Goodsell]: http://pdb101.rcsb.org/motm/motm-about
+ 
 ## [0.7.19] - 2018-06-18
 ### Changed
 - Demo app uses deferred scripts loading and the stylesheet is extracted to a separate file.
@@ -321,7 +350,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.19...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.20...HEAD
+[0.7.20]: https://github.com/epam/miew/compare/v0.7.19...v0.7.20
 [0.7.19]: https://github.com/epam/miew/compare/v0.7.18...v0.7.19
 [0.7.18]: https://github.com/epam/miew/compare/v0.7.17...v0.7.18
 [0.7.17]: https://github.com/epam/miew/compare/v0.7.16...v0.7.17

@@ -5,99 +5,93 @@ import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
 
-var
+const
   Complex = chem.Complex,
   Element = chem.Element;
 
-function PubChemParser(data, options) {
-  Parser.call(this, data, options);
-  this._options.fileType = 'pubchem+json';
+class PubChemParser extends Parser {
+  constructor(data, options) {
+    super(data, options);
+    this._options.fileType = 'pubchem+json';
+  }
+
+  /** @deprecated */
+  static canParse(data, options) {
+    if (!data) {
+      return false;
+    }
+    const type = options.fileType;
+    return (
+      _.isString(data) &&
+      (type === 'pubchem+json' || (!type && data[0] === '{'))
+    );
+  }
+
+  static canProbablyParse(data) {
+    return _.isString(data) && data[0] === '{';
+  }
+
+  parseSync() {
+    this.logger.info('Parsing PubChem JSON file...');
+    return this._toComplex(JSON.parse(this._data));
+  }
+
+  _toComplex(jsonData) {
+    let complex = new Complex();
+    const complexData = jsonData.PC_Compounds && jsonData.PC_Compounds[0];
+    if (complexData) {
+      this._extractAtoms(complex, complexData);
+      complex.finalize({
+        needAutoBonding: false,
+        detectAromaticLoops: this.settings.now.aromatic,
+        enableEditing: this.settings.now.editing,
+      });
+    }
+    return complex;
+  }
+
+  _extractAtoms(complex, complexData) {
+    let aids = complexData.atoms && complexData.atoms.aid;
+    let elements = aids && complexData.atoms.element;
+    if (!elements || aids.length !== elements.length) {
+      throw new Error('Unable to parse atom elements');
+    }
+    elements = _.fromPairs(_.zip(aids, elements));
+    const atoms = {};
+
+    const coords = complexData.coords && complexData.coords[0];
+    const model = coords && coords.conformers && coords.conformers[0];
+    let xs = model && model.x;
+    let ys = model && model.y;
+    const zs = model && model.z || [];
+    aids = coords && coords.aid;
+    if (!aids || !xs || !ys) {
+      throw new Error('Coordinates are not found in the file');
+    }
+
+    const chain = complex.addChain(' ');
+    const residue = chain.addResidue('UNK', 1, ' ');
+
+    for (let i = 0, n = aids.length; i < n; ++i) {
+      const aid = aids[i];
+      const element = Element.ByAtomicNumber[elements[aid]];
+      let xyz = new THREE.Vector3(xs[i], ys[i], zs[i] || 0.0);
+      atoms[aid] = residue.addAtom(element.name, element, xyz, undefined, true, aid, ' ', 1.0, 0.0, 0);
+    }
+
+    let aids1 = complexData.bonds && complexData.bonds.aid1;
+    let aids2 = complexData.bonds && complexData.bonds.aid2;
+    const orders = complexData.bonds && complexData.bonds.order || [];
+    if (!aids1 || !aids2 || aids1.length !== aids2.length) {
+      return;
+    }
+
+    for (let j = 0, m = aids1.length; j < m; ++j) {
+      complex.addBond(atoms[aids1[j]], atoms[aids2[j]], orders[j] || 1, 0, true);
+    }
+  }
 }
 
-////////////////////////////////////////////////////////////////////////////
-// Inheritance
-
-PubChemParser.prototype = Object.create(Parser.prototype);
-PubChemParser.prototype.constructor = PubChemParser;
-
-////////////////////////////////////////////////////////////////////////////
-// Class methods
-
-/** @deprecated */
-PubChemParser.canParse = function(data, options) {
-  if (!data) {
-    return false;
-  }
-  var type = options.fileType;
-  return (
-    _.isString(data) &&
-      (type === 'pubchem+json' || (!type && data[0] === '{'))
-  );
-};
-
-PubChemParser.canProbablyParse = function(data) {
-  return _.isString(data) && data[0] === '{';
-};
-
-PubChemParser.prototype.parseSync = function() {
-  this.logger.info('Parsing PubChem JSON file...');
-  return this._toComplex(JSON.parse(this._data));
-};
-
-PubChemParser.prototype._toComplex = function(jsonData) {
-  var complex = new Complex();
-  var complexData = jsonData.PC_Compounds && jsonData.PC_Compounds[0];
-  if (complexData) {
-    this._extractAtoms(complex, complexData);
-    complex.finalize({
-      needAutoBonding: false,
-      detectAromaticLoops: this.settings.now.aromatic,
-      enableEditing: this.settings.now.editing,
-    });
-  }
-  return complex;
-};
-
-PubChemParser.prototype._extractAtoms = function(complex, complexData) {
-  var aids = complexData.atoms && complexData.atoms.aid;
-  var elements = aids && complexData.atoms.element;
-  if (!elements || aids.length !== elements.length) {
-    throw new Error('Unable to parse atom elements');
-  }
-  elements = _.fromPairs(_.zip(aids, elements));
-  var atoms = {};
-
-  var coords = complexData.coords && complexData.coords[0];
-  var model = coords && coords.conformers && coords.conformers[0];
-  var xs = model && model.x;
-  var ys = model && model.y;
-  var zs = model && model.z || [];
-  aids = coords && coords.aid;
-  if (!aids || !xs || !ys) {
-    throw new Error('Coordinates are not found in the file');
-  }
-
-  var chain = complex.addChain(' ');
-  var residue = chain.addResidue('UNK', 1, ' ');
-
-  for (var i = 0, n = aids.length; i < n; ++i) {
-    var aid = aids[i];
-    var element = Element.ByAtomicNumber[elements[aid]];
-    var xyz = new THREE.Vector3(xs[i], ys[i], zs[i] || 0.0);
-    atoms[aid] = residue.addAtom(element.name, element, xyz, undefined, true, aid, ' ', 1.0, 0.0, 0);
-  }
-
-  var aids1 = complexData.bonds && complexData.bonds.aid1;
-  var aids2 = complexData.bonds && complexData.bonds.aid2;
-  var orders = complexData.bonds && complexData.bonds.order || [];
-  if (!aids1 || !aids2 || aids1.length !== aids2.length) {
-    return;
-  }
-
-  for (var j = 0, m = aids1.length; j < m; ++j) {
-    complex.addBond(atoms[aids1[j]], atoms[aids2[j]], orders[j] || 1, 0, true);
-  }
-};
 
 PubChemParser.formats = ['pubchem', 'pubchem+json', 'pc'];
 PubChemParser.extensions = ['.json'];

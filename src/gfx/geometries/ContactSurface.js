@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 
@@ -19,42 +17,42 @@ import utils from '../../utils';
  * @param {number} maxDistance - max distance
  */
 function AVHash(posRad, min, max, maxDistance) {
-  var itemSize = 4;
-  var nAtoms = posRad.length / itemSize;
+  const itemSize = 4;
+  const nAtoms = posRad.length / itemSize;
 
-  var minX = min[0];
-  var minY = min[1];
-  var minZ = min[2];
+  const minX = min[0];
+  const minY = min[1];
+  const minZ = min[2];
 
-  var maxX = max[0];
-  var maxY = max[1];
-  var maxZ = max[2];
+  const maxX = max[0];
+  const maxY = max[1];
+  const maxZ = max[2];
 
   function hashFunc(w, minW) {
     return Math.floor((w - minW) / maxDistance);
   }
 
-  var iDim = hashFunc(maxX, minX) + 1;
-  var jDim = hashFunc(maxY, minY) + 1;
-  var kDim = hashFunc(maxZ, minZ) + 1;
+  const iDim = hashFunc(maxX, minX) + 1;
+  const jDim = hashFunc(maxY, minY) + 1;
+  const kDim = hashFunc(maxZ, minZ) + 1;
 
-  var nCells = iDim * jDim * kDim;
+  const nCells = iDim * jDim * kDim;
 
-  var jkDim = jDim * kDim;
+  const jkDim = jDim * kDim;
 
 
   /* Get cellID for cartesian x,y,z */
-  var cellID = function(x, y, z) {
+  const cellID = function(x, y, z) {
     return (((hashFunc(x, minX) * jDim) + hashFunc(y, minY)) * kDim) + hashFunc(z, minZ);
   };
 
 
-    /* Initial building, could probably be optimized further */
-  var preHash = []; // preHash[ cellID ] = [ atomId1, atomId2 ];
-  var i;
-  var cid;
+  /* Initial building, could probably be optimized further */
+  const preHash = []; // preHash[ cellID ] = [ atomId1, atomId2 ];
+  let i;
+  let cid;
   for (i = 0; i < nAtoms; i++) {
-    var iIdx = itemSize * i;
+    const iIdx = itemSize * i;
     cid = cellID(posRad[iIdx], posRad[iIdx + 1], posRad[iIdx + 2]);
 
     if (preHash[cid] === undefined) {
@@ -65,17 +63,17 @@ function AVHash(posRad, min, max, maxDistance) {
 
   }
 
-  var cellOffsets = utils.allocateTyped(Uint32Array, nCells);
-  var cellLengths = utils.allocateTyped(Uint16Array, nCells);
-  var data = utils.allocateTyped(Uint32Array, nAtoms);
+  const cellOffsets = utils.allocateTyped(Uint32Array, nCells);
+  const cellLengths = utils.allocateTyped(Uint16Array, nCells);
+  const data = utils.allocateTyped(Uint32Array, nAtoms);
 
-  var offset = 0;
-  var maxCellLength = 0;
-  var j;
+  let offset = 0;
+  let maxCellLength = 0;
+  let j;
   for (i = 0; i < nCells; i++) {
-    var start = cellOffsets[i] = offset;
+    const start = cellOffsets[i] = offset;
 
-    var subArray = preHash[i];
+    const subArray = preHash[i];
 
     if (subArray !== undefined) {
       for (j = 0; j < subArray.length; j++) {
@@ -84,7 +82,7 @@ function AVHash(posRad, min, max, maxDistance) {
       }
     }
 
-    var cellLength = offset - start;
+    const cellLength = offset - start;
     cellLengths[i] = cellLength;
 
     if (cellLength > maxCellLength) {
@@ -109,43 +107,43 @@ function AVHash(posRad, min, max, maxDistance) {
    * @return {undefined}
    */
   this.withinRadii = function(x, y, z, rExtra, out) {
-    var outIdx = 0;
+    let outIdx = 0;
 
-    var nearI = hashFunc(x, minX);
-    var nearJ = hashFunc(y, minY);
-    var nearK = hashFunc(z, minZ);
+    const nearI = hashFunc(x, minX);
+    const nearJ = hashFunc(y, minY);
+    const nearK = hashFunc(z, minZ);
 
-    var loI = Math.max(0, nearI - 1);
-    var loJ = Math.max(0, nearJ - 1);
-    var loK = Math.max(0, nearK - 1);
+    const loI = Math.max(0, nearI - 1);
+    const loJ = Math.max(0, nearJ - 1);
+    const loK = Math.max(0, nearK - 1);
 
-    var hiI = Math.min(iDim - 1, nearI + 1);
-    var hiJ = Math.min(jDim - 1, nearJ + 1);
-    var hiK = Math.min(kDim - 1, nearK + 1);
+    const hiI = Math.min(iDim - 1, nearI + 1);
+    const hiJ = Math.min(jDim - 1, nearJ + 1);
+    const hiK = Math.min(kDim - 1, nearK + 1);
 
     for (i = loI; i <= hiI; ++i) {
 
-      var iOffset = i * jkDim;
+      const iOffset = i * jkDim;
 
       for (j = loJ; j <= hiJ; ++j) {
 
-        var jOffset = j * kDim;
+        const jOffset = j * kDim;
 
-        for (var k = loK; k <= hiK; ++k) {
+        for (let k = loK; k <= hiK; ++k) {
 
           cid = iOffset + jOffset + k;
 
-          var cellStart = cellOffsets[cid];
-          var cellEnd = cellStart + cellLengths[cid];
+          const cellStart = cellOffsets[cid];
+          const cellEnd = cellStart + cellLengths[cid];
 
-          for (var dataIndex = cellStart; dataIndex < cellEnd; dataIndex++) {
+          for (let dataIndex = cellStart; dataIndex < cellEnd; dataIndex++) {
 
-            var atomIndex = data[dataIndex];
-            var baseIndex = itemSize * atomIndex;
-            var dx = posRad[baseIndex] - x;
-            var dy = posRad[baseIndex + 1] - y;
-            var dz = posRad[baseIndex + 2] - z;
-            var rSum = posRad[baseIndex + 3] + rExtra;
+            const atomIndex = data[dataIndex];
+            const baseIndex = itemSize * atomIndex;
+            const dx = posRad[baseIndex] - x;
+            const dy = posRad[baseIndex + 1] - y;
+            const dz = posRad[baseIndex + 2] - z;
+            const rSum = posRad[baseIndex + 3] + rExtra;
 
             if ((dx * dx + dy * dy + dz * dz) <= (rSum * rSum)) {
               out[outIdx++] = data[dataIndex];
@@ -167,50 +165,50 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   // Should work as a drop-in alternative to EDTSurface (though some of
   // the EDT paramters are not relevant in this method).
 
-  var itemSize = 4;
-  var posRad = packedArrays.posRad;
-  var colors = packedArrays.colors;
-  var atoms = packedArrays.atoms;
-  var nAtoms = posRad.length / itemSize;
+  const itemSize = 4;
+  const posRad = packedArrays.posRad;
+  const colors = packedArrays.colors;
+  const atoms = packedArrays.atoms;
+  const nAtoms = posRad.length / itemSize;
 
-  var bbox = boundaries.bbox;
+  const bbox = boundaries.bbox;
 
-  var min = bbox.minPosRad;
-  var max = bbox.maxPosRad;
+  const min = bbox.minPosRad;
+  const max = bbox.maxPosRad;
 
-  var r2;  // Atom positions, expanded radii (squared)
-  var maxRadius;
+  let r2;  // Atom positions, expanded radii (squared)
+  let maxRadius;
 
   // Parameters
-  var probeRadius, scaleFactor, probePositions;
+  let probeRadius, scaleFactor, probePositions;
 
   // Cache last value for obscured test
-  var lastClip = -1;
+  let lastClip = -1;
 
   // Grid params
-  var dim, grid;
-  var volTex, weights, weightsMap = null, atomMap = null;
-  var visibilitySelector = null;
+  let dim, grid;
+  let volTex, weights, weightsMap = null, atomMap = null;
+  let visibilitySelector = null;
 
 
   // grid indices -> xyz coords
-  var gridx, gridy, gridz;
+  let gridx, gridy, gridz;
 
   // Lookup tables:
-  var sinTable, cosTable;
+  let sinTable, cosTable;
 
   // Spatial Hash
-  var hash;
+  let hash;
 
   // Neighbour array to be filled by hash
-  var neighbours;
+  let neighbours;
 
   // Vectors for Torus Projection
-  var mid = new THREE.Vector3(0.0, 0.0, 0.0);
-  var n1 = new THREE.Vector3(0.0, 0.0, 0.0);
-  var n2 = new THREE.Vector3(0.0, 0.0, 0.0);
+  const mid = new THREE.Vector3(0.0, 0.0, 0.0);
+  const n1 = new THREE.Vector3(0.0, 0.0, 0.0);
+  const n2 = new THREE.Vector3(0.0, 0.0, 0.0);
 
-  var ngTorus;
+  let ngTorus;
 
   function init() {
     probeRadius = params.probeRadius;
@@ -220,8 +218,8 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
     r2 = utils.allocateTyped(Float32Array, nAtoms);
     maxRadius = 0;
-    for (var innI = 0; innI < nAtoms; ++innI) {
-      var rExt = posRad[innI * itemSize + 3] += probeRadius;
+    for (let innI = 0; innI < nAtoms; ++innI) {
+      const rExt = posRad[innI * itemSize + 3] += probeRadius;
       if (rExt > maxRadius) {
         maxRadius = rExt;
       }
@@ -236,8 +234,8 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   }
 
   function uniformArray(TypeName, n, a) {
-    var array = utils.allocateTyped(TypeName, n);
-    for (var innI = 0; innI < n; ++innI) {
+    const array = utils.allocateTyped(TypeName, n);
+    for (let innI = 0; innI < n; ++innI) {
       array[innI] = a;
     }
 
@@ -246,7 +244,7 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
 
   function fillGridDim(a, start, step) {
-    for (var innI = 0; innI < a.length; innI++) {
+    for (let innI = 0; innI < a.length; innI++) {
       a[innI] = start + (step * innI);
     }
   }
@@ -257,7 +255,7 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
     ngTorus = Math.min(5, 2 + Math.floor(probeRadius * scaleFactor));
 
-    var gridSize = dim[0] * dim[1] * dim[2];
+    const gridSize = dim[0] * dim[1] * dim[2];
     grid = uniformArray(Float32Array, gridSize, -1001.0);
     volTex = utils.allocateTyped(Float32Array, gridSize * 3);
     weights = utils.allocateTyped(Float32Array, gridSize);
@@ -277,12 +275,12 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   }
 
   function initializeAngleTables() {
-    var theta = 0.0;
-    var step = 2 * Math.PI / probePositions;
+    let theta = 0.0;
+    const step = 2 * Math.PI / probePositions;
 
     cosTable = utils.allocateTyped(Float32Array, probePositions);
     sinTable = utils.allocateTyped(Float32Array, probePositions);
-    for (var innI = 0; innI < probePositions; innI++) {
+    for (let innI = 0; innI < probePositions; innI++) {
       cosTable[innI] = Math.cos(theta);
       sinTable[innI] = Math.sin(theta);
       theta += step;
@@ -301,7 +299,7 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
     // Cache the last clipped atom (as very often the same one in
     // subsequent calls)
-    var ai;
+    let ai;
 
     if (lastClip !== -1) {
       ai = lastClip;
@@ -312,7 +310,7 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
       }
     }
 
-    var ni = 0;
+    let ni = 0;
     ai = neighbours[ni];
     while (ai >= 0) {
       if (ai !== a && ai !== b && singleAtomObscures(ai, innX, innY, innZ)) {
@@ -328,12 +326,12 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   }
 
   function singleAtomObscures(ai, innX, innY, innZ) {
-    var innCI = itemSize * ai;
-    var ra2 = r2[ai];
-    var dx = posRad[innCI] - innX;
-    var dy = posRad[innCI + 1] - innY;
-    var dz = posRad[innCI + 2] - innZ;
-    var d2 = dx * dx + dy * dy + dz * dz;
+    const innCI = itemSize * ai;
+    const ra2 = r2[ai];
+    const dx = posRad[innCI] - innX;
+    const dy = posRad[innCI + 1] - innY;
+    const dz = posRad[innCI + 2] - innZ;
+    const d2 = dx * dx + dy * dy + dz * dz;
 
     return d2 < ra2;
   }
@@ -349,67 +347,67 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     //             Calcualte delta distance and set grid value to minimum of
     //             itself and delta
 
-    // Should we alias frequently accessed closure variables??
+    // Should we alias frequently accessed closure constiables??
     // Assume JS engine capable of optimizing this
     // anyway...
-    var maxRad = 4.0;
-    var sigma = (maxRad) / 3;
-    var sigma2Inv = 1 / (2 * sigma * sigma);
+    const maxRad = 4.0;
+    const sigma = (maxRad) / 3;
+    const sigma2Inv = 1 / (2 * sigma * sigma);
 
-    for (var innI = 0; innI < nAtoms; innI++) {
-      var innCI = itemSize * innI;
-      var ax = posRad[innCI];
-      var ay = posRad[innCI + 1];
-      var az = posRad[innCI + 2];
-      var ar = posRad[innCI + 3];
-      var ar2 = r2[innI];
+    for (let innI = 0; innI < nAtoms; innI++) {
+      const innCI = itemSize * innI;
+      const ax = posRad[innCI];
+      const ay = posRad[innCI + 1];
+      const az = posRad[innCI + 2];
+      const ar = posRad[innCI + 3];
+      const ar2 = r2[innI];
 
       hash.withinRadii(ax, ay, az, ar, neighbours);
 
       // Number of grid points, round this up...
-      var ng = Math.ceil(ar * scaleFactor);
+      const ng = Math.ceil(ar * scaleFactor);
 
       // Center of the atom, mapped to grid points (take floor)
-      var iax = Math.floor(scaleFactor * (ax - min[0]));
-      var iay = Math.floor(scaleFactor * (ay - min[1]));
-      var iaz = Math.floor(scaleFactor * (az - min[2]));
+      const iax = Math.floor(scaleFactor * (ax - min[0]));
+      const iay = Math.floor(scaleFactor * (ay - min[1]));
+      const iaz = Math.floor(scaleFactor * (az - min[2]));
 
       // Extents of grid to consider for this atom
-      var minx = Math.max(0, iax - ng);
-      var miny = Math.max(0, iay - ng);
-      var minz = Math.max(0, iaz - ng);
+      const minx = Math.max(0, iax - ng);
+      const miny = Math.max(0, iay - ng);
+      const minz = Math.max(0, iaz - ng);
 
       // Add two to these points:
       // - iax are floor'd values so this ensures coverage
       // - these are loop limits (exclusive)
-      var maxx = Math.min(dim[0], iax + ng + 2);
-      var maxy = Math.min(dim[1], iay + ng + 2);
-      var maxz = Math.min(dim[2], iaz + ng + 2);
+      const maxx = Math.min(dim[0], iax + ng + 2);
+      const maxy = Math.min(dim[1], iay + ng + 2);
+      const maxz = Math.min(dim[2], iaz + ng + 2);
 
-      var colIdx = innI * 3;
-      var cr = colors[colIdx];
-      var cg = colors[colIdx + 1];
-      var cb = colors[colIdx + 2];
+      const colIdx = innI * 3;
+      const cr = colors[colIdx];
+      const cg = colors[colIdx + 1];
+      const cb = colors[colIdx + 2];
 
-      for (var iz = minz; iz < maxz; iz++) {
-        var dz = gridz[iz] - az;
-        var zOffset = dim[1] * dim[0] * iz;
+      for (let iz = minz; iz < maxz; iz++) {
+        const dz = gridz[iz] - az;
+        const zOffset = dim[1] * dim[0] * iz;
 
-        for (var iy = miny; iy < maxy; iy++) {
+        for (let iy = miny; iy < maxy; iy++) {
 
-          var dy = gridy[iy] - ay;
-          var dzy2 = dz * dz + dy * dy;
-          var zyOffset = zOffset + dim[0] * iy;
+          const dy = gridy[iy] - ay;
+          const dzy2 = dz * dz + dy * dy;
+          const zyOffset = zOffset + dim[0] * iy;
 
-          for (var ix = minx; ix < maxx; ix++) {
-            var idx = ix + zyOffset;
-            var dx = gridx[ix] - ax;
-            var d2 = dzy2 + dx * dx;
+          for (let ix = minx; ix < maxx; ix++) {
+            const idx = ix + zyOffset;
+            const dx = gridx[ix] - ax;
+            const d2 = dzy2 + dx * dx;
 
 
             if (d2 < ar2) {
-              var w = Math.exp(-d2 * sigma2Inv);
-              var cIdx = idx * 3;
+              const w = Math.exp(-d2 * sigma2Inv);
+              const cIdx = idx * 3;
               volTex[cIdx] += cr * w;
               volTex[cIdx + 1] += cg * w;
               volTex[cIdx + 2] += cb * w;
@@ -425,18 +423,18 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
               }
               // Project on to the surface of the sphere
               // sp is the projected point ( dx, dy, dz ) * ( ra / d )
-              var d = Math.sqrt(d2);
-              var ap = ar / d;
-              var spx = dx * ap;
-              var spy = dy * ap;
-              var spz = dz * ap;
+              const d = Math.sqrt(d2);
+              const ap = ar / d;
+              let spx = dx * ap;
+              let spy = dy * ap;
+              let spz = dz * ap;
 
               spx += ax;
               spy += ay;
               spz += az;
 
               if (obscured(spx, spy, spz, innI, -1) === -1) {
-                var dd = ar - d;
+                const dd = ar - d;
                 if (dd < grid[idx]) {
                   grid[idx] = dd;
                 }
@@ -450,14 +448,14 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   }
 
   function projectTorii() {
-    for (var innI = 0; innI < nAtoms; innI++) {
-      var innIdx = itemSize * innI;
+    for (let innI = 0; innI < nAtoms; innI++) {
+      const innIdx = itemSize * innI;
       hash.withinRadii(
         posRad[innIdx], posRad[innIdx + 1], posRad[innIdx + 2],
         posRad[innIdx + 3], neighbours
       );
-      var ia = 0;
-      var ni = neighbours[ia];
+      let ia = 0;
+      let ni = neighbours[ia];
       while (ni >= 0) {
         if (innI < ni) {
           projectTorus(innI, ni);
@@ -469,29 +467,29 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
   function projectTorus(a, b) {
 
-    var aIdx = itemSize * a;
-    var bIdx = itemSize * b;
-    var xa = posRad[aIdx];
-    var ya = posRad[aIdx + 1];
-    var za = posRad[aIdx + 2];
-    var r1 = posRad[aIdx + 3];
-    var dx = mid.x = posRad[bIdx] - xa;
-    var dy = mid.y = posRad[bIdx + 1] - ya;
-    var dz = mid.z = posRad[bIdx + 2] - za;
-    var innR2 = posRad[bIdx + 3];
-    var d2 = dx * dx + dy * dy + dz * dz;
+    const aIdx = itemSize * a;
+    const bIdx = itemSize * b;
+    const xa = posRad[aIdx];
+    const ya = posRad[aIdx + 1];
+    const za = posRad[aIdx + 2];
+    const r1 = posRad[aIdx + 3];
+    let dx = mid.x = posRad[bIdx] - xa;
+    let dy = mid.y = posRad[bIdx + 1] - ya;
+    let dz = mid.z = posRad[bIdx + 2] - za;
+    const innR2 = posRad[bIdx + 3];
+    let d2 = dx * dx + dy * dy + dz * dz;
 
     // This check now redundant as already done in AVHash.withinRadii
     // if( d2 > (( r1 + r2 ) * ( r1 + r2 )) ){ return; }
 
-    var d = Math.sqrt(d2);
+    const d = Math.sqrt(d2);
 
     // Find angle between a->b vector and the circle
     // of their intersection by cosine rule
-    var cosA = (r1 * r1 + d * d - innR2 * innR2) / (2.0 * r1 * d);
+    const cosA = (r1 * r1 + d * d - innR2 * innR2) / (2.0 * r1 * d);
 
     // distance along a->b at intersection
-    var dmp = r1 * cosA;
+    const dmp = r1 * cosA;
 
     mid.normalize();
 
@@ -504,7 +502,7 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     n2.normalize();
 
     // r is radius of circle of intersection
-    var rInt = Math.sqrt(r1 * r1 - dmp * dmp);
+    const rInt = Math.sqrt(r1 * r1 - dmp * dmp);
 
     n1.multiplyScalar(rInt);
     n2.multiplyScalar(rInt);
@@ -516,48 +514,48 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
     lastClip = -1;
 
-    var ng = ngTorus;
+    const ng = ngTorus;
 
-    for (var innI = 0; innI < probePositions; innI++) {
+    for (let innI = 0; innI < probePositions; innI++) {
 
-      var cost = cosTable[innI];
-      var sint = sinTable[innI];
+      const cost = cosTable[innI];
+      const sint = sinTable[innI];
 
-      var px = mid.x + cost * n1.x + sint * n2.x;
-      var py = mid.y + cost * n1.y + sint * n2.y;
-      var pz = mid.z + cost * n1.z + sint * n2.z;
+      const px = mid.x + cost * n1.x + sint * n2.x;
+      const py = mid.y + cost * n1.y + sint * n2.y;
+      const pz = mid.z + cost * n1.z + sint * n2.z;
 
       if (obscured(px, py, pz, a, b) === -1) {
 
         // As above, iterate over our grid...
         // px, py, pz in grid coords
-        var iax = Math.floor(scaleFactor * (px - min[0]));
-        var iay = Math.floor(scaleFactor * (py - min[1]));
-        var iaz = Math.floor(scaleFactor * (pz - min[2]));
+        const iax = Math.floor(scaleFactor * (px - min[0]));
+        const iay = Math.floor(scaleFactor * (py - min[1]));
+        const iaz = Math.floor(scaleFactor * (pz - min[2]));
 
-        var minx = Math.max(0, iax - ng);
-        var miny = Math.max(0, iay - ng);
-        var minz = Math.max(0, iaz - ng);
+        const minx = Math.max(0, iax - ng);
+        const miny = Math.max(0, iay - ng);
+        const minz = Math.max(0, iaz - ng);
 
-        var maxx = Math.min(dim[0], iax + ng + 2);
-        var maxy = Math.min(dim[1], iay + ng + 2);
-        var maxz = Math.min(dim[2], iaz + ng + 2);
+        const maxx = Math.min(dim[0], iax + ng + 2);
+        const maxy = Math.min(dim[1], iay + ng + 2);
+        const maxz = Math.min(dim[2], iaz + ng + 2);
 
-        for (var iz = minz; iz < maxz; iz++) {
+        for (let iz = minz; iz < maxz; iz++) {
 
           dz = pz - gridz[iz];
-          var zOffset = dim[1] * dim[0] * iz;
-          for (var iy = miny; iy < maxy; iy++) {
+          const zOffset = dim[1] * dim[0] * iz;
+          for (let iy = miny; iy < maxy; iy++) {
 
             dy = py - gridy[iy];
-            var dzy2 = dz * dz + dy * dy;
-            var zyOffset = zOffset + dim[0] * iy;
-            for (var ix = minx; ix < maxx; ix++) {
+            const dzy2 = dz * dz + dy * dy;
+            const zyOffset = zOffset + dim[0] * iy;
+            for (let ix = minx; ix < maxx; ix++) {
 
               dx = px - gridx[ix];
               d2 = dzy2 + dx * dx;
-              var idx = ix + zyOffset;
-              var current = grid[idx];
+              const idx = ix + zyOffset;
+              const current = grid[idx];
 
               if (current > 0.0 && d2 < (current * current)) {
                 grid[idx] = Math.sqrt(d2);
@@ -584,12 +582,12 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   }
 
   function fixNegatives() {
-    for (var innI = 0, n = grid.length; innI < n; innI++) {
+    for (let innI = 0, n = grid.length; innI < n; innI++) {
       if (grid[innI] < 0) grid[innI] = 0;
-      var w = weights[innI];
+      let w = weights[innI];
       if (w > 0) {
         w = 1 / w;
-        var innInnI = innI * 3;
+        const innInnI = innI * 3;
         volTex[innInnI] *= w;
         volTex[innInnI + 1] *= w;
         volTex[innInnI + 2] *= w;
@@ -632,4 +630,3 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
 }
 export default ContactSurface;
-

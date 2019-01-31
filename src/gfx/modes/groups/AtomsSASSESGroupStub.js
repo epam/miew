@@ -1,30 +1,22 @@
-
-
 /* This is a stub class keep it until SAS/SES is refactored */
 
 import AtomsSphereGroup from './AtomsSphereGroup';
 
-function AtomsSASSESGroupStub(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
-  AtomsSphereGroup.call(this, geoParams, selection, colorer, mode, transforms, polyComplexity, material);
+class AtomsSASSESGroupStub extends AtomsSphereGroup {
+  _makeGeoArgs() {
+    const selectedAtoms = [];
+    const atoms = this._selection.atoms;
+    const chunks = this._selection.chunks;
+    let i = 0, n = chunks.length;
+    for (; i < n; ++i) {
+      selectedAtoms[i] = atoms[chunks[i]];
+    }
+    const opts = this._mode.getSurfaceOpts();
+    opts.atoms = selectedAtoms;
+    opts.selection = this._selection;
+    opts.colorMode = this._colorer;
+    return [n, opts];
+  }
 }
 
-AtomsSASSESGroupStub.prototype = Object.create(AtomsSphereGroup.prototype);
-AtomsSASSESGroupStub.prototype.constructor = AtomsSASSESGroupStub;
-
-AtomsSASSESGroupStub.prototype._makeGeoArgs = function(selection, mode, colorer, _polyComplexity) {
-  var selectedAtoms = [];
-  var atoms = selection.atoms;
-  var chunks = selection.chunks;
-  var i = 0, n = chunks.length;
-  for (; i < n; ++i) {
-    selectedAtoms[i] = atoms[chunks[i]];
-  }
-  var opts = mode.getSurfaceOpts();
-  opts.atoms = selectedAtoms;
-  opts.selection = selection;
-  opts.colorMode = colorer;
-  return [n, opts];
-};
-
 export default AtomsSASSESGroupStub;
-

@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import UberObject from './UberObject';
 import ZSpriteMesh from './ZSpriteMesh';
@@ -16,4 +14,3 @@ export default {
   Mesh: SimpleMesh,
   ThickLineMesh: ThickLineMesh
 };
-
