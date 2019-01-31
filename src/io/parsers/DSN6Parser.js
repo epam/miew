@@ -1,7 +1,7 @@
 import Parser from './Parser';
 import * as THREE from 'three';
 import VolumeModel from './VolumeModel';
-import valueType from './VolumeModel';
+import {valueType} from './VolumeModel';
 
 
 //http://www.uoxray.uoregon.edu/tnt/manual/node104.html

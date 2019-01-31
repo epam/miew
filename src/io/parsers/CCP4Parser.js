@@ -1,7 +1,7 @@
 import Parser from './Parser';
 import * as THREE from 'three';
 import VolumeModel from './VolumeModel';
-import valueType from './VolumeModel';
+import {valueType} from './VolumeModel';
 
 const CCP4Header = {
   extent: [valueType.array, 'u32', 0],
