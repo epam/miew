@@ -723,7 +723,7 @@ var defaults = {
     shadowMap: false,
     pcf: true,
     soft: true,
-    radius: 5.0,
+    radius: 3.0,
   },
 
   /**
