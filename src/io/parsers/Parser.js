@@ -30,6 +30,12 @@ export default class Parser {
     });
   }
 
+  //only for volume Parsers
+  getModel() {
+    this.model._parseHeader(this._data);
+    return this.model;
+  }
+
   /** @deprecated */
   _parseOLD(callbacks) {
     return this.parse()
