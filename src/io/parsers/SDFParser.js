@@ -3,7 +3,6 @@ import chem from '../../chem';
 import * as THREE from 'three';
 import SDFStream from './SDFStream';
 import Assembly from '../../chem/Assembly';
-import ResidueType from '../../chem/ResidueType';
 
 const
   Complex = chem.Complex,
@@ -12,8 +11,19 @@ const
   Molecule = chem.Molecule;
 
 const chargeMap = [0, 3, 2, 1, 0, -1, -2, -3];
-const bondsMap = [
-  Bond.BondType.UNKNOWN, Bond.BondType.COVALENT, Bond.BondType.COVALENT, Bond.BondType.COVALENT, Bond.BondType.AROMATIC
+const orderMap = [0, 1, 2, 3, 1, 1, 1, 2];
+const typeMap = [
+  Bond.BondType.UNKNOWN,  // 0 - error
+  Bond.BondType.COVALENT, // 1 - single
+  Bond.BondType.COVALENT, // 2 - double
+  Bond.BondType.COVALENT, // 3 - triple
+  Bond.BondType.AROMATIC, // 4 - aromatic
+  Bond.BondType.UNKNOWN,  // 5 - single or double
+  Bond.BondType.AROMATIC, // 6 - single or aromatic
+  Bond.BondType.AROMATIC, // 7 - double or aromatic
+  // 8 - any
+  // 9 - coordination
+  // 10 - hydrogen
 ];
 
 const sdfAndMolRegexp = /.*(M\s\sEND).*|.*(^$$$$).*|.*>\s+<(.+)>.*/;
@@ -27,6 +37,24 @@ const possibleTitleTags = ['msg', 'MSG', 'message', 'title', 'description', 'des
 const tagsNames = ['name', 'id', 'title'];
 const tags = {name:  possibleNameTags, id: possibleIDTags, title: possibleTitleTags};
 
+function buildChainID(index) {
+  if (!index) {
+    return 'A';
+  }
+
+  const codes = [];
+  while (index) {
+    codes.push(65 + index % 26);
+    index = Math.trunc(index / 26);
+  }
+  if (codes.length > 1) {
+    codes.reverse();
+    codes[0] -= 1;
+  }
+
+  return String.fromCharCode(...codes);
+}
+
 export default class SDFParser extends Parser {
   constructor(data, options) {
     super(data, options);
@@ -37,7 +65,7 @@ export default class SDFParser extends Parser {
     this._molecules = null;
     this._metadata = {};
     this._metadata.molecules = [];
-    this._currentMolProps = [];
+    this._currentMolProps = {};
     this._compoundIndx = -1;
     this._assemblies = [];
     this._atomsParsed = 0;
@@ -60,10 +88,9 @@ export default class SDFParser extends Parser {
   _parseAtoms(stream, atomsNum) {
     let curStr, serial = this._atomsParsed;
 
-    //hack for chains and resudies names. each molecule = chain\residie. sdf files contains only
-    //molecules and no chains and residues;
-    const chainID = 'C' + this._compoundIndx;
-    const resName = ResidueType.StandardTypes.UNK;
+    // each molecule = chain\residue
+    const chainID = buildChainID(this._compoundIndx);
+    const resName = 'UNK';
     const resSeq = 1;
 
     this._chain = this._complex.getChain(chainID) || this._complex.addChain(chainID);
@@ -101,7 +128,10 @@ export default class SDFParser extends Parser {
       if (atom1 > atom2) {
         [atom1, atom2] = [atom2, atom1];
       }
-      this._complex.addBond(atom1, atom2, 0, bondsMap[bondType], true);
+      this._complex.addBond(atom1, atom2,
+        orderMap[bondType] || 1,
+        typeMap[bondType] || Bond.BondType.UNKNOWN,
+        true);
     }
   }
 
@@ -143,10 +173,11 @@ export default class SDFParser extends Parser {
 
     //parse data items block
     if (this._format === fileFormat.SDF) {
+      this._currentMolProps = {};
       while (stream.findNextDataItem()) {
         this._parseDataItem(stream);
       }
-      if (this._currentMolProps.length !== 0) {
+      if (Object.keys(this._currentMolProps).length !== 0) {
         const molecule = this._metadata.molecules[this._compoundIndx];
         molecule.props = this._currentMolProps;
         this._tryToUpdateMoleculeData(molecule);
