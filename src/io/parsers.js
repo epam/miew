@@ -7,6 +7,7 @@ import CIFParser from './parsers/CIFParser';
 import CCP4Parser from './parsers/CCP4Parser';
 import PubChemParser from './parsers/PubChemParser';
 import SDFParser from './parsers/SDFParser';
+import DSN6Parser from './parsers/DSN6Parser';
 
 import Parser from './parsers/Parser';
 
@@ -17,8 +18,9 @@ export const parsers = new ParserList([
   MMTFParser,
   CMLParser,
   PubChemParser,
-  CCP4Parser,
   SDFParser,
+  CCP4Parser,
+  DSN6Parser
 ]);
 
 /** @deprecated */
