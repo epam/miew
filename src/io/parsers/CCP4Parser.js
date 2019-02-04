@@ -39,8 +39,8 @@ class Ccp4Model extends VolumeModel {
     arrays.buffer = this._buff;
     const header = this._header;
 
-
     this._fillHeader(CCP4Header, arrays);
+
     // calculate non-orthogonal unit cell coordinates
     header.angles.multiplyScalar(Math.PI / 180.0);
   }

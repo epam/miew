@@ -136,7 +136,6 @@ class DSN6Model extends VolumeModel {
     this._header.dmax = maxDensity;
     this._header.dmin = minDensity;
   }
-
 }
 
 class DSN6Parser extends Parser {
