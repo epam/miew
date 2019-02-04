@@ -5,11 +5,6 @@ uniform vec3 volumeDim;    // volume dimensions, pixels
 uniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data
 uniform vec2 tileTexSize;  // size of tiled texture, pixels
 uniform vec2 tileStride;   // UV stride between slices in tile tex, pixels
-uniform float kSigma;      // coefficient of standart division
-uniform float sd;          // standart division of  volume density datset
-uniform float dmean;       // expectation of volume density datset
-uniform float dmax;        // maximum of volume density datset
-uniform float dmin;        // minimum of volume density datset
 
 uniform float _isoLevel0;
 uniform float _flipV;
@@ -70,7 +65,7 @@ vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
     else
       left = iterator;
   }
-  return 0.5*(left + right);
+  return 0.5 * (left + right);
 }
 
 vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count)
@@ -92,7 +87,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
       right = iterator;
       for (int j = 0; j < 5; j++)
       {
-        iterator = 0.5*(left + right);
+        iterator = 0.5 * (left + right);
         float vol = sample3DTexture(iterator).r;
         if (vol > tr)
           right = iterator;
@@ -119,19 +114,10 @@ vec3 GetCol(float vol, vec3 ad)
   return col;
 }
 */
-vec3 GetCol(float vol, vec3 ad)
-{
-  vec3 col;
-   col = vec3(0.5, 0.5, 0.5);// / (a - IsoLevel0)));
 
-  return col;
-}
-
-float GetAlpha(float vol, float alpha, float alphaTreshold)
+vec3 GetColSimple(float vol)
 {
-  if (vol < alphaTreshold)
-    return 0.;
-  return alpha;
+  return vol * vec3(1, 1, 1);
 }
 
 vec3 CorrectIso(vec3 left, vec3 right, float tr)
@@ -155,17 +141,18 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   //				float stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;
   float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;
   vec3 step = stepSize*dir, col, colOld, right;
+
   float tr0 = _isoLevel0;
   float dif, r, kd, finish;
   int count = 0, stopMol = 0;
-  float a = 0.36, b = 0.44;
-  vec3 ad = vec3(1. / (a - _isoLevel0), 1. / (b - a), 1. / (0.52 - b));
+  //float a = 0.36, b = 0.44;
+  //vec3 ad = vec3(1. / (a - _isoLevel0), 1. / (b - a), 1. / (0.52 - b));
   kd = 140. * tr0 * stepSize;
   r = 1. - kd;
-  float alphaTreshold = (dmean + kSigma * sd - dmin) / (dmax - dmin);
+
   for (int k = 0; k < 3; k++)
   {
-    stepSize = (0.5*float(k) + 1.) / 85.;
+    stepSize = (0.5 * float(k) + 1.) / 85.;
     kd = 140. * tr0 * stepSize;
     r = 1. - kd;
     step = stepSize * dir;
@@ -174,7 +161,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       break;
     iterator = iso.rgb;
     dif = 1.;// CalcColor(iterator, dir);
-    colOld = GetCol(tr0, ad);
+    colOld = GetColSimple(tr0);
     curStepSize = stepSize;
     for (int i = 0; i < 200; i++)
     {
@@ -185,10 +172,9 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
       alpha = (1. - r);
-      alpha = GetAlpha(vol, alpha, alphaTreshold);
-      col = GetCol(vol, ad);
+      col = GetColSimple(vol);
       vol = sample3DTexture(iterator - 0.5*step).r;
-      vec3 colMid = GetCol(vol, ad);
+      vec3 colMid = GetColSimple(vol);
       sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
       sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
       colOld = col;
@@ -209,13 +195,12 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       vol = tr0;
     }
     alpha = (1. - r)*curStepSize / stepSize;
-    alpha = GetAlpha(vol, alpha, alphaTreshold);
     dif = 1.;// CalcColor(right, dir);
-    col = GetCol(vol, ad);
-    vol = sample3DTexture(iterator - 0.5*curStepSize / stepSize*step).r;
-    vec3 colMid = GetCol(vol, ad);
-    sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
-    sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
+    col = GetColSimple(vol);
+    vol = sample3DTexture(iterator - 0.5 * curStepSize / stepSize * step).r;
+    vec3 colMid = GetColSimple(vol);
+    sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;
+    sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
     if (molD > molDist)
       break;
   } // for k
@@ -228,7 +213,7 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
 {
   float stepSize = 1.0 / 200.0;
   float len = length(back - start);
-  vec3 step = stepSize*dir;
+  vec3 step = stepSize * dir;
   vec3 iterator = start;
   float acc = 0.0;
 
@@ -236,7 +221,8 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
   {
     if (float(i) * stepSize > len) break;
     iterator = iterator + step;
-    acc += sample3DTexture(iterator).r / 200.0;
+    if (sample3DTexture(iterator).r > _isoLevel0)
+      acc += sample3DTexture(iterator).r / 200.0;
   }
 
   return vec4(1,1,1, acc);

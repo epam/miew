@@ -11,11 +11,6 @@ var volumeUniforms = THREE.UniformsUtils.merge([
     tileTex:     {type: 't', value: null},
     tileTexSize: {type: 'v2', value: new THREE.Vector2(512, 512)},
     tileStride:  {type: 'v2', value: new THREE.Vector2(512, 512)},
-    kSigma:      {type: 'f', value: 1.0},
-    sd:          {type: 'f', value: 1.0},
-    dmean:       {type: 'f', value: 0.0},
-    dmax:        {type: 'f', value: 0.0},
-    dmin:        {type: 'f', value: 0.0},
 
     _isoLevel0:  {type: 'f', value: 0.28},
     _flipV:      {type: 'f', value: 0.0},

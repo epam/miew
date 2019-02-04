@@ -4,6 +4,8 @@ import VolumeMaterial from './shaders/VolumeMaterial';
 import settings from '../settings';
 
 class VolumeMesh extends THREE.Mesh {
+  volumeInfo = {}; // data for noise filter
+
   constructor() {
     let geo = new THREE.BufferGeometry();
     super(geo);
@@ -355,18 +357,24 @@ class VolumeMesh extends THREE.Mesh {
     vm.uniforms.tileTex.value = texture;
     vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
     vm.uniforms.tileStride.value.set(stride[0], stride[1]);
-    if (dataSource.getVolumeInfo() !== undefined) {
-      vm.uniforms.sd.value = dataSource.getVolumeInfo().sd;
-      vm.uniforms.dmean.value = dataSource.getVolumeInfo().dmean;
-      vm.uniforms.dmax.value = dataSource.getVolumeInfo().dmax;
-      vm.uniforms.dmin.value = dataSource.getVolumeInfo().dmin;
-    }
-    vm.uniforms.kSigma.value = settings.now.modes.VD.kSigma;
+
+    this.volumeInfo.sd = dataSource.getVolumeInfo().sd;
+    this.volumeInfo.dmean = dataSource.getVolumeInfo().dmean;
+    this.volumeInfo.dmax = dataSource.getVolumeInfo().dmax;
+    this.volumeInfo.dmin = dataSource.getVolumeInfo().dmin;
+
     this.material = vm;
 
     const bbox = dataSource.getBox();
     bbox.getSize(this.scale);
     bbox.getCenter(this.position);
+  }
+
+  _updateIsoLevel() {
+    const kSigma = settings.now.modes.VD.kSigma;
+    const volInfo = this.volumeInfo;
+    this.material.uniforms._isoLevel0.value = (volInfo.dmean + kSigma * volInfo.sd - volInfo.dmin) /
+      (volInfo.dmax - volInfo.dmin);
   }
 
   static _nearClipPlaneOffset = 0.2;
@@ -390,7 +398,8 @@ class VolumeMesh extends THREE.Mesh {
     const matrixWorldToLocal = VolumeMesh._matrixWorldToLocal;
     const clipPlane = VolumeMesh._clipPlane;
 
-    this.material.uniforms.kSigma.value = settings.now.modes.VD.kSigma;
+
+    this._updateIsoLevel();
 
     // get clip plane in local space
     camera.getWorldDirection(norm);
