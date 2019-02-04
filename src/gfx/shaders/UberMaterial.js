@@ -13,7 +13,7 @@ var defaultUniforms = THREE.UniformsUtils.merge([
 
   THREE.UniformsLib.common, //FIXME is it needed
   THREE.UniformsLib.fog,
-  THREE.UniformsLib.lights, //FIXME simplify use only directional
+  THREE.UniformsLib.lights,
 
   {
     'specular' :  {type: 'c', value: new THREE.Color(0x111111)},
@@ -83,6 +83,12 @@ function UberMaterial(params) {
   this.prepassTransparancy = false;
   // used to render pixel positions
   this.colorFromPos = false;
+  // used to render shadowmap
+  this.shadowmap = false;
+  // used to describe shadowmap type
+  this.shadowmapType = 'pcf';
+  // used to render pixel view deph
+  this.colorFromDepth = false;
   // used to render dashed line
   this.dashedLine = false;
   // mark as transparent
@@ -180,6 +186,9 @@ UberMaterial.prototype.copy = function(source) {
   this.clipPlane = source.clipPlane;
   this.fakeOpacity = source.fakeOpacity;
   this.colorFromPos = source.colorFromPos;
+  this.shadowmap = source.shadowmap;
+  this.shadowmapType = source.shadowmapType;
+  this.colorFromDepth = source.colorFromDepth;
   this.prepassTransparancy = source.prepassTransparancy;
   this.dashedLine = source.dashedLine;
   this.thickLine = source.thickLine;
@@ -255,6 +264,19 @@ UberMaterial.prototype.setValues = function(values) {
   }
   if (this.colorFromPos) {
     defines.COLOR_FROM_POS = 1;
+  }
+  if (this.shadowmap) {
+    defines.SHADOWMAP = 1;
+    if (this.shadowmapType === 'pcf4') {
+      defines.SHADOWMAP_PCF_SOFT = 1;
+    } else if (this.shadowmapType === 'pcf') {
+      defines.SHADOWMAP_PCF_SHARP = 1;
+    } else {
+      defines.SHADOWMAP_BASIC = 1;
+    }
+  }
+  if (this.colorFromDepth) {
+    defines.COLOR_FROM_DEPTH = 1;
   }
   if (this.prepassTransparancy) {
     defines.PREPASS_TRANSP = 1;

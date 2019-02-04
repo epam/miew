@@ -739,6 +739,19 @@ var defaults = {
   ao: false,
 
   /**
+   * Shadows options.
+   *
+   * @property {boolean} shadowMap - enable/disable.
+   * @property {string} basic/percentage-closer filtering/percentage-closer filtering with bilinear filtering.
+   * @property {number} radius for percentage-closer filtering.
+   */
+  shadow: {
+    on: false,
+    type: 'pcf'/*basic, pcf4*/,
+    radius: 3.0,
+  },
+
+  /**
    * Auto-rotation with constant speed.
    * @type {number}
    * @instance
