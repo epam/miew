@@ -371,6 +371,8 @@ Miew.prototype._initGfx = function() {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
+  gfx.renderer.shadowMap.enabled = false;
+  gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
   capabilities.init(gfx.renderer);
 
   // z-sprites and ambient occlusion possibility
@@ -429,6 +431,13 @@ Miew.prototype._initGfx = function() {
   var light12 = new THREE.DirectionalLight(0xffffff, 0.45);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
+  light12.castShadow = true;
+  light12.shadow = new THREE.DirectionalLightShadow();
+  light12.shadow.bias = -0.0005;
+  light12.shadow.radius = settings.now.shadow.radius;
+  var shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
+  light12.shadow.mapSize.width = shadowMapSize;
+  light12.shadow.mapSize.height = shadowMapSize;
   gfx.scene.add(light12);
 
   var light3 = new THREE.AmbientLight(0x666666);
@@ -930,9 +939,11 @@ Miew.prototype._onRender = function() {
   gfx.camera.updateMatrixWorld();
 
   this._clipPlaneUpdateValue(this._getBSphereRadius());
+  this._updateShadow(this._getBSphereRadius());
   this._fogFarUpdateValue();
 
-  gfx.renderer.clearTarget(null);
+  gfx.renderer.setRenderTarget(null);
+  gfx.renderer.clear();
 
   this._renderFrame(settings.now.stereo);
 };
@@ -1076,12 +1087,14 @@ Miew.prototype._renderScene = (function() {
 
     // render to offscreen buffer
     gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
-    gfx.renderer.clearTarget(target);
+    gfx.renderer.setRenderTarget(target);
+    gfx.renderer.clear();
     if (gfx.renderer.vr.enabled) {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.clearTarget(gfx.offscreenBuf);    // FIXME clean up targets in render selection
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf);   // FIXME clean up targets in render selection
+    gfx.renderer.clear();
 
     var bHaveComplexes = (this._getComplexVisual() !== null);
     var volumeVisual = this._getVolumeVisual();
@@ -1188,7 +1201,8 @@ Miew.prototype._performDistortion = (function() {
 
   return function(srcBuffer, targetBuffer, mesh) {
 
-    this._gfx.renderer.clearTarget(targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.clear();
 
     if (mesh) {
       _material.uniforms.srcTex.value = srcBuffer.texture;
@@ -1235,8 +1249,8 @@ Miew.prototype._renderSelection = (function() {
 
     // clear offscreen buffer (leave z-buffer intact)
     gfx.renderer.setClearColor('black', 0);
-    gfx.renderer.clearTarget(srcBuffer, true, false, false);
-
+    gfx.renderer.setRenderTarget(srcBuffer);
+    gfx.renderer.clear(true, false, false);
 
     // render selection to offscreen buffer
     if (gfx.selectionPivot.children.length > 0) {
@@ -1306,9 +1320,12 @@ Miew.prototype._renderVolume = (function() {
     // use main camera to prepare special textures to be used by volumetric rendering
     // these textures have the size of the window and are stored in offscreen buffers
     gfx.renderer.setClearColor('black', 0);
-    gfx.renderer.clearTarget(tmpBuf1);
-    gfx.renderer.clearTarget(tmpBuf2);
-    gfx.renderer.clearTarget(tmpBuf3);
+    gfx.renderer.setRenderTarget(tmpBuf1);
+    gfx.renderer.clear();
+    gfx.renderer.setRenderTarget(tmpBuf2);
+    gfx.renderer.clear();
+    gfx.renderer.setRenderTarget(tmpBuf3);
+    gfx.renderer.clear();
 
     // draw plane with its own material, because it differs slightly from volumeBFMat
     camera.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
@@ -1390,7 +1407,8 @@ Miew.prototype._performFXAA = (function() {
 
     // clear canvas
     gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
-    gfx.renderer.clearTarget(targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.clear();
 
     // do fxaa processing of offscreen buff2
     _fxaaMaterial.uniforms.srcTex.value = srcBuffer.texture;
@@ -1479,7 +1497,8 @@ Miew.prototype._performAO = (function() {
 
     // clear canvasFMatrix4
     //gfx.renderer.setClearColor(THREE.aliceblue, 1);
-    //gfx.renderer.clearTarget(targetBuffer, true, false);
+    // gfx.renderer.setRenderTarget(targetBuffer);
+    // gfx.renderer.clear(true, false);
 
     // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
@@ -3144,6 +3163,29 @@ Miew.prototype.get = function(param, value) {
   return settings.get(param, value);
 };
 
+Miew.prototype._updateShadow = function(radius) {
+  for (var i = 0; i < this._gfx.scene.children.length; i++) {
+    if (this._gfx.scene.children[i].shadow !== undefined) {
+      var light = this._gfx.scene.children[i];
+
+      light.shadow.bias = -0.0005 * radius;
+
+      light.shadow.camera.bottom = -radius;
+      light.shadow.camera.top = radius;
+      light.shadow.camera.left = -radius;
+      light.shadow.camera.right = radius;
+
+      var distToOrigin = light.position.length();
+      var extraShift = 10;  // if it's smaller there are artefacts in shadow
+      light.shadow.camera.far = distToOrigin + radius + extraShift;
+      light.shadow.camera.near = distToOrigin - radius - extraShift;
+      light.shadow.camera.near = light.shadow.camera.near > 0.1 ? light.shadow.camera.near : 0.1;
+
+      light.shadow.camera.updateProjectionMatrix();
+    }
+  }
+};
+
 Miew.prototype._clipPlaneUpdateValue = function(radius) {
   var clipPlaneValue = Math.max(
     this._gfx.camera.position.z - radius * settings.now.draft.clipPlaneFactor,
@@ -3171,6 +3213,17 @@ Miew.prototype._fogFarUpdateValue = function() {
       this._picker.fogFarValue = this._gfx.scene.fog.far;
     } else {
       this._picker.fogFarValue = undefined;
+    }
+  }
+};
+
+Miew.prototype._updateMaterials = function(values) {
+  this._forEachComplexVisual(visual => visual.setMaterialValues(values));
+  for (let i = 0, n = this._objects.length; i < n; ++i) {
+    const obj = this._objects[i];
+    if (obj._line) {
+      obj._line.material.setValues(values);
+      obj._line.material.needsUpdate = true;
     }
   }
 };
@@ -3217,31 +3270,43 @@ Miew.prototype._initOnSettingsChanged = function() {
     if (gfx) {
       gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     }
-    // TODO: update materials
-    const values = {fogTransparent: evt.value};
-    this._forEachComplexVisual(visual => visual.setMaterialValues(values));
-    for (let i = 0, n = this._objects.length; i < n; ++i) {
-      const obj = this._objects[i];
-      if (obj._line) {
-        obj._line.material.setValues(values);
-        obj._line.material.needsUpdate = true;
-      }
-    }
+    // update materials
+    this._updateMaterials({fogTransparent: evt.value});
     this.rebuildAll();
   });
 
   on('draft.clipPlane', (evt) => {
-    // TODO: update materials
-    const values = {clipPlane: evt.value};
-    this._forEachComplexVisual(visual => visual.setMaterialValues(values));
-    for (let i = 0, n = this._objects.length; i < n; ++i) {
-      const obj = this._objects[i];
-      if (obj._line) {
-        obj._line.material.setValues(values);
-        obj._line.material.needsUpdate = true;
+    // update materials
+    this._updateMaterials({clipPlane: evt.value});
+    this.rebuildAll();
+  });
+
+  on('shadow.on', (evt) => {
+    // update materials and rebuild all
+    const values = {shadowmap: evt.value, shadowmapType: settings.now.shadow.type};
+    const gfx = this._gfx;
+    if (gfx) {
+      gfx.renderer.shadowMap.enabled = values.shadowmap;
+    }
+    this._updateMaterials(values);
+    this.rebuildAll();
+  });
+
+  on('shadow.type', (evt) => {
+    // update materials and rebuild all if shadowmap are enable
+    if (settings.now.shadow.on) {
+      this._updateMaterials({shadowmapType: evt.value});
+      this.rebuildAll();
+    }
+  });
+
+  on('shadow.radius', (evt) => {
+    for (var i = 0; i < this._gfx.scene.children.length; i++) {
+      if (this._gfx.scene.children[i].shadow !== undefined) {
+        var light = this._gfx.scene.children[i];
+        light.shadow.radius = evt.value;
       }
     }
-    this.rebuildAll();
   });
 
   on('fps', () => {

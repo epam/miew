@@ -1,3 +1,5 @@
+
+
 import * as THREE from 'three';
 import UberObject from './UberObject';
 const Mesh = UberObject(THREE.Mesh);
@@ -7,7 +9,8 @@ class ZSpriteMesh extends Mesh {
     super(geometry, material);
   }
 
-  _onBeforeRender(_renderer, _scene, camera, _geometry, _material, _group) {
+  _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
+    Mesh.prototype._onBeforeRender.call(this, renderer, scene, camera);
     const material = this.material;
     if (!material) {
       return;

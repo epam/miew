@@ -2,39 +2,33 @@
 
 import utils from '../utils';
 
-var now = utils.Timer.now;
+const now = utils.Timer.now;
 
 function createElement(tag, id, css) {
-  var element = document.createElement(tag);
+  const element = document.createElement(tag);
   element.id = id;
   element.style.cssText = css;
   return element;
 }
 
-function Stats() {
-  this.domElement = createElement('div', 'stats', 'padding:8px');
-  this._text = createElement('p', 'fps', 'margin:0;color:silver;font-size:large');
-  this.domElement.appendChild(this._text);
+class Stats {
+  constructor() {
+    this.domElement = createElement('div', 'stats', 'padding:8px');
+    this._text = createElement('p', 'fps', 'margin:0;color:silver;font-size:large');
+    this.domElement.appendChild(this._text);
 
-  this._startTime = now();
-  this._prevTime = this._startTime;
-
-  this._deltas = new Array(20);
-  this._index = 0;
-  this._total = 0.0;
-  this._count = 0;
-}
-
-Stats.prototype = {
-  constructor: Stats,
-
-  begin: function() {
     this._startTime = now();
-  },
+    this._prevTime = this._startTime;
 
-  end: function() {
-    var time = now();
-    var delta = time - this._startTime;
+    this._deltas = new Array(20);
+    this._index = 0;
+    this._total = 0.0;
+    this._count = 0;
+  }
+
+  end() {
+    const time = now();
+    const delta = time - this._startTime;
 
     if (this._count < this._deltas.length) {
       this._count++;
@@ -54,20 +48,18 @@ Stats.prototype = {
     }
 
     return time;
-  },
+  }
 
-  update: function() {
+  update() {
     this._startTime = this.end();
-  },
+  }
 
-  show: function(on) {
+  show(on) {
     if (on === undefined) {
       on = true;
     }
     this.domElement.style.display = on ? 'block' : 'none';
-  },
-
-};
+  }
+}
 
 export default Stats;
-

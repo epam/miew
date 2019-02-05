@@ -76,13 +76,13 @@ export default [{
 }, {
   // small molecule
   name: 'serotonin',
-  formats: ['pubchem', 'xyz'],
+  formats: ['pubchem', 'sdf', 'xyz'],
   num: {
     atoms: 25,
     bonds: 26,
     residues: 1,
     chains: 1,
-    molecules: 0,
+    molecules: {sdf: 1, default: 0},
     units: 1,
     symmetries: 0,
     helices: 0,
