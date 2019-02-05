@@ -100,21 +100,6 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
   return acc;
 }
 
-/*
-vec3 GetCol(float vol, vec3 ad)
-{
-  vec3 col;
-  float a = 0.36, b = 0.44;
-  if (vol < a)
-    col = mix(vec3(0., 0., 1.), vec3(0., 1., 0.), max(0., (vol - _isoLevel0)*ad.r));// / (a - IsoLevel0)));
-  if (vol > a && vol < b)
-    col = mix(vec3(0., 1., 0.), vec3(0.5, 0.5, 0.), (vol - a)*ad.b); // / (b - a));
-  if (vol > b)
-    col = mix(vec3(0.5, 0.5, 0.), vec3(1., 0., 0.), (vol - b)*ad.g); // / (0.52 - b));
-  return col;
-}
-*/
-
 vec3 GetColSimple(float vol)
 {
   return vol * vec3(1, 1, 1);
@@ -141,12 +126,9 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   //				float stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;
   float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;
   vec3 step = stepSize*dir, col, colOld, right;
-
   float tr0 = _isoLevel0;
   float dif, r, kd, finish;
   int count = 0, stopMol = 0;
-  //float a = 0.36, b = 0.44;
-  //vec3 ad = vec3(1. / (a - _isoLevel0), 1. / (b - a), 1. / (0.52 - b));
   kd = 140. * tr0 * stepSize;
   r = 1. - kd;
 

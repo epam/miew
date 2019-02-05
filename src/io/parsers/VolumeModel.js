@@ -110,13 +110,7 @@ class VolumeModel {
   }
 
   _getVolumeInfo() {
-    const header = this._header;
-    let volumeInfo = {};
-    volumeInfo.dmean = header.dmean;
-    volumeInfo.dmin = header.dmin;
-    volumeInfo.dmax = header.dmax;
-    volumeInfo.sd = header.sd;
-    return volumeInfo;
+    return _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd']);
   }
 
   _getXYZbox() {

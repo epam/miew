@@ -161,5 +161,3 @@ CCP4Parser.extensions = ['.ccp4', '.map', '.mrc'];
 CCP4Parser.binary = true;
 
 export default CCP4Parser;
-
-

@@ -358,11 +358,7 @@ class VolumeMesh extends THREE.Mesh {
     vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
     vm.uniforms.tileStride.value.set(stride[0], stride[1]);
 
-    this.volumeInfo.sd = dataSource.getVolumeInfo().sd;
-    this.volumeInfo.dmean = dataSource.getVolumeInfo().dmean;
-    this.volumeInfo.dmax = dataSource.getVolumeInfo().dmax;
-    this.volumeInfo.dmin = dataSource.getVolumeInfo().dmin;
-
+    Object.assign(this.volumeInfo, dataSource.getVolumeInfo());
     this.material = vm;
 
     const bbox = dataSource.getBox();
