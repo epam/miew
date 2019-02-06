@@ -5,7 +5,8 @@ import _ from 'lodash';
 
 const
   Complex = chem.Complex,
-  Element = chem.Element;
+  Element = chem.Element,
+  Molecule = chem.Molecule;
 
 class XYZParser extends Parser {
   constructor(data, options) {
@@ -15,24 +16,29 @@ class XYZParser extends Parser {
     this._atomsInf = null;
 
     this._options.fileType = 'xyz';
+    this._fileName = options.name;
   }
 
-  canParse(data, options) {
+  /** @deprecated */
+  static canParse(data, options) {
     if (!data) {
       return false;
     }
     return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'xyz');
   }
 
-  canProbablyParse(data) {
-    return _.isString(data) && /^\s*data_/i.test(data);
+  static canProbablyParse(data) {
+    return _.isString(data) && /^\s*\d+ *\n[^\n]*\n\s*\w{1,3}\s+-?\d/.test(data);
   }
 
   _parseToAtomsInf(source) {
     const endnAtoms = source.indexOf('\n');
     const nAtoms = parseInt(source.substring(0, endnAtoms), 10);
     const endComment = source.indexOf('\n', endnAtoms + 1);
-    const comment = source.slice(endnAtoms + 1, endComment);
+    let comment = source.slice(endnAtoms + 1, endComment);
+    if (comment.length - 1 === 0) {
+      comment = this._fileName;
+    }
 
     const startAtomsInf = endComment + source.substring(endComment).search(/\S/);
     this._atomsInf = source.substring(startAtomsInf).split(/[\s,]*\n[\s,]*/);
@@ -54,7 +60,7 @@ class XYZParser extends Parser {
     const tempFactor = 1;
     const charge = 0;
 
-    const chain = this._complex.addChain(' ');
+    const chain = this._complex.addChain('A');
     const residue = chain.addResidue('LIG', 1, ' ');
 
     for (let i = 0; i < this._atomsInf.length - 1; i++) {
@@ -75,6 +81,10 @@ class XYZParser extends Parser {
 
       residue.addAtom(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
     }
+
+    const molecule = new Molecule(this._complex, this._complex.name, 1);
+    molecule._residues = residue;
+    this._complex._molecules[0] = molecule;
   }
 
   parseSync() {
