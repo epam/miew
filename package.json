@@ -133,7 +133,7 @@
     "jquery.terminal": "~1.14.0",
     "jsdoc": "^3.5.5",
     "lodash": "^4.17.10",
-    "mini-css-extract-plugin": "^0.4.4",
+    "mini-css-extract-plugin": "^0.5.0",
     "mocha": "^5.2.0",
     "ncp": "^2.0.0",
     "node-resemble-js": "^0.2.0",
