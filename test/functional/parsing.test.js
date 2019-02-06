@@ -1,9 +1,10 @@
 import PDBParser from '../../src/io/parsers/PDBParser';
 import CIFParser from '../../src/io/parsers/CIFParser';
 import MMTFParser from '../../src/io/parsers/MMTFParser';
+import XYZParser from '../../src/io/parsers/XYZParser';
 import PubChemParser from '../../src/io/parsers/PubChemParser';
-import CCP4Parser from '../../src/io/parsers/CCP4Parser';
 import SDFParser from '../../src/io/parsers/SDFParser';
+import CCP4Parser from '../../src/io/parsers/CCP4Parser';
 
 import fs from 'fs';
 import path from 'path';
@@ -37,6 +38,12 @@ const formats = {
     extension: 'mmtf',
     encoding: null,
     Parser: MMTFParser,
+  },
+  xyz: {
+    name: 'XYZ',
+    extension: 'xyz',
+    encoding: 'ascii',
+    Parser: XYZParser,
   },
   pubchem: {
     name: 'PubChem JSON',
