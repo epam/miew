@@ -35,8 +35,8 @@ class XYZParser extends Parser {
     const endnAtoms = source.indexOf('\n');
     const nAtoms = parseInt(source.substring(0, endnAtoms), 10);
     const endComment = source.indexOf('\n', endnAtoms + 1);
-    let comment = source.slice(endnAtoms + 1, endComment);
-    if (comment.length - 1 === 0) {
+    let comment = source.slice(endnAtoms + 1, endComment).trim();
+    if (comment.length === 0) {
       comment = this._fileName;
     }
 
@@ -61,7 +61,7 @@ class XYZParser extends Parser {
     const charge = 0;
 
     const chain = this._complex.addChain('A');
-    const residue = chain.addResidue('LIG', 1, ' ');
+    const residue = chain.addResidue('UNK', 1, ' ');
 
     for (let i = 0; i < this._atomsInf.length - 1; i++) {
       const words = this._atomsInf[i].split(/[\s,]+/);
