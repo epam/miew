@@ -81,7 +81,6 @@ class DSN6Model extends VolumeModel {
   }
 
   _blockCalculate(xyzData, byteBuffer, zBlock, yBlock, xBlock, pos) {
-
     for (let k = 0; k < 8; ++k) {
       const z = 8 * zBlock + k;
       for (let j = 0; j < 8; ++j) {
@@ -114,7 +113,28 @@ class DSN6Model extends VolumeModel {
         }
       }
     }
+    this._calculateInfoParams(xyzData);
     return xyzData;
+  }
+
+  _calculateInfoParams(xyzData) {
+    this._header.dmean /=  xyzData.length;
+    let dispersion = 0;
+    let minDensity = xyzData[0];
+    let maxDensity = xyzData[0];
+    for (let j = 0; j < xyzData.length; j++) {
+      dispersion += Math.pow(this._header.dmean - xyzData[j], 2);
+
+      if (xyzData[j] < minDensity) {
+        minDensity = xyzData[j];
+      }
+      if (xyzData[j] > maxDensity) {
+        maxDensity = xyzData[j];
+      }
+    }
+    this._header.sd = Math.sqrt(dispersion / xyzData.length);
+    this._header.dmax = maxDensity;
+    this._header.dmin = minDensity;
   }
 }
 

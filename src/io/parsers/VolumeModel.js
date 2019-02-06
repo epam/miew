@@ -109,6 +109,10 @@ class VolumeModel {
       this._header.extent[this._xyz2crs[2]]];
   }
 
+  _getVolumeInfo() {
+    return _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd']);
+  }
+
   _getXYZbox() {
     return new THREE.Box3(this._origin.clone(), this._origin.clone().add(this._bboxSize));
   }
@@ -118,7 +122,7 @@ class VolumeModel {
   parse(data) {
     this._parseHeader(data);
     this._setOrigins();
-    return new Volume(Float32Array, this._getXYZdim(), this._getXYZbox(), 1, this._toXYZData());
+    return new Volume(Float32Array, this._getXYZdim(), this._getXYZbox(), 1, this._toXYZData(), this._getVolumeInfo());
   }
 }
 

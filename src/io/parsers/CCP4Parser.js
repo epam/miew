@@ -21,7 +21,7 @@ const CCP4Header = {
   origin: [valueType.vector, 'f32', 34],
   map: [valueType.buffer, 'buffer', 52, 1],
   machine: [valueType.singular, 'u32', 53],
-  arms:   [valueType.singular, 'f32', 54],
+  sd:   [valueType.singular, 'f32', 54],
   nlabel: [valueType.singular, 'f32', 55],
   label: [valueType.buffer, 'buffer', 56, 200],
 };
