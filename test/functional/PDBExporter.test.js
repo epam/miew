@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import PDBExporter from './PDBExporter';
-import PDBParser from '../parsers/PDBParser';
+import PDBExporter from '../../src/io/exporters/PDBExporter';
+import PDBParser from '../../src/io/parsers/PDBParser';
 import chai, {expect} from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinonChai from 'sinon-chai';
@@ -11,7 +11,7 @@ chai.use(dirtyChai);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-const pathToFiles = path.join(__dirname, '../../../test/functional/data');
+const pathToFiles = path.join(__dirname, './data');
 
 const filesForTest = [
   '1CRN_for_exporter_test.pdb',
@@ -31,7 +31,6 @@ function getExportedString(data) {
 function getInitialString(filename) {
   return new Promise((resolve, reject) => {
     const filePath = path.join(pathToFiles, '/', filename);
-    console.log(filePath + '\n');
     fs.readFile(filePath, 'ascii', (err, string) => {
       if (err) {
         reject(err);
@@ -42,11 +41,15 @@ function getInitialString(filename) {
   });
 }
 
-describe('PDBExporter test', () => {
+function normalizeNewLines(text) {
+  return text.replace(/\r/g, '');
+}
+
+describe('PDBExporter output matches PDBParser input', () => {
   for (let i = 0; i < filesForTest.length; i++) {
-    it('exported and initial string comparison', () => {
-      getInitialString(filesForTest[i]).then((data) => {
-        expect(getExportedString(data)).to.equal(data);
+    it(`for ${filesForTest[i]}`, () => {
+      return getInitialString(filesForTest[i]).then((data) => {
+        expect(getExportedString(data)).to.equal(normalizeNewLines(data));
       });
     });
   }

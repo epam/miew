@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Matrix4} from "three";
+import {Matrix4} from 'three';
 
 export default class PDBResult {
   constructor() {
