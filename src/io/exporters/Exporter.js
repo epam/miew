@@ -16,7 +16,7 @@ export default class Exporter {
       setTimeout(() => {
         try {
           if (this._abort) {
-            return Promise.reject(new Error('Export aborted'));
+            return reject(new Error('Export aborted'));
           }
           return resolve(this.exportSync());
         } catch (error) {
@@ -28,10 +28,6 @@ export default class Exporter {
 
   abort() {
     this._abort = true;
-  }
-
-  static extractName(_source) {
-    return undefined;
   }
 }
 
