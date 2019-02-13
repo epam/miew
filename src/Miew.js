@@ -91,6 +91,10 @@ function reportProgress(log, action, percent) {
   }
 }
 
+function chooseFogColor() {
+  return settings.now.fogColorEnable ? settings.now.fogColor : settings.now.bg.color;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -277,8 +281,9 @@ Miew.prototype.init = function() {
       self._onDblClick(event);
     });
 
-    this._onThemeChanged();
-
+    if (!settings._changed['bg.color']) {
+      settings.set('bg.color', settings.now.themes[settings.now.theme]);
+    }
   } catch (error) {
     // FIXME: THREE.WebGLRenderer throws error AND catches it, so we receive different one. Some random crash.
     if (error.name === 'TypeError' && error.message === 'Cannot read property \'getExtension\' of null') {
@@ -372,7 +377,10 @@ Miew.prototype._initGfx = function() {
   if (!gfx.renderer.getContext().getExtension('EXT_frag_depth')) {
     settings.set('zSprites', false);
   }
-  if (!gfx.renderer.getContext().getExtension('WEBGL_depth_texture')) {
+  if (
+    !gfx.renderer.getContext().getExtension('WEBGL_depth_texture') ||
+    !gfx.renderer.getContext().getExtension('WEBGL_draw_buffers')
+  ) {
     settings.set('ao', false);
   }
 
@@ -398,10 +406,9 @@ Miew.prototype._initGfx = function() {
   gfx.stereoCam = new THREE.StereoCamera();
 
   gfx.scene = new THREE.Scene();
-  gfx.scene.fog = new THREE.Fog(
-    settings.now.bg.color,
-    settings.now.camNear, settings.now.camFar
-  );
+
+  var color = chooseFogColor();
+  gfx.scene.fog = new THREE.Fog(color, settings.now.camNear, settings.now.camFar);
 
   gfx.root = new gfxutils.RCGroup();
   gfx.scene.add(gfx.root);
@@ -823,6 +830,7 @@ Miew.prototype._resizeOffscreenBuffers = function(width, height, stereo) {
   gfx.offscreenBuf.setSize(multi * width, height);
   gfx.offscreenBuf2.setSize(multi * width, height);
   gfx.offscreenBuf3.setSize(multi * width, height);
+  gfx.offscreenBuf4.setSize(multi * width, height);
   if (gfx.offscreenBuf5) {
     gfx.offscreenBuf5.setSize(multi * width, height);
   }
@@ -875,7 +883,8 @@ Miew.prototype._updateFog = function() {
 
   if (settings.now.fog) {
     if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
-      gfx.scene.fog = new THREE.Fog(settings.now.bg.color);
+      var color = chooseFogColor();
+      gfx.scene.fog = new THREE.Fog(color);
       this._setUberMaterialValues({fog: settings.now.fog});
     }
     updateFogRange(gfx.scene.fog, gfx.camera.position.z, this._getBSphereRadius());
@@ -923,7 +932,8 @@ Miew.prototype._onRender = function() {
   this._clipPlaneUpdateValue(this._getBSphereRadius());
   this._fogFarUpdateValue();
 
-  gfx.renderer.clearTarget(null);
+  gfx.renderer.setRenderTarget(null);
+  gfx.renderer.clear();
 
   this._renderFrame(settings.now.stereo);
 };
@@ -1000,19 +1010,26 @@ Miew.prototype._onThemeChanged = (function() {
   };
 })();
 
-Miew.prototype._onBgColorChanged  = (function() {
-  return function() {
-    const gfx = this._gfx;
-    const color = settings.now.bg.color;
-    if (gfx) {
-      if (gfx.scene.fog) {
-        gfx.scene.fog.color.set(color);
-      }
-      gfx.renderer.setClearColor(color,  Number(!settings.now.bg.transparent));
+Miew.prototype._onBgColorChanged  = function() {
+  const gfx = this._gfx;
+  const color = chooseFogColor();
+  if (gfx) {
+    if (gfx.scene.fog) {
+      gfx.scene.fog.color.set(color);
     }
-    this._needRender = true;
-  };
-})();
+    gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
+  }
+  this._needRender = true;
+};
+
+Miew.prototype._onFogColorChanged = function() {
+  const gfx = this._gfx;
+  const color = chooseFogColor();
+  if (gfx && gfx.scene.fog) {
+    gfx.scene.fog.color.set(color);
+  }
+  this._needRender = true;
+};
 
 Miew.prototype._setUberMaterialValues = function(values) {
   this._gfx.root.traverse(function(obj) {
@@ -1024,6 +1041,33 @@ Miew.prototype._setUberMaterialValues = function(values) {
   });
 };
 
+Miew.prototype._setMRT = function(renderBuffer, textureBuffer) {
+  const gfx = this._gfx;
+  const gl = gfx.renderer.getContext();
+  const ext =  gl.getExtension('WEBGL_draw_buffers');
+  const properties = gfx.renderer.properties;
+
+  //take extra texture from Texture Buffer
+  gfx.renderer.setRenderTarget(textureBuffer);
+  const tx8 = properties.get(textureBuffer.texture).__webglTexture;
+  gl.bindTexture(gl.TEXTURE_2D, tx8);
+
+  //take texture and farmebuffer from renderbuffer
+  gfx.renderer.setRenderTarget(renderBuffer);
+  const fb = properties.get(renderBuffer).__webglFramebuffer;
+  const tx = properties.get(renderBuffer.texture).__webglTexture;
+
+  //set framebuffer
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+  fb.width = renderBuffer.width;
+  fb.height = renderBuffer.height;
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tx, 0);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, tx8, 0);
+
+  //mapping textures
+  ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
+};
+
 Miew.prototype._renderScene = (function() {
   return function(camera, distortion, target) {
     distortion = distortion || false;
@@ -1033,13 +1077,21 @@ Miew.prototype._renderScene = (function() {
 
     // render to offscreen buffer
     gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
-    gfx.renderer.clearTarget(target);
+    gfx.renderer.setRenderTarget(target);
+    gfx.renderer.clear();
     if (gfx.renderer.vr.enabled) {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.clearTarget(gfx.offscreenBuf);
-    // FIXME clean up targets in render selection
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf);   // FIXME clean up targets in render selection
+    gfx.renderer.clear();
+
+    var bHaveComplexes = (this._getComplexVisual() !== null);
+    var volumeVisual = this._getVolumeVisual();
+
+    if (bHaveComplexes && settings.now.ao) {
+      this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
+    }
 
     if (settings.now.transparency === 'prepass') {
       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
@@ -1047,25 +1099,39 @@ Miew.prototype._renderScene = (function() {
       gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
     }
 
-    var bHaveComplexes = (this._getComplexVisual() !== null);
-    var volumeVisual = this._getVolumeVisual();
-
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
     // otherwise we render to canvas
+    var outline = bHaveComplexes && settings.now.outline.on;
     var fxaa = bHaveComplexes && settings.now.fxaa;
     var volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
-    var dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
+    var dstBuffer = (outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     var srcBuffer = gfx.offscreenBuf;
 
     if (bHaveComplexes && settings.now.ao) {
-      this._performAO(srcBuffer, gfx.offscreenBuf.depthTexture, dstBuffer, gfx.offscreenBuf3, gfx.offscreenBuf2);
+      this._performAO(
+        srcBuffer,
+        gfx.offscreenBuf4,
+        gfx.offscreenBuf.depthTexture,
+        dstBuffer,
+        gfx.offscreenBuf3,
+        gfx.offscreenBuf2
+      );
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
     }
 
+    //outline
+    if (outline) {
+      srcBuffer = dstBuffer;
+      dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf3 : target;
+      if (srcBuffer != null) {
+        this._renderOutline(camera, gfx.offscreenBuf, srcBuffer, dstBuffer);
+      }
+    }
+
     // render selected part with outline material
-    this._renderSelection(camera, srcBuffer, dstBuffer);
+    this._renderSelection(camera, gfx.offscreenBuf, dstBuffer);
 
     if (volume) {
       // copy current picture to the buffer that retains depth-data of the original molecule render
@@ -1083,7 +1149,7 @@ Miew.prototype._renderScene = (function() {
     srcBuffer = dstBuffer;
 
     if (fxaa) {
-      dstBuffer = distortion ? gfx.offscreenBuf3 : target;
+      dstBuffer = distortion ? gfx.offscreenBuf2 : target;
       this._performFXAA(srcBuffer, dstBuffer);
       srcBuffer = dstBuffer;
     }
@@ -1125,7 +1191,8 @@ Miew.prototype._performDistortion = (function() {
 
   return function(srcBuffer, targetBuffer, mesh) {
 
-    this._gfx.renderer.clearTarget(targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.clear();
 
     if (mesh) {
       _material.uniforms.srcTex.value = srcBuffer.texture;
@@ -1140,6 +1207,27 @@ Miew.prototype._performDistortion = (function() {
   };
 }());
 
+Miew.prototype._renderOutline = (function() {
+
+  var _outlineMaterial = new OutlineMaterial({depth: true});
+
+  return function(camera, srcDepthBuffer, srcColorBuffer, targetBuffer) {
+
+    var self = this;
+    var gfx = self._gfx;
+
+    // apply Sobel filter -- draw outline
+    _outlineMaterial.uniforms.srcTex.value = srcColorBuffer.texture;
+    _outlineMaterial.uniforms.srcDepthTex.value = srcDepthBuffer.depthTexture;
+    _outlineMaterial.uniforms.srcTexSize.value.set(srcDepthBuffer.width, srcDepthBuffer.height);
+    _outlineMaterial.uniforms.color.value = new THREE.Color(settings.now.outline.color);
+    _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold;
+
+    gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
+  };
+
+})();
+
 Miew.prototype._renderSelection = (function() {
 
   var _outlineMaterial = new OutlineMaterial();
@@ -1151,8 +1239,8 @@ Miew.prototype._renderSelection = (function() {
 
     // clear offscreen buffer (leave z-buffer intact)
     gfx.renderer.setClearColor('black', 0);
-    gfx.renderer.clearTarget(srcBuffer, true, false, false);
-
+    gfx.renderer.setRenderTarget(srcBuffer);
+    gfx.renderer.clear(true, false, false);
 
     // render selection to offscreen buffer
     if (gfx.selectionPivot.children.length > 0) {
@@ -1222,9 +1310,12 @@ Miew.prototype._renderVolume = (function() {
     // use main camera to prepare special textures to be used by volumetric rendering
     // these textures have the size of the window and are stored in offscreen buffers
     gfx.renderer.setClearColor('black', 0);
-    gfx.renderer.clearTarget(tmpBuf1);
-    gfx.renderer.clearTarget(tmpBuf2);
-    gfx.renderer.clearTarget(tmpBuf3);
+    gfx.renderer.setRenderTarget(tmpBuf1);
+    gfx.renderer.clear();
+    gfx.renderer.setRenderTarget(tmpBuf2);
+    gfx.renderer.clear();
+    gfx.renderer.setRenderTarget(tmpBuf3);
+    gfx.renderer.clear();
 
     // draw plane with its own material, because it differs slightly from volumeBFMat
     camera.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
@@ -1306,7 +1397,8 @@ Miew.prototype._performFXAA = (function() {
 
     // clear canvas
     gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
-    gfx.renderer.clearTarget(targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.clear();
 
     // do fxaa processing of offscreen buff2
     _fxaaMaterial.uniforms.srcTex.value = srcBuffer.texture;
@@ -1384,13 +1476,9 @@ Miew.prototype._performAO = (function() {
   // var _kernelOffsets = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0];
   var _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
 
-  return function(srcColorBuffer, srcDepthBuffer, targetBuffer, tempBuffer, tempBuffer1) {
+  return function(srcColorBuffer, normalBuffer, srcDepthTexture, targetBuffer, tempBuffer, tempBuffer1) {
 
-    if (typeof srcColorBuffer === 'undefined' ||
-          typeof srcDepthBuffer === 'undefined' ||
-          typeof targetBuffer === 'undefined' ||
-          typeof tempBuffer === 'undefined' ||
-          typeof tempBuffer1 === 'undefined') {
+    if (!srcColorBuffer || !normalBuffer || !srcDepthTexture || !targetBuffer || !tempBuffer || !tempBuffer1) {
       return;
     }
 
@@ -1399,11 +1487,13 @@ Miew.prototype._performAO = (function() {
 
     // clear canvasFMatrix4
     //gfx.renderer.setClearColor(THREE.aliceblue, 1);
-    //gfx.renderer.clearTarget(targetBuffer, true, false);
+    // gfx.renderer.setRenderTarget(targetBuffer);
+    // gfx.renderer.clear(true, false);
 
     // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
-    _aoMaterial.uniforms.depthTexture.value = srcDepthBuffer;
+    _aoMaterial.uniforms.depthTexture.value = srcDepthTexture;
+    _aoMaterial.uniforms.normalTexture.value = normalBuffer.texture;
     _aoMaterial.uniforms.srcTexelSize.value.set(1.0 / srcColorBuffer.width, 1.0 / srcColorBuffer.height);
     _aoMaterial.uniforms.camNearFar.value.set(gfx.camera.near, gfx.camera.far);
     _aoMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
@@ -1427,14 +1517,14 @@ Miew.prototype._performAO = (function() {
 
     _horBlurMaterial.uniforms.aoMap.value = tempBuffer1.texture;
     _horBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer1.width, 1.0 / tempBuffer1.height);
-    _horBlurMaterial.uniforms.depthTexture.value = srcDepthBuffer;
+    _horBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _horBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.renderScreenQuad(_horBlurMaterial, tempBuffer);
 
     _vertBlurMaterial.uniforms.aoMap.value = tempBuffer.texture;
     _vertBlurMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _vertBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer.width, 1.0 / tempBuffer.height);
-    _vertBlurMaterial.uniforms.depthTexture.value = srcDepthBuffer;
+    _vertBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.renderScreenQuad(_vertBlurMaterial, targetBuffer);
   };
@@ -2423,7 +2513,7 @@ Miew.prototype._onKeyDown = function(event) {
   case 'S'.charCodeAt(0):
     event.preventDefault();
     event.stopPropagation();
-    settings.now.ao = !settings.now.ao;
+    settings.set('ao', !settings.now.ao);
     this._needRender = true;
     break;
   case 107:
@@ -2654,11 +2744,11 @@ Miew.prototype.benchmarkGfx = function(force) {
 Miew.prototype.screenshot = function(width, height) {
   const gfx = this._gfx;
 
-  function Fov2Tan(fov) {
+  function fov2Tan(fov) {
     return Math.tan(THREE.Math.degToRad(0.5 * fov));
   }
 
-  function Tan2Fov(tan) {
+  function tan2Fov(tan) {
     return THREE.Math.radToDeg(Math.atan(tan)) * 2.0;
   }
 
@@ -2674,7 +2764,7 @@ Miew.prototype.screenshot = function(width, height) {
 
     const originalAspect = gfx.camera.aspect;
     const originalFov = gfx.camera.fov;
-    const originalTanFov2 = Fov2Tan(gfx.camera.fov);
+    const originalTanFov2 = fov2Tan(gfx.camera.fov);
 
     // screenshot should contain the principal area of interest (a centered square touching screen sides)
     const areaOfInterestSize = Math.min(gfx.width, gfx.height);
@@ -2683,11 +2773,11 @@ Miew.prototype.screenshot = function(width, height) {
     // set appropriate camera aspect & FOV
     const shotAspect = width / height;
     gfx.camera.aspect = shotAspect;
-    gfx.camera.fov = Tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
+    gfx.camera.fov = tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
     gfx.camera.updateProjectionMatrix();
 
     // resize canvas to the required size of screenshot
-    gfx.renderer.setSize(width, height);
+    gfx.renderer.setDrawingBufferSize(width, height, 1);
 
     // make screenshot
     this._renderFrame(settings.now.stereo);
@@ -2697,7 +2787,7 @@ Miew.prototype.screenshot = function(width, height) {
     gfx.camera.aspect = originalAspect;
     gfx.camera.fov = originalFov;
     gfx.camera.updateProjectionMatrix();
-    gfx.renderer.setSize(gfx.width, gfx.height);
+    gfx.renderer.setDrawingBufferSize(gfx.width, gfx.height, window.devicePixelRatio);
     this._needRender = true;
   }
 
@@ -3094,6 +3184,14 @@ Miew.prototype._fogFarUpdateValue = function() {
   }
 };
 
+Miew.prototype._fogAlphaChanged = function() {
+  this._forEachComplexVisual(function(visual) {
+    visual.setUberOptions({
+      fogAlpha: settings.now.fogAlpha
+    });
+  });
+};
+
 Miew.prototype._initOnSettingsChanged = function() {
   const on = (props, func) => {
     props = _.isArray(props) ? props : [props];
@@ -3109,6 +3207,18 @@ Miew.prototype._initOnSettingsChanged = function() {
 
   on('bg.color', () => {
     this._onBgColorChanged();
+  });
+
+  on('ao', () => {
+    this._setUberMaterialValues({normalsToGBuffer: settings.now.ao});
+  });
+
+  on('fogColor', () => {
+    this._onFogColorChanged();
+  });
+
+  on('fogColorEnable', () => {
+    this._onFogColorChanged();
   });
 
   on('bg.transparent', (evt) => {
@@ -3151,6 +3261,10 @@ Miew.prototype._initOnSettingsChanged = function() {
     this._updateFog();
   });
 
+  on('fogAlpha', () => {
+    this._fogAlphaChanged();
+  });
+
   on('autoResolution', (evt) => {
     if (evt.value && !this._gfxScore) {
       this.logger.warn('Benchmarks are missed, autoresolution will not work! ' +
@@ -3159,14 +3273,14 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('stereo', () => {
-    if (changes.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
+    if (settings.now.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
       this.webVR = new WebVRPoC(() => {
         this._needRender = true;
         this._onResize();
       });
     }
     if (this.webVR) {
-      this.webVR.toggle(changes.stereo === 'WEBVR', this._gfx);
+      this.webVR.toggle(settings.now.stereo === 'WEBVR', this._gfx);
     }
   });
 
@@ -3771,6 +3885,39 @@ Miew.prototype.exportCML = function() {
 
   return null;
 };
+
+/**
+ * Reproduce the RCSB PDB Molecule of the Month style by David S. Goodsell
+ *
+ * @see http://pdb101.rcsb.org/motm/motm-about
+ */
+Miew.prototype.motm = function() {
+  settings.set('theme', 'light');
+  settings.set({
+    fogColorEnable: true,
+    fogColor: 0x000000,
+    outline: {on:true, threshold: 0.01},
+    bg: {color: 0xffffff},
+  });
+
+  this._forEachComplexVisual((visual) => {
+    var rep = [];
+    var complex = visual.getComplex();
+    var palette = palettes.get(settings.now.palette);
+    for (let i = 0; i < complex.getChainCount(); i++) {
+      var curChainName = complex._chains[i]._name;
+      var curChainColor = palette.getChainColor(curChainName);
+      rep[i] = {
+        selector: 'chain ' + curChainName,
+        mode: 'VW',
+        colorer: ['CB', {color: curChainColor, factor: 0.9}],
+        material: 'FL'
+      };
+    }
+    visual.resetReps(rep);
+  });
+};
+
 ////////////////////////////////////////////////////////////////////////////
 // Additional exports
 

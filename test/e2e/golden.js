@@ -81,7 +81,7 @@ const report = {
 function _prepareBrowser(width = 1024, height = 768) {
   const getPadding = 'return[window.outerWidth-window.innerWidth,window.outerHeight-window.innerHeight];';
   return driver.executeScript(getPadding)
-    .then((pad) => driver.manage().window().setSize(width + pad[0], height + pad[1]))
+    .then((pad) => driver.manage().window().setRect({width: width + pad[0], height: height + pad[1]}))
     .then(() => driver.getCapabilities())
     .then((caps) => {
       const browserName = caps.get('browserName').replace(/\b\w/g, c => c.toUpperCase());

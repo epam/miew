@@ -1,5 +1,3 @@
-
-
 import _ from 'lodash';
 import settings from '../../settings';
 import utils from '../../utils';
@@ -19,41 +17,43 @@ import palettes from '../palettes';
  * @constructor
  * @classdesc Basic class for all available coloring algorithms used for building and displaying molecule geometry.
  */
-function Colorer(opts) {
-  if (this.constructor === Colorer) {
-    throw new Error('Can not instantiate abstract class!');
+class Colorer {
+  constructor(opts) {
+    if (this.constructor === Colorer) {
+      throw new Error('Can not instantiate abstract class!');
+    }
+    /**
+     * Colorer options inherited (prototyped) from defaults.
+     * @type {object}
+     */
+    this.opts = _.merge(utils.deriveDeep(settings.now.colorers[this.id], true), opts);
+    /**
+     * Palette in use.
+     * @type {Palette}
+     */
+    this.palette = palettes.first;
   }
+
   /**
-   * Colorer options inherited (prototyped) from defaults.
-   * @type {object}
+   * Get Colorer identification, probably with options.
+   * @returns {string|Array} Colorer identifier string ({@link Colorer#id}) or two-element array containing both colorer
+   *   identifier and options ({@link Colorer#opts}).
+   * Options are returned if they were changed during or after colorer creation.
    */
-  this.opts = _.merge(utils.deriveDeep(settings.now.colorers[this.id], true), opts);
-  /**
-   * Palette in use.
-   * @type {Palette}
-   */
-  this.palette = palettes.first;
+  identify() {
+    const diff = utils.objectsDiff(this.opts, settings.now.colorers[this.id]);
+    if (!_.isEmpty(diff)) {
+      return [this.id, diff];
+    }
+    return this.id;
+  }
 }
 
 /**
  * Colorer identifier.
  * @type {string}
  */
+
 Colorer.prototype.id = '__';
 
-/**
- * Get Colorer identification, probably with options.
- * @returns {string|Array} Colorer identifier string ({@link Colorer#id}) or two-element array containing both colorer
- *   identifier and options ({@link Colorer#opts}).
- * Options are returned if they were changed during or after colorer creation.
- */
-Colorer.prototype.identify = function() {
-  var diff = utils.objectsDiff(this.opts, settings.now.colorers[this.id]);
-  if (!_.isEmpty(diff)) {
-    return [this.id, diff];
-  }
-  return this.id;
-};
-
 export default Colorer;
-

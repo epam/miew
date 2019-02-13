@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import utils from '../../utils';
 
@@ -16,350 +14,350 @@ import utils from '../../utils';
  * @param {number} probeRadius     - Normals for output
  *
  */
-function IsosurfaceBuildNormals(numAtoms, atoms, vBoxMin, vBoxMax, probeRadius) {
-  this._numAtoms = numAtoms;
-  this._atoms = atoms;
-  this._vBoxMin = new THREE.Vector3();
-  this._vBoxMax = new THREE.Vector3();
-  this._vBoxMin.copy(vBoxMin);
-  this._vBoxMax.copy(vBoxMax);
-  this._probeRadius = probeRadius;
+class IsosurfaceBuildNormals {
+  constructor(numAtoms, atoms, vBoxMin, vBoxMax, probeRadius) {
+    this._numAtoms = numAtoms;
+    this._atoms = atoms;
+    this._vBoxMin = new THREE.Vector3();
+    this._vBoxMax = new THREE.Vector3();
+    this._vBoxMin.copy(vBoxMin);
+    this._vBoxMax.copy(vBoxMax);
+    this._probeRadius = probeRadius;
 
-  this._atomsList = null;
-  this._voxelList = null;
-}
-
-IsosurfaceBuildNormals.prototype.createVoxels = function() {
-  var numAtomsRefs;
-  var rad;
-  var ATOM_VOXEL_REF_SCALE = 4.5;
-
-  var numAtoms = this._numAtoms | 0;
-  var atoms = this._atoms;
-  var dx = this._vBoxMax.x - this._vBoxMin.x;
-  var dy = this._vBoxMax.y - this._vBoxMin.y;
-  var dz = this._vBoxMax.z - this._vBoxMin.z;
-  var w = (dx < dy) ? dx : dy;
-  w = (dz < w) ? dz : w;
-  var maxRad = 0.0;
-  var aveRad = 0.0;
-
-  var i;
-  for (i = 0; i < numAtoms; i++) {
-    rad = (atoms[i].radius + this._probeRadius) * 2.0;
-    maxRad = (rad > maxRad) ? rad : maxRad;
-    aveRad += rad;
+    this._atomsList = null;
+    this._voxelList = null;
   }
-  var numCells = Math.floor(w / maxRad);
-  if (numCells < 2) {
-    numCells = 2;
-  }
-  aveRad /= numAtoms;
 
-  this._numCells = numCells;
-  this._aveRad = aveRad;
-  this._maxRad = maxRad;
+  createVoxels() {
+    let numAtomsRefs;
+    let rad;
+    const ATOM_VOXEL_REF_SCALE = 4.5;
 
-  var side = numCells;
-  var side2 = numCells * numCells;
-  var side3 = numCells * numCells * numCells;
+    const numAtoms = this._numAtoms | 0;
+    const atoms = this._atoms;
+    const dx = this._vBoxMax.x - this._vBoxMin.x;
+    const dy = this._vBoxMax.y - this._vBoxMin.y;
+    const dz = this._vBoxMax.z - this._vBoxMin.z;
+    let w = (dx < dy) ? dx : dy;
+    w = (dz < w) ? dz : w;
+    let maxRad = 0.0;
+    let aveRad = 0.0;
 
-  var xScale = this._xScale = 1.0 / (this._vBoxMax.x - this._vBoxMin.x);
-  var yScale = this._yScale = 1.0 / (this._vBoxMax.y - this._vBoxMin.y);
-  var zScale = this._zScale = 1.0 / (this._vBoxMax.z - this._vBoxMin.z);
+    let i;
+    for (i = 0; i < numAtoms; i++) {
+      rad = (atoms[i].radius + this._probeRadius) * 2.0;
+      maxRad = (rad > maxRad) ? rad : maxRad;
+      aveRad += rad;
+    }
+    let numCells = Math.floor(w / maxRad);
+    if (numCells < 2) {
+      numCells = 2;
+    }
+    aveRad /= numAtoms;
 
-  // estimate number of individual atom refs in each voxel list
-  var maxAtomsRefs = 0;
+    this._numCells = numCells;
+    this._aveRad = aveRad;
+    this._maxRad = maxRad;
 
-  var xNumVoxMult = xScale * numCells;
-  var yNumVoxMult = yScale * numCells;
-  var zNumVoxMult = zScale * numCells;
+    const side = numCells;
+    const side2 = numCells * numCells;
+    const side3 = numCells * numCells * numCells;
 
-  for (i = 0; i < numAtoms; i++) {
-    var radAffect = (atoms[i].radius + this._probeRadius) * ATOM_VOXEL_REF_SCALE;
-    var diaAffect = radAffect * 2.0;
-    var numVoxX = Math.floor(xNumVoxMult * diaAffect + 0.8);
-    var numVoxY = Math.floor(yNumVoxMult * diaAffect + 0.8);
-    var numVoxZ = Math.floor(zNumVoxMult * diaAffect + 0.8);
-    // avoid case numVox? == 0
-    // also use loop i <=
-    numVoxX++;
-    numVoxY++;
-    numVoxZ++;
-    maxAtomsRefs += numVoxX * numVoxY * numVoxZ;
-  }     // for (i)
-  //maxAtomsRefs = numAtoms * MAX_ATOMS_IN_SINGLE_VOXEL;
+    const xScale = this._xScale = 1.0 / (this._vBoxMax.x - this._vBoxMin.x);
+    const yScale = this._yScale = 1.0 / (this._vBoxMax.y - this._vBoxMin.y);
+    const zScale = this._zScale = 1.0 / (this._vBoxMax.z - this._vBoxMin.z);
+
+    // estimate number of individual atom refs in each voxel list
+    let maxAtomsRefs = 0;
+
+    const xNumVoxMult = xScale * numCells;
+    const yNumVoxMult = yScale * numCells;
+    const zNumVoxMult = zScale * numCells;
+
+    for (i = 0; i < numAtoms; i++) {
+      const radAffect = (atoms[i].radius + this._probeRadius) * ATOM_VOXEL_REF_SCALE;
+      const diaAffect = radAffect * 2.0;
+      let numVoxX = Math.floor(xNumVoxMult * diaAffect + 0.8);
+      let numVoxY = Math.floor(yNumVoxMult * diaAffect + 0.8);
+      let numVoxZ = Math.floor(zNumVoxMult * diaAffect + 0.8);
+      // avoid case numVox? == 0
+      // also use loop i <=
+      numVoxX++;
+      numVoxY++;
+      numVoxZ++;
+      maxAtomsRefs += numVoxX * numVoxY * numVoxZ;
+    }     // for (i)
+    //maxAtomsRefs = numAtoms * MAX_ATOMS_IN_SINGLE_VOXEL;
 
 
-  this._voxelList = utils.allocateTyped(Int32Array, side3);
-  var atomsList = [];
-  atomsList.length = maxAtomsRefs;
-  if ((this._voxelList === null) || (atomsList === null)) {
-    return 0 - 1;
-  }
-  // init voxel list
-  for (i = 0; i < side3; i++) {
-    this._voxelList[i] = -1;
-  }
-  numAtomsRefs = 0;
+    this._voxelList = utils.allocateTyped(Int32Array, side3);
+    const atomsList = [];
+    atomsList.length = maxAtomsRefs;
+    if ((this._voxelList === null) || (atomsList === null)) {
+      return 0 - 1;
+    }
+    // init voxel list
+    for (i = 0; i < side3; i++) {
+      this._voxelList[i] = -1;
+    }
+    numAtomsRefs = 0;
 
-  // create voxel lists
-  for (i = 0; i < numAtoms; i++) {
-    // use multiplier 4 to locate this atom in different voxels
-    rad = (atoms[i].radius + this._probeRadius) * ATOM_VOXEL_REF_SCALE;
-    var xIndMin = Math.floor((atoms[i].coord.x - this._vBoxMin.x - rad) * numCells * xScale);
-    var yIndMin = Math.floor((atoms[i].coord.y - this._vBoxMin.y - rad) * numCells * yScale);
-    var zIndMin = Math.floor((atoms[i].coord.z - this._vBoxMin.z - rad) * numCells * zScale);
-    var xIndMax = Math.floor((atoms[i].coord.x - this._vBoxMin.x + rad) * numCells * xScale);
-    var yIndMax = Math.floor((atoms[i].coord.y - this._vBoxMin.y + rad) * numCells * yScale);
-    var zIndMax = Math.floor((atoms[i].coord.z - this._vBoxMin.z + rad) * numCells * zScale);
+    // create voxel lists
+    for (i = 0; i < numAtoms; i++) {
+      // use multiplier 4 to locate this atom in different voxels
+      rad = (atoms[i].radius + this._probeRadius) * ATOM_VOXEL_REF_SCALE;
+      let xIndMin = Math.floor((atoms[i].coord.x - this._vBoxMin.x - rad) * numCells * xScale);
+      let yIndMin = Math.floor((atoms[i].coord.y - this._vBoxMin.y - rad) * numCells * yScale);
+      let zIndMin = Math.floor((atoms[i].coord.z - this._vBoxMin.z - rad) * numCells * zScale);
+      let xIndMax = Math.floor((atoms[i].coord.x - this._vBoxMin.x + rad) * numCells * xScale);
+      let yIndMax = Math.floor((atoms[i].coord.y - this._vBoxMin.y + rad) * numCells * yScale);
+      let zIndMax = Math.floor((atoms[i].coord.z - this._vBoxMin.z + rad) * numCells * zScale);
 
-    xIndMin = (xIndMin >= 0) ? xIndMin : 0;
-    yIndMin = (yIndMin >= 0) ? yIndMin : 0;
-    zIndMin = (zIndMin >= 0) ? zIndMin : 0;
+      xIndMin = (xIndMin >= 0) ? xIndMin : 0;
+      yIndMin = (yIndMin >= 0) ? yIndMin : 0;
+      zIndMin = (zIndMin >= 0) ? zIndMin : 0;
 
-    xIndMax = (xIndMax < numCells) ? xIndMax : (numCells - 1);
-    yIndMax = (yIndMax < numCells) ? yIndMax : (numCells - 1);
-    zIndMax = (zIndMax < numCells) ? zIndMax : (numCells - 1);
+      xIndMax = (xIndMax < numCells) ? xIndMax : (numCells - 1);
+      yIndMax = (yIndMax < numCells) ? yIndMax : (numCells - 1);
+      zIndMax = (zIndMax < numCells) ? zIndMax : (numCells - 1);
 
-    for (var z = zIndMin; z <= zIndMax; z++) {
-      for (var y = yIndMin; y <= yIndMax; y++) {
-        for (var x = xIndMin; x <= xIndMax; x++) {
-          // add atom with index "i" to this voxel list
-          var indVoxel = x + y * side + z * side2;
-          //assert(indVoxel >= 0);
-          //assert(indVoxel < side3);
+      for (let z = zIndMin; z <= zIndMax; z++) {
+        for (let y = yIndMin; y <= yIndMax; y++) {
+          for (let x = xIndMin; x <= xIndMax; x++) {
+            // add atom with index "i" to this voxel list
+            const indVoxel = x + y * side + z * side2;
+            //assert(indVoxel >= 0);
+            //assert(indVoxel < side3);
 
-          // add first
-          if (this._voxelList[indVoxel] < 0) {
-            atomsList[numAtomsRefs * 2 + 0] = i;
-            atomsList[numAtomsRefs * 2 + 1] = 0 - 1;
+            // add first
+            if (this._voxelList[indVoxel] < 0) {
+              atomsList[numAtomsRefs * 2 + 0] = i;
+              atomsList[numAtomsRefs * 2 + 1] = 0 - 1;
+              this._voxelList[indVoxel] = numAtomsRefs;
+              numAtomsRefs++;
+              //assert(numAtomsRefs < maxAtomsRefs - 1);
+              continue;
+            }
+            // insert into head of list
+            const indexNext = this._voxelList[indVoxel];
             this._voxelList[indVoxel] = numAtomsRefs;
+            atomsList[numAtomsRefs * 2 + 0] = i;
+            atomsList[numAtomsRefs * 2 + 1] = indexNext;
             numAtomsRefs++;
-            //assert(numAtomsRefs < maxAtomsRefs - 1);
-            continue;
-          }
-          // insert into head of list
-          var indexNext = this._voxelList[indVoxel];
-          this._voxelList[indVoxel] = numAtomsRefs;
-          atomsList[numAtomsRefs * 2 + 0] = i;
-          atomsList[numAtomsRefs * 2 + 1] = indexNext;
-          numAtomsRefs++;
-        }     // for (x)
-      }       // for (y)
-    }         // for (z)
-  }           // for (i)
+          }     // for (x)
+        }       // for (y)
+      }         // for (z)
+    }           // for (i)
 
-  // convert Array to Int32Array
-  this._atomsList = Int32Array.from(atomsList);
+    // convert Array to Int32Array
+    this._atomsList = Int32Array.from(atomsList);
 
-  return 0;
-};
-
-IsosurfaceBuildNormals.prototype.destroyVoxels = function() {
-  this._atomsList = null;
-  this._voxelList = null;
-
-  this._atoms = null;
-  this._vertices = null;
-  this._vBoxMin = null;
-  this._vBoxMax = null;
-};
-
-/**
- * Enumerate all atoms affecting specified point
- *
- * @param {Vector3}    point    - point in 3D
- * @param {func(atom)} process  - function to call for each atom
- */
-IsosurfaceBuildNormals.prototype.forEachRelatedAtom = function(point, process) {
-  // find corresponding voxel
-  var xInd = Math.floor((point.x - this._vBoxMin.x) * this._numCells * this._xScale);
-  var yInd = Math.floor((point.y - this._vBoxMin.y) * this._numCells * this._yScale);
-  var zInd = Math.floor((point.z - this._vBoxMin.z) * this._numCells * this._zScale);
-  var indVoxel = xInd + yInd * this._numCells + zInd * this._numCells * this._numCells;
-
-  // run through atoms affecting this voxel
-  var atoms = this._atoms;
-  for (var ref = this._voxelList[indVoxel]; ref >= 0; ref = this._atomsList[ref * 2 + 1]) {
-    var indexAtom = this._atomsList[ref * 2];
-    process(atoms[indexAtom]);
+    return 0;
   }
-};
 
-/**
- * Get atom closest to specified point
- *
- * @param {Vector3} point  - point in 3D
- *
- * @returns {IsoSurfaceAtomColored} atom, or null if not found
- */
-IsosurfaceBuildNormals.prototype.getClosestAtom = function(point) {
-  var closest = null;
-  var minDist2 = Number.MAX_VALUE;
+  destroyVoxels() {
+    this._atomsList = null;
+    this._voxelList = null;
 
-  this.forEachRelatedAtom(point, function(atom) {
-    var dist2 = point.distanceToSquared(atom.coord);
-    if (dist2 < minDist2) {
-      minDist2 = dist2;
-      closest = atom;
+    this._atoms = null;
+    this._vertices = null;
+    this._vBoxMin = null;
+    this._vBoxMax = null;
+  }
+
+  /**
+   * Enumerate all atoms affecting specified point
+   *
+   * @param {Vector3}    point    - point in 3D
+   * @param {func(atom)} process  - function to call for each atom
+   */
+  forEachRelatedAtom(point, process) {
+    // find corresponding voxel
+    const xInd = Math.floor((point.x - this._vBoxMin.x) * this._numCells * this._xScale);
+    const yInd = Math.floor((point.y - this._vBoxMin.y) * this._numCells * this._yScale);
+    const zInd = Math.floor((point.z - this._vBoxMin.z) * this._numCells * this._zScale);
+    const indVoxel = xInd + yInd * this._numCells + zInd * this._numCells * this._numCells;
+
+    // run through atoms affecting this voxel
+    const atoms = this._atoms;
+    for (let ref = this._voxelList[indVoxel]; ref >= 0; ref = this._atomsList[ref * 2 + 1]) {
+      const indexAtom = this._atomsList[ref * 2];
+      process(atoms[indexAtom]);
     }
-  });
+  }
 
-  return closest;
-};
+  /**
+   * Get atom closest to specified point
+   *
+   * @param {Vector3} point  - point in 3D
+   *
+   * @returns {IsoSurfaceAtomColored} atom, or null if not found
+   */
+  getClosestAtom(point) {
+    let closest = null;
+    let minDist2 = Number.MAX_VALUE;
 
-/**
- * Build normals for isosurface, using atoms information
- *
- * @param {number} numVertices  - Number of vertices in final geometry (to render)
- * @param {Vector3} vertices    - Geometry vertices (3d coordinates array)
- * @param {Vector3} normals     - Normals for output
- *
- * @returns {number} 0, if success
- */
-IsosurfaceBuildNormals.prototype.buildNormals = function(numVertices, vertices, normals) {
-  var self = this;
-  var numCloseAtoms = 0;
-  var vx = 0, vy = 0, vz = 0;
-  var dist2;
-  var vNormalX = 0, vNormalY = 0, vNormalZ = 0;
-  var koef = 0, w = 0;
-  var r25 = 2.5;
-  var r01 = 0.1;
+    this.forEachRelatedAtom(point, function(atom) {
+      const dist2 = point.distanceToSquared(atom.coord);
+      if (dist2 < minDist2) {
+        minDist2 = dist2;
+        closest = atom;
+      }
+    });
 
-  var maxRadAffect = this._aveRad * r25;
-  var maxRadAffect2 = maxRadAffect * maxRadAffect;
-  var expScale = -this._aveRad * r01;
+    return closest;
+  }
 
-  // some stats
-  //numSlowAtoms = 0;
+  /**
+   * Build normals for isosurface, using atoms information
+   *
+   * @param {number} numVertices  - Number of vertices in final geometry (to render)
+   * @param {Vector3} vertices    - Geometry vertices (3d coordinates array)
+   * @param {Vector3} normals     - Normals for output
+   *
+   * @returns {number} 0, if success
+   */
+  buildNormals(numVertices, vertices, normals) {
+    const self = this;
+    let numCloseAtoms = 0;
+    let vx = 0, vy = 0, vz = 0;
+    let dist2;
+    let vNormalX = 0, vNormalY = 0, vNormalZ = 0;
+    let koef = 0, w = 0;
+    const r25 = 2.5;
+    const r01 = 0.1;
 
-  var gatherNormals = function(atom) {
-    var dx = vx - atom.coord.x;
-    var dy = vy - atom.coord.y;
-    var dz = vz - atom.coord.z;
-    dist2 = dx * dx + dy * dy + dz * dz;
-    if (dist2 > maxRadAffect2) {
-      return;
-    }
+    const maxRadAffect = this._aveRad * r25;
+    const maxRadAffect2 = maxRadAffect * maxRadAffect;
+    const expScale = -this._aveRad * r01;
 
-    // get weight for gaussian smoothing
-    var rad = atom.radius + self._probeRadius;
-    koef = dist2 - (rad * rad);
-    if (koef < 0.0) {
-      koef = -koef;
-    }
-    w = Math.exp(expScale * koef);
+    // some stats
+    //numSlowAtoms = 0;
 
-    vNormalX += dx * w;
-    vNormalY += dy * w;
-    vNormalZ += dz * w;
-    numCloseAtoms++;
-  };
+    const gatherNormals = function(atom) {
+      const dx = vx - atom.coord.x;
+      const dy = vy - atom.coord.y;
+      const dz = vz - atom.coord.z;
+      dist2 = dx * dx + dy * dy + dz * dz;
+      if (dist2 > maxRadAffect2) {
+        return;
+      }
 
-  var maxClosedAtoms = 0;
-  // process all vertices, one by one
-  for (var i = 0; i < numVertices; i++) {
-    vx = vertices[i].x;
-    vy = vertices[i].y;
-    vz = vertices[i].z;
+      // get weight for gaussian smoothing
+      const rad = atom.radius + self._probeRadius;
+      koef = dist2 - (rad * rad);
+      if (koef < 0.0) {
+        koef = -koef;
+      }
+      w = Math.exp(expScale * koef);
 
-    numCloseAtoms = 0;
-    vNormalX = vNormalY = vNormalZ = 0.0;
+      vNormalX += dx * w;
+      vNormalY += dy * w;
+      vNormalZ += dz * w;
+      numCloseAtoms++;
+    };
 
-    this.forEachRelatedAtom(vertices[i], gatherNormals);
+    let maxClosedAtoms = 0;
+    // process all vertices, one by one
+    for (let i = 0; i < numVertices; i++) {
+      vx = vertices[i].x;
+      vy = vertices[i].y;
+      vz = vertices[i].z;
 
-    maxClosedAtoms = (numCloseAtoms > maxClosedAtoms) ? numCloseAtoms : maxClosedAtoms;
+      numCloseAtoms = 0;
+      vNormalX = vNormalY = vNormalZ = 0.0;
 
-    // normalize vNormal
-    dist2 = vNormalX * vNormalX + vNormalY * vNormalY + vNormalZ * vNormalZ;
-    if (numCloseAtoms > 0) {
-      koef = 1.0 / Math.sqrt(dist2);
-      vNormalX *= koef;
-      vNormalY *= koef;
-      vNormalZ *= koef;
-    }
-    normals[i].x = vNormalX;
-    normals[i].y = vNormalY;
-    normals[i].z = vNormalZ;
-  }   // for (i) all vertices
+      this.forEachRelatedAtom(vertices[i], gatherNormals);
 
-  return 0;
-};
+      maxClosedAtoms = (numCloseAtoms > maxClosedAtoms) ? numCloseAtoms : maxClosedAtoms;
 
-/**
- * Build vertex colors for isosurface, using atoms information
- *
- * @param {number} numVertices  - Number of vertices in final geometry (to render)
- * @param {Vector3} vertices    - Geometry vertices (3d coordinates array)
- * @param {Vector3} colors                - Colors for output
- * @param {number} radiusColorSmoothness  - Radius of smoothness sphere
- *
- * @returns {number} 0, if success
- */
-IsosurfaceBuildNormals.prototype.buildColors = function(numVertices, vertices, colors, radiusColorSmoothness) {
-  var self = this;
-  var vx = 0.0, vy = 0.0, vz = 0.0;
-  var koef = 0.0, w = 0.0;
-  //var KOEF_ALPHA = 1.0;
-  var KOEF_ADD = 0.8;
+      // normalize vNormal
+      dist2 = vNormalX * vNormalX + vNormalY * vNormalY + vNormalZ * vNormalZ;
+      if (numCloseAtoms > 0) {
+        koef = 1.0 / Math.sqrt(dist2);
+        vNormalX *= koef;
+        vNormalY *= koef;
+        vNormalZ *= koef;
+      }
+      normals[i].x = vNormalX;
+      normals[i].y = vNormalY;
+      normals[i].z = vNormalZ;
+    }   // for (i) all vertices
 
-  var maxRadAffect = radiusColorSmoothness;
-  var maxRadAffect2 = maxRadAffect * maxRadAffect;
+    return 0;
+  }
 
-  //koefAlpha = 4.4 / radiusColorSmoothness;
+  /**
+   * Build vertex colors for isosurface, using atoms information
+   *
+   * @param {number} numVertices  - Number of vertices in final geometry (to render)
+   * @param {Vector3} vertices    - Geometry vertices (3d coordinates array)
+   * @param {Vector3} colors                - Colors for output
+   * @param {number} radiusColorSmoothness  - Radius of smoothness sphere
+   *
+   * @returns {number} 0, if success
+   */
+  buildColors(numVertices, vertices, colors, radiusColorSmoothness) {
+    const self = this;
+    let vx = 0.0, vy = 0.0, vz = 0.0;
+    let koef = 0.0, w = 0.0;
+    //const KOEF_ALPHA = 1.0;
+    const KOEF_ADD = 0.8;
 
-  var colorsClose = [];
-  var weights = [];
-  var weightsSum = 0;
+    const maxRadAffect = radiusColorSmoothness;
+    const maxRadAffect2 = maxRadAffect * maxRadAffect;
 
-  var gatherColors = function(atom) {
-    var dx = vx - atom.coord.x;
-    var dy = vy - atom.coord.y;
-    var dz = vz - atom.coord.z;
-    var dist2 = dx * dx + dy * dy + dz * dz;
-    if (dist2 > maxRadAffect2) {
-      return;
-    }
+    //koefAlpha = 4.4 / radiusColorSmoothness;
 
-    // get weight for gaussian smoothing
-    var rad = atom.radius + self._probeRadius;
-    koef = dist2 - (rad * rad);
-    if (koef < 0.0) {
-      koef = -koef;
-    }
-    //w = Math.exp(expScale * koef);
-    //w = 1.0 / (KOEF_ADD + Math.pow(koef, KOEF_ALPHA));
-    w = 1.0 / (KOEF_ADD + koef);
+    let colorsClose = [];
+    let weights = [];
+    let weightsSum = 0;
 
-    colorsClose.push([atom.colorX, atom.colorY, atom.colorZ]);
-    weights.push(w); // save weights for use
-    weightsSum += w; // calc sum of weights fo further normalization
-  };
+    const gatherColors = function(atom) {
+      const dx = vx - atom.coord.x;
+      const dy = vy - atom.coord.y;
+      const dz = vz - atom.coord.z;
+      const dist2 = dx * dx + dy * dy + dz * dz;
+      if (dist2 > maxRadAffect2) {
+        return;
+      }
+
+      // get weight for gaussian smoothing
+      const rad = atom.radius + self._probeRadius;
+      koef = dist2 - (rad * rad);
+      if (koef < 0.0) {
+        koef = -koef;
+      }
+      //w = Math.exp(expScale * koef);
+      //w = 1.0 / (KOEF_ADD + Math.pow(koef, KOEF_ALPHA));
+      w = 1.0 / (KOEF_ADD + koef);
+
+      colorsClose.push([atom.colorX, atom.colorY, atom.colorZ]);
+      weights.push(w); // save weights for use
+      weightsSum += w; // calc sum of weights fo further normalization
+    };
 
     // process all vertices, one by one
-  for (var i = 0; i < numVertices; i++) {
-    vx = vertices[i].x;
-    vy = vertices[i].y;
-    vz = vertices[i].z;
+    for (let i = 0; i < numVertices; i++) {
+      vx = vertices[i].x;
+      vy = vertices[i].y;
+      vz = vertices[i].z;
 
-    colorsClose = [];
-    weights = [];
-    weightsSum = 0;
+      colorsClose = [];
+      weights = [];
+      weightsSum = 0;
 
-    this.forEachRelatedAtom(vertices[i], gatherColors);
+      this.forEachRelatedAtom(vertices[i], gatherColors);
 
-    // normalized weighted sum of colors
-    for (var j = 0; j < colorsClose.length; ++j) {
-      var weightNormalized = weights[j] / weightsSum;
-      colors[i].x += colorsClose[j][0] * weightNormalized;
-      colors[i].y += colorsClose[j][1] * weightNormalized;
-      colors[i].z += colorsClose[j][2] * weightNormalized;
-    }
-  }   // for (i) all vertices
-  return 0;
-};
-
+      // normalized weighted sum of colors
+      for (let j = 0; j < colorsClose.length; ++j) {
+        const weightNormalized = weights[j] / weightsSum;
+        colors[i].x += colorsClose[j][0] * weightNormalized;
+        colors[i].y += colorsClose[j][1] * weightNormalized;
+        colors[i].z += colorsClose[j][2] * weightNormalized;
+      }
+    }   // for (i) all vertices
+    return 0;
+  }
+}
 export default IsosurfaceBuildNormals;
-

@@ -5,10 +5,10 @@ import chem from '../../../chem';
 
 const ResidueType = chem.ResidueType;
 
-var calcMatrix = gfxutils.calcChunkMatrix;
+const calcMatrix = gfxutils.calcChunkMatrix;
 
 function _buildStructureInterpolator(points, tension) {
-  var path = Smooth(points, {
+  const path = Smooth(points, {
     method: Smooth.METHOD_CUBIC,
     clip: Smooth.CLIP_CLAMP,
     cubicTension: tension,
@@ -16,15 +16,15 @@ function _buildStructureInterpolator(points, tension) {
   });
 
   return function(t, argTrans) {
-    var transformT = argTrans;
+    let transformT = argTrans;
     if (transformT === null) {
       // map our range to the [second .. last but one]
       transformT = function(tt) {
         return (tt * ((points.length - 1) - 2) + 1) / (points.length - 1);
       };
     }
-    var newt = transformT(t);
-    var ans = path(newt);
+    const newt = transformT(t);
+    const ans = path(newt);
     return new THREE.Vector3(ans[0], ans[1], ans[2]);
   };
 }
@@ -35,9 +35,9 @@ function _addPoints(centerPoints, topPoints, idx, residue) {
     topPoints[idx] = topPoints[idx - 1];
     return;
   }
-  var cp = residue._controlPoint;
+  const cp = residue._controlPoint;
   centerPoints[idx] = [cp.x, cp.y, cp.z];
-  var tp = cp.clone().add(residue._wingVector);
+  const tp = cp.clone().add(residue._wingVector);
   topPoints[idx] = [tp.x, tp.y, tp.z];
 }
 
@@ -93,8 +93,8 @@ function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
 }
 
 function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
-  var left = boundaries.start;
-  var right = boundaries.end;
+  const left = boundaries.start;
+  const right = boundaries.end;
   function _prevIdx(idx) {
     return idx > left && residues[idx - 1]._isValid ? idx - 1 : idx;
   }
@@ -102,12 +102,12 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
     return idx < right && residues[idx + 1]._isValid ? idx + 1 : idx;
   }
 
-  var topPoints = []; // new Array(lastIdx - firstIdx + 5);
-  var centerPoints = []; // new Array(lastIdx - firstIdx + 5);
-  var arrIdx = 0;
+  const topPoints = []; // new Array(lastIdx - firstIdx + 5);
+  const centerPoints = []; // new Array(lastIdx - firstIdx + 5);
+  let arrIdx = 0;
   function _extrapolate2(currIdx, otherIdx) {
-    var cp = residues[currIdx]._controlPoint.clone().lerp(residues[otherIdx]._controlPoint, -0.25);
-    var tp = cp.clone().add(residues[currIdx]._wingVector);
+    const cp = residues[currIdx]._controlPoint.clone().lerp(residues[otherIdx]._controlPoint, -0.25);
+    const tp = cp.clone().add(residues[currIdx]._wingVector);
     centerPoints[arrIdx] = [cp.x, cp.y, cp.z];
     topPoints[arrIdx++] = [tp.x, tp.y, tp.z];
     centerPoints[arrIdx] = [cp.x, cp.y, cp.z];
@@ -135,7 +135,7 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   }
 
   // main loop
-  for (var idx = firstIdx; idx <= lastIdx; ++idx) {
+  for (let idx = firstIdx; idx <= lastIdx; ++idx) {
     _addPoints(centerPoints, topPoints, arrIdx++, residues[idx]);
   }
 
@@ -150,40 +150,41 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   return {centerPoints : centerPoints, topPoints : topPoints};
 }
 
-function CartoonHelper(residues, startIdx, endIdx, segmentsCount, tension, boundaries) {
-  var pointsArrays = _calcPoints(residues, startIdx, endIdx, boundaries);
-  this._topInterp = _buildStructureInterpolator(pointsArrays.topPoints, tension);
-  this._centerInterp = _buildStructureInterpolator(pointsArrays.centerPoints, tension);
+class CartoonHelper {
+  constructor(residues, startIdx, endIdx, segmentsCount, tension, boundaries) {
+    const pointsArrays = _calcPoints(residues, startIdx, endIdx, boundaries);
+    this._topInterp = _buildStructureInterpolator(pointsArrays.topPoints, tension);
+    this._centerInterp = _buildStructureInterpolator(pointsArrays.centerPoints, tension);
 
-  this._shift = 0.5 / (endIdx - startIdx + 2);
-  this._valueStep = (1.0 - 2 * this._shift) / (2 * (endIdx - startIdx + 1) * (segmentsCount - 1));
-  this._segmentsCount = segmentsCount;
-}
-
-CartoonHelper.prototype.prepareMatrices = function(idx, firstRad, secondRad) {
-  var mtcCount = this._segmentsCount;
-  var outMtc = new Array(mtcCount);
-  var currRad  = new THREE.Vector2(0, 0);
-
-  var topInterp = this._topInterp;
-  var cenInterp = this._centerInterp;
-
-  var currentValue = this._shift + this._valueStep * (mtcCount - 1) * idx;
-
-  for (var mtxIdx = 0; mtxIdx < mtcCount; ++mtxIdx) {
-    var lerpVal = Math.min(1.0, mtxIdx / (mtcCount - 1));
-    currRad.lerpVectors(firstRad, secondRad, lerpVal);
-
-    var currTop    = topInterp(currentValue, null);
-    var currCenter = cenInterp(currentValue, null);
-    currentValue += this._valueStep;
-    var nextCenter = cenInterp(currentValue, null);
-
-    outMtc[mtxIdx] = calcMatrix(currCenter.clone(), nextCenter.clone(), currTop.clone().sub(currCenter), currRad);
+    this._shift = 0.5 / (endIdx - startIdx + 2);
+    this._valueStep = (1.0 - 2 * this._shift) / (2 * (endIdx - startIdx + 1) * (segmentsCount - 1));
+    this._segmentsCount = segmentsCount;
   }
 
-  return outMtc;
-};
+  prepareMatrices(idx, firstRad, secondRad) {
+    const mtcCount = this._segmentsCount;
+    const outMtc = new Array(mtcCount);
+    const currRad = new THREE.Vector2(0, 0);
+
+    const topInterp = this._topInterp;
+    const cenInterp = this._centerInterp;
+
+    let currentValue = this._shift + this._valueStep * (mtcCount - 1) * idx;
+
+    for (let mtxIdx = 0; mtxIdx < mtcCount; ++mtxIdx) {
+      const lerpVal = Math.min(1.0, mtxIdx / (mtcCount - 1));
+      currRad.lerpVectors(firstRad, secondRad, lerpVal);
+
+      const currTop = topInterp(currentValue, null);
+      const currCenter = cenInterp(currentValue, null);
+      currentValue += this._valueStep;
+      const nextCenter = cenInterp(currentValue, null);
+
+      outMtc[mtxIdx] = calcMatrix(currCenter.clone(), nextCenter.clone(), currTop.clone().sub(currCenter), currRad);
+    }
+
+    return outMtc;
+  }
+}
 
 export default CartoonHelper;
-

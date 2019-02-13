@@ -1,6 +1,3 @@
-
-
-import utils from '../../utils';
 import Colorer from './Colorer';
 
 /**
@@ -15,30 +12,29 @@ import Colorer from './Colorer';
  * @constructor
  * @classdesc Coloring algorithm based on chemical element.
  */
-function ElementColorer(opts) {
-  Colorer.call(this, opts);
+class ElementColorer extends Colorer {
+  static id = ['EL', 'AT']; // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
+
+  constructor(opts) {
+    super(opts);
+  }
+
+  getAtomColor(atom, _complex) {
+    const type = atom.element.name;
+    if (type === 'C' && this.opts.carbon >= 0) {
+      return this.opts.carbon;
+    }
+    return this.palette.getElementColor(type);
+  }
+
+  getResidueColor(_residue, _complex) {
+    return this.palette.defaultResidueColor;
+  }
 }
 
-utils.deriveClass(ElementColorer, Colorer, {
-  id: 'EL',
-  aliases: ['AT'], // @deprecated
-  name: 'Element',
-  shortName: 'Element',
-}, {
-  id: ['EL', 'AT'], // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
-});
-
-ElementColorer.prototype.getAtomColor = function(atom, _complex) {
-  var type = atom.element.name;
-  if (type === 'C' && this.opts.carbon >= 0) {
-    return this.opts.carbon;
-  }
-  return this.palette.getElementColor(type);
-};
-
-ElementColorer.prototype.getResidueColor = function(_residue, _complex) {
-  return this.palette.defaultResidueColor;
-};
+ElementColorer.prototype.id = 'EL';
+ElementColorer.prototype.aliases = ['AT']; // @deprecated
+ElementColorer.prototype.name = 'Element';
+ElementColorer.prototype.shortName = 'Element';
 
 export default ElementColorer;
-
