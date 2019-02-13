@@ -14,12 +14,24 @@ chai.use(chaiAsPromised);
 const pathToFiles = path.join(__dirname, './data');
 
 const filesForTest = [
-  '1CRN_for_exporter_test.pdb',
-  '4NRE_for_exporter_test.pdb',
-  '1MVA_for_exporter_test.pdb',
-  '2MPZ_for_exporter_test.pdb',
-  '5B40_for_exporter_test.pdb'
+  '1CRN.pdb',
+  '1MVA.pdb',
 ];
+
+const matchLines = [
+  'HEADER',
+  'TITLE',
+  'COMPND.... ?(?:MOL_ID:|MOLECULE:|CHAIN:)',
+  'HELIX',
+  // 'SHEET.{35} +$',
+  'ATOM',
+  'HETATM',
+  'CONECT',
+  'REMARK 290 (?:\\s+SMTRY)',
+  'REMARK 350 (?:\\s+BIOMT|BIOMOLECULE:|APPLY THE FOLLOWING TO CHAINS:)',
+];
+
+const matchLinesRE = new RegExp(`(?:${matchLines.join(')|(?:')})`);
 
 function getExportedString(data) {
   const parser = new PDBParser(data, {});
@@ -41,15 +53,18 @@ function getInitialString(filename) {
   });
 }
 
-function normalizeNewLines(text) {
-  return text.replace(/\r/g, '');
+function filterLines(text) {
+  const lines = text
+    .split(/\r?\n/)
+    .filter(line => line.search(matchLinesRE) === 0);
+  return lines;
 }
 
 describe('PDBExporter output matches PDBParser input', () => {
   for (let i = 0; i < filesForTest.length; i++) {
     it(`for ${filesForTest[i]}`, () => {
       return getInitialString(filesForTest[i]).then((data) => {
-        expect(getExportedString(data)).to.equal(normalizeNewLines(data));
+        expect(filterLines(getExportedString(data))).to.deep.equal(filterLines(data));
       });
     });
   }
