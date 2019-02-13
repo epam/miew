@@ -96,7 +96,7 @@ Menu.prototype._initializeTerminal = function() {
   this._terminal = $(this._menuId + ' .miew-terminal');
   this._terminalWindow = this._terminal.find('.terminal-window');
   this._terminalWindow.on('click', () =>  this._hideToolbarPanel());
-  this._terminalWindow.terminal(
+  this._term = this._terminalWindow.terminal(
     function(command, term) {
       if (self._viewer) {
         command = command.trim();
@@ -2624,6 +2624,7 @@ Menu.prototype.show = function(panelID, menuItem) {
 Menu.prototype.showTerminal = function() {
   this._terminal.show();
   this._terminalWindow.focus();
+  this._term.resize();
 };
 
 Menu.prototype._removeActiveFromCombo = function(comboName) {
@@ -2875,6 +2876,9 @@ Menu.prototype._onResize = function() {
     $(this._menuId + ' .panel-menu[data-panel-type=miew-menu-panel-main]').show();
     $(this._menuId + ' a[data-value="' + this._curMenuItem + '"]').addClass('active');
     this._getPanelSelector(this._curPanelID).show();
+  }
+  if (this._term) {
+    this._term.resize();
   }
 };
 
