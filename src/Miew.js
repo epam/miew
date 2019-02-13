@@ -1589,6 +1589,25 @@ Miew.prototype.resetView = function() {
   });
 };
 
+Miew.prototype._export = function(format) {
+  const TheExporter = _.head(io.exporters.find({format: format}));
+  //let result;
+  if (!TheExporter) {
+    this.logger.error('Could not find suitable exporter for this source');
+    return Promise.reject(new Error('Could not find suitable exporter for this source'));
+  }
+
+  if (this._visuals[this._curVisualName] instanceof  ComplexVisual) {
+    const dataSource = this._visuals[this._curVisualName]._complex;
+    const exporter = new TheExporter(dataSource, {binary: true});
+    return exporter.export().then((data) => { return data; });
+  } else if (this._visuals[this._curVisualName] instanceof  VolumeVisual) {
+    return Promise.reject(new Error('Sorry, exporter for volume data not implemented yet'));
+  } else {
+    return Promise.reject(new Error('Unexpected format of data'));
+  }
+};
+
 /**
  * Load molecule asynchronously.
  * @param {string|File} source - Molecule source to load (e.g. PDB ID, URL or File object).
@@ -2815,6 +2834,16 @@ Miew.prototype.screenshot = function(width, height) {
 Miew.prototype.screenshotSave = function(filename, width, height) {
   var uri = this.screenshot(width, height);
   utils.shotDownload(uri, filename);
+};
+
+Miew.prototype.save = function(opts) {
+  this._export(opts.fileType).then((dataString) => {
+    let filename = this._visuals[this._curVisualName]._complex.name;
+    utils.download(dataString, filename, opts.fileType);
+  }).catch((error) => {
+    this.logger.error('Could not export data');
+    this.logger.debug(error);
+  });
 };
 
 Miew.prototype._tweakResolution = function() {

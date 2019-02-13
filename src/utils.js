@@ -467,6 +467,32 @@ function shotDownload(dataUrl, filename) {
   }
 }
 
+function download(data, filename, type) {
+  const blobData = new Blob([data]);
+
+  if (!filename) {
+    filename = ['data', +new Date()].join('');
+  }
+
+  if (!type) {
+    filename += blobData.type || '.bin';
+  } else {
+    filename += '.' + type;
+  }
+
+  if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveBlob) {
+    window.navigator.msSaveBlob(blobData, filename);
+  } else if (typeof document !== 'undefined') {
+    const link = document.createElement('a');
+    link.download = filename;
+    link.innerHTML = 'download';
+    link.href = window.URL.createObjectURL(blobData);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
+
 function copySubArrays(src, dst, indices, itemSize) {
   for (var i = 0, n = indices.length; i < n; ++i) {
     for (var j = 0; j < itemSize; ++j) {
@@ -529,4 +555,5 @@ export default {
   correctSelectorIdentifier: correctSelectorIdentifier,
   getFileExtension,
   splitFileName,
+  download: download,
 };
