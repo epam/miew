@@ -1,10 +1,11 @@
-
-
 import * as THREE from 'three';
 //import utils from '../utils';
 import VolumeMaterial from './shaders/VolumeMaterial';
+import settings from '../settings';
 
 class VolumeMesh extends THREE.Mesh {
+  volumeInfo = {}; // data for noise filter
+
   constructor() {
     let geo = new THREE.BufferGeometry();
     super(geo);
@@ -356,6 +357,8 @@ class VolumeMesh extends THREE.Mesh {
     vm.uniforms.tileTex.value = texture;
     vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
     vm.uniforms.tileStride.value.set(stride[0], stride[1]);
+
+    Object.assign(this.volumeInfo, dataSource.getVolumeInfo());
     this.material = vm;
 
     const bbox = dataSource.getBox();
@@ -363,6 +366,12 @@ class VolumeMesh extends THREE.Mesh {
     bbox.getCenter(this.position);
   }
 
+  _updateIsoLevel() {
+    const kSigma = settings.now.modes.VD.kSigma;
+    const volInfo = this.volumeInfo;
+    this.material.uniforms._isoLevel0.value = (volInfo.dmean + kSigma * volInfo.sd - volInfo.dmin) /
+      (volInfo.dmax - volInfo.dmin);
+  }
 
   static _nearClipPlaneOffset = 0.2;
 
@@ -384,6 +393,10 @@ class VolumeMesh extends THREE.Mesh {
     const norm4D = VolumeMesh._norm4D;
     const matrixWorldToLocal = VolumeMesh._matrixWorldToLocal;
     const clipPlane = VolumeMesh._clipPlane;
+
+
+    this._updateIsoLevel();
+
     // get clip plane in local space
     camera.getWorldDirection(norm);
     camera.getWorldPosition(pos);

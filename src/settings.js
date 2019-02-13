@@ -48,6 +48,7 @@ var defaults = {
    * @property {IsoSurfaceSESModeOptions} SE - Solvent Excluded Surface mode options.
    * @property {ContactSurfaceModeOptions} CS - Contact Surface mode options.
    * @property {TextModeOptions} TX - Text mode options.
+   * @property {VolumeDensityModeOptions} VD - Volume Density mode options.
    */
   modes: {
     /////////////////////    BALLS AND STICKS    ///////////////////////////
@@ -386,6 +387,19 @@ var defaults = {
       fg: 'none',
       bg: '0x202020',
       showBg : true,
+    },
+
+    ////////////////////         VOLUME DENSITY         //////////////////////////
+    /**
+     * Volume density mode options.
+     *
+     * @typedef VolumeDensityModeOptions
+     *
+     * @property {number} kSigma - Noise threshold coefficient .
+     *
+     */
+    VD: {
+      kSigma: 1.0
     }
   },
 
@@ -737,6 +751,19 @@ var defaults = {
    * @instance
    */
   ao: false,
+
+  /**
+   * Shadows options.
+   *
+   * @property {boolean} shadowMap - enable/disable.
+   * @property {string} basic/percentage-closer filtering/percentage-closer filtering with bilinear filtering.
+   * @property {number} radius for percentage-closer filtering.
+   */
+  shadow: {
+    on: false,
+    type: 'pcf'/*basic, pcf4*/,
+    radius: 3.0,
+  },
 
   /**
    * Auto-rotation with constant speed.

@@ -1,4 +1,7 @@
+
+
 import UberMaterial from '../shaders/UberMaterial';
+
 export default function(SuperClass) {
   class NewObjectType extends SuperClass {
     constructor(...rest) {
@@ -11,7 +14,7 @@ export default function(SuperClass) {
       this._update();
     }
 
-    _onBeforeRender(_renderer, _scene, _camera, _geometry, _material, _group) {
+    _onBeforeRender() {
     }
 
     _update() {

@@ -12,6 +12,13 @@
   uniform mat4 world2colorMatrix;
 #endif
 
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
+	#if NUM_DIR_LIGHTS > 0
+		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
+		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
+	#endif
+#endif
+
 #ifdef ATTR_COLOR
   varying vec3 vColor;
 #endif
@@ -209,6 +216,11 @@ varying vec3 vViewPosition;
   struct DirectionalLight {
     vec3 direction;
     vec3 color;
+
+    int shadow;
+    vec2 shadowMapSize;
+    float shadowBias;
+    float shadowRadius;
   };
 
   uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
@@ -289,8 +301,135 @@ varying vec3 vViewPosition;
       }
     #endif
 
+/*
+    #pragma unroll_loop
+    for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+      RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight);
+      RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
+    }*/
+
     return reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;
   }
+#endif
+
+/////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
+const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
+const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
+
+const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
+
+
+const float ShiftRight8 = 1. / 256.;
+
+vec4 packDepthToRGBA( const in float v ) {
+  vec4 r = vec4( fract( v * PackFactors ), v );
+  r.yzw -= r.xyz * ShiftRight8; // tidy overflow
+  return r * PackUpscale;
+}
+
+float unpackRGBAToDepth( const in vec4 v ) {
+  return dot( v, UnpackFactors );
+}
+
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
+	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
+		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
+	}
+
+  float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) {
+		const vec2 offset = vec2( 0.0, 1.0 );
+
+		vec2 texelSize = vec2( 1.0 ) / size;
+		vec2 centroidUV = floor( uv * size + 0.5 ) / size;
+
+		float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );
+		float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );
+		float rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );
+		float rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );
+
+		vec2 f = fract( uv * size + 0.5 );
+
+		float a = mix( lb, lt, f.y );
+		float b = mix( rb, rt, f.y );
+		float c = mix( a, b, f.x );
+
+		return c;
+	}
+
+  float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+ 	  float shadow = 1.0;
+
+		shadowCoord.xyz /= shadowCoord.w;
+		shadowCoord.z += shadowBias;
+
+		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
+		bool inFrustum = all( inFrustumVec );
+		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
+		bool frustumTest = all( frustumTestVec );
+
+		if ( frustumTest ) {
+      #ifdef SHADOWMAP_BASIC
+			  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
+			#endif
+
+			#ifdef SHADOWMAP_PCF_SHARP
+			  vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+
+          float dx0 = - texelSize.x * shadowRadius;
+          float dy0 = - texelSize.y * shadowRadius;
+          float dx1 = + texelSize.x * shadowRadius;
+          float dy1 = + texelSize.y * shadowRadius;
+
+          shadow = (
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+          ) * ( 1.0 / 9.0 );
+      #endif
+
+      #ifdef SHADOWMAP_PCF_SOFT
+        vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+
+        float dx0 = - texelSize.x * shadowRadius;
+        float dy0 = - texelSize.y * shadowRadius;
+        float dx1 = + texelSize.x * shadowRadius;
+        float dy1 = + texelSize.y * shadowRadius;
+
+        shadow = (
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+        ) * ( 1.0 / 9.0 );
+      #endif
+		}
+		return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);
+	}
+
+	float getShadowMask() {
+  	float shadow = 1.0;
+  	#if NUM_DIR_LIGHTS > 0
+  	  DirectionalLight directionalLight;
+  	#pragma unroll_loop
+  	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+  		  directionalLight = directionalLights[ i ];
+  		  shadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+  		}
+    #endif
+  	return shadow;
+    }
 #endif
 
 /////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////
@@ -354,137 +493,153 @@ void main() {
   vec3 viewNormalSprites;
   float cylinderY = 0.0;
 
-  // ray-trace cylinder surface
-  {
-    vec3 p;
-    if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;
+    // ray-trace cylinder surface
+    {
+      vec3 p;
+      if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;
 
-    cylinderY = 0.5 * (p.y + 1.0);
+      cylinderY = 0.5 * (p.y + 1.0);
 
-    vec4 v = vec4(p, 1.0);
-    v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);
-    pixelPosWorld = modelMatrix * v;
-    pixelPosEye = modelViewMatrix * v;
+      vec4 v = vec4(p, 1.0);
+      v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);
+      pixelPosWorld = modelMatrix * v;
+      pixelPosEye = modelViewMatrix * v;
 
-    vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));
-    normal = vec3(
-      dot(localNormal, matVec1.xyz),
-      dot(localNormal, matVec2.xyz),
-      dot(localNormal, matVec3.xyz));
-    #ifdef NORMALS_TO_G_BUFFER
-      viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
-    #endif
-    normal = normalize(normalMatrix * normal);
-  }
+      vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));
+      normal = vec3(
+        dot(localNormal, matVec1.xyz),
+        dot(localNormal, matVec2.xyz),
+        dot(localNormal, matVec3.xyz));
+      #ifdef NORMALS_TO_G_BUFFER
+        viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
+      #endif
+      normal = normalize(normalMatrix * normal);
+    }
 #endif
 
-#ifdef ATTR_COLOR
-  vec3 vertexColor = vColor;
-#else
-  vec3 vertexColor = vec3(1.0, 1.0, 1.0);
-#endif
-
-#ifdef ATTR_COLOR2
-  #ifdef CYLINDER_SPRITE
-    float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing
+  #ifdef ATTR_COLOR
+    vec3 vertexColor = vColor;
   #else
-    float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord
+    vec3 vertexColor = vec3(1.0, 1.0, 1.0);
   #endif
-    // choose either color or color2
-  vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));
-#endif
+
+  #ifdef ATTR_COLOR2
+    #ifdef CYLINDER_SPRITE
+      float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing
+    #else
+      float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord
+    #endif
+      // choose either color or color2
+    vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));
+  #endif
 
   // negative red component is a special condition
   if (vertexColor.x < 0.0) discard;
 
-#ifdef DASHED_LINE
-  if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;
-#endif
-
-// transparency prepass writes only z, so we don't need to calc the color
-#ifdef PREPASS_TRANSP
-  fragColor = vec4(1.0, 1.0, 1.0, 1.0);
-  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+  #ifdef DASHED_LINE
+    if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;
   #endif
-  return;
-#endif
 
-  float totalOpacity = opacity;
+  // transparency prepass writes only z, so we don't need to calc the color
+  #ifdef PREPASS_TRANSP
+    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+    #endif
+    return;
+  #endif
 
-#ifdef ATTR_ALPHA_COLOR
-  totalOpacity *= alphaCol;
-#endif
+    float totalOpacity = opacity;
+
+  #ifdef ATTR_ALPHA_COLOR
+    totalOpacity *= alphaCol;
+  #endif
 
   // discard fully transparent pixels
   if (totalOpacity == 0.0) discard;
 
-#ifdef FAKE_OPACITY
-  // discard pixels in checker pattern
-  vec2 dm_coord = floor(gl_FragCoord.xy);
-  dm_coord = fract(dm_coord * 0.5);
-  if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;
-  vec4 diffuseColor = vec4(diffuse, 1.0);
-#else
-  vec4 diffuseColor = vec4(diffuse, totalOpacity);
-#endif
-
-#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
-  #ifdef DOUBLE_SIDED
-    float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+  #ifdef FAKE_OPACITY
+    // discard pixels in checker pattern
+    vec2 dm_coord = floor(gl_FragCoord.xy);
+    dm_coord = fract(dm_coord * 0.5);
+    if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;
+    vec4 diffuseColor = vec4(diffuse, 1.0);
   #else
-    float flipNormal = 1.0;
-  #endif
-  vec3 normal = normalize( vNormal ) * flipNormal;
-#endif
-
-  diffuseColor.rgb *= vertexColor;
-
-#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-  gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
-#endif
-
-#ifdef NORMALS_TO_G_BUFFER
-  #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
-    vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;
-  #else
-    vec3 viewNormaInColor = 0.5*viewNormal+0.5;
-  #endif
-  // [-1, 1] -> [0, 1]
-  gl_FragData[1] = vec4(viewNormaInColor, 1.0);
-#endif
-
-#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
-  GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
-  BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
-  vec3 outgoingLight = calcLighting(geometry, material);
-#else
-  vec3 outgoingLight = diffuseColor.rgb;
-#endif
-
-#ifdef COLOR_FROM_POS
-  fragColor = world2colorMatrix * pixelPosWorld;
-#else
-  #ifdef OVERRIDE_COLOR
-    fragColor = vec4(fixedColor, diffuseColor.a);
-  #else
-    fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);
+    vec4 diffuseColor = vec4(diffuse, totalOpacity);
   #endif
 
-  #ifdef USE_FOG
-    float viewDistance;
+  #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
+    #ifdef DOUBLE_SIDED
+      float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+    #else
+      float flipNormal = 1.0;
+    #endif
+    vec3 normal = normalize( vNormal ) * flipNormal;
+  #endif
+
+    diffuseColor.rgb *= vertexColor;
+
+  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+  #endif
+
+  #ifdef NORMALS_TO_G_BUFFER
+    #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
+      vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;
+    #else
+      vec3 viewNormaInColor = 0.5*viewNormal+0.5;
+    #endif
+    // [-1, 1] -> [0, 1]
+    gl_FragData[1] = vec4(viewNormaInColor, 1.0);
+  #endif
+
+  #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
+    GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
+    BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
+    vec3 outgoingLight = calcLighting(geometry, material);
+  #else
+    vec3 outgoingLight = diffuseColor.rgb;
+  #endif
+
+  #ifdef COLOR_FROM_DEPTH
+    float depth = 0.0;
     #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-      viewDistance = abs(pixelPosEye.z);
+      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+      depth = gl_FragDepthEXT;
     #else
-      viewDistance = vViewPosition.z;
+      depth = gl_FragCoord.z;
     #endif
-    float fogFactor = smoothstep( fogNear, fogFar, viewDistance) * fogAlpha;
-    #ifdef FOG_TRANSPARENT
-      fragColor.a = fragColor.a * (1.0 - fogFactor);
-    #else
-      fragColor.rgb = mix( fragColor.rgb, fogColor, fogFactor );
-    #endif
+    fragColor = packDepthToRGBA(depth);
+    return;
   #endif
 
-#endif
+  #ifdef COLOR_FROM_POS
+    fragColor = world2colorMatrix * pixelPosWorld;
+  #else
+    #ifdef OVERRIDE_COLOR
+      fragColor = vec4(fixedColor, diffuseColor.a);
+    #else
+      fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);
+    #endif
+
+    #if defined(USE_LIGHTS) && defined(SHADOWMAP)
+        fragColor.rgb *= getShadowMask();
+    #endif
+
+    #ifdef USE_FOG
+      float viewDistance;
+      #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+        viewDistance = abs(pixelPosEye.z);
+      #else
+        viewDistance = vViewPosition.z;
+      #endif
+      float fogFactor = smoothstep( fogNear, fogFar, viewDistance) * fogAlpha;
+      #ifdef FOG_TRANSPARENT
+        fragColor.a = fragColor.a * (1.0 - fogFactor);
+      #else
+        fragColor.rgb = mix( fragColor.rgb, fogColor, fogFactor );
+      #endif
+    #endif
+
+  #endif
 }

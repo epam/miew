@@ -65,7 +65,7 @@ vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
     else
       left = iterator;
   }
-  return 0.5*(left + right);
+  return 0.5 * (left + right);
 }
 
 vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count)
@@ -87,7 +87,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
       right = iterator;
       for (int j = 0; j < 5; j++)
       {
-        iterator = 0.5*(left + right);
+        iterator = 0.5 * (left + right);
         float vol = sample3DTexture(iterator).r;
         if (vol > tr)
           right = iterator;
@@ -100,17 +100,9 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
   return acc;
 }
 
-vec3 GetCol(float vol, vec3 ad)
+vec3 GetColSimple(float vol)
 {
-  vec3 col;
-  float a = 0.36, b = 0.44;
-  if (vol < a)
-    col = mix(vec3(0., 0., 1.), vec3(0., 1., 0.), max(0., (vol - _isoLevel0)*ad.r));// / (a - IsoLevel0)));
-  if (vol > a && vol < b)
-    col = mix(vec3(0., 1., 0.), vec3(0.5, 0.5, 0.), (vol - a)*ad.b); // / (b - a));
-  if (vol > b)
-    col = mix(vec3(0.5, 0.5, 0.), vec3(1., 0., 0.), (vol - b)*ad.g); // / (0.52 - b));
-  return col;
+  return vol * vec3(1, 1, 1);
 }
 
 vec3 CorrectIso(vec3 left, vec3 right, float tr)
@@ -137,25 +129,23 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   float tr0 = _isoLevel0;
   float dif, r, kd, finish;
   int count = 0, stopMol = 0;
-  float a = 0.36, b = 0.44;
-  vec3 ad = vec3(1. / (a - _isoLevel0), 1. / (b - a), 1. / (0.52 - b));
-  kd = 140.*tr0*stepSize;
+  kd = 140. * tr0 * stepSize;
   r = 1. - kd;
 
   for (int k = 0; k < 3; k++)
   {
-    stepSize = (0.5*float(k) + 1.) / 85.;
-    kd = 140.*tr0*stepSize;
+    stepSize = (0.5 * float(k) + 1.) / 85.;
+    kd = 140. * tr0 * stepSize;
     r = 1. - kd;
-    step = stepSize*dir;
+    step = stepSize * dir;
     iso = GetIso1(iterator, back, molDist, dir, tr0, k);
     if (iso.a < 0.1 || length(iso.rgb - start) > molDist)
       break;
     iterator = iso.rgb;
     dif = 1.;// CalcColor(iterator, dir);
-    colOld = GetCol(tr0, ad);
+    colOld = GetColSimple(tr0);
     curStepSize = stepSize;
-    for (int i=0; i < 200; i++)
+    for (int i = 0; i < 200; i++)
     {
       iterator = iterator + step;
       molD = length(iterator - start);
@@ -164,9 +154,9 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
       alpha = (1. - r);
-      col = GetCol(vol, ad);
+      col = GetColSimple(vol);
       vol = sample3DTexture(iterator - 0.5*step).r;
-      vec3 colMid = GetCol(vol, ad);
+      vec3 colMid = GetColSimple(vol);
       sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
       sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
       colOld = col;
@@ -188,11 +178,11 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     }
     alpha = (1. - r)*curStepSize / stepSize;
     dif = 1.;// CalcColor(right, dir);
-    col = GetCol(vol, ad);
-    vol = sample3DTexture(iterator - 0.5*curStepSize / stepSize*step).r;
-    vec3 colMid = GetCol(vol, ad);
-    sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
-    sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
+    col = GetColSimple(vol);
+    vol = sample3DTexture(iterator - 0.5 * curStepSize / stepSize * step).r;
+    vec3 colMid = GetColSimple(vol);
+    sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;
+    sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
     if (molD > molDist)
       break;
   } // for k
@@ -205,7 +195,7 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
 {
   float stepSize = 1.0 / 200.0;
   float len = length(back - start);
-  vec3 step = stepSize*dir;
+  vec3 step = stepSize * dir;
   vec3 iterator = start;
   float acc = 0.0;
 
@@ -213,7 +203,8 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
   {
     if (float(i) * stepSize > len) break;
     iterator = iterator + step;
-    acc += sample3DTexture(iterator).r / 200.0;
+    if (sample3DTexture(iterator).r > _isoLevel0)
+      acc += sample3DTexture(iterator).r / 200.0;
   }
 
   return vec4(1,1,1, acc);

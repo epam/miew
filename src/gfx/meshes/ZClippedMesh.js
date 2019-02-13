@@ -1,3 +1,5 @@
+
+
 import * as THREE from 'three';
 import UberObject from './UberObject';
 const Mesh = UberObject(THREE.Mesh);
@@ -5,9 +7,13 @@ const Mesh = UberObject(THREE.Mesh);
 class ZClippedMesh extends Mesh {
   constructor(geometry, material) {
     super(geometry, material);
+    this.castShadow = true;
+    this.receiveShadow = true;
   }
 
-  _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
+  _onBeforeRender(renderer, scene, camera) {
+    Mesh.prototype._onBeforeRender.call(this, renderer, scene, camera);
+
     const geo = this.geometry;
     const material = this.material;
     if (!geo.zClip || !material.uberOptions) {
