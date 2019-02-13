@@ -13,11 +13,14 @@ import utils from '../utils';
  *                        layout: point by point along X,
  *                                row by row along Y,
  *                                plane by plane along Z
+ * @param {Number} volumeInfo - volume info values to define threshold to filter the noise
  */
+
 class Volume {
-  constructor(type, dimensions, box, vecSize, data) {
+  constructor(type, dimensions, box, vecSize, data, volumeInfo) {
     this._box = box.clone();
     this._dimVec = Math.max(Math.floor(vecSize || 1), 1);
+    this._volumeInfo = volumeInfo;
 
     if (dimensions instanceof Array) {
       this._dimX = dimensions[0];
@@ -109,6 +112,10 @@ class Volume {
 
   getBox() {
     return this._box;
+  }
+
+  getVolumeInfo() {
+    return this._volumeInfo;
   }
 
   getCellSize() {
@@ -269,11 +276,10 @@ class Volume {
       }
     }
 
-    const texture = new THREE.DataTexture(
+    var texture = new THREE.DataTexture(
       data, width, height, THREE.LuminanceFormat, THREE.UnsignedByteType,
       THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter
     );
-    texture.generateMipmaps = false;
     texture.needsUpdate = true;
     return texture;
   }
