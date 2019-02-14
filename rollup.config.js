@@ -1,5 +1,4 @@
 /* eslint-env node */
-/* global require */
 
 import rollupPluginBabel from 'rollup-plugin-babel';
 import rollupPluginCommonJS from 'rollup-plugin-commonjs';
