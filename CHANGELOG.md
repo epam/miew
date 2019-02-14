@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.21] - 2019-02-14
+### Added
+- Add parsers for MOL, SDF and XYZ molecular formats and MAP, MRC and DSN6 electron density maps.
+- Add experimental PDB export via `miew.save()` API.
+- Molecular geometry can cast shadows now (off by default). The effect still needs
+  additional effort to improve the picture and support sprite-based display modes.
+
+### Fixed
+- Fix the crash due to zero voxel grid size for very small molecules.
+- Fix materials and shaders (pre-pass transparency and the backdrop material).
+- Fix electron density maps rendering: now the threshold is set automatically using
+  the standard deviation stored in a file or calculated over the data. Color of the
+  density map is set to grayscale until further changes to the rendering code are made.
+
+### Internal
+- Migrate more parts of code to ES2015 syntax (`gfx/`, `io/`, `checm/`). 
+
 ## [0.7.20] - 2018-07-30
 ### Added
 - Add a separate setting for fog color (`fogColor`, `fogColorEnable`) and transparency
@@ -350,7 +367,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.20...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.21...HEAD
+[0.7.21]: https://github.com/epam/miew/compare/v0.7.20...v0.7.21
 [0.7.20]: https://github.com/epam/miew/compare/v0.7.19...v0.7.20
 [0.7.19]: https://github.com/epam/miew/compare/v0.7.18...v0.7.19
 [0.7.18]: https://github.com/epam/miew/compare/v0.7.17...v0.7.18
