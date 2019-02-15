@@ -40,7 +40,7 @@ function getAtomText(atom) {
 }
 
 const colorMappings = {
-  none: function(c) {
+  none(c) {
     return c;
   },
   adjust: adjustColor,
@@ -63,34 +63,34 @@ function propagateColor(color, rule) {
 }
 
 const templateMappings = {
-  serial: function(a) {
+  serial(a) {
     return a.getSerial();
   },
-  name: function(a) {
+  name(a) {
     return a.getVisualName();
   },
-  elem: function(a) {
+  elem(a) {
     return a.element.name;
   },
-  residue: function(a) {
+  residue(a) {
     return a._residue.getType().getName();
   },
-  sequence: function(a) {
+  sequence(a) {
     return a._residue.getSequence();
   },
-  chain: function(a) {
+  chain(a) {
     return a._residue.getChain().getName();
   },
-  hetatm: function(a) {
+  hetatm(a) {
     return a.isHet();
   },
-  water: function(a) {
+  water(a) {
     return a._residue.getType().getName() === 'HOH' || a._residue.getType().getName() === 'WAT';
   },
 };
 
-const parseTemplate = function(atom, str) {
-  return str.replace(/\{\{(\s*\w+\s*)\}\}/g, function(m) {
+const parseTemplate = function (atom, str) {
+  return str.replace(/\{\{(\s*\w+\s*)\}\}/g, (m) => {
     let key = m.replace(/\s+/g, '');
     key = key.substring(2, key.length - 2).toLowerCase();
 
@@ -111,8 +111,7 @@ class AtomsTextGroup extends AtomsGroup {
     const opts = this._mode.getLabelOpts();
     // TODO is it correct to filter atoms here?
     const atomsIdc = this._selection.chunks;
-    const atoms = this._selection.atoms;
-    const parent = this._selection.parent;
+    const { atoms, parent } = this._selection;
     const colorer = this._colorer;
     const geo = this._geo;
     for (let i = 0, n = atomsIdc.length; i < n; ++i) {
@@ -136,7 +135,7 @@ class AtomsTextGroup extends AtomsGroup {
     const opts = this._mode.getLabelOpts();
     // TODO is it correct to filter atoms here?
     const atomsIdc = this._selection.chunks;
-    const atoms = this._selection.atoms;
+    const { atoms } = this._selection;
     const colorer = this._colorer;
     const geo = this._geo;
     const updateColor = frameData.needsColorUpdate(colorer);

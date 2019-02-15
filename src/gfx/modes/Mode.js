@@ -56,7 +56,7 @@ class Mode {
       let renderParams = {};
       if (_.isArray(currGroup)) {
         renderParams = currGroup[1].call(this);
-        currGroup = currGroup[0];
+        [currGroup] = currGroup;
       }
       const Group = factory[currGroup](null, this.settings, renderParams);
       const newGroup = new Group(complex, colorer, self, polyComplexity, mask, material);

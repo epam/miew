@@ -54,7 +54,7 @@ class ChunkedLinesGeometry extends LinesGeometry {
     const segCount = this._chunkSize;
     this._collisionGeo.raycast(raycaster, intersects);
     for (let i = 0, n = intersects.length; i < n; ++i) {
-      let chunkIdx = intersects[i].chunkIdx;
+      let { chunkIdx } = intersects[i];
       if (chunkIdx === undefined) {
         continue;
       }

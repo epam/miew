@@ -51,4 +51,3 @@ class Molecule {
 }
 
 export default Molecule;
-

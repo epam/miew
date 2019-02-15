@@ -1,6 +1,6 @@
+import * as THREE from 'three';
 import Residue from './Residue';
 import ResidueType from './ResidueType';
-import * as THREE from 'three';
 
 /**
  * Residue chain.
@@ -11,7 +11,7 @@ import * as THREE from 'three';
  * @exports Chain
  * @constructor
  */
-class  Chain {
+class Chain {
   constructor(complex, name) {
     this._complex = complex;
     this._name = name;
@@ -69,14 +69,13 @@ class  Chain {
       }
     }
 
-    //fix very first wing
+    // fix very first wing
     if (residues.length > 1) {
       const p = residues[1]._wingVector;
       residues[0]._wingVector = new THREE.Vector3(p.x, p.y, p.z);
     } else if (residues.length > 0) {
       residues[0]._wingVector = new THREE.Vector3(1, 0, 0);
     }
-
   }
 
   updateToFrame(frameData) {
@@ -98,9 +97,9 @@ class  Chain {
       prevData = currData;
     }
 
-    frameRes[residues[0]._index]._wingVector = n > 1 ?
-      frameRes[residues[1]._index]._wingVector  :
-      new THREE.Vector3(1, 0, 0);
+    frameRes[residues[0]._index]._wingVector = n > 1
+      ? frameRes[residues[1]._index]._wingVector
+      : new THREE.Vector3(1, 0, 0);
   }
 
   /**
@@ -154,4 +153,3 @@ class  Chain {
 }
 
 export default Chain;
-

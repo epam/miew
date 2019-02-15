@@ -71,7 +71,6 @@ class Simple2CCylindersGeometry extends ChunkedObjectsGeometry {
     const second = first + 1;
     super.setColor(second, colorVal2);
   }
-
 }
 
 export default Simple2CCylindersGeometry;

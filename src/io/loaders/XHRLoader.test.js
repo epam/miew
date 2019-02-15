@@ -1,19 +1,16 @@
-import XHRLoader from './XHRLoader';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import XHRLoader from './XHRLoader';
 
 chai.use(dirtyChai);
 chai.use(sinonChai);
 
 describe('XHRLoader', () => {
-
   const fakeSource = 'http://localhost/foo';
 
   describe('#load()', () => {
-
     const fakeProgress = {
       type: 'progress',
       lengthComputable: true,
@@ -43,7 +40,8 @@ describe('XHRLoader', () => {
           if (this._shouldAbort) {
             this._listeners.abort();
             return true;
-          } else if (this._shouldError) {
+          }
+          if (this._shouldError) {
             this._listeners.error();
             return true;
           }
@@ -102,9 +100,7 @@ describe('XHRLoader', () => {
       }
     });
 
-    it('resolves a promise on HTTP 200', () => {
-      return expect(loader.load()).to.be.fulfilled();
-    });
+    it('resolves a promise on HTTP 200', () => expect(loader.load()).to.be.fulfilled());
 
     it('rejects a promise on HTTP 404', () => {
       xhrStub.status = 404;
@@ -135,44 +131,38 @@ describe('XHRLoader', () => {
       });
     });
 
-    it('reads a string by default', () => {
-      return expect(loader.load()).to.be.fulfilled().then((data) => {
-        expect(data).to.equal(fakeText);
-      });
-    });
+    it('reads a string by default', () => expect(loader.load()).to.be.fulfilled().then((data) => {
+      expect(data).to.equal(fakeText);
+    }));
 
     it('reads an ArrayBuffer if requested', () => {
-      loader = new XHRLoader(fakeSource, {binary: true});
+      loader = new XHRLoader(fakeSource, { binary: true });
       return expect(loader.load()).to.be.fulfilled().then((data) => {
         expect(data).to.equal(fakeBinary);
       });
     });
-
   });
 
   describe('.canLoad()', () => {
-
     it('accepts a string', () => {
       expect(XHRLoader.canLoad(fakeSource, {})).to.equal(true);
     });
 
     it('rejects a non-string object', () => {
       expect(XHRLoader.canLoad(42, {})).to.equal(false);
-      expect(XHRLoader.canLoad({name: 'foo'}, {})).to.equal(false);
+      expect(XHRLoader.canLoad({ name: 'foo' }, {})).to.equal(false);
     });
 
     it('requires the source type to be "url"', () => {
-      expect(XHRLoader.canLoad(fakeSource, {sourceType: 'url'})).to.equal(true);
-      expect(XHRLoader.canLoad(fakeSource, {sourceType: 'file'})).to.equal(false);
+      expect(XHRLoader.canLoad(fakeSource, { sourceType: 'url' })).to.equal(true);
+      expect(XHRLoader.canLoad(fakeSource, { sourceType: 'file' })).to.equal(false);
     });
-
   });
 
   describe('.canProbablyLoad()', () => {
-
     it('rejects a non-string object', () => {
       expect(XHRLoader.canProbablyLoad(42)).to.equal(false);
-      expect(XHRLoader.canProbablyLoad({name: 'foo'})).to.equal(false);
+      expect(XHRLoader.canProbablyLoad({ name: 'foo' })).to.equal(false);
     });
 
     it('accepts a string starting from http/https/ftp schemes', () => {
@@ -194,11 +184,9 @@ describe('XHRLoader', () => {
         expect(XHRLoader.canProbablyLoad(str)).to.equal(false);
       });
     });
-
   });
 
   describe('.extractName()', () => {
-
     [
       ['http://www.example.com/path/and/foo', 'foo'],
       ['foo.bar', 'foo.bar'],
@@ -217,7 +205,5 @@ describe('XHRLoader', () => {
     it('returns undefined for undefined sources', () => {
       expect(XHRLoader.extractName(undefined)).to.equal(undefined);
     });
-
   });
-
 });

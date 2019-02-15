@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import utils from '../../utils';
 
 // suppress some JSHint warnings
-/*jshint bitwise: false*/
+/* jshint bitwise: false */
 
 /**
  * Build normals for isosurface, using atoms information
@@ -86,8 +86,8 @@ class IsosurfaceBuildNormals {
       numVoxY++;
       numVoxZ++;
       maxAtomsRefs += numVoxX * numVoxY * numVoxZ;
-    }     // for (i)
-    //maxAtomsRefs = numAtoms * MAX_ATOMS_IN_SINGLE_VOXEL;
+    } // for (i)
+    // maxAtomsRefs = numAtoms * MAX_ATOMS_IN_SINGLE_VOXEL;
 
 
     this._voxelList = utils.allocateTyped(Int32Array, side3);
@@ -126,8 +126,8 @@ class IsosurfaceBuildNormals {
           for (let x = xIndMin; x <= xIndMax; x++) {
             // add atom with index "i" to this voxel list
             const indVoxel = x + y * side + z * side2;
-            //assert(indVoxel >= 0);
-            //assert(indVoxel < side3);
+            // assert(indVoxel >= 0);
+            // assert(indVoxel < side3);
 
             // add first
             if (this._voxelList[indVoxel] < 0) {
@@ -135,7 +135,7 @@ class IsosurfaceBuildNormals {
               atomsList[numAtomsRefs * 2 + 1] = 0 - 1;
               this._voxelList[indVoxel] = numAtomsRefs;
               numAtomsRefs++;
-              //assert(numAtomsRefs < maxAtomsRefs - 1);
+              // assert(numAtomsRefs < maxAtomsRefs - 1);
               continue;
             }
             // insert into head of list
@@ -144,10 +144,10 @@ class IsosurfaceBuildNormals {
             atomsList[numAtomsRefs * 2 + 0] = i;
             atomsList[numAtomsRefs * 2 + 1] = indexNext;
             numAtomsRefs++;
-          }     // for (x)
-        }       // for (y)
-      }         // for (z)
-    }           // for (i)
+          } // for (x)
+        } // for (y)
+      } // for (z)
+    } // for (i)
 
     // convert Array to Int32Array
     this._atomsList = Int32Array.from(atomsList);
@@ -197,7 +197,7 @@ class IsosurfaceBuildNormals {
     let closest = null;
     let minDist2 = Number.MAX_VALUE;
 
-    this.forEachRelatedAtom(point, function(atom) {
+    this.forEachRelatedAtom(point, (atom) => {
       const dist2 = point.distanceToSquared(atom.coord);
       if (dist2 < minDist2) {
         minDist2 = dist2;
@@ -220,10 +220,15 @@ class IsosurfaceBuildNormals {
   buildNormals(numVertices, vertices, normals) {
     const self = this;
     let numCloseAtoms = 0;
-    let vx = 0, vy = 0, vz = 0;
+    let vx = 0;
+    let vy = 0;
+    let vz = 0;
     let dist2;
-    let vNormalX = 0, vNormalY = 0, vNormalZ = 0;
-    let koef = 0, w = 0;
+    let vNormalX = 0;
+    let vNormalY = 0;
+    let vNormalZ = 0;
+    let koef = 0;
+    let w = 0;
     const r25 = 2.5;
     const r01 = 0.1;
 
@@ -232,9 +237,9 @@ class IsosurfaceBuildNormals {
     const expScale = -this._aveRad * r01;
 
     // some stats
-    //numSlowAtoms = 0;
+    // numSlowAtoms = 0;
 
-    const gatherNormals = function(atom) {
+    const gatherNormals = function (atom) {
       const dx = vx - atom.coord.x;
       const dy = vy - atom.coord.y;
       const dz = vz - atom.coord.z;
@@ -282,7 +287,7 @@ class IsosurfaceBuildNormals {
       normals[i].x = vNormalX;
       normals[i].y = vNormalY;
       normals[i].z = vNormalZ;
-    }   // for (i) all vertices
+    } // for (i) all vertices
 
     return 0;
   }
@@ -299,21 +304,24 @@ class IsosurfaceBuildNormals {
    */
   buildColors(numVertices, vertices, colors, radiusColorSmoothness) {
     const self = this;
-    let vx = 0.0, vy = 0.0, vz = 0.0;
-    let koef = 0.0, w = 0.0;
-    //const KOEF_ALPHA = 1.0;
+    let vx = 0.0;
+    let vy = 0.0;
+    let vz = 0.0;
+    let koef = 0.0;
+    let w = 0.0;
+    // const KOEF_ALPHA = 1.0;
     const KOEF_ADD = 0.8;
 
     const maxRadAffect = radiusColorSmoothness;
     const maxRadAffect2 = maxRadAffect * maxRadAffect;
 
-    //koefAlpha = 4.4 / radiusColorSmoothness;
+    // koefAlpha = 4.4 / radiusColorSmoothness;
 
     let colorsClose = [];
     let weights = [];
     let weightsSum = 0;
 
-    const gatherColors = function(atom) {
+    const gatherColors = function (atom) {
       const dx = vx - atom.coord.x;
       const dy = vy - atom.coord.y;
       const dz = vz - atom.coord.z;
@@ -328,8 +336,8 @@ class IsosurfaceBuildNormals {
       if (koef < 0.0) {
         koef = -koef;
       }
-      //w = Math.exp(expScale * koef);
-      //w = 1.0 / (KOEF_ADD + Math.pow(koef, KOEF_ALPHA));
+      // w = Math.exp(expScale * koef);
+      // w = 1.0 / (KOEF_ADD + Math.pow(koef, KOEF_ALPHA));
       w = 1.0 / (KOEF_ADD + koef);
 
       colorsClose.push([atom.colorX, atom.colorY, atom.colorZ]);
@@ -356,7 +364,7 @@ class IsosurfaceBuildNormals {
         colors[i].y += colorsClose[j][1] * weightNormalized;
         colors[i].z += colorsClose[j][2] * weightNormalized;
       }
-    }   // for (i) all vertices
+    } // for (i) all vertices
     return 0;
   }
 }

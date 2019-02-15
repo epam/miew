@@ -10,7 +10,7 @@ import utils from '../../utils';
 
 const COLOR_SIZE = 3;
 const HASH_SIZE = 32768;
-const Element = chem.Element;
+const { Element } = chem;
 
 /**
  * This class implements 'quick' isosurface geometry generation algorithm.
@@ -20,10 +20,6 @@ const Element = chem.Element;
  */
 
 class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
-  constructor(spheresCount, opts) {
-    super(spheresCount, opts);
-  }
-
   _build() {
     // convert geoOut into arrays of positions, indices, normals
     this._innerBuild();
@@ -34,8 +30,8 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
   _fromGeo(geoOut) {
     let colors = null;
-    const positions   = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
-    const normals     = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
+    const positions = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
+    const normals = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
     if (geoOut._colors !== null) {
       colors = utils.allocateTyped(Float32Array, (1 + 2) * geoOut._numVertices);
     }
@@ -74,11 +70,10 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
   }
 
   convertToAtomsColored(packedArrays, atomsColored) {
-    const atoms = packedArrays.atoms;
-    const colors = packedArrays.colors;
+    const { atoms, colors } = packedArrays;
     for (let i = 0, numAtoms = atoms.length; i < numAtoms; i++) {
       const vCenter = atoms[i].getPosition();
-      const radius = atoms[i].element.radius;
+      const { radius } = atoms[i].element;
       atomsColored[i] = new IsoSurfaceAtomColored(vCenter, radius);
       const nm = atoms[i].element.number;
       atomsColored[i].atomType = this.getType(nm);
@@ -183,9 +178,9 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
   buildEdgePoint(indexA, indexB, sign, cube, indexPointValue, vOut) {
     if (sign[indexA] ^ sign[indexB]) {
       const cTwentyFour = 24;
-      const t = (0 - cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]) /
-        (cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexB] -
-          cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]);
+      const t = (0 - cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA])
+        / (cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexB]
+          - cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]);
       const xa = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 0];
       const ya = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 1];
       const za = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 2];
@@ -211,14 +206,14 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const a0 = this.voxelWorld.getClosestAtom(v0);
     const a1 = this.voxelWorld.getClosestAtom(v1);
     const a2 = this.voxelWorld.getClosestAtom(v2);
-    if (a0 === null || a1 === null || a2 === null ||
-      a0.srcAtom === null || a1.srcAtom === null || a2.srcAtom === null) {
+    if (a0 === null || a1 === null || a2 === null
+      || a0.srcAtom === null || a1.srcAtom === null || a2.srcAtom === null) {
       return false;
     }
 
-    return this.visibilitySelector.includesAtom(a0.srcAtom) &&
-      this.visibilitySelector.includesAtom(a1.srcAtom) &&
-      this.visibilitySelector.includesAtom(a2.srcAtom);
+    return this.visibilitySelector.includesAtom(a0.srcAtom)
+      && this.visibilitySelector.includesAtom(a1.srcAtom)
+      && this.visibilitySelector.includesAtom(a2.srcAtom);
   }
 
   /**
@@ -273,7 +268,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const numCells = meshRes - 1;
     const side = meshRes;
     const side2 = meshRes * meshRes;
-    //side3 = meshRes * meshRes * meshRes;
+    // side3 = meshRes * meshRes * meshRes;
 
     const vaEdges = new Array(arrSize);
     for (let i = 0; i < arrSize; i++) {
@@ -308,28 +303,28 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
             cube.pointsValuesLinear[indPointValues + j] = vCorner.z; j++;
           }
 
-          //cell._points[1].x += vCellStep.x;
-          //cell._points[2].x += vCellStep.x;
-          //cell._points[5].x += vCellStep.x;
-          //cell._points[6].x += vCellStep.x;
+          // cell._points[1].x += vCellStep.x;
+          // cell._points[2].x += vCellStep.x;
+          // cell._points[5].x += vCellStep.x;
+          // cell._points[6].x += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 2 * 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 5 * 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 6 * 3] += vCellStep.x;
 
-          //cell._points[2].z += vCellStep.z;
-          //cell._points[3].z += vCellStep.z;
-          //cell._points[6].z += vCellStep.z;
-          //cell._points[7].z += vCellStep.z;
+          // cell._points[2].z += vCellStep.z;
+          // cell._points[3].z += vCellStep.z;
+          // cell._points[6].z += vCellStep.z;
+          // cell._points[7].z += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 2 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 3 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 6 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 7 * 3 + 2] += vCellStep.z;
 
-          //cell._points[4].y += vCellStep.y;
-          //cell._points[5].y += vCellStep.y;
-          //cell._points[6].y += vCellStep.y;
-          //cell._points[7].y += vCellStep.y;
+          // cell._points[4].y += vCellStep.y;
+          // cell._points[5].y += vCellStep.y;
+          // cell._points[6].y += vCellStep.y;
+          // cell._points[7].y += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 4 * 3 + 1] += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 5 * 3 + 1] += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 6 * 3 + 1] += vCellStep.y;
@@ -377,9 +372,9 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
           // next cell (cube)
           indCell++;
-        }     // for (x)
-      }       // for (z)
-    }         // for (y)
+        } // for (x)
+      } // for (z)
+    } // for (y)
     return 0;
   }
 
@@ -397,7 +392,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
   getNumIntersectedCells(side, numCells, corners, cube) {
     const side2 = side * side;
     const cNumVerts = 8;
-    let numIntersectedCells  = 0;
+    let numIntersectedCells = 0;
 
     let indCell = 0;
     let indY = 0;
@@ -418,7 +413,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
           cube.pointsValuesLinear[cubeValuesIndex + 7] = corners[side2 + indCorner + side];
 
           // check read exception
-          //assert(side2 + indCorner + side + 1 < side3);
+          // assert(side2 + indCorner + side + 1 < side3);
 
           // get bit flags inside
           let bitsInside = 0;
@@ -437,9 +432,9 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
           cube.bitsInside[indCell] = bitsInside;
           // next cell
           indCell++;
-        }  // for (x)
-      }    // for (z)
-    }      // for (y)
+        } // for (x)
+      } // for (z)
+    } // for (y)
     return numIntersectedCells;
   }
 
@@ -454,8 +449,8 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       96, 6, 97, 6, 98, 6, 99, 6, 100, 6, 101, 6, 102, 6, 103, 6, 104, 6, 105, 6, 106, 6, 107, 6, 108, 6, 109, 6];
     /* eslint-enable no-magic-numbers */
 
-    if (letter < 1 || letter > atomT.length / 2 ||
-      (Object.keys(Element.ByAtomicNumber).length * 2) !== atomT.length) {
+    if (letter < 1 || letter > atomT.length / 2
+      || (Object.keys(Element.ByAtomicNumber).length * 2) !== atomT.length) {
       throw new Error('atomT.length  should be equal Element.ByAtomicNumber.length * 2');
     }
     return atomT[letter * 2];
@@ -483,7 +478,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     /* eslint-enable no-magic-numbers */
 
     for (let i = 0; i < side3; i++) {
-      corners[i] = aLot;          // to large value
+      corners[i] = aLot; // to large value
     }
 
     const xScale = (side - 1) / (vBoxMax.x - vBoxMin.x);
@@ -530,10 +525,10 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
             if (val < corners[ind]) {
               corners[ind] = val;
             }
-          }  // for (x)
-        }    // for (z)
-      }      // for (y)
-    }        // for (s)
+          } // for (x)
+        } // for (z)
+      } // for (y)
+    } // for (s)
   }
 
   /**
@@ -544,14 +539,13 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
    * @returns {number} 0, if success. (<0) is non memory
    */
   createVertexHash(maxNumVertices, maxNumTriangles) {
-
     this.hashLines = utils.allocateTyped(Int32Array, HASH_SIZE * 2);
     if (this.hashLines === null) {
       return 0 - 1;
     }
     for (let i = 0, j = 0; i < HASH_SIZE; i++) {
-      this.hashLines[j++] = 0;    // num vertices in this hash line
-      this.hashLines[j++] = 0 - 1;    // index of the first entry
+      this.hashLines[j++] = 0; // num vertices in this hash line
+      this.hashLines[j++] = 0 - 1; // index of the first entry
     }
 
     this.maxNumVertices = maxNumVertices;
@@ -563,8 +557,8 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       return 0 - 1;
     }
     for (let i = 0, j = 0; i < this.numHashEtriesAllocated; i++) {
-      this.hashEntries[j++] = 0 - 1;   // index of vertex
-      this.hashEntries[j++] = 0 - 1;   // next hash entry index
+      this.hashEntries[j++] = 0 - 1; // index of vertex
+      this.hashEntries[j++] = 0 - 1; // next hash entry index
     }
     this.numHashEntryIndex = 0;
     return 0;
@@ -613,7 +607,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     // search in hash list
     if (this.vBoxMin !== null && this.vBoxMax !== null) {
       for (entry = this.hashLines[hLineIndex + 1]; entry >= 0; entry = this.hashEntries[entry * 2 + 1]) {
-        const ind = this.hashEntries[entry * 2 + 0];  // vertex index
+        const ind = this.hashEntries[entry * 2 + 0]; // vertex index
         v.copy(geoOut._vertices[ind]);
         v.x -= vAdd.x;
         v.y -= vAdd.y;
@@ -621,9 +615,9 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
         const dot2 = v.x * v.x + v.y * v.y + v.z * v.z;
         if (dot2 < r106) {
           return ind;
-        }   // if (found)
-      }     // for (entry)
-    }       // search
+        } // if (found)
+      } // for (entry)
+    } // search
 
     // add new vertex to geometry
     if (geoOut._numVertices >= this.maxNumVertices) {
@@ -644,7 +638,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       this.hashEntries[entry * 2 + 0] = iVertAdd;
       this.hashEntries[entry * 2 + 1] = entryFirst;
 
-      this.hashLines[hLineIndex + 0]++;   // num vertices in line ++
+      this.hashLines[hLineIndex + 0]++; // num vertices in line ++
     }
     geoOut._numVertices++;
     return iVertAdd;
@@ -663,23 +657,24 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
   modifyExcludedFromGeo(
     side, probeSphereRadius,
     vBoxMin, vBoxMax,
-    geoOut, corners
+    geoOut, corners,
   ) {
     let ind;
-    let distToSphere, distToBorder;
+    let distToSphere;
+    let distToBorder;
     const r11 = 1.1;
 
     function innerBlockWorkAround() {
       if (distToBorder > 0.0) {
         // point is inside probe sphere
         if (corners[ind] < 0.0) {
-          corners[ind] = distToBorder;      // was inside surface, now is oustide ( > 0)
+          corners[ind] = distToBorder; // was inside surface, now is oustide ( > 0)
         }
         if (distToBorder > corners[ind]) {
-          corners[ind] = distToBorder;      // find positive maximum
+          corners[ind] = distToBorder; // find positive maximum
         }
-      } else if (distToBorder > corners[ind]) {               // point is outside sphere
-        corners[ind] = distToBorder;      // find negative maximum
+      } else if (distToBorder > corners[ind]) { // point is outside sphere
+        corners[ind] = distToBorder; // find negative maximum
       }
     }
 
@@ -717,7 +712,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
           const indZ = iz * side;
           for (let ix = indXMin; ix <= indXMax; ix++) {
             ind = indY + indZ + ix;
-            //getCornerCoord(vBoxMin, vBoxMax, ix, iy, iz, side, &vCorner);
+            // getCornerCoord(vBoxMin, vBoxMax, ix, iy, iz, side, &vCorner);
             let t = ix * sideInv;
             const xCorner = vBoxMin.x * (1.0 - t) + vBoxMax.x * t;
             t = iy * sideInv;
@@ -733,11 +728,11 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
               distToSphere = Math.sqrt(dist2);
               distToBorder = -(distToSphere - probeSphereRadius);
               innerBlockWorkAround();
-            }   // if (dist from corner point to sphere center more 2 radiuses)
-          }    // for (ix)
-        }     // for (iz)
-      }      // for (iy)
-    }       // for (i) all geo vertices
+            } // if (dist from corner point to sphere center more 2 radiuses)
+          } // for (ix)
+        } // for (iz)
+      } // for (iy)
+    } // for (i) all geo vertices
     return 0;
   }
 
@@ -748,7 +743,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const r12 = 1.2;
 
     // performance test
-    //this.performanceTest();
+    // this.performanceTest();
 
     // Create temporary atoms (but colored)
     const packedArrays = {
@@ -799,7 +794,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     let numIdealVoxels = 4;
     const numAtomsSrc = this.atoms.length;
     if (numAtomsSrc >= oneHundered) {
-      numIdealVoxels = Math.floor(Math.pow(numAtomsSrc * 2, 1.0 / (1 + 2)));
+      numIdealVoxels = Math.floor((numAtomsSrc * 2) ** (1.0 / (1 + 2)));
     }
     if (numVoxels > numIdealVoxels) {
       numVoxels = numIdealVoxels;
@@ -812,7 +807,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     if (this.clusterizationType > 0) {
       clusterBuilder = new IsoSurfaceCluster(
         this.complex, this.atoms, atomsColored, vBoxMin, vBoxMax,
-        numVoxels, this.colorMode
+        numVoxels, this.colorMode,
       );
       if (this.clusterizationType === 1) {
         atomsClustered = clusterBuilder.buildKMeans();
@@ -820,7 +815,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
         atomsClustered = clusterBuilder.buildSimple();
       }
       // redbuild bbox again due to increase of radius
-      //this.getBoundingBox(atomsClustered, vBoxMin, vBoxMax);
+      // this.getBoundingBox(atomsClustered, vBoxMin, vBoxMax);
       vBoxMin.x -= r35;
       vBoxMin.y -= r35;
       vBoxMin.z -= r35;
@@ -863,13 +858,13 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     this.voxelWorld = null;
     if (this.clusterizationType > 0) {
       this.voxelWorld = new IsosurfaceBuildNormals(
-        atomsClustered.length, atomsClustered, //NOSONAR
-        vBoxMin, vBoxMax, probeRadForNormalsColors
+        atomsClustered.length, atomsClustered, // NOSONAR
+        vBoxMin, vBoxMax, probeRadForNormalsColors,
       );
     } else {
       this.voxelWorld = new IsosurfaceBuildNormals(
         atomsColored.length, atomsColored,
-        vBoxMin, vBoxMax, probeRadForNormalsColors
+        vBoxMin, vBoxMax, probeRadForNormalsColors,
       );
     }
     this.voxelWorld.createVoxels();
@@ -916,7 +911,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       if (this.useVertexColors) {
         this.voxelWorld.buildColors(
           this.geoOut._vertices.length, this.geoOut._vertices,
-          this.geoOut._colors, radiusColorSmoothness
+          this.geoOut._colors, radiusColorSmoothness,
         );
       }
     }
@@ -930,7 +925,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     cube.destroy();
 
     return ok;
-
   }
 }
 

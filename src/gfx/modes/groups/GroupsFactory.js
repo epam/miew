@@ -3,7 +3,7 @@ import groups from './groups';
 import processors from '../processors/processors';
 
 function _bakeGroup(triplet, Processor, Group) {
-  return function(complex, colorer, mode, polyComplexity, mask, material) {
+  return function (complex, colorer, mode, polyComplexity, mask, material) {
     return new Processor(Group, triplet, complex, colorer, mode, polyComplexity, mask, material);
   };
 }

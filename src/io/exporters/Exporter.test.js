@@ -1,30 +1,25 @@
-import Exporter from './Exporter';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
+import Exporter from './Exporter';
 
 chai.use(dirtyChai);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe('Exporter', () => {
-
   const fakeResult = 'foo';
 
   describe('#exportSync()', () => {
-
     it('throws an error', () => {
       const exporter = new Exporter();
       expect(() => exporter.exportSync()).to.throw(Error);
     });
-
   });
 
   describe('#export()', () => {
-
     let exporter;
 
     beforeEach(() => {
@@ -46,7 +41,8 @@ describe('Exporter', () => {
     });
 
     it('resolves the promise eventually if exportSync() does not throw', () => {
-      return expect(exporter.export()).to.eventually.deep.equal(fakeResult);
+      const promise = expect(exporter.export()).to.eventually.deep.equal(fakeResult);
+      return promise;
     });
 
     it('fails and does not call exportSync if aborted', () => {
@@ -56,7 +52,5 @@ describe('Exporter', () => {
         expect(exporter.exportSync).to.not.have.been.called();
       });
     });
-
   });
-
 });

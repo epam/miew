@@ -1,6 +1,6 @@
 import Atom from './Atom';
 import ResidueType from './ResidueType';
-import {parser} from '../utils/SelectionParser';
+import { parser } from '../utils/SelectionParser';
 import utils from '../utils';
 
 const keywords = {};
@@ -17,7 +17,7 @@ function defineSelector(name, SelectorClass) {
   return SelectorClass;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 
 class Range {
   constructor(min, max) {
@@ -30,7 +30,7 @@ class Range {
   }
 
   toString() {
-    const min = this.min, max = this.max;
+    const { min, max } = this;
     return min === max ? String(min) : [min, max].join(':');
   }
 
@@ -39,13 +39,14 @@ class Range {
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 
 class List {
   constructor(arg) {
     if (arg instanceof this.constructor) {
       return arg;
-    } else if (arg instanceof Array) {
+    }
+    if (arg instanceof Array) {
       this._values = arg.slice(0);
     } else if (arg) {
       this._values = [arg];
@@ -74,7 +75,8 @@ class List {
   }
 
   toJSON() {
-    const values = this._values, result = [];
+    const values = this._values;
+    const result = [];
     for (let i = 0, n = values.length; i < n; ++i) {
       const value = values[i];
       result[i] = value.toJSON ? value.toJSON() : value;
@@ -83,7 +85,7 @@ class List {
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 
 class RangeList extends List {
   includes(value) {
@@ -97,7 +99,7 @@ class RangeList extends List {
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 
 const valuesArray = [];
 
@@ -107,7 +109,7 @@ class ValueList extends List {
     if (caseInsensitive) {
       const values = list._values;
       for (let i = 0, n = values.length; i < n; ++i) {
-        let value = values[i];
+        const value = values[i];
         if (typeof value === 'string') {
           values[i] = value.toUpperCase();
         }
@@ -131,8 +133,9 @@ class ValueList extends List {
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Selectors
+//----------------------------------------------------------------------------
 
 /** Base class for atom selectors. */
 class Selector {
@@ -270,8 +273,9 @@ defineSelector('None', class NoneSelector extends Selector {
 
 const NULL_SELECTOR = keywords.none();
 
-//////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Flag selectors
+//----------------------------------------------------------------------------
 
 function byResidueTypeFlag(flag, name) {
   return defineSelector(name, class extends Selector {
@@ -293,8 +297,9 @@ byResidueTypeFlag(ResidueType.Flags.PURINE, 'Purine');
 byResidueTypeFlag(ResidueType.Flags.PYRIMIDINE, 'Pyrimidine');
 byResidueTypeFlag(ResidueType.Flags.WATER, 'Water');
 
-//////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Operators
+//----------------------------------------------------------------------------
 
 function defineOperator(name, priority, OperatorClass) {
   OperatorClass.prototype.priority = priority;
@@ -357,7 +362,7 @@ defineOperator('Or', 3, class OrOperator extends InfixOperator {
   }
 });
 
-//////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 
 const selectors = Object.create(keywords);
 
@@ -372,23 +377,23 @@ selectors.PrefixOperator = PrefixOperator;
 selectors.InfixOperator = InfixOperator;
 selectors.Context = Object.create({});
 
-selectors.GetSelector = function(key) {
+selectors.GetSelector = function (key) {
   if (!selectors.Context.hasOwnProperty(key)) {
-    const exc = {message: 'selector ' + key + ' is not registered'};
+    const exc = { message: `selector ${key} is not registered` };
     throw exc;
   }
   return selectors.Context[key] || NULL_SELECTOR;
 };
 
-selectors.ClearContext = function() {
-  Object.keys(selectors.Context).forEach(function(k) { delete selectors.Context[k]; });
+selectors.ClearContext = function () {
+  Object.keys(selectors.Context).forEach((k) => { delete selectors.Context[k]; });
 };
 
-selectors.keyword = function(key) {
+selectors.keyword = function (key) {
   return keywords[key.toLowerCase()] || keywords.none;
 };
 
-selectors.parse = function(str) {
+selectors.parse = function (str) {
   const res = {};
   try {
     res.selector = parser.parse(str);
@@ -403,4 +408,3 @@ parser.yy = selectors;
 parser.yy.parseError = parser.parseError; // FIXME: workaround for incorrect JISON parser generator for AMD module
 
 export default selectors;
-

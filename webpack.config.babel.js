@@ -16,11 +16,11 @@ const roServerReplacer = {
     replacements: [{
       pattern: /<!-- block:READONLY_SERVER-(\d) -->([\s\S]*)<!-- endblock:READONLY_SERVER-\1 -->/g,
       replacement: () => '',
-    }]
-  })
+    }],
+  }),
 };
 
-const configure = (prod) => ({
+const configure = prod => ({
   entry: {
     demo: './demo/scripts/index.js',
   },
@@ -63,15 +63,15 @@ const configure = (prod) => ({
       use: [{
         loader: 'url-loader',
         options: {
-          limit: 8192
-        }
+          limit: 8192,
+        },
       },
       ],
     }],
   },
   resolve: {
     alias: {
-      Miew:    path.resolve(__dirname, 'src/index.js'),
+      Miew: path.resolve(__dirname, 'src/index.js'),
     },
   },
   plugins: [
@@ -99,15 +99,15 @@ const configure = (prod) => ({
       defaultAttribute: 'defer',
     }),
     new CopyWebpackPlugin([
-      {from: 'demo/data', to: 'data'},
-      {from: 'demo/images', to: 'images'},
+      { from: 'demo/data', to: 'data' },
+      { from: 'demo/images', to: 'images' },
     ]),
     new StringReplaceWebpackPlugin(),
     new webpack.HashedModuleIdsPlugin(),
   ],
   optimization: {
     runtimeChunk: {
-      name: 'manifest'
+      name: 'manifest',
     },
     splitChunks: {
       chunks: 'all',

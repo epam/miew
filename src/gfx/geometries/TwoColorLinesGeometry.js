@@ -28,7 +28,7 @@ class TwoColorLinesGeometry extends LinesGeometry {
   }
 
   raycast(raycaster, intersects) {
-    if (this._collisionGeo)  {
+    if (this._collisionGeo) {
       this._collisionGeo.raycast(raycaster, intersects);
     }
   }
@@ -51,6 +51,6 @@ class TwoColorLinesGeometry extends LinesGeometry {
     this._segCounts = segmentsCount * 2;
   }
 }
-//(???)parent = LinesGeometry.prototype;
+// (???)parent = LinesGeometry.prototype;
 
 export default TwoColorLinesGeometry;

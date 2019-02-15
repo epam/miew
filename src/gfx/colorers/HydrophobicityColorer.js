@@ -3,10 +3,6 @@ import Colorer from './Colorer';
 class HydrophobicityColorer extends Colorer {
   static id = 'HY';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, complex) {
     return this.getResidueColor(atom._residue, complex);
   }
@@ -14,7 +10,7 @@ class HydrophobicityColorer extends Colorer {
   getResidueColor(residue, _complex) {
     let color = this.palette.defaultResidueColor;
     if (residue._type.hydrophobicity) {
-      //Kyte Doolitle hydro [-4.5,4.5]->[0.1]
+      // Kyte Doolitle hydro [-4.5,4.5]->[0.1]
       const min = -4.5;
       const max = 4.5;
       color = this.palette.getGradientColor((residue._type.hydrophobicity - min) / (max - min), this.opts.gradient);

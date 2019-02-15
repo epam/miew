@@ -6,7 +6,6 @@ import logger from '../../utils/logger';
 import settings from '../../settings';
 
 export default class WebVRPoC {
-
   constructor(onToggle) {
     this._mainCamera = new THREE.PerspectiveCamera();
     this._cameraWasStored = false;
@@ -80,7 +79,7 @@ export default class WebVRPoC {
     }
     const self = this;
     this._gfx = gfx;
-    const  renderer = gfx ? gfx.renderer : null;
+    const renderer = gfx ? gfx.renderer : null;
     if (!renderer) {
       throw new Error('No renderer is available to toggle WebVR');
     } else if (!gfx.camera) {
@@ -105,15 +104,14 @@ export default class WebVRPoC {
       }
 
       settings.set('fog', false);
-      //turn on webvr transformation
+      // turn on webvr transformation
       gfx.scene.add(self._molContainer);
       self._molContainer.add(gfx.root);
 
       this._controller1.standingMatrix = renderer.vr.getStandingMatrix();
       this._controller2.standingMatrix = renderer.vr.getStandingMatrix();
-
     } else if (!enable && renderer.vr.enabled) {
-      //disable vr
+      // disable vr
       const display = self.getDevice();
       if (display && display.isPresenting) {
         display.exitPresent();
@@ -127,7 +125,7 @@ export default class WebVRPoC {
         gfx.camera.copy(self._mainCamera);
       }
       settings.set('fog', true);
-      //turn off webvr transformation
+      // turn off webvr transformation
       const root = self._molContainer.children[0];
       if (root) gfx.scene.add(root);
       self._molContainer.parent.remove(self._molContainer);
@@ -169,7 +167,7 @@ export default class WebVRPoC {
       return;
     }
     const gfx = this._gfx;
-    const camera = gfx.camera;
+    const { camera } = gfx;
 
     // set container position in camera space
     const container = this._molContainer;
@@ -200,4 +198,3 @@ export default class WebVRPoC {
     return (gfx && gfx.renderer) ? gfx.renderer.domElement : null;
   }
 }
-

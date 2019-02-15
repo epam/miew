@@ -3,6 +3,7 @@
  */
 
 import _ from 'lodash';
+
 function isUndefOrEqual(param, value) {
   return !param || param === value;
 }
@@ -24,15 +25,15 @@ function EventDispatcher() {
  * @param {function} callback   Callback function.
  * @param {Object}   [context] 'This' object for the callback.
  */
-EventDispatcher.prototype.addEventListener = function(type, callback, context) {
-  var handlers = this._handlers[type];
+EventDispatcher.prototype.addEventListener = function (type, callback, context) {
+  let handlers = this._handlers[type];
 
   if (!handlers) {
     this._handlers[type] = [];
     handlers = this._handlers[type];
   }
 
-  var params = [callback, context];
+  const params = [callback, context];
   function _checkPar(par) {
     return par[0] === params[0] && par[1] === params[1];
   }
@@ -52,19 +53,15 @@ EventDispatcher.prototype.addEventListener = function(type, callback, context) {
  * @param {function} [callback]  Callback function.
  * @param {Object}   [context]  'This' object for the callback.
  */
-EventDispatcher.prototype.removeEventListener = function(type, callback, context) {
-  var self = this;
-  _.forEach(self._handlers, function(handler, ev) {
-    _.remove(handler, function(values) {
-      return isUndefOrEqual(type, ev) &&
-          isUndefOrEqual(callback, values[0]) &&
-          isUndefOrEqual(context, values[1] || self);
-    });
+EventDispatcher.prototype.removeEventListener = function (type, callback, context) {
+  const self = this;
+  _.forEach(self._handlers, (handler, ev) => {
+    _.remove(handler, values => isUndefOrEqual(type, ev)
+          && isUndefOrEqual(callback, values[0])
+          && isUndefOrEqual(context, values[1] || self));
   });
 
-  this._handlers = _.omitBy(self._handlers, function(handler) {
-    return handler.length === 0;
-  });
+  this._handlers = _.omitBy(self._handlers, handler => handler.length === 0);
 };
 
 /**
@@ -72,14 +69,13 @@ EventDispatcher.prototype.removeEventListener = function(type, callback, context
  * @param {Object} event      Event.
  * @param {string} event.type Type of the event.
  */
-EventDispatcher.prototype.dispatchEvent = function(event) {
-  var self = this;
+EventDispatcher.prototype.dispatchEvent = function (event) {
+  const self = this;
 
-  _.forEach(this._handlers[event.type], function(callback) {
-    var context = callback[1] || self;
+  _.forEach(this._handlers[event.type], (callback) => {
+    const context = callback[1] || self;
     callback[0].apply(context, [event]);
   });
 };
 
 export default EventDispatcher;
-

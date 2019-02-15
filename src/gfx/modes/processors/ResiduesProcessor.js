@@ -8,10 +8,10 @@ class ResiduesProcessor extends RCGroup {
     const residues = complex.getResidues();
     const transforms = complex.getTransforms();
 
-    complex.forEachComponent(function(component) {
+    complex.forEachComponent((component) => {
       let chunksCount = 0;
       const resIdc = [];
-      component.forEachResidue(function(residue) {
+      component.forEachResidue((residue) => {
         if (self._checkResidue(residue, mask)) {
           resIdc[chunksCount++] = residue._index;
         }
@@ -21,9 +21,9 @@ class ResiduesProcessor extends RCGroup {
         return;
       }
       const residuesGroup = new ResidueGroup(geoParams, {
-        residues: residues,
+        residues,
         chunks: resIdc,
-        parent: complex
+        parent: complex,
       }, colorer, mode, transforms, polyComplexity, material);
       residuesGroup._component = component;
       self.add(residuesGroup);
@@ -36,7 +36,7 @@ class ResiduesProcessor extends RCGroup {
 
   getSubset(mask, innerOnly) {
     const totalSubset = [];
-    const children = this.children;
+    const { children } = this;
     let meshIdx = 0;
     for (let i = 0, n = children.length; i < n; ++i) {
       if (children[i].getSubset) {

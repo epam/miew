@@ -1,22 +1,20 @@
-import Loader from './Loader';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
+import Loader from './Loader';
 
 chai.use(dirtyChai);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe('Loader', () => {
-
-  const fakeResult = {foo: 'bar'};
+  const fakeResult = { foo: 'bar' };
 
   describe('#load(callbacks) - @deprecated', () => {
-
-    let loader, callbacks;
+    let loader;
+    let callbacks;
 
     beforeEach(() => {
       loader = new Loader();
@@ -68,7 +66,7 @@ describe('Loader', () => {
     });
 
     it('forwards progress events to a callback', () => {
-      const eventA = {type: 'progress'};
+      const eventA = { type: 'progress' };
       const eventB = {
         type: 'progress',
         lengthComputable: true,
@@ -95,11 +93,9 @@ describe('Loader', () => {
         expect(callbacks.progress.secondCall).to.be.calledWithExactly(0.5);
       });
     });
-
   });
 
   describe('#load()', () => {
-
     let loader;
 
     beforeEach(() => {
@@ -121,7 +117,8 @@ describe('Loader', () => {
     });
 
     it('resolves the promise eventually if loadAsync() does not throw', () => {
-      return expect(loader.load()).to.eventually.deep.equal(fakeResult);
+      const promise = expect(loader.load()).to.eventually.deep.equal(fakeResult);
+      return promise;
     });
 
     it('ignores abort() by default', () => {
@@ -129,27 +126,21 @@ describe('Loader', () => {
       loader.abort();
       return expect(promise).to.eventually.deep.equal(fakeResult);
     });
-
   });
 
   describe('#abort()', () => {
-
     it('is immediately forwarded to a loading agent', () => {
       const loader = new Loader();
       const abort = sinon.spy();
-      loader._agent = {abort};
+      loader._agent = { abort };
       loader.abort();
       expect(abort).to.be.calledOnce();
     });
-
   });
 
   describe('.extractName()', () => {
-
     it('returns undefined', () => {
       expect(Loader.extractName('anything')).to.equal(undefined);
     });
-
   });
-
 });

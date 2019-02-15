@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import IsoSurfaceMarchCube from './IsoSurfaceMarchCube';
 import utils from '../../utils';
+
 const edgeTable = [
   0x0, 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
   0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
@@ -60,23 +61,22 @@ class Triangle {
   constructor() {
     this.a = {
       p: new THREE.Vector3(),
-      n: new THREE.Vector3()
+      n: new THREE.Vector3(),
     };
 
     this.b = {
       p: new THREE.Vector3(),
-      n: new THREE.Vector3()
+      n: new THREE.Vector3(),
     };
 
     this.c = {
       p: new THREE.Vector3(),
-      n: new THREE.Vector3()
+      n: new THREE.Vector3(),
     };
   }
 }
 
 function createArray(arrSize) {
-
   const arr = new Array(arrSize);
   for (let i = 0; i < arrSize; ++i) {
     arr[i] = new THREE.Vector3();
@@ -135,17 +135,17 @@ class IsoSurface {
     }
 
     // check that the grid is in the all-positive octant of the coordinate system
-    if (xDir.x < 0 || xDir.y < 0 || xDir.z < 0 ||
-      yDir.x < 0 || yDir.y < 0 || yDir.z < 0 ||
-      zDir.x < 0 || zDir.y < 0 || zDir.z < 0) {
+    if (xDir.x < 0 || xDir.y < 0 || xDir.z < 0
+      || yDir.x < 0 || yDir.y < 0 || yDir.z < 0
+      || zDir.x < 0 || zDir.y < 0 || zDir.z < 0) {
       return false;
     }
 
     // check that the grid is axis-aligned
     // TODO This is a VMD way. Is it correct in our case to compare with floating zero?
-    return !(xAxis.y !== 0 || xAxis.z !== 0 ||
-      yAxis.x !== 0 || yAxis.z !== 0 ||
-      zAxis.x !== 0 || zAxis.y !== 0);
+    return !(xAxis.y !== 0 || xAxis.z !== 0
+      || yAxis.x !== 0 || yAxis.z !== 0
+      || zAxis.x !== 0 || zAxis.y !== 0);
   }
 
   _vertexInterp(isoLevel, grid, ind1, ind2, vertex, normal) {
@@ -181,7 +181,7 @@ class IsoSurface {
   static _normalList = createArray(IsoSurface._arrSize);
 
   _polygonize(grid, isoLevel, triangles) {
-    const cubeIndex = grid.cubeIndex;
+    const { cubeIndex } = grid;
     let i = 0;
     const arrSize = IsoSurface._arrSize;
     const firstIndices = IsoSurface._firstIndices;
@@ -196,7 +196,7 @@ class IsoSurface {
           firstIndices[i],
           secondIndices[i],
           vertexList[i],
-          normalList[i]
+          normalList[i],
         );
       }
     }
@@ -242,7 +242,7 @@ class IsoSurface {
       new THREE.Vector3(0, 0, step), // 4
       new THREE.Vector3(step, 0, step), // 5
       new THREE.Vector3(step, step, step), // 6
-      new THREE.Vector3(0, step, step)// 7
+      new THREE.Vector3(0, step, step), // 7
     ];
 
     const tmpTriCount = 5;
@@ -258,9 +258,9 @@ class IsoSurface {
     const normals = this._normals;
     if (appendSimple) {
       // Special case for axis-aligned grid with positive unit vector normals
-      appendVertex = (function() {
+      appendVertex = (function () {
         const axis = new THREE.Vector3(self._xAxis.x, self._yAxis.y, self._zAxis.z);
-        return function(triVertex) {
+        return function (triVertex) {
           const vertex = triVertex.p.clone();
           vertex.multiply(axis);
           positions.push(vertex.add(self._origin));
@@ -268,21 +268,21 @@ class IsoSurface {
         };
       }());
     } else {
-      appendVertex = (function() {
+      appendVertex = (function () {
         const posMtx = new THREE.Matrix3();
         posMtx.set(
           self._xAxis.x, self._yAxis.x, self._zAxis.x,
           self._xAxis.y, self._yAxis.y, self._zAxis.y,
-          self._xAxis.z, self._yAxis.z, self._zAxis.z
+          self._xAxis.z, self._yAxis.z, self._zAxis.z,
         );
         const normMtx = new THREE.Matrix3();
         normMtx.set(
           self._xDir.x, self._yDir.x, self._zDir.x,
           self._xDir.y, self._yDir.y, self._zDir.y,
-          self._xDir.z, self._yDir.z, self._zDir.z
+          self._xDir.z, self._yDir.z, self._zDir.z,
         );
 
-        return function(triVertex) {
+        return function (triVertex) {
           positions.push(triVertex.p.clone().applyMatrix3(posMtx).add(self._origin));
           normals.push(triVertex.n.clone().applyMatrix3(normMtx));
         };
@@ -335,7 +335,7 @@ class IsoSurface {
           const triCount = this._polygonize(gc, isoValue, triangles);
           globTriCount += triCount;
 
-          //append triangles using different techniques
+          // append triangles using different techniques
           for (i = 0; i < triCount; ++i) {
             indices.push(this._numTriangles * 3);
             indices.push(this._numTriangles * 3 + 1);
@@ -429,12 +429,13 @@ class IsoSurface {
     this._remapVertices(vertices, normals, newVer);
   }
 
-  /// Assign per-vertex colors from a volumetric texture map (same dimensions as the original volumetric data).
-  /// Along with color dominating atom is determined for each vertex
-  /// and vertices with atom out of "visible" subset get filtered out.
-  /// XXX only handles orthogonal volumes currently
+  // Assign per-vertex colors from a volumetric texture map (same dimensions as the original volumetric data).
+  // Along with color dominating atom is determined for each vertex
+  // and vertices with atom out of "visible" subset get filtered out.
+  // XXX only handles orthogonal volumes currently
   setColorVolTex(colorMap, atomMap, atomWeightMap, visibilitySelector) {
-    let i, idx;
+    let i;
+    let idx;
     const numVerts = this._position.length / 3;
     const vertices = this._position;
     const origin = this._origin;
@@ -520,7 +521,7 @@ class IsoSurface {
         // find dominant atom
         let maxWeight = 0.0;
         let dominantIdx = -1;
-        for (let atomIdx in atomWeights) {
+        for (const atomIdx in atomWeights) {
           if (atomWeights[atomIdx] > maxWeight) {
             dominantIdx = atomIdx;
             maxWeight = atomWeights[atomIdx];

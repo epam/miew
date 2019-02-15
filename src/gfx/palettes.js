@@ -12,14 +12,14 @@ const palettes = new EntityList([
 
 /** @deprecated */
 Object.defineProperty(palettes, 'list', {
-  get: function() {
+  get() {
     return this.all;
   },
 });
 
 /** @deprecated */
 Object.defineProperty(palettes, 'any', {
-  get: function() {
+  get() {
     return this.first;
   },
 });

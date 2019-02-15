@@ -1,5 +1,3 @@
-
-
 /**
  * This module contains class for logging.
  * Returns an instance of a logger that have already been created.
@@ -9,7 +7,7 @@
 import _ from 'lodash';
 import EventDispatcher from './EventDispatcher';
 
-var logLevels = {
+const logLevels = {
   debug: 0,
   info: 1,
   report: 2,
@@ -40,7 +38,7 @@ Logger.prototype.constructor = Logger;
  * Create new clean instance of the logger.
  * @returns {Logger}
  */
-Logger.prototype.instantiate = function() {
+Logger.prototype.instantiate = function () {
   return new Logger();
 };
 
@@ -49,24 +47,24 @@ Logger.prototype.instantiate = function() {
  * @name Logger#level
  */
 Object.defineProperty(Logger.prototype, 'level', {
-  get: function() {
-    var self = this;
-    return _.findKey(logLevels, function(lvl) { return lvl === self._level; });
+  get() {
+    const self = this;
+    return _.findKey(logLevels, lvl => lvl === self._level);
   },
-  set: function(strValue) {
-    var lvlVal = logLevels[strValue];
+  set(strValue) {
+    const lvlVal = logLevels[strValue];
     if (!_.isNumber(lvlVal)) {
       throw new Error('Wrong log level specified!');
     }
     this._level = lvlVal;
-  }
+  },
 });
 
 /**
  * Returns the list of all possible level values.
  * @returns {Array}
  */
-Logger.prototype.levels = function() {
+Logger.prototype.levels = function () {
   return Object.keys(logLevels);
 };
 
@@ -76,8 +74,8 @@ Logger.prototype.levels = function() {
  * {'debug' | 'info' | 'report' | 'warn' | 'error'}
  * @param {string} message
  */
-Logger.prototype.message = function(level, message) {
-  var lvlVal = logLevels[level];
+Logger.prototype.message = function (level, message) {
+  const lvlVal = logLevels[level];
   if (!_.isNumber(lvlVal)) {
     throw new Error('Wrong log level specified!');
   }
@@ -88,7 +86,7 @@ Logger.prototype.message = function(level, message) {
  * Shortcut for message('debug', ...);
  * @param message
  */
-Logger.prototype.debug = function(message) {
+Logger.prototype.debug = function (message) {
   this._message(logLevels.debug, message);
 };
 
@@ -96,7 +94,7 @@ Logger.prototype.debug = function(message) {
  * Shortcut for message('info', ...);
  * @param message
  */
-Logger.prototype.info = function(message) {
+Logger.prototype.info = function (message) {
   this._message(logLevels.info, message);
 };
 
@@ -104,7 +102,7 @@ Logger.prototype.info = function(message) {
  * Shortcut for message('report', ...);
  * @param message
  */
-Logger.prototype.report = function(message) {
+Logger.prototype.report = function (message) {
   this._message(logLevels.report, message);
 };
 
@@ -112,7 +110,7 @@ Logger.prototype.report = function(message) {
  * Shortcut for message('warn', ...);
  * @param message
  */
-Logger.prototype.warn = function(message) {
+Logger.prototype.warn = function (message) {
   this._message(logLevels.warn, message);
 };
 
@@ -120,7 +118,7 @@ Logger.prototype.warn = function(message) {
  * Shortcut for message('error', ...);
  * @param message
  */
-Logger.prototype.error = function(message) {
+Logger.prototype.error = function (message) {
   this._message(logLevels.error, message);
 };
 
@@ -130,11 +128,11 @@ Logger.prototype.error = function(message) {
  * @param {string} message
  * @private
  */
-Logger.prototype._message = function(levelVal, message) {
+Logger.prototype._message = function (levelVal, message) {
   if (levelVal < this._level) {
     return;
   }
-  var level = _.findKey(logLevels, function(lvl) { return lvl === levelVal; });
+  const level = _.findKey(logLevels, lvl => lvl === levelVal);
   message = String(message);
   if (this.console) {
     const output = `miew:${level}: ${message}`;
@@ -146,8 +144,7 @@ Logger.prototype._message = function(levelVal, message) {
       console.log(output); // NOSONAR
     }
   }
-  this.dispatchEvent({type: 'message', level: level, message: message});
+  this.dispatchEvent({ type: 'message', level, message });
 };
 
 export default new Logger();
-

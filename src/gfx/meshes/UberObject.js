@@ -1,8 +1,6 @@
-
-
 import UberMaterial from '../shaders/UberMaterial';
 
-export default function(SuperClass) {
+export default function (SuperClass) {
   class NewObjectType extends SuperClass {
     constructor(...rest) {
       super(...rest);
@@ -18,7 +16,7 @@ export default function(SuperClass) {
     }
 
     _update() {
-      const material = this.material;
+      const { material } = this;
       if (!material) {
         return;
       }

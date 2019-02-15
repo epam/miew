@@ -22,14 +22,14 @@ function _buildLabel2D(pos, color, fieldTxt) {
     text.appendChild(spanText);
   } else {
     text.appendChild(fieldTxt);
-    //text.style.paddingTop = '10px';
+    // text.style.paddingTop = '10px';
   }
 
   const label = new CSS2DObject(text);
   label.position.copy(pos);
   label.userData = {
     translation: 'translate(-50%, -50%)',
-    color: color
+    color,
   };
   const el = label.getElement();
   el.style.visibility = 'visible';
@@ -55,7 +55,7 @@ class SGroupProcessor extends RCGroup {
       } else {
         groupLetters.add(_buildLabel2D(
           (new THREE.Vector3()).copy(sGroup._position),
-          markColor, sGroup._name
+          markColor, sGroup._name,
         ));
       }
     }

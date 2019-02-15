@@ -5,10 +5,9 @@ import AtomsSphereGroup from './AtomsSphereGroup';
 class AtomsSASSESGroupStub extends AtomsSphereGroup {
   _makeGeoArgs() {
     const selectedAtoms = [];
-    const atoms = this._selection.atoms;
-    const chunks = this._selection.chunks;
-    let i = 0, n = chunks.length;
-    for (; i < n; ++i) {
+    const { atoms, chunks } = this._selection;
+    const n = chunks.length;
+    for (let i = 0; i < n; ++i) {
       selectedAtoms[i] = atoms[chunks[i]];
     }
     const opts = this._mode.getSurfaceOpts();

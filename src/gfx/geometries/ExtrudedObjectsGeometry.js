@@ -23,8 +23,8 @@ function _createExtrudedChunkGeometry(shape, ringsCount) {
       for (let i = 0; i < ptsCount; i++) {
         const v1 = currVtxIdx + i;
         const v2 = currVtxIdx + ptsCount + i;
-        const v3 = currVtxIdx + ptsCount + (i + 1) % ptsCount;
-        const v4 = currVtxIdx + (i + 1) % ptsCount;
+        const v3 = currVtxIdx + ptsCount + ((i + 1) % ptsCount);
+        const v4 = currVtxIdx + ((i + 1) % ptsCount);
 
         indices.setXYZ(currFaceIdx * TRI_SIZE, v1, v4, v2);
         currFaceIdx++;

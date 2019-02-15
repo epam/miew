@@ -1,11 +1,10 @@
-/*******
+/*
  * Toggling WebVR is done through button.click because of limitations on calling requestPresent in webVR:
  * VRDisplay::requestPresent should be called from user gesture:
  * https://developer.mozilla.org/en-US/docs/Web/API/VRDisplay/requestPresent
  */
-export default function(webVRPoC) {
+export default function (webVRPoC) {
   function showEnterVR(display, button) {
-
     button.style.display = '';
     button.style.cursor = 'pointer';
     button.style.left = 'calc(50% - 50px)';
@@ -13,14 +12,14 @@ export default function(webVRPoC) {
 
     button.textContent = 'ENTER VR';
 
-    button.onmouseenter = function() { button.style.opacity = '1.0'; };
-    button.onmouseleave = function() { button.style.opacity = '0.5'; };
+    button.onmouseenter = function () { button.style.opacity = '1.0'; };
+    button.onmouseleave = function () { button.style.opacity = '0.5'; };
 
-    button.onclick = function() {
+    button.onclick = function () {
       if (display.isPresenting) {
         display.exitPresent();
       } else {
-        display.requestPresent([{source: webVRPoC.getCanvas()}]);
+        display.requestPresent([{ source: webVRPoC.getCanvas() }]);
         webVRPoC.translateMolecule();
       }
     };
@@ -28,7 +27,6 @@ export default function(webVRPoC) {
   }
 
   function showVRNotFound(button) {
-
     button.style.display = '';
     button.style.cursor = 'auto';
     button.style.left = 'calc(50% - 75px)';
@@ -54,24 +52,23 @@ export default function(webVRPoC) {
     element.style.opacity = '0.5';
     element.style.outline = 'none';
     element.style.zIndex = '999';
-
   }
 
   if ('getVRDisplays' in navigator) {
     const button = document.createElement('button');
     button.style.display = 'none';
     stylizeElement(button);
-    window.addEventListener('vrdisplayconnect', function(event) {
+    window.addEventListener('vrdisplayconnect', (event) => {
       showEnterVR(event.display, button);
     }, false);
-    window.addEventListener('vrdisplaydisconnect', function(_event) {
+    window.addEventListener('vrdisplaydisconnect', (_event) => {
       showVRNotFound(button);
     }, false);
-    window.addEventListener('vrdisplaypresentchange', function(event) {
+    window.addEventListener('vrdisplaypresentchange', (event) => {
       button.textContent = event.display.isPresenting ? 'EXIT VR' : 'ENTER VR';
     }, false);
     navigator.getVRDisplays()
-      .then(function(displays) {
+      .then((displays) => {
         if (displays.length > 0) {
           showEnterVR(displays[0], button);
         } else {
@@ -79,15 +76,13 @@ export default function(webVRPoC) {
         }
       });
     return button;
-  } else {
-    const message = document.createElement('a');
-    message.href = 'https://webvr.info';
-    message.innerHTML = 'WEBVR NOT SUPPORTED';
-    message.style.left = 'calc(50% - 90px)';
-    message.style.width = '180px';
-    message.style.textDecoration = 'none';
-    stylizeElement(message);
-    return message;
   }
+  const message = document.createElement('a');
+  message.href = 'https://webvr.info';
+  message.innerHTML = 'WEBVR NOT SUPPORTED';
+  message.style.left = 'calc(50% - 90px)';
+  message.style.width = '180px';
+  message.style.textDecoration = 'none';
+  stylizeElement(message);
+  return message;
 }
-

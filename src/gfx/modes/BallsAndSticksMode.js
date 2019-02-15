@@ -4,10 +4,6 @@ import LabeledMode from './LabeledMode';
 class BallsAndSticksMode extends LabeledMode {
   static id = 'BS';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   calcAtomRadius(atom) {
     return atom.element.radius * this.opts.atom;
   }

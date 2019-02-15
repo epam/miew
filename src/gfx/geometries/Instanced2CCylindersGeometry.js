@@ -10,16 +10,16 @@ const invMatrix = new THREE.Matrix4();
 
 const OFFSET_SIZE = 4;
 const COLOR_SIZE = 3;
-const copySubArrays = utils.copySubArrays;
+const { copySubArrays } = utils;
 
 function setArrayXYZ(arr, idx, x, y, z) {
-  arr[idx]     = x;
+  arr[idx] = x;
   arr[idx + 1] = y;
   arr[idx + 2] = z;
 }
 
 function setArrayXYZW(arr, idx, x, y, z, w) {
-  arr[idx]     = x;
+  arr[idx] = x;
   arr[idx + 1] = y;
   arr[idx + 2] = z;
   arr[idx + 3] = w;
@@ -38,7 +38,7 @@ function _prepareCylinderInfo(chunkIndices) {
     const even = (val | 0) % 2 === 0;
     const newPar = {
       first: false,
-      second: false
+      second: false,
     };
     if (even) {
       newPar.first = true;
@@ -52,7 +52,7 @@ function _prepareCylinderInfo(chunkIndices) {
     chunksIdx.push(Math.floor(val / 2));
     cylinderInfo.push(newPar);
   }
-  return {indices: chunksIdx, cylinderInfo: cylinderInfo};
+  return { indices: chunksIdx, cylinderInfo };
 }
 
 function _assignOpacity(cylinderInfo, color1, color2) {
@@ -70,8 +70,8 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
   constructor(instanceCount, polyComplexity, useZSprites, openEnded) {
     super();
     this._useZSprites = useZSprites;
-    this._cylGeometry = useZSprites ? new THREE.PlaneBufferGeometry(2, 2, 1, 1) :
-      new CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, openEnded);
+    this._cylGeometry = useZSprites ? new THREE.PlaneBufferGeometry(2, 2, 1, 1)
+      : new CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, openEnded);
     this._init(instanceCount, this._cylGeometry, this._useZSprites);
 
     this._collisionGeo = new Simple2CCylindersGeometry(instanceCount, 3);
@@ -202,19 +202,18 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
 
       this.addAttribute(
         'invmatVector1',
-        new THREE.InstancedBufferAttribute(this._invmatVector1, OFFSET_SIZE, false, 1)
+        new THREE.InstancedBufferAttribute(this._invmatVector1, OFFSET_SIZE, false, 1),
       );
       this.addAttribute(
         'invmatVector2',
-        new THREE.InstancedBufferAttribute(this._invmatVector2, OFFSET_SIZE, false, 1)
+        new THREE.InstancedBufferAttribute(this._invmatVector2, OFFSET_SIZE, false, 1),
       );
       this.addAttribute(
         'invmatVector3',
-        new THREE.InstancedBufferAttribute(this._invmatVector3, OFFSET_SIZE, false, 1)
+        new THREE.InstancedBufferAttribute(this._invmatVector3, OFFSET_SIZE, false, 1),
       );
     }
   }
-
 }
 
 export default Instanced2CCylindersGeometry;

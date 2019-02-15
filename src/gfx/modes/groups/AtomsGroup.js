@@ -2,7 +2,7 @@ import ChemGroup from './ChemGroup';
 
 class AtomsGroup extends ChemGroup {
   raycast(raycaster, intersects) {
-    const atoms = this._selection.atoms;
+    const { atoms } = this._selection;
     const inters = [];
     this._mesh.raycast(raycaster, inters);
     const atomsIdc = this._chunksIdc;
@@ -21,7 +21,7 @@ class AtomsGroup extends ChemGroup {
 
   _calcChunksList(mask) {
     const chunksList = [];
-    const atoms = this._selection.atoms;
+    const { atoms } = this._selection;
     const atomsIdc = this._chunksIdc;
     for (let i = 0, n = atomsIdc.length; i < n; ++i) {
       const atom = atoms[atomsIdc[i]];

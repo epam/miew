@@ -7,8 +7,7 @@ class AtomsSphereGroup extends AtomsGroup {
 
   _build() {
     const atomsIdc = this._selection.chunks;
-    const atoms = this._selection.atoms;
-    const parent = this._selection.parent;
+    const { atoms, parent } = this._selection;
     const mode = this._mode;
     const colorer = this._colorer;
     const geo = this._geo;
@@ -24,7 +23,7 @@ class AtomsSphereGroup extends AtomsGroup {
     // TODO This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
     const atomsIdc = this._selection.chunks;
-    const atoms = this._selection.atoms;
+    const { atoms } = this._selection;
     const mode = this._mode;
     const colorer = this._colorer;
     const updateColor = frameData.needsColorUpdate(colorer);

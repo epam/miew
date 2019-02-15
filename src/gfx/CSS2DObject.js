@@ -1,17 +1,16 @@
-
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
 import * as THREE from 'three';
+
 class CSS2DObject extends THREE.Object3D {
   constructor(element) {
     super();
     const self = this;
     this._element = element;
     this._element.style.position = 'absolute';
-    this.addEventListener('removed', function() {
+    this.addEventListener('removed', () => {
       if (self._element.parentNode !== null) {
         self._element.parentNode.removeChild(self._element);
       }
@@ -41,11 +40,11 @@ class CSS2DObject extends THREE.Object3D {
     const top = op.toString();
     const op100 = op * 100;
     el.style.opacity = top;
-    el.style.filter = 'alpha(opacity=' + op100 + ')'; // IE fallback
+    el.style.filter = `alpha(opacity=${op100})`; // IE fallback
   }
 
   clone() {
-    let obj = new CSS2DObject(this._element);
+    const obj = new CSS2DObject(this._element);
     obj.copy(this);
     return obj;
   }
@@ -53,4 +52,3 @@ class CSS2DObject extends THREE.Object3D {
 
 
 export default CSS2DObject;
-

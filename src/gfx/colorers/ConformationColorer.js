@@ -3,10 +3,6 @@ import Colorer from './Colorer';
 class ConformationColorer extends Colorer {
   static id = 'CF';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, _complex) {
     return this.palette.getChainColor(String.fromCharCode(atom._location));
   }

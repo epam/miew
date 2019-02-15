@@ -46,7 +46,7 @@ export default class XHRLoader extends Loader {
 
   /** @deprecated */
   static canLoad(source, options) {
-    const sourceType = options.sourceType;
+    const { sourceType } = options;
     return (typeof source === 'string') && (!sourceType || sourceType === 'url');
   }
 

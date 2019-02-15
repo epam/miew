@@ -4,10 +4,6 @@ import Mode from './Mode';
 class TubeMode extends Mode {
   static id = 'TU';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getResidueRadius(_residue) {
     return this.TUBE_RADIUS;
   }

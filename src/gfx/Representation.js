@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import materials from './materials';
 import UberMaterial from './shaders/UberMaterial';
@@ -22,7 +20,7 @@ class Representation {
     this.count = 0;
     this.material = new UberMaterial();
     this.material.setValues(startMaterialValues);
-    this.material.setUberOptions({fogAlpha: settings.now.fogAlpha});
+    this.material.setUberOptions({ fogAlpha: settings.now.fogAlpha });
     this.materialPreset = materials.first;
     this.needsRebuild = true;
     this.visible = true;
@@ -64,7 +62,7 @@ class Representation {
     this.needsRebuild = false;
 
     if (settings.now.ao) {
-      this.material.setValues({normalsToGBuffer:settings.now.ao});
+      this.material.setValues({ normalsToGBuffer: settings.now.ao });
     }
 
     this.geo = this.mode.buildGeometry(complex, this.colorer, 1 << this.index, this.material);
@@ -146,4 +144,3 @@ class Representation {
 }
 
 export default Representation;
-

@@ -38,7 +38,7 @@ const exports = {
   list: parserList,
 
   /** @deprecated */
-  Parser: Parser,
+  Parser,
 
   /**
    * Create a parser instance.
@@ -48,11 +48,12 @@ const exports = {
    * @returns {Parser} New parser object.
    * @deprecated
    */
-  create: function(context, data, options) {
-    var parser = new Parser(data, options);// this behaviour was copied from the previous version
-    var i = 0, n = parserList.length;
+  create(context, data, options) {
+    let parser = new Parser(data, options);// this behaviour was copied from the previous version
+    let i = 0;
+    const n = parserList.length;
     for (; i < n; ++i) {
-      var SomeParser = parserList[i];
+      const SomeParser = parserList[i];
       if (SomeParser.canParse && SomeParser.canParse(data, options)) {
         parser = new SomeParser(data, options);
         break;

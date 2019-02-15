@@ -1,31 +1,27 @@
-import Parser from './Parser';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
+import Parser from './Parser';
 
 chai.use(dirtyChai);
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe('Parser', () => {
-
-  const fakeResult = {foo: 'bar'};
+  const fakeResult = { foo: 'bar' };
 
   describe('#parseSync()', () => {
-
     it('throws an error', () => {
       const parser = new Parser();
       expect(() => parser.parseSync()).to.throw(Error);
     });
-
   });
 
   describe('#parse(callbacks) - @deprecated', () => {
-
-    let parser, callbacks;
+    let parser;
+    let callbacks;
 
     beforeEach(() => {
       parser = new Parser();
@@ -76,11 +72,9 @@ describe('Parser', () => {
         expect(parser.parseSync).to.not.have.been.called();
       });
     });
-
   });
 
   describe('#parse()', () => {
-
     let parser;
 
     beforeEach(() => {
@@ -102,7 +96,8 @@ describe('Parser', () => {
     });
 
     it('resolves the promise eventually if parseSync() does not throw', () => {
-      return expect(parser.parse()).to.eventually.deep.equal(fakeResult);
+      const promise = expect(parser.parse()).to.eventually.deep.equal(fakeResult);
+      return promise;
     });
 
     it('fails and does not call parseSync if aborted', () => {
@@ -112,31 +107,29 @@ describe('Parser', () => {
         expect(parser.parseSync).to.not.have.been.called();
       });
     });
-
   });
 
   describe('.checkDataTypeOptions() - @deprecated', () => {
-
     const check = Parser.checkDataTypeOptions;
 
     it('accepts matching file type no matter what filename it has', () => {
-      expect(check({fileType: 'pubchem'}, 'pubchem')).to.equal(true);
-      expect(check({fileType: 'pdb', fileName: '1crn.ent'}, 'pdb', '.pdb')).to.equal(true);
+      expect(check({ fileType: 'pubchem' }, 'pubchem')).to.equal(true);
+      expect(check({ fileType: 'pdb', fileName: '1crn.ent' }, 'pdb', '.pdb')).to.equal(true);
     });
 
     it('declines mismatching file type no matter what filename it has', () => {
-      expect(check({fileType: 'pdb'}, 'cif')).to.equal(false);
-      expect(check({fileType: 'pdb', fileName: '1crn.cif'}, 'cif', '.cif')).to.equal(false);
+      expect(check({ fileType: 'pdb' }, 'cif')).to.equal(false);
+      expect(check({ fileType: 'pdb', fileName: '1crn.cif' }, 'cif', '.cif')).to.equal(false);
     });
 
     it('accepts matching extension if no type specified', () => {
-      expect(check({fileName: '1crn.ent'}, 'pdb', '.ent')).to.equal(true);
-      expect(check({fileName: '1crn.pdb'}, 'pdb')).to.equal(true);
+      expect(check({ fileName: '1crn.ent' }, 'pdb', '.ent')).to.equal(true);
+      expect(check({ fileName: '1crn.pdb' }, 'pdb')).to.equal(true);
     });
 
     it('declines mismatching extension if no type specified', () => {
-      expect(check({fileName: '1crn.pdb'}, 'pdb', '.ent')).to.equal(false);
-      expect(check({fileName: '1crn.ent'}, 'pdb')).to.equal(false);
+      expect(check({ fileName: '1crn.pdb' }, 'pdb', '.ent')).to.equal(false);
+      expect(check({ fileName: '1crn.ent' }, 'pdb')).to.equal(false);
     });
 
     it('declines if neither type nor filename is specified', () => {
@@ -144,11 +137,9 @@ describe('Parser', () => {
     });
 
     it('is case insensitive for type and file name', () => {
-      expect(check({fileType: 'PubChem'}, 'PUBchem')).to.equal(true);
-      expect(check({fileName: '1crn.mmCIF'}, 'MMcif')).to.equal(true);
-      expect(check({fileName: '1crn.mmCIF'}, 'mmcif', '.MMcif')).to.equal(true);
+      expect(check({ fileType: 'PubChem' }, 'PUBchem')).to.equal(true);
+      expect(check({ fileName: '1crn.mmCIF' }, 'MMcif')).to.equal(true);
+      expect(check({ fileName: '1crn.mmCIF' }, 'mmcif', '.MMcif')).to.equal(true);
     });
-
   });
-
 });

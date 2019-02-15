@@ -1,21 +1,18 @@
-import EventDispatcher from './EventDispatcher';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import EventDispatcher from './EventDispatcher';
 
 chai.use(dirtyChai);
 chai.use(sinonChai);
 
-//////////////////////////////////////////////////////////////////////////////
-
-describe('utils/EventDispatcher', function() {
+describe('utils/EventDispatcher', () => {
   const type = 'test';
-  const event = {type: type};
+  const event = { type };
 
-  describe('.dispatchEvent()', function() {
-    it('calls callback on event', function() {
+  describe('.dispatchEvent()', () => {
+    it('calls callback on event', () => {
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
 
@@ -26,7 +23,7 @@ describe('utils/EventDispatcher', function() {
       expect(callback).to.be.always.calledWithExactly(event);
     });
 
-    it('registers callback with same context only once', function() {
+    it('registers callback with same context only once', () => {
       // TODO does this test has correct description?
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
@@ -38,7 +35,7 @@ describe('utils/EventDispatcher', function() {
       expect(callback).to.be.calledOnce();
     });
 
-    it('calls multiple callbacks on event', function() {
+    it('calls multiple callbacks on event', () => {
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
       const callback1 = sinon.spy();
@@ -51,7 +48,7 @@ describe('utils/EventDispatcher', function() {
       expect(callback1).to.be.calledOnce();
     });
 
-    it('uses the dispatcher as default context', function() {
+    it('uses the dispatcher as default context', () => {
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
 
@@ -61,7 +58,7 @@ describe('utils/EventDispatcher', function() {
       expect(callback).to.be.calledOn(dispatcher);
     });
 
-    it('uses custom context properly', function() {
+    it('uses custom context properly', () => {
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
       const stubObj = {};
@@ -72,7 +69,7 @@ describe('utils/EventDispatcher', function() {
       expect(callback).to.be.calledOn(stubObj);
     });
 
-    it('triggers multiple times', function() {
+    it('triggers multiple times', () => {
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
 
@@ -83,7 +80,7 @@ describe('utils/EventDispatcher', function() {
       expect(callback).to.be.calledTwice();
     });
 
-    it('calls same function with different contexts', function() {
+    it('calls same function with different contexts', () => {
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
       const stubObj = {};
@@ -101,17 +98,17 @@ describe('utils/EventDispatcher', function() {
       }
     });
 
-    it('preserves passed arguments', function() {
+    it('preserves passed arguments', () => {
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
       const a1 = 1;
       const a2 = 'str';
-      const a3 = {o: {a: 1}};
+      const a3 = { o: { a: 1 } };
       const evt = {
-        type: type,
-        a1: a1,
-        a2: a2,
-        a3: a3,
+        type,
+        a1,
+        a2,
+        a3,
       };
 
       dispatcher.addEventListener(type, callback);
@@ -122,9 +119,9 @@ describe('utils/EventDispatcher', function() {
     });
   });
 
-  describe('.removeEventListener()', function() {
+  describe('.removeEventListener()', () => {
     const type1 = 'test1';
-    const event1 = {type: type1};
+    const event1 = { type: type1 };
     const obj = {};
 
     function init() {
@@ -141,19 +138,21 @@ describe('utils/EventDispatcher', function() {
       dispatcher.addEventListener(type1, callback2, obj);
 
       return {
-        dispatcher: dispatcher,
-        callback: callback,
-        callback1: callback1,
-        callback2: callback2,
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
       };
     }
 
-    it('removes all callbacks if all params are unspecified', function() {
+    it('removes all callbacks if all params are unspecified', () => {
       const res = init();
-      const dispatcher = res.dispatcher;
-      const callback = res.callback;
-      const callback1 = res.callback1;
-      const callback2 = res.callback2;
+      const {
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
+      } = res;
       dispatcher.removeEventListener();
       dispatcher.dispatchEvent(event);
       dispatcher.dispatchEvent(event1);
@@ -163,12 +162,14 @@ describe('utils/EventDispatcher', function() {
       expect(callback2).to.be.not.called();
     });
 
-    it('removes all callbacks for specified event', function() {
+    it('removes all callbacks for specified event', () => {
       const res = init();
-      const dispatcher = res.dispatcher;
-      const callback = res.callback;
-      const callback1 = res.callback1;
-      const callback2 = res.callback2;
+      const {
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
+      } = res;
       dispatcher.removeEventListener(type);
       dispatcher.dispatchEvent(event);
       dispatcher.dispatchEvent(event1);
@@ -180,12 +181,14 @@ describe('utils/EventDispatcher', function() {
       expect(callback2).to.be.calledOn(obj);
     });
 
-    it('removes specified callbacks', function() {
+    it('removes specified callbacks', () => {
       const res = init();
-      const dispatcher = res.dispatcher;
-      const callback = res.callback;
-      const callback1 = res.callback1;
-      const callback2 = res.callback2;
+      const {
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
+      } = res;
       dispatcher.removeEventListener(null, callback);
       dispatcher.dispatchEvent(event);
       dispatcher.dispatchEvent(event1);
@@ -199,12 +202,14 @@ describe('utils/EventDispatcher', function() {
       expect(callback2).to.be.calledOn(obj);
     });
 
-    it('removes all callbacks with specified context', function() {
+    it('removes all callbacks with specified context', () => {
       const res = init();
-      const dispatcher = res.dispatcher;
-      const callback = res.callback;
-      const callback1 = res.callback1;
-      const callback2 = res.callback2;
+      const {
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
+      } = res;
       dispatcher.removeEventListener(null, null, dispatcher);
       dispatcher.dispatchEvent(event);
       dispatcher.dispatchEvent(event1);
@@ -217,12 +222,14 @@ describe('utils/EventDispatcher', function() {
       expect(callback2).to.be.calledOn(obj);
     });
 
-    it('removes specified callbacks for specified event', function() {
+    it('removes specified callbacks for specified event', () => {
       const res = init();
-      const dispatcher = res.dispatcher;
-      const callback = res.callback;
-      const callback1 = res.callback1;
-      const callback2 = res.callback2;
+      const {
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
+      } = res;
       dispatcher.removeEventListener(type, callback);
       dispatcher.dispatchEvent(event);
       dispatcher.dispatchEvent(event1);
@@ -236,12 +243,14 @@ describe('utils/EventDispatcher', function() {
       expect(callback2).to.be.calledOn(obj);
     });
 
-    it('removes callbacks for specified event and context', function() {
+    it('removes callbacks for specified event and context', () => {
       const res = init();
-      const dispatcher = res.dispatcher;
-      const callback = res.callback;
-      const callback1 = res.callback1;
-      const callback2 = res.callback2;
+      const {
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
+      } = res;
       dispatcher.removeEventListener(type, null, obj);
       dispatcher.dispatchEvent(event);
       dispatcher.dispatchEvent(event1);
@@ -255,12 +264,14 @@ describe('utils/EventDispatcher', function() {
       expect(callback2).to.be.calledOn(obj);
     });
 
-    it('removes specified callbacks with specified context', function() {
+    it('removes specified callbacks with specified context', () => {
       const res = init();
-      const dispatcher = res.dispatcher;
-      const callback = res.callback;
-      const callback1 = res.callback1;
-      const callback2 = res.callback2;
+      const {
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
+      } = res;
       dispatcher.removeEventListener(null, callback, obj);
       dispatcher.dispatchEvent(event);
       dispatcher.dispatchEvent(event1);
@@ -275,12 +286,14 @@ describe('utils/EventDispatcher', function() {
       expect(callback2).to.be.calledOn(obj);
     });
 
-    it('removes exact callback when event, callback and context are specified', function() {
+    it('removes exact callback when event, callback and context are specified', () => {
       const res = init();
-      const dispatcher = res.dispatcher;
-      const callback = res.callback;
-      const callback1 = res.callback1;
-      const callback2 = res.callback2;
+      const {
+        dispatcher,
+        callback,
+        callback1,
+        callback2,
+      } = res;
       dispatcher.removeEventListener(type, callback, dispatcher);
       dispatcher.dispatchEvent(event);
       dispatcher.dispatchEvent(event1);

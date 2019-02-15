@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import settings from '../settings';
 
@@ -20,9 +18,7 @@ class View {
 const _transitionTime = 1.5; // in seconds
 
 class ViewInterpolator {
-
   setup(startView, endView) {
-
     this._startTime = undefined;
     this._endTime = undefined;
 
@@ -47,10 +43,9 @@ class ViewInterpolator {
   }
 
   getCurrentView() {
-
-    if (typeof this._srcView === 'undefined' || typeof this._dstView === 'undefined' ||
-      !this._isMoving || !this.wasStarted()) {
-      return {success: false};
+    if (typeof this._srcView === 'undefined' || typeof this._dstView === 'undefined'
+      || !this._isMoving || !this.wasStarted()) {
+      return { success: false };
     }
 
     let view = this.createView();
@@ -58,16 +53,16 @@ class ViewInterpolator {
     if (time > this._endTime) {
       view = this._dstView;
       this._reset();
-      return {success: true, view: view};
+      return { success: true, view };
     }
 
     const factor = (time - this._startTime) / (this._endTime - this._startTime);
     view.position.copy(this._srcView.position);
     view.position.lerp(this._dstView.position, factor);
-    view.scale = (1 - factor) * this._srcView.scale +  factor * this._dstView.scale;
+    view.scale = (1 - factor) * this._srcView.scale + factor * this._dstView.scale;
     view.orientation.copy(this._srcView.orientation);
     view.orientation.slerp(this._dstView.orientation, factor);
-    return {success: true, view: view};
+    return { success: true, view };
   }
 
   _reset() {
@@ -81,4 +76,3 @@ class ViewInterpolator {
 }
 
 export default new ViewInterpolator();
-

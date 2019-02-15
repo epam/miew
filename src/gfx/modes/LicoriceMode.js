@@ -1,11 +1,8 @@
 /* eslint-disable no-magic-numbers */
 import LabeledMode from './LabeledMode';
+
 class LicoriceMode extends LabeledMode {
   static id = 'LC';
-
-  constructor(opts) {
-    super(opts);
-  }
 
   calcAtomRadius(_atom) {
     return this.opts.bond;

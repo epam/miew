@@ -19,7 +19,7 @@ class Assembly extends BiologicalUnit {
   computeBoundaries() {
     super.computeBoundaries();
     // fix up the boundaries
-    const matrices = this.matrices;
+    const { matrices } = this;
     const oldCenter = this._boundaries.boundingSphere.center;
     const oldRad = this._boundaries.boundingSphere.radius;
     const boundingBox = this._boundaries.boundingBox = new THREE.Box3();
@@ -29,7 +29,7 @@ class Assembly extends BiologicalUnit {
     }
 
     const newRad = boundingBox.max.distanceTo(boundingBox.min) / 2 + oldRad;
-    const center  = new THREE.Vector3();
+    const center = new THREE.Vector3();
     boundingBox.getCenter(center);
     this._boundaries.boundingSphere = new THREE.Sphere().set(center, newRad);
     boundingBox.max.addScalar(oldRad);
@@ -66,4 +66,3 @@ class Assembly extends BiologicalUnit {
 }
 
 export default Assembly;
-

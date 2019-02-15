@@ -2,7 +2,7 @@ import VolumeSurfaceGeometry from './VolumeSurfaceGeometry';
 import ContactSurface from './ContactSurface';
 import chem from '../../chem';
 
-const Volume = chem.Volume;
+const { Volume } = chem;
 
 /**
  * This class implements 'contact' isosurface geometry generation algorithm.
@@ -12,10 +12,6 @@ const Volume = chem.Volume;
  */
 
 class ContactSurfaceGeometry extends VolumeSurfaceGeometry {
-  constructor(spheresCount, opts) {
-    super(spheresCount, opts);
-  }
-
   _computeSurface(packedArrays, box, boundaries, params) {
     const contactSurface = new ContactSurface(packedArrays, boundaries, params);
     contactSurface.build();

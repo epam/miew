@@ -3,10 +3,6 @@ import SurfaceMode from './SurfaceMode';
 class ContactSurfaceMode extends SurfaceMode {
   static id = 'CS';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getSurfaceOpts() {
     return {
       probeRadius: this.opts.probeRadius,

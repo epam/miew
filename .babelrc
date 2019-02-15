@@ -1,6 +1,6 @@
 {
   "presets": [
-    "@babel/preset-env"
+    "airbnb"
   ],
   "plugins": [
     "@babel/plugin-syntax-dynamic-import",

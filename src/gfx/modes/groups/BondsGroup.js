@@ -10,7 +10,7 @@ class BondsGroup extends ChemGroup {
     const drawMultiple = this._mode.drawMultiorderBonds();
     const showAromatic = this._mode.showAromaticLoops();
     const bondsIdc = this._selection.chunks;
-    const bonds = this._selection.bonds;
+    const { bonds } = this._selection;
     let bondsCount = 1;
     for (let i = 0, n = bondsIdc.length; i < n; ++i) {
       bondsCount += this.getBondOrder(bonds[bondsIdc[i]], drawMultiple, showAromatic);
@@ -27,7 +27,7 @@ class BondsGroup extends ChemGroup {
   }
 
   raycast(raycaster, intersects) {
-    const bonds = this._selection.bonds;
+    const { bonds } = this._selection;
     const inters = [];
     this._mesh.raycast(raycaster, inters);
     const bondsIdc = this._chunksIdc;
@@ -36,7 +36,7 @@ class BondsGroup extends ChemGroup {
       if (!inters[i].hasOwnProperty('chunkIdx')) {
         continue;
       }
-      const chunkIdx = inters[i].chunkIdx;
+      const { chunkIdx } = inters[i];
       const bondIdx = bondsIdc[Math.floor(chunkIdx / 2)];
       if (bondIdx < bonds.length) {
         const bond = bonds[bondIdx];
@@ -48,7 +48,7 @@ class BondsGroup extends ChemGroup {
 
   _calcChunksList(mask, innerOnly) {
     const chunksList = [];
-    const bonds = this._selection.bonds;
+    const { bonds } = this._selection;
     const chunksToIdx = this._chunksIdc;
     for (let i = 0, n = chunksToIdx.length; i < n; ++i) {
       const bond = bonds[chunksToIdx[i]];

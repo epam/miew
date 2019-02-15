@@ -1,16 +1,13 @@
-import CIFParser from './CIFParser';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
+import CIFParser from './CIFParser';
 
 chai.use(dirtyChai);
 
-let parseCif = CIFParser._parseToObject;
+const parseCif = CIFParser._parseToObject;
 
-describe('CIFParser', function() {
-
-  it('accepts empty file', function() {
-    expect(parseCif('')).to.deep.equal({data:{}});
+describe('CIFParser', () => {
+  it('accepts empty file', () => {
+    expect(parseCif('')).to.deep.equal({ data: {} });
   });
-
 });

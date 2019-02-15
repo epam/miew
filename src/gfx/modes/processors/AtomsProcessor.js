@@ -9,10 +9,10 @@ class AtomsProcessor extends RCGroup {
     const atoms = complex.getAtoms();
     const transforms = complex.getTransforms();
 
-    complex.forEachComponent(function(component) {
+    complex.forEachComponent((component) => {
       const atomsIdc = [];
       let atomCount = 0;
-      component.forEachAtom(function(atom) {
+      component.forEachAtom((atom) => {
         if (!self._checkAtom(atom, mask)) {
           return;
         }
@@ -22,9 +22,9 @@ class AtomsProcessor extends RCGroup {
         return;
       }
       const atomsGroup = new AtomsGroup(geoParams, {
-        atoms: atoms,
+        atoms,
         chunks: atomsIdc,
-        parent: complex
+        parent: complex,
       }, colorer, mode, transforms, polyComplexity, material);
       atomsGroup._component = component;
       self.add(atomsGroup);
@@ -37,7 +37,7 @@ class AtomsProcessor extends RCGroup {
 
   getSubset(mask, innerOnly) {
     const totalSubset = [];
-    const children = this.children;
+    const { children } = this;
     let meshIdx = 0;
     for (let i = 0, n = children.length; i < n; ++i) {
       if (children[i].getSubset) {

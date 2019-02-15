@@ -13,7 +13,7 @@ class BiologicalUnit {
     this._selector = selectors.keyword('All')();
     this._boundaries = {
       boundingBox: new THREE.Box3(),
-      boundingSphere: new THREE.Sphere()
+      boundingSphere: new THREE.Sphere(),
     };
   }
 
@@ -22,13 +22,13 @@ class BiologicalUnit {
     const n = atoms.length;
     const selector = this._selector;
 
-    const boundingBox = this._boundaries.boundingBox;
+    const { boundingBox } = this._boundaries;
     boundingBox.makeEmpty();
     if (n === 1) {
       boundingBox.expandByPoint(atoms[0]._position);
       const bbc = new THREE.Vector3();
       boundingBox.getCenter(bbc);
-      const s = 2 * atoms[0].element.radius; //*settings.now.modes.BS.atom; FIXME N: hack commented
+      const s = 2 * atoms[0].element.radius; // *settings.now.modes.BS.atom; FIXME N: hack commented
       boundingBox.setFromCenterAndSize(bbc, new THREE.Vector3(s, s, s));
     } else {
       for (let i = 0; i < n; ++i) {
@@ -77,4 +77,3 @@ class BiologicalUnit {
 }
 
 export default BiologicalUnit;
-

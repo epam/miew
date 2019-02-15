@@ -1,11 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import PDBExporter from '../../src/io/exporters/PDBExporter';
-import PDBParser from '../../src/io/parsers/PDBParser';
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
+import PDBParser from '../../src/io/parsers/PDBParser';
+import PDBExporter from '../../src/io/exporters/PDBExporter';
 
 chai.use(dirtyChai);
 chai.use(sinonChai);
@@ -62,10 +62,8 @@ function filterLines(text) {
 
 describe('PDBExporter output matches PDBParser input', () => {
   for (let i = 0; i < filesForTest.length; i++) {
-    it(`for ${filesForTest[i]}`, () => {
-      return getInitialString(filesForTest[i]).then((data) => {
-        expect(filterLines(getExportedString(data))).to.deep.equal(filterLines(data));
-      });
-    });
+    it(`for ${filesForTest[i]}`, () => getInitialString(filesForTest[i]).then((data) => {
+      expect(filterLines(getExportedString(data))).to.deep.equal(filterLines(data));
+    }));
   }
 });

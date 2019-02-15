@@ -1,12 +1,12 @@
 import utils from '../utils';
 
-var cMaxPairsForHashCode = 32;
-var cHashTableSize = 1024 * 1024;
-var cNumbersPerPair = 4;
-var cMaxNeighbours = 14;
-var cInvalidVal = -1;
+const cMaxPairsForHashCode = 32;
+const cHashTableSize = 1024 * 1024;
+const cNumbersPerPair = 4;
+const cMaxNeighbours = 14;
+const cInvalidVal = -1;
 // 89237 is a large simple number, can be used for pseudo random hash code create
-var cBigPrime = 89237;
+const cBigPrime = 89237;
 
 class AtomPairs {
   constructor(maxPairsEstimate) {

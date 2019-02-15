@@ -1,7 +1,6 @@
-import ExporterList from './ExporterList';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
+import ExporterList from './ExporterList';
 
 chai.use(dirtyChai);
 
@@ -13,20 +12,18 @@ function getSomeExporterClass(fmt = 'some') {
 }
 
 describe('ExporterList', () => {
-
   const A = getSomeExporterClass('a');
   const B = getSomeExporterClass('b');
   const C = getSomeExporterClass('See');
   const A2 = getSomeExporterClass('a');
 
-  const fmtA  = ['a', 'a-format'];
-  const fmtB  = ['b', 'b-format'];
+  const fmtA = ['a', 'a-format'];
+  const fmtB = ['b', 'b-format'];
   const fmtAB = ['a', 'a-format', 'b', 'b-format'];
 
   const formats = list => list.keys('formats');
 
   describe('constructor', () => {
-
     it('creates an empty list', () => {
       const exporterList = new ExporterList();
       expect(formats(exporterList)).to.be.empty();
@@ -36,11 +33,9 @@ describe('ExporterList', () => {
       const exporterList = new ExporterList([A, B]);
       expect(formats(exporterList).sort()).to.deep.equal(fmtAB);
     });
-
   });
 
   describe('#register()', () => {
-
     it('adds an exporter to the list', () => {
       const exporterList = new ExporterList();
       exporterList.register(A);
@@ -61,11 +56,9 @@ describe('ExporterList', () => {
       exporterList.register(A2);
       expect(formats(exporterList)).to.deep.equal(fmtA);
     });
-
   });
 
   describe('#unregister()', () => {
-
     it('removes an exporter from the list', () => {
       const exporterList = new ExporterList([A, B]);
       exporterList.unregister(A);
@@ -86,11 +79,9 @@ describe('ExporterList', () => {
       exporterList.unregister(A);
       expect(formats(exporterList)).to.be.empty();
     });
-
   });
 
   describe('#find()', () => {
-
     let exporterList;
 
     beforeEach(() => {
@@ -98,32 +89,30 @@ describe('ExporterList', () => {
     });
 
     it('returns matching file type', () => {
-      expect(exporterList.find({format: 'b'})).to.deep.equal([B]);
+      expect(exporterList.find({ format: 'b' })).to.deep.equal([B]);
     });
 
     it('ignores mismatching file type', () => {
-      expect(exporterList.find({format: 'c'})).to.be.empty();
+      expect(exporterList.find({ format: 'c' })).to.be.empty();
     });
 
     it('returns a match if an alternative type name or extension is used', () => {
-      expect(exporterList.find({format: 'b-format'})).to.deep.equal([B]);
+      expect(exporterList.find({ format: 'b-format' })).to.deep.equal([B]);
     });
 
     it('is case insensitive for type name', () => {
       exporterList.register(C);
-      expect(exporterList.find({format: 'A-Format'})).to.deep.equal([A]);
-      expect(exporterList.find({format: 'see-Format'})).to.deep.equal([C]);
+      expect(exporterList.find({ format: 'A-Format' })).to.deep.equal([A]);
+      expect(exporterList.find({ format: 'see-Format' })).to.deep.equal([C]);
     });
 
     it('returns multiple entries if they all fit', () => {
       exporterList.register(A2);
-      expect(exporterList.find({format: 'a'})).to.deep.equal([A, A2]);
+      expect(exporterList.find({ format: 'a' })).to.deep.equal([A, A2]);
     });
 
     it('returns nothing if type is not specified', () => {
       expect(exporterList.find({})).to.be.empty();
     });
-
   });
-
 });

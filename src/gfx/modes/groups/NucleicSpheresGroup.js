@@ -1,6 +1,6 @@
 import NucleicItemGroup from './NucleicItemGroup';
 
-class NucleicSpheresGroup extends  NucleicItemGroup {
+class NucleicSpheresGroup extends NucleicItemGroup {
   _makeGeoArgs() {
     return [this._selection.chunks.length * 2, this._polyComplexity];
   }

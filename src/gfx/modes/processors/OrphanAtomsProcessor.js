@@ -1,10 +1,6 @@
 import AtomsProcessor from './AtomsProcessor';
 
 class OrphanAtomsProcessor extends AtomsProcessor {
-  constructor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
-    super(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material);
-  }
-
   _checkAtom(atom, mask) {
     if (!(atom._mask & mask)) {
       return false;

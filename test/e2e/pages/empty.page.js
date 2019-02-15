@@ -1,7 +1,6 @@
 const timeout = 10000;
 
 export default class EmptyPage {
-
   constructor(driver, url) {
     this.driver = driver;
     if (url !== null) {
@@ -22,7 +21,7 @@ export default class EmptyPage {
   getValueFor(expression) {
     return this.driver.executeScript(`\
 return Miew && JSON.stringify(${expression});`)
-      .then((json) => JSON.parse(json));
+      .then(json => JSON.parse(json));
   }
 
   /**

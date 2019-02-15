@@ -2,14 +2,12 @@ import Colorer from './Colorer';
 import Atom from '../../chem/Atom';
 
 function scaleColor(c, factor) {
-  var
-    r1 = (c >> 16) & 0xff,
-    g1 = (c >> 8) & 0xff,
-    b1 = c & 0xff;
-  var
-    r = factor * r1,
-    g = factor * g1,
-    b = factor * b1;
+  const r1 = (c >> 16) & 0xff;
+  const g1 = (c >> 8) & 0xff;
+  const b1 = c & 0xff;
+  const r = factor * r1;
+  const g = factor * g1;
+  const b = factor * b1;
   return (r << 16) | (g << 8) | b;
 }
 
@@ -26,13 +24,9 @@ function scaleColor(c, factor) {
 class CarbonColorer extends Colorer {
   static id = 'CB';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, _complex) {
-    var colorCarbon = this.opts.color;
-    var colorNotCarbon = scaleColor(colorCarbon, this.opts.factor);
+    const colorCarbon = this.opts.color;
+    const colorNotCarbon = scaleColor(colorCarbon, this.opts.factor);
     return (atom.flags & Atom.Flags.CARBON) ? colorCarbon : colorNotCarbon;
   }
 

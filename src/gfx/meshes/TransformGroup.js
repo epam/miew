@@ -22,7 +22,7 @@ class TransformGroup extends THREE.Object3D {
   raycast(raycaster, intersects) {
     const ray = TransformGroup._ray;
     const inverseMatrix = TransformGroup._inverseMatrix;
-    const children = this.children;
+    const { children } = this;
     ray.copy(raycaster.ray);
     for (let i = 0, n = children.length; i < n; ++i) {
       const child = children[i];

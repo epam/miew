@@ -2,13 +2,13 @@ import AtomPairs from './AtomPairs';
 import Bond from './Bond';
 import settings from '../settings';
 
-var cProfileBondBuilder = false;
-var cEstBondsMultiplier = 4;
-var cSpaceCode = 32;
-var cBondTolerance = 0.45;
-var cVMDTolerance = 0.6;
-var cBondRadInJMOL = true;
-var cEpsilon = 0.001;
+const cProfileBondBuilder = false;
+const cEstBondsMultiplier = 4;
+const cSpaceCode = 32;
+const cBondTolerance = 0.45;
+const cVMDTolerance = 0.6;
+const cBondRadInJMOL = true;
+const cEpsilon = 0.001;
 
 /**
  * Get radius used for building bonds.
@@ -17,12 +17,11 @@ var cEpsilon = 0.001;
  * @returns {number} special value for bonding radius for this atom
  */
 function _getBondingRadius(atom) {
-  const element = atom.element;
+  const { element } = atom;
   if (element) {
     return element.radiusBonding;
-  } else {
-    throw new Error('_getBondingRadius: Logic error.');
   }
+  throw new Error('_getBondingRadius: Logic error.');
 }
 
 function _isAtomEligible(atom) {
@@ -32,7 +31,7 @@ function _isAtomEligible(atom) {
 
 function _isAtomEligibleWithWaterBondingHack(atom) {
   // TODO: remove this hack (requested by customer)
-  var noHack = atom._residue._type._name !== 'HOH';
+  const noHack = atom._residue._type._name !== 'HOH';
   return noHack && !atom.isHet();
 }
 
@@ -98,21 +97,21 @@ class AutoBond {
         if (indTo === aInd) {
           collection.addPair(aInd, bond._right._index);
         }
-      }   // for (b) all bonds in atom
+      } // for (b) all bonds in atom
     } // for (a)
     return 0;
   }
 
   _findPairs() {
-    let vw = this._complex.getVoxelWorld();
+    const vw = this._complex.getVoxelWorld();
     if (vw === null) {
       return;
     }
 
-    let atoms = this._complex._atoms;
-    let atomsNum = atoms.length;
-    let isAtomEligible = this.isAtomEligible;
-    let self = this;
+    const atoms = this._complex._atoms;
+    const atomsNum = atoms.length;
+    const { isAtomEligible } = this;
+    const self = this;
 
     let rA;
     let isHydrogenA;
@@ -120,21 +119,21 @@ class AutoBond {
     let locationA;
     let atomA;
 
-    let processAtom = function(atomB) {
+    const processAtom = function (atomB) {
       if (isHydrogenA && atomB.isHydrogen()) {
         return;
       }
 
-      let locationB = atomB.getLocation();
-      if ((locationA !== cSpaceCode) &&
-        (locationB !== cSpaceCode) &&
-        (locationA !== locationB)) {
+      const locationB = atomB.getLocation();
+      if ((locationA !== cSpaceCode)
+        && (locationB !== cSpaceCode)
+        && (locationA !== locationB)) {
         return;
       }
 
-      let dist2 = posA.distanceToSquared(atomB._position);
-      let rB = atomB.element.radiusBonding;
-      let maxAcceptable = cBondRadInJMOL ? rA + rB + cBondTolerance : cVMDTolerance * (rA + rB);
+      const dist2 = posA.distanceToSquared(atomB._position);
+      const rB = atomB.element.radiusBonding;
+      const maxAcceptable = cBondRadInJMOL ? rA + rB + cBondTolerance : cVMDTolerance * (rA + rB);
 
       if (dist2 > (maxAcceptable * maxAcceptable)) {
         return;

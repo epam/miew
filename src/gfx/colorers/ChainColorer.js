@@ -3,10 +3,6 @@ import Colorer from './Colorer';
 class ChainColorer extends Colorer {
   static id = 'CH';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, complex) {
     return this.getResidueColor(atom._residue, complex);
   }

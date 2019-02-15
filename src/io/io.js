@@ -1,6 +1,6 @@
-import {loaders} from './loaders';
-import {parsers} from './parsers';
-import {exporters} from './exporters';
+import { loaders } from './loaders';
+import { parsers } from './parsers';
+import exporters from './exporters';
 
 export default {
   loaders,

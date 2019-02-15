@@ -6,8 +6,7 @@ const STEP_SIZE = 0.15;
 class BondsLinesGroup extends BondsGroup {
   _build() {
     const bondsIdc = this._selection.chunks;
-    const bonds = this._selection.bonds;
-    const parent = this._selection.parent;
+    const { bonds, parent } = this._selection;
     const mode = this._mode;
     const colorer = this._colorer;
     const geo = this._geo;
@@ -37,9 +36,9 @@ class BondsLinesGroup extends BondsGroup {
       for (let j = 0; j < order; ++j) {
         leftPos.copy(a1Pos);
         rightPos.copy(a2Pos);
-        let scale = (order % 2 === 0 ?
-          (((j / 2) | 0) + 0.5) * (1 - 2 * (j % 2)) :
-          (((j + 1) / 2) | 0) * (-1 + 2 * (j % 2)));
+        let scale = (order % 2 === 0
+          ? (((j / 2) | 0) + 0.5) * (1 - 2 * (j % 2))
+          : (((j + 1) / 2) | 0) * (-1 + 2 * (j % 2)));
         chunksToIdx[currBondIdx] = bond._index;
         if (order === 2 && (!a1Hangs && !a2Hangs)) {
           scale -= 0.5;
@@ -67,7 +66,7 @@ class BondsLinesGroup extends BondsGroup {
     // TODO This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
     const bondsIdc = this._selection.chunks;
-    const bonds = this._selection.bonds;
+    const { bonds } = this._selection;
     const mode = this._mode;
     const colorer = this._colorer;
     const geo = this._geo;
@@ -97,9 +96,9 @@ class BondsLinesGroup extends BondsGroup {
       for (let j = 0; j < order; ++j) {
         leftPos.copy(a1Pos);
         rightPos.copy(a2Pos);
-        let scale = (order % 2 === 0 ?
-          (((j / 2) | 0) + 0.5) * (1 - 2 * (j % 2)) :
-          (((j + 1) / 2) | 0) * (-1 + 2 * (j % 2)));
+        let scale = (order % 2 === 0
+          ? (((j / 2) | 0) + 0.5) * (1 - 2 * (j % 2))
+          : (((j + 1) / 2) | 0) * (-1 + 2 * (j % 2)));
         if (order === 2 && (!a1Hangs && !a2Hangs)) {
           scale -= 0.5;
           scale *= -1;

@@ -3,7 +3,7 @@ import meshes from './meshes';
 import ThickLinesGeometry from '../geometries/ThickLinesGeometry';
 
 function setMatParams(params, uniforms) {
-  return function(material) {
+  return function (material) {
     material.setValues(params);
     material.setUberOptions(uniforms);
   };
@@ -11,7 +11,7 @@ function setMatParams(params, uniforms) {
 
 function _createInstancedCylinders(useZSprites, openEnded) {
   return {
-    Geometry: function(a, b) {
+    Geometry(a, b) {
       return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
     },
     Object: meshes.ZSprite,
@@ -37,7 +37,7 @@ function _createLineSegmentsGeoTriplet(geo, renderParams) {
       attrAlphaColor: true,
       thickLine: thickLines,
     }, {
-      lineWidth: lineWidth,
+      lineWidth,
     }),
   };
 }
@@ -76,7 +76,7 @@ class MeshCreator {
   static createSpheres(caps, settings) {
     const useZSprites = settings.now.zSprites;
     return {
-      Geometry: function(a, b) {
+      Geometry(a, b) {
         return new geometries.InstancedSpheresGeometry(a, b, useZSprites);
       },
       Object: meshes.ZSprite,
@@ -130,7 +130,7 @@ class MeshCreator {
     return {
       Geometry: geometries.LabelsGeometry,
       Object: meshes.Text,
-      initMaterial: function() {
+      initMaterial() {
       },
     };
   }

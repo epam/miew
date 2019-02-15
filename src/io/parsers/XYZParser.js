@@ -1,12 +1,9 @@
-import Parser from './Parser';
-import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
+import Parser from './Parser';
+import chem from '../../chem';
 
-const
-  Complex = chem.Complex,
-  Element = chem.Element,
-  Molecule = chem.Molecule;
+const { Complex, Element, Molecule } = chem;
 
 class XYZParser extends Parser {
   constructor(data, options) {
@@ -44,7 +41,7 @@ class XYZParser extends Parser {
     this._atomsInf = source.substring(startAtomsInf).split(/[\s,]*\n[\s,]*/);
     if (!Number.isNaN(nAtoms) && (this._atomsInf.length - 1 !== nAtoms)) {
       this._complex.error = {
-        message: 'wrong number of atoms'
+        message: 'wrong number of atoms',
       };
       return;
     }
@@ -68,7 +65,7 @@ class XYZParser extends Parser {
 
       if (words.length !== 4) {
         this._complex.error = {
-          message: 'missed parameters'
+          message: 'missed parameters',
         };
         break;
       }
@@ -97,7 +94,7 @@ class XYZParser extends Parser {
       needAutoBonding: true,
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
-      serialAtomMap: this._serialAtomMap
+      serialAtomMap: this._serialAtomMap,
     });
 
     this._complex = null;

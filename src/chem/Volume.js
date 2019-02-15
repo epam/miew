@@ -1,6 +1,16 @@
 import * as THREE from 'three';
 import utils from '../utils';
 
+function pow2ceil(v) {
+  let p = 2;
+  v = (v - 1) >> 1;
+  while (v) {
+    p <<= 1;
+    v >>= 1;
+  }
+  return p;
+}
+
 /**
  * Volume constructor
  *
@@ -23,9 +33,7 @@ class Volume {
     this._volumeInfo = volumeInfo;
 
     if (dimensions instanceof Array) {
-      this._dimX = dimensions[0];
-      this._dimY = dimensions[1];
-      this._dimZ = dimensions[2];
+      [this._dimX, this._dimY, this._dimZ] = dimensions;
     } else {
       this._dimX = dimensions.x;
       this._dimY = dimensions.y;
@@ -43,51 +51,51 @@ class Volume {
 
     // override getter/setter for vector fields
     switch (this._dimVec) {
-    case 1:
-      break;
+      case 1:
+        break;
 
-    case 2:
-      this.getValue = function(x, y, z) {
-        const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-        return [this._data[idx], this._data[idx + 1]];
-      };
+      case 2:
+        this.getValue = function (x, y, z) {
+          const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+          return [this._data[idx], this._data[idx + 1]];
+        };
 
-      this.setValue = function(x, y, z) {
-        const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-        this._data[idx] = arguments[3];
-        this._data[idx + 1] = arguments[4];
-      };
+        this.setValue = function (x, y, z, a, b) {
+          const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+          this._data[idx] = a;
+          this._data[idx + 1] = b;
+        };
 
-      this.addValue = function(x, y, z) {
-        const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-        this._data[idx] += arguments[3];
-        this._data[idx + 1] += arguments[4];
-      };
-      break;
+        this.addValue = function (x, y, z, a, b) {
+          const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+          this._data[idx] += a;
+          this._data[idx + 1] += b;
+        };
+        break;
 
-    case 3:
-      this.getValue = function(x, y, z) {
-        const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-        return [this._data[idx], this._data[idx + 1], this._data[idx + 2]];
-      };
+      case 3:
+        this.getValue = function (x, y, z) {
+          const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+          return [this._data[idx], this._data[idx + 1], this._data[idx + 2]];
+        };
 
-      this.setValue = function(x, y, z) {
-        const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-        this._data[idx] = arguments[3];
-        this._data[idx + 1] = arguments[4];
-        this._data[idx + 2] = arguments[5];
-      };
+        this.setValue = function (x, y, z, a, b, c) {
+          const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+          this._data[idx] = a;
+          this._data[idx + 1] = b;
+          this._data[idx + 2] = c;
+        };
 
-      this.addValue = function(x, y, z) {
-        const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-        this._data[idx] += arguments[3];
-        this._data[idx + 1] += arguments[4];
-        this._data[idx + 2] += arguments[5];
-      };
-      break;
+        this.addValue = function (x, y, z, a, b, c) {
+          const idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
+          this._data[idx] += a;
+          this._data[idx + 1] += b;
+          this._data[idx + 2] += c;
+        };
+        break;
 
-    default:
-      throw new Error('Volume: invalid vector dimension');
+      default:
+        throw new Error('Volume: invalid vector dimension');
     }
   }
 
@@ -184,7 +192,7 @@ class Volume {
             xi, yi, zi,
             (_voxelValue(xp, yi, zi) - _voxelValue(xm, yi, zi)) * vs.x,
             (_voxelValue(xi, yp, zi) - _voxelValue(xi, ym, zi)) * vs.y,
-            (_voxelValue(xi, yi, zp) - _voxelValue(xi, yi, zm)) * vs.z
+            (_voxelValue(xi, yi, zp) - _voxelValue(xi, yi, zm)) * vs.z,
           );
         }
       }
@@ -232,7 +240,8 @@ class Volume {
 
     const data = new Uint8Array(width * height);
 
-    let src, dst;
+    let src;
+    let dst;
     for (let tileRow = 0; tileRow < tilesY; ++tileRow) {
       // process each pixel row of this tile row
       for (let row = 0; row < this._dimY; ++row) {
@@ -276,19 +285,19 @@ class Volume {
       }
     }
 
-    var texture = new THREE.DataTexture(
+    const texture = new THREE.DataTexture(
       data, width, height, THREE.LuminanceFormat, THREE.UnsignedByteType,
-      THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter
+      THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter,
     );
     texture.needsUpdate = true;
     return texture;
   }
 
-  /**********************************************************************************
+  /* ********************************************************************************
    *
    * Methods that provide direct access to internal array (for better performance)
    *
-   *********************************************************************************/
+   ******************************************************************************** */
 
   getData() {
     return this._data;
@@ -313,15 +322,4 @@ class Volume {
 
 Volume.prototype.id = 'Volume';
 
-function pow2ceil(v) {
-  let p = 2;
-  v = (v - 1) >> 1;
-  while (v) {
-    p <<= 1;
-    v >>= 1;
-  }
-  return p;
-}
-
 export default Volume;
-

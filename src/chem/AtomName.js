@@ -35,4 +35,3 @@ class AtomName {
 }
 
 export default AtomName;
-

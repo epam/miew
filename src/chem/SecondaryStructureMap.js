@@ -51,7 +51,7 @@ export default class SecondaryStructureMap {
     // calculate peptide chain lengths
     this._chainLengths = [];
     for (let i = 0; i < this._complex._chains.length; ++i) {
-      let chain = this._complex._chains[i].getResidues();
+      const chain = this._complex._chains[i].getResidues();
       let len = 0;
       for (; len < chain.length; ++len) {
         if ((chain[len].getType().flags & ResidueType.Flags.PROTEIN) === 0) {
@@ -77,10 +77,10 @@ export default class SecondaryStructureMap {
 
       for (let i = 0; i + stride < chainLength; ++i) {
         if (this._hbonds.isBond(inResidues[i + stride]._index, inResidues[i]._index)
-        /*&& NoChainBreak(res[i], res[i + stride])*/) {
+        /* && NoChainBreak(res[i], res[i + stride]) */) {
           this._helixFlags[stride][inResidues[i + stride]._index] = HelixFlag.END;
           for (let j = i + 1; j < i + stride; ++j) {
-            if (typeof  this._helixFlags[stride][inResidues[j]._index] === 'undefined') {
+            if (typeof this._helixFlags[stride][inResidues[j]._index] === 'undefined') {
               this._helixFlags[stride][inResidues[j]._index] = HelixFlag.MIDDLE;
             }
           }
@@ -95,7 +95,7 @@ export default class SecondaryStructureMap {
     }
 
     for (let i = 2; i < chainLength - 2; ++i) {
-      let kappa = this._kappa(inResidues[i - 2], inResidues[i], inResidues[i + 2]);
+      const kappa = this._kappa(inResidues[i - 2], inResidues[i], inResidues[i + 2]);
       this._bend[inResidues[i]._index] = (kappa !== 360 && kappa > 70);
     }
 
@@ -111,8 +111,8 @@ export default class SecondaryStructureMap {
       if (this._isHelixStart(inResidues[i]._index, 3) && this._isHelixStart(inResidues[i - 1]._index, 3)) {
         let empty = true;
         for (let j = i; empty && j <= i + 2; ++j) {
-          empty = typeof this._ss[inResidues[j]._index] === 'undefined' ||
-                  this._ss[inResidues[j]._index] === StructureType.HELIX_310;
+          empty = typeof this._ss[inResidues[j]._index] === 'undefined'
+                  || this._ss[inResidues[j]._index] === StructureType.HELIX_310;
         }
         if (empty) {
           for (let j = i; j <= i + 2; ++j) {
@@ -126,9 +126,9 @@ export default class SecondaryStructureMap {
       if (this._isHelixStart(inResidues[i]._index, 5) && this._isHelixStart(inResidues[i - 1]._index, 5)) {
         let empty = true;
         for (let j = i; empty && j <= i + 4; ++j) {
-          empty = typeof this._ss[inResidues[j]._index] === 'undefined' ||
-                  this._ss[inResidues[j]._index] === StructureType.HELIX_PI ||
-                  (inPreferPiHelices && this._ss[inResidues[j]._index] === StructureType.HELIX_ALPHA);
+          empty = typeof this._ss[inResidues[j]._index] === 'undefined'
+                  || this._ss[inResidues[j]._index] === StructureType.HELIX_PI
+                  || (inPreferPiHelices && this._ss[inResidues[j]._index] === StructureType.HELIX_ALPHA);
         }
         if (empty) {
           for (let j = i; j <= i + 4; ++j) {
@@ -158,9 +158,9 @@ export default class SecondaryStructureMap {
 
   _residueGetCAlpha(res) {
     for (let i = 0; i < res._atoms.length; ++i) {
-      let name = res._atoms[i].getName().getString();
-      if (name === 'CA' ||
-          name === 'C1') {
+      const name = res._atoms[i].getName().getString();
+      if (name === 'CA'
+          || name === 'C1') {
         return res._atoms[i].getPosition();
       }
     }
@@ -169,12 +169,12 @@ export default class SecondaryStructureMap {
   }
 
   _cosinusAngle(p1, p2, p3, p4) {
-    let v12 = p1.clone(); v12.sub(p2);
-    let v34 = p3.clone(); v34.sub(p4);
+    const v12 = p1.clone(); v12.sub(p2);
+    const v34 = p3.clone(); v34.sub(p4);
 
     let result = 0;
 
-    let x = v12.dot(v12) * v34.dot(v34);
+    const x = v12.dot(v12) * v34.dot(v34);
     if (x > 0) {
       result = v12.dot(v34) / Math.sqrt(x);
     }
@@ -183,45 +183,45 @@ export default class SecondaryStructureMap {
   }
 
   _kappa(prevPrev, res, nextNext) {
-    let curCA = this._residueGetCAlpha(res);
-    let ppCA = this._residueGetCAlpha(prevPrev);
-    let nnCA = this._residueGetCAlpha(nextNext);
+    const curCA = this._residueGetCAlpha(res);
+    const ppCA = this._residueGetCAlpha(prevPrev);
+    const nnCA = this._residueGetCAlpha(nextNext);
     if (curCA === null || ppCA === null || nnCA === null) {
       return 180;
     }
 
-    let ckap = this._cosinusAngle(curCA, ppCA, nnCA, curCA);
-    let skap = Math.sqrt(1 - ckap * ckap);
+    const ckap = this._cosinusAngle(curCA, ppCA, nnCA, curCA);
+    const skap = Math.sqrt(1 - ckap * ckap);
     return Math.atan2(skap, ckap) * 180 / Math.PI;
   }
 
   _isHelixStart(res, stride) {
-    return (this._helixFlags[stride][res] === HelixFlag.START ||
-      this._helixFlags[stride][res] === HelixFlag.START_AND_END);
+    return (this._helixFlags[stride][res] === HelixFlag.START
+      || this._helixFlags[stride][res] === HelixFlag.START_AND_END);
   }
 
   _buildBetaSheets() {
     // find bridges
     // check each chain against each other chain, and against itself
-    let bridges = [];
+    const bridges = [];
     for (let a = 0; a < this._complex._chains.length; ++a) {
-      let lenA = this._chainLengths[a];
+      const lenA = this._chainLengths[a];
       if (lenA <= 4) {
         continue;
       }
 
-      let chainA = this._complex._chains[a].getResidues();
+      const chainA = this._complex._chains[a].getResidues();
 
       for (let b = a; b < this._complex._chains.length; ++b) {
-        let lenB = this._chainLengths[b];
+        const lenB = this._chainLengths[b];
         if (lenB <= 4) {
           continue;
         }
 
-        let chainB = this._complex._chains[b].getResidues();
+        const chainB = this._complex._chains[b].getResidues();
 
         for (let i = 1; i + 1 < lenA; ++i) {
-          let ri = chainA[i];
+          const ri = chainA[i];
 
           let j = 1;
           if (b === a) {
@@ -229,16 +229,16 @@ export default class SecondaryStructureMap {
           }
 
           for (; j + 1 < lenB; ++j) {
-            let rj = chainB[j];
+            const rj = chainB[j];
 
-            let type = this._testBridge(chainA, i, chainB, j);
+            const type = this._testBridge(chainA, i, chainB, j);
             if (type === BridgeType.NO_BRIDGE) {
               continue;
             }
 
             // there is a bridge, try to attach it to previously found sequence
             let found = false;
-            for (let bridge of bridges) {
+            for (const bridge of bridges) {
               if (type !== bridge.type || ri._index !== bridge.i[bridge.i.length - 1] + 1) {
                 continue;
               }
@@ -261,11 +261,11 @@ export default class SecondaryStructureMap {
             // this bridge cannot be attached anywhere, start a new sequence
             if (!found) {
               bridges.push({
-                type: type,
+                type,
                 i: [ri._index],
                 chainI: ri.getChain()._index,
                 j: [rj._index],
-                chainJ: rj.getChain()._index
+                chainJ: rj.getChain()._index,
               });
             }
           }
@@ -274,7 +274,7 @@ export default class SecondaryStructureMap {
     }
 
     // extend ladders
-    bridges.sort(function(a, b) {
+    bridges.sort((a, b) => {
       if (a.chainI < b.chainI || (a.chainI === b.chainI && a.i[0] < b.i[0])) {
         return -1;
       }
@@ -283,19 +283,19 @@ export default class SecondaryStructureMap {
 
     for (let i = 0; i < bridges.length; ++i) {
       for (let j = i + 1; j < bridges.length; ++j) {
-        let ibi = bridges[i].i[0];
-        let iei = bridges[i].i[bridges[i].i.length - 1];
-        let jbi = bridges[i].j[0];
-        let jei = bridges[i].j[bridges[i].j.length - 1];
-        let ibj = bridges[j].i[0];
-        let iej = bridges[j].i[bridges[j].i.length - 1];
-        let jbj = bridges[j].j[0];
-        let jej = bridges[j].j[bridges[j].j.length - 1];
+        const ibi = bridges[i].i[0];
+        const iei = bridges[i].i[bridges[i].i.length - 1];
+        const jbi = bridges[i].j[0];
+        const jei = bridges[i].j[bridges[i].j.length - 1];
+        const ibj = bridges[j].i[0];
+        const iej = bridges[j].i[bridges[j].i.length - 1];
+        const jbj = bridges[j].j[0];
+        const jej = bridges[j].j[bridges[j].j.length - 1];
 
-        if (bridges[i].type !== bridges[j].type ||
-          this._hasChainBreak(Math.min(ibi, ibj), Math.max(iei, iej)) ||
-          this._hasChainBreak(Math.min(jbi, jbj), Math.max(jei, jej)) ||
-          ibj - iei >= 6 || (iei >= ibj && ibi <= iej)) {
+        if (bridges[i].type !== bridges[j].type
+          || this._hasChainBreak(Math.min(ibi, ibj), Math.max(iei, iej))
+          || this._hasChainBreak(Math.min(jbi, jbj), Math.max(jei, jej))
+          || ibj - iei >= 6 || (iei >= ibj && ibi <= iej)) {
           continue;
         }
 
@@ -319,24 +319,25 @@ export default class SecondaryStructureMap {
     }
 
     // Sheet
-    let ladderset = new Set();
+    const ladderset = new Set();
     for (let i = 0; i < bridges.length; ++i) {
       ladderset.add(bridges[i]);
     }
 
-    let sheet = 1, ladder = 0;
+    let sheet = 1;
+    let ladder = 0;
     while (ladderset.size > 0) {
       let bridge = ladderset.values().next().value;
       ladderset.delete(bridge);
 
-      let sheetset = new Set();
+      const sheetset = new Set();
       sheetset.add(bridge);
 
       let toMove;
       do {
         toMove = new Set();
-        for (let a of sheetset.values()) {
-          for (let b of ladderset.values()) {
+        for (const a of sheetset.values()) {
+          for (const b of ladderset.values()) {
             if (this._areBridgesLinked(a, b)) {
               toMove.add(b);
             }
@@ -359,12 +360,13 @@ export default class SecondaryStructureMap {
     }
 
     for (let i = 0; i < bridges.length; ++i) {
-      let bridge = bridges[i];
+      const bridge = bridges[i];
 
       // find out if any of the i and j set members already have
       // a bridge assigned, if so, we're assigning bridge 2
 
-      let betai = 0, betaj = 0;
+      let betai = 0;
+      let betaj = 0;
 
       for (let l = 0; l < bridge.i.length; ++l) {
         if (this._betaPartners[bridge.i[l]][0]) {
@@ -391,7 +393,7 @@ export default class SecondaryStructureMap {
           this._betaPartners[bridge.i[k]][betai] = {
             residue: bridge.j[j++],
             ladder: bridge.ladder,
-            parallel: true
+            parallel: true,
           };
         }
 
@@ -400,7 +402,7 @@ export default class SecondaryStructureMap {
           this._betaPartners[bridge.j[k]][betaj] = {
             residue: bridge.i[j++],
             ladder: bridge.ladder,
-            parallel: true
+            parallel: true,
           };
         }
       } else {
@@ -409,7 +411,7 @@ export default class SecondaryStructureMap {
           this._betaPartners[bridge.i[k]][betai] = {
             residue: bridge.j[j--],
             ladder: bridge.ladder,
-            parallel: false
+            parallel: false,
           };
         }
 
@@ -418,7 +420,7 @@ export default class SecondaryStructureMap {
           this._betaPartners[bridge.j[k]][betaj] = {
             residue: bridge.i[j--],
             ladder: bridge.ladder,
-            parallel: false
+            parallel: false,
           };
         }
       }
@@ -442,14 +444,14 @@ export default class SecondaryStructureMap {
   _testBridge(chainA, from, chainB, to) {
     let result = BridgeType.NO_BRIDGE;
 
-    let a = chainA[from - 1]._index;
-    let b = chainA[from]._index;
-    let c = chainA[from + 1]._index;
-    let d = chainB[to - 1]._index;
-    let e = chainB[to]._index;
-    let f = chainB[to + 1]._index;
+    const a = chainA[from - 1]._index;
+    const b = chainA[from]._index;
+    const c = chainA[from + 1]._index;
+    const d = chainB[to - 1]._index;
+    const e = chainB[to]._index;
+    const f = chainB[to + 1]._index;
 
-    let isBond = this._hbonds.isBond.bind(this._hbonds);
+    const isBond = this._hbonds.isBond.bind(this._hbonds);
     if ((isBond(c, e) && isBond(e, a)) || (isBond(f, b) && isBond(b, d))) {
       result = BridgeType.PARALLEL;
     } else if ((isBond(c, d) && isBond(f, a)) || (isBond(e, b) && isBond(b, e))) {
@@ -461,16 +463,16 @@ export default class SecondaryStructureMap {
   // return true if any of the residues in bridge a is identical to any of the residues in bridge b
   // TODO Optimize
   _areBridgesLinked(a, b) {
-    let ai = new Set(a.i);
-    let aj = new Set(a.j);
+    const ai = new Set(a.i);
+    const aj = new Set(a.j);
 
-    for (let i of b.i) {
+    for (const i of b.i) {
       if (ai.has(i) || aj.has(i)) {
         return true;
       }
     }
 
-    for (let i of b.j) {
+    for (const i of b.j) {
       if (ai.has(i) || aj.has(i)) {
         return true;
       }

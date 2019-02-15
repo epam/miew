@@ -10,7 +10,7 @@ function _createShape(rad, parts) {
   }
   return pts;
 }
-const calcChunkMatrix = gfxutils.calcChunkMatrix;
+const { calcChunkMatrix } = gfxutils;
 
 class AromaticTorusGroup extends AromaticGroup {
   _build() {
@@ -21,7 +21,7 @@ class AromaticTorusGroup extends AromaticGroup {
     const lookAtVector = new THREE.Vector3();
     const mtc = [];
     const geo = this._geo;
-    this._buildInner(radOffset, function(chunkIdx, color, points, center, upDir) {
+    this._buildInner(radOffset, (chunkIdx, color, points, center, upDir) => {
       for (let j = 0; j <= segmentsHeight; ++j) {
         const currPoint = points[j];
         const currDir = currPoint.clone().sub(center).cross(upDir);

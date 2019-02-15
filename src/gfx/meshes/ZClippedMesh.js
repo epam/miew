@@ -1,7 +1,6 @@
-
-
 import * as THREE from 'three';
 import UberObject from './UberObject';
+
 const Mesh = UberObject(THREE.Mesh);
 
 class ZClippedMesh extends Mesh {
@@ -15,7 +14,7 @@ class ZClippedMesh extends Mesh {
     Mesh.prototype._onBeforeRender.call(this, renderer, scene, camera);
 
     const geo = this.geometry;
-    const material = this.material;
+    const { material } = this;
     if (!geo.zClip || !material.uberOptions) {
       return;
     }
@@ -28,8 +27,8 @@ class ZClippedMesh extends Mesh {
 
     const center = new THREE.Vector3().copy(geo.boundingSphere.center);
     this.localToWorld(center);
-    material.uberOptions.zClipValue = camera.position.z - center.z -
-      s * (zClipCoef * geo.boundingSphere.radius);
+    material.uberOptions.zClipValue = camera.position.z - center.z
+      - s * (zClipCoef * geo.boundingSphere.radius);
   }
 }
 

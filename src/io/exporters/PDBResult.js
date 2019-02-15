@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Matrix4} from 'three';
+import { Matrix4 } from 'three';
 
 export default class PDBResult {
   constructor() {
@@ -17,13 +17,13 @@ export default class PDBResult {
   }
 
   _currentStrLength() {
-    let curStr = this._resultArray[this._currentStr];
+    const curStr = this._resultArray[this._currentStr];
     return curStr ? curStr.length : 0;
   }
 
-  //numeration can be number or boolean
-  //if numeration is number then just put this number to 8-10 pos in string
-  //if numeration is boolean then increase number for all new strings
+  // numeration can be number or boolean
+  // if numeration is number then just put this number to 8-10 pos in string
+  // if numeration is boolean then increase number for all new strings
   newTag(tag, numeration) {
     if (!tag) {
       this._tag = null;
@@ -75,7 +75,7 @@ export default class PDBResult {
     for (let j = 0; j < string.length; j++) {
       if (this._currentStrLength() === maxStrPos && j !== string.length - 1) {
         this.newString();
-        if (concat) {                         //pretty hardcoddy
+        if (concat) { // pretty hardcoddy
           this.writeString(concat.tag, concat.begin, concat.end);
         }
       }
@@ -118,28 +118,28 @@ export default class PDBResult {
       str = str.substr(0, Math.abs(begin - end + 1));
     }
 
-    //spaces before start of new data
+    // spaces before start of new data
     if (start > curStrLength + 1) {
       this._resultArray[this._currentStr] += ' '.repeat(start - curStrLength - 1);
     } else if (start <= curStrLength) {
-      let cStr = this._resultArray[this._currentStr];
+      const cStr = this._resultArray[this._currentStr];
       this._resultArray[this._currentStr] = cStr.slice(0, start - 1);
     }
 
-    //if reverse order
-    //reverse order of end and begin means that user wants to align text right
+    // if reverse order
+    // reverse order of end and begin means that user wants to align text right
     if (end < begin) {
       const len = begin - end + 1;
       str = ' '.repeat(len - str.length) + str;
     }
 
-    //some hardcode fix for space between string numeration and data
-    //(see pdb file format description)
+    // some hardcode fix for space between string numeration and data
+    // (see pdb file format description)
     if (start === 11 && this._numeration && this._tagStrNum !== 1) {
-      str = ' ' + str;
+      str = ` ${str}`;
     }
 
-    //append new data to string
+    // append new data to string
     this._resultArray[this._currentStr] += str;
     curStr = this._resultArray[this._currentStr];
 
@@ -156,8 +156,8 @@ export default class PDBResult {
       this.writeString(atom._serial, 11, 7);
 
       for (let j = 0; j < bondsArrays[k].length; j++) {
-        const serial = (bondsArrays[k][j]._left._serial === atom._serial) ?
-          bondsArrays[k][j]._right._serial : bondsArrays[k][j]._left._serial;
+        const serial = (bondsArrays[k][j]._left._serial === atom._serial)
+          ? bondsArrays[k][j]._right._serial : bondsArrays[k][j]._left._serial;
 
         this.writeString(serial, 16 + 5 * j, 12 + 5 * j);
       }
@@ -172,8 +172,8 @@ export default class PDBResult {
     return subArrays;
   }
 
-  //function for writing matrix in Remark290 and Remark350 tags
-  //(see pdb file description)
+  // function for writing matrix in Remark290 and Remark350 tags
+  // (see pdb file description)
   writeMatrix(matrix, matrixIndx, tag) {
     for (let j = 0; j < 3; j++) {
       this.newString();
