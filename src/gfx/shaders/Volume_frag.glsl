@@ -17,6 +17,10 @@ uniform sampler2D _WFFRight;
 
 varying vec4 screenSpacePos;
 
+/**
+  texCoord - cube coordinat
+  */
+
 vec4 sample3DTexture(vec3 texCoord)
 {
   float rowTiles = floor(tileTexSize.x / tileStride.x);
@@ -70,15 +74,15 @@ vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
 
 vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count)
 {
-  float vol, stepSize = (0.5*float(count) + 1.) / 85.;
+  float vol, stepSize = (0.5*float(count) + 1.) / 85. / 4.;
   //    		float vol, stepSize = (0.5*count + 1.) / 64.;// 128.;
-  vec3 step = stepSize*dir, iterator = start, left, right;
+  vec3 step = stepSize * dir, iterator = start, left, right;
   vec4 acc = vec4(0., 0., 0., 0.);
-    for (int i=0; i < 200; i++)
+    for (int i=0; i < 200 * 4; i++)
     {
       iterator = iterator + step;
       vol = sample3DTexture(iterator).r;
-      if (length(iterator - back) < stepSize || vol > tr)
+      if (length(iterator - back) < stepSize ||  vol >  tr)
         break;
     }
     if (vol > tr)
@@ -102,7 +106,8 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
 
 vec3 GetColSimple(float vol)
 {
-  return vol * vec3(1, 1, 1);
+  return vol * vec3(1, 1, 0);
+  //return mix(vec3(0.5, 0.5, 0), vec3(0, 0.5, 0), vol);
 }
 
 vec3 CorrectIso(vec3 left, vec3 right, float tr)
@@ -125,27 +130,27 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   vec3 iterator = start, sumColor = vec3(0., 0., 0.);
   //				float stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;
   float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;
-  vec3 step = stepSize*dir, col, colOld, right;
+  vec3 step = stepSize * dir, col, colOld, right;
   float tr0 = _isoLevel0;
   float dif, r, kd, finish;
   int count = 0, stopMol = 0;
-  kd = 140. * tr0 * stepSize;
-  r = 1. - kd;
+  kd = 140. * tr0 * stepSize; // !**!
+  r = 1. - kd;// !**!
 
-  for (int k = 0; k < 3; k++)
+  for (int k = 0; k < 1; k++)
   {
-    stepSize = (0.5 * float(k) + 1.) / 85.;
-    kd = 140. * tr0 * stepSize;
-    r = 1. - kd;
+    stepSize = (0.5 * float(k) + 1.) / 85.;// !**! Should it be equal to stepSize in GetIso1?
+    kd = 140. * tr0 * stepSize; // !**!
+    r = 1. - kd; // !**! very strange theme
     step = stepSize * dir;
     iso = GetIso1(iterator, back, molDist, dir, tr0, k);
     if (iso.a < 0.1 || length(iso.rgb - start) > molDist)
       break;
     iterator = iso.rgb;
-    dif = 1.;// CalcColor(iterator, dir);
+    dif = 1.;// CalcColor(iterator, dir); // interesting...
     colOld = GetColSimple(tr0);
     curStepSize = stepSize;
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < 200; i++) // 200 - Should it be correlated with the same numvers in GetIso1 ?
     {
       iterator = iterator + step;
       molD = length(iterator - start);
@@ -153,11 +158,11 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       finish = distance(iterator, back) - stepSize;
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
-      alpha = (1. - r);
+      alpha = (1. - r);// !**!
       col = GetColSimple(vol);
       vol = sample3DTexture(iterator - 0.5*step).r;
       vec3 colMid = GetColSimple(vol);
-      sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
+      sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.; // not (1. - sumColor) ????
       sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
       colOld = col;
     } // for i
@@ -181,7 +186,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     col = GetColSimple(vol);
     vol = sample3DTexture(iterator - 0.5 * curStepSize / stepSize * step).r;
     vec3 colMid = GetColSimple(vol);
-    sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;
+    sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;// not (1. - sumColor) ????
     sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
     if (molD > molDist)
       break;
@@ -212,12 +217,12 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
 
 vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)
 {
-  vec4 tst = GetIso1(start, back, 2., dir, 0.28, 0);
+  vec4 tst = GetIso1(start, back, 2., dir, _isoLevel0, 0);
   vec4 col = vec4(0, 0., 0., 0.);
   if (tst.a > 0.1)
   {
    float dif = CalcColor(tst.rgb, dir);
-   col = vec4(dif, 0., 0., 1.);
+   col = vec4(dif, dif, 0., 1.0);
   }
   return col;
 }
