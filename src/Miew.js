@@ -1096,8 +1096,9 @@ Miew.prototype._renderScene = (function () {
 
     const bHaveComplexes = (this._getComplexVisual() !== null);
     const volumeVisual = this._getVolumeVisual();
+    const ssao = bHaveComplexes && settings.now.ao;
 
-    if (bHaveComplexes && settings.now.ao) {
+    if (ssao) {
       this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
@@ -1112,10 +1113,10 @@ Miew.prototype._renderScene = (function () {
     const outline = bHaveComplexes && settings.now.outline.on;
     const fxaa = bHaveComplexes && settings.now.fxaa;
     const volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
-    let dstBuffer = (outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
+    let dstBuffer = (ssao || outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     let srcBuffer = gfx.offscreenBuf;
 
-    if (bHaveComplexes && settings.now.ao) {
+    if (ssao) {
       this._performAO(
         srcBuffer,
         gfx.offscreenBuf4,
@@ -1124,6 +1125,9 @@ Miew.prototype._renderScene = (function () {
         gfx.offscreenBuf3,
         gfx.offscreenBuf2,
       );
+      if (!fxaa && !distortion && !volume && !outline) {
+        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, target);
+      }
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
