@@ -154,7 +154,7 @@
     "rollup-plugin-commonjs": "^9.1.4",
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-string": "^2.0.2",
+    "rollup-plugin-string": "^3.0.0",
     "script-ext-html-webpack-plugin": "^2.1.2",
     "selenium-webdriver": "^4.0.0-alpha.1",
     "sinon": "^7.2.3",
