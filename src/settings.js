@@ -437,6 +437,8 @@ const defaults = {
      */
     VD: {
       kSigma: 1.0,
+      kSigmaMed: 2.0,
+      kSigmaMax: 4.0,
     },
   },
 
