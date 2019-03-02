@@ -186,7 +186,27 @@ varying vec3 vViewPosition;
   }
 #endif
 
-/////////////////////////////////////////// Lighting ////////////////////////////////////////////////
+///////////////////////////////////// Pack and unpack ///////////////////////////////////////////////
+const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
+const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
+
+const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
+
+
+const float ShiftRight8 = 1. / 256.;
+
+vec4 packDepthToRGBA( const in float v ) {
+  vec4 r = vec4( fract( v * PackFactors ), v );
+  r.yzw -= r.xyz * ShiftRight8; // tidy overflow
+  return r * PackUpscale;
+}
+
+float unpackRGBAToDepth( const in vec4 v ) {
+  return dot( v, UnpackFactors );
+}
+
+////////////////////////////////////////// All Lighting /////////////////////////////////////////////////
 #ifdef TOON_SHADING
   #define LOW_TOON_BORDER 0.0
   #define MEDIUM_TOON_BORDER 0.7
@@ -226,6 +246,97 @@ varying vec3 vViewPosition;
   uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
   uniform vec3 ambientLightColor;
 
+  /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
+
+  #if defined(SHADOWMAP)
+  	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
+  		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
+  	}
+
+    float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) {
+  		const vec2 offset = vec2( 0.0, 1.0 );
+
+  		vec2 texelSize = vec2( 1.0 ) / size;
+  		vec2 centroidUV = floor( uv * size + 0.5 ) / size;
+
+  		float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );
+  		float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );
+  		float rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );
+  		float rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );
+
+  		vec2 f = fract( uv * size + 0.5 );
+
+  		float a = mix( lb, lt, f.y );
+  		float b = mix( rb, rt, f.y );
+  		float c = mix( a, b, f.x );
+
+  		return c;
+  	}
+
+    float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+   	  float shadow = 1.0;
+
+  		shadowCoord.xyz /= shadowCoord.w;
+  		shadowCoord.z += shadowBias;
+
+  		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
+  		bool inFrustum = all( inFrustumVec );
+  		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
+  		bool frustumTest = all( frustumTestVec );
+
+  		if ( frustumTest ) {
+        #ifdef SHADOWMAP_BASIC
+  			  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
+  			#endif
+
+  			#ifdef SHADOWMAP_PCF_SHARP
+  			  vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+
+            float dx0 = - texelSize.x * shadowRadius;
+            float dy0 = - texelSize.y * shadowRadius;
+            float dx1 = + texelSize.x * shadowRadius;
+            float dy1 = + texelSize.y * shadowRadius;
+
+            shadow = (
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+            ) * ( 1.0 / 9.0 );
+        #endif
+
+        #ifdef SHADOWMAP_PCF_SOFT
+          vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+
+          float dx0 = - texelSize.x * shadowRadius;
+          float dy0 = - texelSize.y * shadowRadius;
+          float dx1 = + texelSize.x * shadowRadius;
+          float dy1 = + texelSize.y * shadowRadius;
+
+          shadow = (
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+          ) * ( 1.0 / 9.0 );
+        #endif
+  		}
+  		return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);
+  	}
+  #endif
+
+  /////////////////////////////////////////// Lighting /////////////////////////////////////////////////
+
   vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
     return RECIPROCAL_PI * diffuseColor;
   } // validated
@@ -259,7 +370,7 @@ varying vec3 vViewPosition;
     return F * ( G * D );
   } // validated
 
-  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight, float penumbra ) {
 
     float dotNL = saturate( dot( geometry.normal, directLight.direction ));
     #ifdef TOON_SHADING
@@ -275,8 +386,8 @@ varying vec3 vViewPosition;
     #endif
 
     vec3 irradiance = dotNL * directLight.color * PI;
-    reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
-    reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );
+    reflectedLight.directDiffuse += penumbra * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+    reflectedLight.directSpecular += penumbra * irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );
   }
 
   void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
@@ -287,149 +398,37 @@ varying vec3 vViewPosition;
     ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));
     vec3 irradiance = ambientLightColor * PI;
 
+    float shadowMask = 1.0;
     // use loop for number
     #if NUM_DIR_LIGHTS > 1
       for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-        RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight);
+        #if defined(SHADOWMAP)
+          if(directionalLights[i].shadow > 0) {
+            shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ].shadowMapSize, directionalLights[ i ].shadowBias, directionalLights[ i ].shadowRadius, vDirectionalShadowCoord[ i ] );
+          }
+        #endif
+        if(shadowMask > 0.0) {
+          RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight, shadowMask);
+        }
     #else
-        RE_Direct_BlinnPhong(directionalLights[0], geometry, material, reflectedLight);
+        #if defined(SHADOWMAP)
+          if(directionalLights[0].shadow > 0) {
+            shadowMask = getShadow( directionalShadowMap[ 0 ], directionalLights[ 0 ].shadowMapSize, directionalLights[ 0 ].shadowBias, directionalLights[ 0 ].shadowRadius, vDirectionalShadowCoord[ 0 ] );
+          }
+        #endif
+        if(shadowMask > 0.0) {
+          RE_Direct_BlinnPhong(directionalLights[0], geometry, material, reflectedLight, shadowMask);
+        }
     #endif
-
-        RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
 
     #if NUM_DIR_LIGHTS > 1
       }
     #endif
 
-/*
-    #pragma unroll_loop
-    for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-      RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight);
-      RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
-    }*/
+    RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
 
-    return reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;
+    return saturate(reflectedLight.indirectDiffuse + reflectedLight.directDiffuse + reflectedLight.directSpecular);
   }
-#endif
-
-/////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
-const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
-const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
-
-const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
-const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
-
-
-const float ShiftRight8 = 1. / 256.;
-
-vec4 packDepthToRGBA( const in float v ) {
-  vec4 r = vec4( fract( v * PackFactors ), v );
-  r.yzw -= r.xyz * ShiftRight8; // tidy overflow
-  return r * PackUpscale;
-}
-
-float unpackRGBAToDepth( const in vec4 v ) {
-  return dot( v, UnpackFactors );
-}
-
-#if defined(USE_LIGHTS) && defined(SHADOWMAP)
-	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
-		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
-	}
-
-  float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) {
-		const vec2 offset = vec2( 0.0, 1.0 );
-
-		vec2 texelSize = vec2( 1.0 ) / size;
-		vec2 centroidUV = floor( uv * size + 0.5 ) / size;
-
-		float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );
-		float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );
-		float rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );
-		float rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );
-
-		vec2 f = fract( uv * size + 0.5 );
-
-		float a = mix( lb, lt, f.y );
-		float b = mix( rb, rt, f.y );
-		float c = mix( a, b, f.x );
-
-		return c;
-	}
-
-  float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
- 	  float shadow = 1.0;
-
-		shadowCoord.xyz /= shadowCoord.w;
-		shadowCoord.z += shadowBias;
-
-		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
-		bool inFrustum = all( inFrustumVec );
-		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
-		bool frustumTest = all( frustumTestVec );
-
-		if ( frustumTest ) {
-      #ifdef SHADOWMAP_BASIC
-			  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
-			#endif
-
-			#ifdef SHADOWMAP_PCF_SHARP
-			  vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
-
-          float dx0 = - texelSize.x * shadowRadius;
-          float dy0 = - texelSize.y * shadowRadius;
-          float dx1 = + texelSize.x * shadowRadius;
-          float dy1 = + texelSize.y * shadowRadius;
-
-          shadow = (
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
-          ) * ( 1.0 / 9.0 );
-      #endif
-
-      #ifdef SHADOWMAP_PCF_SOFT
-        vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
-
-        float dx0 = - texelSize.x * shadowRadius;
-        float dy0 = - texelSize.y * shadowRadius;
-        float dx1 = + texelSize.x * shadowRadius;
-        float dy1 = + texelSize.y * shadowRadius;
-
-        shadow = (
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
-        	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
-        ) * ( 1.0 / 9.0 );
-      #endif
-		}
-		return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);
-	}
-
-	float getShadowMask() {
-  	float shadow = 1.0;
-  	#if NUM_DIR_LIGHTS > 0
-  	  DirectionalLight directionalLight;
-  	#pragma unroll_loop
-  	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-  		  directionalLight = directionalLights[ i ];
-  		  shadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
-  		}
-    #endif
-  	return shadow;
-    }
 #endif
 
 /////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////
@@ -620,10 +619,6 @@ void main() {
       fragColor = vec4(fixedColor, diffuseColor.a);
     #else
       fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);
-    #endif
-
-    #if defined(USE_LIGHTS) && defined(SHADOWMAP)
-        fragColor.rgb *= getShadowMask();
     #endif
 
     #ifdef USE_FOG
