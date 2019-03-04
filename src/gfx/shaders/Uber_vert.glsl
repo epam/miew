@@ -27,6 +27,7 @@ varying vec3 vViewPosition;
 	#if NUM_DIR_LIGHTS > 0
 		uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
+		varying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
 	#endif
 #endif
 
@@ -218,12 +219,19 @@ void main() {
 
 #if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	#if NUM_DIR_LIGHTS > 0
-	vec4 worldPosition;
-	#pragma unroll_loop
-	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-	  worldPosition = vec4(vWorldPosition, 1.0);
-		vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;
-	}
+	  vec4 worldPosition;
+	  #pragma unroll_loop
+	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+	    #ifdef NORMAL_OFFSET_BIAS
+        vec4 worldNormal = modelMatrix * vec4(objectNormal, 0.0);
+        float bias = 0.09; // smaller bias -> more self-shadowing
+        worldPosition = vec4(vWorldPosition + bias * worldNormal.xyz, 1.0);
+      #else
+        worldPosition = vec4(vWorldPosition, 1.0);
+      #endif
+      vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;
+      vDirectionalShadowNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(objectNormal, 0.0))).xyz;
+	  }
 	#endif
 #endif
 

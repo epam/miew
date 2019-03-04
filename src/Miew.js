@@ -425,7 +425,7 @@ Miew.prototype._initGfx = function () {
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light12.castShadow = true;
   light12.shadow = new THREE.DirectionalLightShadow();
-  light12.shadow.bias = -0.0005;
+  light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
   const shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
   light12.shadow.mapSize.width = shadowMapSize;
@@ -3432,7 +3432,7 @@ Miew.prototype._updateShadow = function (radius) {
     if (this._gfx.scene.children[i].shadow !== undefined) {
       const light = this._gfx.scene.children[i];
 
-      light.shadow.bias = -0.0005 * radius;
+      light.shadow.bias = 0.09 * radius;
 
       light.shadow.camera.bottom = -radius;
       light.shadow.camera.top = radius;
