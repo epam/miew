@@ -16,16 +16,24 @@
       background-color: #222;
     }
 
-    #fs {
+    .btn {
       position: absolute;
-      right: 8px;
-      bottom: 8px;
       width: 44px;
       height: 44px;
       background-color: #aaa;
       color: #222;
       border: 1px solid #222;
       padding: 5px;
+    }
+
+    #fs {
+      right: 8px;
+      bottom: 8px;
+    }
+
+    #app {
+      left: 8px;
+      bottom: 8px;
     }
   </style>
 
@@ -34,7 +42,8 @@
 </head>
 <body>
   <div id="miew-container"></div>
-  <button id="fs"><img src="data:image/gif;base64,R0lGODlhIAAgAIABAAAAAP///yH5BAEKAAEALAAAAAAgACAAAAJdjI+py+0PIwO01mmtynrxm3yAI24feYaltyIiZbbHC7tvnKr5PAZZ06kBhRjJzIhMKpfMpvO5JBZRhg6mJvXJbLvqTdfVbsXhL+4HtrI4Z9AVzWWv5XF4Wg3N65kFADs=" alt="FS" width="32" height="32" /></button>
+  <button id="fs" class="btn"><img src="data:image/gif;base64,R0lGODlhIAAgAIABAAAAAP///yH5BAEKAAEALAAAAAAgACAAAAJdjI+py+0PIwO01mmtynrxm3yAI24feYaltyIiZbbHC7tvnKr5PAZZ06kBhRjJzIhMKpfMpvO5JBZRhg6mJvXJbLvqTdfVbsXhL+4HtrI4Z9AVzWWv5XF4Wg3N65kFADs=" alt="FS" width="32" height="32" /></button>
+  <button id="app" class="btn"><b>APP</b></button>
 
   <script>
     function fullscreen(e) {
@@ -59,6 +68,14 @@
       }
       document.getElementById('fs').addEventListener('click', function() {
         fullscreen(document.getElementById('miew-container'));
+      });
+      document.getElementById('app').addEventListener('click', function() {
+        var pathname = window.location.pathname;
+        var slash = pathname.lastIndexOf('/');
+        slash = pathname.lastIndexOf('/', slash - 1);
+        if (slash >= 0) {
+          window.location.pathname = pathname.slice(0, slash);
+        }
       });
     })();
   </script>
