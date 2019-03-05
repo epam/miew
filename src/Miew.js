@@ -1615,13 +1615,13 @@ function resolveSourceShortcut(source, opts) {
 
     switch (format) {
       case 'pdb':
-        source = `http://files.rcsb.org/download/${id}.pdb`;
+        source = `https://files.rcsb.org/download/${id}.pdb`;
         break;
       case 'cif':
-        source = `http://files.rcsb.org/download/${id}.cif`;
+        source = `https://files.rcsb.org/download/${id}.cif`;
         break;
       case 'mmtf':
-        source = `http://mmtf.rcsb.org/v1.0/full/${id}`;
+        source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
         break;
       case 'ccp4':
         source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
