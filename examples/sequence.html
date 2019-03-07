@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sequence</title>
+
+  <link rel="stylesheet" href="../dist/Miew.min.css">
+  <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
+  <script src="../dist/Miew.min.js"></script>
+</head>
+<body>
+  <div>
+  <div class="miew-container" style="width:640px; height:480px; float:left;"></div>
+  <div id="chains" style="padding:30px; margin-left:640px;"></div>
+
+  <script>
+
+    (function() {
+      var viewer = new Miew({
+        container: document.getElementsByClassName('miew-container')[0],
+        load: '1CRN',
+      });
+
+      if (viewer.init()) {
+        viewer.run();
+      }
+
+      viewer.addEventListener('onParseDone', function() {
+        viewer._forEachComplexVisual((visual) => {
+          const complex = visual.getComplex();
+          const chains = complex.getChainNames();
+          const div = document.getElementById('chains');
+          for (let i = 0; i < chains.length; ++i) {
+            const elem = document.createElement('p');
+            elem.style = 'font-weight: bold;';
+            fillChainElement(elem, complex.getChain(chains[i]));
+            div.appendChild(elem);
+          }
+        });
+      });
+
+      function fillChainElement(elem, chain) {
+        // store chain name
+        const chainName = chain.getName();
+        elem.textContent = `chain ${chainName} `;
+        // create div
+        const resDiv = document.createElement('div');
+        // create nested set of residue names
+        chain.forEachResidue((res) => {
+          const resType = res.getType();
+          // skip water
+          if (resType.flags & Miew.chem.ResidueType.Flags.WATER) return;
+          // create residue a-element
+          const resElem = document.createElement('a');
+          resElem.textContent = resType._name;
+          resElem.style = 'font-weight: normal;';
+          resElem.href = '#';
+          // make selection when click
+          const iCode = res.getICode() != ' ' ? `${res.getICode()}` : `\' \'`;
+          const selectorStr = `chain ${chainName} AND sequence ${res.getSequence()} AND icode ${iCode}`;
+          resElem.setAttribute('data-select', selectorStr);
+          resElem.addEventListener('click', (obj) => {
+            viewer.select(obj.currentTarget.getAttribute('data-select'), false);
+          });
+          resDiv.append(resElem);
+          // create space element to prevent one-lining
+          const space = document.createElement('span');
+          space.style = 'white-space: pre-wrap';
+          space.textContent = ' ';
+          resDiv.append(space);
+        });
+        elem.appendChild(resDiv);
+      }
+    })();
+  </script>
+  </div>
+</body>
+</html>
