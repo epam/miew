@@ -5,6 +5,33 @@ import vertexShader from './Uber_vert.glsl';
 import fragmentShader from './Uber_frag.glsl';
 import capabilities from '../capabilities';
 
+const _samplesKernel = [
+  new THREE.Vector2(-0.541978, 0.840393),
+  new THREE.Vector2(0.125533, -0.992089),
+  new THREE.Vector2(0.374329, 0.927296),
+  new THREE.Vector2(-0.105475, 0.994422),
+];
+
+const _noiseWidth = 4;
+const _noiseHeight = 4;
+const _noiseData = new Uint8Array([
+  24, 52, 0, 254, 145, 0, 122, 0, 0, 7, 170, 0,
+  34, 214, 0, 173, 8, 0, 86, 249, 0, 160, 4, 0,
+  226, 46, 0, 224, 211, 0, 3, 157, 0, 174, 247, 0,
+  12, 182, 0, 220, 216, 0, 1, 109, 0, 253, 154, 0,
+]);
+
+const _noiseWrapS = THREE.RepeatWrapping;
+const _noiseWrapT = THREE.RepeatWrapping;
+const _noiseMinFilter = THREE.NearestFilter;
+const _noiseMagFilter = THREE.NearestFilter;
+const _noiseMapping = THREE.UVMapping;
+const _noiseTexture = new THREE.DataTexture(
+  _noiseData, _noiseWidth, _noiseHeight, THREE.RGBFormat,
+  THREE.UnsignedByteType, _noiseMapping, _noiseWrapS, _noiseWrapT, _noiseMagFilter, _noiseMinFilter, 1,
+);
+_noiseTexture.needsUpdate = true;
+
 //  var INSTANCED_SPRITE_OVERSCALE = 1.3;
 
 const defaultUniforms = THREE.UniformsUtils.merge([
@@ -29,6 +56,10 @@ const defaultUniforms = THREE.UniformsUtils.merge([
     lineWidth: { type: 'f', value: 2.0 },
     // default value must be the same as settings
     fogAlpha: { type: 'f', value: 1.0 },
+    samplesKernel: { type: 'v2v', value: null },
+    noiseTex: { type: 't', value: null },
+    noiseTexelSize: { type: 'v2', value: null },
+    srcTexelSize: { type: 'v2', value: null },
   },
 
 ]);
@@ -50,6 +81,10 @@ const uberOptionNames = [
   'viewport',
   'lineWidth',
   'fogAlpha',
+  'samplesKernel',
+  'noiseTex',
+  'noiseTexelSize',
+  'srcTexelSize',
 ];
 
 function UberMaterial(params) {
@@ -84,7 +119,7 @@ function UberMaterial(params) {
   // used to render shadowmap
   this.shadowmap = false;
   // used to describe shadowmap type
-  this.shadowmapType = 'pcf';
+  this.shadowmapType = 'random';
   // used to render pixel view deph
   this.colorFromDepth = false;
   // used to render dashed line
@@ -144,6 +179,10 @@ UberMaterial.prototype.uberOptions = {
   viewport: new THREE.Vector2(800, 600),
   lineWidth: 2.0,
   fogAlpha: 1.0,
+  samplesKernel: _samplesKernel,
+  noiseTex: _noiseTexture,
+  noiseTexelSize: new THREE.Vector2(1.0 / _noiseWidth, 1.0 / _noiseHeight),
+  srcTexelSize: new THREE.Vector2(1.0 / 800.0, 1.0 / 600.0),
 
   copy(source) {
     this.diffuse.copy(source.diffuse);
@@ -163,6 +202,10 @@ UberMaterial.prototype.uberOptions = {
     this.lineWidth = source.lineWidth; // used for thick lines only
     this.toonShading = source.toonShading;
     this.fogAlpha = source.fogAlpha;
+    this.samplesKernel = source.samplesKernel;
+    this.noiseTex = source.noiseTex;
+    this.noiseTexelSize = source.noiseTexelSize;
+    this.srcTexelSize = source.srcTexelSize;
   },
 };
 
@@ -264,10 +307,10 @@ UberMaterial.prototype.setValues = function (values) {
   }
   if (this.shadowmap) {
     defines.SHADOWMAP = 1;
-    if (this.shadowmapType === 'pcf4') {
-      defines.SHADOWMAP_PCF_SOFT = 1;
-    } else if (this.shadowmapType === 'pcf') {
+    if (this.shadowmapType === 'pcf') {
       defines.SHADOWMAP_PCF_SHARP = 1;
+    } else if (this.shadowmapType === 'random') {
+      defines.SHADOWMAP_PCF_RAND = 1;
     } else {
       defines.SHADOWMAP_BASIC = 1;
     }
