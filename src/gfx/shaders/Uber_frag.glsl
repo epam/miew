@@ -273,11 +273,11 @@ float unpackRGBAToDepth( const in vec4 v ) {
   		return c;
   	}
 
-    float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+    float getShadow( sampler2D shadowMap, DirectionalLight dirLight, vec4 shadowCoord ) {
    	  float shadow = 1.0;
 
   		shadowCoord.xyz /= shadowCoord.w;
-  		shadowCoord.z += shadowBias;
+  		shadowCoord.z += dirLight.shadowBias;
 
   		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
   		bool inFrustum = all( inFrustumVec );
@@ -290,12 +290,12 @@ float unpackRGBAToDepth( const in vec4 v ) {
   			#endif
 
   			#ifdef SHADOWMAP_PCF_SHARP
-  			  vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+  			  vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;
 
-            float dx0 = - texelSize.x * shadowRadius;
-            float dy0 = - texelSize.y * shadowRadius;
-            float dx1 = + texelSize.x * shadowRadius;
-            float dy1 = + texelSize.y * shadowRadius;
+            float dx0 = - texelSize.x * dirLight.shadowRadius;
+            float dy0 = - texelSize.y * dirLight.shadowRadius;
+            float dx1 = + texelSize.x * dirLight.shadowRadius;
+            float dy1 = + texelSize.y * dirLight.shadowRadius;
 
             shadow = (
             	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
@@ -311,23 +311,23 @@ float unpackRGBAToDepth( const in vec4 v ) {
         #endif
 
         #ifdef SHADOWMAP_PCF_SOFT
-          vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+          vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;
 
-          float dx0 = - texelSize.x * shadowRadius;
-          float dy0 = - texelSize.y * shadowRadius;
-          float dx1 = + texelSize.x * shadowRadius;
-          float dy1 = + texelSize.y * shadowRadius;
+          float dx0 = - texelSize.x * dirLight.shadowRadius;
+          float dy0 = - texelSize.y * dirLight.shadowRadius;
+          float dx1 = + texelSize.x * dirLight.shadowRadius;
+          float dy1 = + texelSize.y * dirLight.shadowRadius;
 
           shadow = (
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
-          	texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy, shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+          	texture2DShadowLerp( shadowMap, dirLight.shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
           ) * ( 1.0 / 9.0 );
         #endif
   		}
@@ -404,7 +404,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
       for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
         #if defined(SHADOWMAP)
           if(directionalLights[i].shadow > 0) {
-            shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ].shadowMapSize, directionalLights[ i ].shadowBias, directionalLights[ i ].shadowRadius, vDirectionalShadowCoord[ i ] );
+            shadowMask = getShadow( directionalShadowMap[i], directionalLights[i], vDirectionalShadowCoord[i] );
           }
         #endif
         if(shadowMask > 0.0) {
@@ -413,7 +413,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
     #else
         #if defined(SHADOWMAP)
           if(directionalLights[0].shadow > 0) {
-            shadowMask = getShadow( directionalShadowMap[ 0 ], directionalLights[ 0 ].shadowMapSize, directionalLights[ 0 ].shadowBias, directionalLights[ 0 ].shadowRadius, vDirectionalShadowCoord[ 0 ] );
+            shadowMask = getShadow( directionalShadowMap[0], directionalLights[0], vDirectionalShadowCoord[0] );
           }
         #endif
         if(shadowMask > 0.0) {
