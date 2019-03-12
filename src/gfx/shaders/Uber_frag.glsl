@@ -16,6 +16,7 @@
 	#if NUM_DIR_LIGHTS > 0
 		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
+		varying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
 	#endif
 #endif
 
@@ -357,11 +358,11 @@ float unpackRGBAToDepth( const in vec4 v ) {
 		return c;
 	}
 
-  float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+  float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, vec3 vNormal ) {
  	  float shadow = 1.0;
 
-		shadowCoord.xyz /= shadowCoord.w;
-		shadowCoord.z += shadowBias;
+    shadowCoord.xyz += shadowBias * vNormal;
+    shadowCoord.xyz /= shadowCoord.w;
 
 		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
 		bool inFrustum = all( inFrustumVec );
@@ -425,7 +426,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
   	#pragma unroll_loop
   	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
   		  directionalLight = directionalLights[ i ];
-  		  shadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+  		  shadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ], vDirectionalShadowNormal[ i ] ) : 1.0;
   		}
     #endif
   	return shadow;
@@ -623,7 +624,7 @@ void main() {
     #endif
 
     #if defined(USE_LIGHTS) && defined(SHADOWMAP)
-        fragColor.rgb *= getShadowMask();
+      fragColor.rgb *= getShadowMask();
     #endif
 
     #ifdef USE_FOG
