@@ -399,31 +399,14 @@ float unpackRGBAToDepth( const in vec4 v ) {
     vec3 irradiance = ambientLightColor * PI;
 
     float shadowMask = 1.0;
-    // use loop for number
-    #if NUM_DIR_LIGHTS > 1
-      for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-        #if defined(SHADOWMAP)
-          if(directionalLights[i].shadow > 0) {
-            shadowMask = getShadow( directionalShadowMap[i], directionalLights[i], vDirectionalShadowCoord[i] );
-          }
-        #endif
-        if(shadowMask > 0.0) {
-          RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight, shadowMask);
-        }
-    #else
-        #if defined(SHADOWMAP)
-          if(directionalLights[0].shadow > 0) {
-            shadowMask = getShadow( directionalShadowMap[0], directionalLights[0], vDirectionalShadowCoord[0] );
-          }
-        #endif
-        if(shadowMask > 0.0) {
-          RE_Direct_BlinnPhong(directionalLights[0], geometry, material, reflectedLight, shadowMask);
-        }
-    #endif
+  	#pragma unroll_loop
+  	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+  	    #ifdef SHADOWMAP
+  	    if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ] );
+  	    #endif
 
-    #if NUM_DIR_LIGHTS > 1
-      }
-    #endif
+  		  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );
+  		}
 
     RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
 
