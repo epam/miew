@@ -222,14 +222,7 @@ void main() {
 	  vec4 worldPosition;
 	  #pragma unroll_loop
 	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-	    #ifdef NORMAL_OFFSET_BIAS
-        vec4 worldNormal = modelMatrix * vec4(objectNormal, 0.0);
-        float bias = 0.09; // smaller bias -> more self-shadowing
-        worldPosition = vec4(vWorldPosition + bias * worldNormal.xyz, 1.0);
-      #else
-        worldPosition = vec4(vWorldPosition, 1.0);
-      #endif
-      vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * worldPosition;
+      vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * vec4(vWorldPosition, 1.0);
       vDirectionalShadowNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(objectNormal, 0.0))).xyz;
 	  }
 	#endif
