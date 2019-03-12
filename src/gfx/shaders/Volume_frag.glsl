@@ -6,6 +6,9 @@ uniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data
 uniform vec2 tileTexSize;  // size of tiled texture, pixels
 uniform vec2 tileStride;   // UV stride between slices in tile tex, pixels
 
+uniform vec3 boxSize;
+uniform vec3 boxAngles;
+
 uniform float _isoLevel0;
 uniform float _flipV;
 uniform sampler2D _BFLeft;
@@ -17,18 +20,70 @@ uniform sampler2D _WFFRight;
 
 varying vec4 screenSpacePos;
 
-/**
-  texCoord - cube coordinat
-  */
+const float PI = 3.1415926535898;
 
 vec4 sample3DTexture(vec3 texCoord)
 {
-  float rowTiles = floor(tileTexSize.x / tileStride.x);
+  const float E = 0.0000001;
+
+ /* if (abs(boxAngles.z - PI / 2.) < E)
+    return vec4(0., 0., 0., 0.);*/
+    // Case 1! Summ on X coordinate
+    /*
+  if((PI / 2. - boxAngles.z) * (PI / 2. - boxAngles.y) >=0 ) {
+
+  } else {  //Case 2! Maximum of Summ on X coordinate
+
+  }
+  */
+
+  float deltaXYM =  boxSize.y / boxSize.x / abs(tan(boxAngles.z));
+
+  float deltaXY = (1. - texCoord.y) * deltaXYM; //  if (boxAngles.y - PI /.2 > E)
+  if (PI / 2. - boxAngles.z > E) {
+    deltaXY = texCoord.y * deltaXYM;
+  }
+  if (deltaXY > texCoord.x  || texCoord.x > 1. - deltaXYM + deltaXY)
+       return vec4(0., 0., 0., 0.);
+
+  texCoord.x = (texCoord.x   - deltaXY) / (1. - deltaXYM);
+
+/*
+  float deltaXM =  boxSize.z / boxSize.x / abs(tan(boxAngles.y));
+
+  float deltaX = (1. - texCoord.z) * deltaXM; //  if (boxAngles.y - PI /.2 > E)
+  if (PI / 2. - boxAngles.y > E) {
+    deltaX = texCoord.z * deltaXM;
+  }
+  if (deltaX > texCoord.x  || texCoord.x > 1. - deltaXM + deltaX)
+       return vec4(0., 0., 0., 0.);
+
+  texCoord.x = (texCoord.x   - deltaX) / (1. - deltaXM);
+
+*/
+
+
+
+
+  float deltaZM =  boxSize.z / boxSize.y / abs(tan(boxAngles.x));
+
+  float deltaZ = (1. - texCoord.z) * deltaZM;
+  if (PI / 2. - boxAngles.x > E) {
+    deltaZ = texCoord.z * deltaZM;
+  }
+
+  if (deltaZ > texCoord.y  || texCoord.y > 1. - deltaZM + deltaZ)
+    return vec4(0., 0., 0., 0.);
+
+  texCoord.y = (texCoord.y   - deltaZ) / (1. - deltaZM);
+
 
   // a pair of Z slices is determined by nearest slice border
   float zSliceBorder = floor(texCoord.z * volumeDim.z + 0.5);
   float zSliceNumber1 = max(zSliceBorder - 1.0, 0.0);
   float zSliceNumber2 = min(zSliceBorder, volumeDim.z - 1.0);
+
+  float rowTiles = floor(tileTexSize.x / tileStride.x);
 
   // calculate coords in tile texture for both slices
   vec2 tileOffset = vec2(mod(zSliceNumber1, rowTiles), floor(zSliceNumber1 / rowTiles));
@@ -74,15 +129,15 @@ vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
 
 vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count)
 {
-  float vol, stepSize = (0.5*float(count) + 1.) / 85. / 4.;
+  float vol, stepSize = (0.5*float(count) + 1.) / 85.;
   //    		float vol, stepSize = (0.5*count + 1.) / 64.;// 128.;
-  vec3 step = stepSize * dir, iterator = start, left, right;
+  vec3 step = stepSize*dir, iterator = start, left, right;
   vec4 acc = vec4(0., 0., 0., 0.);
-    for (int i=0; i < 200 * 4; i++)
+    for (int i=0; i < 200; i++)
     {
       iterator = iterator + step;
       vol = sample3DTexture(iterator).r;
-      if (length(iterator - back) < stepSize ||  vol >  tr)
+      if (length(iterator - back) < stepSize || vol > tr)
         break;
     }
     if (vol > tr)
@@ -106,8 +161,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
 
 vec3 GetColSimple(float vol)
 {
-  return vol * vec3(1, 1, 0);
-  //return mix(vec3(0.5, 0.5, 0), vec3(0, 0.5, 0), vol);
+  return vol * (0.3 + vec3(1, 1, 0));
 }
 
 vec3 CorrectIso(vec3 left, vec3 right, float tr)
@@ -130,27 +184,27 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   vec3 iterator = start, sumColor = vec3(0., 0., 0.);
   //				float stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;
   float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;
-  vec3 step = stepSize * dir, col, colOld, right;
+  vec3 step = stepSize*dir, col, colOld, right;
   float tr0 = _isoLevel0;
   float dif, r, kd, finish;
   int count = 0, stopMol = 0;
-  kd = 140. * tr0 * stepSize; // !**!
-  r = 1. - kd;// !**!
+  kd = 140. * tr0 * stepSize;
+  r = 1. - kd;
 
-  for (int k = 0; k < 1; k++)
+  for (int k = 0; k < 3; k++)
   {
-    stepSize = (0.5 * float(k) + 1.) / 85.;// !**! Should it be equal to stepSize in GetIso1?
-    kd = 140. * tr0 * stepSize; // !**!
-    r = 1. - kd; // !**! very strange theme
+    stepSize = (0.5 * float(k) + 1.) / 85.;
+    kd = 140. * tr0 * stepSize;
+    r = 1. - kd;
     step = stepSize * dir;
     iso = GetIso1(iterator, back, molDist, dir, tr0, k);
     if (iso.a < 0.1 || length(iso.rgb - start) > molDist)
       break;
     iterator = iso.rgb;
-    dif = 1.;// CalcColor(iterator, dir); // interesting...
+    dif = 1.;// CalcColor(iterator, dir);
     colOld = GetColSimple(tr0);
     curStepSize = stepSize;
-    for (int i = 0; i < 200; i++) // 200 - Should it be correlated with the same numvers in GetIso1 ?
+    for (int i = 0; i < 200; i++)
     {
       iterator = iterator + step;
       molD = length(iterator - start);
@@ -158,11 +212,11 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
       finish = distance(iterator, back) - stepSize;
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
-      alpha = (1. - r);// !**!
+      alpha = (1. - r);
       col = GetColSimple(vol);
       vol = sample3DTexture(iterator - 0.5*step).r;
       vec3 colMid = GetColSimple(vol);
-      sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.; // not (1. - sumColor) ????
+      sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
       sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
       colOld = col;
     } // for i
@@ -186,7 +240,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     col = GetColSimple(vol);
     vol = sample3DTexture(iterator - 0.5 * curStepSize / stepSize * step).r;
     vec3 colMid = GetColSimple(vol);
-    sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;// not (1. - sumColor) ????
+    sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;
     sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
     if (molD > molDist)
       break;
@@ -217,12 +271,12 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
 
 vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)
 {
-  vec4 tst = GetIso1(start, back, 2., dir, _isoLevel0, 0);
+  vec4 tst = GetIso1(start, back, 2., dir, 0.28, 0);
   vec4 col = vec4(0, 0., 0., 0.);
   if (tst.a > 0.1)
   {
    float dif = CalcColor(tst.rgb, dir);
-   col = vec4(dif, dif, 0., 1.0);
+   col = vec4(dif, 0., 0., 1.);
   }
   return col;
 }
@@ -266,5 +320,7 @@ void main()
 
   //gl_FragColor = texture2D(_WFFLeft, tc.xy);
   //gl_FragColor = texture2D(tileTex, tc.xy);
-  gl_FragColor = VolRender(start, back, molDist, dir);
+  //vec4 color1 = VolRender3(start, back, molDist, dir, 1);
+  //vec4 color2 = VolRender(start, back, molDist, dir, 3);// VolRender(start, back, molDist, dir,3);
+  gl_FragColor = VolRender(start, back, molDist, dir);//VolRender(start, back, molDist, dir, 1);
 }

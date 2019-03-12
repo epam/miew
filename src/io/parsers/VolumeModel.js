@@ -16,7 +16,8 @@ class VolumeModel {
 
   constructor() {
     this._header = {};
-    this._bboxSize = new THREE.Vector3();
+    this._boxSize = new THREE.Vector3();
+    this._boxStart = new THREE.Vector3();
     this._header.extent = [];
     this._header.nstart = [];
     this._header.grid = [];
@@ -97,7 +98,7 @@ class VolumeModel {
       Math.cos(header.angles.z)) / Math.sin(header.angles.z);
     const z3 = Math.sqrt(1.0 - z1 * z1 - z2 * z2);
     let xaxis = new THREE.Vector3(xScale, 0, 0);
-    let yaxis = new THREE.Vector3(Math.cos(header.angles.y) * yScale, Math.sin(header.angles.y) * yScale, 0);
+    let yaxis = new THREE.Vector3(Math.cos(header.angles.z) * yScale, Math.sin(header.angles.z) * yScale, 0);
     let zaxis = new THREE.Vector3(z1 * zScale, z2 * zScale, z3 * zScale);
 
     return [xaxis, yaxis, zaxis];
@@ -110,11 +111,40 @@ class VolumeModel {
   }
 
   _getVolumeInfo() {
-    return _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd']);
+    return _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd', 'angles']);
+  }
+
+  _setBoxParams(xaxis, yaxis, zaxis) {
+    // if axes are not orthogonal, the origins might not match with box coordinates - need to make shift
+    let shiftX = 0, shiftY = 0;
+    // depending on angles ratio, there could  be different box sizes (the things are in projections)
+    let Xprojection = Math.abs(xaxis.x), Yprojection =  Math.abs(yaxis.y), Zprojection =  Math.abs(zaxis.z);
+
+    const bettaSharp = (this._header.angles.y <= Math.PI / 2);
+    const gammaSharp = (this._header.angles.z <= Math.PI / 2);
+    const alphaSharp = (this._header.angles.x <= Math.PI / 2);
+
+    if (bettaSharp && gammaSharp) {
+      Xprojection += shiftX = Math.abs(yaxis.x) + Math.abs(zaxis.x);
+    } else if (!bettaSharp && !gammaSharp) {
+      Xprojection += Math.abs(yaxis.x) + Math.abs(zaxis.x);
+    } else if (bettaSharp && !gammaSharp) {
+      Xprojection += Math.max(Math.abs(yaxis.x), Math.abs(zaxis.x));
+      shiftX =  Math.abs(yaxis.x) - Math.abs(zaxis.x);
+    } else if (!bettaSharp && gammaSharp) {
+      Xprojection += Math.max(Math.abs(yaxis.x), Math.abs(zaxis.x));
+      shiftX =  Math.abs(zaxis.x) - Math.abs(yaxis.x);
+    }
+
+    if (!alphaSharp) {
+      Yprojection += shiftY = Math.abs(zaxis.y);
+    }
+    this._boxStart = new THREE.Vector3(this._origin.x - shiftX, this._origin.y - shiftY, this._origin.z);
+    this._boxSize = new THREE.Vector3(Xprojection, Yprojection, Zprojection);
   }
 
   _getXYZbox() {
-    return new THREE.Box3(this._origin.clone(), this._origin.clone().add(this._bboxSize));
+    return new THREE.Box3(this._boxStart.clone(), this._boxStart.clone().add(this._boxSize));
   }
 
   _toXYZData() {}

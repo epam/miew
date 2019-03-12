@@ -118,6 +118,7 @@ class Volume {
     return this._volumeInfo;
   }
 
+  // TODO: check - wrong code!
   getCellSize() {
     const boxSize = new THREE.Vector3();
     this._box.getSize(boxSize);

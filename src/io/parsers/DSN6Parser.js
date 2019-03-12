@@ -63,7 +63,7 @@ class DSN6Model extends VolumeModel {
     yaxis.multiplyScalar(header.extent[1]);
     zaxis.multiplyScalar(header.extent[2]);
 
-    this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
+    this._setBoxParams(xaxis, yaxis, zaxis);
   }
 
   _pointCalculate(xyzData, byteBuffer, z, y, x, pos, i) {

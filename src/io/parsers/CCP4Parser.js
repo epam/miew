@@ -66,6 +66,7 @@ class Ccp4Model extends VolumeModel {
     xyz2crs[crs2xyz[2] - 1] = 2; // section
   }
 
+
   _setOrigins() {
     let [xaxis, yaxis, zaxis] = this._getAxis();
     this._setAxisIndices();
@@ -98,7 +99,7 @@ class Ccp4Model extends VolumeModel {
       throw new Error('CCP4: Unsupported format ' + header.type);
     }
 
-    this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
+    this._setBoxParams(xaxis, yaxis, zaxis);
   }
 
   _toXYZData() {
