@@ -27,12 +27,12 @@
       }
 
       viewer.addEventListener('onParseDone', function() {
-        viewer._forEachComplexVisual((visual) => {
-          const complex = visual.getComplex();
-          const chains = complex.getChainNames();
-          const div = document.getElementById('chains');
-          for (let i = 0; i < chains.length; ++i) {
-            const elem = document.createElement('p');
+        viewer._forEachComplexVisual(function(visual) {
+          var complex = visual.getComplex();
+          var chains = complex.getChainNames();
+          var div = document.getElementById('chains');
+          for (var i = 0; i < chains.length; ++i) {
+            var elem = document.createElement('p');
             elem.style = 'font-weight: bold;';
             fillChainElement(elem, complex.getChain(chains[i]));
             div.appendChild(elem);
@@ -42,29 +42,31 @@
 
       function fillChainElement(elem, chain) {
         // store chain name
-        const chainName = chain.getName();
-        elem.textContent = `chain ${chainName} `;
+        var chainName = chain.getName();
+        elem.textContent = 'chain ' + chainName;
         // create div
-        const resDiv = document.createElement('div');
+        var resDiv = document.createElement('div');
+        resDiv.style = 'overflow-wrap: break-word';
 
         // create nested set of residue names
-        chain.forEachResidue((res) => {
-          const resType = res.getType();
+        chain.forEachResidue(function(res) {
+          var resType = res.getType();
 
           // skip water
           if (resType.flags & Miew.chem.ResidueType.Flags.WATER) return;
 
           // create residue a-element
-          const resElem = document.createElement('a');
+          var resElem = document.createElement('a');
           resElem.textContent = resType.letterCode;
           resElem.style = 'font-weight: normal;';
           resElem.href = '#';
 
           // make selection when click
-          const selectorStr = `chain ${chainName} AND residx ${res._index}`;
+          var selectorStr = 'chain ' + chainName +' AND residx ' + res._index;
           resElem.setAttribute('data-select', selectorStr);
-          resElem.addEventListener('click', (obj) => {
-            viewer.select(obj.currentTarget.getAttribute('data-select'), false);
+          resElem.addEventListener('click', function(event) {
+            viewer.select(event.currentTarget.getAttribute('data-select'), false);
+            event.preventDefault();
           });
           resDiv.append(resElem);
         });
