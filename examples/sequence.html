@@ -19,7 +19,7 @@
     (function() {
       var viewer = new Miew({
         container: document.getElementsByClassName('miew-container')[0],
-        load: '1CRN',
+        load: '1AID',
       });
 
       if (viewer.init()) {
@@ -46,29 +46,27 @@
         elem.textContent = `chain ${chainName} `;
         // create div
         const resDiv = document.createElement('div');
+
         // create nested set of residue names
         chain.forEachResidue((res) => {
           const resType = res.getType();
+
           // skip water
           if (resType.flags & Miew.chem.ResidueType.Flags.WATER) return;
+
           // create residue a-element
           const resElem = document.createElement('a');
-          resElem.textContent = resType._name;
+          resElem.textContent = resType.letterCode;
           resElem.style = 'font-weight: normal;';
           resElem.href = '#';
+
           // make selection when click
-          const iCode = res.getICode() != ' ' ? `${res.getICode()}` : `\' \'`;
-          const selectorStr = `chain ${chainName} AND sequence ${res.getSequence()} AND icode ${iCode}`;
+          const selectorStr = `chain ${chainName} AND residx ${res._index}`;
           resElem.setAttribute('data-select', selectorStr);
           resElem.addEventListener('click', (obj) => {
             viewer.select(obj.currentTarget.getAttribute('data-select'), false);
           });
           resDiv.append(resElem);
-          // create space element to prevent one-lining
-          const space = document.createElement('span');
-          space.style = 'white-space: pre-wrap';
-          space.textContent = ' ';
-          resDiv.append(space);
         });
         elem.appendChild(resDiv);
       }
