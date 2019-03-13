@@ -41,6 +41,7 @@
     (function() {
       var viewer = new Miew({ load: '1AID' });
       var sequences = [];
+      var selectState = true;
 
       if (viewer.init()) {
         viewer.run();
@@ -58,14 +59,34 @@
           }
         });
 
-        // delegate onclick processing to a parent element
-        div.addEventListener('click', function(event) {
+        function isTarget(event) {
           var target = event.target;
-          if (!target.dataset || target.dataset.residx === undefined) return;
+          return target.dataset && target.dataset.residx !== undefined;
+        }
 
-          target.classList.toggle('selected');
+        div.addEventListener('click', function(event) {
+          if (!isTarget(event)) return;
+          event.preventDefault();
+        });
+
+        div.addEventListener('mousedown', function(event) {
+          if (!isTarget(event)) return;
+
+          selectState = event.target.classList.toggle('selected');
           viewer.select(buildSelector(), false);
           event.preventDefault();
+        });
+
+        div.addEventListener('mouseover', function(event) {
+          if ((event.buttons & 1) === 0) return;
+          if (!isTarget(event)) return;
+
+          var classList = event.target.classList;
+          if (classList.contains('selected') !== selectState) {
+            classList.toggle('selected');
+            viewer.select(buildSelector(), false);
+            event.preventDefault();
+          }
         });
       });
 
@@ -79,7 +100,7 @@
 
         // create div
         var resDiv = document.createElement('div');
-        resDiv.style = 'overflow-wrap: break-word';
+        resDiv.style = 'overflow-wrap: break-word; word-wrap: break-word;';
 
         // create nested set of residue names
         chain.forEachResidue(function(res) {
@@ -93,7 +114,7 @@
           resElem.textContent = resType.letterCode;
           resElem.href = '#';
           resElem.dataset.residx = res._index;
-          resDiv.append(resElem);
+          resDiv.appendChild(resElem);
         });
         sequences.push(resDiv);
         elem.appendChild(resDiv);
