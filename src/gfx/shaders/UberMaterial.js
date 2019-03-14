@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import vertexShader from './Uber_vert.glsl';
 import fragmentShader from './Uber_frag.glsl';
 import capabilities from '../capabilities';
+import noise from '../noiseTexture';
 
 const _samplesKernel = [
   new THREE.Vector2(-0.541978, 0.840393),
@@ -11,26 +12,6 @@ const _samplesKernel = [
   new THREE.Vector2(0.374329, 0.927296),
   new THREE.Vector2(-0.105475, 0.994422),
 ];
-
-const _noiseWidth = 4;
-const _noiseHeight = 4;
-const _noiseData = new Uint8Array([
-  24, 52, 0, 254, 145, 0, 122, 0, 0, 7, 170, 0,
-  34, 214, 0, 173, 8, 0, 86, 249, 0, 160, 4, 0,
-  226, 46, 0, 224, 211, 0, 3, 157, 0, 174, 247, 0,
-  12, 182, 0, 220, 216, 0, 1, 109, 0, 253, 154, 0,
-]);
-
-const _noiseWrapS = THREE.RepeatWrapping;
-const _noiseWrapT = THREE.RepeatWrapping;
-const _noiseMinFilter = THREE.NearestFilter;
-const _noiseMagFilter = THREE.NearestFilter;
-const _noiseMapping = THREE.UVMapping;
-const _noiseTexture = new THREE.DataTexture(
-  _noiseData, _noiseWidth, _noiseHeight, THREE.RGBFormat,
-  THREE.UnsignedByteType, _noiseMapping, _noiseWrapS, _noiseWrapT, _noiseMagFilter, _noiseMinFilter, 1,
-);
-_noiseTexture.needsUpdate = true;
 
 //  var INSTANCED_SPRITE_OVERSCALE = 1.3;
 
@@ -180,8 +161,8 @@ UberMaterial.prototype.uberOptions = {
   lineWidth: 2.0,
   fogAlpha: 1.0,
   samplesKernel: _samplesKernel,
-  noiseTex: _noiseTexture,
-  noiseTexelSize: new THREE.Vector2(1.0 / _noiseWidth, 1.0 / _noiseHeight),
+  noiseTex: noise.noiseTexture,
+  noiseTexelSize: new THREE.Vector2(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight),
   srcTexelSize: new THREE.Vector2(1.0 / 800.0, 1.0 / 600.0),
 
   copy(source) {

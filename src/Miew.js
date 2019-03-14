@@ -23,6 +23,7 @@ import ObjectControls from './ui/ObjectControls';
 import Picker from './ui/Picker';
 import Axes from './gfx/Axes';
 import gfxutils from './gfx/gfxutils';
+import noise from './gfx/noiseTexture';
 import FrameInfo from './gfx/FrameInfo';
 import meshes from './gfx/meshes/meshes';
 import LinesObject from './gfx/objects/LinesObj';
@@ -1413,25 +1414,6 @@ Miew.prototype._performAO = (function () {
   const _horBlurMaterial = new ao.HorBilateralBlurMaterial();
   const _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
 
-  const _noiseWidth = 4;
-  const _noiseHeight = 4;
-  const _noiseData = new Uint8Array([
-    0, 0, 0, 66, 0, 0, 77, 0, 0, 155, 62, 0,
-    0, 247, 0, 33, 0, 0, 0, 0, 0, 235, 0, 0,
-    0, 0, 0, 176, 44, 0, 232, 46, 0, 0, 29, 0,
-    0, 0, 0, 78, 197, 0, 93, 0, 0, 0, 0, 0,
-  ]);
-  const _noiseWrapS = THREE.RepeatWrapping;
-  const _noiseWrapT = THREE.RepeatWrapping;
-  const _noiseMinFilter = THREE.NearestFilter;
-  const _noiseMagFilter = THREE.NearestFilter;
-  const _noiseMapping = THREE.UVMapping;
-  const _noiseTexture = new THREE.DataTexture(
-    _noiseData, _noiseWidth, _noiseHeight, THREE.RGBFormat,
-    THREE.UnsignedByteType, _noiseMapping, _noiseWrapS, _noiseWrapT, _noiseMagFilter, _noiseMinFilter, 1,
-  );
-  _noiseTexture.needsUpdate = true;
-
   const _samplesKernel = [
     // hemisphere samples adopted to sphere (FIXME remove minus from Z)
     new THREE.Vector3(0.295184, 0.077723, 0.068429),
@@ -1500,8 +1482,8 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
-    _aoMaterial.uniforms.noiseTexture.value = _noiseTexture;
-    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / _noiseWidth, 1.0 / _noiseHeight);
+    _aoMaterial.uniforms.noiseTexture.value = noise.noiseTexture;
+    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight);
     const { fog } = gfx.scene;
     if (fog) {
       _aoMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
