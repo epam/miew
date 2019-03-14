@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select residues from sequence</title>
+
+  <link rel="stylesheet" href="../dist/Miew.min.css">
+  <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
+  <script src="../dist/Miew.min.js"></script>
+</head>
+<body>
+  <h1>Select residues from sequence</h1>
+  <div>
+  <div class="miew-container" style="width:640px; height:480px; float:left;"></div>
+  <div id="chains" style="padding:30px; margin-left:640px;"></div>
+
+  <script>
+
+    (function() {
+      var viewer = new Miew({
+        container: document.getElementsByClassName('miew-container')[0],
+        load: '1AID',
+      });
+
+      if (viewer.init()) {
+        viewer.run();
+      }
+
+      viewer.addEventListener('onParseDone', function() {
+        viewer._forEachComplexVisual(function(visual) {
+          var complex = visual.getComplex();
+          var chains = complex.getChainNames();
+          var div = document.getElementById('chains');
+          for (var i = 0; i < chains.length; ++i) {
+            var elem = document.createElement('p');
+            elem.style = 'font-weight: bold;';
+            fillChainElement(elem, complex.getChain(chains[i]));
+            div.appendChild(elem);
+          }
+        });
+      });
+
+      function fillChainElement(elem, chain) {
+        // store chain name
+        var chainName = chain.getName();
+        elem.textContent = 'chain ' + chainName;
+        // create div
+        var resDiv = document.createElement('div');
+        resDiv.style = 'overflow-wrap: break-word';
+
+        // create nested set of residue names
+        chain.forEachResidue(function(res) {
+          var resType = res.getType();
+
+          // skip water
+          if (resType.flags & Miew.chem.ResidueType.Flags.WATER) return;
+
+          // create residue a-element
+          var resElem = document.createElement('a');
+          resElem.textContent = resType.letterCode;
+          resElem.style = 'font-weight: normal;';
+          resElem.href = '#';
+
+          // make selection when click
+          var selectorStr = 'chain ' + chainName +' AND residx ' + res._index;
+          resElem.setAttribute('data-select', selectorStr);
+          resElem.addEventListener('click', function(event) {
+            viewer.select(event.currentTarget.getAttribute('data-select'), false);
+            event.preventDefault();
+          });
+          resDiv.append(resElem);
+        });
+        elem.appendChild(resDiv);
+      }
+    })();
+  </script>
+  </div>
+</body>
+</html>

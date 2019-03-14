@@ -6,7 +6,7 @@ uniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data
 uniform vec2 tileTexSize;  // size of tiled texture, pixels
 uniform vec2 tileStride;   // UV stride between slices in tile tex, pixels
 
-uniform float _isoLevel0;
+uniform vec3 _isoLevel0;
 uniform float _flipV;
 uniform sampler2D _BFLeft;
 uniform sampler2D _BFRight;
@@ -100,9 +100,21 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
   return acc;
 }
 
+float easeOut(float x0, float x1, float x) {
+  float t = clamp((x - x0) / (x1 - x0), 0.0, 1.0);
+  return 1.0 - (1.0 - t) * (1.0 - t);
+}
+
+float easeIn(float x0, float x1, float x) {
+  float t = clamp((x - x0) / (x1 - x0), 0.0, 1.0);
+  return t * t;
+}
+
 vec3 GetColSimple(float vol)
 {
-  return vol * vec3(1, 1, 1);
+  float t = easeOut(_isoLevel0.x, _isoLevel0.y, vol);
+  float s = easeIn(_isoLevel0.y, _isoLevel0.z, vol);
+  return vec3(0.5, 0.6, 0.7) * (1.0 - t) + 2.0 * vec3(s, 0, 0);
 }
 
 vec3 CorrectIso(vec3 left, vec3 right, float tr)
@@ -126,7 +138,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   //				float stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;
   float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;
   vec3 step = stepSize*dir, col, colOld, right;
-  float tr0 = _isoLevel0;
+  float tr0 = _isoLevel0.x;
   float dif, r, kd, finish;
   int count = 0, stopMol = 0;
   kd = 140. * tr0 * stepSize;
@@ -203,7 +215,7 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
   {
     if (float(i) * stepSize > len) break;
     iterator = iterator + step;
-    if (sample3DTexture(iterator).r > _isoLevel0)
+    if (sample3DTexture(iterator).r > _isoLevel0.x)
       acc += sample3DTexture(iterator).r / 200.0;
   }
 

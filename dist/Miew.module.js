@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.21 Copyright (c) 2015-2019 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.22 Copyright (c) 2015-2019 EPAM Systems, Inc. */
 
 function _typeof(obj) {
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -150,6 +150,42 @@ function _wrapNativeSuper(Class) {
   return _wrapNativeSuper(Class);
 }
 
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+
+  var target = _objectWithoutPropertiesLoose(source, excluded);
+
+  var key, i;
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
+}
+
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -264,7 +300,7 @@ var lodash = createCommonjsModule(function (module, exports) {
 (function() {
 
   /** Used as a safe reference for `undefined` in pre-ES5 environments. */
-  var undefined;
+  var undefined$1;
 
   /** Used as the semantic version number. */
   var VERSION = '4.17.11';
@@ -1132,7 +1168,7 @@ var lodash = createCommonjsModule(function (module, exports) {
    */
   function baseProperty(key) {
     return function(object) {
-      return object == null ? undefined : object[key];
+      return object == null ? undefined$1 : object[key];
     };
   }
 
@@ -1145,7 +1181,7 @@ var lodash = createCommonjsModule(function (module, exports) {
    */
   function basePropertyOf(object) {
     return function(key) {
-      return object == null ? undefined : object[key];
+      return object == null ? undefined$1 : object[key];
     };
   }
 
@@ -1207,8 +1243,8 @@ var lodash = createCommonjsModule(function (module, exports) {
 
     while (++index < length) {
       var current = iteratee(array[index]);
-      if (current !== undefined) {
-        result = result === undefined ? current : (result + current);
+      if (current !== undefined$1) {
+        result = result === undefined$1 ? current : (result + current);
       }
     }
     return result;
@@ -1381,7 +1417,7 @@ var lodash = createCommonjsModule(function (module, exports) {
    * @returns {*} Returns the property value.
    */
   function getValue(object, key) {
-    return object == null ? undefined : object[key];
+    return object == null ? undefined$1 : object[key];
   }
 
   /**
@@ -1715,17 +1751,17 @@ var lodash = createCommonjsModule(function (module, exports) {
     );
 
     /** Built-in value references. */
-    var Buffer = moduleExports ? context.Buffer : undefined,
+    var Buffer = moduleExports ? context.Buffer : undefined$1,
         Symbol = context.Symbol,
         Uint8Array = context.Uint8Array,
-        allocUnsafe = Buffer ? Buffer.allocUnsafe : undefined,
+        allocUnsafe = Buffer ? Buffer.allocUnsafe : undefined$1,
         getPrototype = overArg(Object.getPrototypeOf, Object),
         objectCreate = Object.create,
         propertyIsEnumerable = objectProto.propertyIsEnumerable,
         splice = arrayProto.splice,
-        spreadableSymbol = Symbol ? Symbol.isConcatSpreadable : undefined,
-        symIterator = Symbol ? Symbol.iterator : undefined,
-        symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+        spreadableSymbol = Symbol ? Symbol.isConcatSpreadable : undefined$1,
+        symIterator = Symbol ? Symbol.iterator : undefined$1,
+        symToStringTag = Symbol ? Symbol.toStringTag : undefined$1;
 
     var defineProperty = (function() {
       try {
@@ -1744,7 +1780,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     var nativeCeil = Math.ceil,
         nativeFloor = Math.floor,
         nativeGetSymbols = Object.getOwnPropertySymbols,
-        nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined,
+        nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined$1,
         nativeIsFinite = context.isFinite,
         nativeJoin = arrayProto.join,
         nativeKeys = overArg(Object.keys, Object),
@@ -1777,9 +1813,9 @@ var lodash = createCommonjsModule(function (module, exports) {
         weakMapCtorString = toSource(WeakMap);
 
     /** Used to convert symbols to primitives and strings. */
-    var symbolProto = Symbol ? Symbol.prototype : undefined,
-        symbolValueOf = symbolProto ? symbolProto.valueOf : undefined,
-        symbolToString = symbolProto ? symbolProto.toString : undefined;
+    var symbolProto = Symbol ? Symbol.prototype : undefined$1,
+        symbolValueOf = symbolProto ? symbolProto.valueOf : undefined$1,
+        symbolToString = symbolProto ? symbolProto.toString : undefined$1;
 
     /*------------------------------------------------------------------------*/
 
@@ -1931,7 +1967,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         }
         object.prototype = proto;
         var result = new object;
-        object.prototype = undefined;
+        object.prototype = undefined$1;
         return result;
       };
     }());
@@ -1957,7 +1993,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       this.__actions__ = [];
       this.__chain__ = !!chainAll;
       this.__index__ = 0;
-      this.__values__ = undefined;
+      this.__values__ = undefined$1;
     }
 
     /**
@@ -2208,9 +2244,9 @@ var lodash = createCommonjsModule(function (module, exports) {
       var data = this.__data__;
       if (nativeCreate) {
         var result = data[key];
-        return result === HASH_UNDEFINED ? undefined : result;
+        return result === HASH_UNDEFINED ? undefined$1 : result;
       }
-      return hasOwnProperty.call(data, key) ? data[key] : undefined;
+      return hasOwnProperty.call(data, key) ? data[key] : undefined$1;
     }
 
     /**
@@ -2224,7 +2260,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function hashHas(key) {
       var data = this.__data__;
-      return nativeCreate ? (data[key] !== undefined) : hasOwnProperty.call(data, key);
+      return nativeCreate ? (data[key] !== undefined$1) : hasOwnProperty.call(data, key);
     }
 
     /**
@@ -2240,7 +2276,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     function hashSet(key, value) {
       var data = this.__data__;
       this.size += this.has(key) ? 0 : 1;
-      data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
+      data[key] = (nativeCreate && value === undefined$1) ? HASH_UNDEFINED : value;
       return this;
     }
 
@@ -2322,7 +2358,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       var data = this.__data__,
           index = assocIndexOf(data, key);
 
-      return index < 0 ? undefined : data[index][1];
+      return index < 0 ? undefined$1 : data[index][1];
     }
 
     /**
@@ -2671,7 +2707,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function arraySample(array) {
       var length = array.length;
-      return length ? array[baseRandom(0, length - 1)] : undefined;
+      return length ? array[baseRandom(0, length - 1)] : undefined$1;
     }
 
     /**
@@ -2707,8 +2743,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @param {*} value The value to assign.
      */
     function assignMergeValue(object, key, value) {
-      if ((value !== undefined && !eq(object[key], value)) ||
-          (value === undefined && !(key in object))) {
+      if ((value !== undefined$1 && !eq(object[key], value)) ||
+          (value === undefined$1 && !(key in object))) {
         baseAssignValue(object, key, value);
       }
     }
@@ -2726,7 +2762,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     function assignValue(object, key, value) {
       var objValue = object[key];
       if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) ||
-          (value === undefined && !(key in object))) {
+          (value === undefined$1 && !(key in object))) {
         baseAssignValue(object, key, value);
       }
     }
@@ -2830,7 +2866,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           skip = object == null;
 
       while (++index < length) {
-        result[index] = skip ? undefined : get(object, paths[index]);
+        result[index] = skip ? undefined$1 : get(object, paths[index]);
       }
       return result;
     }
@@ -2846,10 +2882,10 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function baseClamp(number, lower, upper) {
       if (number === number) {
-        if (upper !== undefined) {
+        if (upper !== undefined$1) {
           number = number <= upper ? number : upper;
         }
-        if (lower !== undefined) {
+        if (lower !== undefined$1) {
           number = number >= lower ? number : lower;
         }
       }
@@ -2881,7 +2917,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (customizer) {
         result = object ? customizer(value, key, object, stack) : customizer(value);
       }
-      if (result !== undefined) {
+      if (result !== undefined$1) {
         return result;
       }
       if (!isObject(value)) {
@@ -2942,7 +2978,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         ? (isFlat ? getAllKeysIn : getAllKeys)
         : (isFlat ? keysIn : keys);
 
-      var props = isArr ? undefined : keysFunc(value);
+      var props = isArr ? undefined$1 : keysFunc(value);
       arrayEach(props || value, function(subValue, key) {
         if (props) {
           key = subValue;
@@ -2987,7 +3023,7 @@ var lodash = createCommonjsModule(function (module, exports) {
             predicate = source[key],
             value = object[key];
 
-        if ((value === undefined && !(key in object)) || !predicate(value)) {
+        if ((value === undefined$1 && !(key in object)) || !predicate(value)) {
           return false;
         }
       }
@@ -3008,7 +3044,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (typeof func != 'function') {
         throw new TypeError(FUNC_ERROR_TEXT);
       }
-      return setTimeout(function() { func.apply(undefined, args); }, wait);
+      return setTimeout(function() { func.apply(undefined$1, args); }, wait);
     }
 
     /**
@@ -3123,7 +3159,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         var value = array[index],
             current = iteratee(value);
 
-        if (current != null && (computed === undefined
+        if (current != null && (computed === undefined$1
               ? (current === current && !isSymbol(current))
               : comparator(current, computed)
             )) {
@@ -3151,7 +3187,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (start < 0) {
         start = -start > length ? 0 : (length + start);
       }
-      end = (end === undefined || end > length) ? length : toInteger(end);
+      end = (end === undefined$1 || end > length) ? length : toInteger(end);
       if (end < 0) {
         end += length;
       }
@@ -3295,7 +3331,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       while (object != null && index < length) {
         object = object[toKey(path[index++])];
       }
-      return (index && index == length) ? object : undefined;
+      return (index && index == length) ? object : undefined$1;
     }
 
     /**
@@ -3323,7 +3359,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function baseGetTag(value) {
       if (value == null) {
-        return value === undefined ? undefinedTag : nullTag;
+        return value === undefined$1 ? undefinedTag : nullTag;
       }
       return (symToStringTag && symToStringTag in Object(value))
         ? getRawTag(value)
@@ -3407,7 +3443,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         maxLength = nativeMin(array.length, maxLength);
         caches[othIndex] = !comparator && (iteratee || (length >= 120 && array.length >= 120))
           ? new SetCache(othIndex && array)
-          : undefined;
+          : undefined$1;
       }
       array = arrays[0];
 
@@ -3475,7 +3511,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       path = castPath(path, object);
       object = parent(object, path);
       var func = object == null ? object : object[toKey(last(path))];
-      return func == null ? undefined : apply(func, object, args);
+      return func == null ? undefined$1 : apply(func, object, args);
     }
 
     /**
@@ -3640,7 +3676,7 @@ var lodash = createCommonjsModule(function (module, exports) {
             srcValue = data[1];
 
         if (noCustomizer && data[2]) {
-          if (objValue === undefined && !(key in object)) {
+          if (objValue === undefined$1 && !(key in object)) {
             return false;
           }
         } else {
@@ -3648,7 +3684,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           if (customizer) {
             var result = customizer(objValue, srcValue, key, object, source, stack);
           }
-          if (!(result === undefined
+          if (!(result === undefined$1
                 ? baseIsEqual(srcValue, objValue, COMPARE_PARTIAL_FLAG | COMPARE_UNORDERED_FLAG, customizer, stack)
                 : result
               )) {
@@ -3837,7 +3873,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       }
       return function(object) {
         var objValue = get(object, path);
-        return (objValue === undefined && objValue === srcValue)
+        return (objValue === undefined$1 && objValue === srcValue)
           ? hasIn(object, path)
           : baseIsEqual(srcValue, objValue, COMPARE_PARTIAL_FLAG | COMPARE_UNORDERED_FLAG);
       };
@@ -3866,9 +3902,9 @@ var lodash = createCommonjsModule(function (module, exports) {
         else {
           var newValue = customizer
             ? customizer(safeGet(object, key), srcValue, (key + ''), object, source, stack)
-            : undefined;
+            : undefined$1;
 
-          if (newValue === undefined) {
+          if (newValue === undefined$1) {
             newValue = srcValue;
           }
           assignMergeValue(object, key, newValue);
@@ -3902,9 +3938,9 @@ var lodash = createCommonjsModule(function (module, exports) {
       }
       var newValue = customizer
         ? customizer(objValue, srcValue, (key + ''), object, source, stack)
-        : undefined;
+        : undefined$1;
 
-      var isCommon = newValue === undefined;
+      var isCommon = newValue === undefined$1;
 
       if (isCommon) {
         var isArr = isArray(srcValue),
@@ -3967,7 +4003,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         return;
       }
       n += n < 0 ? length : 0;
-      return isIndex(n, length) ? array[n] : undefined;
+      return isIndex(n, length) ? array[n] : undefined$1;
     }
 
     /**
@@ -4240,8 +4276,8 @@ var lodash = createCommonjsModule(function (module, exports) {
 
         if (index != lastIndex) {
           var objValue = nested[key];
-          newValue = customizer ? customizer(objValue, key, nested) : undefined;
-          if (newValue === undefined) {
+          newValue = customizer ? customizer(objValue, key, nested) : undefined$1;
+          if (newValue === undefined$1) {
             newValue = isObject(objValue)
               ? objValue
               : (isIndex(path[index + 1]) ? [] : {});
@@ -4397,12 +4433,12 @@ var lodash = createCommonjsModule(function (module, exports) {
           valIsNaN = value !== value,
           valIsNull = value === null,
           valIsSymbol = isSymbol(value),
-          valIsUndefined = value === undefined;
+          valIsUndefined = value === undefined$1;
 
       while (low < high) {
         var mid = nativeFloor((low + high) / 2),
             computed = iteratee(array[mid]),
-            othIsDefined = computed !== undefined,
+            othIsDefined = computed !== undefined$1,
             othIsNull = computed === null,
             othIsReflexive = computed === computed,
             othIsSymbol = isSymbol(computed);
@@ -4677,7 +4713,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           result = {};
 
       while (++index < length) {
-        var value = index < valsLength ? values[index] : undefined;
+        var value = index < valsLength ? values[index] : undefined$1;
         assignFunc(result, props[index], value);
       }
       return result;
@@ -4742,7 +4778,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function castSlice(array, start, end) {
       var length = array.length;
-      end = end === undefined ? length : end;
+      end = end === undefined$1 ? length : end;
       return (!start && end >= length) ? array : baseSlice(array, start, end);
     }
 
@@ -4848,12 +4884,12 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function compareAscending(value, other) {
       if (value !== other) {
-        var valIsDefined = value !== undefined,
+        var valIsDefined = value !== undefined$1,
             valIsNull = value === null,
             valIsReflexive = value === value,
             valIsSymbol = isSymbol(value);
 
-        var othIsDefined = other !== undefined,
+        var othIsDefined = other !== undefined$1,
             othIsNull = other === null,
             othIsReflexive = other === other,
             othIsSymbol = isSymbol(other);
@@ -5030,9 +5066,9 @@ var lodash = createCommonjsModule(function (module, exports) {
 
         var newValue = customizer
           ? customizer(object[key], source[key], key, object, source)
-          : undefined;
+          : undefined$1;
 
-        if (newValue === undefined) {
+        if (newValue === undefined$1) {
           newValue = source[key];
         }
         if (isNew) {
@@ -5096,15 +5132,15 @@ var lodash = createCommonjsModule(function (module, exports) {
       return baseRest(function(object, sources) {
         var index = -1,
             length = sources.length,
-            customizer = length > 1 ? sources[length - 1] : undefined,
-            guard = length > 2 ? sources[2] : undefined;
+            customizer = length > 1 ? sources[length - 1] : undefined$1,
+            guard = length > 2 ? sources[2] : undefined$1;
 
         customizer = (assigner.length > 3 && typeof customizer == 'function')
           ? (length--, customizer)
-          : undefined;
+          : undefined$1;
 
         if (guard && isIterateeCall(sources[0], sources[1], guard)) {
-          customizer = length < 3 ? undefined : customizer;
+          customizer = length < 3 ? undefined$1 : customizer;
           length = 1;
         }
         object = Object(object);
@@ -5205,7 +5241,7 @@ var lodash = createCommonjsModule(function (module, exports) {
 
         var strSymbols = hasUnicode(string)
           ? stringToArray(string)
-          : undefined;
+          : undefined$1;
 
         var chr = strSymbols
           ? strSymbols[0]
@@ -5293,8 +5329,8 @@ var lodash = createCommonjsModule(function (module, exports) {
         length -= holders.length;
         if (length < arity) {
           return createRecurry(
-            func, bitmask, createHybrid, wrapper.placeholder, undefined,
-            args, holders, undefined, undefined, arity - length);
+            func, bitmask, createHybrid, wrapper.placeholder, undefined$1,
+            args, holders, undefined$1, undefined$1, arity - length);
         }
         var fn = (this && this !== root && this instanceof wrapper) ? Ctor : func;
         return apply(fn, this, args);
@@ -5318,7 +5354,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           predicate = function(key) { return iteratee(iterable[key], key, iterable); };
         }
         var index = findIndexFunc(collection, predicate, fromIndex);
-        return index > -1 ? iterable[iteratee ? collection[index] : index] : undefined;
+        return index > -1 ? iterable[iteratee ? collection[index] : index] : undefined$1;
       };
     }
 
@@ -5352,7 +5388,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           func = funcs[index];
 
           var funcName = getFuncName(func),
-              data = funcName == 'wrapper' ? getData(func) : undefined;
+              data = funcName == 'wrapper' ? getData(func) : undefined$1;
 
           if (data && isLaziable(data[0]) &&
                 data[1] == (WRAP_ARY_FLAG | WRAP_CURRY_FLAG | WRAP_PARTIAL_FLAG | WRAP_REARG_FLAG) &&
@@ -5408,7 +5444,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           isBindKey = bitmask & WRAP_BIND_KEY_FLAG,
           isCurried = bitmask & (WRAP_CURRY_FLAG | WRAP_CURRY_RIGHT_FLAG),
           isFlip = bitmask & WRAP_FLIP_FLAG,
-          Ctor = isBindKey ? undefined : createCtor(func);
+          Ctor = isBindKey ? undefined$1 : createCtor(func);
 
       function wrapper() {
         var length = arguments.length,
@@ -5481,14 +5517,14 @@ var lodash = createCommonjsModule(function (module, exports) {
     function createMathOperation(operator, defaultValue) {
       return function(value, other) {
         var result;
-        if (value === undefined && other === undefined) {
+        if (value === undefined$1 && other === undefined$1) {
           return defaultValue;
         }
-        if (value !== undefined) {
+        if (value !== undefined$1) {
           result = value;
         }
-        if (other !== undefined) {
-          if (result === undefined) {
+        if (other !== undefined$1) {
+          if (result === undefined$1) {
             return other;
           }
           if (typeof value == 'string' || typeof other == 'string') {
@@ -5533,7 +5569,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {string} Returns the padding for `string`.
      */
     function createPadding(length, chars) {
-      chars = chars === undefined ? ' ' : baseToString(chars);
+      chars = chars === undefined$1 ? ' ' : baseToString(chars);
 
       var charsLength = chars.length;
       if (charsLength < 2) {
@@ -5590,17 +5626,17 @@ var lodash = createCommonjsModule(function (module, exports) {
     function createRange(fromRight) {
       return function(start, end, step) {
         if (step && typeof step != 'number' && isIterateeCall(start, end, step)) {
-          end = step = undefined;
+          end = step = undefined$1;
         }
         // Ensure the sign of `-0` is preserved.
         start = toFinite(start);
-        if (end === undefined) {
+        if (end === undefined$1) {
           end = start;
           start = 0;
         } else {
           end = toFinite(end);
         }
-        step = step === undefined ? (start < end ? 1 : -1) : toFinite(step);
+        step = step === undefined$1 ? (start < end ? 1 : -1) : toFinite(step);
         return baseRange(start, end, step, fromRight);
       };
     }
@@ -5641,10 +5677,10 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function createRecurry(func, bitmask, wrapFunc, placeholder, thisArg, partials, holders, argPos, ary, arity) {
       var isCurry = bitmask & WRAP_CURRY_FLAG,
-          newHolders = isCurry ? holders : undefined,
-          newHoldersRight = isCurry ? undefined : holders,
-          newPartials = isCurry ? partials : undefined,
-          newPartialsRight = isCurry ? undefined : partials;
+          newHolders = isCurry ? holders : undefined$1,
+          newHoldersRight = isCurry ? undefined$1 : holders,
+          newPartials = isCurry ? partials : undefined$1,
+          newPartialsRight = isCurry ? undefined$1 : partials;
 
       bitmask |= (isCurry ? WRAP_PARTIAL_FLAG : WRAP_PARTIAL_RIGHT_FLAG);
       bitmask &= ~(isCurry ? WRAP_PARTIAL_RIGHT_FLAG : WRAP_PARTIAL_FLAG);
@@ -5657,7 +5693,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         newHoldersRight, argPos, ary, arity
       ];
 
-      var result = wrapFunc.apply(undefined, newData);
+      var result = wrapFunc.apply(undefined$1, newData);
       if (isLaziable(func)) {
         setData(result, newData);
       }
@@ -5754,19 +5790,19 @@ var lodash = createCommonjsModule(function (module, exports) {
       var length = partials ? partials.length : 0;
       if (!length) {
         bitmask &= ~(WRAP_PARTIAL_FLAG | WRAP_PARTIAL_RIGHT_FLAG);
-        partials = holders = undefined;
+        partials = holders = undefined$1;
       }
-      ary = ary === undefined ? ary : nativeMax(toInteger(ary), 0);
-      arity = arity === undefined ? arity : toInteger(arity);
+      ary = ary === undefined$1 ? ary : nativeMax(toInteger(ary), 0);
+      arity = arity === undefined$1 ? arity : toInteger(arity);
       length -= holders ? holders.length : 0;
 
       if (bitmask & WRAP_PARTIAL_RIGHT_FLAG) {
         var partialsRight = partials,
             holdersRight = holders;
 
-        partials = holders = undefined;
+        partials = holders = undefined$1;
       }
-      var data = isBindKey ? undefined : getData(func);
+      var data = isBindKey ? undefined$1 : getData(func);
 
       var newData = [
         func, bitmask, thisArg, partials, holders, partialsRight, holdersRight,
@@ -5781,7 +5817,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       thisArg = newData[2];
       partials = newData[3];
       holders = newData[4];
-      arity = newData[9] = newData[9] === undefined
+      arity = newData[9] = newData[9] === undefined$1
         ? (isBindKey ? 0 : func.length)
         : nativeMax(newData[9] - length, 0);
 
@@ -5795,7 +5831,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       } else if ((bitmask == WRAP_PARTIAL_FLAG || bitmask == (WRAP_BIND_FLAG | WRAP_PARTIAL_FLAG)) && !holders.length) {
         result = createPartial(func, bitmask, thisArg, partials);
       } else {
-        result = createHybrid.apply(undefined, newData);
+        result = createHybrid.apply(undefined$1, newData);
       }
       var setter = data ? baseSetData : setData;
       return setWrapToString(setter(result, newData), func, bitmask);
@@ -5814,7 +5850,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {*} Returns the value to assign.
      */
     function customDefaultsAssignIn(objValue, srcValue, key, object) {
-      if (objValue === undefined ||
+      if (objValue === undefined$1 ||
           (eq(objValue, objectProto[key]) && !hasOwnProperty.call(object, key))) {
         return srcValue;
       }
@@ -5839,7 +5875,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (isObject(objValue) && isObject(srcValue)) {
         // Recursively merge objects and arrays (susceptible to call stack limits).
         stack.set(srcValue, objValue);
-        baseMerge(objValue, srcValue, undefined, customDefaultsMerge, stack);
+        baseMerge(objValue, srcValue, undefined$1, customDefaultsMerge, stack);
         stack['delete'](srcValue);
       }
       return objValue;
@@ -5855,7 +5891,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {*} Returns the uncloned value or `undefined` to defer cloning to `_.cloneDeep`.
      */
     function customOmitClone(value) {
-      return isPlainObject(value) ? undefined : value;
+      return isPlainObject(value) ? undefined$1 : value;
     }
 
     /**
@@ -5886,7 +5922,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       }
       var index = -1,
           result = true,
-          seen = (bitmask & COMPARE_UNORDERED_FLAG) ? new SetCache : undefined;
+          seen = (bitmask & COMPARE_UNORDERED_FLAG) ? new SetCache : undefined$1;
 
       stack.set(array, other);
       stack.set(other, array);
@@ -5901,7 +5937,7 @@ var lodash = createCommonjsModule(function (module, exports) {
             ? customizer(othValue, arrValue, index, other, array, stack)
             : customizer(arrValue, othValue, index, array, other, stack);
         }
-        if (compared !== undefined) {
+        if (compared !== undefined$1) {
           if (compared) {
             continue;
           }
@@ -6065,7 +6101,7 @@ var lodash = createCommonjsModule(function (module, exports) {
             : customizer(objValue, othValue, key, object, other, stack);
         }
         // Recursively compare objects (susceptible to call stack limits).
-        if (!(compared === undefined
+        if (!(compared === undefined$1
               ? (objValue === othValue || equalFunc(objValue, othValue, bitmask, customizer, stack))
               : compared
             )) {
@@ -6099,7 +6135,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {Function} Returns the new function.
      */
     function flatRest(func) {
-      return setToString(overRest(func, undefined, flatten), func + '');
+      return setToString(overRest(func, undefined$1, flatten), func + '');
     }
 
     /**
@@ -6232,7 +6268,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function getNative(object, key) {
       var value = getValue(object, key);
-      return baseIsNative(value) ? value : undefined;
+      return baseIsNative(value) ? value : undefined$1;
     }
 
     /**
@@ -6247,7 +6283,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           tag = value[symToStringTag];
 
       try {
-        value[symToStringTag] = undefined;
+        value[symToStringTag] = undefined$1;
         var unmasked = true;
       } catch (e) {}
 
@@ -6312,7 +6348,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         (WeakMap && getTag(new WeakMap) != weakMapTag)) {
       getTag = function(value) {
         var result = baseGetTag(value),
-            Ctor = result == objectTag ? value.constructor : undefined,
+            Ctor = result == objectTag ? value.constructor : undefined$1,
             ctorString = Ctor ? toSource(Ctor) : '';
 
         if (ctorString) {
@@ -6670,7 +6706,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           return false;
         }
         return object[key] === srcValue &&
-          (srcValue !== undefined || (key in Object(object)));
+          (srcValue !== undefined$1 || (key in Object(object)));
       };
     }
 
@@ -6805,7 +6841,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {Function} Returns the new function.
      */
     function overRest(func, start, transform) {
-      start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
+      start = nativeMax(start === undefined$1 ? (func.length - 1) : start, 0);
       return function() {
         var args = arguments,
             index = -1,
@@ -6854,7 +6890,7 @@ var lodash = createCommonjsModule(function (module, exports) {
 
       while (length--) {
         var index = indexes[length];
-        array[length] = isIndex(index, arrLength) ? oldArray[index] : undefined;
+        array[length] = isIndex(index, arrLength) ? oldArray[index] : undefined$1;
       }
       return array;
     }
@@ -6953,7 +6989,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         } else {
           count = 0;
         }
-        return func.apply(undefined, arguments);
+        return func.apply(undefined$1, arguments);
       };
     }
 
@@ -6970,7 +7006,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           length = array.length,
           lastIndex = length - 1;
 
-      size = size === undefined ? length : size;
+      size = size === undefined$1 ? length : size;
       while (++index < size) {
         var rand = baseRandom(index, lastIndex),
             value = array[rand];
@@ -7094,7 +7130,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => [['a', 'b', 'c'], ['d']]
      */
     function chunk(array, size, guard) {
-      if ((guard ? isIterateeCall(array, size, guard) : size === undefined)) {
+      if ((guard ? isIterateeCall(array, size, guard) : size === undefined$1)) {
         size = 1;
       } else {
         size = nativeMax(toInteger(size), 0);
@@ -7236,7 +7272,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     var differenceBy = baseRest(function(array, values) {
       var iteratee = last(values);
       if (isArrayLikeObject(iteratee)) {
-        iteratee = undefined;
+        iteratee = undefined$1;
       }
       return isArrayLikeObject(array)
         ? baseDifference(array, baseFlatten(values, 1, isArrayLikeObject, true), getIteratee(iteratee, 2))
@@ -7269,10 +7305,10 @@ var lodash = createCommonjsModule(function (module, exports) {
     var differenceWith = baseRest(function(array, values) {
       var comparator = last(values);
       if (isArrayLikeObject(comparator)) {
-        comparator = undefined;
+        comparator = undefined$1;
       }
       return isArrayLikeObject(array)
-        ? baseDifference(array, baseFlatten(values, 1, isArrayLikeObject, true), undefined, comparator)
+        ? baseDifference(array, baseFlatten(values, 1, isArrayLikeObject, true), undefined$1, comparator)
         : [];
     });
 
@@ -7306,7 +7342,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (!length) {
         return [];
       }
-      n = (guard || n === undefined) ? 1 : toInteger(n);
+      n = (guard || n === undefined$1) ? 1 : toInteger(n);
       return baseSlice(array, n < 0 ? 0 : n, length);
     }
 
@@ -7340,7 +7376,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (!length) {
         return [];
       }
-      n = (guard || n === undefined) ? 1 : toInteger(n);
+      n = (guard || n === undefined$1) ? 1 : toInteger(n);
       n = length - n;
       return baseSlice(array, 0, n < 0 ? 0 : n);
     }
@@ -7556,7 +7592,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         return -1;
       }
       var index = length - 1;
-      if (fromIndex !== undefined) {
+      if (fromIndex !== undefined$1) {
         index = toInteger(fromIndex);
         index = fromIndex < 0
           ? nativeMax(length + index, 0)
@@ -7628,7 +7664,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (!length) {
         return [];
       }
-      depth = depth === undefined ? 1 : toInteger(depth);
+      depth = depth === undefined$1 ? 1 : toInteger(depth);
       return baseFlatten(array, depth);
     }
 
@@ -7678,7 +7714,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => undefined
      */
     function head(array) {
-      return (array && array.length) ? array[0] : undefined;
+      return (array && array.length) ? array[0] : undefined$1;
     }
 
     /**
@@ -7787,7 +7823,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           mapped = arrayMap(arrays, castArrayLikeObject);
 
       if (iteratee === last(mapped)) {
-        iteratee = undefined;
+        iteratee = undefined$1;
       } else {
         mapped.pop();
       }
@@ -7821,12 +7857,12 @@ var lodash = createCommonjsModule(function (module, exports) {
       var comparator = last(arrays),
           mapped = arrayMap(arrays, castArrayLikeObject);
 
-      comparator = typeof comparator == 'function' ? comparator : undefined;
+      comparator = typeof comparator == 'function' ? comparator : undefined$1;
       if (comparator) {
         mapped.pop();
       }
       return (mapped.length && mapped[0] === arrays[0])
-        ? baseIntersection(mapped, undefined, comparator)
+        ? baseIntersection(mapped, undefined$1, comparator)
         : [];
     });
 
@@ -7865,7 +7901,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function last(array) {
       var length = array == null ? 0 : array.length;
-      return length ? array[length - 1] : undefined;
+      return length ? array[length - 1] : undefined$1;
     }
 
     /**
@@ -7895,7 +7931,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         return -1;
       }
       var index = length;
-      if (fromIndex !== undefined) {
+      if (fromIndex !== undefined$1) {
         index = toInteger(fromIndex);
         index = index < 0 ? nativeMax(length + index, 0) : nativeMin(index, length - 1);
       }
@@ -7926,7 +7962,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => 'c';
      */
     function nth(array, n) {
-      return (array && array.length) ? baseNth(array, toInteger(n)) : undefined;
+      return (array && array.length) ? baseNth(array, toInteger(n)) : undefined$1;
     }
 
     /**
@@ -8034,7 +8070,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function pullAllWith(array, values, comparator) {
       return (array && array.length && values && values.length)
-        ? basePullAll(array, values, undefined, comparator)
+        ? basePullAll(array, values, undefined$1, comparator)
         : array;
     }
 
@@ -8176,7 +8212,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       }
       else {
         start = start == null ? 0 : toInteger(start);
-        end = end === undefined ? length : toInteger(end);
+        end = end === undefined$1 ? length : toInteger(end);
       }
       return baseSlice(array, start, end);
     }
@@ -8427,7 +8463,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (!(array && array.length)) {
         return [];
       }
-      n = (guard || n === undefined) ? 1 : toInteger(n);
+      n = (guard || n === undefined$1) ? 1 : toInteger(n);
       return baseSlice(array, 0, n < 0 ? 0 : n);
     }
 
@@ -8461,7 +8497,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (!length) {
         return [];
       }
-      n = (guard || n === undefined) ? 1 : toInteger(n);
+      n = (guard || n === undefined$1) ? 1 : toInteger(n);
       n = length - n;
       return baseSlice(array, n < 0 ? 0 : n, length);
     }
@@ -8594,7 +8630,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     var unionBy = baseRest(function(arrays) {
       var iteratee = last(arrays);
       if (isArrayLikeObject(iteratee)) {
-        iteratee = undefined;
+        iteratee = undefined$1;
       }
       return baseUniq(baseFlatten(arrays, 1, isArrayLikeObject, true), getIteratee(iteratee, 2));
     });
@@ -8622,8 +8658,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     var unionWith = baseRest(function(arrays) {
       var comparator = last(arrays);
-      comparator = typeof comparator == 'function' ? comparator : undefined;
-      return baseUniq(baseFlatten(arrays, 1, isArrayLikeObject, true), undefined, comparator);
+      comparator = typeof comparator == 'function' ? comparator : undefined$1;
+      return baseUniq(baseFlatten(arrays, 1, isArrayLikeObject, true), undefined$1, comparator);
     });
 
     /**
@@ -8696,8 +8732,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }]
      */
     function uniqWith(array, comparator) {
-      comparator = typeof comparator == 'function' ? comparator : undefined;
-      return (array && array.length) ? baseUniq(array, undefined, comparator) : [];
+      comparator = typeof comparator == 'function' ? comparator : undefined$1;
+      return (array && array.length) ? baseUniq(array, undefined$1, comparator) : [];
     }
 
     /**
@@ -8765,7 +8801,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         return result;
       }
       return arrayMap(result, function(group) {
-        return apply(iteratee, undefined, group);
+        return apply(iteratee, undefined$1, group);
       });
     }
 
@@ -8843,7 +8879,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     var xorBy = baseRest(function(arrays) {
       var iteratee = last(arrays);
       if (isArrayLikeObject(iteratee)) {
-        iteratee = undefined;
+        iteratee = undefined$1;
       }
       return baseXor(arrayFilter(arrays, isArrayLikeObject), getIteratee(iteratee, 2));
     });
@@ -8871,8 +8907,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     var xorWith = baseRest(function(arrays) {
       var comparator = last(arrays);
-      comparator = typeof comparator == 'function' ? comparator : undefined;
-      return baseXor(arrayFilter(arrays, isArrayLikeObject), undefined, comparator);
+      comparator = typeof comparator == 'function' ? comparator : undefined$1;
+      return baseXor(arrayFilter(arrays, isArrayLikeObject), undefined$1, comparator);
     });
 
     /**
@@ -8954,9 +8990,9 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     var zipWith = baseRest(function(arrays) {
       var length = arrays.length,
-          iteratee = length > 1 ? arrays[length - 1] : undefined;
+          iteratee = length > 1 ? arrays[length - 1] : undefined$1;
 
-      iteratee = typeof iteratee == 'function' ? (arrays.pop(), iteratee) : undefined;
+      iteratee = typeof iteratee == 'function' ? (arrays.pop(), iteratee) : undefined$1;
       return unzipWith(arrays, iteratee);
     });
 
@@ -9082,11 +9118,11 @@ var lodash = createCommonjsModule(function (module, exports) {
       value.__actions__.push({
         'func': thru,
         'args': [interceptor],
-        'thisArg': undefined
+        'thisArg': undefined$1
       });
       return new LodashWrapper(value, this.__chain__).thru(function(array) {
         if (length && !array.length) {
-          array.push(undefined);
+          array.push(undefined$1);
         }
         return array;
       });
@@ -9176,11 +9212,11 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => { 'done': true, 'value': undefined }
      */
     function wrapperNext() {
-      if (this.__values__ === undefined) {
+      if (this.__values__ === undefined$1) {
         this.__values__ = toArray(this.value());
       }
       var done = this.__index__ >= this.__values__.length,
-          value = done ? undefined : this.__values__[this.__index__++];
+          value = done ? undefined$1 : this.__values__[this.__index__++];
 
       return { 'done': done, 'value': value };
     }
@@ -9238,7 +9274,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       while (parent instanceof baseLodash) {
         var clone = wrapperClone(parent);
         clone.__index__ = 0;
-        clone.__values__ = undefined;
+        clone.__values__ = undefined$1;
         if (result) {
           previous.__wrapped__ = clone;
         } else {
@@ -9282,7 +9318,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         wrapped.__actions__.push({
           'func': thru,
           'args': [reverse],
-          'thisArg': undefined
+          'thisArg': undefined$1
         });
         return new LodashWrapper(wrapped, this.__chain__);
       }
@@ -9383,7 +9419,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     function every(collection, predicate, guard) {
       var func = isArray(collection) ? arrayEvery : baseEvery;
       if (guard && isIterateeCall(collection, predicate, guard)) {
-        predicate = undefined;
+        predicate = undefined$1;
       }
       return func(collection, getIteratee(predicate, 3));
     }
@@ -9560,7 +9596,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => [[1, 1], [2, 2]]
      */
     function flatMapDepth(collection, iteratee, depth) {
-      depth = depth === undefined ? 1 : toInteger(depth);
+      depth = depth === undefined$1 ? 1 : toInteger(depth);
       return baseFlatten(map(collection, iteratee), depth);
     }
 
@@ -9847,7 +9883,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (!isArray(iteratees)) {
         iteratees = iteratees == null ? [] : [iteratees];
       }
-      orders = guard ? undefined : orders;
+      orders = guard ? undefined$1 : orders;
       if (!isArray(orders)) {
         orders = orders == null ? [] : [orders];
       }
@@ -10046,7 +10082,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => [2, 3, 1]
      */
     function sampleSize(collection, n, guard) {
-      if ((guard ? isIterateeCall(collection, n, guard) : n === undefined)) {
+      if ((guard ? isIterateeCall(collection, n, guard) : n === undefined$1)) {
         n = 1;
       } else {
         n = toInteger(n);
@@ -10149,7 +10185,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     function some(collection, predicate, guard) {
       var func = isArray(collection) ? arraySome : baseSome;
       if (guard && isIterateeCall(collection, predicate, guard)) {
-        predicate = undefined;
+        predicate = undefined$1;
       }
       return func(collection, getIteratee(predicate, 3));
     }
@@ -10274,9 +10310,9 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => [6, 8, 10]
      */
     function ary(func, n, guard) {
-      n = guard ? undefined : n;
+      n = guard ? undefined$1 : n;
       n = (func && n == null) ? func.length : n;
-      return createWrap(func, WRAP_ARY_FLAG, undefined, undefined, undefined, undefined, n);
+      return createWrap(func, WRAP_ARY_FLAG, undefined$1, undefined$1, undefined$1, undefined$1, n);
     }
 
     /**
@@ -10307,7 +10343,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           result = func.apply(this, arguments);
         }
         if (n <= 1) {
-          func = undefined;
+          func = undefined$1;
         }
         return result;
       };
@@ -10453,8 +10489,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => [1, 2, 3]
      */
     function curry(func, arity, guard) {
-      arity = guard ? undefined : arity;
-      var result = createWrap(func, WRAP_CURRY_FLAG, undefined, undefined, undefined, undefined, undefined, arity);
+      arity = guard ? undefined$1 : arity;
+      var result = createWrap(func, WRAP_CURRY_FLAG, undefined$1, undefined$1, undefined$1, undefined$1, undefined$1, arity);
       result.placeholder = curry.placeholder;
       return result;
     }
@@ -10498,8 +10534,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => [1, 2, 3]
      */
     function curryRight(func, arity, guard) {
-      arity = guard ? undefined : arity;
-      var result = createWrap(func, WRAP_CURRY_RIGHT_FLAG, undefined, undefined, undefined, undefined, undefined, arity);
+      arity = guard ? undefined$1 : arity;
+      var result = createWrap(func, WRAP_CURRY_RIGHT_FLAG, undefined$1, undefined$1, undefined$1, undefined$1, undefined$1, arity);
       result.placeholder = curryRight.placeholder;
       return result;
     }
@@ -10585,7 +10621,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         var args = lastArgs,
             thisArg = lastThis;
 
-        lastArgs = lastThis = undefined;
+        lastArgs = lastThis = undefined$1;
         lastInvokeTime = time;
         result = func.apply(thisArg, args);
         return result;
@@ -10617,7 +10653,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         // Either this is the first call, activity has stopped and we're at the
         // trailing edge, the system time has gone backwards and we're treating
         // it as the trailing edge, or we've hit the `maxWait` limit.
-        return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+        return (lastCallTime === undefined$1 || (timeSinceLastCall >= wait) ||
           (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
       }
 
@@ -10631,27 +10667,27 @@ var lodash = createCommonjsModule(function (module, exports) {
       }
 
       function trailingEdge(time) {
-        timerId = undefined;
+        timerId = undefined$1;
 
         // Only invoke if we have `lastArgs` which means `func` has been
         // debounced at least once.
         if (trailing && lastArgs) {
           return invokeFunc(time);
         }
-        lastArgs = lastThis = undefined;
+        lastArgs = lastThis = undefined$1;
         return result;
       }
 
       function cancel() {
-        if (timerId !== undefined) {
+        if (timerId !== undefined$1) {
           clearTimeout(timerId);
         }
         lastInvokeTime = 0;
-        lastArgs = lastCallTime = lastThis = timerId = undefined;
+        lastArgs = lastCallTime = lastThis = timerId = undefined$1;
       }
 
       function flush() {
-        return timerId === undefined ? result : trailingEdge(now());
+        return timerId === undefined$1 ? result : trailingEdge(now());
       }
 
       function debounced() {
@@ -10663,7 +10699,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         lastCallTime = time;
 
         if (isInvoking) {
-          if (timerId === undefined) {
+          if (timerId === undefined$1) {
             return leadingEdge(lastCallTime);
           }
           if (maxing) {
@@ -10672,7 +10708,7 @@ var lodash = createCommonjsModule(function (module, exports) {
             return invokeFunc(lastCallTime);
           }
         }
-        if (timerId === undefined) {
+        if (timerId === undefined$1) {
           timerId = setTimeout(timerExpired, wait);
         }
         return result;
@@ -10957,7 +10993,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     var partial = baseRest(function(func, partials) {
       var holders = replaceHolders(partials, getHolder(partial));
-      return createWrap(func, WRAP_PARTIAL_FLAG, undefined, partials, holders);
+      return createWrap(func, WRAP_PARTIAL_FLAG, undefined$1, partials, holders);
     });
 
     /**
@@ -10994,7 +11030,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     var partialRight = baseRest(function(func, partials) {
       var holders = replaceHolders(partials, getHolder(partialRight));
-      return createWrap(func, WRAP_PARTIAL_RIGHT_FLAG, undefined, partials, holders);
+      return createWrap(func, WRAP_PARTIAL_RIGHT_FLAG, undefined$1, partials, holders);
     });
 
     /**
@@ -11020,7 +11056,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => ['a', 'b', 'c']
      */
     var rearg = flatRest(function(func, indexes) {
-      return createWrap(func, WRAP_REARG_FLAG, undefined, undefined, undefined, indexes);
+      return createWrap(func, WRAP_REARG_FLAG, undefined$1, undefined$1, undefined$1, indexes);
     });
 
     /**
@@ -11052,7 +11088,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (typeof func != 'function') {
         throw new TypeError(FUNC_ERROR_TEXT);
       }
-      start = start === undefined ? start : toInteger(start);
+      start = start === undefined$1 ? start : toInteger(start);
       return baseRest(func, start);
     }
 
@@ -11318,7 +11354,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => 0
      */
     function cloneWith(value, customizer) {
-      customizer = typeof customizer == 'function' ? customizer : undefined;
+      customizer = typeof customizer == 'function' ? customizer : undefined$1;
       return baseClone(value, CLONE_SYMBOLS_FLAG, customizer);
     }
 
@@ -11373,7 +11409,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => 20
      */
     function cloneDeepWith(value, customizer) {
-      customizer = typeof customizer == 'function' ? customizer : undefined;
+      customizer = typeof customizer == 'function' ? customizer : undefined$1;
       return baseClone(value, CLONE_DEEP_FLAG | CLONE_SYMBOLS_FLAG, customizer);
     }
 
@@ -11821,9 +11857,9 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => true
      */
     function isEqualWith(value, other, customizer) {
-      customizer = typeof customizer == 'function' ? customizer : undefined;
-      var result = customizer ? customizer(value, other) : undefined;
-      return result === undefined ? baseIsEqual(value, other, undefined, customizer) : !!result;
+      customizer = typeof customizer == 'function' ? customizer : undefined$1;
+      var result = customizer ? customizer(value, other) : undefined$1;
+      return result === undefined$1 ? baseIsEqual(value, other, undefined$1, customizer) : !!result;
     }
 
     /**
@@ -12113,7 +12149,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => true
      */
     function isMatchWith(object, source, customizer) {
-      customizer = typeof customizer == 'function' ? customizer : undefined;
+      customizer = typeof customizer == 'function' ? customizer : undefined$1;
       return baseIsMatch(object, source, getMatchData(source), customizer);
     }
 
@@ -12452,7 +12488,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => false
      */
     function isUndefined(value) {
-      return value === undefined;
+      return value === undefined$1;
     }
 
     /**
@@ -13044,7 +13080,7 @@ var lodash = createCommonjsModule(function (module, exports) {
 
       var index = -1;
       var length = sources.length;
-      var guard = length > 2 ? sources[2] : undefined;
+      var guard = length > 2 ? sources[2] : undefined$1;
 
       if (guard && isIterateeCall(sources[0], sources[1], guard)) {
         length = 1;
@@ -13060,7 +13096,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           var key = props[propsIndex];
           var value = object[key];
 
-          if (value === undefined ||
+          if (value === undefined$1 ||
               (eq(value, objectProto[key]) && !hasOwnProperty.call(object, key))) {
             object[key] = source[key];
           }
@@ -13090,8 +13126,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => { 'a': { 'b': 2, 'c': 3 } }
      */
     var defaultsDeep = baseRest(function(args) {
-      args.push(undefined, customDefaultsMerge);
-      return apply(mergeWith, undefined, args);
+      args.push(undefined$1, customDefaultsMerge);
+      return apply(mergeWith, undefined$1, args);
     });
 
     /**
@@ -13380,8 +13416,8 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => 'default'
      */
     function get(object, path, defaultValue) {
-      var result = object == null ? undefined : baseGet(object, path);
-      return result === undefined ? defaultValue : result;
+      var result = object == null ? undefined$1 : baseGet(object, path);
+      return result === undefined$1 ? defaultValue : result;
     }
 
     /**
@@ -13885,11 +13921,11 @@ var lodash = createCommonjsModule(function (module, exports) {
       // Ensure the loop is entered when path is empty.
       if (!length) {
         length = 1;
-        object = undefined;
+        object = undefined$1;
       }
       while (++index < length) {
-        var value = object == null ? undefined : object[toKey(path[index])];
-        if (value === undefined) {
+        var value = object == null ? undefined$1 : object[toKey(path[index])];
+        if (value === undefined$1) {
           index = length;
           value = defaultValue;
         }
@@ -13955,7 +13991,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => { '0': { '1': 'a' } }
      */
     function setWith(object, path, value, customizer) {
-      customizer = typeof customizer == 'function' ? customizer : undefined;
+      customizer = typeof customizer == 'function' ? customizer : undefined$1;
       return object == null ? object : baseSet(object, path, value, customizer);
     }
 
@@ -14151,7 +14187,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => { '0': { '1': 'a' } }
      */
     function updateWith(object, path, updater, customizer) {
-      customizer = typeof customizer == 'function' ? customizer : undefined;
+      customizer = typeof customizer == 'function' ? customizer : undefined$1;
       return object == null ? object : baseUpdate(object, path, castFunction(updater), customizer);
     }
 
@@ -14235,15 +14271,15 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => 5
      */
     function clamp(number, lower, upper) {
-      if (upper === undefined) {
+      if (upper === undefined$1) {
         upper = lower;
-        lower = undefined;
+        lower = undefined$1;
       }
-      if (upper !== undefined) {
+      if (upper !== undefined$1) {
         upper = toNumber(upper);
         upper = upper === upper ? upper : 0;
       }
-      if (lower !== undefined) {
+      if (lower !== undefined$1) {
         lower = toNumber(lower);
         lower = lower === lower ? lower : 0;
       }
@@ -14290,7 +14326,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function inRange(number, start, end) {
       start = toFinite(start);
-      if (end === undefined) {
+      if (end === undefined$1) {
         end = start;
         start = 0;
       } else {
@@ -14333,25 +14369,25 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function random(lower, upper, floating) {
       if (floating && typeof floating != 'boolean' && isIterateeCall(lower, upper, floating)) {
-        upper = floating = undefined;
+        upper = floating = undefined$1;
       }
-      if (floating === undefined) {
+      if (floating === undefined$1) {
         if (typeof upper == 'boolean') {
           floating = upper;
-          upper = undefined;
+          upper = undefined$1;
         }
         else if (typeof lower == 'boolean') {
           floating = lower;
-          lower = undefined;
+          lower = undefined$1;
         }
       }
-      if (lower === undefined && upper === undefined) {
+      if (lower === undefined$1 && upper === undefined$1) {
         lower = 0;
         upper = 1;
       }
       else {
         lower = toFinite(lower);
-        if (upper === undefined) {
+        if (upper === undefined$1) {
           upper = lower;
           lower = 0;
         } else {
@@ -14467,7 +14503,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       target = baseToString(target);
 
       var length = string.length;
-      position = position === undefined
+      position = position === undefined$1
         ? length
         : baseClamp(toInteger(position), 0, length);
 
@@ -14762,7 +14798,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // => ''
      */
     function repeat(string, n, guard) {
-      if ((guard ? isIterateeCall(string, n, guard) : n === undefined)) {
+      if ((guard ? isIterateeCall(string, n, guard) : n === undefined$1)) {
         n = 1;
       } else {
         n = toInteger(n);
@@ -14842,9 +14878,9 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function split(string, separator, limit) {
       if (limit && typeof limit != 'number' && isIterateeCall(string, separator, limit)) {
-        separator = limit = undefined;
+        separator = limit = undefined$1;
       }
-      limit = limit === undefined ? MAX_ARRAY_LENGTH : limit >>> 0;
+      limit = limit === undefined$1 ? MAX_ARRAY_LENGTH : limit >>> 0;
       if (!limit) {
         return [];
       }
@@ -15030,7 +15066,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       var settings = lodash.templateSettings;
 
       if (guard && isIterateeCall(string, options, guard)) {
-        options = undefined;
+        options = undefined$1;
       }
       string = toString(string);
       options = assignInWith({}, options, settings, customDefaultsAssignIn);
@@ -15119,7 +15155,7 @@ var lodash = createCommonjsModule(function (module, exports) {
 
       var result = attempt(function() {
         return Function(importsKeys, sourceURL + 'return ' + source)
-          .apply(undefined, importsValues);
+          .apply(undefined$1, importsValues);
       });
 
       // Provide the compiled function's source by its `toString` method or
@@ -15205,7 +15241,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function trim(string, chars, guard) {
       string = toString(string);
-      if (string && (guard || chars === undefined)) {
+      if (string && (guard || chars === undefined$1)) {
         return string.replace(reTrim, '');
       }
       if (!string || !(chars = baseToString(chars))) {
@@ -15240,7 +15276,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function trimEnd(string, chars, guard) {
       string = toString(string);
-      if (string && (guard || chars === undefined)) {
+      if (string && (guard || chars === undefined$1)) {
         return string.replace(reTrimEnd, '');
       }
       if (!string || !(chars = baseToString(chars))) {
@@ -15273,7 +15309,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function trimStart(string, chars, guard) {
       string = toString(string);
-      if (string && (guard || chars === undefined)) {
+      if (string && (guard || chars === undefined$1)) {
         return string.replace(reTrimStart, '');
       }
       if (!string || !(chars = baseToString(chars))) {
@@ -15349,7 +15385,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         ? castSlice(strSymbols, 0, end).join('')
         : string.slice(0, end);
 
-      if (separator === undefined) {
+      if (separator === undefined$1) {
         return result + omission;
       }
       if (strSymbols) {
@@ -15367,7 +15403,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           while ((match = separator.exec(substring))) {
             var newEnd = match.index;
           }
-          result = result.slice(0, newEnd === undefined ? end : newEnd);
+          result = result.slice(0, newEnd === undefined$1 ? end : newEnd);
         }
       } else if (string.indexOf(baseToString(separator), end) != end) {
         var index = result.lastIndexOf(separator);
@@ -15468,9 +15504,9 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function words(string, pattern, guard) {
       string = toString(string);
-      pattern = guard ? undefined : pattern;
+      pattern = guard ? undefined$1 : pattern;
 
-      if (pattern === undefined) {
+      if (pattern === undefined$1) {
         return hasUnicodeWord(string) ? unicodeWords(string) : asciiWords(string);
       }
       return string.match(pattern) || [];
@@ -15502,7 +15538,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     var attempt = baseRest(function(func, args) {
       try {
-        return apply(func, undefined, args);
+        return apply(func, undefined$1, args);
       } catch (e) {
         return isError(e) ? e : new Error(e);
       }
@@ -16160,7 +16196,7 @@ var lodash = createCommonjsModule(function (module, exports) {
      */
     function propertyOf(object) {
       return function(path) {
-        return object == null ? undefined : baseGet(object, path);
+        return object == null ? undefined$1 : baseGet(object, path);
       };
     }
 
@@ -16530,7 +16566,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     function max(array) {
       return (array && array.length)
         ? baseExtremum(array, identity, baseGt)
-        : undefined;
+        : undefined$1;
     }
 
     /**
@@ -16559,7 +16595,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     function maxBy(array, iteratee) {
       return (array && array.length)
         ? baseExtremum(array, getIteratee(iteratee, 2), baseGt)
-        : undefined;
+        : undefined$1;
     }
 
     /**
@@ -16628,7 +16664,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     function min(array) {
       return (array && array.length)
         ? baseExtremum(array, identity, baseLt)
-        : undefined;
+        : undefined$1;
     }
 
     /**
@@ -16657,7 +16693,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     function minBy(array, iteratee) {
       return (array && array.length)
         ? baseExtremum(array, getIteratee(iteratee, 2), baseLt)
-        : undefined;
+        : undefined$1;
     }
 
     /**
@@ -17119,7 +17155,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     // Add `LazyWrapper` methods for `_.drop` and `_.take` variants.
     arrayEach(['drop', 'take'], function(methodName, index) {
       LazyWrapper.prototype[methodName] = function(n) {
-        n = n === undefined ? 1 : nativeMax(toInteger(n), 0);
+        n = n === undefined$1 ? 1 : nativeMax(toInteger(n), 0);
 
         var result = (this.__filtered__ && !index)
           ? new LazyWrapper(this)
@@ -17212,7 +17248,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       } else if (start) {
         result = result.drop(start);
       }
-      if (end !== undefined) {
+      if (end !== undefined$1) {
         end = toInteger(end);
         result = end < 0 ? result.dropRight(-end) : result.take(end - start);
       }
@@ -17261,7 +17297,7 @@ var lodash = createCommonjsModule(function (module, exports) {
         if (!retUnwrapped && useLazy) {
           value = onlyLazy ? value : new LazyWrapper(this);
           var result = func.apply(value, args);
-          result.__actions__.push({ 'func': thru, 'args': [interceptor], 'thisArg': undefined });
+          result.__actions__.push({ 'func': thru, 'args': [interceptor], 'thisArg': undefined$1 });
           return new LodashWrapper(result, chainAll);
         }
         if (isUnwrapped && onlyLazy) {
@@ -17301,9 +17337,9 @@ var lodash = createCommonjsModule(function (module, exports) {
       }
     });
 
-    realNames[createHybrid(undefined, WRAP_BIND_KEY_FLAG).name] = [{
+    realNames[createHybrid(undefined$1, WRAP_BIND_KEY_FLAG).name] = [{
       'name': 'wrapper',
-      'func': undefined
+      'func': undefined$1
     }];
 
     // Add methods to `LazyWrapper`.
@@ -65557,7 +65593,7 @@ Timer.prototype = {
 
     return delta;
   }
-}; ////////////////////////////////////////////////////////////////////////////
+}; //----------------------------------------------------------------------------
 // Query string
 
 /**
@@ -65578,9 +65614,11 @@ Timer.prototype = {
  */
 
 function encodeQueryComponent(text, excludeExp) {
-  return encodeURIComponent(text).replace(excludeExp, function (code) {
+  var encode = function encode(code) {
     return String.fromCharCode(parseInt(code.substr(1), 16));
-  }).replace(/%20/g, '+');
+  };
+
+  return encodeURIComponent(text).replace(excludeExp, encode).replace(/%20/g, '+');
 }
 /**
  * Unescape dangerous chars in a query string component.
@@ -65609,6 +65647,7 @@ function getUrlParameters(url) {
   var match;
 
   while ((match = search.exec(query)) !== null) {
+    // eslint-disable-line no-cond-assign
     result.push([decodeQueryComponent(match[1]), decodeQueryComponent(match[2])]);
   }
 
@@ -65626,7 +65665,11 @@ function getUrlParametersAsDict(url) {
   var a = getUrlParameters(url);
 
   for (var i = 0; i < a.length; ++i) {
-    result[a[i][0]] = a[i][1];
+    var _a$i = _slicedToArray(a[i], 2),
+        key = _a$i[0],
+        value = _a$i[1];
+
+    result[key] = value;
   }
 
   return result;
@@ -65637,9 +65680,9 @@ function resolveURL(str) {
     try {
       if (typeof window !== 'undefined') {
         return new URL(str, window.location).href;
-      } else {
-        return new URL(str).href;
       }
+
+      return new URL(str).href;
     } catch (error) {// IE 11 has a URL object with no constructor available so just try a different approach instead
     }
   }
@@ -65668,14 +65711,15 @@ function generateRegExp(symbolStr) {
   }
 
   var listStr = symbolList.join('|');
-  return new RegExp('%(?:' + listStr + ')', 'gi');
-} ////////////////////////////////////////////////////////////////////////////
+  return new RegExp("%(?:".concat(listStr, ")"), 'gi');
+} //----------------------------------------------------------------------------
 // Create HTML element
 
 
 function createElement(tag, attrs, content) {
   var element = document.createElement(tag);
-  var i, n;
+  var i;
+  var n;
 
   if (attrs) {
     var keys = Object.keys(attrs);
@@ -65703,7 +65747,7 @@ function createElement(tag, attrs, content) {
   }
 
   return element;
-} ////////////////////////////////////////////////////////////////////////////
+} //----------------------------------------------------------------------------
 // Easy inheritance
 
 /**
@@ -65726,13 +65770,14 @@ function deriveClass(cls, base, members, statics) {
   }
 
   return cls;
-} ////////////////////////////////////////////////////////////////////////////
+} //----------------------------------------------------------------------------
 // Deep prototyping
 
 
 function deriveDeep(obj, needZeroOwnProperties) {
   var res = obj;
-  var i, n;
+  var i;
+  var n;
 
   if (obj instanceof Array) {
     res = new Array(obj.length);
@@ -65760,14 +65805,14 @@ function deriveDeep(obj, needZeroOwnProperties) {
   }
 
   return res;
-} ////////////////////////////////////////////////////////////////////////////
+} //----------------------------------------------------------------------------
 // Colors
 
 
 function hexColor(color) {
-  var hex = ('0000000' + color.toString(16)).substr(-6);
-  return '#' + hex;
-} ////////////////////////////////////////////////////////////////////////////
+  var hex = "0000000".concat(color.toString(16)).substr(-6);
+  return "#".concat(hex);
+} //----------------------------------------------------------------------------
 // Debug tracing
 
 
@@ -65786,16 +65831,21 @@ function DebugTracer(namespace) {
       var spaces = DebugTracer.spaces.substr(0, indent * 2);
 
       if (enabled) {
-        logger.debug(spaces + name_ + ' {');
+        logger.debug("".concat(spaces + name_, " {"));
       }
 
       indent++;
-      var result = method_.apply(this, arguments); // eslint-disable-line no-invalid-this
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      var result = method_.apply(this, args); // eslint-disable-line no-invalid-this
 
       indent--;
 
       if (enabled) {
-        logger.debug(spaces + '} // ' + name_);
+        logger.debug("".concat(spaces, "} // ").concat(name_));
       }
 
       return result;
@@ -65836,7 +65886,7 @@ function allocateTyped(TypedArrayName, size) {
   }
 
   return result;
-} ////////////////////////////////////////////////////////////////////////////
+} //----------------------------------------------------------------------------
 // Float array conversion
 
 
@@ -65880,7 +65930,7 @@ str,
 /** function */
 TypedArrayClass) {
   return Array.prototype.slice.call(new TypedArrayClass(bytesFromBase64(str)));
-} //NOTE: this is 1-level comparison
+} // NOTE: this is 1-level comparison
 
 
 function compareOptionsWithDefaults(opts, defOpts) {
@@ -65894,12 +65944,12 @@ function compareOptionsWithDefaults(opts, defOpts) {
       var value = opts[key]; // TODO add processing for tree structure
 
       if (!(value instanceof Object) && typeof defOpts[key] !== 'undefined' && defOpts[key] !== value) {
-        optsStr.push(key + ':' + value);
+        optsStr.push("".concat(key, ":").concat(value));
       }
     }
 
     if (optsStr.length > 0) {
-      return '!' + optsStr.join();
+      return "!".concat(optsStr.join());
     }
   }
 
@@ -65961,7 +66011,7 @@ function forInRecursive(object, callback) {
 
 function enquoteString(value) {
   if (lodash.isString(value)) {
-    return '"' + value.replace(/"/g, '\\"') + '"';
+    return "\"".concat(value.replace(/"/g, '\\"'), "\"");
   }
 
   return value;
@@ -66008,7 +66058,7 @@ function dataUrlToBlob(url) {
 
 function shotOpen(url) {
   if (typeof window !== 'undefined') {
-    window.open().document.write('<body style="margin:0"><img src="' + url + '" /></body>');
+    window.open().document.write("<body style=\"margin:0\"><img src=\"".concat(url, "\" /></body>"));
   }
 }
 
@@ -66044,7 +66094,7 @@ function download(data, filename, type) {
   if (!type) {
     filename += blobData.type || '.bin';
   } else {
-    filename += '.' + type;
+    filename += ".".concat(type);
   }
 
   if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveBlob) {
@@ -66086,7 +66136,7 @@ function correctSelectorIdentifier(value) {
 
   enquoteHelper[1] = value;
   return enquoteHelper.join('');
-} ////////////////////////////////////////////////////////////////////////////
+} //----------------------------------------------------------------------------
 // Exports
 
 
@@ -66237,9 +66287,9 @@ function (_EventDispatcher) {
   return JobHandle;
 }(EventDispatcher$1);
 
-var VERSION = 0; //////////////////////////////////////////////////////////////////////////
-/////////////////////     DEFAULT SETTINGS     ///////////////////////////
-//////////////////////////////////////////////////////////////////////////
+var VERSION = 0; //----------------------------------------------------------------------------
+// DEFAULT SETTINGS
+//----------------------------------------------------------------------------
 
 /**
  * Polygonal complexity settings.
@@ -66283,7 +66333,9 @@ var defaults$1 = {
    * @property {VolumeDensityModeOptions} VD - Volume Density mode options.
    */
   modes: {
-    /////////////////////    BALLS AND STICKS    ///////////////////////////
+    //----------------------------------------------------------------------------
+    // BALLS AND STICKS
+    //----------------------------------------------------------------------------
 
     /**
      * Balls and Sticks mode options.
@@ -66314,7 +66366,9 @@ var defaults$1 = {
         ultra: 32
       }
     },
-    ////////////////////       VAN DER WAALS      //////////////////////////
+    //----------------------------------------------------------------------------
+    // VAN DER WAALS
+    //----------------------------------------------------------------------------
 
     /**
      * Van der Waals mode options.
@@ -66332,7 +66386,9 @@ var defaults$1 = {
         ultra: 32
       }
     },
-    ////////////////////           LINES          //////////////////////////
+    //----------------------------------------------------------------------------
+    // LINES
+    //----------------------------------------------------------------------------
 
     /**
      * Lines mode options.
@@ -66354,7 +66410,9 @@ var defaults$1 = {
       atom: 0.23,
       lineWidth: 2
     },
-    ////////////////////         LICORICE         //////////////////////////
+    //----------------------------------------------------------------------------
+    // LICORICE
+    //----------------------------------------------------------------------------
 
     /**
      * Licorice mode options.
@@ -66383,7 +66441,9 @@ var defaults$1 = {
         ultra: 32
       }
     },
-    ////////////////////          SURFACE   SAS   //////////////////////////
+    //----------------------------------------------------------------------------
+    // SURFACE SAS
+    //----------------------------------------------------------------------------
 
     /**
      * Solvent Accessible Surface mode options.
@@ -66410,7 +66470,9 @@ var defaults$1 = {
         ultra: 60
       }
     },
-    ////////////////////          SURFACE   SES   //////////////////////////
+    //----------------------------------------------------------------------------
+    // SURFACE SES
+    //----------------------------------------------------------------------------
 
     /**
      * Solvent Excluded Surface mode options.
@@ -66437,7 +66499,9 @@ var defaults$1 = {
         ultra: 60
       }
     },
-    ////////////////////       QUICK SURFACE        //////////////////////////
+    //----------------------------------------------------------------------------
+    // QUICK SURFACE
+    //----------------------------------------------------------------------------
 
     /**
      * Quick Surface mode options.
@@ -66475,7 +66539,9 @@ var defaults$1 = {
       subset: '',
       zClip: false
     },
-    ////////////////////      CONTACT SURFACE       //////////////////////////
+    //----------------------------------------------------------------------------
+    // CONTACT SURFACE
+    //----------------------------------------------------------------------------
 
     /**
      * Contact Surface mode options.
@@ -66507,7 +66573,9 @@ var defaults$1 = {
       subset: '',
       zClip: false
     },
-    ////////////////////           TRACE          //////////////////////////
+    //----------------------------------------------------------------------------
+    // TRACE
+    //----------------------------------------------------------------------------
 
     /**
      * Trace mode options.
@@ -66527,7 +66595,9 @@ var defaults$1 = {
         ultra: 64
       }
     },
-    ////////////////////           TUBE           //////////////////////////
+    //----------------------------------------------------------------------------
+    // TUBE
+    //----------------------------------------------------------------------------
 
     /**
      * Tube mode options.
@@ -66551,7 +66621,9 @@ var defaults$1 = {
         ultra: 34
       }
     },
-    ////////////////////          CARTOON         //////////////////////////
+    //----------------------------------------------------------------------------
+    // CARTOON
+    //----------------------------------------------------------------------------
 
     /**
      * Cartoon mode options.
@@ -66592,7 +66664,9 @@ var defaults$1 = {
         ultra: 34
       }
     },
-    ////////////////////           TEXT           //////////////////////////
+    //----------------------------------------------------------------------------
+    // TEXT
+    //----------------------------------------------------------------------------
 
     /**
      * Text mode options.
@@ -66621,7 +66695,9 @@ var defaults$1 = {
       bg: '0x202020',
       showBg: true
     },
-    ////////////////////         VOLUME DENSITY         //////////////////////////
+    //----------------------------------------------------------------------------
+    // VOLUME DENSITY
+    //----------------------------------------------------------------------------
 
     /**
      * Volume density mode options.
@@ -66632,7 +66708,9 @@ var defaults$1 = {
      *
      */
     VD: {
-      kSigma: 1.0
+      kSigma: 1.0,
+      kSigmaMed: 2.0,
+      kSigmaMax: 4.0
     }
   },
 
@@ -66658,8 +66736,6 @@ var defaults$1 = {
    * @property {HydrophobicityColorerOptions} HY - Hydrophobicity colorer options.
    */
   colorers: {
-    ////////////////////         ATOM TYPE        //////////////////////////
-
     /**
      * Element colorer options.
      *
@@ -66670,7 +66746,6 @@ var defaults$1 = {
     EL: {
       carbon: -1
     },
-    ////////////////////          UNIFORM         //////////////////////////
 
     /**
      * Uniform colorer options.
@@ -66682,7 +66757,6 @@ var defaults$1 = {
     UN: {
       color: 0xFFFFFF
     },
-    ////////////////////        CONDITIONAL       //////////////////////////
 
     /**
      * Conditional colorer options.
@@ -66698,7 +66772,6 @@ var defaults$1 = {
       color: 0xFF0000,
       baseColor: 0xFFFFFF
     },
-    ////////////////////          CARBON         //////////////////////////
 
     /**
      * Carbon colorer options.
@@ -66712,7 +66785,6 @@ var defaults$1 = {
       color: 0x909090,
       factor: 0.6
     },
-    ////////////////////         SEQUENCE         //////////////////////////
 
     /**
      * Sequence colorer options.
@@ -66724,7 +66796,6 @@ var defaults$1 = {
     SQ: {
       gradient: 'rainbow'
     },
-    ////////////////////         TEMPERATURE      //////////////////////////
 
     /**
      * Temperature colorer options.
@@ -66740,7 +66811,6 @@ var defaults$1 = {
       min: 5,
       max: 40
     },
-    ////////////////////         OCCUPANCY       //////////////////////////
 
     /**
      * Occupancy colorer options.
@@ -66752,7 +66822,6 @@ var defaults$1 = {
     OC: {
       gradient: 'reds'
     },
-    ////////////////////         HYDROPHOBICITY       //////////////////////////
 
     /**
      * Hydrophobicity colorer options.
@@ -66764,7 +66833,6 @@ var defaults$1 = {
     HY: {
       gradient: 'blue-red'
     },
-    ////////////////////         MOLECULE      //////////////////////////
 
     /**
      * Molecule colorer options.
@@ -66813,14 +66881,14 @@ var defaults$1 = {
    * @instance
    */
   fogNearFactor: 0.5,
-  //[0, 1]
+  // [0, 1]
 
   /**
    * @type {number}
    * @instance
    */
   fogFarFactor: 1,
-  //[0, 1]
+  // [0, 1]
   fogAlpha: 1.0,
   fogColor: 0x000000,
   fogColorEnable: false,
@@ -66837,14 +66905,14 @@ var defaults$1 = {
      */
   resolution: 'medium',
   autoResolution: false
-  /*true*/
+  /* true */
   ,
   autoPreset: true,
   preset: 'default',
   // TODO: remove 'preset' from settings, implement autodetection
   presets: {
     // Default
-    default: [{
+    "default": [{
       mode: 'BS',
       colorer: 'EL',
       selector: 'all',
@@ -66885,7 +66953,7 @@ var defaults$1 = {
       gapSize: 0.05
     }
   },
-  /////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
 
   /**
    * Theme to use, 'dark' or 'light'.
@@ -66985,7 +67053,7 @@ var defaults$1 = {
   shadow: {
     on: false,
     type: 'pcf'
-    /*basic, pcf4*/
+    /* basic, pcf4 */
     ,
     radius: 3.0
   },
@@ -67087,9 +67155,9 @@ var defaults$1 = {
   use: {
     multiFile: false
   }
-}; //////////////////////////////////////////////////////////////////////////
-/////////////////////      SETTINGS CLASS      ///////////////////////////
-//////////////////////////////////////////////////////////////////////////
+}; //----------------------------------------------------------------------------
+// SETTINGS CLASS
+//----------------------------------------------------------------------------
 
 function Settings() {
   EventDispatcher$1.call(this);
@@ -67155,8 +67223,8 @@ utils.deriveClass(Settings, EventDispatcher$1, {
       return [];
     }
 
-    var old = this.old;
-    var now = this.now;
+    var old = this.old,
+        now = this.now;
 
     var keys = lodash.filter(Object.keys(this._changed), function (key) {
       return lodash.get(old, key) !== lodash.get(now, key);
@@ -67203,9 +67271,9 @@ function asBoolean(value) {
 }
 
 var adapters = {
-  'string': String,
-  'number': Number,
-  'boolean': asBoolean
+  string: String,
+  number: Number,
+  "boolean": asBoolean
 }; // Level 1 assignment symbol
 
 var cL1Ass = '=';
@@ -67261,8 +67329,13 @@ function ensureRepList(opts) {
     reps = presets[preset];
 
     if (!reps) {
-      logger.warn('Unknown preset "' + preset + '"');
-      preset = Object.keys(presets)[0];
+      logger.warn("Unknown preset \"".concat(preset, "\""));
+
+      var _Object$keys = Object.keys(presets);
+
+      var _Object$keys2 = _slicedToArray(_Object$keys, 1);
+
+      preset = _Object$keys2[0];
       reps = presets[preset]; // fall back to any preset
     }
 
@@ -67291,13 +67364,17 @@ function addObject(opts, params, options) {
     opts._objects = [];
   }
 
+  var _options = _slicedToArray(options, 2),
+      type = _options[0],
+      newOpts = _options[1];
+
   var newObj = {
-    type: options[0],
+    type: type,
     params: params
   };
 
-  if (options[1] !== undefined) {
-    newObj.opts = options[1];
+  if (newOpts !== undefined) {
+    newObj.opts = newOpts;
   }
 
   opts._objects[opts._objects.length] = newObj;
@@ -67329,15 +67406,15 @@ function extractArgs(input, defaultsDict, params) {
         var opts = utils.deriveDeep(defaults, true);
         args.forEach(function (arg) {
           var pair = arg.split(cL2Ass, 2);
-          var key = decodeURIComponent(pair[0]),
-              value = decodeURIComponent(pair[1]);
+          var key = decodeURIComponent(pair[0]);
+          var value = decodeURIComponent(pair[1]);
 
           var adapter = adapters[_typeof(lodash.get(defaults, key))];
 
           if (adapter) {
             lodash.set(opts, key, adapter(value));
           } else {
-            logger.warn('Unknown argument "' + key + '" for option "' + input + '"');
+            logger.warn("Unknown argument \"".concat(key, "\" for option \"").concat(input, "\""));
           }
         });
 
@@ -67354,21 +67431,18 @@ function extractArgs(input, defaultsDict, params) {
 }
 
 var actions = {
-  //////////////////////////////////////////////////////////////////////////////
-  // Options
-  'l': 'load',
-  'load': String,
-  't': 'type',
-  'type': String,
-  'v': 'view',
-  'view': String,
-  'u': 'unit',
-  'unit': Number,
-  'menu': asBoolean,
-  //////////////////////////////////////////////////////////////////////////////
+  l: 'load',
+  load: String,
+  t: 'type',
+  type: String,
+  v: 'view',
+  view: String,
+  u: 'unit',
+  unit: Number,
+  menu: asBoolean,
   // Commands
-  'o': 'object',
-  'object': function object(value, opts) {
+  o: 'object',
+  object: function object(value, opts) {
     var params = [];
     var options = extractArgs(value, settings.defaults.objects, params);
 
@@ -67378,14 +67452,14 @@ var actions = {
 
     addObject(opts, params[0], options);
   },
-  'p': 'preset',
-  'preset': function preset(value, opts) {
+  p: 'preset',
+  preset: function preset(value, opts) {
     opts.preset = value;
     opts.reps = null;
     ensureRepList(opts);
   },
-  'r': 'rep',
-  'rep': function rep(value, opts) {
+  r: 'rep',
+  rep: function rep(value, opts) {
     ensureRepList(opts);
     repIndex = Number(value); // clamp the index to one greater than the last
 
@@ -67393,26 +67467,26 @@ var actions = {
 
     if (repIndex === opts.reps.length) {
       // if there is no rep to derive from, derive from the first rep of the default
-      opts.reps[repIndex] = repIndex > 0 ? utils.deriveDeep(opts.reps[repIndex - 1], true) : utils.deriveDeep(settings.defaults.presets.default[0], true);
+      opts.reps[repIndex] = repIndex > 0 ? utils.deriveDeep(opts.reps[repIndex - 1], true) : utils.deriveDeep(settings.defaults.presets["default"][0], true);
     }
   },
-  's': 'select',
-  'select': function select(value, opts) {
+  s: 'select',
+  select: function select(value, opts) {
     ensureRepAssign(opts, 'selector', value);
   },
-  'm': 'mode',
-  'mode': function mode(value, opts) {
+  m: 'mode',
+  mode: function mode(value, opts) {
     ensureRepAssign(opts, 'mode', extractArgs(value, settings.defaults.modes));
   },
-  'c': 'color',
-  'color': function color(value, opts) {
+  c: 'color',
+  color: function color(value, opts) {
     ensureRepAssign(opts, 'colorer', extractArgs(value, settings.defaults.colorers));
   },
-  'mt': 'material',
-  'material': function material(value, opts) {
+  mt: 'material',
+  material: function material(value, opts) {
     ensureRepAssign(opts, 'material', extractArgs(value, settings.defaults.materials));
   },
-  'dup': function dup(value, opts) {
+  dup: function dup(value, opts) {
     ensureRepList(opts);
     var reps = opts.reps;
     var rep = reps[repIndex];
@@ -67421,12 +67495,10 @@ var actions = {
       reps[repIndex] = utils.deriveDeep(rep, true);
     }
   },
-  //////////////////////////////////////////////////////////////////////////////
   // Settings shortcuts
-  'ar': 'autoResolution',
-  //////////////////////////////////////////////////////////////////////////////
+  ar: 'autoResolution',
   // Deprecated
-  'background': 'theme'
+  background: 'theme'
 };
 
 function _fromArray(entries) {
@@ -67457,9 +67529,9 @@ function _fromArray(entries) {
       var adapter = adapters[_typeof(lodash.get(settings.defaults, key))];
 
       if (adapter) {
-        lodash.set(opts, 'settings.' + key, adapter(value));
+        lodash.set(opts, "settings.".concat(key), adapter(value));
       } else {
-        logger.warn('Unknown option "' + key + '"');
+        logger.warn("Unknown option \"".concat(key, "\""));
       }
     } else if (lodash.isFunction(action)) {
       var result = action(value, opts);
@@ -67474,7 +67546,7 @@ function _fromArray(entries) {
 }
 
 function fromAttr(attr) {
-  return _fromArray(utils.getUrlParameters('?' + (attr || ''))); // TODO: We need different processing for attrs.
+  return _fromArray(utils.getUrlParameters("?".concat(attr || ''))); // TODO: We need different processing for attrs.
 }
 
 function fromURL(url) {
@@ -67506,7 +67578,7 @@ function _processObjForURL(objOpts) {
   var res = objOpts.type;
 
   if (lodash.isArray(objOpts.params) && objOpts.params.length > 0) {
-    res += ',' + objOpts.params.join(',');
+    res += ",".concat(objOpts.params.join(','));
   }
 
   if (objOpts.opts) {
@@ -67573,12 +67645,13 @@ function toURL(opts) {
   var url = '';
 
   if (typeof window !== 'undefined') {
-    var location = window.location;
-    url = location.protocol + '//' + location.host + location.pathname;
+    var _window = window,
+        location = _window.location;
+    url = "".concat(location.protocol, "//").concat(location.host).concat(location.pathname);
   }
 
   if (stringList.length > 0) {
-    url += '?' + stringList.join('&');
+    url += "?".concat(stringList.join('&'));
   }
 
   return url;
@@ -67588,7 +67661,7 @@ function _processOptsForScript(opts) {
   var str = [];
   var i = 0;
   utils.forInRecursive(opts, function (value, key) {
-    str[i++] = key + '=' + utils.enquoteString(value);
+    str[i++] = "".concat(key, "=").concat(utils.enquoteString(value));
   });
   return str.join(' ');
 }
@@ -67598,7 +67671,7 @@ function _processArgsForScript(args) {
     return args;
   }
 
-  return args[0] + (args.length < 2 ? '' : ' ' + _processOptsForScript(args[1]));
+  return args[0] + (args.length < 2 ? '' : " ".concat(_processOptsForScript(args[1])));
 }
 
 function _processObjForScript(objOpts) {
@@ -67609,11 +67682,11 @@ function _processObjForScript(objOpts) {
   var res = objOpts.type;
 
   if (lodash.isArray(objOpts.params) && objOpts.params.length > 0) {
-    res += ' ' + objOpts.params.map(utils.enquoteString).join(' ');
+    res += " ".concat(objOpts.params.map(utils.enquoteString).join(' '));
   }
 
   if (objOpts.opts) {
-    res += ' ' + _processOptsForScript(objOpts.opts);
+    res += " ".concat(_processOptsForScript(objOpts.opts));
   }
 
   return res;
@@ -67648,7 +67721,7 @@ function toScript(opts) {
   function checkAndAdd(command, value, saveQuotes) {
     if (value !== null && value !== undefined) {
       var quote = typeof value === 'string' && saveQuotes ? '"' : '';
-      commandsList[idx++] = command + ' ' + quote + value + quote;
+      commandsList[idx++] = "".concat(command, " ").concat(quote).concat(value).concat(quote);
     }
   }
 
@@ -67685,7 +67758,7 @@ function toScript(opts) {
       return;
     }
 
-    checkAndAdd('set ' + key, value, true);
+    checkAndAdd("set ".concat(key), value, true);
   });
   checkAndAdd('view', opts.view); // this is kind of hack
 
@@ -67792,8 +67865,8 @@ _defineProperty(Element, "ByName", {
   // Duplicate atomic numbers (isotopes)
 
   /* eslint-disable no-magic-numbers */
-  'D': new Element(1, 'D', 'Deuterium', 2.014, 1.2, 0.23, [1]),
-  'T': new Element(1, 'T', 'Tritium', 3.016, 1.2, 0.23, [1])
+  D: new Element(1, 'D', 'Deuterium', 2.014, 1.2, 0.23, [1]),
+  T: new Element(1, 'T', 'Tritium', 3.016, 1.2, 0.23, [1])
   /* eslint-enable no-magic-numbers */
   // All regular elements will be added later, automatically
 
@@ -67874,10 +67947,10 @@ function () {
     this._occupancy = occupancy || 1;
     this._temperature = temperature;
     this._charge = charge;
-    this._hydrogenCount = -1; //explicitly invalid
+    this._hydrogenCount = -1; // explicitly invalid
 
     this._radicalCount = 0;
-    this._valence = -1; //explicitly invalid
+    this._valence = -1; // explicitly invalid
 
     this._bonds = [];
     this.flags = 0x0000;
@@ -67941,9 +68014,9 @@ function () {
 
       if (name.getString().length > 0) {
         return name.getString();
-      } else {
-        return this.element.name.trim();
       }
+
+      return this.element.name.trim();
     }
   }, {
     key: "forEachBond",
@@ -67984,9 +68057,9 @@ function () {
   }, {
     key: "getHydrogenCountBoron",
     value: function getHydrogenCountBoron() {
-      //examples
-      //BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
-      var valence = 3; //hardcoded as 3
+      // examples
+      // BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
+      var valence = 3; // hardcoded as 3
 
       var hc = valence - this.getCharge() - this.getAtomBondsCount() - this._radicalCount;
 
@@ -68005,7 +68078,7 @@ function () {
 
       if (this.getCharge() !== 0) {
         defVal = 4;
-      } //find default valency for our case
+      } // find default valency for our case
 
 
       return Math.max(0, defVal - valence);
@@ -68024,7 +68097,7 @@ function () {
         valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this._radicalCount;
       }
 
-      var defVal = this.findSuitableValence(valence); //find default valency for our case
+      var defVal = this.findSuitableValence(valence); // find default valency for our case
 
       return Math.max(0, defVal - valence);
     }
@@ -68039,7 +68112,7 @@ function () {
         valence = this.getAtomBondsCount() - this.getCharge() + this._radicalCount;
       }
 
-      var defVal = this.findSuitableValence(valence); //find default valency for our case
+      var defVal = this.findSuitableValence(valence); // find default valency for our case
 
       return Math.max(0, defVal - valence);
     }
@@ -68048,7 +68121,7 @@ function () {
     value: function getHydrogenCountHydrogen() {
       if (this.getAtomBondsCount() === 0 && this.getCharge() === 0 && this.getValence() === 0 && this._radicalCount === 0) {
         return 1;
-      } //do add in any other case
+      } // do add in any other case
 
 
       return 0;
@@ -68076,34 +68149,34 @@ function () {
         case 19:
         case 37:
         case 55:
-        case 87: //group 1
+        case 87: // group 1
 
         case 4:
         case 12:
         case 20:
         case 38:
         case 56:
-        case 88: //group 2
+        case 88: // group 2
 
         case 13:
         case 31:
         case 49:
-        case 41: //group 13 but Boron
+        case 41: // group 13 but Boron
 
         case 82:
         case 83:
-          //Bi and Pb
+          // Bi and Pb
           return this.getHydrogenCountMetal();
 
         case 6:
         case 14:
         case 32:
         case 51:
-          //C, Si, Ge, Sb
+          // C, Si, Ge, Sb
           return this.getHydrogenCountGroup14();
 
         case 50:
-          //Sn
+          // Sn
           return this.getHydrogenCountTin();
 
         case 7:
@@ -68111,14 +68184,14 @@ function () {
         case 9:
         case 15:
         case 16:
-        case 17: //N, O, F, P, S, Cl
+        case 17: // N, O, F, P, S, Cl
 
         case 33:
         case 34:
         case 35:
         case 53:
         case 85:
-          //As, Se, Br, I, At
+          // As, Se, Br, I, At
           return this.getHydrogenCountNonMetal();
 
         case 5:
@@ -68172,10 +68245,10 @@ function () {
 
       if (this._residue !== null) {
         if (this._residue._chain !== null) {
-          name += this._residue._chain.getName() + '.';
+          name += "".concat(this._residue._chain.getName(), ".");
         }
 
-        name += this._residue._sequence + '.';
+        name += "".concat(this._residue._sequence, ".");
       }
 
       name += this._name.getString();
@@ -68371,7 +68444,9 @@ function () {
 
         if (leftCount > rightCount) {
           return currDir.multiplyScalar(-1);
-        } else if (leftCount < rightCount) {
+        }
+
+        if (leftCount < rightCount) {
           return currDir;
         }
       }
@@ -68476,52 +68551,52 @@ function () {
 
 _defineProperty(ResidueType, "StandardTypes", {
   /* eslint-disable no-magic-numbers */
-  'ALA': new ResidueType('ALA', 'Alanine', 'A'),
-  'ARG': new ResidueType('ARG', 'Arginine', 'R'),
-  'ASN': new ResidueType('ASN', 'Asparagine', 'N'),
-  'ASP': new ResidueType('ASP', 'Aspartic Acid', 'D'),
-  'CYS': new ResidueType('CYS', 'Cysteine', 'C'),
-  'GLN': new ResidueType('GLN', 'Glutamine', 'Q'),
-  'GLU': new ResidueType('GLU', 'Glutamic Acid', 'E'),
-  'GLY': new ResidueType('GLY', 'Glycine', 'G'),
-  'HIS': new ResidueType('HIS', 'Histidine', 'H'),
-  'ILE': new ResidueType('ILE', 'Isoleucine', 'I'),
-  'LEU': new ResidueType('LEU', 'Leucine', 'L'),
-  'LYS': new ResidueType('LYS', 'Lysine', 'K'),
-  'MET': new ResidueType('MET', 'Methionine', 'M'),
-  'PHE': new ResidueType('PHE', 'Phenylalanine', 'F'),
-  'PRO': new ResidueType('PRO', 'Proline', 'P'),
-  'PYL': new ResidueType('PYL', 'Pyrrolysine', 'O'),
-  'SEC': new ResidueType('SEC', 'Selenocysteine', 'U'),
-  'SER': new ResidueType('SER', 'Serine', 'S'),
-  'THR': new ResidueType('THR', 'Threonine', 'T'),
-  'TRP': new ResidueType('TRP', 'Tryptophan', 'W'),
-  'TYR': new ResidueType('TYR', 'Tyrosine', 'Y'),
-  'VAL': new ResidueType('VAL', 'Valine', 'V'),
-  'A': new ResidueType('A', 'Adenine', 'A'),
-  'C': new ResidueType('C', 'Cytosine', 'C'),
-  'G': new ResidueType('G', 'Guanine', 'G'),
-  'I': new ResidueType('I', 'Inosine', 'I'),
-  'T': new ResidueType('T', 'Thymine', 'T'),
-  'U': new ResidueType('U', 'Uracil', 'U'),
-  'DA': new ResidueType('DA', 'Adenine', 'A'),
-  'DC': new ResidueType('DC', 'Cytosine', 'C'),
-  'DG': new ResidueType('DG', 'Guanine', 'G'),
-  'DI': new ResidueType('DI', 'Inosine', 'I'),
-  'DT': new ResidueType('DT', 'Thymine', 'T'),
-  'DU': new ResidueType('DU', 'Uracil', 'U'),
+  ALA: new ResidueType('ALA', 'Alanine', 'A'),
+  ARG: new ResidueType('ARG', 'Arginine', 'R'),
+  ASN: new ResidueType('ASN', 'Asparagine', 'N'),
+  ASP: new ResidueType('ASP', 'Aspartic Acid', 'D'),
+  CYS: new ResidueType('CYS', 'Cysteine', 'C'),
+  GLN: new ResidueType('GLN', 'Glutamine', 'Q'),
+  GLU: new ResidueType('GLU', 'Glutamic Acid', 'E'),
+  GLY: new ResidueType('GLY', 'Glycine', 'G'),
+  HIS: new ResidueType('HIS', 'Histidine', 'H'),
+  ILE: new ResidueType('ILE', 'Isoleucine', 'I'),
+  LEU: new ResidueType('LEU', 'Leucine', 'L'),
+  LYS: new ResidueType('LYS', 'Lysine', 'K'),
+  MET: new ResidueType('MET', 'Methionine', 'M'),
+  PHE: new ResidueType('PHE', 'Phenylalanine', 'F'),
+  PRO: new ResidueType('PRO', 'Proline', 'P'),
+  PYL: new ResidueType('PYL', 'Pyrrolysine', 'O'),
+  SEC: new ResidueType('SEC', 'Selenocysteine', 'U'),
+  SER: new ResidueType('SER', 'Serine', 'S'),
+  THR: new ResidueType('THR', 'Threonine', 'T'),
+  TRP: new ResidueType('TRP', 'Tryptophan', 'W'),
+  TYR: new ResidueType('TYR', 'Tyrosine', 'Y'),
+  VAL: new ResidueType('VAL', 'Valine', 'V'),
+  A: new ResidueType('A', 'Adenine', 'A'),
+  C: new ResidueType('C', 'Cytosine', 'C'),
+  G: new ResidueType('G', 'Guanine', 'G'),
+  I: new ResidueType('I', 'Inosine', 'I'),
+  T: new ResidueType('T', 'Thymine', 'T'),
+  U: new ResidueType('U', 'Uracil', 'U'),
+  DA: new ResidueType('DA', 'Adenine', 'A'),
+  DC: new ResidueType('DC', 'Cytosine', 'C'),
+  DG: new ResidueType('DG', 'Guanine', 'G'),
+  DI: new ResidueType('DI', 'Inosine', 'I'),
+  DT: new ResidueType('DT', 'Thymine', 'T'),
+  DU: new ResidueType('DU', 'Uracil', 'U'),
   '+A': new ResidueType('+A', 'Adenine', 'A'),
   '+C': new ResidueType('+C', 'Cytosine', 'C'),
   '+G': new ResidueType('+G', 'Guanine', 'G'),
   '+I': new ResidueType('+I', 'Inosine', 'I'),
   '+T': new ResidueType('+T', 'Thymine', 'T'),
   '+U': new ResidueType('+U', 'Uracil', 'U'),
-  'WAT': new ResidueType('WAT', 'Water', ''),
-  'H2O': new ResidueType('H2O', 'Water', ''),
-  'HOH': new ResidueType('HOH', 'Water', ''),
-  'DOD': new ResidueType('DOD', 'Water', ''),
-  'UNK': new ResidueType('UNK', 'Unknown', ''),
-  'UNL': new ResidueType('UNL', 'Unknown Ligand', '')
+  WAT: new ResidueType('WAT', 'Water', ''),
+  H2O: new ResidueType('H2O', 'Water', ''),
+  HOH: new ResidueType('HOH', 'Water', ''),
+  DOD: new ResidueType('DOD', 'Water', ''),
+  UNK: new ResidueType('UNK', 'Unknown', ''),
+  UNL: new ResidueType('UNL', 'Unknown Ligand', '')
   /* eslint-enable no-magic-numbers */
 
 });
@@ -68605,26 +68680,26 @@ _addFlag(Flags.RNA, ['A', 'G', 'I', 'C', 'T', 'U']); // Table of kdHydrophobicit
 
 
 var hydro = {
-  'ILE': 4.5,
-  'VAL': 4.2,
-  'LEU': 3.8,
-  'PHE': 2.8,
-  'CYS': 2.5,
-  'MET': 1.9,
-  'ALA': 1.8,
-  'GLY': -0.4,
-  'THR': -0.7,
-  'SER': -0.8,
-  'TRP': -0.9,
-  'TYR': -1.3,
-  'PRO': -1.6,
-  'HIS': -3.2,
-  'GLU': -3.5,
-  'GLN': -3.5,
-  'ASP': -3.5,
-  'ASN': -3.5,
-  'LYS': -3.9,
-  'ARG': -4.5
+  ILE: 4.5,
+  VAL: 4.2,
+  LEU: 3.8,
+  PHE: 2.8,
+  CYS: 2.5,
+  MET: 1.9,
+  ALA: 1.8,
+  GLY: -0.4,
+  THR: -0.7,
+  SER: -0.8,
+  TRP: -0.9,
+  TYR: -1.3,
+  PRO: -1.6,
+  HIS: -3.2,
+  GLU: -3.5,
+  GLN: -3.5,
+  ASP: -3.5,
+  ASN: -3.5,
+  LYS: -3.9,
+  ARG: -4.5
 };
 
 function _addParam(param, list) {
@@ -68880,10 +68955,10 @@ function () {
       }
 
       if (bFirstInChain) {
-        //for first one in chain
+        // for first one in chain
         dst._midPoint = getAtomPosition(this._firstAtom).clone();
       } else {
-        var prevLeadPos = prev._controlPoint; //lead point of previous monomer
+        var prevLeadPos = prev._controlPoint; // lead point of previous monomer
 
         dst._midPoint = prevLeadPos.clone().lerp(currLeadPos, 0.5);
         dst._wingVector = this.calcWing(prevLeadPos, currLeadPos, getAtomPosition(prevRes._wingAtom), prev._wingVector);
@@ -68894,7 +68969,7 @@ function () {
   }, {
     key: "_finalize2",
     value: function _finalize2(prev, next) {
-      //Should be called AFTER first finalize
+      // Should be called AFTER first finalize
       this._innerFinalize(prev, prev, next, this, function (atom) {
         return atom._position;
       });
@@ -68931,7 +69006,10 @@ function () {
     key: "_finalize",
     value: function _finalize() {
       var self = this;
-      this._firstAtom = this._atoms[0];
+
+      var _this$_atoms = _slicedToArray(this._atoms, 1);
+
+      this._firstAtom = _this$_atoms[0];
       this._lastAtom = this._atoms[this._atoms.length - 1];
       this._leadAtom = null;
       this._wingAtom = null;
@@ -68974,7 +69052,7 @@ function () {
 
       if (occupCount > 0) {
         this.occupancy = occupancy / occupCount;
-      } //Still try to make monomer look valid
+      } // Still try to make monomer look valid
 
 
       if (this._leadAtom === null || this._wingAtom === null) {
@@ -69073,7 +69151,7 @@ function () {
 
             prev = curr;
           }
-      } //fix very first wing
+      } // fix very first wing
 
 
       if (residues.length > 1) {
@@ -69545,7 +69623,7 @@ function () {
       }
 
       if (s.length !== this._width) {
-        throw new Error('Sheet ' + this._name + ' is inconsistent.');
+        throw new Error("Sheet ".concat(this._name, " is inconsistent."));
       }
     }
   }]);
@@ -69576,9 +69654,9 @@ function () {
     this._name = name;
     this._position = position || new Vector3();
     this._atoms = atoms || [];
-    this._charge = 0; //default group charge
+    this._charge = 0; // default group charge
 
-    this._repeat = 1; //how many times group repeated: always > 0
+    this._repeat = 1; // how many times group repeated: always > 0
 
     this._center = null;
     this.xmlNodeRef = saveNode || null;
@@ -69610,7 +69688,7 @@ function () {
       var nLimon = 100000000;
 
       if (this._center === null) {
-        return; //nothing to do if we are not relative
+        return; // nothing to do if we are not relative
       }
 
       var bLow = new Vector3(nLimon, nLimon, nLimon);
@@ -69643,16 +69721,16 @@ function () {
       if (finalCharge !== 0) {
         if (this._repeat > 1) {
           if (atomsCount > 1) {
-            formula = this._repeat.toString() + '(' + formula + ')';
+            formula = "".concat(this._repeat.toString(), "(").concat(formula, ")");
           } else {
             formula = this._repeat.toString() + formula;
           }
         } else if (atomsCount > 1) {
-          formula = '(' + formula + ')';
+          formula = "(".concat(formula, ")");
         }
 
         if (finalCharge > 1) {
-          formula += '^' + finalCharge.toString() + '+';
+          formula += "^".concat(finalCharge.toString(), "+");
         }
 
         if (finalCharge === 1) {
@@ -69660,7 +69738,7 @@ function () {
         }
 
         if (finalCharge < -1) {
-          formula += '^' + Math.abs(finalCharge).toString() + '-';
+          formula += "^".concat(Math.abs(finalCharge).toString(), "-");
         }
 
         if (finalCharge === -1) {
@@ -70623,7 +70701,7 @@ function defineSelector(name, SelectorClass) {
   factory.SelectorClass = SelectorClass;
   keywords[keyword] = factory;
   return SelectorClass;
-} //////////////////////////////////////////////////////////////////////////////
+} //----------------------------------------------------------------------------
 
 
 var Range =
@@ -70656,7 +70734,7 @@ function () {
   }]);
 
   return Range;
-}(); //////////////////////////////////////////////////////////////////////////////
+}(); // ////////////////////////////////////////////////////////////////////////////
 
 
 var List =
@@ -70667,7 +70745,9 @@ function () {
 
     if (arg instanceof this.constructor) {
       return arg;
-    } else if (arg instanceof Array) {
+    }
+
+    if (arg instanceof Array) {
       this._values = arg.slice(0);
     } else if (arg) {
       this._values = [arg];
@@ -70703,8 +70783,8 @@ function () {
   }, {
     key: "toJSON",
     value: function toJSON() {
-      var values = this._values,
-          result = [];
+      var values = this._values;
+      var result = [];
 
       for (var i = 0, n = values.length; i < n; ++i) {
         var value = values[i];
@@ -70716,7 +70796,7 @@ function () {
   }]);
 
   return List;
-}(); //////////////////////////////////////////////////////////////////////////////
+}(); //----------------------------------------------------------------------------
 
 
 var RangeList =
@@ -70746,7 +70826,7 @@ function (_List) {
   }]);
 
   return RangeList;
-}(List); //////////////////////////////////////////////////////////////////////////////
+}(List); //----------------------------------------------------------------------------
 
 
 var valuesArray = [];
@@ -70799,8 +70879,9 @@ function (_List2) {
   }]);
 
   return ValueList;
-}(List); //////////////////////////////////////////////////////////////////////////////
+}(List); //----------------------------------------------------------------------------
 // Selectors
+//----------------------------------------------------------------------------
 
 /** Base class for atom selectors. */
 
@@ -71169,8 +71250,9 @@ function (_Selector6) {
 
   return NoneSelector;
 }(Selector));
-var NULL_SELECTOR = keywords.none(); //////////////////////////////////////////////////////////////////////////////
+var NULL_SELECTOR = keywords.none(); //----------------------------------------------------------------------------
 // Flag selectors
+//----------------------------------------------------------------------------
 
 function byResidueTypeFlag(flag, name) {
   return defineSelector(name,
@@ -71205,8 +71287,9 @@ byResidueTypeFlag(ResidueType.Flags.AROMATIC, 'Aromatic');
 byResidueTypeFlag(ResidueType.Flags.NUCLEIC, 'Nucleic');
 byResidueTypeFlag(ResidueType.Flags.PURINE, 'Purine');
 byResidueTypeFlag(ResidueType.Flags.PYRIMIDINE, 'Pyrimidine');
-byResidueTypeFlag(ResidueType.Flags.WATER, 'Water'); //////////////////////////////////////////////////////////////////////////////
+byResidueTypeFlag(ResidueType.Flags.WATER, 'Water'); //----------------------------------------------------------------------------
 // Operators
+//----------------------------------------------------------------------------
 
 function defineOperator(name, priority, OperatorClass) {
   OperatorClass.prototype.priority = priority;
@@ -71339,7 +71422,7 @@ function (_InfixOperator2) {
   }]);
 
   return OrOperator;
-}(InfixOperator)); //////////////////////////////////////////////////////////////////////////////
+}(InfixOperator)); //----------------------------------------------------------------------------
 
 var selectors = Object.create(keywords); // TODO: Provide consistent module exports
 
@@ -71356,7 +71439,7 @@ selectors.Context = Object.create({});
 selectors.GetSelector = function (key) {
   if (!selectors.Context.hasOwnProperty(key)) {
     var exc = {
-      message: 'selector ' + key + ' is not registered'
+      message: "selector ".concat(key, " is not registered")
     };
     throw exc;
   }
@@ -71424,7 +71507,7 @@ function () {
         boundingBox.expandByPoint(atoms[0]._position);
         var bbc = new Vector3();
         boundingBox.getCenter(bbc);
-        var s = 2 * atoms[0].element.radius; //*settings.now.modes.BS.atom; FIXME N: hack commented
+        var s = 2 * atoms[0].element.radius; // *settings.now.modes.BS.atom; FIXME N: hack commented
 
         boundingBox.setFromCenterAndSize(bbc, new Vector3(s, s, s));
       } else {
@@ -71871,9 +71954,9 @@ function _getBondingRadius(atom) {
 
   if (element) {
     return element.radiusBonding;
-  } else {
-    throw new Error('_getBondingRadius: Logic error.');
   }
+
+  throw new Error('_getBondingRadius: Logic error.');
 }
 
 function _isAtomEligible(atom) {
@@ -72135,10 +72218,7 @@ function () {
 
 var cCrossThresh = 0.1;
 var cAromaticType = Bond.BondType.AROMATIC;
-var cAromaticAtoms = [Element.ByName.C.number, Element.ByName.N.number
-/*Element.ByName.O.number,
-  Element.ByName.S.number,*/
-];
+var cAromaticAtoms = [Element.ByName.C.number, Element.ByName.N.number];
 /** Conditions for bonds:
    *   - Cross product with each subsequent bond to add is collinear and point to the same direction
    *   - Each pair of a adjacent bonds belong to not more than one cycle
@@ -72604,7 +72684,14 @@ function () {
         return;
       }
 
-      var rRangeXY, rRangeX, xVal, yVal, zVal, isInsideX, isInsideY, isInsideZ;
+      var rRangeXY;
+      var rRangeX;
+      var xVal;
+      var yVal;
+      var zVal;
+      var isInsideX;
+      var isInsideY;
+      var isInsideZ;
       zRange.set(center.z - radius, center.z + radius);
       zRange.subScalar(this._box.min.z).divideScalar(this._cellSize.z).floor().clampScalar(0, this._count.z - 1);
 
@@ -72872,15 +72959,15 @@ function () {
     key: "isBond",
     value: function isBond(from, to) {
       if (this._hbonds[from]) {
-        var acc = this._hbonds[from].acceptor[0];
+        var _this$_hbonds$from$ac = _slicedToArray(this._hbonds[from].acceptor, 2),
+            acc0 = _this$_hbonds$from$ac[0],
+            acc1 = _this$_hbonds$from$ac[1];
 
-        if (acc && acc.residue === to && acc.energy < MAX_HBOND_ENERGY) {
+        if (acc0 && acc0.residue === to && acc0.energy < MAX_HBOND_ENERGY) {
           return true;
         }
 
-        acc = this._hbonds[from].acceptor[1];
-
-        if (acc && acc.residue === to && acc.energy < MAX_HBOND_ENERGY) {
+        if (acc1 && acc1.residue === to && acc1.energy < MAX_HBOND_ENERGY) {
           return true;
         }
       }
@@ -72933,7 +73020,8 @@ function () {
     value: function _buildVW() {
       var self = this;
       var residues = this._complex._residues;
-      var ri, preri;
+      var ri;
+      var preri;
 
       var vw = this._complex.getVoxelWorld();
 
@@ -73006,8 +73094,8 @@ function () {
   }, {
     key: "_residueGetCO",
     value: function _residueGetCO(res) {
-      var c = null,
-          o = null;
+      var c = null;
+      var o = null;
       res.forEachAtom(function (a) {
         if (a.getName().getString() === 'C') {
           c = a.getPosition();
@@ -73239,7 +73327,7 @@ function () {
 
         for (var i = 0; i + stride < chainLength; ++i) {
           if (this._hbonds.isBond(inResidues[i + stride]._index, inResidues[i]._index)
-          /*&& NoChainBreak(res[i], res[i + stride])*/
+          /* && NoChainBreak(res[i], res[i + stride]) */
           ) {
               this._helixFlags[stride][inResidues[i + stride]._index] = HelixFlag.END;
 
@@ -73509,12 +73597,12 @@ function () {
         ladderset.add(bridges[_i10]);
       }
 
-      var sheet = 1,
-          ladder = 0;
+      var sheet = 1;
+      var ladder = 0;
 
       while (ladderset.size > 0) {
         var _bridge = ladderset.values().next().value;
-        ladderset.delete(_bridge);
+        ladderset["delete"](_bridge);
         var sheetset = new Set();
         sheetset.add(_bridge);
         var toMove = void 0;
@@ -73545,8 +73633,8 @@ function () {
                 _iteratorError3 = err;
               } finally {
                 try {
-                  if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                    _iterator3.return();
+                  if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
+                    _iterator3["return"]();
                   }
                 } finally {
                   if (_didIteratorError3) {
@@ -73560,8 +73648,8 @@ function () {
             _iteratorError = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
+              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+                _iterator["return"]();
               }
             } finally {
               if (_didIteratorError) {
@@ -73578,15 +73666,15 @@ function () {
             for (var _iterator2 = toMove.values()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
               _bridge = _step2.value;
               sheetset.add(_bridge);
-              ladderset.delete(_bridge);
+              ladderset["delete"](_bridge);
             }
           } catch (err) {
             _didIteratorError2 = true;
             _iteratorError2 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                _iterator2.return();
+              if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+                _iterator2["return"]();
               }
             } finally {
               if (_didIteratorError2) {
@@ -73613,8 +73701,8 @@ function () {
           _iteratorError4 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-              _iterator4.return();
+            if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
+              _iterator4["return"]();
             }
           } finally {
             if (_didIteratorError4) {
@@ -73630,8 +73718,8 @@ function () {
         var _bridge2 = bridges[_i11]; // find out if any of the i and j set members already have
         // a bridge assigned, if so, we're assigning bridge 2
 
-        var betai = 0,
-            betaj = 0;
+        var betai = 0;
+        var betaj = 0;
 
         for (var l = 0; l < _bridge2.i.length; ++l) {
           if (this._betaPartners[_bridge2.i[l]][0]) {
@@ -73755,8 +73843,8 @@ function () {
         _iteratorError5 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-            _iterator5.return();
+          if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
+            _iterator5["return"]();
           }
         } finally {
           if (_didIteratorError5) {
@@ -73782,8 +73870,8 @@ function () {
         _iteratorError6 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion6 && _iterator6.return != null) {
-            _iterator6.return();
+          if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
+            _iterator6["return"]();
           }
         } finally {
           if (_didIteratorError6) {
@@ -74220,14 +74308,14 @@ function () {
       });
 
       if (charge === null) {
-        //apply ourselves
+        // apply ourselves
         if (actualCharge !== 0) {
           if (k.length > 1) {
-            out = '(' + out + ')';
+            out = "(".concat(out, ")");
           }
 
           if (actualCharge > 1) {
-            out += '^{' + actualCharge.toString() + '+}';
+            out += "^{".concat(actualCharge.toString(), "+}");
           }
 
           if (actualCharge === 1) {
@@ -74235,7 +74323,7 @@ function () {
           }
 
           if (actualCharge < -1) {
-            out += '^{' + Math.abs(actualCharge).toString() + '-}';
+            out += "^{".concat(Math.abs(actualCharge).toString(), "-}");
           }
 
           if (actualCharge === -1) {
@@ -74257,11 +74345,13 @@ function () {
     value: function _buildPartFormula(part) {
       if (part.owner instanceof Complex || part.owner instanceof Component) {
         return this._buildFormulaSimple(part, null);
-      } else if (part.owner instanceof SGroup) {
-        return part.owner.buildChemicalFormula(this, part);
-      } else {
-        return '';
       }
+
+      if (part.owner instanceof SGroup) {
+        return part.owner.buildChemicalFormula(this, part);
+      }
+
+      return '';
     }
   }, {
     key: "_partCompareFunc",
@@ -74342,9 +74432,9 @@ function () {
         if (atomDiff !== 0 || !skipPar) {
           if (atomDiff === 0) {
             return this._getCumulativeCharge(a.atoms) - this._getCumulativeCharge(b.atoms);
-          } else {
-            return atomDiff;
           }
+
+          return atomDiff;
         }
       }
 
@@ -74370,7 +74460,7 @@ function () {
     key: "buildChemicalFormula",
     value: function buildChemicalFormula() {
       var retDelim = '*';
-      var formulaParts = []; //object array
+      var formulaParts = []; // object array
 
       var currPart = null;
       var pAtoms = null;
@@ -74393,11 +74483,11 @@ function () {
           atom: a,
           taken: null
         };
-      }); //groups part goes first
+      }); // groups part goes first
 
       this.forEachSGroup(function (grp) {
         if (grp._charge === 0 && grp._repeat === 1) {
-          //if do not we have valid reason to take part ==> skip
+          // if do not we have valid reason to take part ==> skip
           return;
         }
 
@@ -74409,10 +74499,10 @@ function () {
         pAtoms = currPart.atoms;
 
         grp._atoms.forEach(function (a) {
-          hEntry = atomsHash[a.getSerial()]; //check is not taken
+          hEntry = atomsHash[a.getSerial()]; // check is not taken
 
           if (hEntry.taken === null) {
-            pAtoms.push(a); //mark as taken
+            pAtoms.push(a); // mark as taken
 
             hEntry.taken = grp;
           }
@@ -74423,7 +74513,7 @@ function () {
         }
 
         currPart = null;
-      }); //components part
+      }); // components part
 
       this.forEachComponent(function (cmp) {
         currPart = {
@@ -74434,10 +74524,10 @@ function () {
         pAtoms = currPart.atoms;
         cmp.forEachResidue(function (r) {
           r._atoms.forEach(function (a) {
-            hEntry = atomsHash[a.getSerial()]; //check is not taken
+            hEntry = atomsHash[a.getSerial()]; // check is not taken
 
             if (hEntry.taken === null) {
-              pAtoms.push(a); //mark as taken
+              pAtoms.push(a); // mark as taken
 
               hEntry.taken = cmp;
             }
@@ -74449,7 +74539,7 @@ function () {
         }
 
         currPart = null;
-      }); //collect main part
+      }); // collect main part
 
       var atomKeys = Object.keys(atomsHash);
       atomKeys.forEach(function (a) {
@@ -74465,18 +74555,18 @@ function () {
           currPart.atoms.push(a.atom);
           a.taken = self;
         }
-      }); //add first part
+      }); // add first part
 
       if (currPart !== null) {
         if (currPart.atoms.length > 0) {
           formulaParts.push(currPart);
         }
-      } //sort parts
+      } // sort parts
 
 
       formulaParts.sort(function (a, b) {
         return self._partCompareFunc(a, b);
-      }); //now join the same parts
+      }); // now join the same parts
 
       var i = formulaParts.length - 1;
       var j = formulaParts.length - 2;
@@ -74507,7 +74597,7 @@ function () {
 
         j--;
         i--;
-      } //build formula for each part individually
+      } // build formula for each part individually
 
 
       formulaParts.forEach(function (p) {
@@ -74755,7 +74845,7 @@ function () {
 
       var bonds = this._bonds;
       var i;
-      var n; //remove invalid bonds
+      var n; // remove invalid bonds
 
       for (i = bonds.length - 1; i >= 0; i--) {
         var bond = bonds[i];
@@ -75058,7 +75148,8 @@ function () {
   }, {
     key: "joinComplexes",
     value: function joinComplexes(complexes) {
-      var i, j; // clear target complex
+      var i;
+      var j; // clear target complex
 
       this._chains = [];
       this._components = [];
@@ -75246,6 +75337,17 @@ function () {
 Complex.prototype.id = 'Complex';
 Complex.prototype.name = '';
 
+function pow2ceil(v) {
+  var p = 2;
+  v = v - 1 >> 1;
+
+  while (v) {
+    p <<= 1;
+    v >>= 1;
+  }
+
+  return p;
+}
 /**
  * Volume constructor
  *
@@ -75261,6 +75363,7 @@ Complex.prototype.name = '';
  * @param {Number} volumeInfo - volume info values to define threshold to filter the noise
  */
 
+
 var Volume =
 /*#__PURE__*/
 function () {
@@ -75272,9 +75375,11 @@ function () {
     this._volumeInfo = volumeInfo;
 
     if (dimensions instanceof Array) {
-      this._dimX = dimensions[0];
-      this._dimY = dimensions[1];
-      this._dimZ = dimensions[2];
+      var _dimensions = _slicedToArray(dimensions, 3);
+
+      this._dimX = _dimensions[0];
+      this._dimY = _dimensions[1];
+      this._dimZ = _dimensions[2];
     } else {
       this._dimX = dimensions.x;
       this._dimY = dimensions.y;
@@ -75299,16 +75404,16 @@ function () {
           return [this._data[idx], this._data[idx + 1]];
         };
 
-        this.setValue = function (x, y, z) {
+        this.setValue = function (x, y, z, a, b) {
           var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-          this._data[idx] = arguments[3];
-          this._data[idx + 1] = arguments[4];
+          this._data[idx] = a;
+          this._data[idx + 1] = b;
         };
 
-        this.addValue = function (x, y, z) {
+        this.addValue = function (x, y, z, a, b) {
           var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-          this._data[idx] += arguments[3];
-          this._data[idx + 1] += arguments[4];
+          this._data[idx] += a;
+          this._data[idx + 1] += b;
         };
 
         break;
@@ -75319,18 +75424,18 @@ function () {
           return [this._data[idx], this._data[idx + 1], this._data[idx + 2]];
         };
 
-        this.setValue = function (x, y, z) {
+        this.setValue = function (x, y, z, a, b, c) {
           var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-          this._data[idx] = arguments[3];
-          this._data[idx + 1] = arguments[4];
-          this._data[idx + 2] = arguments[5];
+          this._data[idx] = a;
+          this._data[idx + 1] = b;
+          this._data[idx + 2] = c;
         };
 
-        this.addValue = function (x, y, z) {
+        this.addValue = function (x, y, z, a, b, c) {
           var idx = x * this._dimVec + y * this._rowElements + z * this._planeElements;
-          this._data[idx] += arguments[3];
-          this._data[idx + 1] += arguments[4];
-          this._data[idx + 2] += arguments[5];
+          this._data[idx] += a;
+          this._data[idx + 1] += b;
+          this._data[idx + 2] += c;
         };
 
         break;
@@ -75481,7 +75586,8 @@ function () {
       var height = tilesY * (this._dimY + 2) - 1;
       height = pow2ceil(height);
       var data = new Uint8Array(width * height);
-      var src, dst;
+      var src;
+      var dst;
 
       for (var tileRow = 0; tileRow < tilesY; ++tileRow) {
         // process each pixel row of this tile row
@@ -75533,11 +75639,11 @@ function () {
       texture.needsUpdate = true;
       return texture;
     }
-    /**********************************************************************************
+    /* ********************************************************************************
      *
      * Methods that provide direct access to internal array (for better performance)
      *
-     *********************************************************************************/
+     ******************************************************************************** */
 
   }, {
     key: "getData",
@@ -75570,18 +75676,6 @@ function () {
 }();
 
 Volume.prototype.id = 'Volume';
-
-function pow2ceil(v) {
-  var p = 2;
-  v = v - 1 >> 1;
-
-  while (v) {
-    p <<= 1;
-    v >>= 1;
-  }
-
-  return p;
-}
 
 /**
  * Residue Molecule.
@@ -75728,7 +75822,7 @@ function (_THREE$Object3D) {
       var top = op.toString();
       var op100 = op * 100;
       el.style.opacity = top;
-      el.style.filter = 'alpha(opacity=' + op100 + ')'; // IE fallback
+      el.style.filter = "alpha(opacity=".concat(op100, ")"); // IE fallback
     }
   }, {
     key: "clone",
@@ -75750,7 +75844,7 @@ function (_THREE$Group) {
   function RCGroup() {
     _classCallCheck(this, RCGroup);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(RCGroup).call(this));
+    return _possibleConstructorReturn(this, _getPrototypeOf(RCGroup).apply(this, arguments));
   }
 
   _createClass(RCGroup, [{
@@ -75841,62 +75935,62 @@ var capabilities = {
 
 /* eslint-disable no-magic-numbers */
 
-var defaultUniforms = UniformsUtils.merge([UniformsLib.common, //FIXME is it needed
+var defaultUniforms = UniformsUtils.merge([UniformsLib.common, // FIXME is it needed
 UniformsLib.fog, UniformsLib.lights, {
-  'specular': {
+  specular: {
     type: 'c',
     value: new Color(0x111111)
   },
-  'shininess': {
+  shininess: {
     type: 'f',
     value: 30
   },
-  'fixedColor': {
+  fixedColor: {
     type: 'c',
     value: new Color(0xffffff)
   },
-  'zOffset': {
+  zOffset: {
     type: 'f',
     value: 0.0
   },
-  'zClipValue': {
+  zClipValue: {
     type: 'f',
     value: 0.0
   },
-  'clipPlaneValue': {
+  clipPlaneValue: {
     type: 'f',
     value: 0.0
   },
-  'invModelViewMatrix': {
+  invModelViewMatrix: {
     type: '4fv',
     value: new Matrix4()
   },
-  'world2colorMatrix': {
+  world2colorMatrix: {
     type: '4fv',
     value: new Matrix4()
   },
-  'dashedLineSize': {
+  dashedLineSize: {
     type: 'f',
     value: 0.1
   },
-  'dashedLinePeriod': {
+  dashedLinePeriod: {
     type: 'f',
     value: 0.2
   },
-  'projMatrixInv': {
+  projMatrixInv: {
     type: '4fv',
     value: new Matrix4()
   },
-  'viewport': {
+  viewport: {
     type: 'v2',
     value: new Vector2()
   },
-  'lineWidth': {
+  lineWidth: {
     type: 'f',
     value: 2.0
   },
-  //default value must be the same as settings
-  'fogAlpha': {
+  // default value must be the same as settings
+  fogAlpha: {
     type: 'f',
     value: 1.0
   }
@@ -75946,7 +76040,7 @@ function UberMaterial(params) {
 
   this.fogTransparent = false; // used to render surface normals to G buffer for ssao effect
 
-  this.normalsToGBuffer = false; //used for toon material
+  this.normalsToGBuffer = false; // used for toon material
 
   this.toonShading = false; // uber options of "root" materials are inherited from single uber-options object that resides in prototype
 
@@ -75968,7 +76062,7 @@ UberMaterial.prototype.constructor = UberMaterial;
 
 UberMaterial.prototype.precisionString = function () {
   var precision = capabilities.precision;
-  var str = 'precision ' + precision + ' float;\n' + 'precision ' + precision + ' int;\n\n';
+  var str = "precision ".concat(precision, " float;\n") + "precision ".concat(precision, " int;\n\n");
   return str;
 }; // properties that convert to uniforms
 
@@ -76022,7 +76116,7 @@ UberMaterial.prototype.uberOptions = {
 };
 
 UberMaterial.prototype.copy = function (source) {
-  //TODO Why not RawShaderMaterial?
+  // TODO Why not RawShaderMaterial?
   ShaderMaterial.prototype.copy.call(this, source);
   this.fog = source.fog;
   this.instancedPos = source.instancedPos;
@@ -76674,7 +76768,7 @@ function processMaterialForShadow(root, material) {
     }
   });
 }
-/** Traverse tree and make visible only needed meshes*/
+/** Traverse tree and make visible only needed meshes */
 
 
 function makeVisibleMeshes(object, checker) {
@@ -76760,7 +76854,16 @@ Visual.prototype.getBoundaries = function () {
   return _defaultBoundaries;
 };
 
+function _ensureArray(x) {
+  if (x === null || x === undefined || Array.isArray(x)) {
+    return x;
+  }
+
+  return [x];
+}
 /** An indexed list of objects or classes. */
+
+
 var EntityList =
 /*#__PURE__*/
 function () {
@@ -76988,14 +77091,6 @@ function () {
   return EntityList;
 }();
 
-function _ensureArray(x) {
-  if (x === null || x === undefined || Array.isArray(x)) {
-    return x;
-  }
-
-  return [x];
-}
-
 function makeContextDependent(prototype) {
   Object.defineProperties(prototype, {
     logger: {
@@ -77040,8 +77135,7 @@ function () {
   }]);
 
   return CollisionSphere;
-}(); //////////////////////////////////////////////////////////////////////////////z
-
+}();
 
 _defineProperty(CollisionSphere, "_sphere", new Sphere());
 
@@ -77260,12 +77354,12 @@ function (_THREE$BufferGeometry) {
   function RaycastableBufferGeometry() {
     _classCallCheck(this, RaycastableBufferGeometry);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(RaycastableBufferGeometry).call(this));
-  } // This method was copied from three.js
-
+    return _possibleConstructorReturn(this, _getPrototypeOf(RaycastableBufferGeometry).apply(this, arguments));
+  }
 
   _createClass(RaycastableBufferGeometry, [{
     key: "uvIntersection",
+    // This method was copied from three.js
     value: function uvIntersection(point, p1, p2, p3, uv1, uv2, uv3) {
       var barycoord = RaycastableBufferGeometry._barycoord;
       Triangle.barycoordFromPoint(point, p1, p2, p3, barycoord);
@@ -77278,7 +77372,7 @@ function (_THREE$BufferGeometry) {
   }, {
     key: "checkIntersection",
     value: function checkIntersection(object, raycaster, ray, pA, pB, pC, point) {
-      //let intersect;
+      // let intersect;
       var intersect = ray.intersectTriangle(pA, pB, pC, false, point);
 
       if (intersect === null) {
@@ -77339,10 +77433,13 @@ function (_THREE$BufferGeometry) {
         }
       }
 
-      var a, b, c;
-      var index = this.index;
-      var position = this.attributes.position;
-      var uv = this.attributes.uv;
+      var a;
+      var b;
+      var c;
+      var index = this.index,
+          _this$attributes = this.attributes,
+          position = _this$attributes.position,
+          uv = _this$attributes.uv;
 
       if (index === null) {
         return;
@@ -77691,14 +77788,14 @@ var PTS_PER_TRIANGLE = 3;
 var CylinderBufferGeometry$1 =
 /*#__PURE__*/
 function (_THREE$BufferGeometry) {
-  _inherits(CylinderBufferGeometry$$1, _THREE$BufferGeometry);
+  _inherits(CylinderBufferGeometry, _THREE$BufferGeometry);
 
-  function CylinderBufferGeometry$$1(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded) {
+  function CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded) {
     var _this;
 
-    _classCallCheck(this, CylinderBufferGeometry$$1);
+    _classCallCheck(this, CylinderBufferGeometry);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(CylinderBufferGeometry$$1).call(this));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(CylinderBufferGeometry).call(this));
     var thetaStart = 0;
     var thetaLength = 2 * Math.PI;
     _this.type = 'CylinderBufferGeometry';
@@ -77814,15 +77911,15 @@ function (_THREE$BufferGeometry) {
     return _this;
   }
 
-  _createClass(CylinderBufferGeometry$$1, [{
+  _createClass(CylinderBufferGeometry, [{
     key: "clone",
     value: function clone() {
       var parameters = this.parameters;
-      return new CylinderBufferGeometry$$1(parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded);
+      return new CylinderBufferGeometry(parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded);
     }
   }]);
 
-  return CylinderBufferGeometry$$1;
+  return CylinderBufferGeometry;
 }(BufferGeometry);
 
 var tmpColor$2 = new Color();
@@ -78385,10 +78482,10 @@ var LinesGeometry =
 function (_BaseLinesGeometry) {
   _inherits(LinesGeometry, _BaseLinesGeometry);
 
-  function LinesGeometry(segmentsCount) {
+  function LinesGeometry() {
     _classCallCheck(this, LinesGeometry);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(LinesGeometry).call(this, segmentsCount));
+    return _possibleConstructorReturn(this, _getPrototypeOf(LinesGeometry).apply(this, arguments));
   }
 
   _createClass(LinesGeometry, [{
@@ -78740,7 +78837,7 @@ function (_LinesGeometry) {
   }]);
 
   return TwoColorLinesGeometry;
-}(LinesGeometry); //(???)parent = LinesGeometry.prototype;
+}(LinesGeometry); // (???)parent = LinesGeometry.prototype;
 
 var vectors = [new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, -1, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1)];
 var vecCount = vectors.length;
@@ -78761,7 +78858,7 @@ function (_SphereCollisionGeo) {
   _createClass(CrossGeometry, [{
     key: "setItem",
     value: function setItem(itemIdx, itemPos, itemRad) {
-      this.setSphere(itemIdx, itemPos, itemRad); //const offset = itemIdx * this._chunkSize;
+      this.setSphere(itemIdx, itemPos, itemRad); // const offset = itemIdx * this._chunkSize;
 
       for (var i = 0; i < vecCount / 2; ++i) {
         var first = i * 2;
@@ -78932,8 +79029,8 @@ var GridCell = function GridCell() {
 }; // Helper class Triangle
 
 
-var Triangle$1 = function Triangle$$1() {
-  _classCallCheck(this, Triangle$$1);
+var Triangle$1 = function Triangle() {
+  _classCallCheck(this, Triangle);
 
   this.a = {
     p: new Vector3(),
@@ -79097,8 +79194,7 @@ function () {
       new Vector3(0, 0, step), // 4
       new Vector3(step, 0, step), // 5
       new Vector3(step, step, step), // 6
-      new Vector3(0, step, step) // 7
-      ];
+      new Vector3(0, step, step)];
       var tmpTriCount = 5;
       var triangles = new Array(tmpTriCount);
 
@@ -79186,7 +79282,7 @@ function () {
 
             var triCount = this._polygonize(gc, isoValue, triangles);
 
-            globTriCount += triCount; //append triangles using different techniques
+            globTriCount += triCount; // append triangles using different techniques
 
             for (i = 0; i < triCount; ++i) {
               indices.push(this._numTriangles * 3);
@@ -79288,15 +79384,16 @@ function () {
       this._remapIndices(vMap, faceVer);
 
       this._remapVertices(vertices, normals, newVer);
-    } /// Assign per-vertex colors from a volumetric texture map (same dimensions as the original volumetric data).
-    /// Along with color dominating atom is determined for each vertex
-    /// and vertices with atom out of "visible" subset get filtered out.
-    /// XXX only handles orthogonal volumes currently
+    } // Assign per-vertex colors from a volumetric texture map (same dimensions as the original volumetric data).
+    // Along with color dominating atom is determined for each vertex
+    // and vertices with atom out of "visible" subset get filtered out.
+    // XXX only handles orthogonal volumes currently
 
   }, {
     key: "setColorVolTex",
     value: function setColorVolTex(colorMap, atomMap, atomWeightMap, visibilitySelector) {
-      var i, idx;
+      var i;
+      var idx;
       var numVerts = this._position.length / 3;
       var vertices = this._position;
       var origin = this._origin;
@@ -79510,10 +79607,10 @@ var VolumeSurfaceGeometry =
 function (_IsoSurfaceGeometry) {
   _inherits(VolumeSurfaceGeometry, _IsoSurfaceGeometry);
 
-  function VolumeSurfaceGeometry(spheresCount, opts) {
+  function VolumeSurfaceGeometry() {
     _classCallCheck(this, VolumeSurfaceGeometry);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(VolumeSurfaceGeometry).call(this, spheresCount, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(VolumeSurfaceGeometry).apply(this, arguments));
   }
 
   _createClass(VolumeSurfaceGeometry, [{
@@ -79584,9 +79681,12 @@ function (_IsoSurfaceGeometry) {
       this.xAxis.x = (numVoxels[0] - 1) * params.gridSpacing;
       this.yAxis.y = (numVoxels[1] - 1) * params.gridSpacing;
       this.zAxis.z = (numVoxels[2] - 1) * params.gridSpacing;
-      this.origin.x = minCoordRad[0];
-      this.origin.y = minCoordRad[1];
-      this.origin.z = minCoordRad[2];
+
+      var _minCoordRad = _slicedToArray(minCoordRad, 3);
+
+      this.origin.x = _minCoordRad[0];
+      this.origin.y = _minCoordRad[1];
+      this.origin.z = _minCoordRad[2];
       return {
         bbox: minMaxValues,
         dim: numVoxels
@@ -79597,7 +79697,7 @@ function (_IsoSurfaceGeometry) {
     value: function _makeSurface(surface, params) {
       var isoSurf = new IsoSurface();
       isoSurf.compute(surface.volMap, this.origin, params.isoValue, 1);
-      isoSurf.vertexFusion(9, 9); //normalization is included
+      isoSurf.vertexFusion(9, 9); // normalization is included
 
       if (isoSurf._numTriangles > 0) {
         isoSurf.setColorVolTex(surface.volTexMap, surface.atomMap, surface.atomWeightMap, this._visibilitySelector);
@@ -79649,10 +79749,10 @@ var QuickSurfGeometry =
 function (_VolumeSurfaceGeometr) {
   _inherits(QuickSurfGeometry, _VolumeSurfaceGeometr);
 
-  function QuickSurfGeometry(spheresCount, opts) {
+  function QuickSurfGeometry() {
     _classCallCheck(this, QuickSurfGeometry);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(QuickSurfGeometry).call(this, spheresCount, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(QuickSurfGeometry).apply(this, arguments));
   }
 
   _createClass(QuickSurfGeometry, [{
@@ -79678,20 +79778,20 @@ function (_VolumeSurfaceGeometr) {
     key: "gaussdensity",
     value: function gaussdensity(surface, packedArrays, atomicNum, params) {
       var numAtoms = packedArrays.posRad.length / 4;
-      var posRad = packedArrays.posRad;
-      var colors = packedArrays.colors;
+      var posRad = packedArrays.posRad,
+          colors = packedArrays.colors;
       var numVoxels = this.numVoxels;
-      var radScale = params.radScale;
-      var gaussLim = params.gaussLim;
-      var gridSpacing = params.gridSpacing;
+      var radScale = params.radScale,
+          gaussLim = params.gaussLim,
+          gridSpacing = params.gridSpacing;
       var invIsoValue = 1.0 / params.isoValue;
       var invGridSpacing = 1.0 / gridSpacing;
       var maxVoxelX = numVoxels[0] - 1;
       var maxVoxelY = numVoxels[1] - 1;
-      var maxVoxelZ = numVoxels[2] - 1; //TODO is densityMap and volTexMap initialized?
+      var maxVoxelZ = numVoxels[2] - 1; // TODO is densityMap and volTexMap initialized?
 
-      var volMap = surface.volMap;
-      var volTexMap = surface.volTexMap;
+      var volMap = surface.volMap,
+          volTexMap = surface.volTexMap;
       var volData = volMap.getData();
       var strideX = volMap.getStrideX();
       var volTexData = volTexMap.getData();
@@ -79744,7 +79844,7 @@ function (_VolumeSurfaceGeometr) {
               var density = Math.exp(expVal) * atomicNumFactor; // store most relevant atom (with highest density)
 
               if (this._visibilitySelector != null && density > atomWeightData[addr]) {
-                //NOSONAR
+                // NOSONAR
                 atomWeightData[addr] = density; // we use same index into atom map and atomWeightMap
 
                 atomMap[addr] = packedArrays.atoms[i];
@@ -79936,9 +80036,9 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   // Should work as a drop-in alternative to EDTSurface (though some of
   // the EDT paramters are not relevant in this method).
   var itemSize = 4;
-  var posRad = packedArrays.posRad;
-  var colors = packedArrays.colors;
-  var atoms = packedArrays.atoms;
+  var posRad = packedArrays.posRad,
+      colors = packedArrays.colors,
+      atoms = packedArrays.atoms;
   var nAtoms = posRad.length / itemSize;
   var bbox = boundaries.bbox;
   var min = bbox.minPosRad;
@@ -79947,20 +80047,26 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
   var maxRadius; // Parameters
 
-  var probeRadius, scaleFactor, probePositions; // Cache last value for obscured test
+  var probeRadius;
+  var scaleFactor;
+  var probePositions; // Cache last value for obscured test
 
   var lastClip = -1; // Grid params
 
-  var dim, grid;
-  var volTex,
-      weights,
-      weightsMap = null,
-      atomMap = null;
+  var dim;
+  var grid;
+  var volTex;
+  var weights;
+  var weightsMap = null;
+  var atomMap = null;
   var visibilitySelector = null; // grid indices -> xyz coords
 
-  var gridx, gridy, gridz; // Lookup tables:
+  var gridx;
+  var gridy;
+  var gridz; // Lookup tables:
 
-  var sinTable, cosTable; // Spatial Hash
+  var sinTable;
+  var cosTable; // Spatial Hash
 
   var hash; // Neighbour array to be filled by hash
 
@@ -79970,30 +80076,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   var n1 = new Vector3(0.0, 0.0, 0.0);
   var n2 = new Vector3(0.0, 0.0, 0.0);
   var ngTorus;
-
-  function init() {
-    probeRadius = params.probeRadius;
-    scaleFactor = params.scaleFactor;
-    probePositions = params.probePositions;
-    visibilitySelector = params.visibilitySelector;
-    r2 = utils.allocateTyped(Float32Array, nAtoms);
-    maxRadius = 0;
-
-    for (var innI = 0; innI < nAtoms; ++innI) {
-      var rExt = posRad[innI * itemSize + 3] += probeRadius;
-
-      if (rExt > maxRadius) {
-        maxRadius = rExt;
-      }
-
-      r2[innI] = rExt * rExt;
-    }
-
-    initializeGrid();
-    initializeAngleTables();
-    initializeHash();
-    lastClip = -1;
-  }
 
   function uniformArray(TypeName, n, a) {
     var array = utils.allocateTyped(TypeName, n);
@@ -80051,6 +80133,40 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     neighbours = new Int32Array(hash.neighbourListLength);
   }
 
+  function init() {
+    probeRadius = params.probeRadius;
+    scaleFactor = params.scaleFactor;
+    probePositions = params.probePositions;
+    visibilitySelector = params.visibilitySelector;
+    r2 = utils.allocateTyped(Float32Array, nAtoms);
+    maxRadius = 0;
+
+    for (var innI = 0; innI < nAtoms; ++innI) {
+      var rExt = posRad[innI * itemSize + 3] += probeRadius;
+
+      if (rExt > maxRadius) {
+        maxRadius = rExt;
+      }
+
+      r2[innI] = rExt * rExt;
+    }
+
+    initializeGrid();
+    initializeAngleTables();
+    initializeHash();
+    lastClip = -1;
+  }
+
+  function singleAtomObscures(ai, innX, innY, innZ) {
+    var innCI = itemSize * ai;
+    var ra2 = r2[ai];
+    var dx = posRad[innCI] - innX;
+    var dy = posRad[innCI + 1] - innY;
+    var dz = posRad[innCI + 2] - innZ;
+    var d2 = dx * dx + dy * dy + dz * dz;
+    return d2 < ra2;
+  }
+
   function obscured(innX, innY, innZ, a, b) {
     // Is the point at x,y,z obscured by any of the atoms
     // specifeid by indices in neighbours. Ignore indices
@@ -80064,9 +80180,9 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
       if (ai !== a && ai !== b && singleAtomObscures(ai, innX, innY, innZ)) {
         return ai;
-      } else {
-        lastClip = -1;
       }
+
+      lastClip = -1;
     }
 
     var ni = 0;
@@ -80083,16 +80199,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
     lastClip = -1;
     return -1;
-  }
-
-  function singleAtomObscures(ai, innX, innY, innZ) {
-    var innCI = itemSize * ai;
-    var ra2 = r2[ai];
-    var dx = posRad[innCI] - innX;
-    var dy = posRad[innCI + 1] - innY;
-    var dz = posRad[innCI + 2] - innZ;
-    var d2 = dx * dx + dy * dy + dz * dz;
-    return d2 < ra2;
   }
 
   function projectPoints() {
@@ -80197,21 +80303,18 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     }
   }
 
-  function projectTorii() {
-    for (var innI = 0; innI < nAtoms; innI++) {
-      var innIdx = itemSize * innI;
-      hash.withinRadii(posRad[innIdx], posRad[innIdx + 1], posRad[innIdx + 2], posRad[innIdx + 3], neighbours);
-      var ia = 0;
-      var ni = neighbours[ia];
+  function normalToLine(out, p) {
+    out.x = out.y = out.z = 1.0;
 
-      while (ni >= 0) {
-        if (innI < ni) {
-          projectTorus(innI, ni);
-        }
-
-        ni = neighbours[++ia];
-      }
+    if (p.x !== 0) {
+      out.x = (p.y + p.z) / -p.x;
+    } else if (p.y !== 0) {
+      out.y = (p.x + p.z) / -p.y;
+    } else if (p.z !== 0) {
+      out.z = (p.x + p.y) / -p.z;
     }
+
+    return out;
   }
 
   function projectTorus(a, b) {
@@ -80297,18 +80400,21 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     }
   }
 
-  function normalToLine(out, p) {
-    out.x = out.y = out.z = 1.0;
+  function projectTorii() {
+    for (var innI = 0; innI < nAtoms; innI++) {
+      var innIdx = itemSize * innI;
+      hash.withinRadii(posRad[innIdx], posRad[innIdx + 1], posRad[innIdx + 2], posRad[innIdx + 3], neighbours);
+      var ia = 0;
+      var ni = neighbours[ia];
 
-    if (p.x !== 0) {
-      out.x = (p.y + p.z) / -p.x;
-    } else if (p.y !== 0) {
-      out.y = (p.x + p.z) / -p.y;
-    } else if (p.z !== 0) {
-      out.z = (p.x + p.y) / -p.z;
+      while (ni >= 0) {
+        if (innI < ni) {
+          projectTorus(innI, ni);
+        }
+
+        ni = neighbours[++ia];
+      }
     }
-
-    return out;
   }
 
   function fixNegatives() {
@@ -80369,10 +80475,10 @@ var ContactSurfaceGeometry =
 function (_VolumeSurfaceGeometr) {
   _inherits(ContactSurfaceGeometry, _VolumeSurfaceGeometr);
 
-  function ContactSurfaceGeometry(spheresCount, opts) {
+  function ContactSurfaceGeometry() {
     _classCallCheck(this, ContactSurfaceGeometry);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ContactSurfaceGeometry).call(this, spheresCount, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ContactSurfaceGeometry).apply(this, arguments));
   }
 
   _createClass(ContactSurfaceGeometry, [{
@@ -80413,7 +80519,7 @@ var IsoSurfaceAtomColored = function IsoSurfaceAtomColored(vCenter, radiusAt) {
   this.srcAtom = null;
 };
 
-/*jshint bitwise: false*/
+/* jshint bitwise: false */
 
 /**
  * Build normals for isosurface, using atoms information
@@ -80504,7 +80610,7 @@ function () {
         numVoxZ++;
         maxAtomsRefs += numVoxX * numVoxY * numVoxZ;
       } // for (i)
-      //maxAtomsRefs = numAtoms * MAX_ATOMS_IN_SINGLE_VOXEL;
+      // maxAtomsRefs = numAtoms * MAX_ATOMS_IN_SINGLE_VOXEL;
 
 
       this._voxelList = utils.allocateTyped(Int32Array, side3);
@@ -80542,15 +80648,15 @@ function () {
           for (var y = yIndMin; y <= yIndMax; y++) {
             for (var x = xIndMin; x <= xIndMax; x++) {
               // add atom with index "i" to this voxel list
-              var indVoxel = x + y * side + z * side2; //assert(indVoxel >= 0);
-              //assert(indVoxel < side3);
+              var indVoxel = x + y * side + z * side2; // assert(indVoxel >= 0);
+              // assert(indVoxel < side3);
               // add first
 
               if (this._voxelList[indVoxel] < 0) {
                 atomsList[numAtomsRefs * 2 + 0] = i;
                 atomsList[numAtomsRefs * 2 + 1] = 0 - 1;
                 this._voxelList[indVoxel] = numAtomsRefs;
-                numAtomsRefs++; //assert(numAtomsRefs < maxAtomsRefs - 1);
+                numAtomsRefs++; // assert(numAtomsRefs < maxAtomsRefs - 1);
 
                 continue;
               } // insert into head of list
@@ -80645,21 +80751,21 @@ function () {
     value: function buildNormals(numVertices, vertices, normals) {
       var self = this;
       var numCloseAtoms = 0;
-      var vx = 0,
-          vy = 0,
-          vz = 0;
+      var vx = 0;
+      var vy = 0;
+      var vz = 0;
       var dist2;
-      var vNormalX = 0,
-          vNormalY = 0,
-          vNormalZ = 0;
-      var koef = 0,
-          w = 0;
+      var vNormalX = 0;
+      var vNormalY = 0;
+      var vNormalZ = 0;
+      var koef = 0;
+      var w = 0;
       var r25 = 2.5;
       var r01 = 0.1;
       var maxRadAffect = this._aveRad * r25;
       var maxRadAffect2 = maxRadAffect * maxRadAffect;
       var expScale = -this._aveRad * r01; // some stats
-      //numSlowAtoms = 0;
+      // numSlowAtoms = 0;
 
       var gatherNormals = function gatherNormals(atom) {
         var dx = vx - atom.coord.x;
@@ -80726,15 +80832,15 @@ function () {
     key: "buildColors",
     value: function buildColors(numVertices, vertices, colors, radiusColorSmoothness) {
       var self = this;
-      var vx = 0.0,
-          vy = 0.0,
-          vz = 0.0;
-      var koef = 0.0,
-          w = 0.0; //const KOEF_ALPHA = 1.0;
+      var vx = 0.0;
+      var vy = 0.0;
+      var vz = 0.0;
+      var koef = 0.0;
+      var w = 0.0; // const KOEF_ALPHA = 1.0;
 
       var KOEF_ADD = 0.8;
       var maxRadAffect = radiusColorSmoothness;
-      var maxRadAffect2 = maxRadAffect * maxRadAffect; //koefAlpha = 4.4 / radiusColorSmoothness;
+      var maxRadAffect2 = maxRadAffect * maxRadAffect; // koefAlpha = 4.4 / radiusColorSmoothness;
 
       var colorsClose = [];
       var weights = [];
@@ -80756,8 +80862,8 @@ function () {
 
         if (koef < 0.0) {
           koef = -koef;
-        } //w = Math.exp(expScale * koef);
-        //w = 1.0 / (KOEF_ADD + Math.pow(koef, KOEF_ALPHA));
+        } // w = Math.exp(expScale * koef);
+        // w = 1.0 / (KOEF_ADD + Math.pow(koef, KOEF_ALPHA));
 
 
         w = 1.0 / (KOEF_ADD + koef);
@@ -80825,11 +80931,12 @@ function () {
     key: "buildSimple",
     value: function buildSimple(complex, colorer) {
       var atomsClustered = [];
-      var indVoxel, indAtomRef;
+      var indVoxel;
+      var indAtomRef;
       var atom;
-      var vColorX = 0,
-          vColorY = 0,
-          vColorZ = 0;
+      var vColorX = 0;
+      var vColorY = 0;
+      var vColorZ = 0;
       var ind = 0;
       var cNumNeighbours = 8;
       var cMask = 7;
@@ -80861,8 +80968,8 @@ function () {
         var xVox = Math.floor((v.x - this.vBoxMin.x) * numVoxels * xScale);
         var yVox = Math.floor((v.y - this.vBoxMin.y) * numVoxels * yScale);
         var zVox = Math.floor((v.z - this.vBoxMin.z) * numVoxels * zScale);
-        indVoxel = xVox + yVox * numVoxels + zVox * numVoxels * numVoxels; //assert(indVoxel >= 0);
-        //assert(indVoxel < n3);
+        indVoxel = xVox + yVox * numVoxels + zVox * numVoxels * numVoxels; // assert(indVoxel >= 0);
+        // assert(indVoxel < n3);
 
         indAtomRef = this.voxels[indVoxel];
 
@@ -80876,7 +80983,7 @@ function () {
             break;
           }
 
-          indAtomRef = this.voxelsRefs[indAtomRef * 2 + 1]; //assert(indAtomRef < numAtoms);
+          indAtomRef = this.voxelsRefs[indAtomRef * 2 + 1]; // assert(indAtomRef < numAtoms);
         } // add new atom to list tail
 
 
@@ -80953,7 +81060,7 @@ function () {
               if (histTypes[_i4] > histTypes[indMax]) {
                 indMax = _i4;
               }
-            } //TODO: Earnol
+            } // TODO: Earnol
 
 
             var vCenter = new Color(colorer.getAtomColor(complex, this.atoms[indMax]));
@@ -81009,8 +81116,7 @@ new Vector3(0.20, 0.20, 0.90), // N
 new Vector3(0.30, 0.90, 0.20), // P
 new Vector3(0.90, 0.90, 0.20), // S
 new Vector3(0.0, 0.0, 0.0), // undefined
-new Vector3(0.60, 0.60, 0.60) // undefined
-];
+new Vector3(0.60, 0.60, 0.60)];
 IsoSurfaceCluster.prototype.resiudeColors = [new Vector3(0.9, 0.9, 0.2), new Vector3(0.0, 0.9, 0.9), new Vector3(0.9, 0.1, 0.9), new Vector3(0.9, 0.4, 0.6), new Vector3(0.9, 0.6, 0.4), new Vector3(0.4, 0.6, 0.9), new Vector3(0.9, 0.4, 0.7), new Vector3(0.7, 0.3, 0.6)];
 IsoSurfaceCluster.prototype.chainColors = [new Vector3(0.1, 0.1, 0.1), new Vector3(0.3, 0.3, 0.3), new Vector3(0.7, 0.7, 0.7), new Vector3(0.9, 0.9, 0.9), new Vector3(0.5, 0.2, 0.2), new Vector3(0.3, 0.7, 0.7), new Vector3(0.7, 0.3, 0.7), new Vector3(0.8, 0.2, 0.5)];
 
@@ -81087,10 +81193,10 @@ var SSIsosurfaceGeometry =
 function (_IsoSurfaceGeometry) {
   _inherits(SSIsosurfaceGeometry, _IsoSurfaceGeometry);
 
-  function SSIsosurfaceGeometry(spheresCount, opts) {
+  function SSIsosurfaceGeometry() {
     _classCallCheck(this, SSIsosurfaceGeometry);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SSIsosurfaceGeometry).call(this, spheresCount, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(SSIsosurfaceGeometry).apply(this, arguments));
   }
 
   _createClass(SSIsosurfaceGeometry, [{
@@ -81152,8 +81258,8 @@ function (_IsoSurfaceGeometry) {
   }, {
     key: "convertToAtomsColored",
     value: function convertToAtomsColored(packedArrays, atomsColored) {
-      var atoms = packedArrays.atoms;
-      var colors = packedArrays.colors;
+      var atoms = packedArrays.atoms,
+          colors = packedArrays.colors;
 
       for (var i = 0, numAtoms = atoms.length; i < numAtoms; i++) {
         var vCenter = atoms[i].getPosition();
@@ -81365,7 +81471,7 @@ function (_IsoSurfaceGeometry) {
       var cNumVerts = 8;
       var numCells = meshRes - 1;
       var side = meshRes;
-      var side2 = meshRes * meshRes; //side3 = meshRes * meshRes * meshRes;
+      var side2 = meshRes * meshRes; // side3 = meshRes * meshRes * meshRes;
 
       var vaEdges = new Array(arrSize);
 
@@ -81407,27 +81513,27 @@ function (_IsoSurfaceGeometry) {
               j++;
               cube.pointsValuesLinear[indPointValues + j] = vCorner.z;
               j++;
-            } //cell._points[1].x += vCellStep.x;
-            //cell._points[2].x += vCellStep.x;
-            //cell._points[5].x += vCellStep.x;
-            //cell._points[6].x += vCellStep.x;
+            } // cell._points[1].x += vCellStep.x;
+            // cell._points[2].x += vCellStep.x;
+            // cell._points[5].x += vCellStep.x;
+            // cell._points[6].x += vCellStep.x;
 
 
             cube.pointsValuesLinear[indPointValues + 3] += vCellStep.x;
             cube.pointsValuesLinear[indPointValues + 2 * 3] += vCellStep.x;
             cube.pointsValuesLinear[indPointValues + 5 * 3] += vCellStep.x;
-            cube.pointsValuesLinear[indPointValues + 6 * 3] += vCellStep.x; //cell._points[2].z += vCellStep.z;
-            //cell._points[3].z += vCellStep.z;
-            //cell._points[6].z += vCellStep.z;
-            //cell._points[7].z += vCellStep.z;
+            cube.pointsValuesLinear[indPointValues + 6 * 3] += vCellStep.x; // cell._points[2].z += vCellStep.z;
+            // cell._points[3].z += vCellStep.z;
+            // cell._points[6].z += vCellStep.z;
+            // cell._points[7].z += vCellStep.z;
 
             cube.pointsValuesLinear[indPointValues + 2 * 3 + 2] += vCellStep.z;
             cube.pointsValuesLinear[indPointValues + 3 * 3 + 2] += vCellStep.z;
             cube.pointsValuesLinear[indPointValues + 6 * 3 + 2] += vCellStep.z;
-            cube.pointsValuesLinear[indPointValues + 7 * 3 + 2] += vCellStep.z; //cell._points[4].y += vCellStep.y;
-            //cell._points[5].y += vCellStep.y;
-            //cell._points[6].y += vCellStep.y;
-            //cell._points[7].y += vCellStep.y;
+            cube.pointsValuesLinear[indPointValues + 7 * 3 + 2] += vCellStep.z; // cell._points[4].y += vCellStep.y;
+            // cell._points[5].y += vCellStep.y;
+            // cell._points[6].y += vCellStep.y;
+            // cell._points[7].y += vCellStep.y;
 
             cube.pointsValuesLinear[indPointValues + 4 * 3 + 1] += vCellStep.y;
             cube.pointsValuesLinear[indPointValues + 5 * 3 + 1] += vCellStep.y;
@@ -81520,7 +81626,7 @@ function (_IsoSurfaceGeometry) {
             cube.pointsValuesLinear[cubeValuesIndex + 5] = corners[side2 + indCorner + 1];
             cube.pointsValuesLinear[cubeValuesIndex + 6] = corners[side2 + indCorner + side + 1];
             cube.pointsValuesLinear[cubeValuesIndex + 7] = corners[side2 + indCorner + side]; // check read exception
-            //assert(side2 + indCorner + side + 1 < side3);
+            // assert(side2 + indCorner + side + 1 < side3);
             // get bit flags inside
 
             var bitsInside = 0;
@@ -81790,7 +81896,8 @@ function (_IsoSurfaceGeometry) {
     key: "modifyExcludedFromGeo",
     value: function modifyExcludedFromGeo(side, probeSphereRadius, vBoxMin, vBoxMax, geoOut, corners) {
       var ind;
-      var distToSphere, distToBorder;
+      var distToSphere;
+      var distToBorder;
       var r11 = 1.1;
 
       function innerBlockWorkAround() {
@@ -81839,7 +81946,7 @@ function (_IsoSurfaceGeometry) {
             var indZ = iz * side;
 
             for (var ix = indXMin; ix <= indXMax; ix++) {
-              ind = indY + indZ + ix; //getCornerCoord(vBoxMin, vBoxMax, ix, iy, iz, side, &vCorner);
+              ind = indY + indZ + ix; // getCornerCoord(vBoxMin, vBoxMax, ix, iy, iz, side, &vCorner);
 
               var t = ix * sideInv;
               var xCorner = vBoxMin.x * (1.0 - t) + vBoxMax.x * t;
@@ -81876,7 +81983,7 @@ function (_IsoSurfaceGeometry) {
       var oneHundered = 100;
       var r35 = 3.5;
       var r12 = 1.2; // performance test
-      //this.performanceTest();
+      // this.performanceTest();
       // Create temporary atoms (but colored)
 
       var packedArrays = {
@@ -81940,7 +82047,7 @@ function (_IsoSurfaceGeometry) {
         } else {
           atomsClustered = clusterBuilder.buildSimple();
         } // redbuild bbox again due to increase of radius
-        //this.getBoundingBox(atomsClustered, vBoxMin, vBoxMax);
+        // this.getBoundingBox(atomsClustered, vBoxMin, vBoxMax);
 
 
         vBoxMin.x -= r35;
@@ -81987,7 +82094,7 @@ function (_IsoSurfaceGeometry) {
       this.voxelWorld = null;
 
       if (this.clusterizationType > 0) {
-        this.voxelWorld = new IsosurfaceBuildNormals(atomsClustered.length, atomsClustered, //NOSONAR
+        this.voxelWorld = new IsosurfaceBuildNormals(atomsClustered.length, atomsClustered, // NOSONAR
         vBoxMin, vBoxMax, probeRadForNormalsColors);
       } else {
         this.voxelWorld = new IsosurfaceBuildNormals(atomsColored.length, atomsColored, vBoxMin, vBoxMax, probeRadForNormalsColors);
@@ -82077,7 +82184,7 @@ function createLabel(fieldTxt, className) {
 
     text.appendChild(spanText);
   } else {
-    text.appendChild(fieldTxt); //text.style.paddingTop = '10px';
+    text.appendChild(fieldTxt); // text.style.paddingTop = '10px';
   }
 
   text.worldPos = new Vector3();
@@ -82130,7 +82237,7 @@ function (_EventDispatcher) {
 
     var deltaPos = new Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
     _this.userData = {
-      translation: 'translate(' + xTranslation + '%, ' + yTranslation + '%)',
+      translation: "translate(".concat(xTranslation, "%, ").concat(yTranslation, "%)"),
       offset: deltaPos
     };
     return _this;
@@ -82141,7 +82248,7 @@ function (_EventDispatcher) {
     value: function setItem(itemIdx, itemPos, fieldTxt) {
       var opts = this._opts;
       var labels = opts.labels;
-      var text = this.items[itemIdx] || createLabel(fieldTxt, 'label label-' + labels);
+      var text = this.items[itemIdx] || createLabel(fieldTxt, "label label-".concat(labels));
       text.worldPos.copy(itemPos);
       text.style.textAlign = opts.horizontalAlign;
       text.style.verticalAlign = opts.verticalAlign;
@@ -82266,10 +82373,10 @@ var ZSpriteMesh =
 function (_Mesh) {
   _inherits(ZSpriteMesh, _Mesh);
 
-  function ZSpriteMesh(geometry, material) {
+  function ZSpriteMesh() {
     _classCallCheck(this, ZSpriteMesh);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ZSpriteMesh).call(this, geometry, material));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ZSpriteMesh).apply(this, arguments));
   }
 
   _createClass(ZSpriteMesh, [{
@@ -82374,8 +82481,9 @@ function (_THREE$Group) {
         this.remove(children[i]);
       }
 
-      var items = this.geometry.items;
-      var userData = this.geometry.userData;
+      var _this$geometry = this.geometry,
+          items = _this$geometry.items,
+          userData = _this$geometry.userData;
 
       for (var _i = 0, n = items.length; _i < n; ++_i) {
         var srcItem = items[_i];
@@ -82441,10 +82549,10 @@ var ThickLineMesh =
 function (_Mesh) {
   _inherits(ThickLineMesh, _Mesh);
 
-  function ThickLineMesh(geometry, material) {
+  function ThickLineMesh() {
     _classCallCheck(this, ThickLineMesh);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ThickLineMesh).call(this, geometry, material));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ThickLineMesh).apply(this, arguments));
   }
 
   _createClass(ThickLineMesh, [{
@@ -82713,12 +82821,12 @@ function (_THREE$Object3D) {
     key: "_createMeshes",
     value: function _createMeshes(geometry) {
       var transforms = this._transforms;
-      var Mesh$$1 = this._geoParams.Object;
+      var Mesh = this._geoParams.Object;
       var material = this._material;
       var meshes = [];
 
       for (var i = 0, n = transforms.length; i < n; ++i) {
-        var mesh = new Mesh$$1(geometry, material);
+        var mesh = new Mesh(geometry, material);
         mesh.applyMatrix(transforms[i]);
         meshes[i] = mesh;
       }
@@ -82736,7 +82844,7 @@ _defineProperty(TransformGroup, "_ray", new Ray());
 
 function wrapper(Name, args) {
   var params = [Name].concat(args);
-  return Name.bind.apply(Name, params);
+  return Name.bind.apply(Name, _toConsumableArray(params));
 }
 
 var ChemGroup =
@@ -82902,8 +83010,9 @@ function (_AtomsGroup) {
     key: "_build",
     value: function _build() {
       var atomsIdc = this._selection.chunks;
-      var atoms = this._selection.atoms;
-      var parent = this._selection.parent;
+      var _this$_selection = this._selection,
+          atoms = _this$_selection.atoms,
+          parent = _this$_selection.parent;
       var mode = this._mode;
       var colorer = this._colorer;
       var geo = this._geo;
@@ -82959,12 +83068,12 @@ function (_AtomsSphereGroup) {
     key: "_makeGeoArgs",
     value: function _makeGeoArgs() {
       var selectedAtoms = [];
-      var atoms = this._selection.atoms;
-      var chunks = this._selection.chunks;
-      var i = 0,
-          n = chunks.length;
+      var _this$_selection = this._selection,
+          atoms = _this$_selection.atoms,
+          chunks = _this$_selection.chunks;
+      var n = chunks.length;
 
-      for (; i < n; ++i) {
+      for (var i = 0; i < n; ++i) {
         selectedAtoms[i] = atoms[chunks[i]];
       }
 
@@ -82993,12 +83102,12 @@ function (_AtomsSphereGroup) {
     key: "_makeGeoArgs",
     value: function _makeGeoArgs() {
       var selectedAtoms = [];
-      var atoms = this._selection.atoms;
-      var chunks = this._selection.chunks;
-      var i = 0,
-          n = chunks.length;
+      var _this$_selection = this._selection,
+          atoms = _this$_selection.atoms,
+          chunks = _this$_selection.chunks;
+      var n = chunks.length;
 
-      for (; i < n; ++i) {
+      for (var i = 0; i < n; ++i) {
         selectedAtoms[i] = atoms[chunks[i]];
       }
 
@@ -83142,8 +83251,9 @@ function (_AtomsGroup) {
 
 
       var atomsIdc = this._selection.chunks;
-      var atoms = this._selection.atoms;
-      var parent = this._selection.parent;
+      var _this$_selection = this._selection,
+          atoms = _this$_selection.atoms,
+          parent = _this$_selection.parent;
       var colorer = this._colorer;
       var geo = this._geo;
 
@@ -83228,8 +83338,9 @@ function (_AtomsGroup) {
       var segmentsHeight = this._segmentsHeight;
       var leprStep = 1.0 / segmentsHeight;
       var colorer = this._colorer;
-      var cycles = this._selection.cycles;
-      var parent = this._selection.parent;
+      var _this$_selection = this._selection,
+          cycles = _this$_selection.cycles,
+          parent = _this$_selection.parent;
       var chunkIdx = 0;
       var currAtomIdx = chunksToIdx[chunkIdx];
 
@@ -83363,7 +83474,7 @@ function (_AromaticGroup) {
       var radOffset = this._mode.getAromaticOffset();
 
       this._buildInner(radOffset, function (chunkIdx, color, points) {
-        var prevPt = points[0]; //do not replace with start
+        var prevPt = points[0]; // do not replace with start
 
         for (var j = 1; j <= _this._segmentsHeight; ++j) {
           var currPoint = points[j];
@@ -83480,8 +83591,9 @@ function (_ResiduesGroup) {
   }, {
     key: "_build",
     value: function _build() {
-      var residues = this._selection.residues;
-      var parent = this._selection.parent;
+      var _this$_selection = this._selection,
+          residues = _this$_selection.residues,
+          parent = _this$_selection.parent;
       var colorer = this._colorer;
       var geo = this._geo;
 
@@ -84064,7 +84176,8 @@ function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
   var nucleic = (residue._type.flags & ResidueType$1.Flags.NUCLEIC) !== 0;
   var nameFrom = nucleic ? 'C5\'' : 'N';
   var nameTo = nucleic ? 'C3\'' : 'C';
-  var posFrom, posTo;
+  var posFrom;
+  var posTo;
   residue.forEachAtom(function (atom) {
     var name = atom.getVisualName();
 
@@ -84282,8 +84395,9 @@ function (_ResiduesGroup) {
   }, {
     key: "_build",
     value: function _build() {
-      var residues = this._selection.residues;
-      var parent = this._selection.parent;
+      var _this$_selection = this._selection,
+          residues = _this$_selection.residues,
+          parent = _this$_selection.parent;
       var mode = this._mode;
       var colorer = this._colorer;
       var tension = mode.getTension();
@@ -84362,8 +84476,9 @@ function (_ChemGroup) {
   }, {
     key: "_build",
     value: function _build() {
-      var residues = this._selection.residues;
-      var parent = this._selection.parent;
+      var _this$_selection = this._selection,
+          residues = _this$_selection.residues,
+          parent = _this$_selection.parent;
       var mode = this._mode;
       var colorer = this._colorer;
       var geo = this._geo;
@@ -84596,8 +84711,9 @@ function (_BondsGroup) {
     key: "_build",
     value: function _build() {
       var bondsIdc = this._selection.chunks;
-      var bonds = this._selection.bonds;
-      var parent = this._selection.parent;
+      var _this$_selection = this._selection,
+          bonds = _this$_selection.bonds,
+          parent = _this$_selection.parent;
       var mode = this._mode;
       var colorer = this._colorer;
       var geo = this._geo;
@@ -84708,8 +84824,9 @@ function (_BondsGroup) {
     key: "_build",
     value: function _build() {
       var bondsIdc = this._selection.chunks;
-      var bonds = this._selection.bonds;
-      var parent = this._selection.parent;
+      var _this$_selection = this._selection,
+          bonds = _this$_selection.bonds,
+          parent = _this$_selection.parent;
       var mode = this._mode;
       var colorer = this._colorer;
       var geo = this._geo;
@@ -84922,10 +85039,10 @@ var OrphanAtomsProcessor =
 function (_AtomsProcessor) {
   _inherits(OrphanAtomsProcessor, _AtomsProcessor);
 
-  function OrphanAtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
+  function OrphanAtomsProcessor() {
     _classCallCheck(this, OrphanAtomsProcessor);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(OrphanAtomsProcessor).call(this, AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material));
+    return _possibleConstructorReturn(this, _getPrototypeOf(OrphanAtomsProcessor).apply(this, arguments));
   }
 
   _createClass(OrphanAtomsProcessor, [{
@@ -85296,7 +85413,7 @@ function _buildLabel2D(pos, color, fieldTxt) {
     spanText.appendChild(spanNodeP);
     text.appendChild(spanText);
   } else {
-    text.appendChild(fieldTxt); //text.style.paddingTop = '10px';
+    text.appendChild(fieldTxt); // text.style.paddingTop = '10px';
   }
 
   var label = new CSS2DObject(text);
@@ -85534,7 +85651,11 @@ function () {
 
         if (lodash.isArray(currGroup)) {
           renderParams = currGroup[1].call(this);
-          currGroup = currGroup[0];
+          var _currGroup = currGroup;
+
+          var _currGroup2 = _slicedToArray(_currGroup, 1);
+
+          currGroup = _currGroup2[0];
         }
 
         var Group = GroupsFactory[currGroup](null, this.settings, renderParams);
@@ -85691,10 +85812,10 @@ var LicoriceMode =
 function (_LabeledMode) {
   _inherits(LicoriceMode, _LabeledMode);
 
-  function LicoriceMode(opts) {
+  function LicoriceMode() {
     _classCallCheck(this, LicoriceMode);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(LicoriceMode).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(LicoriceMode).apply(this, arguments));
   }
 
   _createClass(LicoriceMode, [{
@@ -85759,10 +85880,10 @@ var BallsAndSticksMode =
 function (_LabeledMode) {
   _inherits(BallsAndSticksMode, _LabeledMode);
 
-  function BallsAndSticksMode(opts) {
+  function BallsAndSticksMode() {
     _classCallCheck(this, BallsAndSticksMode);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(BallsAndSticksMode).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(BallsAndSticksMode).apply(this, arguments));
   }
 
   _createClass(BallsAndSticksMode, [{
@@ -85827,10 +85948,10 @@ var VanDerWaalsMode =
 function (_Mode) {
   _inherits(VanDerWaalsMode, _Mode);
 
-  function VanDerWaalsMode(opts) {
+  function VanDerWaalsMode() {
     _classCallCheck(this, VanDerWaalsMode);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(VanDerWaalsMode).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(VanDerWaalsMode).apply(this, arguments));
   }
 
   _createClass(VanDerWaalsMode, [{
@@ -85855,10 +85976,10 @@ var TraceMode =
 function (_Mode) {
   _inherits(TraceMode, _Mode);
 
-  function TraceMode(opts) {
+  function TraceMode() {
     _classCallCheck(this, TraceMode);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(TraceMode).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(TraceMode).apply(this, arguments));
   }
 
   _createClass(TraceMode, [{
@@ -85883,10 +86004,10 @@ var TubeMode =
 function (_Mode) {
   _inherits(TubeMode, _Mode);
 
-  function TubeMode(opts) {
+  function TubeMode() {
     _classCallCheck(this, TubeMode);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(TubeMode).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(TubeMode).apply(this, arguments));
   }
 
   _createClass(TubeMode, [{
@@ -86114,10 +86235,10 @@ var QuickSurfaceMode =
 function (_SurfaceMode) {
   _inherits(QuickSurfaceMode, _SurfaceMode);
 
-  function QuickSurfaceMode(opts) {
+  function QuickSurfaceMode() {
     _classCallCheck(this, QuickSurfaceMode);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(QuickSurfaceMode).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(QuickSurfaceMode).apply(this, arguments));
   }
 
   _createClass(QuickSurfaceMode, [{
@@ -86156,8 +86277,8 @@ function (_SurfaceMode) {
     _classCallCheck(this, IsoSurfaceMode);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(IsoSurfaceMode).call(this, opts));
-    _this._excludeProbe = excludeProbe; //this._isVertexNormalsRendered = false; FIXME are used?
-    //this._isSurfaceTransparent = false; FIXME are used?
+    _this._excludeProbe = excludeProbe; // this._isVertexNormalsRendered = false; FIXME are used?
+    // this._isSurfaceTransparent = false; FIXME are used?
 
     return _this;
   }
@@ -86240,10 +86361,10 @@ var ContactSurfaceMode =
 function (_SurfaceMode) {
   _inherits(ContactSurfaceMode, _SurfaceMode);
 
-  function ContactSurfaceMode(opts) {
+  function ContactSurfaceMode() {
     _classCallCheck(this, ContactSurfaceMode);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ContactSurfaceMode).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ContactSurfaceMode).apply(this, arguments));
   }
 
   _createClass(ContactSurfaceMode, [{
@@ -86280,10 +86401,10 @@ var TextMode =
 function (_Mode) {
   _inherits(TextMode, _Mode);
 
-  function TextMode(opts) {
+  function TextMode() {
     _classCallCheck(this, TextMode);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(TextMode).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(TextMode).apply(this, arguments));
   }
 
   _createClass(TextMode, [{
@@ -86341,8 +86462,12 @@ Object.defineProperty(modes, 'descriptions', {
 
 modes.create = function (mode, opts) {
   if (!opts && mode instanceof Array) {
-    opts = mode[1];
-    mode = mode[0];
+    var _mode = mode;
+
+    var _mode2 = _slicedToArray(_mode, 2);
+
+    mode = _mode2[0];
+    opts = _mode2[1];
   }
 
   var Mode = this.get(mode) || this.first;
@@ -86355,15 +86480,15 @@ function clamp(x, a, b) {
 
 function lerpColor(c1, c2, alpha) {
   var beta = 1 - alpha;
-  var r1 = c1 >> 16 & 0xff,
-      g1 = c1 >> 8 & 0xff,
-      b1 = c1 & 0xff;
-  var r2 = c2 >> 16 & 0xff,
-      g2 = c2 >> 8 & 0xff,
-      b2 = c2 & 0xff;
-  var r = beta * r1 + alpha * r2,
-      g = beta * g1 + alpha * g2,
-      b = beta * b1 + alpha * b2;
+  var r1 = c1 >> 16 & 0xff;
+  var g1 = c1 >> 8 & 0xff;
+  var b1 = c1 & 0xff;
+  var r2 = c2 >> 16 & 0xff;
+  var g2 = c2 >> 8 & 0xff;
+  var b2 = c2 & 0xff;
+  var r = beta * r1 + alpha * r2;
+  var g = beta * g1 + alpha * g2;
+  var b = beta * b1 + alpha * b2;
   return r << 16 | g << 8 | b;
 }
 
@@ -86389,33 +86514,35 @@ Palette.prototype = {
   secondaryColors: {},
   defaultGradientColor: 0x000000,
   defaultNamedColor: 0xFFFFFF,
-  namedColorsArray: [['indianred', 0xcd5c5c], ['lightcoral', 0xf08080], ['salmon', 0xfa8072], ['darksalmon', 0xe9967a], ['lightsalmon', 0xffa07a], ['crimson', 0xdc143c], ['red', 0xff0000], ['firebrick', 0xb22222], ['darkred', 0x8b0000], ['pink', 0xffc0cb], ['lightpink', 0xffb6c1], ['hotpink', 0xff69b4], ['deeppink', 0xff1493], ['mediumvioletred', 0xc71585], ['palevioletred', 0xdb7093], ['coral', 0xff7f50], ['tomato', 0xff6347], ['orangered', 0xff4500], ['darkorange', 0xff8c00], ['orange', 0xffa500], ['gold', 0xffd700], ['yellow', 0xffff00], ['lightyellow', 0xffffe0], ['lemonchiffon', 0xfffacd], ['lightgoldenrodyellow', 0xfafad2], ['papayawhip', 0xffefd5], ['moccasin', 0xffe4b5], ['peachpuff', 0xffdab9], ['palegoldenrod', 0xeee8aa], ['khaki', 0xf0e68c], ['darkkhaki', 0xbdb76b], ['lavender', 0xe6e6fa], ['thistle', 0xd8bfd8], ['plum', 0xdda0dd], ['violet', 0xee82ee], ['orchid', 0xda70d6], ['fuchsia', 0xff00ff], ['magenta', 0xff00ff], ['mediumorchid', 0xba55d3], ['mediumpurple', 0x9370db], ['rebeccapurple', 0x663399], ['blueviolet', 0x8a2be2], ['darkviolet', 0x9400d3], ['darkorchid', 0x9932cc], ['darkmagenta', 0x8b008b], ['purple', 0x800080], ['indigo', 0x4b0082], ['slateblue', 0x6a5acd], ['mediumslateblue', 0x7b68ee], ['darkslateblue', 0x483d8b], ['greenyellow', 0xadff2f], ['chartreuse', 0x7fff00], ['lawngreen', 0x7cfc00], ['lime', 0x00ff00], ['limegreen', 0x32cd32], ['palegreen', 0x98fb98], ['lightgreen', 0x90ee90], ['mediumspringgreen', 0x00fa9a], ['springgreen', 0x00ff7f], ['mediumseagreen', 0x3cb371], ['seagreen', 0x2e8b57], ['forestgreen', 0x228b22], ['green', 0x008000], ['darkgreen', 0x006400], ['yellowgreen', 0x9acd32], ['olivedrab', 0x6b8e23], ['olive', 0x808000], ['darkolivegreen', 0x556b2f], ['mediumaquamarine', 0x66cdaa], ['darkseagreen', 0x8fbc8f], ['lightseagreen', 0x20b2aa], ['darkcyan', 0x008b8b], ['teal', 0x008080], ['aqua', 0x00ffff], ['cyan', 0x00ffff], ['lightcyan', 0xe0ffff], ['paleturquoise', 0xafeeee], ['aquamarine', 0x7fffd4], ['turquoise', 0x40e0d0], ['mediumturquoise', 0x48d1cc], ['darkturquoise', 0x00ced1], ['cadetblue', 0x5f9ea0], ['steelblue', 0x4682b4], ['lightsteelblue', 0xb0c4de], ['powderblue', 0xb0e0e6], ['lightblue', 0xadd8e6], ['skyblue', 0x87ceeb], ['lightskyblue', 0x87cefa], ['deepskyblue', 0x00bfff], ['dodgerblue', 0x1e90ff], ['cornflowerblue', 0x6495ed], ['royalblue', 0x4169e1], ['blue', 0x0000ff], ['mediumblue', 0x0000cd], ['darkblue', 0x00008b], ['navy', 0x000080], ['midnightblue', 0x191970], ['cornsilk', 0xfff8dc], ['blanchedalmond', 0xffebcd], ['bisque', 0xffe4c4], ['navajowhite', 0xffdead], ['wheat', 0xf5deb3], ['burlywood', 0xdeb887], ['tan', 0xd2b48c], ['rosybrown', 0xbc8f8f], ['sandybrown', 0xf4a460], ['goldenrod', 0xdaa520], ['darkgoldenrod', 0xb8860b], ['peru', 0xcd853f], ['chocolate', 0xd2691e], ['saddlebrown', 0x8b4513], ['sienna', 0xa0522d], ['brown', 0xa52a2a], ['maroon', 0x800000], ['white', 0xffffff], ['snow', 0xfffafa], ['honeydew', 0xf0fff0], ['mintcream', 0xf5fffa], ['azure', 0xf0ffff], ['aliceblue', 0xf0f8ff], ['ghostwhite', 0xf8f8ff], ['whitesmoke', 0xf5f5f5], ['seashell', 0xfff5ee], ['beige', 0xf5f5dc], ['oldlace', 0xfdf5e6], ['floralwhite', 0xfffaf0], ['ivory', 0xfffff0], ['antiquewhite', 0xfaebd7], ['linen', 0xfaf0e6], ['lavenderblush', 0xfff0f5], ['mistyrose', 0xffe4e1], ['gainsboro', 0xdcdcdc], ['lightgray', 0xd3d3d3], ['silver', 0xc0c0c0], ['darkgray', 0xa9a9a9], ['gray', 0x808080], ['dimgray', 0x696969], ['lightslategray', 0x778899], ['slategray', 0x708090], ['darkslategray', 0x2f4f4f], ['black', 0x000000]],
+  namedColorsArray: [
+  /* eslint-disable no-multi-spaces */
+  ['indianred', 0xcd5c5c], ['lightcoral', 0xf08080], ['salmon', 0xfa8072], ['darksalmon', 0xe9967a], ['lightsalmon', 0xffa07a], ['crimson', 0xdc143c], ['red', 0xff0000], ['firebrick', 0xb22222], ['darkred', 0x8b0000], ['pink', 0xffc0cb], ['lightpink', 0xffb6c1], ['hotpink', 0xff69b4], ['deeppink', 0xff1493], ['mediumvioletred', 0xc71585], ['palevioletred', 0xdb7093], ['coral', 0xff7f50], ['tomato', 0xff6347], ['orangered', 0xff4500], ['darkorange', 0xff8c00], ['orange', 0xffa500], ['gold', 0xffd700], ['yellow', 0xffff00], ['lightyellow', 0xffffe0], ['lemonchiffon', 0xfffacd], ['lightgoldenrodyellow', 0xfafad2], ['papayawhip', 0xffefd5], ['moccasin', 0xffe4b5], ['peachpuff', 0xffdab9], ['palegoldenrod', 0xeee8aa], ['khaki', 0xf0e68c], ['darkkhaki', 0xbdb76b], ['lavender', 0xe6e6fa], ['thistle', 0xd8bfd8], ['plum', 0xdda0dd], ['violet', 0xee82ee], ['orchid', 0xda70d6], ['fuchsia', 0xff00ff], ['magenta', 0xff00ff], ['mediumorchid', 0xba55d3], ['mediumpurple', 0x9370db], ['rebeccapurple', 0x663399], ['blueviolet', 0x8a2be2], ['darkviolet', 0x9400d3], ['darkorchid', 0x9932cc], ['darkmagenta', 0x8b008b], ['purple', 0x800080], ['indigo', 0x4b0082], ['slateblue', 0x6a5acd], ['mediumslateblue', 0x7b68ee], ['darkslateblue', 0x483d8b], ['greenyellow', 0xadff2f], ['chartreuse', 0x7fff00], ['lawngreen', 0x7cfc00], ['lime', 0x00ff00], ['limegreen', 0x32cd32], ['palegreen', 0x98fb98], ['lightgreen', 0x90ee90], ['mediumspringgreen', 0x00fa9a], ['springgreen', 0x00ff7f], ['mediumseagreen', 0x3cb371], ['seagreen', 0x2e8b57], ['forestgreen', 0x228b22], ['green', 0x008000], ['darkgreen', 0x006400], ['yellowgreen', 0x9acd32], ['olivedrab', 0x6b8e23], ['olive', 0x808000], ['darkolivegreen', 0x556b2f], ['mediumaquamarine', 0x66cdaa], ['darkseagreen', 0x8fbc8f], ['lightseagreen', 0x20b2aa], ['darkcyan', 0x008b8b], ['teal', 0x008080], ['aqua', 0x00ffff], ['cyan', 0x00ffff], ['lightcyan', 0xe0ffff], ['paleturquoise', 0xafeeee], ['aquamarine', 0x7fffd4], ['turquoise', 0x40e0d0], ['mediumturquoise', 0x48d1cc], ['darkturquoise', 0x00ced1], ['cadetblue', 0x5f9ea0], ['steelblue', 0x4682b4], ['lightsteelblue', 0xb0c4de], ['powderblue', 0xb0e0e6], ['lightblue', 0xadd8e6], ['skyblue', 0x87ceeb], ['lightskyblue', 0x87cefa], ['deepskyblue', 0x00bfff], ['dodgerblue', 0x1e90ff], ['cornflowerblue', 0x6495ed], ['royalblue', 0x4169e1], ['blue', 0x0000ff], ['mediumblue', 0x0000cd], ['darkblue', 0x00008b], ['navy', 0x000080], ['midnightblue', 0x191970], ['cornsilk', 0xfff8dc], ['blanchedalmond', 0xffebcd], ['bisque', 0xffe4c4], ['navajowhite', 0xffdead], ['wheat', 0xf5deb3], ['burlywood', 0xdeb887], ['tan', 0xd2b48c], ['rosybrown', 0xbc8f8f], ['sandybrown', 0xf4a460], ['goldenrod', 0xdaa520], ['darkgoldenrod', 0xb8860b], ['peru', 0xcd853f], ['chocolate', 0xd2691e], ['saddlebrown', 0x8b4513], ['sienna', 0xa0522d], ['brown', 0xa52a2a], ['maroon', 0x800000], ['white', 0xffffff], ['snow', 0xfffafa], ['honeydew', 0xf0fff0], ['mintcream', 0xf5fffa], ['azure', 0xf0ffff], ['aliceblue', 0xf0f8ff], ['ghostwhite', 0xf8f8ff], ['whitesmoke', 0xf5f5f5], ['seashell', 0xfff5ee], ['beige', 0xf5f5dc], ['oldlace', 0xfdf5e6], ['floralwhite', 0xfffaf0], ['ivory', 0xfffff0], ['antiquewhite', 0xfaebd7], ['linen', 0xfaf0e6], ['lavenderblush', 0xfff0f5], ['mistyrose', 0xffe4e1], ['gainsboro', 0xdcdcdc], ['lightgray', 0xd3d3d3], ['silver', 0xc0c0c0], ['darkgray', 0xa9a9a9], ['gray', 0x808080], ['dimgray', 0x696969], ['lightslategray', 0x778899], ['slategray', 0x708090], ['darkslategray', 0x2f4f4f], ['black', 0x000000]],
   namedColors: {},
 
   /* eslint-enable no-magic-numbers */
   gradients: {
-    'rainbow': [0x0000ff, // blue
+    rainbow: [0x0000ff, // blue
     0x00ffff, // cyan
     0x00ff00, // green
     0xffff00, // yellow
     0xff0000],
-    'temp': [0x0000ff, // blue
+    temp: [0x0000ff, // blue
     0x007fff, // light-blue
     0xffffff, // white
     0xff7f00, // orange
     0xff0000],
-    'hot': [0xffffff, // white
+    hot: [0xffffff, // white
     0xff7f00, // orange
     0xff0000],
-    'cold': [0xffffff, // white
+    cold: [0xffffff, // white
     0x007fff, // light-blue
     0x0000ff],
     'blue-red': [0x0000ff, // blue
     0xffffff, // white
     0xff0000],
-    'reds': [0xffffff, // white
+    reds: [0xffffff, // white
     0xff0000],
-    'blues': [0xffffff, // white
+    blues: [0xffffff, // white
     0x0000ff]
   },
   getElementColor: function getElementColor(name) {
@@ -86448,14 +86575,14 @@ Palette.prototype = {
 
     if (!gradient) {
       return this.defaultNamedColor;
-    } else {
-      var count = gradient.length;
-      var index = value * (count - 1);
-      var left = Math.floor(index);
-      var right = clamp(left + 1, 0, count - 1);
-      left = clamp(left, 0, count - 1);
-      return lerpColor(gradient[left], gradient[right], index - left);
     }
+
+    var count = gradient.length;
+    var index = value * (count - 1);
+    var left = Math.floor(index);
+    var right = clamp(left + 1, 0, count - 1);
+    left = clamp(left, 0, count - 1);
+    return lerpColor(gradient[left], gradient[right], index - left);
   },
   getNamedColor: function getNamedColor(name) {
     var asIs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -86463,12 +86590,16 @@ Palette.prototype = {
     return color === undefined && !asIs ? this.defaultNamedColor : color;
   }
 };
-var namedColorsArray = Palette.prototype.namedColorsArray;
-var namedColors = Palette.prototype.namedColors;
+var _Palette$prototype = Palette.prototype,
+    namedColorsArray = _Palette$prototype.namedColorsArray,
+    namedColors = _Palette$prototype.namedColors;
 
 for (var i = 0, length = namedColorsArray.length; i < length; ++i) {
-  var namedColor = namedColorsArray[i];
-  namedColors[namedColor[0]] = namedColor[1];
+  var _namedColorsArray$i = _slicedToArray(namedColorsArray[i], 2),
+      name = _namedColorsArray$i[0],
+      value = _namedColorsArray$i[1];
+
+  namedColors[name] = value;
 }
 
 var palette = new Palette('CPK', 'CP'); // DO NOT EDIT MANUALLY! Autogenerated from atom_types.csv by atom_types.py.
@@ -86636,38 +86767,38 @@ palette$1.defaultResidueColor = 0xBEA06E; // DO NOT EDIT MANUALLY! Autogenerated
 
 palette$1.residueColors = {
   /* eslint-disable no-magic-numbers */
-  'ALA': 0xC8C8C8,
-  'ARG': 0x145AFF,
-  'ASN': 0x00DCDC,
-  'ASP': 0xE60A0A,
-  'CYS': 0xE6E600,
-  'GLN': 0x00DCDC,
-  'GLU': 0xE60A0A,
-  'GLY': 0xEBEBEB,
-  'HIS': 0x8282D2,
-  'ILE': 0x0F820F,
-  'LEU': 0x0F820F,
-  'LYS': 0x145AFF,
-  'MET': 0xE6E600,
-  'PHE': 0x3232AA,
-  'PRO': 0xDC9682,
-  'SER': 0xFA9600,
-  'THR': 0xFA9600,
-  'TRP': 0xB45AB4,
-  'TYR': 0x3232AA,
-  'VAL': 0x0F820F,
-  'A': 0xA0A0FF,
-  'C': 0xFF8C4B,
-  'G': 0xFF7070,
-  'I': 0x80FFFF,
-  'T': 0xA0FFA0,
-  'U': 0xFF8080,
-  'DA': 0xA0A0FF,
-  'DC': 0xFF8C4B,
-  'DG': 0xFF7070,
-  'DI': 0x80FFFF,
-  'DT': 0xA0FFA0,
-  'DU': 0xFF8080,
+  ALA: 0xC8C8C8,
+  ARG: 0x145AFF,
+  ASN: 0x00DCDC,
+  ASP: 0xE60A0A,
+  CYS: 0xE6E600,
+  GLN: 0x00DCDC,
+  GLU: 0xE60A0A,
+  GLY: 0xEBEBEB,
+  HIS: 0x8282D2,
+  ILE: 0x0F820F,
+  LEU: 0x0F820F,
+  LYS: 0x145AFF,
+  MET: 0xE6E600,
+  PHE: 0x3232AA,
+  PRO: 0xDC9682,
+  SER: 0xFA9600,
+  THR: 0xFA9600,
+  TRP: 0xB45AB4,
+  TYR: 0x3232AA,
+  VAL: 0x0F820F,
+  A: 0xA0A0FF,
+  C: 0xFF8C4B,
+  G: 0xFF7070,
+  I: 0x80FFFF,
+  T: 0xA0FFA0,
+  U: 0xFF8080,
+  DA: 0xA0A0FF,
+  DC: 0xFF8C4B,
+  DG: 0xFF7070,
+  DI: 0x80FFFF,
+  DT: 0xA0FFA0,
+  DU: 0xFF8080,
   '+A': 0xA0A0FF,
   '+C': 0xFF8C4B,
   '+G': 0xFF7070,
@@ -86707,7 +86838,7 @@ palette$1.chainColors = [// ' '->0 'A'->1, 'B'->2
 0xFFB8860B, // darkgoldenrod
 0xFFB22222];
 var StructuralElementType$3 = StructuralElement.Type;
-palette$1.secondaryColors = (_palette$secondaryCol = {}, _defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_ALPHA, 0xFF0080), _defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_PI, 0x600080), _defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_310, 0xA00080), _defineProperty(_palette$secondaryCol, StructuralElementType$3.STRAND, 0xFFC800), _defineProperty(_palette$secondaryCol, StructuralElementType$3.TURN, 0x6080FF), _defineProperty(_palette$secondaryCol, 'dna', 0xAE00FE), _defineProperty(_palette$secondaryCol, 'rna', 0xFD0162), _palette$secondaryCol);
+palette$1.secondaryColors = (_palette$secondaryCol = {}, _defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_ALPHA, 0xFF0080), _defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_PI, 0x600080), _defineProperty(_palette$secondaryCol, StructuralElementType$3.HELIX_310, 0xA00080), _defineProperty(_palette$secondaryCol, StructuralElementType$3.STRAND, 0xFFC800), _defineProperty(_palette$secondaryCol, StructuralElementType$3.TURN, 0x6080FF), _defineProperty(_palette$secondaryCol, "dna", 0xAE00FE), _defineProperty(_palette$secondaryCol, "rna", 0xFD0162), _palette$secondaryCol);
 
 var _palette$secondaryCol$1;
 var palette$2 = new Palette('VMD', 'VM');
@@ -86728,10 +86859,7 @@ palette$2.colors = [
 0x80E666, // lime
 0xE666B3, // mauve
 0x804D00, // ochre
-0x8080C0 // ice blue
-
-/* eslint-enable no-magic-numbers */
-];
+0x8080C0];
 palette$2.defaultElementColor = 0x804D00; // DO NOT EDIT MANUALLY! Autogenerated from atom_types.csv by atom_types.py.
 
 palette$2.elementColors = {
@@ -86749,44 +86877,44 @@ palette$2.defaultResidueColor = 0x40C0C0; // DO NOT EDIT MANUALLY! Autogenerated
 
 palette$2.residueColors = {
   /* eslint-disable no-magic-numbers */
-  'ALA': 0x0000FF,
-  'ARG': 0xFFFFFF,
-  'ASN': 0x808033,
-  'ASP': 0xFF0000,
-  'CYS': 0xFFFF00,
-  'GLN': 0xFF8000,
-  'GLU': 0xFF9999,
-  'GLY': 0xFFFFFF,
-  'HIS': 0x40C0C0,
-  'ILE': 0x00FF00,
-  'LEU': 0xFF9999,
-  'LYS': 0x40C0C0,
-  'MET': 0xFFFF00,
-  'PHE': 0xA600A6,
-  'PRO': 0x804C00,
-  'SER': 0xFFFF00,
-  'THR': 0xE666B3,
-  'TRP': 0x999999,
-  'TYR': 0x00FF00,
-  'VAL': 0x808033,
-  'A': 0x0000FF,
-  'C': 0xFF8000,
-  'G': 0xFFFF00,
-  'T': 0xA600A6,
-  'U': 0x00FF00,
-  'DA': 0x0000FF,
-  'DC': 0xFF8000,
-  'DG': 0xFFFF00,
-  'DT': 0xA600A6,
-  'DU': 0x00FF00,
+  ALA: 0x0000FF,
+  ARG: 0xFFFFFF,
+  ASN: 0x808033,
+  ASP: 0xFF0000,
+  CYS: 0xFFFF00,
+  GLN: 0xFF8000,
+  GLU: 0xFF9999,
+  GLY: 0xFFFFFF,
+  HIS: 0x40C0C0,
+  ILE: 0x00FF00,
+  LEU: 0xFF9999,
+  LYS: 0x40C0C0,
+  MET: 0xFFFF00,
+  PHE: 0xA600A6,
+  PRO: 0x804C00,
+  SER: 0xFFFF00,
+  THR: 0xE666B3,
+  TRP: 0x999999,
+  TYR: 0x00FF00,
+  VAL: 0x808033,
+  A: 0x0000FF,
+  C: 0xFF8000,
+  G: 0xFFFF00,
+  T: 0xA600A6,
+  U: 0x00FF00,
+  DA: 0x0000FF,
+  DC: 0xFF8000,
+  DG: 0xFFFF00,
+  DT: 0xA600A6,
+  DU: 0x00FF00,
   '+A': 0x0000FF,
   '+C': 0xFF8000,
   '+G': 0xFFFF00,
   '+T': 0xA600A6,
   '+U': 0x00FF00,
-  'WAT': 0x40C0C0,
-  'H2O': 0x40C0C0,
-  'HOH': 0x40C0C0
+  WAT: 0x40C0C0,
+  H2O: 0x40C0C0,
+  HOH: 0x40C0C0
   /* eslint-enable no-magic-numbers */
 
 };
@@ -86897,15 +87025,15 @@ var ElementColorer =
 function (_Colorer) {
   _inherits(ElementColorer, _Colorer);
 
-  // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
-  function ElementColorer(opts) {
+  function ElementColorer() {
     _classCallCheck(this, ElementColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ElementColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ElementColorer).apply(this, arguments));
   }
 
   _createClass(ElementColorer, [{
     key: "getAtomColor",
+    // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
     value: function getAtomColor(atom, _complex) {
       var type = atom.element.name;
 
@@ -86947,10 +87075,10 @@ var ResidueTypeColorer =
 function (_Colorer) {
   _inherits(ResidueTypeColorer, _Colorer);
 
-  function ResidueTypeColorer(opts) {
+  function ResidueTypeColorer() {
     _classCallCheck(this, ResidueTypeColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ResidueTypeColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ResidueTypeColorer).apply(this, arguments));
   }
 
   _createClass(ResidueTypeColorer, [{
@@ -86979,15 +87107,15 @@ var SequenceColorer =
 function (_Colorer) {
   _inherits(SequenceColorer, _Colorer);
 
-  // 'RI' is @deprecated backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
-  function SequenceColorer(opts) {
+  function SequenceColorer() {
     _classCallCheck(this, SequenceColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SequenceColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(SequenceColorer).apply(this, arguments));
   }
 
   _createClass(SequenceColorer, [{
     key: "getAtomColor",
+    // 'RI' is @deprecated backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
     value: function getAtomColor(atom, complex) {
       return this.getResidueColor(atom._residue, complex);
     }
@@ -87022,10 +87150,10 @@ var ChainColorer =
 function (_Colorer) {
   _inherits(ChainColorer, _Colorer);
 
-  function ChainColorer(opts) {
+  function ChainColorer() {
     _classCallCheck(this, ChainColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ChainColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ChainColorer).apply(this, arguments));
   }
 
   _createClass(ChainColorer, [{
@@ -87054,10 +87182,10 @@ var SecondaryStructureColorer =
 function (_Colorer) {
   _inherits(SecondaryStructureColorer, _Colorer);
 
-  function SecondaryStructureColorer(opts) {
+  function SecondaryStructureColorer() {
     _classCallCheck(this, SecondaryStructureColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SecondaryStructureColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(SecondaryStructureColorer).apply(this, arguments));
   }
 
   _createClass(SecondaryStructureColorer, [{
@@ -87070,7 +87198,9 @@ function (_Colorer) {
     value: function getResidueColor(residue, _complex) {
       if (residue._type.flags & ResidueType.Flags.DNA) {
         return this.palette.getSecondaryColor('dna');
-      } else if (residue._type.flags & ResidueType.Flags.RNA) {
+      }
+
+      if (residue._type.flags & ResidueType.Flags.RNA) {
         return this.palette.getSecondaryColor('rna');
       }
 
@@ -87104,10 +87234,10 @@ var UniformColorer =
 function (_Colorer) {
   _inherits(UniformColorer, _Colorer);
 
-  function UniformColorer(opts) {
+  function UniformColorer() {
     _classCallCheck(this, UniformColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(UniformColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(UniformColorer).apply(this, arguments));
   }
 
   _createClass(UniformColorer, [{
@@ -87192,10 +87322,10 @@ var ConformationColorer =
 function (_Colorer) {
   _inherits(ConformationColorer, _Colorer);
 
-  function ConformationColorer(opts) {
+  function ConformationColorer() {
     _classCallCheck(this, ConformationColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ConformationColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ConformationColorer).apply(this, arguments));
   }
 
   _createClass(ConformationColorer, [{
@@ -87237,10 +87367,10 @@ var TemperatureColorer =
 function (_Colorer) {
   _inherits(TemperatureColorer, _Colorer);
 
-  function TemperatureColorer(opts) {
+  function TemperatureColorer() {
     _classCallCheck(this, TemperatureColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(TemperatureColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(TemperatureColorer).apply(this, arguments));
   }
 
   _createClass(TemperatureColorer, [{
@@ -87314,10 +87444,10 @@ var OccupancyColorer =
 function (_Colorer) {
   _inherits(OccupancyColorer, _Colorer);
 
-  function OccupancyColorer(opts) {
+  function OccupancyColorer() {
     _classCallCheck(this, OccupancyColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(OccupancyColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(OccupancyColorer).apply(this, arguments));
   }
 
   _createClass(OccupancyColorer, [{
@@ -87355,7 +87485,7 @@ function (_Colorer) {
 
 _defineProperty(OccupancyColorer, "id", 'OC');
 
-OccupancyColorer.prototype.id = 'OC'; //[OC]cupancy
+OccupancyColorer.prototype.id = 'OC'; // [OC]cupancy
 
 OccupancyColorer.prototype.name = 'Occupancy';
 OccupancyColorer.prototype.shortName = 'Occupancy';
@@ -87365,10 +87495,10 @@ var HydrophobicityColorer =
 function (_Colorer) {
   _inherits(HydrophobicityColorer, _Colorer);
 
-  function HydrophobicityColorer(opts) {
+  function HydrophobicityColorer() {
     _classCallCheck(this, HydrophobicityColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(HydrophobicityColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(HydrophobicityColorer).apply(this, arguments));
   }
 
   _createClass(HydrophobicityColorer, [{
@@ -87382,7 +87512,7 @@ function (_Colorer) {
       var color = this.palette.defaultResidueColor;
 
       if (residue._type.hydrophobicity) {
-        //Kyte Doolitle hydro [-4.5,4.5]->[0.1]
+        // Kyte Doolitle hydro [-4.5,4.5]->[0.1]
         var min = -4.5;
         var max = 4.5;
         color = this.palette.getGradientColor((residue._type.hydrophobicity - min) / (max - min), this.opts.gradient);
@@ -87406,10 +87536,10 @@ var MoleculeColorer =
 function (_Colorer) {
   _inherits(MoleculeColorer, _Colorer);
 
-  function MoleculeColorer(opts) {
+  function MoleculeColorer() {
     _classCallCheck(this, MoleculeColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(MoleculeColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(MoleculeColorer).apply(this, arguments));
   }
 
   _createClass(MoleculeColorer, [{
@@ -87442,12 +87572,12 @@ MoleculeColorer.prototype.name = 'Molecule';
 MoleculeColorer.prototype.shortName = 'Molecule';
 
 function scaleColor(c, factor) {
-  var r1 = c >> 16 & 0xff,
-      g1 = c >> 8 & 0xff,
-      b1 = c & 0xff;
-  var r = factor * r1,
-      g = factor * g1,
-      b = factor * b1;
+  var r1 = c >> 16 & 0xff;
+  var g1 = c >> 8 & 0xff;
+  var b1 = c & 0xff;
+  var r = factor * r1;
+  var g = factor * g1;
+  var b = factor * b1;
   return r << 16 | g << 8 | b;
 }
 /**
@@ -87467,10 +87597,10 @@ var CarbonColorer =
 function (_Colorer) {
   _inherits(CarbonColorer, _Colorer);
 
-  function CarbonColorer(opts) {
+  function CarbonColorer() {
     _classCallCheck(this, CarbonColorer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(CarbonColorer).call(this, opts));
+    return _possibleConstructorReturn(this, _getPrototypeOf(CarbonColorer).apply(this, arguments));
   }
 
   _createClass(CarbonColorer, [{
@@ -87524,8 +87654,12 @@ Object.defineProperty(colorers, 'descriptions', {
 
 colorers.create = function (colorer, opts) {
   if (!opts && colorer instanceof Array) {
-    opts = colorer[1];
-    colorer = colorer[0];
+    var _colorer = colorer;
+
+    var _colorer2 = _slicedToArray(_colorer, 2);
+
+    colorer = _colorer2[0];
+    opts = _colorer2[1];
   }
 
   var Colorer = this.get(colorer) || this.first;
@@ -87976,7 +88110,10 @@ ComplexComponentEditor.prototype.getAltObj = function () {
   var selection = this._complexVisual.getSelectionGeo();
 
   var selectionMask = 1 << visual.getSelectionBit();
-  var i, j, reprNode, geo; // find all geo nodes for this component
+  var i;
+  var j;
+  var reprNode;
+  var geo; // find all geo nodes for this component
 
   _traverseComponentGroups(visual, component, function (child) {
     res.objects.push(child);
@@ -88033,7 +88170,10 @@ ComplexComponentEditor.prototype._resetComponentTransform = function () {
 
   var selection = this._complexVisual.getSelectionGeo();
 
-  var i, j, reprNode, geo;
+  var i;
+  var j;
+  var reprNode;
+  var geo;
 
   for (i = 0; i < this._componentTransforms.length; ++i) {
     geo = this._componentTransforms[i];
@@ -88356,14 +88496,21 @@ ComplexVisual.prototype.resetReps = function (reps) {
 
   for (var i = 0, n = reps.length; i < n; ++i) {
     var rep = reps[i];
-    var selector, selectorString;
+    var selector = void 0;
+    var selectorString = void 0;
 
     if (typeof rep.selector === 'string') {
       selectorString = rep.selector;
-      selector = selectors$2.parse(selectorString).selector;
+
+      var _selectors$parse = selectors$2.parse(selectorString);
+
+      selector = _selectors$parse.selector;
     } else if (typeof rep.selector === 'undefined') {
-      selectorString = settings.now.presets.default[0].selector;
-      selector = selectors$2.parse(selectorString).selector;
+      selectorString = settings.now.presets["default"][0].selector;
+
+      var _selectors$parse2 = selectors$2.parse(selectorString);
+
+      selector = _selectors$parse2.selector;
     } else {
       selector = rep.selector;
       selectorString = selector.toString();
@@ -88474,7 +88621,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
         target.selector = newSelectorObject;
         target.markAtoms(this._complex);
         changed = true;
-        logger.debug('rep[' + index + '].selector changed to' + newSelector);
+        logger.debug("rep[".concat(index, "].selector changed to").concat(newSelector));
       }
     } // modify mode
 
@@ -88486,7 +88633,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
         desc.mode = newMode;
         target.setMode(lookupAndCreate(modes, rep.mode));
         changed = true;
-        logger.debug('rep[' + index + '].mode changed to ' + newMode); // safety hack: lower resolution for surface modes
+        logger.debug("rep[".concat(index, "].mode changed to ").concat(newMode)); // safety hack: lower resolution for surface modes
 
         if (target.mode.isSurface && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
           logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
@@ -88503,7 +88650,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
         desc.colorer = newColorer;
         target.colorer = lookupAndCreate(colorers, rep.colorer);
         changed = true;
-        logger.debug('rep[' + index + '].colorer changed to ' + newColorer);
+        logger.debug("rep[".concat(index, "].colorer changed to ").concat(newColorer));
       }
     } // modify material
 
@@ -88515,7 +88662,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
         desc.material = newMaterial;
         target.setMaterialPreset(materials.get(rep.material));
         changed = true;
-        logger.debug('rep[' + index + '].material changed to' + newMaterial);
+        logger.debug("rep[".concat(index, "].material changed to").concat(newMaterial));
       }
     } // finalize
 
@@ -88579,7 +88726,7 @@ ComplexVisual.prototype.repAdd = function (rep) {
 
   var originalSelection = this.buildSelectorFromMask(1 << this._selectionBit); // Fill in default values
 
-  var def = settings.now.presets.default[0];
+  var def = settings.now.presets["default"][0];
 
   var desc = lodash.merge({
     selector: def.selector,
@@ -88690,9 +88837,9 @@ ComplexVisual.prototype.resetSelectionMask = function () {
 ComplexVisual.prototype.updateSelectionMask = function (pickedObj) {
   var self = this;
   var atom = pickedObj.atom;
-  var residue = pickedObj.residue;
-  var chain = pickedObj.chain;
-  var molecule = pickedObj.molecule;
+  var residue = pickedObj.residue,
+      chain = pickedObj.chain,
+      molecule = pickedObj.molecule;
   var setMask = 1 << this._selectionBit;
   var clearMask = ~setMask;
 
@@ -88910,7 +89057,7 @@ ComplexVisual.prototype.rebuild = function () {
     }
 
     var errorOccured = false;
-    setTimeout(function _rebuild() {
+    setTimeout(function () {
       console.time('build');
       var reprList = self._reprList;
       var palette = palettes.get(settings.now.palette) || palettes.first;
@@ -88929,7 +89076,7 @@ ComplexVisual.prototype.rebuild = function () {
             if (e instanceof utils.OutOfMemoryError) {
               repr.needsRebuild = false;
               repr.reset();
-              logger.error('Not enough memory to build geometry for representation ' + (repr.index + 1));
+              logger.error("Not enough memory to build geometry for representation ".concat(repr.index + 1));
               errorOccured = true;
             } else {
               throw e;
@@ -88996,10 +89143,10 @@ ComplexVisual.prototype._buildSelectorFromSortedLists = function (atoms, residue
   var complex = this._complex;
 
   function optimizeList(list) {
-    var result = [],
-        k = 0;
-    var first = NaN,
-        last = NaN;
+    var result = [];
+    var k = 0;
+    var first = NaN;
+    var last = NaN;
 
     for (var i = 0, n = list.length; i < n; ++i) {
       var value = list[i];
@@ -89186,7 +89333,7 @@ ComplexVisual.prototype.within = function (selector, radius) {
   return this.buildSelectorFromMask(selectionMask);
 };
 
-var volumeFrag = "uniform mat4 projectionMatrix;\r\n\r\n// 3D volume texture\r\nuniform vec3 volumeDim;    // volume dimensions, pixels\r\nuniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data\r\nuniform vec2 tileTexSize;  // size of tiled texture, pixels\r\nuniform vec2 tileStride;   // UV stride between slices in tile tex, pixels\r\n\r\nuniform float _isoLevel0;\r\nuniform float _flipV;\r\nuniform sampler2D _BFLeft;\r\nuniform sampler2D _BFRight;\r\nuniform sampler2D _FFLeft;\r\nuniform sampler2D _FFRight;\r\nuniform sampler2D _WFFLeft;\r\nuniform sampler2D _WFFRight;\r\n\r\nvarying vec4 screenSpacePos;\r\n\r\nvec4 sample3DTexture(vec3 texCoord)\r\n{\r\n  float rowTiles = floor(tileTexSize.x / tileStride.x);\r\n\r\n  // a pair of Z slices is determined by nearest slice border\r\n  float zSliceBorder = floor(texCoord.z * volumeDim.z + 0.5);\r\n  float zSliceNumber1 = max(zSliceBorder - 1.0, 0.0);\r\n  float zSliceNumber2 = min(zSliceBorder, volumeDim.z - 1.0);\r\n\r\n  // calculate coords in tile texture for both slices\r\n  vec2 tileOffset = vec2(mod(zSliceNumber1, rowTiles), floor(zSliceNumber1 / rowTiles));\r\n  vec2 texCoordSlice1 = (texCoord.xy * volumeDim.xy + tileOffset * tileStride) / tileTexSize.xy;\r\n  tileOffset = vec2(mod(zSliceNumber2, rowTiles), floor(zSliceNumber2 / rowTiles));\r\n  vec2 texCoordSlice2 = (texCoord.xy * volumeDim.xy + tileOffset * tileStride) / tileTexSize.xy;\r\n\r\n  // bilinear filtering\r\n  vec4 colorSlice1 = texture2D(tileTex, texCoordSlice1);\r\n  vec4 colorSlice2 = texture2D(tileTex, texCoordSlice2);\r\n  float weightSlice2 = texCoord.z * volumeDim.z - (zSliceNumber1 + 0.5);\r\n  return mix(colorSlice1, colorSlice2, weightSlice2);\r\n}\r\n\r\nfloat CalcColor(vec3 iter, vec3 dir)\r\n{\r\n  float d = 1.0 / 128.0;\r\n  vec3 dx = vec3(d, 0.0, 0.0);\r\n  vec3 dy = vec3(0.0, d, 0.0);\r\n  vec3 dz = vec3(0.0, 0.0, d);\r\n  vec3 N;\r\n  N.x = sample3DTexture(iter + dx).r - sample3DTexture(iter - dx).r;\r\n  N.y = sample3DTexture(iter + dy).r - sample3DTexture(iter - dy).r;\r\n  N.z = sample3DTexture(iter + dz).r - sample3DTexture(iter - dz).r;\r\n  N = normalize(N);\r\n  float dif = max(0.0, dot(N,dir));\r\n  return dif;\r\n}\r\n\r\nvec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)\r\n{\r\n  for (int i = 0; i < 5; i++)\r\n  {\r\n    vec3 iterator = 0.5*(left + right);\r\n    float vol = sample3DTexture(iterator).r;\r\n    if ((volLeft - threshold)*(vol - threshold) < 0.)\r\n      right = iterator;\r\n    else\r\n      left = iterator;\r\n  }\r\n  return 0.5 * (left + right);\r\n}\r\n\r\nvec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count)\r\n{\r\n  float vol, stepSize = (0.5*float(count) + 1.) / 85.;\r\n  //    \t\tfloat vol, stepSize = (0.5*count + 1.) / 64.;// 128.;\r\n  vec3 step = stepSize*dir, iterator = start, left, right;\r\n  vec4 acc = vec4(0., 0., 0., 0.);\r\n    for (int i=0; i < 200; i++)\r\n    {\r\n      iterator = iterator + step;\r\n      vol = sample3DTexture(iterator).r;\r\n      if (length(iterator - back) < stepSize || vol > tr)\r\n        break;\r\n    }\r\n    if (vol > tr)\r\n    {\r\n      left = iterator - step;\r\n      right = iterator;\r\n      for (int j = 0; j < 5; j++)\r\n      {\r\n        iterator = 0.5 * (left + right);\r\n        float vol = sample3DTexture(iterator).r;\r\n        if (vol > tr)\r\n          right = iterator;\r\n        else\r\n          left = iterator;\r\n      }\r\n      acc = vec4(0.5*(left + right), 1.);\r\n    }\r\n\r\n  return acc;\r\n}\r\n\r\nvec3 GetColSimple(float vol)\r\n{\r\n  return vol * vec3(1, 1, 1);\r\n}\r\n\r\nvec3 CorrectIso(vec3 left, vec3 right, float tr)\r\n{\r\n  for (int j = 0; j < 5; j++)\r\n  {\r\n    vec3 iterator = 0.5*(left + right);\r\n    float vol = sample3DTexture(iterator).r;\r\n    if (vol < tr)\r\n      right = iterator;\r\n    else\r\n      left = iterator;\r\n  }\r\n  return 0.5*(left + right);\r\n}\r\n\r\nvec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  vec4 acc = vec4(0., 0., 0., 0.), iso;\r\n  vec3 iterator = start, sumColor = vec3(0., 0., 0.);\r\n  //\t\t\t\tfloat stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;\r\n  float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;\r\n  vec3 step = stepSize*dir, col, colOld, right;\r\n  float tr0 = _isoLevel0;\r\n  float dif, r, kd, finish;\r\n  int count = 0, stopMol = 0;\r\n  kd = 140. * tr0 * stepSize;\r\n  r = 1. - kd;\r\n\r\n  for (int k = 0; k < 3; k++)\r\n  {\r\n    stepSize = (0.5 * float(k) + 1.) / 85.;\r\n    kd = 140. * tr0 * stepSize;\r\n    r = 1. - kd;\r\n    step = stepSize * dir;\r\n    iso = GetIso1(iterator, back, molDist, dir, tr0, k);\r\n    if (iso.a < 0.1 || length(iso.rgb - start) > molDist)\r\n      break;\r\n    iterator = iso.rgb;\r\n    dif = 1.;// CalcColor(iterator, dir);\r\n    colOld = GetColSimple(tr0);\r\n    curStepSize = stepSize;\r\n    for (int i = 0; i < 200; i++)\r\n    {\r\n      iterator = iterator + step;\r\n      molD = length(iterator - start);\r\n      vol = sample3DTexture(iterator).r;\r\n      finish = distance(iterator, back) - stepSize;\r\n      if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)\r\n        break;\r\n      alpha = (1. - r);\r\n      col = GetColSimple(vol);\r\n      vol = sample3DTexture(iterator - 0.5*step).r;\r\n      vec3 colMid = GetColSimple(vol);\r\n      sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;\r\n      sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);\r\n      colOld = col;\r\n    } // for i\r\n    if (finish < 0.0 || sumAlpha > 0.97)\r\n      break;\r\n    if (molD > molDist)\r\n    {\r\n      curStepSize = stepSize - (molD - molDist);\r\n      right = iterator - (molD - molDist)*dir;\r\n      vol = sample3DTexture(right).r;\r\n    }\r\n    else\r\n    {\r\n      vec3 left = iterator - step;\r\n      right = CorrectIso(left, iterator, tr0);\r\n      curStepSize = distance(left, right);\r\n      vol = tr0;\r\n    }\r\n    alpha = (1. - r)*curStepSize / stepSize;\r\n    dif = 1.;// CalcColor(right, dir);\r\n    col = GetColSimple(vol);\r\n    vol = sample3DTexture(iterator - 0.5 * curStepSize / stepSize * step).r;\r\n    vec3 colMid = GetColSimple(vol);\r\n    sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;\r\n    sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);\r\n    if (molD > molDist)\r\n      break;\r\n  } // for k\r\n  acc.rgb = 1.*sumColor / sumAlpha;\r\n  acc.a = sumAlpha;\r\n  return acc;\r\n}\r\n\r\nvec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  float stepSize = 1.0 / 200.0;\r\n  float len = length(back - start);\r\n  vec3 step = stepSize * dir;\r\n  vec3 iterator = start;\r\n  float acc = 0.0;\r\n\r\n  for (int i=0; i < 200; i++)\r\n  {\r\n    if (float(i) * stepSize > len) break;\r\n    iterator = iterator + step;\r\n    if (sample3DTexture(iterator).r > _isoLevel0)\r\n      acc += sample3DTexture(iterator).r / 200.0;\r\n  }\r\n\r\n  return vec4(1,1,1, acc);\r\n}\r\n\r\nvec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  vec4 tst = GetIso1(start, back, 2., dir, 0.28, 0);\r\n  vec4 col = vec4(0, 0., 0., 0.);\r\n  if (tst.a > 0.1)\r\n  {\r\n   float dif = CalcColor(tst.rgb, dir);\r\n   col = vec4(dif, 0., 0., 1.);\r\n  }\r\n  return col;\r\n}\r\n\r\nvec4 VolRender3(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  return sample3DTexture(start);\r\n}\r\n\r\nvoid main()\r\n{\r\n  vec3 tc = screenSpacePos.xyz / screenSpacePos.w * 0.5 + 0.5;\r\n\r\n  if (_flipV > 0.0) {\r\n    tc.y = 1.0 - tc.y;\r\n  }\r\n\r\n  vec3 start;\r\n  vec3 back;\r\n  vec3 molBack;\r\n  if (projectionMatrix[0][2] < 0.0)\r\n  {\r\n    start = texture2D(_FFLeft, tc.xy).xyz;\r\n    back = texture2D(_BFLeft, tc.xy).xyz;\r\n    molBack = texture2D(_WFFLeft, tc.xy).xyz;\r\n  }\r\n  else\r\n  {\r\n    start = texture2D(_FFRight, tc.xy).xyz;\r\n    back = texture2D(_BFRight, tc.xy).xyz;\r\n    molBack = texture2D(_WFFRight, tc.xy).xyz;\r\n  }\r\n\r\n  vec3 dir = normalize(back - start);\r\n\r\n  float molDist = 2.0;\r\n  if (length(molBack) > 0.001)\r\n  {\r\n    molDist = distance(start, molBack);\r\n  }\r\n\r\n  //gl_FragColor = texture2D(_WFFLeft, tc.xy);\r\n  //gl_FragColor = texture2D(tileTex, tc.xy);\r\n  gl_FragColor = VolRender(start, back, molDist, dir);\r\n}\r\n";
+var volumeFrag = "uniform mat4 projectionMatrix;\r\n\r\n// 3D volume texture\r\nuniform vec3 volumeDim;    // volume dimensions, pixels\r\nuniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data\r\nuniform vec2 tileTexSize;  // size of tiled texture, pixels\r\nuniform vec2 tileStride;   // UV stride between slices in tile tex, pixels\r\n\r\nuniform vec3 _isoLevel0;\r\nuniform float _flipV;\r\nuniform sampler2D _BFLeft;\r\nuniform sampler2D _BFRight;\r\nuniform sampler2D _FFLeft;\r\nuniform sampler2D _FFRight;\r\nuniform sampler2D _WFFLeft;\r\nuniform sampler2D _WFFRight;\r\n\r\nvarying vec4 screenSpacePos;\r\n\r\nvec4 sample3DTexture(vec3 texCoord)\r\n{\r\n  float rowTiles = floor(tileTexSize.x / tileStride.x);\r\n\r\n  // a pair of Z slices is determined by nearest slice border\r\n  float zSliceBorder = floor(texCoord.z * volumeDim.z + 0.5);\r\n  float zSliceNumber1 = max(zSliceBorder - 1.0, 0.0);\r\n  float zSliceNumber2 = min(zSliceBorder, volumeDim.z - 1.0);\r\n\r\n  // calculate coords in tile texture for both slices\r\n  vec2 tileOffset = vec2(mod(zSliceNumber1, rowTiles), floor(zSliceNumber1 / rowTiles));\r\n  vec2 texCoordSlice1 = (texCoord.xy * volumeDim.xy + tileOffset * tileStride) / tileTexSize.xy;\r\n  tileOffset = vec2(mod(zSliceNumber2, rowTiles), floor(zSliceNumber2 / rowTiles));\r\n  vec2 texCoordSlice2 = (texCoord.xy * volumeDim.xy + tileOffset * tileStride) / tileTexSize.xy;\r\n\r\n  // bilinear filtering\r\n  vec4 colorSlice1 = texture2D(tileTex, texCoordSlice1);\r\n  vec4 colorSlice2 = texture2D(tileTex, texCoordSlice2);\r\n  float weightSlice2 = texCoord.z * volumeDim.z - (zSliceNumber1 + 0.5);\r\n  return mix(colorSlice1, colorSlice2, weightSlice2);\r\n}\r\n\r\nfloat CalcColor(vec3 iter, vec3 dir)\r\n{\r\n  float d = 1.0 / 128.0;\r\n  vec3 dx = vec3(d, 0.0, 0.0);\r\n  vec3 dy = vec3(0.0, d, 0.0);\r\n  vec3 dz = vec3(0.0, 0.0, d);\r\n  vec3 N;\r\n  N.x = sample3DTexture(iter + dx).r - sample3DTexture(iter - dx).r;\r\n  N.y = sample3DTexture(iter + dy).r - sample3DTexture(iter - dy).r;\r\n  N.z = sample3DTexture(iter + dz).r - sample3DTexture(iter - dz).r;\r\n  N = normalize(N);\r\n  float dif = max(0.0, dot(N,dir));\r\n  return dif;\r\n}\r\n\r\nvec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)\r\n{\r\n  for (int i = 0; i < 5; i++)\r\n  {\r\n    vec3 iterator = 0.5*(left + right);\r\n    float vol = sample3DTexture(iterator).r;\r\n    if ((volLeft - threshold)*(vol - threshold) < 0.)\r\n      right = iterator;\r\n    else\r\n      left = iterator;\r\n  }\r\n  return 0.5 * (left + right);\r\n}\r\n\r\nvec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count)\r\n{\r\n  float vol, stepSize = (0.5*float(count) + 1.) / 85.;\r\n  //    \t\tfloat vol, stepSize = (0.5*count + 1.) / 64.;// 128.;\r\n  vec3 step = stepSize*dir, iterator = start, left, right;\r\n  vec4 acc = vec4(0., 0., 0., 0.);\r\n    for (int i=0; i < 200; i++)\r\n    {\r\n      iterator = iterator + step;\r\n      vol = sample3DTexture(iterator).r;\r\n      if (length(iterator - back) < stepSize || vol > tr)\r\n        break;\r\n    }\r\n    if (vol > tr)\r\n    {\r\n      left = iterator - step;\r\n      right = iterator;\r\n      for (int j = 0; j < 5; j++)\r\n      {\r\n        iterator = 0.5 * (left + right);\r\n        float vol = sample3DTexture(iterator).r;\r\n        if (vol > tr)\r\n          right = iterator;\r\n        else\r\n          left = iterator;\r\n      }\r\n      acc = vec4(0.5*(left + right), 1.);\r\n    }\r\n\r\n  return acc;\r\n}\r\n\r\nfloat easeOut(float x0, float x1, float x) {\r\n  float t = clamp((x - x0) / (x1 - x0), 0.0, 1.0);\r\n  return 1.0 - (1.0 - t) * (1.0 - t);\r\n}\r\n\r\nfloat easeIn(float x0, float x1, float x) {\r\n  float t = clamp((x - x0) / (x1 - x0), 0.0, 1.0);\r\n  return t * t;\r\n}\r\n\r\nvec3 GetColSimple(float vol)\r\n{\r\n  float t = easeOut(_isoLevel0.x, _isoLevel0.y, vol);\r\n  float s = easeIn(_isoLevel0.y, _isoLevel0.z, vol);\r\n  return vec3(0.5, 0.6, 0.7) * (1.0 - t) + 2.0 * vec3(s, 0, 0);\r\n}\r\n\r\nvec3 CorrectIso(vec3 left, vec3 right, float tr)\r\n{\r\n  for (int j = 0; j < 5; j++)\r\n  {\r\n    vec3 iterator = 0.5*(left + right);\r\n    float vol = sample3DTexture(iterator).r;\r\n    if (vol < tr)\r\n      right = iterator;\r\n    else\r\n      left = iterator;\r\n  }\r\n  return 0.5*(left + right);\r\n}\r\n\r\nvec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  vec4 acc = vec4(0., 0., 0., 0.), iso;\r\n  vec3 iterator = start, sumColor = vec3(0., 0., 0.);\r\n  //\t\t\t\tfloat stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;\r\n  float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;\r\n  vec3 step = stepSize*dir, col, colOld, right;\r\n  float tr0 = _isoLevel0.x;\r\n  float dif, r, kd, finish;\r\n  int count = 0, stopMol = 0;\r\n  kd = 140. * tr0 * stepSize;\r\n  r = 1. - kd;\r\n\r\n  for (int k = 0; k < 3; k++)\r\n  {\r\n    stepSize = (0.5 * float(k) + 1.) / 85.;\r\n    kd = 140. * tr0 * stepSize;\r\n    r = 1. - kd;\r\n    step = stepSize * dir;\r\n    iso = GetIso1(iterator, back, molDist, dir, tr0, k);\r\n    if (iso.a < 0.1 || length(iso.rgb - start) > molDist)\r\n      break;\r\n    iterator = iso.rgb;\r\n    dif = 1.;// CalcColor(iterator, dir);\r\n    colOld = GetColSimple(tr0);\r\n    curStepSize = stepSize;\r\n    for (int i = 0; i < 200; i++)\r\n    {\r\n      iterator = iterator + step;\r\n      molD = length(iterator - start);\r\n      vol = sample3DTexture(iterator).r;\r\n      finish = distance(iterator, back) - stepSize;\r\n      if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)\r\n        break;\r\n      alpha = (1. - r);\r\n      col = GetColSimple(vol);\r\n      vol = sample3DTexture(iterator - 0.5*step).r;\r\n      vec3 colMid = GetColSimple(vol);\r\n      sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;\r\n      sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);\r\n      colOld = col;\r\n    } // for i\r\n    if (finish < 0.0 || sumAlpha > 0.97)\r\n      break;\r\n    if (molD > molDist)\r\n    {\r\n      curStepSize = stepSize - (molD - molDist);\r\n      right = iterator - (molD - molDist)*dir;\r\n      vol = sample3DTexture(right).r;\r\n    }\r\n    else\r\n    {\r\n      vec3 left = iterator - step;\r\n      right = CorrectIso(left, iterator, tr0);\r\n      curStepSize = distance(left, right);\r\n      vol = tr0;\r\n    }\r\n    alpha = (1. - r)*curStepSize / stepSize;\r\n    dif = 1.;// CalcColor(right, dir);\r\n    col = GetColSimple(vol);\r\n    vol = sample3DTexture(iterator - 0.5 * curStepSize / stepSize * step).r;\r\n    vec3 colMid = GetColSimple(vol);\r\n    sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;\r\n    sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);\r\n    if (molD > molDist)\r\n      break;\r\n  } // for k\r\n  acc.rgb = 1.*sumColor / sumAlpha;\r\n  acc.a = sumAlpha;\r\n  return acc;\r\n}\r\n\r\nvec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  float stepSize = 1.0 / 200.0;\r\n  float len = length(back - start);\r\n  vec3 step = stepSize * dir;\r\n  vec3 iterator = start;\r\n  float acc = 0.0;\r\n\r\n  for (int i=0; i < 200; i++)\r\n  {\r\n    if (float(i) * stepSize > len) break;\r\n    iterator = iterator + step;\r\n    if (sample3DTexture(iterator).r > _isoLevel0.x)\r\n      acc += sample3DTexture(iterator).r / 200.0;\r\n  }\r\n\r\n  return vec4(1,1,1, acc);\r\n}\r\n\r\nvec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  vec4 tst = GetIso1(start, back, 2., dir, 0.28, 0);\r\n  vec4 col = vec4(0, 0., 0., 0.);\r\n  if (tst.a > 0.1)\r\n  {\r\n   float dif = CalcColor(tst.rgb, dir);\r\n   col = vec4(dif, 0., 0., 1.);\r\n  }\r\n  return col;\r\n}\r\n\r\nvec4 VolRender3(vec3 start, vec3 back, float molDist, vec3 dir)\r\n{\r\n  return sample3DTexture(start);\r\n}\r\n\r\nvoid main()\r\n{\r\n  vec3 tc = screenSpacePos.xyz / screenSpacePos.w * 0.5 + 0.5;\r\n\r\n  if (_flipV > 0.0) {\r\n    tc.y = 1.0 - tc.y;\r\n  }\r\n\r\n  vec3 start;\r\n  vec3 back;\r\n  vec3 molBack;\r\n  if (projectionMatrix[0][2] < 0.0)\r\n  {\r\n    start = texture2D(_FFLeft, tc.xy).xyz;\r\n    back = texture2D(_BFLeft, tc.xy).xyz;\r\n    molBack = texture2D(_WFFLeft, tc.xy).xyz;\r\n  }\r\n  else\r\n  {\r\n    start = texture2D(_FFRight, tc.xy).xyz;\r\n    back = texture2D(_BFRight, tc.xy).xyz;\r\n    molBack = texture2D(_WFFRight, tc.xy).xyz;\r\n  }\r\n\r\n  vec3 dir = normalize(back - start);\r\n\r\n  float molDist = 2.0;\r\n  if (length(molBack) > 0.001)\r\n  {\r\n    molDist = distance(start, molBack);\r\n  }\r\n\r\n  //gl_FragColor = texture2D(_WFFLeft, tc.xy);\r\n  //gl_FragColor = texture2D(tileTex, tc.xy);\r\n  gl_FragColor = VolRender(start, back, molDist, dir);\r\n}\r\n";
 
 /* eslint-disable no-magic-numbers */
 var volumeUniforms = UniformsUtils.merge([{
@@ -89207,8 +89354,8 @@ var volumeUniforms = UniformsUtils.merge([{
     value: new Vector2(512, 512)
   },
   _isoLevel0: {
-    type: 'f',
-    value: 0.28
+    type: 'v2',
+    value: new Vector3(0.5, 0.75, 1.0)
   },
   _flipV: {
     type: 'f',
@@ -89255,9 +89402,9 @@ function overrideUniforms(params, defUniforms) {
 function BackFacePosMaterial(params) {
   var settings = {
     uniforms: overrideUniforms(params, {}),
-    vertexShader: 'varying vec3 pos; ' + 'void main() {' + // we're assuming local position is in [-0.5, 0.5]
+    vertexShader: 'varying vec3 pos; ' + 'void main() {' // we're assuming local position is in [-0.5, 0.5]
     // we need to offset it to be represented in RGB
-    'pos = position.xyz + 0.5;' + 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);' + '}',
+    + 'pos = position.xyz + 0.5;' + 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);' + '}',
     fragmentShader: 'varying vec3 pos; ' + 'void main() { gl_FragColor = vec4(pos, 0.5); }',
     transparent: false,
     depthTest: false,
@@ -89288,12 +89435,12 @@ function BackFacePosMaterialFarPlane(params) {
   }]);
   var settings = {
     uniforms: overrideUniforms(params, matUniforms),
-    vertexShader: 'varying vec4 volPos;\n' + 'uniform float aspectRatio;\n' + 'uniform float farZ;\n' + 'uniform float tanHalfFOV;\n' + 'uniform mat4  matWorld2Volume\n;' + 'void main() {\n' + // rescale plane to fill in the whole far plane area seen from camera
-    'vec3 pos = position.xyz;\n' + 'pos.x = pos.x * tanHalfFOV * farZ * aspectRatio;\n' + 'pos.y = pos.y * tanHalfFOV * farZ;\n' + // common transformation
-    'gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);\n' + // calc pos in volume CS
-    'volPos = matWorld2Volume * modelMatrix * vec4(pos, 1.0);\n' + // we're assuming local position is in [-0.5, 0.5]
+    vertexShader: 'varying vec4 volPos;\n' + 'uniform float aspectRatio;\n' + 'uniform float farZ;\n' + 'uniform float tanHalfFOV;\n' + 'uniform mat4  matWorld2Volume\n;' + 'void main() {\n' // rescale plane to fill in the whole far plane area seen from camera
+    + 'vec3 pos = position.xyz;\n' + 'pos.x = pos.x * tanHalfFOV * farZ * aspectRatio;\n' + 'pos.y = pos.y * tanHalfFOV * farZ;\n' // common transformation
+    + 'gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);\n' // calc pos in volume CS
+    + 'volPos = matWorld2Volume * modelMatrix * vec4(pos, 1.0);\n' // we're assuming local position is in [-0.5, 0.5]
     // we need to offset it to be represented in RGB
-    'volPos = volPos + 0.5;\n' + 'volPos.w = 0.5;' + '}',
+    + 'volPos = volPos + 0.5;\n' + 'volPos.w = 0.5;' + '}',
     fragmentShader: 'varying vec4 volPos; \n' + 'void main() { gl_FragColor = volPos; }',
     transparent: false,
     depthTest: false,
@@ -89306,9 +89453,9 @@ function BackFacePosMaterialFarPlane(params) {
 function FrontFacePosMaterial(params) {
   var settings = {
     uniforms: overrideUniforms(params, {}),
-    vertexShader: 'varying vec3 pos; ' + 'void main() {' + // we're assuming local position is in [-0.5, 0.5]
+    vertexShader: 'varying vec3 pos; ' + 'void main() {' // we're assuming local position is in [-0.5, 0.5]
     // we need to offset it to be represented in RGB
-    'pos = position.xyz + 0.5;' + 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);' + '}',
+    + 'pos = position.xyz + 0.5;' + 'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);' + '}',
     fragmentShader: 'varying vec3 pos; ' + 'void main() { gl_FragColor = vec4(pos, 0.5); }',
     transparent: false,
     depthTest: false,
@@ -89544,7 +89691,8 @@ function (_THREE$Mesh) {
   }, {
     key: "_sortIndices",
     value: function _sortIndices(face, right) {
-      var i, j;
+      var i;
+      var j;
       var vert = this.vertices;
       var angle = [];
       var dir = new Vector3();
@@ -89580,7 +89728,9 @@ function (_THREE$Mesh) {
       // 2. Get "right" vector in plane
       // 3. Sort vertices using Graham-like method
       // 4. Create indices
-      var i, faceIdx, face;
+      var i;
+      var faceIdx;
+      var face;
       var vert = this.vertices;
       var size = this.size;
 
@@ -89637,7 +89787,10 @@ function (_THREE$Mesh) {
             var t = rightProj[0];
             rightProj[0] = rightProj[i];
             rightProj[i] = t;
-            t = face.indices[0];
+
+            var _face$indices = _slicedToArray(face.indices, 1);
+
+            t = _face$indices[0];
             face.indices[0] = face.indices[i];
             face.indices[i] = t;
           }
@@ -89663,7 +89816,8 @@ function (_THREE$Mesh) {
         face = this.faces[faceIdx];
 
         for (i = 0; i < face.indices.length - 2; ++i) {
-          indices[offset + 0] = face.indices[0];
+          indices[offset] = face.indices[0]; // eslint-disable-line prefer-destructuring
+
           indices[offset + 1] = face.indices[i + 1];
           indices[offset + 2] = face.indices[i + 2];
           offset += 3;
@@ -89692,9 +89846,19 @@ function (_THREE$Mesh) {
   }, {
     key: "_updateIsoLevel",
     value: function _updateIsoLevel() {
-      var kSigma = settings.now.modes.VD.kSigma;
+      var _settings$now$modes$V = settings.now.modes.VD,
+          kSigma = _settings$now$modes$V.kSigma,
+          kSigmaMed = _settings$now$modes$V.kSigmaMed,
+          kSigmaMax = _settings$now$modes$V.kSigmaMax;
       var volInfo = this.volumeInfo;
-      this.material.uniforms._isoLevel0.value = (volInfo.dmean + kSigma * volInfo.sd - volInfo.dmin) / (volInfo.dmax - volInfo.dmin);
+      var mean = volInfo.dmean - volInfo.dmin;
+      var span = volInfo.dmax - volInfo.dmin;
+
+      var level = function level(k) {
+        return (mean + k * volInfo.sd) / span;
+      };
+
+      this.material.uniforms._isoLevel0.value.set(level(kSigma), level(kSigmaMed), level(kSigmaMax));
     }
   }, {
     key: "rebuild",
@@ -90119,7 +90283,7 @@ function (_EventDispatcher) {
 
       return this.load().then(function (result) {
         callbacks.ready(result);
-      }).catch(function (error) {
+      })["catch"](function (error) {
         callbacks.error(error);
       });
     }
@@ -90298,10 +90462,10 @@ var ImmediateLoader =
 function (_Loader) {
   _inherits(ImmediateLoader, _Loader);
 
-  function ImmediateLoader(source, options) {
+  function ImmediateLoader() {
     _classCallCheck(this, ImmediateLoader);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ImmediateLoader).call(this, source, options));
+    return _possibleConstructorReturn(this, _getPrototypeOf(ImmediateLoader).apply(this, arguments));
   }
 
   _createClass(ImmediateLoader, [{
@@ -90432,7 +90596,7 @@ function () {
           }
         });
       });
-    } //only for volume Parsers
+    } // only for volume Parsers
 
   }, {
     key: "getModel",
@@ -90448,7 +90612,7 @@ function () {
     value: function _parseOLD(callbacks) {
       return this.parse().then(function (result) {
         callbacks.ready(result);
-      }).catch(function (error) {
+      })["catch"](function (error) {
         callbacks.error(error);
       });
     }
@@ -90462,9 +90626,9 @@ function () {
   }], [{
     key: "checkDataTypeOptions",
     value: function checkDataTypeOptions(options, type, extension) {
-      var fileType = options.fileType;
-      var fileName = options.fileName;
-      extension = (extension || '.' + type).toLowerCase();
+      var fileType = options.fileType,
+          fileName = options.fileName;
+      extension = (extension || ".".concat(type)).toLowerCase();
       return Boolean(fileType && fileType.toLowerCase() === type.toLowerCase() || !fileType && fileName && fileName.toLowerCase().endsWith(extension));
     }
   }]);
@@ -90520,7 +90684,8 @@ function () {
           this.matrices[this.matrices.length] = matrix;
         }
 
-        var elements = matrix.elements;
+        var _matrix = matrix,
+            elements = _matrix.elements;
         elements[matrixRow] = parseFloat(matrixData[1]);
         elements[matrixRow + 4] = parseFloat(matrixData[2]);
         elements[matrixRow + 8] = parseFloat(matrixData[3]);
@@ -90591,7 +90756,8 @@ function () {
           assembly.addMatrix(matrix);
         }
 
-        var elements = matrix.elements;
+        var _matrix = matrix,
+            elements = _matrix.elements;
         elements[matrixRow] = parseFloat(matrixData[1]);
         elements[matrixRow + 4] = parseFloat(matrixData[2]);
         elements[matrixRow + 8] = parseFloat(matrixData[3]);
@@ -90758,16 +90924,12 @@ function (_Parser) {
     _this._compndCurrToken = '';
     _this._options.fileType = 'pdb';
     return _this;
-  } ////////////////////////////////////////////////////////////////////////////
-  // Class methods
-
+  }
   /** @deprecated */
 
 
   _createClass(PDBParser, [{
     key: "_finalize",
-    ////////////////////////////////////////////////////////////////////////////
-    // Instance methods
     value: function _finalize() {
       // console.time('PDBParser._finalize');
       this._fixBondsArray();
@@ -90825,7 +90987,7 @@ function (_Parser) {
     key: "_fixChains",
     value: function _fixChains() {
       var idChainMap = {};
-      var complex = this._complex; //prepare
+      var complex = this._complex; // prepare
 
       for (var i = 0; i < complex._chains.length; i++) {
         var chain = complex._chains[i];
@@ -90858,20 +91020,16 @@ function (_Parser) {
       var serialAtomMap = this._serialAtomMap = {};
       var complex = this._complex;
       var atoms = complex._atoms;
-      var i = 0,
-          ni = atoms.length;
 
-      for (; i < ni; ++i) {
+      for (var i = 0, ni = atoms.length; i < ni; ++i) {
         var atom = atoms[i];
         serialAtomMap[atom._serial] = atom;
       }
 
       var bonds = complex._bonds;
-      var j = 0,
-          nj = bonds.length;
       var logger = this.logger;
 
-      for (; j < nj; ++j) {
+      for (var j = 0, nj = bonds.length; j < nj; ++j) {
         var bond = bonds[j];
 
         if (bond._right < bond._left) {
@@ -91036,26 +91194,30 @@ function (_Parser) {
   }, {
     key: "_parseHELIX",
     value: function _parseHELIX(stream) {
+      var _this2 = this;
+
       /* eslint-disable no-magic-numbers */
       var fields = [20, 22, 32, 34];
       /* eslint-enable no-magic-numbers */
 
       this._parseSTRUCTURE(stream, fields, function (obj) {
-        this._complex.addHelix(obj);
+        _this2._complex.addHelix(obj);
 
-        this._complex.structures.push(obj);
-      }.bind(this));
+        _this2._complex.structures.push(obj);
+      });
     }
   }, {
     key: "_parseSHEET",
     value: function _parseSHEET(stream) {
+      var _this3 = this;
+
       /* eslint-disable no-magic-numbers */
       var fields = [22, 23, 33, 34];
       /* eslint-enable no-magic-numbers */
 
       this._parseSTRUCTURE(stream, fields, function (obj) {
-        this._complex.addSheet(obj);
-      }.bind(this));
+        _this3._complex.addSheet(obj);
+      });
     }
   }, {
     key: "_parseSTRUCTURE",
@@ -91064,11 +91226,11 @@ function (_Parser) {
       var startId = 0;
       var startIndex = 1;
       var endId = 2;
-      var endIndex = 3; //identify fields: debugging and stuff
+      var endIndex = 3; // identify fields: debugging and stuff
 
       /* eslint-disable no-magic-numbers */
 
-      var codeOfS = 0x53; //var twoLinesMaxLen = 2 * 80;
+      var codeOfS = 0x53; // var twoLinesMaxLen = 2 * 80;
 
       var serialNumber = stream.readInt(8, 10);
       var structureName = stream.readString(12, 14).trim(); // FIXME: LString(3) forbids trim()
@@ -91080,7 +91242,7 @@ function (_Parser) {
       var shCur = stream.readInt(42, 45);
       var shPrev = stream.readInt(57, 60);
       /* eslint-enable no-magic-numbers */
-      //file fields
+      // file fields
 
       var startChainID = stream.readString(pars[startId], pars[endId] + 1).charCodeAt(0); // FIXME: no need in these
 
@@ -91202,14 +91364,14 @@ function (_Parser) {
 }(Parser);
 
 _defineProperty(PDBParser, "tagParsers", {
-  'HEADER': PDBParser.prototype._parseHEADER,
+  HEADER: PDBParser.prototype._parseHEADER,
   'TITLE ': PDBParser.prototype._parseTITLE,
   'ATOM  ': PDBParser.prototype._parseATOM,
-  'HETATM': PDBParser.prototype._parseATOM,
-  'ENDMDL': PDBParser.prototype._parseENDMDL,
-  'CONECT': PDBParser.prototype._parseCONECT,
-  'COMPND': PDBParser.prototype._parseCOMPND,
-  'REMARK': PDBParser.prototype._parseREMARK,
+  HETATM: PDBParser.prototype._parseATOM,
+  ENDMDL: PDBParser.prototype._parseENDMDL,
+  CONECT: PDBParser.prototype._parseCONECT,
+  COMPND: PDBParser.prototype._parseCOMPND,
+  REMARK: PDBParser.prototype._parseREMARK,
   // 'SOURCE': PDBParser.prototype._parseSOURCE,
   'HELIX ': PDBParser.prototype._parseHELIX,
   'SHEET ': PDBParser.prototype._parseSHEET,
@@ -91260,16 +91422,12 @@ function (_Parser) {
     _this._readOnlyOneMolecule = false;
     _this._options.fileType = 'cml';
     return _this;
-  } ////////////////////////////////////////////////////////////////////////////
-  // Class methods
-
+  }
   /** @deprecated */
 
 
   _createClass(CMLParser, [{
     key: "_rebuidBondIndexes",
-    ////////////////////////////////////////////////////////////////////////////
-    // Instance methods
     value: function _rebuidBondIndexes(atoms, bonds) {
       var count = atoms.length;
 
@@ -91363,10 +91521,10 @@ function (_Parser) {
             atoms[i].sgroupRef.push(moleculeArr[j]);
           }
         }
-      } //build sGroups centers
+      } // build sGroups centers
 
 
-      var atomMap = {}; //sgrpmap cache
+      var atomMap = {}; // sgrpmap cache
 
       var mapEntry = null;
       var nLimon = 100000000;
@@ -91594,7 +91752,7 @@ function (_Parser) {
 
         for (var _i = 0; _i < count; _i++) {
           if (!addCurrBond(_i)) {
-            //ignore invalid bond
+            // ignore invalid bond
             continue;
           }
 
@@ -91627,14 +91785,14 @@ function (_Parser) {
           atom.edges.sort();
         }
 
-        var labels = self._breadWidthSearch(atoms, 0); //for now
+        var labels = self._breadWidthSearch(atoms, 0); // for now
 
 
         var retStruct = {};
         retStruct.atoms = atoms;
         retStruct.bonds = localBond;
         retStruct.labels = labels.atomLabels;
-        retStruct.count = Math.min(1, labels.labelsCount); //for now
+        retStruct.count = Math.min(1, labels.labelsCount); // for now
 
         retStruct.curr = -1;
         retStruct.originalCML = doc;
@@ -91708,7 +91866,7 @@ function (_Parser) {
 
         if (startID < 0) {
           break;
-        } //Bread first search
+        } // Bread first search
 
 
         breadthQueue.push(atoms[startID]);
@@ -91752,20 +91910,16 @@ function (_Parser) {
       var serialAtomMap = this._serialAtomMap = {};
       var complex = this._complex;
       var atoms = complex._atoms;
-      var i = 0,
-          ni = atoms.length;
 
-      for (; i < ni; ++i) {
+      for (var i = 0, ni = atoms.length; i < ni; ++i) {
         var atom = atoms[i];
         serialAtomMap[atom._serial] = atom;
       }
 
       var bonds = complex._bonds;
-      var j = 0,
-          nj = bonds.length;
       var logger = this.logger;
 
-      for (; j < nj; ++j) {
+      for (var j = 0, nj = bonds.length; j < nj; ++j) {
         var bond = bonds[j];
 
         if (bond._right < bond._left) {
@@ -91782,8 +91936,8 @@ function (_Parser) {
       var complex = this._complex = new Complex$2();
       var data = varData;
       var currentLabel = data.curr;
-      var atoms = data.atoms;
-      var labels = data.labels;
+      var atoms = data.atoms,
+          labels = data.labels;
       var atom = null;
       var i;
       var j;
@@ -91810,7 +91964,7 @@ function (_Parser) {
       } //    var nodeHText;
 
 
-      var chains = {}; //parse atoms in label order
+      var chains = {}; // parse atoms in label order
 
       var reorder = [];
 
@@ -91850,10 +92004,10 @@ function (_Parser) {
             var strLabel = currAtomComp.toString();
 
             if (strLabel.length === 1) {
-              strLabel = '0' + strLabel;
+              strLabel = "0".concat(strLabel);
             }
 
-            var resName = 'N' + strLabel;
+            var resName = "N".concat(strLabel);
             var chain = chains[chainID];
 
             if (!chain || chain.getName() !== chainID) {
@@ -91865,7 +92019,7 @@ function (_Parser) {
 
             if (!residue || residue.getSequence() !== resSeq || residue.getICode() !== iCode) {
               this._residue = residue = chain.addResidue(resName, resSeq, iCode);
-            } //_x, _y, _z, mname, mindex, atomNameFull, atomName, chainID, serial, isHet, atlLocInd, atomNameToTypeF
+            } // _x, _y, _z, mname, mindex, atomNameFull, atomName, chainID, serial, isHet, atlLocInd, atomNameToTypeF
 
 
             var xyz = null;
@@ -91902,7 +92056,7 @@ function (_Parser) {
         }
       }
 
-      chains = null; //NOSONAR
+      chains = null; // NOSONAR
 
       for (i = 0; i < data.bonds.length; i++) {
         var cb = data.bonds[i];
@@ -91911,7 +92065,7 @@ function (_Parser) {
           atom = atoms[cb.start];
 
           if (!atom || !atoms[cb.end]) {
-            continue; //skip invalid
+            continue; // skip invalid
           }
 
           this._parseBond(parseInt(atom.id.replace(/[^0-9]/, ''), 10), parseInt(atoms[cb.end].id.replace(/[^0-9]/, ''), 10), cb.order, cb.type);
@@ -91984,11 +92138,13 @@ function (_Parser) {
         joinedComplex.joinComplexes(complexes);
         joinedComplex.originalCML = complexes[0].originalCML;
         return joinedComplex;
-      } else if (complexes.length === 1) {
-        return complexes[0];
-      } else {
-        return new Complex$2();
       }
+
+      if (complexes.length === 1) {
+        return complexes[0];
+      }
+
+      return new Complex$2();
     }
   }], [{
     key: "canParse",
@@ -92057,8 +92213,8 @@ function () {
         return false;
       }
 
-      var sum = 0,
-          i;
+      var sum = 0;
+      var i;
 
       for (i = 0; i < len; ++i) {
         sum += candidate[i];
@@ -92114,9 +92270,7 @@ function (_Parser) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(MMTFParser).call(this, data, options));
     _this._options.fileType = 'mmtf';
     return _this;
-  } ////////////////////////////////////////////////////////////////////////////
-  // Class methods
-
+  }
   /** @deprecated */
 
 
@@ -92225,13 +92379,15 @@ function (_Parser) {
             break;
 
           case 3:
-            // extended
-            var sheet = new Sheet$2('', 0);
+            {
+              // extended
+              var sheet = new Sheet$2('', 0);
 
-            complex._sheets.push(sheet);
+              complex._sheets.push(sheet);
 
-            struct = new Strand$2(sheet, residue, residue, 0, null, null);
-            break;
+              struct = new Strand$2(sheet, residue, residue, 0, null, null);
+              break;
+            }
 
           default:
             if (type !== undefined) {
@@ -92360,7 +92516,9 @@ function (_Parser) {
   }, {
     key: "_parseAssemblyInfo",
     value: function _parseAssemblyInfo(mmtfData) {
-      var i, j, k;
+      var i;
+      var j;
+      var k;
       var assemblies = [];
       var logger = this.logger;
 
@@ -92470,7 +92628,8 @@ function (_Parser) {
   }, {
     key: "_joinSynonymousChains",
     value: function _joinSynonymousChains() {
-      var i, j;
+      var i;
+      var j;
       var primaryChainsArray = [];
       var primaryChainsHash = {}; // join chains
 
@@ -92633,8 +92792,8 @@ function _getOperations(operList) {
   }
 
   var idc = arrize(operList.id);
-  var matrix = operList.matrix;
-  var vector = operList.vector;
+  var matrix = operList.matrix,
+      vector = operList.vector;
 
   if (!idc || !matrix || !vector) {
     return null;
@@ -92661,7 +92820,7 @@ function _getOperations(operList) {
 }
 
 function _extractOperations(assemblyGen, opsDict) {
-  assemblyGen = lodash.isString(assemblyGen) ? assemblyGen : '' + assemblyGen;
+  assemblyGen = lodash.isString(assemblyGen) ? assemblyGen : "".concat(assemblyGen);
   var l = assemblyGen.replace(/\)\s*\(/g, '!').replace(/[()']/g, '');
   var groupStr = l.split('!');
   var gps = [];
@@ -92726,9 +92885,7 @@ function (_Parser) {
     _this2.molecules = [];
     _this2._options.fileType = 'cif';
     return _this2;
-  } ////////////////////////////////////////////////////////////////////////////
-  // Class methods
-
+  }
   /** @deprecated */
 
 
@@ -92840,7 +92997,7 @@ function (_Parser) {
 
       for (var f = 0, n = cRequiredAtomFields.length; f < n; ++f) {
         if (!atomData[cRequiredAtomFields[f]]) {
-          throw new AtomDataError('CIF parsing error: requires field ' + cRequiredAtomFields[f] + ' not found!');
+          throw new AtomDataError("CIF parsing error: requires field ".concat(cRequiredAtomFields[f], " not found!"));
         }
       }
 
@@ -92952,16 +93109,15 @@ function (_Parser) {
 
       if (!sheetData.sheet_id || !sheetData.id || !sheetData.beg_label_seq_id || !sheetData.end_label_seq_id || !sheetData.beg_label_asym_id) {
         return;
-      } //Strand(sheet, start, end, sense, cur, prev)
+      } // Strand(sheet, start, end, sense, cur, prev)
 
 
       var sheets = complex._sheets;
 
       function getSheet(name) {
-        var i = 0,
-            n = sheets.length;
+        var n = sheets.length;
 
-        for (; i < n; ++i) {
+        for (var i = 0; i < n; ++i) {
           if (sheets[i]._name === name) {
             return sheets[i];
           }
@@ -93147,25 +93303,25 @@ function (_Parser) {
   }, {
     key: "_parseToObject",
     value: function _parseToObject(source) {
-      var i = 0,
-          j = 0,
-          n = source.length;
-      var code = NaN,
-          newline = true,
-          line = 1,
-          column = 1,
-          begin;
+      var i = 0;
+      var j = 0;
+      var n = source.length;
+      var code = NaN;
+      var newline = true;
+      var line = 1;
+      var column = 1;
+      var begin;
       var state = 0; // -1 - stop, 0 - start, 1 - block, 2 - item, 3 - loop, 4 - values, 5 - value, 666 - error
 
       var err = 'unexpected character';
-      var result = {},
-          block = {};
-      var keys = [],
-          keysCount = 0,
-          key = '';
-      var values = [],
-          valuesCount = 0,
-          value;
+      var result = {};
+      var block = {};
+      var keys = [];
+      var keysCount = 0;
+      var key = '';
+      var values = [];
+      var valuesCount = 0;
+      var value;
 
       function _isWhitespace(ch) {
         return ch === 32 || ch === 10 || ch === 13 || ch === 9;
@@ -93197,7 +93353,9 @@ function (_Parser) {
           ++column;
           ++i;
           return undefined;
-        } else if (newline && code === 59) {
+        }
+
+        if (newline && code === 59) {
           // ';' ......................................................................
           // parse multi-line string
           j = i;
@@ -93220,7 +93378,9 @@ function (_Parser) {
           column = 1;
           newline = false;
           return val;
-        } else if (code === 39 || code === 34) {
+        }
+
+        if (code === 39 || code === 34) {
           // ''' or '"' ...........................................................
           // parse quoted string
           j = i;
@@ -93238,28 +93398,28 @@ function (_Parser) {
           column += j - i + 1;
           i = j + 1;
           return val;
-        } else {
-          // ......................................................................................................
-          // parse until the first whitespace
-          j = i;
-
-          while (j < n && !_isWhitespace(source.charCodeAt(j))) {
-            ++j;
-          }
-
-          val = source.substring(i, j);
-          column += j - i;
-          i = j; // try to convert to a number
-
-          var num = Number(val);
-
-          if (!Number.isNaN(num)) {
-            return num;
-          } // or leave as an unquoted string
+        } // ......................................................................................................
+        // parse until the first whitespace
 
 
-          return val;
+        j = i;
+
+        while (j < n && !_isWhitespace(source.charCodeAt(j))) {
+          ++j;
         }
+
+        val = source.substring(i, j);
+        column += j - i;
+        i = j; // try to convert to a number
+
+        var num = Number(val);
+
+        if (!Number.isNaN(num)) {
+          return num;
+        } // or leave as an unquoted string
+
+
+        return val;
       }
 
       function _storeKey(tag) {
@@ -93267,8 +93427,7 @@ function (_Parser) {
       }
 
       function _storeValue(val) {
-        var keyIndex;
-        keyIndex = valuesCount % keysCount;
+        var keyIndex = valuesCount % keysCount;
         values[keyIndex].push(val);
         ++valuesCount;
         return val;
@@ -93326,7 +93485,7 @@ function (_Parser) {
               break;
             } else {
               // ..................................................................................................
-              err += ' in state ' + state;
+              err += " in state ".concat(state);
               state = 666; // error
 
               break;
@@ -93368,7 +93527,7 @@ function (_Parser) {
               column += 5;
 
               if (i < n && !_isWhitespace(source.charCodeAt(i))) {
-                err += ' in state ' + state;
+                err += " in state ".concat(state);
                 state = 666; // error
 
                 break;
@@ -93387,7 +93546,7 @@ function (_Parser) {
               break;
             } else {
               // ..................................................................................................
-              err += ' in state ' + state;
+              err += " in state ".concat(state);
               state = 666; // error
 
               break;
@@ -93397,6 +93556,7 @@ function (_Parser) {
             if (Number.isNaN(code)) {
               break;
             } else if ((value = _parseValue()) !== null) {
+              // eslint-disable-line no-cond-assign
               lodash.set(block, key, value);
 
               state = 1; // block
@@ -93477,7 +93637,7 @@ function (_Parser) {
             continue; // parse again in a different state
           } else {
             // ====================================================================================================
-            err = 'unexpected internal state ' + state;
+            err = "unexpected internal state ".concat(state);
             state = 666; // error
 
             break;
@@ -93492,7 +93652,7 @@ function (_Parser) {
 
       if (state === 2) {
         // item
-        err = 'unexpected end of file in state ' + state;
+        err = "unexpected end of file in state ".concat(state);
         state = 666; // error
       }
 
@@ -93774,7 +93934,7 @@ function (_VolumeModel) {
       if (header.type === 2) {
         this._data = new Float32Array(this._buff, 1024 + header.nsymbt, header.extent[0] * header.extent[1] * header.extent[2]);
       } else {
-        throw new Error('CCP4: Unsupported format ' + header.type);
+        throw new Error("CCP4: Unsupported format ".concat(header.type));
       }
 
       this._bboxSize = new Vector3(xaxis.length(), yaxis.length(), zaxis.length());
@@ -93793,7 +93953,9 @@ function (_VolumeModel) {
       var ySize = dim[1];
       var crsIdx = 0;
       var coord = [];
-      var x, y, z;
+      var x;
+      var y;
+      var z;
 
       for (coord[2] = 0; coord[2] < header.extent[2]; coord[2]++) {
         // Site
@@ -93830,9 +93992,7 @@ function (_Parser) {
     _this._options.fileType = 'ccp4';
     _this.model = new Ccp4Model();
     return _this;
-  } ////////////////////////////////////////////////////////////////////////////
-  // Class methods
-
+  }
   /** @deprecated */
 
 
@@ -94265,7 +94425,7 @@ function (_Parser) {
   _createClass(SDFParser, [{
     key: "canProbablyParse",
     value: function canProbablyParse(data) {
-      return _.isString(data) && sdfAndMolRegexp.test(data);
+      return lodash.isString(data) && sdfAndMolRegexp.test(data);
     }
   }, {
     key: "_parseHeader",
@@ -94281,8 +94441,8 @@ function (_Parser) {
   }, {
     key: "_parseAtoms",
     value: function _parseAtoms(stream, atomsNum) {
-      var curStr,
-          serial = this._atomsParsed; // each molecule = chain\residue
+      var curStr;
+      var serial = this._atomsParsed; // each molecule = chain\residue
 
       var chainID = buildChainID(this._compoundIndx);
       var resName = 'UNK';
@@ -94306,7 +94466,7 @@ function (_Parser) {
         }
 
         this._atomsIndexes[name] += 1;
-        name += this._atomsIndexes[name]; //hack. every atom need to have unique name.
+        name += this._atomsIndexes[name]; // hack. every atom need to have unique name.
 
         this._residue.addAtom(name, type, xyz, undefined, true, serial, ' ', 1.0, 0.0, charge);
       }
@@ -94359,7 +94519,7 @@ function (_Parser) {
     value: function _parseDataItem(stream) {
       var tag = stream.getCurrentString();
       var data = [];
-      var curStr = stream.getNextString(); //read data
+      var curStr = stream.getNextString(); // read data
 
       while (curStr.trim() !== '') {
         data.push(curStr);
@@ -94367,15 +94527,19 @@ function (_Parser) {
       }
 
       if (data.length === 1) {
-        data = data[0];
+        var _data = data;
+
+        var _data2 = _slicedToArray(_data, 1);
+
+        data = _data2[0];
       }
 
-      this._currentMolProps[tag.replace(/<|>/g, '').trim()] = data;
+      this._currentMolProps[tag.replace(/[<>]/g, '').trim()] = data;
     }
   }, {
     key: "_parseCompound",
     value: function _parseCompound(stream) {
-      this._parseMOL(stream); //parse data items block
+      this._parseMOL(stream); // parse data items block
 
 
       if (this._format === fileFormat.SDF) {
@@ -94488,7 +94652,7 @@ function (_Parser) {
       molecule.name = molecule.name || molecule.id;
 
       if (molecule.name.match(/^\d+$/)) {
-        molecule.name = 'CID: ' + molecule.name;
+        molecule.name = "CID: ".concat(molecule.name);
       }
 
       return res;
@@ -94922,9 +95086,9 @@ function () {
     value: function _currentStrLength() {
       var curStr = this._resultArray[this._currentStr];
       return curStr ? curStr.length : 0;
-    } //numeration can be number or boolean
-    //if numeration is number then just put this number to 8-10 pos in string
-    //if numeration is boolean then increase number for all new strings
+    } // numeration can be number or boolean
+    // if numeration is number then just put this number to 8-10 pos in string
+    // if numeration is boolean then increase number for all new strings
 
   }, {
     key: "newTag",
@@ -94987,7 +95151,7 @@ function () {
           this.newString();
 
           if (concat) {
-            //pretty hardcoddy
+            // pretty hardcoddy
             this.writeString(concat.tag, concat.begin, concat.end);
           }
         }
@@ -95029,7 +95193,7 @@ function () {
 
       if (str.length > Math.abs(begin - end) + 1) {
         str = str.substr(0, Math.abs(begin - end + 1));
-      } //spaces before start of new data
+      } // spaces before start of new data
 
 
       if (start > curStrLength + 1) {
@@ -95037,20 +95201,20 @@ function () {
       } else if (start <= curStrLength) {
         var cStr = this._resultArray[this._currentStr];
         this._resultArray[this._currentStr] = cStr.slice(0, start - 1);
-      } //if reverse order
-      //reverse order of end and begin means that user wants to align text right
+      } // if reverse order
+      // reverse order of end and begin means that user wants to align text right
 
 
       if (end < begin) {
         var len = begin - end + 1;
         str = ' '.repeat(len - str.length) + str;
-      } //some hardcode fix for space between string numeration and data
-      //(see pdb file format description)
+      } // some hardcode fix for space between string numeration and data
+      // (see pdb file format description)
 
 
       if (start === 11 && this._numeration && this._tagStrNum !== 1) {
-        str = ' ' + str;
-      } //append new data to string
+        str = " ".concat(str);
+      } // append new data to string
 
 
       this._resultArray[this._currentStr] += str;
@@ -95085,8 +95249,8 @@ function () {
       }
 
       return subArrays;
-    } //function for writing matrix in Remark290 and Remark350 tags
-    //(see pdb file description)
+    } // function for writing matrix in Remark290 and Remark350 tags
+    // (see pdb file description)
 
   }, {
     key: "writeMatrix",
@@ -95140,14 +95304,14 @@ function (_Exporter) {
     _this._tags = ['HEADER', 'TITLE', 'COMPND', 'REMARK', 'HELIX', 'SHEET', 'ATOM and HETATM', 'CONECT'];
     _this._result = null;
     _this._tagExtractors = {
-      'HEADER': _this._extractHEADER,
-      'TITLE': _this._extractTITLE,
+      HEADER: _this._extractHEADER,
+      TITLE: _this._extractTITLE,
       'ATOM and HETATM': _this._extractATOM,
-      'CONECT': _this._extractCONECT,
-      'COMPND': _this._extractCOMPND,
-      'REMARK': _this._extractREMARK,
-      'HELIX': _this._extractHELIX,
-      'SHEET': _this._extractSHEET
+      CONECT: _this._extractCONECT,
+      COMPND: _this._extractCOMPND,
+      REMARK: _this._extractREMARK,
+      HELIX: _this._extractHELIX,
+      SHEET: _this._extractSHEET
     };
     _this._stringForRemark350 = 'COORDINATES FOR A COMPLETE MULTIMER REPRESENTING THE KNOWN\n' + 'BIOLOGICALLY SIGNIFICANT OLIGOMERIZATION STATE OF THE\n' + 'MOLECULE CAN BE GENERATED BY APPLYING BIOMT TRANSFORMATIONS\n' + 'GIVEN BELOW.  BOTH NON-CRYSTALLOGRAPHIC AND\n' + 'CRYSTALLOGRAPHIC OPERATIONS ARE GIVEN.';
     _this._stringForRemark290 = 'CRYSTALLOGRAPHIC SYMMETRY TRANSFORMATIONS\n' + 'THE FOLLOWING TRANSFORMATIONS OPERATE ON THE ATOM/HETATM\n' + 'RECORDS IN THIS ENTRY TO PRODUCE CRYSTALLOGRAPHICALLY\n' + 'RELATED MOLECULES.';
@@ -95347,12 +95511,12 @@ function (_Exporter) {
         var chains = this._getMoleculeChains(molecules[i]);
 
         result.newString();
-        result.writeString('MOL_ID: ' + molecules[i]._index + ';', 11, 80);
+        result.writeString("MOL_ID: ".concat(molecules[i]._index, ";"), 11, 80);
         result.newString();
-        result.writeString('MOLECULE: ' + molecules[i]._name + ';', 11, 80);
+        result.writeString("MOLECULE: ".concat(molecules[i]._name, ";"), 11, 80);
         result.newString();
         result.writeString('CHAIN: ', 11, 18);
-        var chainsString = chains.join(', ') + ';';
+        var chainsString = "".concat(chains.join(', '), ";");
         result.writeEntireString(chainsString, 81);
       }
     }
@@ -95403,7 +95567,7 @@ function (_Exporter) {
         result.newString();
         result.newString();
         biomolIndx++;
-        result.writeString('BIOMOLECULE: ' + biomolIndx, 11, 80);
+        result.writeString("BIOMOLECULE: ".concat(biomolIndx), 11, 80);
         var chains = assemblies[i].chains.join(', ');
         result.newString();
         result.writeString('APPLY THE FOLLOWING TO CHAINS: ');
@@ -95488,8 +95652,8 @@ function () {
       this._height = height;
       this._widthHalf = this._width / 2;
       this._heightHalf = this._height / 2;
-      this._domElement.style.width = width + 'px';
-      this._domElement.style.height = height + 'px';
+      this._domElement.style.width = "".concat(width, "px");
+      this._domElement.style.height = "".concat(height, "px");
     }
   }, {
     key: "_renderObject",
@@ -95497,12 +95661,12 @@ function () {
       function lerpColorAsHex(a, b, t) {
         tempColor.setHex(a);
         tempColor.lerp(b, t);
-        return '#' + tempColor.getHexString();
+        return "#".concat(tempColor.getHexString());
       }
 
       function colorAsHex(a) {
         tempColor.setHex(a);
-        return '#' + tempColor.getHexString();
+        return "#".concat(tempColor.getHexString());
       }
 
       if (object instanceof CSS2DObject) {
@@ -95537,7 +95701,7 @@ function () {
 
         this._vector.applyMatrix4(this._projectionMatrix);
 
-        var style = (object.userData !== {} ? object.userData.translation : 'translate(-50%, -50%) ') + 'translate(' + (this._vector.x * this._widthHalf + this._widthHalf) + 'px,' + (-this._vector.y * this._heightHalf + this._heightHalf) + 'px)';
+        var style = "".concat(object.userData !== {} ? object.userData.translation : 'translate(-50%, -50%) ', "translate(").concat(this._vector.x * this._widthHalf + this._widthHalf, "px,").concat(-this._vector.y * this._heightHalf + this._heightHalf, "px)");
         element.style.visibility = visibility;
         element.style.WebkitTransform = style;
         element.style.MozTransform = style;
@@ -95576,7 +95740,6 @@ function () {
   return CSS2DRenderer;
 }();
 
-//////////////////////////////////////////////////////////////////////////////
 var VK_LEFT = 37;
 var VK_UP = 38;
 var VK_RIGHT = 39;
@@ -95595,7 +95758,10 @@ var PINCH_PAN_COEF = 0.1; // pivot -- local offset of the rotation pivot point
 
 function ObjectHandler(objects, camera, pivot, options) {
   this.objects = objects;
-  this.object = objects[0];
+
+  var _objects = _slicedToArray(objects, 1);
+
+  this.object = _objects[0];
   this.camera = camera;
   this.pivot = pivot;
   this.axis = new Vector3(0, 0, 1);
@@ -95637,7 +95803,10 @@ ObjectHandler.prototype._rotate = function (quaternion) {
 
 ObjectHandler.prototype.setObjects = function (objects) {
   this.objects = objects;
-  this.object = objects[0];
+
+  var _objects2 = _slicedToArray(objects, 1);
+
+  this.object = _objects2[0];
 };
 
 ObjectHandler.prototype.rotate = function (mousePrevPos, mouseCurPos, aboutAxis) {
@@ -96272,21 +96441,23 @@ ObjectControls.prototype.touchstartend = function (event) {
       break;
 
     case 2:
-      // prevent inertial rotation
-      this._mainObj.stop();
+      {
+        // prevent inertial rotation
+        this._mainObj.stop();
 
-      this._altObj.stop();
+        this._altObj.stop();
 
-      this._state = STATE.SCALE_PAN;
-      var dx = event.touches[0].pageX - event.touches[1].pageX;
-      var dy = event.touches[0].pageY - event.touches[1].pageY;
-      this._touchDistanceCur = this._touchDistanceStart = Math.sqrt(dx * dx + dy * dy);
-      this._scaleStart = this.object.scale.x;
-      this._originalPinchCenter = new Vector2(0.5 * (event.touches[0].pageX + event.touches[1].pageX), 0.5 * (event.touches[0].pageY + event.touches[1].pageY));
+        this._state = STATE.SCALE_PAN;
+        var dx = event.touches[0].pageX - event.touches[1].pageX;
+        var dy = event.touches[0].pageY - event.touches[1].pageY;
+        this._touchDistanceCur = this._touchDistanceStart = Math.sqrt(dx * dx + dy * dy);
+        this._scaleStart = this.object.scale.x;
+        this._originalPinchCenter = new Vector2(0.5 * (event.touches[0].pageX + event.touches[1].pageX), 0.5 * (event.touches[0].pageY + event.touches[1].pageY));
 
-      this._originalCameraPos.copy(this.camera.position);
+        this._originalCameraPos.copy(this.camera.position);
 
-      break;
+        break;
+      }
 
     default:
       this._state = STATE.NONE;
@@ -96408,7 +96579,7 @@ ObjectControls.prototype.translatePivot = function (x, y, z) {
   });
 };
 
-//////////////////////////////////////////////////////////////////////////////
+/* eslint-disable no-magic-numbers */
 
 function Picker(gfxObj, camera, domElement) {
   EventDispatcher$1.call(this);
@@ -96931,7 +97102,7 @@ function () {
         ++iName;
       }
 
-      this._timeStep = timeStep.toString() + ' ' + cSecNames[iName];
+      this._timeStep = "".concat(timeStep.toString(), " ").concat(cSecNames[iName]);
       offset += 4;
       var secondary = [];
       var posData = new Float32Array(chunkedFramesCount * atomsCount * 3);
@@ -97002,8 +97173,8 @@ function () {
 
       for (i = 0, n = sec.length; i < n; ++i) {
         var oldSec = sec[i];
-        var start = oldSec.start;
-        var end = oldSec.end;
+        var start = oldSec.start,
+            end = oldSec.end;
         var nSec = {
           _start: myResidues[start],
           _end: myResidues[end],
@@ -97147,7 +97318,7 @@ function () {
     this.params = params;
     this.opts = lodash.merge(utils.deriveDeep(settings.now.objects[this.type], true), opts);
     this.needsRebuild = false;
-    this._mesh = NULL;
+    this._mesh = null;
     this.id = null;
   }
   /**
@@ -97176,7 +97347,7 @@ function () {
   }, {
     key: "toString",
     value: function toString() {
-      var paramsStr = 'o=' + this.type + ',' + this.params.join(',');
+      var paramsStr = "o=".concat(this.type, ",").concat(this.params.join(','));
       var optsStr = utils.compareOptionsWithDefaults(this.opts, settings.defaults.objects[this.type]);
       return paramsStr + optsStr;
     }
@@ -97220,8 +97391,10 @@ function (_SceneObject) {
       throw new Error('Wrong number of argumets on line object creation!');
     }
 
-    _this._id1 = params[0];
-    _this._id2 = params[1];
+    var _params = _slicedToArray(params, 2);
+
+    _this._id1 = _params[0];
+    _this._id2 = _params[1];
     return _this;
   }
 
@@ -97288,7 +97461,7 @@ function (_SceneObject) {
       geo.vertices[0].copy(frameData.getAtomPos(this._atom1._index));
       geo.vertices[1].copy(frameData.getAtomPos(this._atom2._index));
 
-      this._line.computeLineDistances(); //geo.computeBoundingBox();
+      this._line.computeLineDistances(); // geo.computeBoundingBox();
 
 
       geo.computeBoundingSphere();
@@ -97347,7 +97520,7 @@ function overrideUniforms$1(params) {
 }
 
 function OutlineMaterial(params) {
-  ShaderMaterial.call(this); //add depth outline
+  ShaderMaterial.call(this); // add depth outline
 
   this.depth = false;
   var settings = {
@@ -97408,7 +97581,7 @@ var defaultUniforms$2 = UniformsUtils.merge([{
 
 function FXAAMaterial(params) {
   ShaderMaterial.call(this);
-  this.bgTransparent = false; //TODO RawShaderMaterial? Why we use ShaderMaterial now ?
+  this.bgTransparent = false; // TODO RawShaderMaterial? Why we use ShaderMaterial now ?
   // set default values
 
   ShaderMaterial.prototype.setValues.call(this, {
@@ -97755,6 +97928,7 @@ function () {
 
 var viewInterpolator = new ViewInterpolator();
 
+/* global FileError */
 var prec = settings.now.fbxprec;
 var heading = ';  FBX 6.1.0 project file\n' + '; Copyright (C) 1997-2007 Autodesk Inc. and/or its licensors.\n' + '; All rights reserved.\n' + '; ----------------------------------------------------\n' + '\n' + '  FBXHeaderExtension:  {\n' + '  FBXHeaderVersion: 1003\n' + '  FBXVersion: 6100\n' + '  CreationTimeStamp:  {\n' + '    Version: 1000\n' + '    Year: 2015\n' + '    Month: 12\n' + '    Day: 7\n' + '    Hour: 17\n' + '    Minute: 34\n' + '    Second: 53\n' + '    Millisecond: 369\n' + '  }\n' + ' Creator: "FBX SDK/FBX Plugins build 20080212"\n' + '  OtherFlags:  {\n' + '    FlagPLE: 0\n' + '  }\n' + '}\n' + 'reationTime: "2015-12-07 17:34:53:369"\n' + 'reator: "FBX SDK/FBX Plugins build 20080212"\n' + '\n' + '; Document Description\n' + ';------------------------------------------------------------------\n' + '\n' + '  Document:  {\n' + ' Name: ""\n' + '}\n' + '\n' + '; Document References\n' + ';------------------------------------------------------------------\n' + '\n' + '  References:  {\n' + '}\n' + '\n' + '; Object definitions\n' + ';------------------------------------------------------------------\n' + '\n' + '  Definitions:  {\n' + '  Version: 100\n' + '  Count: 3\n' + '  ObjectType: "Model" {\n' + '    Count: 1\n' + '  }\n' + '  ObjectType: "SceneInfo" {\n' + '    Count: 1\n' + '  }\n' + '  ObjectType: "GlobalSettings" {\n' + '    Count: 1\n' + '  }\n' + '}\n' + '\n' + '; Object properties\n' + ';------------------------------------------------------------------\n' + '\n' + '  Objects:  {\n' + '  Model: "Model::Sphere01", "Mesh" {\n' + '    Version: 232\n' + '    Properties60:  {\n' + '      Property: "QuaternionInterpolate", "bool", "",0\n' + '      Property: "RotationOffset", "Vector3D", "",0,0,0\n' + '      Property: "RotationPivot", "Vector3D", "",0,0,0\n' + '      Property: "ScalingOffset", "Vector3D", "",0,0,0\n' + '      Property: "ScalingPivot", "Vector3D", "",0,0,0\n' + '      Property: "TranslationActive", "bool", "",0\n' + '      Property: "TranslationMin", "Vector3D", "",0,0,0\n' + '      Property: "TranslationMax", "Vector3D", "",0,0,0\n' + '      Property: "TranslationMinX", "bool", "",0\n' + '      Property: "TranslationMinY", "bool", "",0\n' + '      Property: "TranslationMinZ", "bool", "",0\n' + '      Property: "TranslationMaxX", "bool", "",0\n' + '      Property: "TranslationMaxY", "bool", "",0\n' + '      Property: "TranslationMaxZ", "bool", "",0\n' + '      Property: "RotationOrder", "enum", "",0\n' + '      Property: "RotationSpaceForLimitOnly", "bool", "",0\n' + '      Property: "RotationStiffnessX", "double", "",0\n' + '      Property: "RotationStiffnessY", "double", "",0\n' + '      Property: "RotationStiffnessZ", "double", "",0\n' + '      Property: "AxisLen", "double", "",10\n' + '      Property: "PreRotation", "Vector3D", "",0,0,0\n' + '      Property: "PostRotation", "Vector3D", "",0,0,0\n' + '      Property: "RotationActive", "bool", "",0\n' + '      Property: "RotationMin", "Vector3D", "",0,0,0\n' + '      Property: "RotationMax", "Vector3D", "",0,0,0\n' + '      Property: "RotationMinX", "bool", "",0\n' + '      Property: "RotationMinY", "bool", "",0\n' + '      Property: "RotationMinZ", "bool", "",0\n' + '      Property: "RotationMaxX", "bool", "",0\n' + '      Property: "RotationMaxY", "bool", "",0\n' + '      Property: "RotationMaxZ", "bool", "",0\n' + '      Property: "InheritType", "enum", "",1\n' + '      Property: "ScalingActive", "bool", "",0\n' + '      Property: "ScalingMin", "Vector3D", "",1,1,1\n' + '      Property: "ScalingMax", "Vector3D", "",1,1,1\n' + '      Property: "ScalingMinX", "bool", "",0\n' + '      Property: "ScalingMinY", "bool", "",0\n' + '      Property: "ScalingMinZ", "bool", "",0\n' + '      Property: "ScalingMaxX", "bool", "",0\n' + '      Property: "ScalingMaxY", "bool", "",0\n' + '      Property: "ScalingMaxZ", "bool", "",0\n' + '      Property: "GeometricTranslation", "Vector3D", "",0,0,0\n' + '      Property: "GeometricRotation", "Vector3D", "",0,0,0\n' + '      Property: "GeometricScaling", "Vector3D", "",1,1,1\n' + '      Property: "MinDampRangeX", "double", "",0\n' + '      Property: "MinDampRangeY", "double", "",0\n' + '      Property: "MinDampRangeZ", "double", "",0\n' + '      Property: "MaxDampRangeX", "double", "",0\n' + '      Property: "MaxDampRangeY", "double", "",0\n' + '      Property: "MaxDampRangeZ", "double", "",0\n' + '      Property: "MinDampStrengthX", "double", "",0\n' + '      Property: "MinDampStrengthY", "double", "",0\n' + '      Property: "MinDampStrengthZ", "double", "",0\n' + '      Property: "MaxDampStrengthX", "double", "",0\n' + '      Property: "MaxDampStrengthY", "double", "",0\n' + '      Property: "MaxDampStrengthZ", "double", "",0\n' + '      Property: "PreferedAngleX", "double", "",0\n' + '      Property: "PreferedAngleY", "double", "",0\n' + '      Property: "PreferedAngleZ", "double", "",0\n' + '      Property: "LookAtProperty", "object", ""\n' + '      Property: "UpVectorProperty", "object", ""\n' + '      Property: "Show", "bool", "",1\n' + '      Property: "NegativePercentShapeSupport", "bool", "",1\n' + '      Property: "DefaultAttributeIndex", "int", "",0\n' + '      Property: "Lcl Translation", "Lcl Translation", "A+",-0.169204741716385,-0.507614195346832,0\n' + '      Property: "Lcl Rotation", "Lcl Rotation", "A+",0,0,0\n' + '      Property: "Lcl Scaling", "Lcl Scaling", "A+",1,1,1\n' + '      Property: "Visibility", "Visibility", "A+",1\n' + '      Property: "BBoxMin", "Vector3D", "N",0,0,0\n' + '      Property: "BBoxMax", "Vector3D", "N",0,0,0\n' + '    }\n' + '    MultiLayer: 0\n' + '    MultiTake: 1\n' + '    Shading: T\n' + '   Culling: "CullingOff"\n';
 var ending = 'NodeAttributeName: "Geometry::Sphere01"\n' + '}\n' + 'ceneInfo: "SceneInfo::GlobalInfo", "UserData" {\n' + ' Type: "UserData"\n' + '  Version: 100\n' + '  MetaData:  {\n' + '    Version: 100\n' + '   Title: ""\n' + '   Subject: ""\n' + '   Author: ""\n' + '   Keywords: ""\n' + '   Revision: ""\n' + '   Comment: ""\n' + '  }\n' + '  Properties60:  {\n' + '    Property: "DocumentUrl", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"\n' + '    Property: "SrcDocumentUrl", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"\n' + '   Property: "Original", "Compound", ""\n' + '   Property: "Original|ApplicationVendor", "KString", "", "Autodesk"\n' + '   Property: "Original|ApplicationName", "KString", "", "3ds Max"\n' + '   Property: "Original|ApplicationVersion", "KString", "", "2009.0"\n' + '   Property: "Original|DateTime_GMT", "DateTime", "", "07/12/2015 14:34:53.369"\n' + '    Property: "Original|FileName", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"\n' + '   Property: "LastSaved", "Compound", ""\n' + '   Property: "LastSaved|ApplicationVendor", "KString", "", "Autodesk"\n' + '   Property: "LastSaved|ApplicationName", "KString", "", "3ds Max"\n' + '   Property: "LastSaved|ApplicationVersion", "KString", "", "2009.0"\n' + '   Property: "LastSaved|DateTime_GMT", "DateTime", "", "07/12/2015 14:34:53.369"\n' + '  }\n' + '}\n' + 'lobalSettings:  {\n' + '  Version: 1000\n' + '  Properties60:  {\n' + '    Property: "UpAxis", "int", "",2\n' + '    Property: "UpAxisSign", "int", "",1\n' + '    Property: "FrontAxis", "int", "",1\n' + '    Property: "FrontAxisSign", "int", "",-1\n' + '    Property: "CoordAxis", "int", "",0\n' + '    Property: "CoordAxisSign", "int", "",1\n' + '    Property: "UnitScaleFactor", "double", "",2.54\n' + '  }\n' + '}\n' + '}\n' + '\n' + '; Object relations\n' + ';------------------------------------------------------------------\n' + '\n' + '  Relations:  {\n' + '  Model: "Model::Sphere01", "Mesh" {\n' + '  }\n' + '  SceneInfo: "SceneInfo::GlobalInfo", "UserData" {\n' + '  }\n' + '}\n' + '\n' + '; Object connections\n' + ';------------------------------------------------------------------\n' + '\n' + '  Connections:  {\n' + ' Connect: "OO", "Model::Sphere01", "Model::Scene"\n' + '}\n' + '\n' + ';Object data\n' + ';------------------------------------------------------------------\n' + '\n' + '  ObjectData:  {\n' + '}\n' + ';Takes and animation section\n' + ';----------------------------------------------------\n' + '\n' + '  Takes:  {\n' + ' Current: "Take 001"\n' + '}\n' + ';Version 5 settings\n' + ';------------------------------------------------------------------\n' + '\n' + '  Version5:  {\n' + '  AmbientRenderSettings:  {\n' + '    Version: 101\n' + '    AmbientLightColor: 0.533333003520966,0.533333003520966,0.533333003520966,1\n' + '  }\n' + '  FogOptions:  {\n' + '    FlogEnable: 0\n' + '    FogMode: 0\n' + '    FogDensity: 0.002\n' + '    FogStart: 0.3\n' + '    FogEnd: 1000\n' + '    FogColor: 1,1,1,1\n' + '  }\n' + '  Settings:  {\n' + '   FrameRate: "30"\n' + '    TimeFormat: 1\n' + '    SnapOnFrames: 0\n' + '    ReferenceTimeIndex: -1\n' + '    TimeLineStartTime: 0\n' + '    TimeLineStopTime: 153953860000\n' + '  }\n' + '  RendererSetting:  {\n' + '   DefaultCamera: ""\n' + '    DefaultViewingMode: 0\n' + '  }\n' + '}\n' + '\n';
@@ -97803,7 +97977,7 @@ function _writeToFile(filename, data, isBinary, append, callback) {
       // Create a new Blob and write it to log.txt.
       var blob = new Blob([data], {
         type: isBinary ? 'octet/stream' : 'text/plain'
-      }); //fileWriter.write(blob);
+      }); // fileWriter.write(blob);
 
       if (append) {
         fileWriter.onwriteend = function () {
@@ -97816,11 +97990,11 @@ function _writeToFile(filename, data, isBinary, append, callback) {
       } else {
         fileWriter.onwriteend = function () {
           if (fileWriter.length === 0 && data.length > 0) {
-            //fileWriter has been reset, write file
+            // fileWriter has been reset, write file
             fileWriter.write(blob);
           } else {
-            //file has been overwritten with blob
-            //use callback or resolve promise
+            // file has been overwritten with blob
+            // use callback or resolve promise
             callback();
           }
         };
@@ -97870,8 +98044,8 @@ function _stringifyArray(arr) {
 }
 
 function _wrapValuesVector(queue, fname, layerName, vectorName, vectorData, layerData) {
-  queue.add(fname, layerName + ': 0 {\n' + 'Version: 101\n' + 'Name: ""\n' + 'MappingInformationType: "ByVertice"\n' + 'ReferenceInformationType: "Direct"\n' + vectorName + ': ' + vectorData + '\n' + '}\n', false, true);
-  return layerData + 'LayerElement:  {\n' + 'Type: "' + layerName + '"\n' + 'TypedIndex: 0\n' + '}\n';
+  queue.add(fname, "".concat(layerName, ": 0 {\n") + 'Version: 101\n' + 'Name: ""\n' + 'MappingInformationType: "ByVertice"\n' + "ReferenceInformationType: \"Direct\"\n".concat(vectorName, ": ").concat(vectorData, "\n") + '}\n', false, true);
+  return "".concat(layerData, "LayerElement:  {\n") + "Type: \"".concat(layerName, "\"\n") + 'TypedIndex: 0\n' + '}\n';
 }
 
 function _exportData(queue, indices, positions, normals, colors, uvs) {
@@ -97999,7 +98173,7 @@ function exportAtoms(queue, complex, atomsFileName, mode, colorer) {
   complex.forEachAtom(function (atom) {
     var pos = atom.getPosition();
     var col = new Color(colorer.getAtomColor(atom, complex));
-    var string = 'ATOM ' + atom._index + ' ' + pos.x + ' ' + pos.y + ' ' + pos.z + ' ' + mode.calcAtomRadius(atom) + ' ' + col.r + ' ' + col.g + ' ' + col.b + '\n';
+    var string = "ATOM ".concat(atom._index, " ").concat(pos.x, " ").concat(pos.y, " ").concat(pos.z, " ").concat(mode.calcAtomRadius(atom), " ").concat(col.r, " ").concat(col.g, " ").concat(col.b, "\n");
     queue.add(atomsFileName, string, false, true);
   });
 }
@@ -98007,7 +98181,7 @@ function exportAtoms(queue, complex, atomsFileName, mode, colorer) {
 function exportBonds(queue, complex, bondsFileName) {
   queue.add(bondsFileName, '', false, false);
   complex.forEachBond(function (bond) {
-    var string = 'BIND ' + bond._left._index + ' ' + bond._right._index + '\n';
+    var string = "BIND ".concat(bond._left._index, " ").concat(bond._right._index, "\n");
     queue.add(bondsFileName, string, false, true);
   });
   queue.add(bondsFileName, 'TED', false, true);
@@ -98036,8 +98210,8 @@ var MAX_COOKIE_LEN = 4000;
 var COUNT_SUFFIX = 'Cnt';
 
 function _chunkSrting(string, chunkLen) {
-  var l = string.length,
-      chunks = [];
+  var l = string.length;
+  var chunks = [];
 
   for (var lc = 0, c = 0; lc < l; c++) {
     chunks[c] = string.slice(lc, lc += chunkLen);
@@ -98146,7 +98320,7 @@ Cookies.prototype._toCount = function (key) {
 };
 
 Cookies.prototype._removeSimpleCookie = function (key) {
-  document.cookie = key + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  document.cookie = "".concat(key, "=; expires=Thu, 01 Jan 1970 00:00:01 GMT;");
 };
 
 Cookies.prototype._getExpirationDate = function () {
@@ -98157,16 +98331,16 @@ Cookies.prototype._getExpirationDate = function () {
 };
 
 Cookies.prototype._setSimpleCookie = function (key, value) {
-  document.cookie = key + '=' + value + ';expires=' + this._getExpirationDate().toUTCString() + ';path=' + this._opts.path;
+  document.cookie = "".concat(key, "=").concat(value, ";expires=").concat(this._getExpirationDate().toUTCString(), ";path=").concat(this._opts.path);
 };
 
 Cookies.prototype._getSimpleCookie = function (key) {
-  var matches = document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
+  var matches = document.cookie.match(new RegExp("(?:^|; )".concat(key, "=([^;]*)")));
   return matches ? decodeURIComponent(matches[1]) : '';
 };
 
 Cookies.prototype._exists = function (key) {
-  return document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
+  return document.cookie.match(new RegExp("(?:^|; )".concat(key, "=([^;]*)")));
 };
 
 var ViveController =
@@ -98249,10 +98423,12 @@ function (_THREE$Object3D) {
         this.visible = true; //  Thumbpad and Buttons.
 
         if (this.axes[0] !== this.gamepad.axes[0] || this.axes[1] !== this.gamepad.axes[1]) {
-          this.axes[0] = this.gamepad.axes[0]; //  X axis: -1 = Left, +1 = Right.
+          //  X axis: -1 = Left, +1 = Right.
+          //  Y axis: -1 = Bottom, +1 = Top.
+          var _this$gamepad$axes = _slicedToArray(this.gamepad.axes, 2);
 
-          this.axes[1] = this.gamepad.axes[1]; //  Y axis: -1 = Bottom, +1 = Top.
-
+          this.axes[0] = _this$gamepad$axes[0];
+          this.axes[1] = _this$gamepad$axes[1];
           this.dispatchEvent({
             type: 'axischanged',
             axes: this.axes
@@ -98328,7 +98504,7 @@ function (_ViveController) {
   return GeoViveController;
 }(ViveController);
 
-/*******
+/*
  * Toggling WebVR is done through button.click because of limitations on calling requestPresent in webVR:
  * VRDisplay::requestPresent should be called from user gesture:
  * https://developer.mozilla.org/en-US/docs/Web/API/VRDisplay/requestPresent
@@ -98411,16 +98587,16 @@ function createWebVRButton (webVRPoC) {
       }
     });
     return button;
-  } else {
-    var message = document.createElement('a');
-    message.href = 'https://webvr.info';
-    message.innerHTML = 'WEBVR NOT SUPPORTED';
-    message.style.left = 'calc(50% - 90px)';
-    message.style.width = '180px';
-    message.style.textDecoration = 'none';
-    stylizeElement(message);
-    return message;
   }
+
+  var message = document.createElement('a');
+  message.href = 'https://webvr.info';
+  message.innerHTML = 'WEBVR NOT SUPPORTED';
+  message.style.left = 'calc(50% - 90px)';
+  message.style.width = '180px';
+  message.style.textDecoration = 'none';
+  stylizeElement(message);
+  return message;
 }
 
 var WebVRPoC =
@@ -98544,7 +98720,7 @@ function () {
           gfx.scene.add(self._user);
         }
 
-        settings.set('fog', false); //turn on webvr transformation
+        settings.set('fog', false); // turn on webvr transformation
 
         gfx.scene.add(self._molContainer);
 
@@ -98553,7 +98729,7 @@ function () {
         this._controller1.standingMatrix = renderer.vr.getStandingMatrix();
         this._controller2.standingMatrix = renderer.vr.getStandingMatrix();
       } else if (!enable && renderer.vr.enabled) {
-        //disable vr
+        // disable vr
         var display = self.getDevice();
 
         if (display && display.isPresenting) {
@@ -98571,7 +98747,7 @@ function () {
           gfx.camera.copy(self._mainCamera);
         }
 
-        settings.set('fog', true); //turn off webvr transformation
+        settings.set('fog', true); // turn off webvr transformation
 
         var root = self._molContainer.children[0];
         if (root) gfx.scene.add(root);
@@ -98705,15 +98881,15 @@ function reportProgress(log, action, percent) {
   var TOTAL_PERCENT = 100;
 
   if (percent !== undefined) {
-    log.debug(action + '... ' + Math.floor(percent * TOTAL_PERCENT) + '%');
+    log.debug("".concat(action, "... ").concat(Math.floor(percent * TOTAL_PERCENT), "%"));
   } else {
-    log.debug(action + '...');
+    log.debug("".concat(action, "..."));
   }
 }
 
 function chooseFogColor() {
   return settings.now.fogColorEnable ? settings.now.fogColor : settings.now.bg.color;
-} //////////////////////////////////////////////////////////////////////////////
+} // ////////////////////////////////////////////////////////////////////////////
 
 /**
  * Main 3D Molecular Viewer class.
@@ -98809,7 +98985,7 @@ function Miew(opts) {
   this.reset();
 
   if (this._repr) {
-    log.debug('Selected ' + this._repr.mode.name + ' mode with ' + this._repr.colorer.name + ' colorer.');
+    log.debug("Selected ".concat(this._repr.mode.name, " mode with ").concat(this._repr.colorer.name, " colorer."));
   }
 
   var self = this;
@@ -98827,6 +99003,23 @@ Miew.prototype.getMaxRepresentationCount = function () {
   return ComplexVisual.NUM_REPRESENTATION_BITS;
 };
 /**
+ * Replace viewer container contents with a DOM element.
+ * @param {HTMLElement} container - parent container.
+ * @param {HTMLElement} element - DOM element to show.
+ * @private
+ */
+
+
+function _setContainerContents(container, element) {
+  var parent = container;
+
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+
+  parent.appendChild(element);
+}
+/**
  * Initialize the viewer.
  * @returns {boolean} true on success.
  * @throws Forwards exception raised during initialization.
@@ -98837,7 +99030,7 @@ Miew.prototype.getMaxRepresentationCount = function () {
 Miew.prototype.init = function () {
   var container = this._container;
   var elem = utils.createElement('div', {
-    'class': 'miew-canvas'
+    "class": 'miew-canvas'
   });
 
   _setContainerContents(container, elem);
@@ -98845,15 +99038,15 @@ Miew.prototype.init = function () {
   this._container = elem;
   var frag = document.createDocumentFragment();
   frag.appendChild(this._msgMode = createElement$2('div', {
-    'class': 'mode-message overlay'
+    "class": 'mode-message overlay'
   }, createElement$2('p', {}, 'COMPONENT EDIT MODE')));
   frag.appendChild(this._msgAtomInfo = createElement$2('div', {
-    'class': 'atom-info overlay'
+    "class": 'atom-info overlay'
   }, createElement$2('p', {}, '')));
   container.appendChild(frag);
 
   if (this._gfx !== null) {
-    //block double init
+    // block double init
     return true;
   }
 
@@ -98967,23 +99160,6 @@ Miew.prototype.term = function () {
   this.halt();
   this._gfx = null;
 };
-/**
- * Replace viewer container contents with a DOM element.
- * @param {HTMLElement} container - parent container.
- * @param {HTMLElement} element - DOM element to show.
- * @private
- */
-
-
-function _setContainerContents(container, element) {
-  var parent = container;
-
-  while (parent.firstChild) {
-    parent.removeChild(parent.firstChild);
-  }
-
-  parent.appendChild(element);
-}
 /**
  * Display message inside the viewer container, hiding WebGL canvas.
  * @param {string} msg - Message to show.
@@ -99199,7 +99375,7 @@ Miew.prototype._initGfx = function () {
 
 Miew.prototype._initListeners = function () {
   var self = this;
-  window.addEventListener('resize', function _onResize() {
+  window.addEventListener('resize', function () {
     self._onResize();
   });
 };
@@ -99218,7 +99394,7 @@ Miew.prototype._makeUniqueVisualName = function (baseName) {
   var suffix = 1;
 
   while (this._visuals.hasOwnProperty(name)) {
-    name = baseName + ' (' + suffix.toString() + ')';
+    name = "".concat(baseName, " (").concat(suffix.toString(), ")");
     suffix++;
   }
 
@@ -99703,7 +99879,7 @@ Miew.prototype._onThemeChanged = function () {
   return function () {
     var theme = settings.now.theme;
     var div = this._containerRoot;
-    div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
+    div.className = "".concat(div.className.replace(themeRE, ''), " theme-").concat(theme);
     settings.set('bg.color', settings.now.themes[theme]);
     this._needRender = true;
   };
@@ -99748,26 +99924,26 @@ Miew.prototype._setMRT = function (renderBuffer, textureBuffer) {
   var gfx = this._gfx;
   var gl = gfx.renderer.getContext();
   var ext = gl.getExtension('WEBGL_draw_buffers');
-  var properties = gfx.renderer.properties; //take extra texture from Texture Buffer
+  var properties = gfx.renderer.properties; // take extra texture from Texture Buffer
 
   gfx.renderer.setRenderTarget(textureBuffer);
 
   var tx8 = properties.get(textureBuffer.texture).__webglTexture;
 
-  gl.bindTexture(gl.TEXTURE_2D, tx8); //take texture and farmebuffer from renderbuffer
+  gl.bindTexture(gl.TEXTURE_2D, tx8); // take texture and farmebuffer from renderbuffer
 
   gfx.renderer.setRenderTarget(renderBuffer);
 
   var fb = properties.get(renderBuffer).__webglFramebuffer;
 
-  var tx = properties.get(renderBuffer.texture).__webglTexture; //set framebuffer
+  var tx = properties.get(renderBuffer.texture).__webglTexture; // set framebuffer
 
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
   fb.width = renderBuffer.width;
   fb.height = renderBuffer.height;
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tx, 0);
-  gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, tx8, 0); //mapping textures
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, tx8, 0); // mapping textures
 
   ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
 };
@@ -99794,7 +99970,9 @@ Miew.prototype._renderScene = function () {
 
     var volumeVisual = this._getVolumeVisual();
 
-    if (bHaveComplexes && settings.now.ao) {
+    var ssao = bHaveComplexes && settings.now.ao;
+
+    if (ssao) {
       this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
@@ -99809,15 +99987,19 @@ Miew.prototype._renderScene = function () {
     var outline = bHaveComplexes && settings.now.outline.on;
     var fxaa = bHaveComplexes && settings.now.fxaa;
     var volume = volumeVisual !== null && volumeVisual.getMesh().material != null;
-    var dstBuffer = outline || volume || fxaa || distortion ? gfx.offscreenBuf2 : target;
+    var dstBuffer = ssao || outline || volume || fxaa || distortion ? gfx.offscreenBuf2 : target;
     var srcBuffer = gfx.offscreenBuf;
 
-    if (bHaveComplexes && settings.now.ao) {
+    if (ssao) {
       this._performAO(srcBuffer, gfx.offscreenBuf4, gfx.offscreenBuf.depthTexture, dstBuffer, gfx.offscreenBuf3, gfx.offscreenBuf2);
+
+      if (!fxaa && !distortion && !volume && !outline) {
+        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, target);
+      }
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
-    } //outline
+    } // outline
 
 
     if (outline) {
@@ -99892,8 +100074,9 @@ Miew.prototype._performDistortion = function () {
   _scene.add(new meshes.Mesh(_geo, _material));
 
   return function (srcBuffer, targetBuffer, mesh) {
-    gfx.renderer.setRenderTarget(targetBuffer);
-    gfx.renderer.clear();
+    this._gfx.renderer.setRenderTarget(targetBuffer);
+
+    this._gfx.renderer.clear();
 
     if (mesh) {
       _material.uniforms.srcTex.value = srcBuffer.texture;
@@ -99971,12 +100154,12 @@ Miew.prototype._checkVolumeRenderingSupport = function (renderTarget) {
   gfx.renderer.setRenderTarget(oldRT);
 
   if (result !== context.FRAMEBUFFER_COMPLETE) {
-    //floatFrameBufferWarning = ;
+    // floatFrameBufferWarning = ;
     this.logger.warn('Device doesn\'t support electron density rendering');
     return false;
-  } else {
-    return true;
   }
+
+  return true;
 };
 
 Miew.prototype._renderVolume = function () {
@@ -100113,8 +100296,8 @@ Miew.prototype._performAO = function () {
 
   var _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
 
-  var _noiseWidth = 4,
-      _noiseHeight = 4;
+  var _noiseWidth = 4;
+  var _noiseHeight = 4;
 
   var _noiseData = new Uint8Array([0, 0, 0, 66, 0, 0, 77, 0, 0, 155, 62, 0, 0, 247, 0, 33, 0, 0, 0, 0, 0, 235, 0, 0, 0, 0, 0, 176, 44, 0, 232, 46, 0, 0, 29, 0, 0, 0, 0, 78, 197, 0, 93, 0, 0, 0, 0, 0]);
 
@@ -100138,7 +100321,7 @@ Miew.prototype._performAO = function () {
 
     var self = this;
     var gfx = self._gfx; // clear canvasFMatrix4
-    //gfx.renderer.setClearColor(THREE.aliceblue, 1);
+    // gfx.renderer.setClearColor(THREE.aliceblue, 1);
     // gfx.renderer.setRenderTarget(targetBuffer);
     // gfx.renderer.clear(true, false);
     // do fxaa processing of offscreen buff2
@@ -100155,9 +100338,9 @@ Miew.prototype._performAO = function () {
     _aoMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
     _aoMaterial.uniforms.tanHalfFOV.value = Math.tan(_Math.DEG2RAD * 0.5 * gfx.camera.fov);
     _aoMaterial.uniforms.samplesKernel.value = _samplesKernel;
-    var translation = new Vector3(),
-        quaternion = new Quaternion(),
-        scale = new Vector3();
+    var translation = new Vector3();
+    var quaternion = new Quaternion();
+    var scale = new Vector3();
     gfx.root.matrix.decompose(translation, quaternion, scale);
     _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
@@ -100255,7 +100438,7 @@ Miew.prototype.resetView = function () {
 Miew.prototype._export = function (format) {
   var TheExporter = lodash.head(io.exporters.find({
     format: format
-  })); //let result;
+  })); // let result;
 
 
   if (!TheExporter) {
@@ -100268,15 +100451,332 @@ Miew.prototype._export = function (format) {
     var exporter = new TheExporter(dataSource, {
       binary: true
     });
-    return exporter.export().then(function (data) {
+    return exporter["export"]().then(function (data) {
       return data;
     });
-  } else if (this._visuals[this._curVisualName] instanceof VolumeVisual) {
-    return Promise.reject(new Error('Sorry, exporter for volume data not implemented yet'));
-  } else {
-    return Promise.reject(new Error('Unexpected format of data'));
   }
+
+  if (this._visuals[this._curVisualName] instanceof VolumeVisual) {
+    return Promise.reject(new Error('Sorry, exporter for volume data not implemented yet'));
+  }
+
+  return Promise.reject(new Error('Unexpected format of data'));
 };
+
+var rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
+var rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
+var reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
+
+function resolveSourceShortcut(source, opts) {
+  if (!lodash.isString(source)) {
+    return source;
+  } // e.g. "mmtf:1CRN"
+
+
+  var matchesPdbId = rePdbId.exec(source);
+
+  if (matchesPdbId) {
+    var _matchesPdbId = _slicedToArray(matchesPdbId, 3),
+        _matchesPdbId$ = _matchesPdbId[1],
+        format = _matchesPdbId$ === void 0 ? 'pdb' : _matchesPdbId$,
+        id = _matchesPdbId[2];
+
+    format = format.toLowerCase();
+    id = id.toUpperCase();
+
+    switch (format) {
+      case 'pdb':
+        source = "http://files.rcsb.org/download/".concat(id, ".pdb");
+        break;
+
+      case 'cif':
+        source = "http://files.rcsb.org/download/".concat(id, ".cif");
+        break;
+
+      case 'mmtf':
+        source = "http://mmtf.rcsb.org/v1.0/full/".concat(id);
+        break;
+
+      case 'ccp4':
+        source = "https://www.ebi.ac.uk/pdbe/coordinates/files/".concat(id.toLowerCase(), ".ccp4");
+        break;
+
+      default:
+        throw new Error('Unexpected data format shortcut');
+    }
+
+    opts.fileType = format;
+    opts.fileName = "".concat(id, ".").concat(format);
+    opts.sourceType = 'url';
+    return source;
+  } // e.g. "pc:aspirin"
+
+
+  var matchesPubchem = rePubchem.exec(source);
+
+  if (matchesPubchem) {
+    var compound = matchesPubchem[1].toLowerCase();
+    source = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/".concat(compound, "/JSON?record_type=3d");
+    opts.fileType = 'pubchem';
+    opts.fileName = "".concat(compound, ".json");
+    opts.sourceType = 'url';
+    return source;
+  } // otherwise is should be an URL
+
+
+  if (opts.sourceType === 'url' || opts.sourceType === undefined) {
+    opts.sourceType = 'url'; // e.g. "./data/1CRN.pdb"
+
+    if (!reUrlScheme.test(source)) {
+      source = utils.resolveURL(source);
+    }
+  }
+
+  return source;
+}
+
+function updateBinaryMode(opts) {
+  var binary = opts.binary; // detect by format
+
+  if (opts.fileType !== undefined) {
+    var TheParser = lodash.head(io.parsers.find({
+      format: opts.fileType
+    }));
+
+    if (TheParser) {
+      binary = TheParser.binary || false;
+    } else {
+      throw new Error('Could not find suitable parser for this format');
+    }
+  } // detect by file extension
+
+
+  if (binary === undefined && opts.fileExt !== undefined) {
+    var _TheParser = lodash.head(io.parsers.find({
+      ext: opts.fileExt
+    }));
+
+    if (_TheParser) {
+      binary = _TheParser.binary || false;
+    }
+  } // temporary workaround for animation
+
+
+  if (opts.fileExt !== undefined && opts.fileExt.toLowerCase() === '.man') {
+    opts.binary = true;
+    opts.animation = true; // who cares?
+  } // update if detected
+
+
+  if (binary !== undefined) {
+    if (opts.binary !== undefined && opts.binary !== binary) {
+      opts.context.logger.warn('Overriding incorrect binary mode');
+    }
+  }
+
+  opts.binary = binary || false;
+}
+
+function _fetchData(source, opts, job) {
+  return new Promise(function (resolve) {
+    if (job.shouldCancel()) {
+      throw new Error('Operation cancelled');
+    } // allow for source shortcuts
+
+
+    source = resolveSourceShortcut(source, opts); // detect a proper loader
+
+    var TheLoader = lodash.head(io.loaders.find({
+      type: opts.sourceType,
+      source: source
+    }));
+
+    if (!TheLoader) {
+      throw new Error('Could not find suitable loader for this source');
+    } // split file name
+
+
+    var fileName = opts.fileName || TheLoader.extractName(source);
+
+    if (fileName) {
+      var _utils$splitFileName = utils.splitFileName(fileName),
+          _utils$splitFileName2 = _slicedToArray(_utils$splitFileName, 2),
+          name = _utils$splitFileName2[0],
+          fileExt = _utils$splitFileName2[1];
+
+      lodash.defaults(opts, {
+        name: name,
+        fileExt: fileExt,
+        fileName: fileName
+      });
+    } // should it be text or binary?
+
+
+    updateBinaryMode(opts); // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
+    // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
+    // all hacks and everybody's happy.
+
+    var newOptions = lodash.get(opts, 'preset.expression');
+
+    if (!lodash.isUndefined(newOptions)) {
+      newOptions = JSON.parse(newOptions);
+
+      if (newOptions && newOptions.settings) {
+        var keys = ['singleUnit', 'draft.waterBondingHack'];
+
+        for (var keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
+          var key = keys[keyIndex];
+
+          var value = lodash.get(newOptions.settings, key);
+
+          if (!lodash.isUndefined(value)) {
+            settings.set(key, value);
+          }
+        }
+      }
+    } // create a loader
+
+
+    var loader = new TheLoader(source, opts);
+    loader.context = opts.context;
+    job.addEventListener('cancel', function () {
+      return loader.abort();
+    });
+    loader.addEventListener('progress', function (event) {
+      if (event.lengthComputable && event.total > 0) {
+        reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
+      } else {
+        reportProgress(loader.logger, 'Fetching');
+      }
+    });
+    console.time('fetch');
+    var promise = loader.load().then(function (data) {
+      console.timeEnd('fetch');
+      opts.context.logger.info('Fetching finished');
+      job.notify({
+        type: 'fetchingFinished',
+        data: data
+      });
+      return data;
+    })["catch"](function (error) {
+      console.timeEnd('fetch');
+      opts.context.logger.debug(error.message);
+
+      if (error.stack) {
+        opts.context.logger.debug(error.stack);
+      }
+
+      opts.context.logger.error('Fetching failed');
+      job.notify({
+        type: 'fetchingFinished',
+        error: error
+      });
+      throw error;
+    });
+    resolve(promise);
+  });
+}
+
+function _convertData(data, opts, job) {
+  return new Promise(function (resolve, reject) {
+    if (job.shouldCancel()) {
+      throw new Error('Operation cancelled');
+    }
+
+    job.notify({
+      type: 'convert'
+    });
+
+    if (opts.mdFile) {
+      var byteNumbers = new Array(data.length);
+
+      for (var i = 0; i < data.length; i++) {
+        byteNumbers[i] = data.charCodeAt(i);
+      }
+
+      var bytes = new Uint8Array(byteNumbers);
+      var blob = new File([bytes], opts.fileName);
+      console.time('convert');
+      Miew.prototype.srvTopologyConvert(blob, opts.mdFile, function (success, newData, message) {
+        console.timeEnd('convert');
+
+        if (success) {
+          opts.converted = true;
+          opts.amberFileName = opts.fileName;
+          opts.convertedFile = new File([bytes], opts.fileName);
+          opts.fileName = null;
+          opts.fileType = 'pdb';
+          job.notify({
+            type: 'convertingFinished'
+          });
+          resolve(newData);
+        } else {
+          opts.converted = false;
+          logger.error(message);
+          opts.error = message;
+          job.notify({
+            type: 'convertingFinished',
+            error: message
+          });
+          reject(new Error(message));
+        }
+      });
+    } else {
+      opts.converted = true;
+      resolve(data);
+    }
+  });
+}
+
+function _parseData(data, opts, job) {
+  if (job.shouldCancel()) {
+    return Promise.reject(new Error('Operation cancelled'));
+  }
+
+  job.notify({
+    type: 'parse'
+  });
+
+  var TheParser = lodash.head(io.parsers.find({
+    format: opts.fileType,
+    ext: opts.fileExt,
+    data: data
+  }));
+
+  if (!TheParser) {
+    return Promise.reject(new Error('Could not find suitable parser'));
+  }
+
+  var parser = new TheParser(data, opts);
+  parser.context = opts.context;
+  job.addEventListener('cancel', function () {
+    return parser.abort();
+  });
+  console.time('parse');
+  return parser.parse().then(function (dataSet) {
+    console.timeEnd('parse');
+    job.notify({
+      type: 'parsingFinished',
+      data: dataSet
+    });
+    return dataSet;
+  })["catch"](function (error) {
+    console.timeEnd('parse');
+    opts.error = error;
+    opts.context.logger.debug(error.message);
+
+    if (error.stack) {
+      opts.context.logger.debug(error.stack);
+    }
+
+    opts.context.logger.error('Parsing failed');
+    job.notify({
+      type: 'parsingFinished',
+      error: error
+    });
+    throw error;
+  });
+}
 /**
  * Load molecule asynchronously.
  * @param {string|File} source - Molecule source to load (e.g. PDB ID, URL or File object).
@@ -100350,7 +100850,7 @@ Miew.prototype.load = function (source, opts) {
     var name = _this4._onLoad(object, opts);
 
     return onLoadEnd(name);
-  }).catch(function (err) {
+  })["catch"](function (err) {
     _this4.logger.error('Could not load data');
 
     _this4.logger.debug(err);
@@ -100493,7 +100993,7 @@ Miew.prototype._continueAnimation = function () {
 
       self._updateObjsToFrame(self._frameInfo);
 
-      self._refreshTitle(' Frame ' + self._frameInfo._currFrame + ' of ' + self._frameInfo._framesCount + ' time interval - ' + self._frameInfo._timeStep);
+      self._refreshTitle(" Frame ".concat(self._frameInfo._currFrame, " of ").concat(self._frameInfo._framesCount, " time interval - ").concat(self._frameInfo._timeStep));
 
       try {
         self._frameInfo.nextFrame();
@@ -100545,13 +101045,13 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     this._startAnimation(dataSource);
 
     return null;
-  } else {
-    this._stopAnimation();
+  }
 
-    if (!opts || !opts.keepRepsInfo) {
-      this._opts.reps = null;
-      this._opts._objects = null;
-    }
+  this._stopAnimation();
+
+  if (!opts || !opts.keepRepsInfo) {
+    this._opts.reps = null;
+    this._opts._objects = null;
   }
 
   if (dataSource.id === 'Complex') {
@@ -100562,13 +101062,13 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     } else if (opts.amberFileName) {
       complex.name = complex.name || removeExtension(opts.amberFileName).toUpperCase();
     } else {
-      complex.name = 'Dynamic ' + opts.fileType + ' molecule';
+      complex.name = "Dynamic ".concat(opts.fileType, " molecule");
     }
 
     visualName = this._addVisual(new ComplexVisual(complex.name, complex));
     this._curVisualName = visualName;
     var desc = this.info();
-    this.logger.info('Parsed ' + opts.fileName + ' (' + desc.atoms + ' atoms, ' + desc.bonds + ' bonds, ' + desc.residues + ' residues, ' + desc.chains + ' chains).');
+    this.logger.info("Parsed ".concat(opts.fileName, " (").concat(desc.atoms, " atoms, ").concat(desc.bonds, " bonds, ").concat(desc.residues, " residues, ").concat(desc.chains, " chains)."));
 
     if (lodash.isNumber(this._opts.unit)) {
       complex.setCurrentUnit(this._opts.unit);
@@ -100692,7 +101192,7 @@ Miew.prototype.loadEd = function (source) {
     return parser.parse().then(function (dataSource) {
       _this5._onLoadEd(dataSource);
     });
-  }).catch(function (error) {
+  })["catch"](function (error) {
     _this5.logger.error('Could not load ED data');
 
     _this5.logger.debug(error);
@@ -100723,7 +101223,8 @@ Miew.prototype._needRebuild = function () {
 Miew.prototype._rebuildObjects = function () {
   var self = this;
   var gfx = this._gfx;
-  var i, n; // remove old object geometry
+  var i;
+  var n; // remove old object geometry
 
   var toRemove = [];
 
@@ -100739,7 +101240,7 @@ Miew.prototype._rebuildObjects = function () {
     toRemove[i].parent.remove(toRemove[i]);
   }
 
-  setTimeout(function _rebuild() {
+  setTimeout(function () {
     var objList = self._objects;
 
     for (i = 0, n = objList.length; i < n; ++i) {
@@ -100765,8 +101266,8 @@ Miew.prototype.changeUnit = function (unitIdx, name) {
 
   function currentUnitInfo() {
     var unit = visual ? visual.getComplex().getCurrentUnit() : 0;
-    var type = unit > 0 ? 'Bio molecule ' + unit : 'Asymmetric unit';
-    return 'Current unit: ' + unit + ' (' + type + ')';
+    var type = unit > 0 ? "Bio molecule ".concat(unit) : 'Asymmetric unit';
+    return "Current unit: ".concat(unit, " (").concat(type, ")");
   }
 
   if (unitIdx === undefined) {
@@ -100850,7 +101351,7 @@ Miew.prototype._refreshTitle = function (appendix) {
   if (visual) {
     title = visual.getComplex().name;
     var rep = visual.repGet(visual.repCurrent());
-    title += rep ? ' – ' + rep.mode.name + ' Mode' : '';
+    title += rep ? " \u2013 ".concat(rep.mode.name, " Mode") : '';
   } else {
     title = Object.keys(this._visuals).length > 0 ? 'Unknown' : 'No Data';
   }
@@ -100877,7 +101378,7 @@ Miew.prototype._extractRepresentation = function () {
     }
 
     var selector = visual.buildSelectorFromMask(1 << visual.getSelectionBit());
-    var defPreset = settings.now.presets.default;
+    var defPreset = settings.now.presets["default"];
     var idx = visual.repAdd({
       selector: selector,
       mode: defPreset[0].mode.id,
@@ -100933,7 +101434,7 @@ Miew.prototype.applyPreset = function (preset) {
     reps = presets[settings.now.preset];
 
     if (!reps) {
-      this.logger.warn('Unknown preset "' + settings.now.preset + '"');
+      this.logger.warn("Unknown preset \"".concat(settings.now.preset, "\""));
     }
   }
 
@@ -101417,7 +101918,8 @@ Miew.prototype._onKeyUp = function (event) {
 Miew.prototype._updateInfoPanel = function () {
   var info = this._msgAtomInfo.getElementsByTagName('p')[0];
 
-  var atom, residue;
+  var atom;
+  var residue;
   var count = 0;
 
   this._forEachComplexVisual(function (visual) {
@@ -101552,9 +102054,9 @@ Miew.prototype.setPivotResidue = function (residue) {
   if (residue._controlPoint) {
     pos.copy(residue._controlPoint);
   } else {
-    var x = 0,
-        y = 0,
-        z = 0;
+    var x = 0;
+    var y = 0;
+    var z = 0;
     var amount = residue._atoms.length;
 
     for (var i = 0; i < amount; ++i) {
@@ -101699,7 +102201,7 @@ Miew.prototype.save = function (opts) {
   this._export(opts.fileType).then(function (dataString) {
     var filename = _this7._visuals[_this7._curVisualName]._complex.name;
     utils.download(dataString, filename, opts.fileType);
-  }).catch(function (error) {
+  })["catch"](function (error) {
     _this7.logger.error('Could not export data');
 
     _this7.logger.debug(error);
@@ -101729,7 +102231,7 @@ Miew.prototype._tweakResolution = function () {
 
 Miew.prototype._autoChangeResolution = function (resolution) {
   if (resolution !== settings.now.resolution) {
-    this.logger.report('Your rendering resolution was changed to "' + resolution + '" for best performance.');
+    this.logger.report("Your rendering resolution was changed to \"".concat(resolution, "\" for best performance."));
   }
 
   settings.now.resolution = resolution;
@@ -101754,7 +102256,7 @@ Miew.prototype.restoreSettings = function () {
     var diffs = cookie ? JSON.parse(cookie) : {};
     this.settings.applyDiffs(diffs, true);
   } catch (e) {
-    this.logger.error('Cookies parse error: ' + e.message);
+    this.logger.error("Cookies parse error: ".concat(e.message));
   }
 };
 /**
@@ -101856,7 +102358,7 @@ Miew.prototype.addObject = function (objData, bThrow) {
   }
 
   if (Ctor === null) {
-    throw new Error('Unknown scene object type - ' + objData.type);
+    throw new Error("Unknown scene object type - ".concat(objData.type));
   }
 
   try {
@@ -101865,7 +102367,7 @@ Miew.prototype.addObject = function (objData, bThrow) {
     this._addSceneObject(newObj);
   } catch (error) {
     if (!bThrow) {
-      this.logger.debug('Error during scene object creation: ' + error.message);
+      this.logger.debug("Error during scene object creation: ".concat(error.message));
     } else {
       throw error;
     }
@@ -101912,7 +102414,7 @@ Miew.prototype.removeObject = function (index) {
   var obj = this._objects[index];
 
   if (!obj) {
-    throw new Error('Scene object with index ' + index + ' does not exist');
+    throw new Error("Scene object with index ".concat(index, " does not exist"));
   }
 
   obj.destroy();
@@ -102348,7 +102850,7 @@ Miew.prototype.view = function (expression) {
     // HACK: old non-versioned view is the 0th version
     if (expression.length === 40) {
       // TODO: remove when db migration is finished
-      expression = '0' + expression;
+      expression = "0".concat(expression);
     }
 
     var version = expression[0];
@@ -102360,7 +102862,7 @@ Miew.prototype.view = function (expression) {
         transform[3] /= 8.0;
       } else {
         // do nothing
-        self.logger.warn('Encoded view version mismatch, stored as ' + version + ' vs ' + VIEW_VERSION + ' expected');
+        self.logger.warn("Encoded view version mismatch, stored as ".concat(version, " vs ").concat(VIEW_VERSION, " expected"));
         return;
       }
     }
@@ -102377,17 +102879,17 @@ Miew.prototype.view = function (expression) {
       dstView.position.sub(self._getComplexVisual().position);
     }
 
-    dstView.scale = transform[3];
+    dstView.scale = transform[3]; // eslint-disable-line prefer-destructuring
+
     dstView.orientation.setFromEuler(new Euler(transform[4], transform[5], transform[6], eulerOrder));
     viewInterpolator.setup(srcView, dstView);
   }
 
   if (typeof expression === 'undefined') {
     return encode();
-  } else {
-    decode();
   }
 
+  decode();
   return expression;
 };
 /*
@@ -102405,7 +102907,7 @@ Miew.prototype._updateView = function () {
 
   if (!viewInterpolator.isMoving()) {
     return;
-  } //var curr = viewInterpolator.createView();
+  } // var curr = viewInterpolator.createView();
 
 
   var res = viewInterpolator.getCurrentView();
@@ -102581,321 +103083,6 @@ Miew.prototype.dssp = function (complexName) {
   });
 };
 
-var rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
-var rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
-var reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
-
-function resolveSourceShortcut(source, opts) {
-  if (!lodash.isString(source)) {
-    return source;
-  } // e.g. "mmtf:1CRN"
-
-
-  var matchesPdbId = rePdbId.exec(source);
-
-  if (matchesPdbId) {
-    var _matchesPdbId = _slicedToArray(matchesPdbId, 3),
-        _matchesPdbId$ = _matchesPdbId[1],
-        format = _matchesPdbId$ === void 0 ? 'pdb' : _matchesPdbId$,
-        id = _matchesPdbId[2];
-
-    format = format.toLowerCase();
-    id = id.toUpperCase();
-
-    switch (format) {
-      case 'pdb':
-        source = "http://files.rcsb.org/download/".concat(id, ".pdb");
-        break;
-
-      case 'cif':
-        source = "http://files.rcsb.org/download/".concat(id, ".cif");
-        break;
-
-      case 'mmtf':
-        source = "http://mmtf.rcsb.org/v1.0/full/".concat(id);
-        break;
-
-      case 'ccp4':
-        source = "https://www.ebi.ac.uk/pdbe/coordinates/files/".concat(id.toLowerCase(), ".ccp4");
-        break;
-
-      default:
-        throw new Error('Unexpected data format shortcut');
-    }
-
-    opts.fileType = format;
-    opts.fileName = "".concat(id, ".").concat(format);
-    opts.sourceType = 'url';
-    return source;
-  } // e.g. "pc:aspirin"
-
-
-  var matchesPubchem = rePubchem.exec(source);
-
-  if (matchesPubchem) {
-    var compound = matchesPubchem[1].toLowerCase();
-    source = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/".concat(compound, "/JSON?record_type=3d");
-    opts.fileType = 'pubchem';
-    opts.fileName = "".concat(compound, ".json");
-    opts.sourceType = 'url';
-    return source;
-  } // otherwise is should be an URL
-
-
-  if (opts.sourceType === 'url' || opts.sourceType === undefined) {
-    opts.sourceType = 'url'; // e.g. "./data/1CRN.pdb"
-
-    if (!reUrlScheme.test(source)) {
-      source = utils.resolveURL(source);
-    }
-  }
-
-  return source;
-}
-
-function updateBinaryMode(opts) {
-  var binary = opts.binary; // detect by format
-
-  if (opts.fileType !== undefined) {
-    var TheParser = lodash.head(io.parsers.find({
-      format: opts.fileType
-    }));
-
-    if (TheParser) {
-      binary = TheParser.binary || false;
-    } else {
-      throw new Error('Could not find suitable parser for this format');
-    }
-  } // detect by file extension
-
-
-  if (binary === undefined && opts.fileExt !== undefined) {
-    var _TheParser = lodash.head(io.parsers.find({
-      ext: opts.fileExt
-    }));
-
-    if (_TheParser) {
-      binary = _TheParser.binary || false;
-    }
-  } // temporary workaround for animation
-
-
-  if (opts.fileExt !== undefined && opts.fileExt.toLowerCase() === '.man') {
-    opts.binary = true;
-    opts.animation = true; // who cares?
-  } // update if detected
-
-
-  if (binary !== undefined) {
-    if (opts.binary !== undefined && opts.binary !== binary) {
-      opts.context.logger.warn('Overriding incorrect binary mode');
-    }
-  }
-
-  opts.binary = binary || false;
-}
-
-function _fetchData(source, opts, job) {
-  return new Promise(function (resolve) {
-    if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
-    } // allow for source shortcuts
-
-
-    source = resolveSourceShortcut(source, opts); // detect a proper loader
-
-    var TheLoader = lodash.head(io.loaders.find({
-      type: opts.sourceType,
-      source: source
-    }));
-
-    if (!TheLoader) {
-      throw new Error('Could not find suitable loader for this source');
-    } // split file name
-
-
-    var fileName = opts.fileName || TheLoader.extractName(source);
-
-    if (fileName) {
-      var _utils$splitFileName = utils.splitFileName(fileName),
-          _utils$splitFileName2 = _slicedToArray(_utils$splitFileName, 2),
-          name = _utils$splitFileName2[0],
-          fileExt = _utils$splitFileName2[1];
-
-      lodash.defaults(opts, {
-        name: name,
-        fileExt: fileExt,
-        fileName: fileName
-      });
-    } // should it be text or binary?
-
-
-    updateBinaryMode(opts); // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
-    // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
-    // all hacks and everybody's happy.
-
-    var newOptions = lodash.get(opts, 'preset.expression');
-
-    if (!lodash.isUndefined(newOptions)) {
-      newOptions = JSON.parse(newOptions);
-
-      if (newOptions && newOptions.settings) {
-        var keys = ['singleUnit', 'draft.waterBondingHack'];
-
-        for (var keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
-          var key = keys[keyIndex];
-
-          var value = lodash.get(newOptions.settings, key);
-
-          if (!lodash.isUndefined(value)) {
-            settings.set(key, value);
-          }
-        }
-      }
-    } // create a loader
-
-
-    var loader = new TheLoader(source, opts);
-    loader.context = opts.context;
-    job.addEventListener('cancel', function () {
-      return loader.abort();
-    });
-    loader.addEventListener('progress', function (event) {
-      if (event.lengthComputable && event.total > 0) {
-        reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
-      } else {
-        reportProgress(loader.logger, 'Fetching');
-      }
-    });
-    console.time('fetch');
-    var promise = loader.load().then(function (data) {
-      console.timeEnd('fetch');
-      opts.context.logger.info('Fetching finished');
-      job.notify({
-        type: 'fetchingFinished',
-        data: data
-      });
-      return data;
-    }).catch(function (error) {
-      console.timeEnd('fetch');
-      opts.context.logger.debug(error.message);
-
-      if (error.stack) {
-        opts.context.logger.debug(error.stack);
-      }
-
-      opts.context.logger.error('Fetching failed');
-      job.notify({
-        type: 'fetchingFinished',
-        error: error
-      });
-      throw error;
-    });
-    resolve(promise);
-  });
-}
-
-function _convertData(data, opts, job) {
-  return new Promise(function (resolve, reject) {
-    if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
-    }
-
-    job.notify({
-      type: 'convert'
-    });
-
-    if (opts.mdFile) {
-      var byteNumbers = new Array(data.length);
-
-      for (var i = 0; i < data.length; i++) {
-        byteNumbers[i] = data.charCodeAt(i);
-      }
-
-      var bytes = new Uint8Array(byteNumbers);
-      var blob = new File([bytes], opts.fileName);
-      console.time('convert');
-      Miew.prototype.srvTopologyConvert(blob, opts.mdFile, function (success, newData, message) {
-        console.timeEnd('convert');
-
-        if (success) {
-          opts.converted = true;
-          opts.amberFileName = opts.fileName;
-          opts.convertedFile = new File([bytes], opts.fileName);
-          opts.fileName = null;
-          opts.fileType = 'pdb';
-          job.notify({
-            type: 'convertingFinished'
-          });
-          resolve(newData);
-        } else {
-          opts.converted = false;
-          logger.error(message);
-          opts.error = message;
-          job.notify({
-            type: 'convertingFinished',
-            error: message
-          });
-          reject(new Error(message));
-        }
-      });
-    } else {
-      opts.converted = true;
-      resolve(data);
-    }
-  });
-}
-
-function _parseData(data, opts, job) {
-  if (job.shouldCancel()) {
-    return Promise.reject(new Error('Operation cancelled'));
-  }
-
-  job.notify({
-    type: 'parse'
-  });
-
-  var TheParser = lodash.head(io.parsers.find({
-    format: opts.fileType,
-    ext: opts.fileExt,
-    data: data
-  }));
-
-  if (!TheParser) {
-    return Promise.reject(new Error('Could not find suitable parser'));
-  }
-
-  var parser = new TheParser(data, opts);
-  parser.context = opts.context;
-  job.addEventListener('cancel', function () {
-    return parser.abort();
-  });
-  console.time('parse');
-  return parser.parse().then(function (dataSet) {
-    console.timeEnd('parse');
-    job.notify({
-      type: 'parsingFinished',
-      data: dataSet
-    });
-    return dataSet;
-  }).catch(function (error) {
-    console.timeEnd('parse');
-    opts.error = error;
-    opts.context.logger.debug(error.message);
-
-    if (error.stack) {
-      opts.context.logger.debug(error.stack);
-    }
-
-    opts.context.logger.error('Parsing failed');
-    job.notify({
-      type: 'parsingFinished',
-      error: error
-    });
-    throw error;
-  });
-}
-
 Miew.prototype.exportCML = function () {
   var self = this;
 
@@ -103005,7 +103192,7 @@ Miew.prototype.motm = function () {
       var curChainName = complex._chains[i]._name;
       var curChainColor = palette.getChainColor(curChainName);
       rep[i] = {
-        selector: 'chain ' + curChainName,
+        selector: "chain ".concat(curChainName),
         mode: 'VW',
         colorer: ['CB', {
           color: curChainColor,
@@ -103017,11 +103204,9 @@ Miew.prototype.motm = function () {
 
     visual.resetReps(rep);
   });
-}; ////////////////////////////////////////////////////////////////////////////
-// Additional exports
+};
 
-
-Miew.prototype.VERSION = "0.7.21"; // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
+Miew.prototype.VERSION = "0.7.22"; // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew,
 /** @lends Miew */
@@ -104199,7 +104384,7 @@ var help = {
     URL: {
       $help: 'url to source file'
     },
-    'f': {
+    f: {
       $help: ['open file system dialog to fetch local file', 'optionally you can determine trajectory file', 'via URL for *.top model']
     }
   },
@@ -104254,7 +104439,7 @@ var help = {
     $help: 'build help str',
     add: {
       $help: 'build.add',
-      new: {
+      "new": {
         $help: ['add.new', 'add.new new line 1', 'add.new new line 2', 'add.new new line 3']
       }
     },
@@ -104374,9 +104559,9 @@ var help = {
 function parseRange(node) {
   if (node instanceof Array) {
     return new selectors.Range(node[0], node[1]);
-  } else {
-    return new selectors.Range(node, node);
   }
+
+  return new selectors.Range(node, node);
 }
 
 function parseRangeList(node) {
@@ -104451,7 +104636,7 @@ var selectors$4 = Miew.chem.selectors,
 
 function None() {}
 
-var NULL$1 = function () {
+var NULL = function () {
   var obj = new None();
   return function () {
     return obj;
@@ -104477,7 +104662,7 @@ RepresentationMap.prototype.add = function (strId, index) {
     }
   }
 
-  return 'Representation ' + strId + ' successfully added';
+  return "Representation ".concat(strId, " successfully added");
 };
 
 RepresentationMap.prototype.remove = function (index) {
@@ -104508,7 +104693,7 @@ RepresentationMap.prototype.clear = function () {
 
 var representationsStorage = new RepresentationMap();
 
-function CLIUtils() {} //repIndexOrRepMap could be RepresentationMap or index
+function CLIUtils() {} // repIndexOrRepMap could be RepresentationMap or index
 
 
 CLIUtils.prototype.list = function (miew, repMap, key) {
@@ -104538,17 +104723,17 @@ CLIUtils.prototype.listRep = function (miew, repMap, repIndex, key) {
 
   var index = repIndex;
   var repName = repMap.get(index);
-  var mode = rep.mode;
+  var mode = rep.mode,
+      colorer = rep.colorer;
   var selectionStr = rep.selectorString;
-  var colorer = rep.colorer;
   var material = rep.materialPreset;
-  ret += '#' + index + ' : ' + mode.name + (repName === '<no name>' ? '' : ', ' + repName) + '\n';
+  ret += "#".concat(index, " : ").concat(mode.name).concat(repName === '<no name>' ? '' : ", ".concat(repName), "\n");
 
   if (key !== undefined) {
-    ret += '    selection : "' + selectionStr + '"\n';
-    ret += '    mode      : (' + mode.id + '), ' + mode.name + '\n';
-    ret += '    colorer   : (' + colorer.id + '), ' + colorer.name + '\n';
-    ret += '    material  : (' + material.id + '), ' + material.name + '\n';
+    ret += "    selection : \"".concat(selectionStr, "\"\n");
+    ret += "    mode      : (".concat(mode.id, "), ").concat(mode.name, "\n");
+    ret += "    colorer   : (".concat(colorer.id, "), ").concat(colorer.name, "\n");
+    ret += "    material  : (".concat(material.id, "), ").concat(material.name, "\n");
   }
 
   return ret;
@@ -104559,7 +104744,7 @@ CLIUtils.prototype.listSelector = function (miew, context) {
 
   for (var k in context) {
     if (context.hasOwnProperty(k)) {
-      ret += k + ' : "' + context[k] + '"\n';
+      ret += "".concat(k, " : \"").concat(context[k], "\"\n");
     }
   }
 
@@ -104576,7 +104761,7 @@ CLIUtils.prototype.listObjs = function (miew) {
   var strList = [];
 
   for (var i = 0, n = objs.length; i < n; ++i) {
-    strList[i] = '' + i + ': ' + objs[i].toString();
+    strList[i] = "".concat(i, ": ").concat(objs[i].toString());
   }
 
   return strList.join('\n');
@@ -104592,12 +104777,12 @@ CLIUtils.prototype.joinHelpStr = function (helpData) {
 
 CLIUtils.prototype.help = function (path) {
   if (lodash.isUndefined(path)) {
-    return this.joinHelpStr(help.$help) + '\n' + lodash.slice(lodash.sortBy(lodash.keys(help)), 1).join(', ') + '\n';
+    return "".concat(this.joinHelpStr(help.$help), "\n").concat(lodash.slice(lodash.sortBy(lodash.keys(help)), 1).join(', '), "\n");
   }
 
   var helpItem = lodash.get(help, path);
 
-  return lodash.isUndefined(helpItem) ? this.help() : this.joinHelpStr(helpItem.$help) + '\n';
+  return lodash.isUndefined(helpItem) ? this.help() : "".concat(this.joinHelpStr(helpItem.$help), "\n");
 };
 
 CLIUtils.prototype.load = function (miew, arg) {
@@ -104613,6 +104798,23 @@ CLIUtils.prototype.load = function (miew, arg) {
 
   miew.load(arg).then(finish, finish);
 };
+
+function keyRemap(key) {
+  var keys = {
+    s: 'selector',
+    m: 'mode',
+    c: 'colorer',
+    mt: 'material',
+    mode: 'modes',
+    color: 'colorers',
+    colorer: 'colorers',
+    select: 'selector',
+    material: 'materials',
+    selector: 'selector'
+  };
+  var ans = keys[key];
+  return ans === undefined ? key : ans;
+}
 
 CLIUtils.prototype.checkArg = function (key, arg, modificate) {
   if (key !== undefined && arg !== undefined) {
@@ -104634,12 +104836,12 @@ CLIUtils.prototype.checkArg = function (key, arg, modificate) {
     }
 
     var modificators = {
-      'colorers': colorers$1,
-      'modes': modes$1,
-      'materials': materials$1
+      colorers: colorers$1,
+      modes: modes$1,
+      materials: materials$1
     };
-    var modificator = key,
-        temp;
+    var modificator = key;
+    var temp;
 
     while (modificator !== temp) {
       temp = modificator;
@@ -104648,7 +104850,7 @@ CLIUtils.prototype.checkArg = function (key, arg, modificate) {
 
     if (modificators[modificator].get(arg) === undefined) {
       var exc = {
-        message: arg + ' is not existed in ' + modificator
+        message: "".concat(arg, " is not existed in ").concat(modificator)
       };
       throw exc;
     }
@@ -104656,7 +104858,7 @@ CLIUtils.prototype.checkArg = function (key, arg, modificate) {
     return arg;
   }
 
-  return NULL$1;
+  return NULL;
 };
 
 CLIUtils.prototype.propagateProp = function (path, arg) {
@@ -104667,7 +104869,7 @@ CLIUtils.prototype.propagateProp = function (path, arg) {
 
     if (adapter === undefined) {
       var pathExc = {
-        message: path + ' is not existed'
+        message: "".concat(path, " is not existed")
       };
       throw pathExc;
     }
@@ -104681,20 +104883,20 @@ CLIUtils.prototype.propagateProp = function (path, arg) {
         var val = palettes$1.get(settings$1.now.palette).getNamedColor(arg, true);
 
         if (val !== undefined) {
-          arg = '0x' + val.toString(16);
+          arg = "0x".concat(val.toString(16));
         }
       } else {
-        arg = '0x' + arg.toString(16);
+        arg = "0x".concat(arg.toString(16));
       }
     }
 
     if (path.endsWith('.template')) {
-      arg = arg.replace(/\\n/g, '\n'); //NOSONAR
+      arg = arg.replace(/\\n/g, '\n'); // NOSONAR
     }
 
     if (arg !== undefined && adapter(arg) !== arg && adapter(arg) !== arg > 0) {
       argExc = {
-        message: path + ' must be a "' + _typeof(lodash.get(settings$1.defaults, path)) + '"'
+        message: "".concat(path, " must be a \"").concat(_typeof(lodash.get(settings$1.defaults, path)), "\"")
       };
       throw argExc;
     }
@@ -104896,15 +105098,13 @@ SRVProxy.prototype.requestPresetId = function (miew, path, done, fail) {
     self.finish(miew);
   }
 
-  function donePdb(id) {
-    miew.srvPresetList(id, donePresetList, failPdb);
-  }
-
   function donePresetList(presetList) {
     if (presetList instanceof Array) {
-      var availableItems = lodash.filter(presetList, function (item) {
+      var suits = function suits(item) {
         return item.name.toLowerCase() === pathParts[1].toLowerCase() || item.id === Number(pathParts[1]);
-      });
+      };
+
+      var availableItems = lodash.filter(presetList, suits);
 
       if (availableItems.length < 1) {
         if (fail !== undefined) {
@@ -104926,6 +105126,10 @@ SRVProxy.prototype.requestPresetId = function (miew, path, done, fail) {
     } else {
       self.finish(miew);
     }
+  }
+
+  function donePdb(id) {
+    miew.srvPresetList(id, donePresetList, failPdb);
   }
 
   if (pathParts.length !== 2) {
@@ -104994,18 +105198,20 @@ SRVProxy.prototype.listScenario = function (miew, echo, error, name) {
         var drawExpand = name === '-e' || scenarioList[i].id === Number(name) || scenarioList[i].name === name;
 
         if (draw || drawExpand) {
-          res += 'id : ' + scenarioList[i].id + ', name : ' + scenarioList[i].name + '\n';
+          res += "id : ".concat(scenarioList[i].id, ", name : ").concat(scenarioList[i].name, "\n");
 
           if (drawExpand) {
-            var data = JSON.parse(scenarioList[i].script).data;
+            var _JSON$parse = JSON.parse(scenarioList[i].script),
+                data = _JSON$parse.data;
+
             res += 'scenario : \n';
 
             for (var j = 0, m = data.length; j < m; ++j) {
-              res += '    index : ' + j + '\n';
-              res += '        pdbId       : ' + data[j].pdbId + '\n';
-              res += '        presetId    : ' + data[j].presetId + '\n';
-              res += '        delay       : ' + data[j].delay + '\n';
-              res += '        description : ' + data[j].description + '\n';
+              res += "    index : ".concat(j, "\n");
+              res += "        pdbId       : ".concat(data[j].pdbId, "\n");
+              res += "        presetId    : ".concat(data[j].presetId, "\n");
+              res += "        delay       : ".concat(data[j].delay, "\n");
+              res += "        description : ".concat(data[j].description, "\n");
             }
           }
         }
@@ -105028,23 +105234,27 @@ SRVProxy.prototype.listScenario = function (miew, echo, error, name) {
   miew.srvScenarioList(done, fail);
 };
 
-SRVProxy.prototype.addScenarioItem = function (miew, echo, error) {
+SRVProxy.prototype.addScenarioItem = function () {
+  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  var miew = args.miew,
+      echo = args.echo,
+      error = args.error;
   var self = this;
-  var selfArguments = arguments;
   this.init(miew, echo);
   miew.awaitWhileCMDisInProcess();
 
   function doneFindPdb(id) {
     if (id >= 0) {
-      selfArguments[3] = id;
-      self.addScenarioItem.apply(self, selfArguments);
+      self.addScenarioItem.apply(self, args.concat([id]));
     }
   }
 
   function doneFindPreset(id) {
     if (id >= 0) {
-      selfArguments[4] = id;
-      self.addScenarioItem.apply(self, selfArguments);
+      self.addScenarioItem.apply(self, args.concat([id]));
     }
   }
 
@@ -105077,16 +105287,16 @@ SRVProxy.prototype.addScenarioItem = function (miew, echo, error) {
     return undefined;
   }
 
-  if (arguments.length === 7) {
-    var _pdb = arguments[3];
-    var _preset = arguments[4];
-    var _delay = arguments[5];
-    var _desc = arguments[6];
+  if (args.length === 7) {
+    var _pdb = args[3],
+        _preset = args[4],
+        _delay = args[5],
+        _desc = args[6];
 
     if (lodash.isString(_pdb)) {
       this.requestPdbID(miew, _pdb, doneFindPdb, fail);
     } else if (lodash.isString(_preset)) {
-      this.requestPresetId(miew, _pdb + '/' + _preset, doneFindPreset, fail);
+      this.requestPresetId(miew, "".concat(_pdb, "/").concat(_preset), doneFindPreset, fail);
     } else if (typeof _pdb === 'number' && typeof _preset === 'number') {
       doAddItem(_pdb, _preset, _delay, _desc);
     } else {
@@ -105095,7 +105305,7 @@ SRVProxy.prototype.addScenarioItem = function (miew, echo, error) {
       return undefined;
     }
   } else if (arguments.length === 5) {
-    //proceed with pdb and preset id's
+    // proceed with pdb and preset id's
     error('not supported now');
     self.finish(miew);
     return undefined;
@@ -105125,7 +105335,7 @@ SRVProxy.prototype.init = function (miew, echo) {
 
 SRVProxy.prototype.finish = function (miew) {
   miew.finishAwaitingCMDInProcess();
-}; //repIndexOrRepMap could be RepresentationMap or index
+}; // repIndexOrRepMap could be RepresentationMap or index
 
 
 SRVProxy.prototype.fileList = function (miew, echo, error, fileId, idStarts) {
@@ -105136,7 +105346,7 @@ SRVProxy.prototype.fileList = function (miew, echo, error, fileId, idStarts) {
     if (list !== undefined) {
       for (var i = 0; i < list.length; i++) {
         if (idStarts === undefined || list[i].name.toLowerCase().startsWith(idStarts.toLowerCase())) {
-          echo(list[i].name + ', id= ' + list[i].id);
+          echo("".concat(list[i].name, ", id= ").concat(list[i].id));
         }
       }
     }
@@ -105146,7 +105356,7 @@ SRVProxy.prototype.fileList = function (miew, echo, error, fileId, idStarts) {
 
   function fail(message) {
     if (message !== undefined) {
-      echo(message + '\n');
+      echo("".concat(message, "\n"));
     }
 
     self.finish(miew);
@@ -105161,7 +105371,17 @@ SRVProxy.prototype.fileList = function (miew, echo, error, fileId, idStarts) {
   }
 };
 
-SRVProxy.prototype.callSrvFunc = function (miew, echo, error, func) {
+SRVProxy.prototype.callSrvFunc = function () {
+  for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+    args[_key2] = arguments[_key2];
+  }
+
+  var miew = args.miew,
+      echo = args.echo,
+      error = args.error,
+      funcName = args.funcName,
+      rest = _objectWithoutProperties(args, ["miew", "echo", "error", "funcName"]);
+
   var self = this;
   this.init(miew, echo);
 
@@ -105182,29 +105402,10 @@ SRVProxy.prototype.callSrvFunc = function (miew, echo, error, func) {
   }
 
   miew.awaitWhileCMDisInProcess();
-  func = miew[func];
+  var func = miew[funcName];
 
-  if (func !== undefined) {
-    switch (arguments.length) {
-      case 4:
-        func.call(miew, done, fail);
-        break;
-
-      case 5:
-        func.call(miew, arguments[4], done, fail);
-        break;
-
-      case 6:
-        func.call(miew, arguments[4], arguments[5], done, fail);
-        break;
-
-      case 7:
-        func.call(miew, arguments[4], arguments[5], arguments[6], done, fail);
-        break;
-
-      default:
-        this.finish(miew);
-    }
+  if (func !== undefined && args.length >= 4) {
+    func.call.apply(func, [miew].concat(_toConsumableArray(rest), [done, fail]));
   } else {
     this.finish(miew);
   }
@@ -105224,11 +105425,21 @@ SRVProxy.prototype.coroutineWithPresetPath = function (miew, echo, error, path, 
     self.finish(miew);
   }
 
+  function fail(message) {
+    if (message !== undefined) {
+      error(message);
+    }
+
+    self.finish(miew);
+  }
+
   function donePresetList(presetList) {
     if (presetList instanceof Array) {
-      var availableItems = lodash.filter(presetList, function (item) {
+      var suits = function suits(item) {
         return item.name.toLowerCase() === pathParts[1].toLowerCase() || item.id === Number(pathParts[1]);
-      });
+      };
+
+      var availableItems = lodash.filter(presetList, suits);
 
       if (availableItems.length < 1) {
         error('Preset not found');
@@ -105262,14 +105473,6 @@ SRVProxy.prototype.coroutineWithPresetPath = function (miew, echo, error, path, 
     }
   }
 
-  function fail(message) {
-    if (message !== undefined) {
-      error(message);
-    }
-
-    self.finish(miew);
-  }
-
   if (pathParts.length !== 2) {
     error('Path can has 2 levels only (pdb/preset)');
     self.finish(miew);
@@ -105278,9 +105481,17 @@ SRVProxy.prototype.coroutineWithPresetPath = function (miew, echo, error, path, 
   }
 };
 
-SRVProxy.prototype.coroutineWithFileName = function (miew, echo, error, name, callBack) {
+SRVProxy.prototype.coroutineWithFileName = function () {
+  for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+    args[_key3] = arguments[_key3];
+  }
+
+  var miew = args.miew,
+      echo = args.echo,
+      error = args.error,
+      name = args.name,
+      callBack = args.callBack;
   var self = this;
-  var selfArguments = arguments;
   this.init(miew);
   miew.awaitWhileCMDisInProcess();
   var pathParts = name.split('/');
@@ -105293,6 +105504,14 @@ SRVProxy.prototype.coroutineWithFileName = function (miew, echo, error, name, ca
     self.finish(miew);
   }
 
+  function fail(message) {
+    if (message !== undefined) {
+      error(message);
+    }
+
+    self.finish(miew);
+  }
+
   function doneFindTopology(topologyList) {
     if (topologyList instanceof Array) {
       if (topologyList.length < 1) {
@@ -105300,35 +105519,27 @@ SRVProxy.prototype.coroutineWithFileName = function (miew, echo, error, name, ca
       } else if (topologyList.length > 1) {
         error('There are two or more files, please specify one by file_id');
       } else {
-        switch (selfArguments.length) {
+        switch (args.length) {
           case 5:
             callBack.call(miew, topologyList[0].id, done, fail);
             break;
 
           case 6:
-            callBack.call(miew, topologyList[0].id, selfArguments[5], done, fail);
+            callBack.call(miew, topologyList[0].id, args[5], done, fail);
             break;
 
           case 9:
-            callBack.call(selfArguments[5], selfArguments[6], selfArguments[7], selfArguments[8], topologyList[0].id);
+            callBack.call(args[5], args[6], args[7], args[8], topologyList[0].id);
             break;
 
           case 10:
-            callBack.call(selfArguments[5], selfArguments[6], selfArguments[7], selfArguments[8], topologyList[0].id, selfArguments[9]);
+            callBack.call(args[5], args[6], args[7], args[8], topologyList[0].id, args[9]);
             break;
 
           default:
             self.finish(miew);
         }
       }
-    }
-
-    self.finish(miew);
-  }
-
-  function fail(message) {
-    if (message !== undefined) {
-      error(message);
     }
 
     self.finish(miew);
@@ -105350,27 +105561,12 @@ function CreateObjectPair(a, b) {
   return obj;
 }
 
-function keyRemap(key) {
-  var keys = {
-    s: 'selector',
-    m: 'mode',
-    c: 'colorer',
-    mt: 'material',
-    mode: 'modes',
-    color: 'colorers',
-    colorer: 'colorers',
-    select: 'selector',
-    material: 'materials',
-    selector: 'selector'
-  };
-  var ans = keys[key];
-  return ans === undefined ? key : ans;
-}
-
 function ArgList(arg) {
   if (arg instanceof this.constructor) {
     return arg;
-  } else if (arg instanceof Array) {
+  }
+
+  if (arg instanceof Array) {
     this._values = arg.slice(0);
   } else if (arg) {
     this._values = [arg];
@@ -105401,7 +105597,7 @@ ArgList.prototype.toJSO = function (cliUtils, cmd, arg) {
   var list = this._values;
 
   for (var i = 0, n = list.length; i < n; ++i) {
-    lodash.set(res, list[i].id, cliUtils.propagateProp(keyRemap(cmd) + '.' + arg + '.' + list[i].id, list[i].val));
+    lodash.set(res, list[i].id, cliUtils.propagateProp("".concat(keyRemap(cmd), ".").concat(arg, ".").concat(list[i].id), list[i].val));
   }
 
   return res;
@@ -105425,7 +105621,7 @@ cliutils.CreateObjectPair = CreateObjectPair;
 cliutils.keyRemap = keyRemap;
 cliutils.Context = selectors$4.Context;
 cliutils.ClearContext = selectors$4.ClearContext;
-cliutils.NULL = NULL$1;
+cliutils.NULL = NULL;
 
 cliutils.notimplemented = function () {
   return this.NULL;
