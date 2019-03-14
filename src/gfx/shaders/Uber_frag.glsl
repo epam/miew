@@ -390,8 +390,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
         vec4 vUv = ((projectionMatrix * vec4(vViewPosition, 1.0)) + 1.0) / 2.0;
         vec2 vUvNoise = vUv.xy / srcTexelSize * noiseTexelSize;
 
-        vec2 randN = texture2D(noiseTex, vUvNoise).rg;
-        vec2 noiseVec = normalize(randN);
+        vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);
         mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);
 
         //#pragma unroll_loop
