@@ -196,7 +196,27 @@ varying vec3 vViewPosition;
   }
 #endif
 
-/////////////////////////////////////////// Lighting ////////////////////////////////////////////////
+///////////////////////////////////// Pack and unpack ///////////////////////////////////////////////
+const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
+const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
+
+const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
+
+
+const float ShiftRight8 = 1. / 256.;
+
+vec4 packDepthToRGBA( const in float v ) {
+  vec4 r = vec4( fract( v * PackFactors ), v );
+  r.yzw -= r.xyz * ShiftRight8; // tidy overflow
+  return r * PackUpscale;
+}
+
+float unpackRGBAToDepth( const in vec4 v ) {
+  return dot( v, UnpackFactors );
+}
+
+////////////////////////////////////////// All Lighting /////////////////////////////////////////////////
 #ifdef TOON_SHADING
   #define LOW_TOON_BORDER 0.0
   #define MEDIUM_TOON_BORDER 0.7
@@ -236,6 +256,74 @@ varying vec3 vViewPosition;
   uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
   uniform vec3 ambientLightColor;
 
+  /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
+
+  #if defined(SHADOWMAP)
+  	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
+  		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
+  	}
+
+    float getShadow( sampler2D shadowMap, DirectionalLight dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {
+   	  float shadow = 0.0;
+
+      shadowCoord.xyz += dirLight.shadowBias * vNormal; //TODO use normals as it done for G-buffer (for sprites)
+      shadowCoord.xyz /= shadowCoord.w;
+
+      bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
+      bool inFrustum = all( inFrustumVec );
+      bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
+      bool frustumTest = all( frustumTestVec );
+
+      if ( frustumTest ) {
+        #ifdef SHADOWMAP_BASIC
+      	  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
+      	#endif
+
+      	#ifdef SHADOWMAP_PCF_SHARP
+      	  vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;
+
+            float dx0 = - texelSize.x * dirLight.shadowRadius;
+            float dy0 = - texelSize.y * dirLight.shadowRadius;
+            float dx1 = + texelSize.x * dirLight.shadowRadius;
+            float dy1 = + texelSize.y * dirLight.shadowRadius;
+
+            shadow = (
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
+            	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+            ) * ( 1.0 / 9.0 );
+        #endif
+
+        #ifdef SHADOWMAP_PCF_RAND
+          vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;
+
+          vec4 vUv = ((projectionMatrix * vec4(vViewPosition, 1.0)) + 1.0) / 2.0;
+          vec2 vUvNoise = vUv.xy / srcTexelSize * noiseTexelSize;
+
+          vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);
+          mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);
+
+          // see THREE.WebGLProgram.unrollLoops
+          #pragma unroll_loop
+            for ( int i = 0; i < MAX_SAMPLES_COUNT; i ++ ) {
+              vec2 offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );
+              shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );
+            }
+          shadow /= float( MAX_SAMPLES_COUNT );
+        #endif
+      }
+      return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);
+   }
+  #endif
+
+  /////////////////////////////////////////// Lighting /////////////////////////////////////////////////
+
   vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
     return RECIPROCAL_PI * diffuseColor;
   } // validated
@@ -269,7 +357,7 @@ varying vec3 vViewPosition;
     return F * ( G * D );
   } // validated
 
-  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
+  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight, float penumbra ) {
 
     float dotNL = saturate( dot( geometry.normal, directLight.direction ));
     #ifdef TOON_SHADING
@@ -285,137 +373,33 @@ varying vec3 vViewPosition;
     #endif
 
     vec3 irradiance = dotNL * directLight.color * PI;
-    reflectedLight.directDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
-    reflectedLight.directSpecular += irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );
+    reflectedLight.directDiffuse += penumbra * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
+    reflectedLight.directSpecular += penumbra * irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );
   }
 
   void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {
     reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
   }
 
-  vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material) {
+  vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material, vec3 vViewPosition) {
     ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));
     vec3 irradiance = ambientLightColor * PI;
 
-    // use loop for number
-    #if NUM_DIR_LIGHTS > 1
-      for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-        RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight);
-    #else
-        RE_Direct_BlinnPhong(directionalLights[0], geometry, material, reflectedLight);
-    #endif
-
-        RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
-
-    #if NUM_DIR_LIGHTS > 1
-      }
-    #endif
-
-/*
-    #pragma unroll_loop
-    for (int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-      RE_Direct_BlinnPhong(directionalLights[i], geometry, material, reflectedLight);
-      RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
-    }*/
-
-    return reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular;
-  }
-#endif
-
-/////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
-const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
-const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
-
-const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
-const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
-
-
-const float ShiftRight8 = 1. / 256.;
-
-vec4 packDepthToRGBA( const in float v ) {
-  vec4 r = vec4( fract( v * PackFactors ), v );
-  r.yzw -= r.xyz * ShiftRight8; // tidy overflow
-  return r * PackUpscale;
-}
-
-float unpackRGBAToDepth( const in vec4 v ) {
-  return dot( v, UnpackFactors );
-}
-
-#if defined(USE_LIGHTS) && defined(SHADOWMAP)
-	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
-		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
-	}
-
-  float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {
- 	  float shadow = 0.0;
-
-    shadowCoord.xyz += shadowBias * vNormal; //TODO use normals as it done for G-buffer (for sprites)
-    shadowCoord.xyz /= shadowCoord.w;
-
-		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
-		bool inFrustum = all( inFrustumVec );
-		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
-		bool frustumTest = all( frustumTestVec );
-
-		if ( frustumTest ) {
-      #ifdef SHADOWMAP_BASIC
-			  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );
-			#endif
-
-			#ifdef SHADOWMAP_PCF_SHARP
-			  vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
-
-          float dx0 = - texelSize.x * shadowRadius;
-          float dy0 = - texelSize.y * shadowRadius;
-          float dx1 = + texelSize.x * shadowRadius;
-          float dy1 = + texelSize.y * shadowRadius;
-
-          shadow = (
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
-          	texture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
-          ) * ( 1.0 / 9.0 );
-      #endif
-
-      #ifdef SHADOWMAP_PCF_RAND
-        vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
-
-        vec4 vUv = ((projectionMatrix * vec4(vViewPosition, 1.0)) + 1.0) / 2.0;
-        vec2 vUvNoise = vUv.xy / srcTexelSize * noiseTexelSize;
-
-        vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);
-        mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);
-
-        //#pragma unroll_loop
-        for(int i = 0; i < MAX_SAMPLES_COUNT; i++){
-          vec2 offset = mNoise * (normalize(samplesKernel[i])* texelSize * shadowRadius);
-          shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );
-        }
-        shadow /= float( MAX_SAMPLES_COUNT );
-      #endif
-		}
-		return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);
-	}
-
-	float getShadowMask(vec3 vViewPosition) {
-  	float shadow = 1.0;
-  	#if NUM_DIR_LIGHTS > 0
-  	  DirectionalLight directionalLight;
+    float shadowMask = 1.0;
+    // see THREE.WebGLProgram.unrollLoops
   	#pragma unroll_loop
   	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-  		  directionalLight = directionalLights[ i ];
-  		  shadow *= bool( directionalLight.shadow ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] ) : 1.0;
+  	    #ifdef SHADOWMAP
+  	    if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );
+  	    #endif
+
+  		  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );
   		}
-    #endif
-  	return shadow;
-    }
+
+    RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
+
+    return saturate(reflectedLight.indirectDiffuse + reflectedLight.directDiffuse + reflectedLight.directSpecular);
+  }
 #endif
 
 /////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////
@@ -582,7 +566,7 @@ void main() {
   #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
     GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
     BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
-    vec3 outgoingLight = calcLighting(geometry, material);
+    vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);
   #else
     vec3 outgoingLight = diffuseColor.rgb;
   #endif
@@ -606,10 +590,6 @@ void main() {
       fragColor = vec4(fixedColor, diffuseColor.a);
     #else
       fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);
-    #endif
-
-    #if defined(USE_LIGHTS) && defined(SHADOWMAP)
-        fragColor.rgb *= getShadowMask(vViewPosition);
     #endif
 
     #ifdef USE_FOG

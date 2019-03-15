@@ -220,6 +220,7 @@ void main() {
 #if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	#if NUM_DIR_LIGHTS > 0
 	  vec4 worldPosition;
+	  // see THREE.WebGLProgram.unrollLoops
 	  #pragma unroll_loop
 	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
       vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * vec4(vWorldPosition, 1.0);
