@@ -903,7 +903,6 @@ Miew.prototype._updateFog = function () {
     gfx.scene.fog = undefined;
     this._setUberMaterialValues({ fog: settings.now.fog });
   }
-  this._needRender = true;
 };
 
 Miew.prototype._onUpdate = function () {
@@ -3568,6 +3567,7 @@ Miew.prototype._initOnSettingsChanged = function () {
 
   on(['fog', 'fogNearFactor', 'fogFarFactor'], () => {
     this._updateFog();
+    this._needRender = true;
   });
 
   on('fogAlpha', () => {
