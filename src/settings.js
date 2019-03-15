@@ -786,13 +786,13 @@ const defaults = {
    * Shadows options.
    *
    * @property {boolean} shadowMap - enable/disable.
-   * @property {string} basic/percentage-closer filtering/percentage-closer filtering with bilinear filtering.
+   * @property {string} basic/percentage-closer filtering/non-uniform randomizing pcf.
    * @property {number} radius for percentage-closer filtering.
    */
   shadow: {
     on: false,
-    type: 'pcf'/* basic, pcf4 */,
-    radius: 3.0,
+    type: 'random'/* basic, pcf, random */,
+    radius: 1.0,
   },
 
   /**
