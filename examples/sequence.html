@@ -19,10 +19,20 @@
       margin-left: 640px;
     }
 
-    #chains a {
+    .sequence a {
       color: black;
       text-decoration: none;
       font-family: monospace;
+    }
+
+    .sequence {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    /* add ZERO WIDTH SPACE for wrapping in IE11, as "break-word" doesn't work between nodes */
+    .sequence a:after { /* stylelint-disable-line selector-pseudo-element-colon-notation */
+      content: "\00200b";
     }
 
     .selected {
@@ -100,7 +110,7 @@
 
         // create div
         var resDiv = document.createElement('div');
-        resDiv.style = 'overflow-wrap: break-word; word-wrap: break-word;';
+        resDiv.classList.add('sequence');
 
         // create nested set of residue names
         chain.forEachResidue(function(res) {
