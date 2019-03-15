@@ -78,7 +78,6 @@ $selection-panel-row-height: 42px;
   color: $titlebar-color;
   background-color: rgba($titlebar-gray, $titlebar-gray, $titlebar-gray, $titlebar-alpha);
   display: flex;
-  align-items: left;
   justify-content: left;
   opacity: 0;
 
@@ -592,11 +591,6 @@ $selection-panel-row-height: 42px;
   }
 }
 
-.terminal,
-.cmd {
-  background-color: transparent !important;
-}
-
 .miew-terminal {
   position: fixed;
   top: 0;
@@ -605,6 +599,8 @@ $selection-panel-row-height: 42px;
   width: 30%;
   padding: 0;
   margin-top: $titlebar-height;
+
+  --background: transparent;
 
   .row {
     margin-left: 0;

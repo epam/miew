@@ -370,10 +370,12 @@ class VolumeMesh extends THREE.Mesh {
   }
 
   _updateIsoLevel() {
-    const { kSigma } = settings.now.modes.VD;
+    const { kSigma, kSigmaMed, kSigmaMax } = settings.now.modes.VD;
     const volInfo = this.volumeInfo;
-    this.material.uniforms._isoLevel0.value = (volInfo.dmean + kSigma * volInfo.sd - volInfo.dmin)
-      / (volInfo.dmax - volInfo.dmin);
+    const mean = volInfo.dmean - volInfo.dmin;
+    const span = volInfo.dmax - volInfo.dmin;
+    const level = k => (mean + k * volInfo.sd) / span;
+    this.material.uniforms._isoLevel0.value.set(level(kSigma), level(kSigmaMed), level(kSigmaMax));
   }
 
   static _nearClipPlaneOffset = 0.2;

@@ -10,7 +10,7 @@ const volumeUniforms = THREE.UniformsUtils.merge([
     tileTexSize: { type: 'v2', value: new THREE.Vector2(512, 512) },
     tileStride: { type: 'v2', value: new THREE.Vector2(512, 512) },
 
-    _isoLevel0: { type: 'f', value: 0.28 },
+    _isoLevel0: { type: 'v2', value: new THREE.Vector3(0.5, 0.75, 1.0) },
     _flipV: { type: 'f', value: 0.0 },
     _BFLeft: { type: 't', value: null },
     _BFRight: { type: 't', value: null },

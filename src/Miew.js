@@ -23,6 +23,7 @@ import ObjectControls from './ui/ObjectControls';
 import Picker from './ui/Picker';
 import Axes from './gfx/Axes';
 import gfxutils from './gfx/gfxutils';
+import noise from './gfx/noiseTexture';
 import FrameInfo from './gfx/FrameInfo';
 import meshes from './gfx/meshes/meshes';
 import LinesObject from './gfx/objects/LinesObj';
@@ -425,7 +426,7 @@ Miew.prototype._initGfx = function () {
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light12.castShadow = true;
   light12.shadow = new THREE.DirectionalLightShadow();
-  light12.shadow.bias = -0.0005;
+  light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
   const shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
   light12.shadow.mapSize.width = shadowMapSize;
@@ -1096,8 +1097,9 @@ Miew.prototype._renderScene = (function () {
 
     const bHaveComplexes = (this._getComplexVisual() !== null);
     const volumeVisual = this._getVolumeVisual();
+    const ssao = bHaveComplexes && settings.now.ao;
 
-    if (bHaveComplexes && settings.now.ao) {
+    if (ssao) {
       this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
@@ -1112,10 +1114,10 @@ Miew.prototype._renderScene = (function () {
     const outline = bHaveComplexes && settings.now.outline.on;
     const fxaa = bHaveComplexes && settings.now.fxaa;
     const volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
-    let dstBuffer = (outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
+    let dstBuffer = (ssao || outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     let srcBuffer = gfx.offscreenBuf;
 
-    if (bHaveComplexes && settings.now.ao) {
+    if (ssao) {
       this._performAO(
         srcBuffer,
         gfx.offscreenBuf4,
@@ -1124,6 +1126,9 @@ Miew.prototype._renderScene = (function () {
         gfx.offscreenBuf3,
         gfx.offscreenBuf2,
       );
+      if (!fxaa && !distortion && !volume && !outline) {
+        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, target);
+      }
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
@@ -1413,25 +1418,6 @@ Miew.prototype._performAO = (function () {
   const _horBlurMaterial = new ao.HorBilateralBlurMaterial();
   const _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
 
-  const _noiseWidth = 4;
-  const _noiseHeight = 4;
-  const _noiseData = new Uint8Array([
-    0, 0, 0, 66, 0, 0, 77, 0, 0, 155, 62, 0,
-    0, 247, 0, 33, 0, 0, 0, 0, 0, 235, 0, 0,
-    0, 0, 0, 176, 44, 0, 232, 46, 0, 0, 29, 0,
-    0, 0, 0, 78, 197, 0, 93, 0, 0, 0, 0, 0,
-  ]);
-  const _noiseWrapS = THREE.RepeatWrapping;
-  const _noiseWrapT = THREE.RepeatWrapping;
-  const _noiseMinFilter = THREE.NearestFilter;
-  const _noiseMagFilter = THREE.NearestFilter;
-  const _noiseMapping = THREE.UVMapping;
-  const _noiseTexture = new THREE.DataTexture(
-    _noiseData, _noiseWidth, _noiseHeight, THREE.RGBFormat,
-    THREE.UnsignedByteType, _noiseMapping, _noiseWrapS, _noiseWrapT, _noiseMagFilter, _noiseMinFilter, 1,
-  );
-  _noiseTexture.needsUpdate = true;
-
   const _samplesKernel = [
     // hemisphere samples adopted to sphere (FIXME remove minus from Z)
     new THREE.Vector3(0.295184, 0.077723, 0.068429),
@@ -1500,8 +1486,8 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
-    _aoMaterial.uniforms.noiseTexture.value = _noiseTexture;
-    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / _noiseWidth, 1.0 / _noiseHeight);
+    _aoMaterial.uniforms.noiseTexture.value = noise.noiseTexture;
+    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight);
     const { fog } = gfx.scene;
     if (fog) {
       _aoMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
@@ -1592,7 +1578,7 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
-const rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
+const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
 const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
 
@@ -1611,16 +1597,19 @@ function resolveSourceShortcut(source, opts) {
 
     switch (format) {
       case 'pdb':
-        source = `http://files.rcsb.org/download/${id}.pdb`;
+        source = `https://files.rcsb.org/download/${id}.pdb`;
         break;
       case 'cif':
-        source = `http://files.rcsb.org/download/${id}.cif`;
+        source = `https://files.rcsb.org/download/${id}.cif`;
         break;
       case 'mmtf':
-        source = `http://mmtf.rcsb.org/v1.0/full/${id}`;
+        source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
         break;
       case 'ccp4':
         source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
+        break;
+      case 'dsn6':
+        source = `https://edmaps.rcsb.org/maps/${id.toLowerCase()}_2fofc.dsn6`;
         break;
       default:
         throw new Error('Unexpected data format shortcut');
@@ -3432,7 +3421,7 @@ Miew.prototype._updateShadow = function (radius) {
     if (this._gfx.scene.children[i].shadow !== undefined) {
       const light = this._gfx.scene.children[i];
 
-      light.shadow.bias = -0.0005 * radius;
+      light.shadow.bias = 0.09 * radius;
 
       light.shadow.camera.bottom = -radius;
       light.shadow.camera.top = radius;

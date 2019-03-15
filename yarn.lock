@@ -5009,10 +5009,10 @@ jpeg-js@0.2.0:
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.2.0.tgz#53e448ec9d263e683266467e9442d2c5a2ef5482"
   integrity sha1-U+RI7J0mPmgyZkZ+lELSxaLvVII=
 
-jquery.terminal@^2.1.2:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/jquery.terminal/-/jquery.terminal-2.2.0.tgz#a5fd15fbae55021fb2d80c2213dbe32d37fa5966"
-  integrity sha512-oeiMlWKw/M07U/FYmqqOpvt1sfbytDvFoAE1C1JNjY68IgdUiIM+5dCKab2RGAffh/YZBdgypjjuNLdfGvMCag==
+jquery.terminal@=2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/jquery.terminal/-/jquery.terminal-2.1.0.tgz#e240ac654a5ff9270dfca9cd9beb272824c27c3a"
+  integrity sha512-PUIJ2HD87ilXGy2meLY07ZDEDGSuYFCGE7KnMM1Tq0SEl+iRLx35FkZCkaU6t1q+2ZknkYQe/wlc1CQOEYZO3Q==
   dependencies:
     "@types/jquery" "^3.3.6"
     jquery "~3"
