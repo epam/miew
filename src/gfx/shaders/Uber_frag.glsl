@@ -309,11 +309,12 @@ float unpackRGBAToDepth( const in vec4 v ) {
           vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);
           mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);
 
-          //#pragma unroll_loop
-          for(int i = 0; i < MAX_SAMPLES_COUNT; i++){
-            vec2 offset = mNoise * (normalize(samplesKernel[i])* texelSize * dirLight.shadowRadius);
-            shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );
-          }
+          // see THREE.WebGLProgram.unrollLoops
+          #pragma unroll_loop
+            for ( int i = 0; i < MAX_SAMPLES_COUNT; i ++ ) {
+              vec2 offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );
+              shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );
+            }
           shadow /= float( MAX_SAMPLES_COUNT );
         #endif
       }
@@ -385,6 +386,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
     vec3 irradiance = ambientLightColor * PI;
 
     float shadowMask = 1.0;
+    // see THREE.WebGLProgram.unrollLoops
   	#pragma unroll_loop
   	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
   	    #ifdef SHADOWMAP
