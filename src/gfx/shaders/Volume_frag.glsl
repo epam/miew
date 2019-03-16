@@ -8,6 +8,9 @@ uniform vec2 tileStride;   // UV stride between slices in tile tex, pixels
 
 uniform vec3 boxSize;
 uniform vec3 boxAngles;
+uniform float deltaXZ;
+uniform float deltaXY;
+uniform float deltaYZ;
 
 uniform float _isoLevel0;
 uniform float _flipV;
@@ -24,60 +27,6 @@ const float PI = 3.1415926535898;
 
 vec4 sample3DTexture(vec3 texCoord)
 {
-  const float E = 0.0000001;
-
- /* if (abs(boxAngles.z - PI / 2.) < E)
-    return vec4(0., 0., 0., 0.);*/
-    // Case 1! Summ on X coordinate
-    /*
-  if((PI / 2. - boxAngles.z) * (PI / 2. - boxAngles.y) >=0 ) {
-
-  } else {  //Case 2! Maximum of Summ on X coordinate
-
-  }
-  */
-
-  float deltaXYM =  boxSize.y / boxSize.x / abs(tan(boxAngles.z));
-
-  float deltaXY = (1. - texCoord.y) * deltaXYM; //  if (boxAngles.y - PI /.2 > E)
-  if (PI / 2. - boxAngles.z > E) {
-    deltaXY = texCoord.y * deltaXYM;
-  }
-  if (deltaXY > texCoord.x  || texCoord.x > 1. - deltaXYM + deltaXY)
-       return vec4(0., 0., 0., 0.);
-
-  texCoord.x = (texCoord.x   - deltaXY) / (1. - deltaXYM);
-
-/*
-  float deltaXM =  boxSize.z / boxSize.x / abs(tan(boxAngles.y));
-
-  float deltaX = (1. - texCoord.z) * deltaXM; //  if (boxAngles.y - PI /.2 > E)
-  if (PI / 2. - boxAngles.y > E) {
-    deltaX = texCoord.z * deltaXM;
-  }
-  if (deltaX > texCoord.x  || texCoord.x > 1. - deltaXM + deltaX)
-       return vec4(0., 0., 0., 0.);
-
-  texCoord.x = (texCoord.x   - deltaX) / (1. - deltaXM);
-
-*/
-
-
-
-
-  float deltaZM =  boxSize.z / boxSize.y / abs(tan(boxAngles.x));
-
-  float deltaZ = (1. - texCoord.z) * deltaZM;
-  if (PI / 2. - boxAngles.x > E) {
-    deltaZ = texCoord.z * deltaZM;
-  }
-
-  if (deltaZ > texCoord.y  || texCoord.y > 1. - deltaZM + deltaZ)
-    return vec4(0., 0., 0., 0.);
-
-  texCoord.y = (texCoord.y   - deltaZ) / (1. - deltaZM);
-
-
   // a pair of Z slices is determined by nearest slice border
   float zSliceBorder = floor(texCoord.z * volumeDim.z + 0.5);
   float zSliceNumber1 = max(zSliceBorder - 1.0, 0.0);
@@ -98,6 +47,36 @@ vec4 sample3DTexture(vec3 texCoord)
   return mix(colorSlice1, colorSlice2, weightSlice2);
 }
 
+vec4 cubeToTextCoord(vec3 texCoord) {
+  /***************** YOZ *********************/
+  float currDeltaYZ = (1. - texCoord.z) * deltaYZ;
+  if (PI / 2. - boxAngles.x > 0.) {
+    currDeltaYZ = texCoord.z * deltaYZ;
+  }
+  if (currDeltaYZ > texCoord.y  || texCoord.y > 1. - deltaYZ + currDeltaYZ)
+    return vec4(0., 0., 0., 0);
+  texCoord.y = (texCoord.y   - currDeltaYZ) / (1. - deltaYZ);
+
+  /***************** XOZ *********************/
+  float currDeltaXZ = (1. - texCoord.z) * deltaXZ;
+  if (PI / 2. - boxAngles.y > 0.) {
+    currDeltaXZ = texCoord.z * deltaXZ;
+  }
+  if (currDeltaXZ > texCoord.x  || texCoord.x > 1. - deltaXZ + currDeltaXZ)
+       return vec4(0., 0., 0., 0);
+
+  /***************** XOY *********************/
+  float currDeltaXY = (1. - texCoord.y) * deltaXY;
+  if (PI / 2. - boxAngles.z > 0.) {
+    currDeltaXY = texCoord.y * deltaXY;
+  }
+  if (currDeltaXY + currDeltaXZ > texCoord.x  || texCoord.x > 1. - deltaXY + currDeltaXY - deltaXZ + currDeltaXZ)
+       return vec4(0., 0., 0., 0);
+  texCoord.x = (texCoord.x   - currDeltaXY - currDeltaXZ) / (1. - deltaXY - deltaXZ);
+
+  return sample3DTexture(texCoord);
+}
+
 float CalcColor(vec3 iter, vec3 dir)
 {
   float d = 1.0 / 128.0;
@@ -105,9 +84,9 @@ float CalcColor(vec3 iter, vec3 dir)
   vec3 dy = vec3(0.0, d, 0.0);
   vec3 dz = vec3(0.0, 0.0, d);
   vec3 N;
-  N.x = sample3DTexture(iter + dx).r - sample3DTexture(iter - dx).r;
-  N.y = sample3DTexture(iter + dy).r - sample3DTexture(iter - dy).r;
-  N.z = sample3DTexture(iter + dz).r - sample3DTexture(iter - dz).r;
+  N.x = cubeToTextCoord(iter + dx).r - cubeToTextCoord(iter - dx).r;
+  N.y = cubeToTextCoord(iter + dy).r - cubeToTextCoord(iter - dy).r;
+  N.z = cubeToTextCoord(iter + dz).r - cubeToTextCoord(iter - dz).r;
   N = normalize(N);
   float dif = max(0.0, dot(N,dir));
   return dif;
@@ -118,7 +97,7 @@ vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
   for (int i = 0; i < 5; i++)
   {
     vec3 iterator = 0.5*(left + right);
-    float vol = sample3DTexture(iterator).r;
+    float vol = cubeToTextCoord(iterator).r;
     if ((volLeft - threshold)*(vol - threshold) < 0.)
       right = iterator;
     else
@@ -136,7 +115,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
     for (int i=0; i < 200; i++)
     {
       iterator = iterator + step;
-      vol = sample3DTexture(iterator).r;
+      vol = cubeToTextCoord(iterator).r;
       if (length(iterator - back) < stepSize || vol > tr)
         break;
     }
@@ -147,7 +126,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
       for (int j = 0; j < 5; j++)
       {
         iterator = 0.5 * (left + right);
-        float vol = sample3DTexture(iterator).r;
+        float vol = cubeToTextCoord(iterator).r;
         if (vol > tr)
           right = iterator;
         else
@@ -169,7 +148,7 @@ vec3 CorrectIso(vec3 left, vec3 right, float tr)
   for (int j = 0; j < 5; j++)
   {
     vec3 iterator = 0.5*(left + right);
-    float vol = sample3DTexture(iterator).r;
+    float vol = cubeToTextCoord(iterator).r;
     if (vol < tr)
       right = iterator;
     else
@@ -208,13 +187,13 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     {
       iterator = iterator + step;
       molD = length(iterator - start);
-      vol = sample3DTexture(iterator).r;
+      vol = cubeToTextCoord(iterator).r;
       finish = distance(iterator, back) - stepSize;
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
       alpha = (1. - r);
       col = GetColSimple(vol);
-      vol = sample3DTexture(iterator - 0.5*step).r;
+      vol = cubeToTextCoord(iterator - 0.5*step).r;
       vec3 colMid = GetColSimple(vol);
       sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
       sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
@@ -226,7 +205,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     {
       curStepSize = stepSize - (molD - molDist);
       right = iterator - (molD - molDist)*dir;
-      vol = sample3DTexture(right).r;
+      vol = cubeToTextCoord(right).r;
     }
     else
     {
@@ -238,7 +217,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     alpha = (1. - r)*curStepSize / stepSize;
     dif = 1.;// CalcColor(right, dir);
     col = GetColSimple(vol);
-    vol = sample3DTexture(iterator - 0.5 * curStepSize / stepSize * step).r;
+    vol = cubeToTextCoord(iterator - 0.5 * curStepSize / stepSize * step).r;
     vec3 colMid = GetColSimple(vol);
     sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;
     sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
@@ -262,8 +241,8 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
   {
     if (float(i) * stepSize > len) break;
     iterator = iterator + step;
-    if (sample3DTexture(iterator).r > _isoLevel0)
-      acc += sample3DTexture(iterator).r / 200.0;
+    if (cubeToTextCoord(iterator).r > _isoLevel0)
+      acc += cubeToTextCoord(iterator).r / 200.0;
   }
 
   return vec4(1,1,1, acc);
@@ -283,7 +262,7 @@ vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)
 
 vec4 VolRender3(vec3 start, vec3 back, float molDist, vec3 dir)
 {
-  return sample3DTexture(start);
+  return cubeToTextCoord(start);
 }
 
 void main()
@@ -320,7 +299,5 @@ void main()
 
   //gl_FragColor = texture2D(_WFFLeft, tc.xy);
   //gl_FragColor = texture2D(tileTex, tc.xy);
-  //vec4 color1 = VolRender3(start, back, molDist, dir, 1);
-  //vec4 color2 = VolRender(start, back, molDist, dir, 3);// VolRender(start, back, molDist, dir,3);
-  gl_FragColor = VolRender(start, back, molDist, dir);//VolRender(start, back, molDist, dir, 1);
+  gl_FragColor = VolRender(start, back, molDist, dir);
 }

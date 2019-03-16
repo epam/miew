@@ -12,7 +12,11 @@ var volumeUniforms = THREE.UniformsUtils.merge([
     tileTexSize: {type: 'v2', value: new THREE.Vector2(512, 512)},
     tileStride:  {type: 'v2', value: new THREE.Vector2(512, 512)},
     boxSize:     {type: 'v3', value: new THREE.Vector3(0, 0, 0)},
+
     boxAngles:   {type: 'v3', value: new THREE.Vector3(Math.PI / 2, Math.PI / 2, Math.PI / 2)},
+    deltaXZ:     {type: 'f', value: 0.0},
+    deltaXY:     {type: 'f', value: 0.0},
+    deltaYZ:     {type: 'f', value: 0.0},
 
     _isoLevel0:  {type: 'f', value: 0.28},
     _flipV:      {type: 'f', value: 0.0},

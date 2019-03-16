@@ -360,8 +360,10 @@ class VolumeMesh extends THREE.Mesh {
     vm.uniforms.tileStride.value.set(stride[0], stride[1]);
     vm.uniforms.boxSize.value.set(bbox.getSize().x, bbox.getSize().y, bbox.getSize().z)
     Object.assign(this.volumeInfo, dataSource.getVolumeInfo());
+    vm.uniforms.deltaXY.value = this.volumeInfo.delta.XY;
+    vm.uniforms.deltaXZ.value = this.volumeInfo.delta.XZ;
+    vm.uniforms.deltaYZ.value = this.volumeInfo.delta.YZ;
     vm.uniforms.boxAngles.value.set(this.volumeInfo.angles.x, this.volumeInfo.angles.y, this.volumeInfo.angles.z);
-    //vm.uniforms.boxAngles.set(Math.PI / 2, Math.PI / 2, Math.PI / 2);
     this.material = vm;
 
     bbox.getSize(this.scale);

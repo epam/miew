@@ -18,6 +18,7 @@ class VolumeModel {
     this._header = {};
     this._boxSize = new THREE.Vector3();
     this._boxStart = new THREE.Vector3();
+    this._header.delta = {};
     this._header.extent = [];
     this._header.nstart = [];
     this._header.grid = [];
@@ -111,36 +112,33 @@ class VolumeModel {
   }
 
   _getVolumeInfo() {
-    return _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd', 'angles']);
+    return _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd', 'angles', 'delta']);
   }
 
   _setBoxParams(xaxis, yaxis, zaxis) {
     // if axes are not orthogonal, the origins might not match with box coordinates - need to make shift
     let shiftX = 0, shiftY = 0;
-    // depending on angles ratio, there could  be different box sizes (the things are in projections)
-    let Xprojection = Math.abs(xaxis.x), Yprojection =  Math.abs(yaxis.y), Zprojection =  Math.abs(zaxis.z);
 
-    const bettaSharp = (this._header.angles.y <= Math.PI / 2);
-    const gammaSharp = (this._header.angles.z <= Math.PI / 2);
-    const alphaSharp = (this._header.angles.x <= Math.PI / 2);
-
-    if (bettaSharp && gammaSharp) {
-      Xprojection += shiftX = Math.abs(yaxis.x) + Math.abs(zaxis.x);
-    } else if (!bettaSharp && !gammaSharp) {
-      Xprojection += Math.abs(yaxis.x) + Math.abs(zaxis.x);
-    } else if (bettaSharp && !gammaSharp) {
-      Xprojection += Math.max(Math.abs(yaxis.x), Math.abs(zaxis.x));
-      shiftX =  Math.abs(yaxis.x) - Math.abs(zaxis.x);
-    } else if (!bettaSharp && gammaSharp) {
-      Xprojection += Math.max(Math.abs(yaxis.x), Math.abs(zaxis.x));
-      shiftX =  Math.abs(zaxis.x) - Math.abs(yaxis.x);
+    if (this._header.angles.z >= Math.PI / 2) {
+      shiftX += Math.abs(yaxis.x);
+    }
+    if (this._header.angles.y >= Math.PI / 2) {
+      shiftX += Math.abs(zaxis.x);
+    }
+    if (this._header.angles.x >= Math.PI / 2) {
+      shiftY += Math.abs(zaxis.y);
     }
 
-    if (!alphaSharp) {
-      Yprojection += shiftY = Math.abs(zaxis.y);
-    }
+    this._header.delta.XY = Math.abs(yaxis.x) / (Math.abs(xaxis.x) + Math.abs(yaxis.x) + Math.abs(zaxis.x));
+    this._header.delta.XZ = Math.abs(zaxis.x) / (Math.abs(xaxis.x) + Math.abs(yaxis.x) + Math.abs(zaxis.x));
+    this._header.delta.YZ = Math.abs(zaxis.y) / (Math.abs(yaxis.y) + Math.abs(zaxis.y));
+
     this._boxStart = new THREE.Vector3(this._origin.x - shiftX, this._origin.y - shiftY, this._origin.z);
-    this._boxSize = new THREE.Vector3(Xprojection, Yprojection, Zprojection);
+    this._boxSize = new THREE.Vector3(
+      Math.abs(xaxis.x) + Math.abs(yaxis.x) + Math.abs(zaxis.x),
+      Math.abs(yaxis.y) + Math.abs(zaxis.y),
+      Math.abs(zaxis.z)
+    );
   }
 
   _getXYZbox() {
