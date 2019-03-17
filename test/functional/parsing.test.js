@@ -1,15 +1,16 @@
-import PDBParser from '../../src/io/parsers/PDBParser';
-import CIFParser from '../../src/io/parsers/CIFParser';
-import MMTFParser from '../../src/io/parsers/MMTFParser';
-import PubChemParser from '../../src/io/parsers/PubChemParser';
-import CCP4Parser from '../../src/io/parsers/CCP4Parser';
-import SDFParser from '../../src/io/parsers/SDFParser';
-
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
+import PDBParser from '../../src/io/parsers/PDBParser';
+import CIFParser from '../../src/io/parsers/CIFParser';
+import MMTFParser from '../../src/io/parsers/MMTFParser';
+import XYZParser from '../../src/io/parsers/XYZParser';
+import PubChemParser from '../../src/io/parsers/PubChemParser';
+import SDFParser from '../../src/io/parsers/SDFParser';
+import CCP4Parser from '../../src/io/parsers/CCP4Parser';
+
 
 import complexTestData from './data/complexTestData';
 import volumeTestData from './data/volumeTestData';
@@ -37,6 +38,12 @@ const formats = {
     extension: 'mmtf',
     encoding: null,
     Parser: MMTFParser,
+  },
+  xyz: {
+    name: 'XYZ',
+    extension: 'xyz',
+    encoding: 'ascii',
+    Parser: XYZParser,
   },
   pubchem: {
     name: 'PubChem JSON',
@@ -103,17 +110,14 @@ function createLookForAssertion(dataSet, formatId) {
       }
     }
   };
-
 }
 
 describe('Parsed Complex data', () => {
-
   complexTestData.forEach((entry) => {
     describe(`for ${entry.name}`, () => {
-
       entry.formats.forEach((formatId) => {
         const format = formats[formatId];
-        it(`looks good in ${format.name} format`, function() {
+        it(`looks good in ${format.name} format`, function () {
           this.timeout(0);
           if (entry.skip && entry.skip[formatId]) {
             this.skip();
@@ -122,7 +126,6 @@ describe('Parsed Complex data', () => {
 
           return parse(entry, format)
             .then((complex) => {
-
               const lookFor = createLookForAssertion(complex, formatId);
 
               lookFor('_atoms.length', entry.num.atoms);
@@ -139,20 +142,16 @@ describe('Parsed Complex data', () => {
             });
         });
       });
-
     });
   });
-
 });
 
 describe('Parsed Volume data', () => {
-
   volumeTestData.forEach((entry) => {
     describe(`for ${entry.name}`, () => {
-
       entry.formats.forEach((formatId) => {
         const format = formats[formatId];
-        it(`looks good in ${format.name} format`, function() {
+        it(`looks good in ${format.name} format`, function () {
           this.timeout(0);
           if (entry.skip && entry.skip[formatId]) {
             this.skip();
@@ -161,7 +160,6 @@ describe('Parsed Volume data', () => {
 
           return parse(entry, format)
             .then((volume) => {
-
               const lookFor = createLookForAssertion(volume, formatId);
 
               lookFor('_dimX', entry.subdivisions.x, entry.subdivisions.precision);
@@ -177,19 +175,16 @@ describe('Parsed Volume data', () => {
             });
         });
       });
-
     });
   });
-
 });
 
 describe('Model Volume data', () => {
-
   volumeTestData.forEach((entry) => {
     describe(`for ${entry.name}`, () => {
       entry.formats.forEach((formatId) => {
         const format = formats[formatId];
-        it(`looks good in ${format.name} format`, function() {
+        it(`looks good in ${format.name} format`, function () {
           this.timeout(0);
           if (entry.skip && entry.skip[formatId]) {
             this.skip();
@@ -198,7 +193,6 @@ describe('Model Volume data', () => {
 
           return parse(entry, format, true)
             .then((model) => {
-
               const lookFor = createLookForAssertion(model, formatId);
 
               lookFor('_header.nstart[0]', entry.nstart.x, entry.nstart.precision);
@@ -220,7 +214,6 @@ describe('Model Volume data', () => {
               lookFor('_header.grid[0]', entry.grid.x);
               lookFor('_header.grid[1]', entry.grid.y);
               lookFor('_header.grid[2]', entry.grid.z);
-
             });
         });
       });

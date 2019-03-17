@@ -14,8 +14,7 @@ class ResiduesTraceGroup extends ChemGroup {
   }
 
   _build() {
-    const residues = this._selection.residues;
-    const parent = this._selection.parent;
+    const { residues, parent } = this._selection;
     const mode = this._mode;
     const colorer = this._colorer;
     const geo = this._geo;
@@ -32,7 +31,7 @@ class ResiduesTraceGroup extends ChemGroup {
         let prevRes = residues[startIdx];
         for (let idx = startIdx + 1; idx <= endIdx; ++idx) {
           const currRes = residues[idx];
-          chunkIdc[chunkIdx] = {first: prevRes._index, second: currRes._index};
+          chunkIdc[chunkIdx] = { first: prevRes._index, second: currRes._index };
           geo.setItem(chunkIdx, prevRes._controlPoint, currRes._controlPoint, stickRad);
           geo.setColor(chunkIdx, colorer.getResidueColor(prevRes, parent), colorer.getResidueColor(currRes, parent));
           chunkIdx++;
@@ -50,7 +49,7 @@ class ResiduesTraceGroup extends ChemGroup {
     // was decided to postpone animation refactoring until GFX is fixed.
 
     const residues = frameData.getResidues();
-    const parent = this._selection.parent;
+    const { parent } = this._selection;
     const mode = this._mode;
     const colorer = this._colorer;
     const geo = this._geo;
@@ -82,7 +81,7 @@ class ResiduesTraceGroup extends ChemGroup {
 
   raycast(raycaster, intersects) {
     const inters = [];
-    const residues = this._selection.residues;
+    const { residues } = this._selection;
     this._mesh.raycast(raycaster, inters);
     const chunksToIdx = this._chunksIdc;
     // process inters array - arr object references
@@ -90,7 +89,7 @@ class ResiduesTraceGroup extends ChemGroup {
       if (!inters[i].hasOwnProperty('chunkIdx')) {
         continue;
       }
-      const chunkIdx = inters[i].chunkIdx;
+      const { chunkIdx } = inters[i];
       const chunk = chunksToIdx[Math.floor(chunkIdx / 2)];
       const resIdx = chunkIdx % 2 === 0 ? chunk.first : chunk.second;
       if (resIdx < residues.length) {
@@ -102,8 +101,8 @@ class ResiduesTraceGroup extends ChemGroup {
 
   _calcChunksList(mask) {
     const chunksList = [];
-    let chunksToIdx = this._chunksIdc;
-    const residues = this._selection.residues;
+    const chunksToIdx = this._chunksIdc;
+    const { residues } = this._selection;
     for (let i = 0, n = chunksToIdx.length; i < n; ++i) {
       const chunk = chunksToIdx[i];
       if (residues[chunk.first]._mask & mask) {

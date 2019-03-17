@@ -1,33 +1,35 @@
-import Parser from './Parser';
-import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
+import Parser from './Parser';
+import chem from '../../chem';
 import StructuralElement from '../../chem/StructuralElement';
 
-const Complex = chem.Complex,
-  Element = chem.Element,
-  Helix = chem.Helix,
-  Sheet = chem.Sheet,
-  Strand = chem.Strand,
-  Assembly = chem.Assembly,
-  Molecule = chem.Molecule;
+const {
+  Complex,
+  Element,
+  Helix,
+  Sheet,
+  Strand,
+  Assembly,
+  Molecule,
+} = chem;
 
 const cRequiredAtomFields = [
   'auth_seq_id',
   'Cartn_x',
   'Cartn_y',
   'Cartn_z',
-  'label_atom_id'
+  'label_atom_id',
 ];
 
 const cSecondaryCoding = {
   helx: 'helix',
   turn: 'turn',
-  strn: 'strand'
+  strn: 'strand',
 };
 
 function getTypeFromId(string) {
-  let typeId = /[A-Za-z]+/.exec(string);
+  const typeId = /[A-Za-z]+/.exec(string);
   if (!typeId) {
     return null;
   }
@@ -76,22 +78,21 @@ function _getOperations(operList) {
     return null;
   }
   const idc = arrize(operList.id);
-  const matrix = operList.matrix;
-  const vector = operList.vector;
+  const { matrix, vector } = operList;
   if (!idc || !matrix || !vector) {
     return null;
   }
 
   const ops = [];
   for (let i = 0, n = idc.length; i < n; ++i) {
-    let mtx = new THREE.Matrix4();
-    const elements = mtx.elements;
+    const mtx = new THREE.Matrix4();
+    const { elements } = mtx;
 
     for (let row = 0; row < 3; ++row) {
       const matrixData = matrix[row + 1];
-      elements[row]      = arrize(matrixData[1])[i];
-      elements[row + 4]  = arrize(matrixData[2])[i];
-      elements[row + 8]  = arrize(matrixData[3])[i];
+      elements[row] = arrize(matrixData[1])[i];
+      elements[row + 4] = arrize(matrixData[2])[i];
+      elements[row + 8] = arrize(matrixData[3])[i];
       elements[row + 12] = arrize(vector[row + 1])[i];
     }
     ops[idc[i]] = mtx;
@@ -100,7 +101,7 @@ function _getOperations(operList) {
 }
 
 function _extractOperations(assemblyGen, opsDict) {
-  assemblyGen = _.isString(assemblyGen) ? assemblyGen : '' + assemblyGen;
+  assemblyGen = _.isString(assemblyGen) ? assemblyGen : `${assemblyGen}`;
   const l = assemblyGen.replace(/\)\s*\(/g, '!').replace(/[()']/g, '');
   const groupStr = l.split('!');
   const gps = [];
@@ -138,7 +139,6 @@ function _extractOperations(assemblyGen, opsDict) {
         traverse(level - 1, newMtx);
       }
     }
-
   }
   traverse(gps.length - 1);
   return matrices;
@@ -151,10 +151,6 @@ class CIFParser extends Parser {
     this.molecules = [];
     this._options.fileType = 'cif';
   }
-
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Class methods
 
   /** @deprecated */
   static canParse(data, options) {
@@ -201,7 +197,6 @@ class CIFParser extends Parser {
   }
 
 
-
   /**
    * Extract metadata
    * @param complex structure to fill
@@ -210,7 +205,7 @@ class CIFParser extends Parser {
    */
 
   _extractMetadata(complex, complexData) {
-    const metadata = complex.metadata;
+    const { metadata } = complex;
     metadata.id = complexData.entry.id;
     metadata.classification = complexData.struct_keywords.pdbx_keywords;
     const databaserev = complexData.database_PDB_rev;
@@ -233,7 +228,7 @@ class CIFParser extends Parser {
 
     // molecules names from cif
     for (i = 0; i < count; i++) {
-      this.molecules[i].name =  names[i];
+      this.molecules[i].name = names[i];
     }
 
     // reorganize molecules for complex and check chains
@@ -252,7 +247,7 @@ class CIFParser extends Parser {
    * @private
    */
   _extractAtoms(complex, complexData) {
-    let atomData = complexData.atom_site;
+    const atomData = complexData.atom_site;
     if (!atomData) {
       throw new AtomDataError('CIF parsing error: atom_site is not specified!');
     }
@@ -260,11 +255,11 @@ class CIFParser extends Parser {
     // TODO also add length chacks?
     for (let f = 0, n = cRequiredAtomFields.length; f < n; ++f) {
       if (!atomData[cRequiredAtomFields[f]]) {
-        throw new AtomDataError('CIF parsing error: requires field ' + cRequiredAtomFields[f] + ' not found!');
+        throw new AtomDataError(`CIF parsing error: requires field ${cRequiredAtomFields[f]} not found!`);
       }
     }
 
-    const asymDict = this.asymDict;
+    const { asymDict } = this;
     // required fields
     const resIdc = arrize(atomData.auth_seq_id);
     const x = arrize(atomData.Cartn_x);
@@ -300,7 +295,7 @@ class CIFParser extends Parser {
         chain = complex.getChain(chainID) || complex.addChain(chainID);
       }
       asymDict[String(chainLabelIdc[i] || ' ')] = chainID;
-      const resSeq  = resIdc[i];
+      const resSeq = resIdc[i];
       const iCode = String(iCodes[i] || ' ');
       const resName = String(resNames[i] || '');
       if (!residue || residue.getSequence() !== resSeq || residue.getICode() !== iCode) {
@@ -310,7 +305,7 @@ class CIFParser extends Parser {
         const moleculeIdx = molecules[i] - 1;
         let entity = this.molecules[moleculeIdx];
         if (!entity) {
-          this.molecules[moleculeIdx] = {name: '', residues: []};
+          this.molecules[moleculeIdx] = { name: '', residues: [] };
           entity = this.molecules[moleculeIdx];
         }
         entity.residues.push(residue);
@@ -320,7 +315,7 @@ class CIFParser extends Parser {
       const element = elements[i] || nameToElement(name);
       const type = Element.getByName(element);
       const role = Element.Role[name.trim()];
-      let xyz = new THREE.Vector3(x[i], y[i], z[i]);
+      const xyz = new THREE.Vector3(x[i], y[i], z[i]);
       const het = group[i] === 'HETATM' || false;
       const serial = serials[i] || i;
       const tempFactor = tempFactors[i] || 0.0;
@@ -330,9 +325,8 @@ class CIFParser extends Parser {
 
       residue.addAtom(
         name, type, xyz,
-        role, het, serial, altLoc, occupancy, tempFactor, charge
+        role, het, serial, altLoc, occupancy, tempFactor, charge,
       );
-
     }
   }
 
@@ -360,17 +354,17 @@ class CIFParser extends Parser {
    * @private
    */
   _extractSheets(complex, sheetData) {
-    const asymDict = this.asymDict;
-    if (!sheetData.sheet_id || !sheetData.id || !sheetData.beg_label_seq_id || !sheetData.end_label_seq_id ||
-      !sheetData.beg_label_asym_id) {
+    const { asymDict } = this;
+    if (!sheetData.sheet_id || !sheetData.id || !sheetData.beg_label_seq_id || !sheetData.end_label_seq_id
+      || !sheetData.beg_label_asym_id) {
       return;
     }
-    //Strand(sheet, start, end, sense, cur, prev)
+    // Strand(sheet, start, end, sense, cur, prev)
     const sheets = complex._sheets;
 
     function getSheet(name) {
-      let i = 0, n = sheets.length;
-      for (; i < n; ++i) {
+      const n = sheets.length;
+      for (let i = 0; i < n; ++i) {
         if (sheets[i]._name === name) {
           return sheets[i];
         }
@@ -421,9 +415,9 @@ class CIFParser extends Parser {
    * @private
    */
   _extractConfs(complex, helicesData) {
-    const asymDict = this.asymDict;
-    if (!helicesData.conf_type_id || !helicesData.beg_label_seq_id || !helicesData.end_label_seq_id ||
-      !helicesData.beg_label_asym_id) {
+    const { asymDict } = this;
+    if (!helicesData.conf_type_id || !helicesData.beg_label_seq_id || !helicesData.end_label_seq_id
+      || !helicesData.beg_label_asym_id) {
       return;
     }
 
@@ -438,7 +432,7 @@ class CIFParser extends Parser {
     const names = arrize(helicesData.id) || [];
     const chains = arrize(helicesData.beg_label_asym_id);
 
-    for (let i = 0, n  = types.length; i < n; ++i) {
+    for (let i = 0, n = types.length; i < n; ++i) {
       const type = getTypeFromId(types[i]);
       if (!type) {
         continue;
@@ -485,7 +479,6 @@ class CIFParser extends Parser {
   }
 
 
-
   /**
    * Extract biological assemblies information from CIF structure and fill complex
    * @param {Complex} complex
@@ -493,20 +486,20 @@ class CIFParser extends Parser {
    * @private
    */
   _extractAssemblies(complex, complexData) {
-    const asymDict = this.asymDict;
-    let asmGen = complexData.pdbx_struct_assembly_gen;
+    const { asymDict } = this;
+    const asmGen = complexData.pdbx_struct_assembly_gen;
     if (!asmGen) {
       return;
     }
 
-    let asmIdx = arrize(asmGen.assembly_id);
-    let asmOper = arrize(asmGen.oper_expression);
-    let asmList = arrize(asmGen.asym_id_list);
+    const asmIdx = arrize(asmGen.assembly_id);
+    const asmOper = arrize(asmGen.oper_expression);
+    const asmList = arrize(asmGen.asym_id_list);
     if (!asmIdx || !asmOper || !asmList) {
       return;
     }
 
-    let operList = _getOperations(complexData.pdbx_struct_oper_list);
+    const operList = _getOperations(complexData.pdbx_struct_oper_list);
     if (!operList) {
       return;
     }
@@ -527,13 +520,24 @@ class CIFParser extends Parser {
   }
 
   static _parseToObject(source) {
-    let i = 0, j = 0, n = source.length;
-    let code = NaN, newline = true, line = 1, column = 1, begin;
+    let i = 0;
+    let j = 0;
+    const n = source.length;
+    let code = NaN;
+    let newline = true;
+    let line = 1;
+    let column = 1;
+    let begin;
     let state = 0; // -1 - stop, 0 - start, 1 - block, 2 - item, 3 - loop, 4 - values, 5 - value, 666 - error
     let err = 'unexpected character';
-    let result = {}, block = {};
-    let keys = [], keysCount = 0, key = '';
-    let values = [], valuesCount = 0, value;
+    const result = {};
+    let block = {};
+    let keys = [];
+    let keysCount = 0;
+    let key = '';
+    let values = [];
+    let valuesCount = 0;
+    let value;
 
     function _isWhitespace(ch) {
       return ch === 32 || ch === 10 || ch === 13 || ch === 9;
@@ -559,7 +563,8 @@ class CIFParser extends Parser {
         ++column;
         ++i;
         return undefined;
-      } else if (newline && code === 59) { // ';' ......................................................................
+      }
+      if (newline && code === 59) { // ';' ......................................................................
         // parse multi-line string
         j = i;
         let lines = 0;
@@ -570,14 +575,15 @@ class CIFParser extends Parser {
             return null;
           }
           ++lines;
-        } while (j + 1 < n && source.charCodeAt(j + 1) !== code || j + 1 >= n);
+        } while ((j + 1 < n && source.charCodeAt(j + 1) !== code) || j + 1 >= n);
         val = source.substring(i + 1, j).replace(/\r/g, '');
         i = j + 2;
         line += lines;
         column = 1;
         newline = false;
         return val;
-      } else if (code === 39 || code === 34) { // ''' or '"' ...........................................................
+      }
+      if (code === 39 || code === 34) { // ''' or '"' ...........................................................
         // parse quoted string
         j = i;
         do {
@@ -591,23 +597,22 @@ class CIFParser extends Parser {
         column += j - i + 1;
         i = j + 1;
         return val;
-      } else { // ......................................................................................................
-        // parse until the first whitespace
-        j = i;
-        while (j < n && !_isWhitespace(source.charCodeAt(j))) {
-          ++j;
-        }
-        val = source.substring(i, j);
-        column += j - i;
-        i = j;
-        // try to convert to a number
-        const num = Number(val);
-        if (!Number.isNaN(num)) {
-          return num;
-        }
-        // or leave as an unquoted string
-        return val;
+      } // ......................................................................................................
+      // parse until the first whitespace
+      j = i;
+      while (j < n && !_isWhitespace(source.charCodeAt(j))) {
+        ++j;
       }
+      val = source.substring(i, j);
+      column += j - i;
+      i = j;
+      // try to convert to a number
+      const num = Number(val);
+      if (!Number.isNaN(num)) {
+        return num;
+      }
+      // or leave as an unquoted string
+      return val;
     }
 
     function _storeKey(tag) {
@@ -615,8 +620,7 @@ class CIFParser extends Parser {
     }
 
     function _storeValue(val) {
-      let keyIndex;
-      keyIndex = valuesCount % keysCount;
+      const keyIndex = valuesCount % keysCount;
       values[keyIndex].push(val);
       ++valuesCount;
       return val;
@@ -665,7 +669,7 @@ class CIFParser extends Parser {
           } else if (Number.isNaN(code)) { // <eof> ....................................................................
             break;
           } else { // ..................................................................................................
-            err += ' in state ' + state;
+            err += ` in state ${state}`;
             state = 666; // error
             break;
           }
@@ -695,7 +699,7 @@ class CIFParser extends Parser {
             i += 5;
             column += 5;
             if (i < n && !_isWhitespace(source.charCodeAt(i))) {
-              err += ' in state ' + state;
+              err += ` in state ${state}`;
               state = 666; // error
               break;
             } else {
@@ -710,14 +714,14 @@ class CIFParser extends Parser {
           } else if (Number.isNaN(code)) { // <eof> ....................................................................
             break;
           } else { // ..................................................................................................
-            err += ' in state ' + state;
+            err += ` in state ${state}`;
             state = 666; // error
             break;
           }
         } else if (state === 2) { // item ==============================================================================
           if (Number.isNaN(code)) {
             break;
-          } else if ((value = _parseValue()) !== null) {
+          } else if ((value = _parseValue()) !== null) { // eslint-disable-line no-cond-assign
             _.set(block, key, value);
             state = 1; // block
             continue;
@@ -774,7 +778,7 @@ class CIFParser extends Parser {
           }
           continue; // parse again in a different state
         } else { // ====================================================================================================
-          err = 'unexpected internal state ' + state;
+          err = `unexpected internal state ${state}`;
           state = 666; // error
           break;
         }
@@ -786,7 +790,7 @@ class CIFParser extends Parser {
     }
 
     if (state === 2) { // item
-      err = 'unexpected end of file in state ' + state;
+      err = `unexpected end of file in state ${state}`;
       state = 666; // error
     }
 
@@ -796,9 +800,9 @@ class CIFParser extends Parser {
 
     if (state === 666) { // error
       ret.error = {
-        line: line,
-        column: column,
-        message: err
+        line,
+        column,
+        message: err,
       };
     }
 

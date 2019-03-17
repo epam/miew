@@ -11,13 +11,13 @@ const tmpColor = new THREE.Color();
 const direction = new THREE.Vector3();
 
 function setArrayXYZ(arr, idx, x, y, z) {
-  arr[idx]     = x;
+  arr[idx] = x;
   arr[idx + 1] = y;
   arr[idx + 2] = z;
 }
 
 function setArrayXYZW(arr, idx, x, y, z, w) {
-  arr[idx]     = x;
+  arr[idx] = x;
   arr[idx + 1] = y;
   arr[idx + 2] = z;
   arr[idx + 3] = w;
@@ -88,7 +88,6 @@ class ThickLinesGeometry extends THREE.BufferGeometry {
     dirIdx += DIR_SIZE;
     setArrayXYZW(positions, idx, pos2.x, pos2.y, pos2.z, -0.5);
     setArrayXYZ(directions, dirIdx, direction.x, direction.y, direction.z);
-
   }
 
   setOpacity(startSegIdx, endSegIdx, value) {
@@ -101,7 +100,7 @@ class ThickLinesGeometry extends THREE.BufferGeometry {
   getSubsetSegments(startSegmentIdx, segmentsCount) {
     return [
       getSubset(this._positions, startSegmentIdx, segmentsCount, POS_SIZE),
-      getSubset(this._directions, startSegmentIdx, segmentsCount, DIR_SIZE)
+      getSubset(this._directions, startSegmentIdx, segmentsCount, DIR_SIZE),
     ];
   }
 

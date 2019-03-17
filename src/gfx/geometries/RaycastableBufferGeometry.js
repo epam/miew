@@ -7,10 +7,6 @@ import * as THREE from 'three';
  */
 
 class RaycastableBufferGeometry extends THREE.BufferGeometry {
-  constructor() {
-    super();
-  }
-
   // This method was copied from three.js
 
   static _vA = new THREE.Vector3();
@@ -45,7 +41,7 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
   }
 
   checkIntersection(object, raycaster, ray, pA, pB, pC, point) {
-    //let intersect;
+    // let intersect;
     const intersect = ray.intersectTriangle(pA, pB, pC, false, point);
 
     if (intersect === null) {
@@ -53,7 +49,7 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
     }
 
     return {
-      point: point.clone()
+      point: point.clone(),
     };
   }
 
@@ -68,7 +64,7 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
     vC.fromBufferAttribute(position, c);
 
     const intersection = this.checkIntersection(
-      object, raycaster, ray, vA, vB, vC, intersectionPoint
+      object, raycaster, ray, vA, vB, vC, intersectionPoint,
     );
     if (intersection) {
       if (uv) {
@@ -80,7 +76,7 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
         uvB.fromBufferAttribute(uv, b);
         uvC.fromBufferAttribute(uv, c);
         intersection.uv = this.uvIntersection(
-          intersectionPoint, vA, vB, vC, uvA, uvB, uvC
+          intersectionPoint, vA, vB, vC, uvA, uvB, uvC,
         );
       }
       const normal = new THREE.Vector3();
@@ -93,7 +89,7 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
   }
 
   raycast(raycaster, intersects) {
-    const ray = raycaster.ray;
+    const { ray } = raycaster;
     if (this.boundingSphere === null) {
       this.computeBoundingSphere();
     }
@@ -108,10 +104,13 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
       }
     }
 
-    let a, b, c;
-    const index = this.index;
-    const position = this.attributes.position;
-    const uv = this.attributes.uv;
+    let a;
+    let b;
+    let c;
+    const {
+      index,
+      attributes: { position, uv },
+    } = this;
 
     if (index === null) {
       return;

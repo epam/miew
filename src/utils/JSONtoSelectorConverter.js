@@ -3,9 +3,8 @@ import selectors from '../chem/selectors';
 function parseRange(node) {
   if (node instanceof Array) {
     return new selectors.Range(node[0], node[1]);
-  } else {
-    return new selectors.Range(node, node);
   }
+  return new selectors.Range(node, node);
 }
 
 function parseRangeList(node) {

@@ -1,3 +1,10 @@
+function _ensureArray(x) {
+  if (x === null || x === undefined || Array.isArray(x)) {
+    return x;
+  }
+  return [x];
+}
+
 /** An indexed list of objects or classes. */
 class EntityList {
   /**
@@ -175,13 +182,6 @@ class EntityList {
     }
     return undefined;
   }
-}
-
-function _ensureArray(x) {
-  if (x === null || x === undefined || Array.isArray(x)) {
-    return x;
-  }
-  return [x];
 }
 
 export default EntityList;

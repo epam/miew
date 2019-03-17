@@ -1,5 +1,4 @@
 /* eslint-env node */
-/* global require */
 
 import rollupPluginBabel from 'rollup-plugin-babel';
 import rollupPluginCommonJS from 'rollup-plugin-commonjs';
@@ -10,7 +9,7 @@ import rollupPluginString from 'rollup-plugin-string';
 import version from './tools/version';
 import packageJson from './package.json';
 
-const banner = '/** ' + version.copyright + ' */\n';
+const banner = `/** ${version.copyright} */\n`;
 
 const warnExceptions = {
   THIS_IS_UNDEFINED: [
@@ -20,8 +19,8 @@ const warnExceptions = {
 
 export default {
   input: './src/index.js',
-  onwarn: function(warning, warn) {
-    const exceptions = warning.loc && warnExceptions[warning.code] || [];
+  onwarn(warning, warn) {
+    const exceptions = (warning.loc && warnExceptions[warning.code]) || [];
     if (!exceptions.some(name => warning.loc.file.endsWith(name))) {
       warn(warning);
     }
@@ -59,14 +58,13 @@ export default {
   output: [{
     format: 'umd',
     name: 'Miew',
-    file: 'build/' + packageJson.main,
+    file: `build/${packageJson.main}`,
     banner,
     sourcemap: true,
   }, {
     format: 'es',
-    file: 'build/' + packageJson.module,
+    file: `build/${packageJson.module}`,
     banner,
     sourcemap: true,
   }],
 };
-

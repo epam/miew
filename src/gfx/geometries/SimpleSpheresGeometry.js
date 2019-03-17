@@ -9,7 +9,7 @@ class SimpleSpheresGeometry extends SphereCollisionGeo(ChunkedObjectsGeometry) {
   constructor(spheresCount, sphereComplexity) {
     const sphGeometry = new THREE.SphereBufferGeometry(
       1, sphereComplexity * 2, sphereComplexity,
-      0, Math.PI * 2, 0, Math.PI
+      0, Math.PI * 2, 0, Math.PI,
     );
     super(spheresCount, sphGeometry, spheresCount);
 

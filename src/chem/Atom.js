@@ -49,9 +49,9 @@ class Atom {
     this._occupancy = occupancy || 1;
     this._temperature = temperature;
     this._charge = charge;
-    this._hydrogenCount = -1; //explicitly invalid
+    this._hydrogenCount = -1; // explicitly invalid
     this._radicalCount = 0;
-    this._valence = -1; //explicitly invalid
+    this._valence = -1; // explicitly invalid
 
     this._bonds = [];
 
@@ -62,7 +62,6 @@ class Atom {
       this.flags |= Atom.Flags.CARBON;
     }
   }
-
 
 
   /**
@@ -105,9 +104,8 @@ class Atom {
     const name = this.getName();
     if (name.getString().length > 0) {
       return name.getString();
-    } else {
-      return this.element.name.trim();
     }
+    return this.element.name.trim();
   }
 
   forEachBond(process) {
@@ -139,9 +137,9 @@ class Atom {
   }
 
   getHydrogenCountBoron() {
-    //examples
-    //BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
-    const valence = 3; //hardcoded as 3
+    // examples
+    // BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
+    const valence = 3; // hardcoded as 3
     const hc = valence - this.getCharge() - this.getAtomBondsCount() - this._radicalCount;
     return Math.max(0, hc);
   }
@@ -156,7 +154,7 @@ class Atom {
     if (this.getCharge() !== 0) {
       defVal = 4;
     }
-    //find default valency for our case
+    // find default valency for our case
     return Math.max(0, defVal - valence);
   }
 
@@ -170,8 +168,8 @@ class Atom {
       valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this._radicalCount;
     }
 
-    let defVal = this.findSuitableValence(valence);
-    //find default valency for our case
+    const defVal = this.findSuitableValence(valence);
+    // find default valency for our case
     return Math.max(0, defVal - valence);
   }
 
@@ -184,16 +182,16 @@ class Atom {
     }
     const defVal = this.findSuitableValence(valence);
 
-    //find default valency for our case
+    // find default valency for our case
     return Math.max(0, defVal - valence);
   }
 
   getHydrogenCountHydrogen() {
-    if (this.getAtomBondsCount() === 0 && this.getCharge() === 0 &&
-      this.getValence() === 0 && this._radicalCount === 0) {
+    if (this.getAtomBondsCount() === 0 && this.getCharge() === 0
+      && this.getValence() === 0 && this._radicalCount === 0) {
       return 1;
     }
-    //do add in any other case
+    // do add in any other case
     return 0;
   }
 
@@ -202,57 +200,57 @@ class Atom {
       return this._hydrogenCount;
     }
 
-    const element = this.element;
+    const { element } = this;
     const val = element.hydrogenValency;
     if (val.length === 1 && val[0] === 0) {
       return 0;
     }
 
     switch (element.number) {
-    case 1:
-      return this.getHydrogenCountHydrogen();
-    case 3:
-    case 11:
-    case 19:
-    case 37:
-    case 55:
-    case 87: //group 1
-    case 4:
-    case 12:
-    case 20:
-    case 38:
-    case 56:
-    case 88: //group 2
-    case 13:
-    case 31:
-    case 49:
-    case 41: //group 13 but Boron
-    case 82:
-    case 83: //Bi and Pb
-      return this.getHydrogenCountMetal();
-    case 6:
-    case 14:
-    case 32:
-    case 51:      //C, Si, Ge, Sb
-      return this.getHydrogenCountGroup14();
-    case 50:       //Sn
-      return this.getHydrogenCountTin();
-    case 7:
-    case 8:
-    case 9:
-    case 15:
-    case 16:
-    case 17:      //N, O, F, P, S, Cl
-    case 33:
-    case 34:
-    case 35:
-    case 53:
-    case 85:       //As, Se, Br, I, At
-      return this.getHydrogenCountNonMetal();
-    case 5:
-      return this.getHydrogenCountBoron();
-    default:
-      return 0;
+      case 1:
+        return this.getHydrogenCountHydrogen();
+      case 3:
+      case 11:
+      case 19:
+      case 37:
+      case 55:
+      case 87: // group 1
+      case 4:
+      case 12:
+      case 20:
+      case 38:
+      case 56:
+      case 88: // group 2
+      case 13:
+      case 31:
+      case 49:
+      case 41: // group 13 but Boron
+      case 82:
+      case 83: // Bi and Pb
+        return this.getHydrogenCountMetal();
+      case 6:
+      case 14:
+      case 32:
+      case 51: // C, Si, Ge, Sb
+        return this.getHydrogenCountGroup14();
+      case 50: // Sn
+        return this.getHydrogenCountTin();
+      case 7:
+      case 8:
+      case 9:
+      case 15:
+      case 16:
+      case 17: // N, O, F, P, S, Cl
+      case 33:
+      case 34:
+      case 35:
+      case 53:
+      case 85: // As, Se, Br, I, At
+        return this.getHydrogenCountNonMetal();
+      case 5:
+        return this.getHydrogenCountBoron();
+      default:
+        return 0;
     }
   }
 
@@ -289,10 +287,10 @@ class Atom {
     let name = '';
     if (this._residue !== null) {
       if (this._residue._chain !== null) {
-        name += this._residue._chain.getName() + '.';
+        name += `${this._residue._chain.getName()}.`;
       }
 
-      name += this._residue._sequence + '.';
+      name += `${this._residue._sequence}.`;
     }
 
     name += this._name.getString();
@@ -317,4 +315,3 @@ class Atom {
 }
 
 export default Atom;
-

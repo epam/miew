@@ -11,10 +11,6 @@ import Colorer from './Colorer';
 class ResidueTypeColorer extends Colorer {
   static id = 'RT';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, complex) {
     return this.getResidueColor(atom._residue, complex);
   }

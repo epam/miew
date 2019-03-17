@@ -1,19 +1,21 @@
 import _ from 'lodash';
+import * as THREE from 'three';
 import Parser from './Parser';
 import chem from '../../chem';
-import * as THREE from 'three';
 
-const Complex = chem.Complex,
-  Element = chem.Element,
-  AtomName = chem.AtomName,
-  SGroup = chem.SGroup,
-  Bond = chem.Bond;
+const {
+  Complex,
+  Element,
+  AtomName,
+  SGroup,
+  Bond,
+} = chem;
 
 const cOrderCharCodes = {
   A: 0,
   S: 1,
   D: 2,
-  T: 3
+  T: 3,
 };
 
 const cmlStartRegexp = /\s*<\?xml\b[^?>]*\?>\s*<(?:cml|molecule)\b/i;
@@ -30,9 +32,6 @@ class CMLParser extends Parser {
     this._options.fileType = 'cml';
   }
 
-  ////////////////////////////////////////////////////////////////////////////
-  // Class methods
-
   /** @deprecated */
   static canParse(data, options) {
     if (!data) {
@@ -42,17 +41,14 @@ class CMLParser extends Parser {
     const re1 = new RegExp('^\\s*?\\<cml');
     const dataHasXML = (typeof data === 'string' || data instanceof String) && (data.match(re) || data.match(re1));
     return (
-      dataHasXML &&
-      Parser.checkDataTypeOptions(options, 'cml')
+      dataHasXML
+      && Parser.checkDataTypeOptions(options, 'cml')
     );
   }
 
   static canProbablyParse(data) {
     return _.isString(data) && cmlStartRegexp.test(data);
   }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Instance methods
 
   _rebuidBondIndexes(atoms, bonds) {
     const count = atoms.length;
@@ -76,7 +72,7 @@ class CMLParser extends Parser {
   _createSGroup(molecule, moleculeArr) {
     const newGroup = new SGroup(
       molecule.id, molecule.fieldData,
-      new THREE.Vector3(parseFloat(molecule.x), parseFloat(molecule.y), 0), molecule.atomRefs, molecule
+      new THREE.Vector3(parseFloat(molecule.x), parseFloat(molecule.y), 0), molecule.atomRefs, molecule,
     );
     if (molecule.placement === 'Relative') {
       newGroup._center = new THREE.Vector3(0, 0, 0);
@@ -138,12 +134,12 @@ class CMLParser extends Parser {
         }
       }
     }
-    //build sGroups centers
-    let atomMap = {}; //sgrpmap cache
+    // build sGroups centers
+    let atomMap = {}; // sgrpmap cache
     let mapEntry = null;
-    let nLimon = 100000000;
-    let bLow = new THREE.Vector3(nLimon, nLimon, nLimon);
-    let bHight = new THREE.Vector3(-nLimon, -nLimon, -nLimon);
+    const nLimon = 100000000;
+    const bLow = new THREE.Vector3(nLimon, nLimon, nLimon);
+    const bHight = new THREE.Vector3(-nLimon, -nLimon, -nLimon);
 
     function cycleFuncInner(e) {
       mapEntry = atomMap[e];
@@ -228,14 +224,14 @@ class CMLParser extends Parser {
       let length;
       let i;
       if (xmlNode.attributes) {
-        length = xmlNode.attributes.length;
+        ({ length } = xmlNode.attributes);
         for (i = 0; i < length; i++) {
           const attribute = xmlNode.attributes[i];
           jsonNode[attribute.nodeName] = attribute.nodeValue;
         }
       }
 
-      length = xmlNode.childNodes.length;
+      ({ length } = xmlNode.childNodes);
       for (i = 0; i < length; i++) {
         parseNode(xmlNode.childNodes[i], jsonNode);
       }
@@ -261,7 +257,7 @@ class CMLParser extends Parser {
           if (Array.isArray(data.molecule)) {
             for (let i = 0; i < data.molecule.length; i++) {
               if (data.molecule[i].atomArray && data.molecule[i].atomArray.atom) {
-                molSet.push({molecule: data.molecule[i]});
+                molSet.push({ molecule: data.molecule[i] });
               }
             }
           }
@@ -334,7 +330,7 @@ class CMLParser extends Parser {
 
       for (let i = 0; i < count; i++) {
         if (!addCurrBond(i)) {
-          //ignore invalid bond
+          // ignore invalid bond
           continue;
         }
         const orderAttr = bond.xmlNode.getAttribute('order');
@@ -354,7 +350,6 @@ class CMLParser extends Parser {
             }
           }
         }
-
       }
 
       count = atoms.length;
@@ -363,13 +358,13 @@ class CMLParser extends Parser {
         atom.edges.sort();
       }
 
-      const labels = self._breadWidthSearch(atoms, 0); //for now
+      const labels = self._breadWidthSearch(atoms, 0); // for now
 
       const retStruct = {};
       retStruct.atoms = atoms;
       retStruct.bonds = localBond;
       retStruct.labels = labels.atomLabels;
-      retStruct.count = Math.min(1, labels.labelsCount); //for now
+      retStruct.count = Math.min(1, labels.labelsCount); // for now
       retStruct.curr = -1;
       retStruct.originalCML = doc;
 
@@ -387,7 +382,7 @@ class CMLParser extends Parser {
     if (this._readOnlyOneMolecule && filteredData.length > 1) {
       filteredData.splice(1, filteredData.length - 1);
     }
-    filteredData.forEach(function(d) {
+    filteredData.forEach((d) => {
       const rd = prepareComponentCompound(d);
       if (rd.atoms.length > 0) {
         retData.push(rd);
@@ -404,7 +399,7 @@ class CMLParser extends Parser {
   _unpackLabel(l) {
     const shift = 16;
     const mask = (1 << shift) - 1;
-    return {molId: l >>> shift, compId: l & mask};
+    return { molId: l >>> shift, compId: l & mask };
   }
 
   _breadWidthSearch(atoms, molID) {
@@ -434,13 +429,13 @@ class CMLParser extends Parser {
         break;
       }
 
-      //Bread first search
+      // Bread first search
       breadthQueue.push(atoms[startID]);
       atomLabels[startID] = this._packLabel(componentID, molID);
       labeledAtoms--;
 
       while (breadthQueue.length > 0) {
-        let curr = breadthQueue.shift();
+        const curr = breadthQueue.shift();
         if (!curr) {
           continue;
         }
@@ -472,16 +467,14 @@ class CMLParser extends Parser {
     const complex = this._complex;
 
     const atoms = complex._atoms;
-    let i = 0, ni = atoms.length;
-    for (; i < ni; ++i) {
+    for (let i = 0, ni = atoms.length; i < ni; ++i) {
       const atom = atoms[i];
       serialAtomMap[atom._serial] = atom;
     }
 
     const bonds = complex._bonds;
-    let j = 0, nj = bonds.length;
-    const logger = this.logger;
-    for (; j < nj; ++j) {
+    const { logger } = this;
+    for (let j = 0, nj = bonds.length; j < nj; ++j) {
       const bond = bonds[j];
       if (bond._right < bond._left) {
         logger.debug('_fixBondsArray: Logic error.');
@@ -495,8 +488,7 @@ class CMLParser extends Parser {
     const complex = this._complex = new Complex();
     const data = varData;
     const currentLabel = data.curr;
-    const atoms = data.atoms;
-    const labels = data.labels;
+    const { atoms, labels } = data;
     let atom = null;
     let i;
     let j;
@@ -521,19 +513,16 @@ class CMLParser extends Parser {
     //    var nodeHText;
 
     let chains = {};
-    //parse atoms in label order
+    // parse atoms in label order
     const reorder = [];
     for (i = 0; i < count; i++) {
       reorder.push(i);
     }
-    reorder.sort(function(a, b) {
-      return labels[a] - labels[b];
-    });
+    reorder.sort((a, b) => labels[a] - labels[b]);
     for (i = 0; i < count; i++) {
       const atomCharge = 0;
       const lLabel = labels[reorder[i]];
       if (this._unpackLabel(lLabel).molId === this._unpackLabel(currentLabel).molId) {
-
         atom = atoms[reorder[i]];
         const atomHtmlNode = null;
 
@@ -554,9 +543,9 @@ class CMLParser extends Parser {
           const iCode = ' ';
           let strLabel = currAtomComp.toString();
           if (strLabel.length === 1) {
-            strLabel = '0' + strLabel;
+            strLabel = `0${strLabel}`;
           }
-          const resName = 'N' + strLabel;
+          const resName = `N${strLabel}`;
           let chain = chains[chainID];
           if (!chain || chain.getName() !== chainID) {
             chains[chainID] = chain = this._complex.getChain(chainID) || this._complex.addChain(chainID);
@@ -568,7 +557,7 @@ class CMLParser extends Parser {
             this._residue = residue = chain.addResidue(resName, resSeq, iCode);
           }
 
-          //_x, _y, _z, mname, mindex, atomNameFull, atomName, chainID, serial, isHet, atlLocInd, atomNameToTypeF
+          // _x, _y, _z, mname, mindex, atomNameFull, atomName, chainID, serial, isHet, atlLocInd, atomNameToTypeF
           let xyz = null;
           if (atom.x3) {
             xyz = new THREE.Vector3(parseFloat(atom.x3), parseFloat(atom.y3), parseFloat(atom.z3));
@@ -587,7 +576,7 @@ class CMLParser extends Parser {
           const atomSerial = parseInt(atom.id.replace(/[^0-9]/, ''), 10);
           const added = residue.addAtom(
             atomFullNameStruct, element, xyz, Element.Role.SG,
-            true, atomSerial, ' ', 1.0, 0.0, atomCharge
+            true, atomSerial, ' ', 1.0, 0.0, atomCharge,
           );
           if (atom.hydrogenCount) {
             added._hydrogenCount = parseInt(atom.hydrogenCount, 10);
@@ -599,18 +588,18 @@ class CMLParser extends Parser {
         }
       }
     }
-    chains = null;//NOSONAR
+    chains = null;// NOSONAR
     for (i = 0; i < data.bonds.length; i++) {
       const cb = data.bonds[i];
-      if (this._unpackLabel(labels[cb.start]).molId === this._unpackLabel(currentLabel).molId &&
-          this._unpackLabel(labels[cb.end]).molId === this._unpackLabel(currentLabel).molId) {
+      if (this._unpackLabel(labels[cb.start]).molId === this._unpackLabel(currentLabel).molId
+          && this._unpackLabel(labels[cb.end]).molId === this._unpackLabel(currentLabel).molId) {
         atom = atoms[cb.start];
         if (!atom || !(atoms[cb.end])) {
-          continue; //skip invalid
+          continue; // skip invalid
         }
         this._parseBond(
           parseInt(atom.id.replace(/[^0-9]/, ''), 10),
-          parseInt(atoms[cb.end].id.replace(/[^0-9]/, ''), 10), cb.order, cb.type
+          parseInt(atoms[cb.end].id.replace(/[^0-9]/, ''), 10), cb.order, cb.type,
         );
       }
     }
@@ -634,7 +623,7 @@ class CMLParser extends Parser {
       needAutoBonding: false,
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
-      serialAtomMap: this._serialAtomMap
+      serialAtomMap: this._serialAtomMap,
     });
     this._serialAtomMap = null;
     this._complex = null;
@@ -647,7 +636,7 @@ class CMLParser extends Parser {
     const complexes = [];
     const self = this;
     const moleculaSet = this._selectComponents(this._data);
-    moleculaSet.forEach(function(molSet) {
+    moleculaSet.forEach((molSet) => {
       molSet.curr = 2;
       if (molSet.count === 0) {
         molSet.count = 1;
@@ -660,7 +649,7 @@ class CMLParser extends Parser {
     // console.timeEnd('CML parse');
 
     let totalAtomsParsed = 0;
-    complexes.forEach(function(c) {
+    complexes.forEach((c) => {
       totalAtomsParsed += c.getAtomCount();
     });
     if (totalAtomsParsed <= 0) {
@@ -672,11 +661,11 @@ class CMLParser extends Parser {
       joinedComplex.joinComplexes(complexes);
       joinedComplex.originalCML = complexes[0].originalCML;
       return joinedComplex;
-    } else if (complexes.length === 1) {
-      return complexes[0];
-    } else {
-      return new Complex();
     }
+    if (complexes.length === 1) {
+      return complexes[0];
+    }
+    return new Complex();
   }
 }
 

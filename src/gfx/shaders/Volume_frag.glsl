@@ -12,7 +12,7 @@ uniform float deltaXZ;
 uniform float deltaXY;
 uniform float deltaYZ;
 
-uniform float _isoLevel0;
+uniform vec3 _isoLevel0;
 uniform float _flipV;
 uniform sampler2D _BFLeft;
 uniform sampler2D _BFRight;
@@ -47,34 +47,34 @@ vec4 sample3DTexture(vec3 texCoord)
   return mix(colorSlice1, colorSlice2, weightSlice2);
 }
 
-vec4 cubeToTextCoord(vec3 texCoord) {
+vec4 boxToTextCoord(vec3 boxCoord) {
   /***************** YOZ *********************/
-  float currDeltaYZ = (1. - texCoord.z) * deltaYZ;
+  float currDeltaYZ = (1. - boxCoord.z) * deltaYZ;
   if (PI / 2. - boxAngles.x > 0.) {
-    currDeltaYZ = texCoord.z * deltaYZ;
+    currDeltaYZ = boxCoord.z * deltaYZ;
   }
-  if (currDeltaYZ > texCoord.y  || texCoord.y > 1. - deltaYZ + currDeltaYZ)
+  if (currDeltaYZ > boxCoord.y  || boxCoord.y > 1. - deltaYZ + currDeltaYZ)
     return vec4(0., 0., 0., 0);
-  texCoord.y = (texCoord.y   - currDeltaYZ) / (1. - deltaYZ);
+  boxCoord.y = (boxCoord.y   - currDeltaYZ) / (1. - deltaYZ);
 
   /***************** XOZ *********************/
-  float currDeltaXZ = (1. - texCoord.z) * deltaXZ;
+  float currDeltaXZ = (1. - boxCoord.z) * deltaXZ;
   if (PI / 2. - boxAngles.y > 0.) {
-    currDeltaXZ = texCoord.z * deltaXZ;
+    currDeltaXZ = boxCoord.z * deltaXZ;
   }
-  if (currDeltaXZ > texCoord.x  || texCoord.x > 1. - deltaXZ + currDeltaXZ)
+  if (currDeltaXZ > boxCoord.x  || boxCoord.x > 1. - deltaXZ + currDeltaXZ)
        return vec4(0., 0., 0., 0);
 
   /***************** XOY *********************/
-  float currDeltaXY = (1. - texCoord.y) * deltaXY;
+  float currDeltaXY = (1. - boxCoord.y) * deltaXY;
   if (PI / 2. - boxAngles.z > 0.) {
-    currDeltaXY = texCoord.y * deltaXY;
+    currDeltaXY = boxCoord.y * deltaXY;
   }
-  if (currDeltaXY + currDeltaXZ > texCoord.x  || texCoord.x > 1. - deltaXY + currDeltaXY - deltaXZ + currDeltaXZ)
+  if (currDeltaXY + currDeltaXZ > boxCoord.x  || boxCoord.x > 1. - deltaXY + currDeltaXY - deltaXZ + currDeltaXZ)
        return vec4(0., 0., 0., 0);
-  texCoord.x = (texCoord.x   - currDeltaXY - currDeltaXZ) / (1. - deltaXY - deltaXZ);
+  boxCoord.x = (boxCoord.x   - currDeltaXY - currDeltaXZ) / (1. - deltaXY - deltaXZ);
 
-  return sample3DTexture(texCoord);
+  return sample3DTexture(boxCoord);
 }
 
 float CalcColor(vec3 iter, vec3 dir)
@@ -84,9 +84,9 @@ float CalcColor(vec3 iter, vec3 dir)
   vec3 dy = vec3(0.0, d, 0.0);
   vec3 dz = vec3(0.0, 0.0, d);
   vec3 N;
-  N.x = cubeToTextCoord(iter + dx).r - cubeToTextCoord(iter - dx).r;
-  N.y = cubeToTextCoord(iter + dy).r - cubeToTextCoord(iter - dy).r;
-  N.z = cubeToTextCoord(iter + dz).r - cubeToTextCoord(iter - dz).r;
+  N.x = boxToTextCoord(iter + dx).r - boxToTextCoord(iter - dx).r;
+  N.y = boxToTextCoord(iter + dy).r - boxToTextCoord(iter - dy).r;
+  N.z = boxToTextCoord(iter + dz).r - boxToTextCoord(iter - dz).r;
   N = normalize(N);
   float dif = max(0.0, dot(N,dir));
   return dif;
@@ -97,7 +97,7 @@ vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
   for (int i = 0; i < 5; i++)
   {
     vec3 iterator = 0.5*(left + right);
-    float vol = cubeToTextCoord(iterator).r;
+    float vol = boxToTextCoord(iterator).r;
     if ((volLeft - threshold)*(vol - threshold) < 0.)
       right = iterator;
     else
@@ -115,7 +115,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
     for (int i=0; i < 200; i++)
     {
       iterator = iterator + step;
-      vol = cubeToTextCoord(iterator).r;
+      vol = boxToTextCoord(iterator).r;
       if (length(iterator - back) < stepSize || vol > tr)
         break;
     }
@@ -126,7 +126,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
       for (int j = 0; j < 5; j++)
       {
         iterator = 0.5 * (left + right);
-        float vol = cubeToTextCoord(iterator).r;
+        float vol = boxToTextCoord(iterator).r;
         if (vol > tr)
           right = iterator;
         else
@@ -138,9 +138,22 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
   return acc;
 }
 
+
+float easeOut(float x0, float x1, float x) {
+  float t = clamp((x - x0) / (x1 - x0), 0.0, 1.0);
+  return 1.0 - (1.0 - t) * (1.0 - t);
+}
+
+float easeIn(float x0, float x1, float x) {
+  float t = clamp((x - x0) / (x1 - x0), 0.0, 1.0);
+  return t * t;
+}
+
 vec3 GetColSimple(float vol)
 {
-  return vol * (0.3 + vec3(1, 1, 0));
+  float t = easeOut(_isoLevel0.x, _isoLevel0.y, vol);
+  float s = easeIn(_isoLevel0.y, _isoLevel0.z, vol);
+  return vec3(0.5, 0.6, 0.7) * (1.0 - t) + 2.0 * vec3(s, 0, 0);
 }
 
 vec3 CorrectIso(vec3 left, vec3 right, float tr)
@@ -148,7 +161,7 @@ vec3 CorrectIso(vec3 left, vec3 right, float tr)
   for (int j = 0; j < 5; j++)
   {
     vec3 iterator = 0.5*(left + right);
-    float vol = cubeToTextCoord(iterator).r;
+    float vol = boxToTextCoord(iterator).r;
     if (vol < tr)
       right = iterator;
     else
@@ -164,7 +177,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
   //				float stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;
   float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;
   vec3 step = stepSize*dir, col, colOld, right;
-  float tr0 = _isoLevel0;
+  float tr0 = _isoLevel0.x;
   float dif, r, kd, finish;
   int count = 0, stopMol = 0;
   kd = 140. * tr0 * stepSize;
@@ -187,13 +200,13 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     {
       iterator = iterator + step;
       molD = length(iterator - start);
-      vol = cubeToTextCoord(iterator).r;
+      vol = boxToTextCoord(iterator).r;
       finish = distance(iterator, back) - stepSize;
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
       alpha = (1. - r);
       col = GetColSimple(vol);
-      vol = cubeToTextCoord(iterator - 0.5*step).r;
+      vol = boxToTextCoord(iterator - 0.5*step).r;
       vec3 colMid = GetColSimple(vol);
       sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
       sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
@@ -205,7 +218,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     {
       curStepSize = stepSize - (molD - molDist);
       right = iterator - (molD - molDist)*dir;
-      vol = cubeToTextCoord(right).r;
+      vol = boxToTextCoord(right).r;
     }
     else
     {
@@ -217,7 +230,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     alpha = (1. - r)*curStepSize / stepSize;
     dif = 1.;// CalcColor(right, dir);
     col = GetColSimple(vol);
-    vol = cubeToTextCoord(iterator - 0.5 * curStepSize / stepSize * step).r;
+    vol = boxToTextCoord(iterator - 0.5 * curStepSize / stepSize * step).r;
     vec3 colMid = GetColSimple(vol);
     sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;
     sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
@@ -241,8 +254,8 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
   {
     if (float(i) * stepSize > len) break;
     iterator = iterator + step;
-    if (cubeToTextCoord(iterator).r > _isoLevel0)
-      acc += cubeToTextCoord(iterator).r / 200.0;
+    if (boxToTextCoord(iterator).r > _isoLevel0.x)
+      acc += boxToTextCoord(iterator).r / 200.0;
   }
 
   return vec4(1,1,1, acc);
@@ -262,7 +275,7 @@ vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)
 
 vec4 VolRender3(vec3 start, vec3 back, float molDist, vec3 dir)
 {
-  return cubeToTextCoord(start);
+  return boxToTextCoord(start);
 }
 
 void main()

@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import {Smooth} from '../../../../vendor/js/Smooth';
+import { Smooth } from '../../../../vendor/js/Smooth';
 import gfxutils from '../../gfxutils';
 import chem from '../../../chem';
 
-const ResidueType = chem.ResidueType;
+const { ResidueType } = chem;
 
 const calcMatrix = gfxutils.calcChunkMatrix;
 
@@ -12,14 +12,14 @@ function _buildStructureInterpolator(points, tension) {
     method: Smooth.METHOD_CUBIC,
     clip: Smooth.CLIP_CLAMP,
     cubicTension: tension,
-    scaleTo: 1
+    scaleTo: 1,
   });
 
-  return function(t, argTrans) {
+  return function (t, argTrans) {
     let transformT = argTrans;
     if (transformT === null) {
       // map our range to the [second .. last but one]
-      transformT = function(tt) {
+      transformT = function (tt) {
         return (tt * ((points.length - 1) - 2) + 1) / (points.length - 1);
       };
     }
@@ -46,7 +46,8 @@ function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
   const nameFrom = nucleic ? 'C5\'' : 'N';
   const nameTo = nucleic ? 'C3\'' : 'C';
 
-  let posFrom, posTo;
+  let posFrom;
+  let posTo;
   residue.forEachAtom((atom) => {
     const name = atom.getVisualName();
     if (!posFrom && name === nameFrom) {
@@ -119,7 +120,7 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
   const nextIdx = _nextIdx(lastIdx);
   if (prevIdx === nextIdx) {
     _addPointsForLoneResidue(centerPoints, topPoints, arrIdx, residues[firstIdx]);
-    return {centerPoints : centerPoints, topPoints : topPoints};
+    return { centerPoints, topPoints };
   }
 
   // Two points (prev-prev and next-next) are added to support edge conditions for cubic splines, they are ignored
@@ -147,7 +148,7 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
     _addPoints(centerPoints, topPoints, arrIdx++, residues[nextIdx]);
     _addPoints(centerPoints, topPoints, arrIdx, residues[_nextIdx(nextIdx)]);
   }
-  return {centerPoints : centerPoints, topPoints : topPoints};
+  return { centerPoints, topPoints };
 }
 
 class CartoonHelper {

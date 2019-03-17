@@ -1,9 +1,7 @@
-
-
-import chem from '../../../chem';
 import * as THREE from 'three';
+import chem from '../../../chem';
 
-var Assembly = chem.Assembly;
+const { Assembly } = chem;
 
 /**
  * Parser helper for PDB tag "REMARK 350".
@@ -48,7 +46,7 @@ class Remark350 {
         assembly.addMatrix(matrix);
       }
 
-      const elements = matrix.elements;
+      const { elements } = matrix;
       elements[matrixRow] = parseFloat(matrixData[1]);
       elements[matrixRow + 4] = parseFloat(matrixData[2]);
       elements[matrixRow + 8] = parseFloat(matrixData[3]);
@@ -75,4 +73,3 @@ class Remark350 {
 Remark350.prototype.id = 350;
 
 export default Remark350;
-

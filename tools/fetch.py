@@ -10,6 +10,7 @@ formats = {
   'cif':  {'type': '',  'url': 'http://files.rcsb.org/download/%s.cif.gz', 'postprocess': lambda data: gzip.decompress(data).decode('ascii') },
   'mmtf': {'type': 'b', 'url': 'http://mmtf.rcsb.org/v1.0/full/%s',        'postprocess': lambda data: data },
   'ccp4': {'type': 'b', 'url': 'https://www.ebi.ac.uk/pdbe/coordinates/files/%s.ccp4', 'postprocess': lambda data: data },
+  'dsn6': {'type': 'b', 'url': 'https://edmaps.rcsb.org/maps/%s_2fofc.dsn6', 'postprocess': lambda data: data },
   'pubchem': {'type': '', 'url': 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%s/JSON?record_type=3d', 'postprocess': lambda data: data.decode('ascii'), 'ext': 'json'},
 }
 

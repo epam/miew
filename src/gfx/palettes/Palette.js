@@ -1,23 +1,18 @@
-
-
 function clamp(x, a, b) {
   return x <= b ? x < 0 ? 0 : x : b;
 }
 
 function lerpColor(c1, c2, alpha) {
-  var beta = 1 - alpha;
-  var
-    r1 = (c1 >> 16) & 0xff,
-    g1 = (c1 >> 8) & 0xff,
-    b1 = c1 & 0xff;
-  var
-    r2 = (c2 >> 16) & 0xff,
-    g2 = (c2 >> 8) & 0xff,
-    b2 = c2 & 0xff;
-  var
-    r = beta * r1 + alpha * r2,
-    g = beta * g1 + alpha * g2,
-    b = beta * b1 + alpha * b2;
+  const beta = 1 - alpha;
+  const r1 = (c1 >> 16) & 0xff;
+  const g1 = (c1 >> 8) & 0xff;
+  const b1 = c1 & 0xff;
+  const r2 = (c2 >> 16) & 0xff;
+  const g2 = (c2 >> 8) & 0xff;
+  const b2 = c2 & 0xff;
+  const r = beta * r1 + alpha * r2;
+  const g = beta * g1 + alpha * g2;
+  const b = beta * b1 + alpha * b2;
   return (r << 16) | (g << 8) | b;
 }
 
@@ -53,6 +48,7 @@ Palette.prototype = {
 
   defaultNamedColor: 0xFFFFFF,
   namedColorsArray: [
+    /* eslint-disable no-multi-spaces */
     ['indianred',               0xcd5c5c],
     ['lightcoral',              0xf08080],
     ['salmon',                  0xfa8072],
@@ -194,32 +190,33 @@ Palette.prototype = {
     ['slategray',               0x708090],
     ['darkslategray',           0x2f4f4f],
     ['black',                   0x000000],
+    /* eslint-enable no-multi-spaces */
   ],
 
   namedColors: {},
   /* eslint-enable no-magic-numbers */
 
   gradients: {
-    'rainbow': [
+    rainbow: [
       0x0000ff, // blue
       0x00ffff, // cyan
       0x00ff00, // green
       0xffff00, // yellow
       0xff0000, // red
     ],
-    'temp': [
+    temp: [
       0x0000ff, // blue
       0x007fff, // light-blue
       0xffffff, // white
       0xff7f00, // orange
       0xff0000, // red
     ],
-    'hot': [
+    hot: [
       0xffffff, // white
       0xff7f00, // orange
       0xff0000, // red
     ],
-    'cold': [
+    cold: [
       0xffffff, // white
       0x007fff, // light-blue
       0x0000ff, // blue
@@ -229,71 +226,68 @@ Palette.prototype = {
       0xffffff, // white
       0xff0000, // red
     ],
-    'reds': [
+    reds: [
       0xffffff, // white
       0xff0000, // red
     ],
-    'blues': [
+    blues: [
       0xffffff, // white
       0x0000ff, // blue
     ],
   },
 
-  getElementColor: function(name, asIs = false) {
-    var color = this.elementColors[name];
+  getElementColor(name, asIs = false) {
+    const color = this.elementColors[name];
     return color === undefined && !asIs ? this.defaultElementColor : color;
   },
 
-  getResidueColor: function(name, asIs = false) {
-    var color = this.residueColors[name];
+  getResidueColor(name, asIs = false) {
+    const color = this.residueColors[name];
     return color === undefined && !asIs ? this.defaultResidueColor : color;
   },
 
-  getChainColor: function(name) {
-    var chain = name.charCodeAt(0);
-    chain = ((chain < 0 ? 0 : chain >= 256 ? chain - 256 : chain) & 0x1F) %
-            this.chainColors.length;
+  getChainColor(name) {
+    let chain = name.charCodeAt(0);
+    chain = ((chain < 0 ? 0 : chain >= 256 ? chain - 256 : chain) & 0x1F)
+            % this.chainColors.length;
     return this.chainColors[chain];
   },
 
-  getSecondaryColor: function(type, asIs = false) {
-    var color = this.secondaryColors[type];
+  getSecondaryColor(type, asIs = false) {
+    const color = this.secondaryColors[type];
     return color === undefined && !asIs ? this.defaultSecondaryColor : color;
   },
 
-  getSequentialColor: function(index) {
-    var colors = this.colors;
-    var len = colors.length;
-    return index < 0 ? colors[index % len + len] : colors[index % len];
+  getSequentialColor(index) {
+    const { colors } = this;
+    const len = colors.length;
+    return index < 0 ? colors[(index % len) + len] : colors[index % len];
   },
 
-  getGradientColor: function(value, gradientName) {
-    var gradient = this.gradients[gradientName];
+  getGradientColor(value, gradientName) {
+    const gradient = this.gradients[gradientName];
     if (!gradient) {
       return this.defaultNamedColor;
-    } else {
-      var count = gradient.length;
-      var index = value * (count - 1);
-      var left = Math.floor(index);
-      var right = clamp(left + 1, 0, count - 1);
-      left = clamp(left, 0, count - 1);
-      return lerpColor(gradient[left], gradient[right], index - left);
     }
+    const count = gradient.length;
+    const index = value * (count - 1);
+    let left = Math.floor(index);
+    const right = clamp(left + 1, 0, count - 1);
+    left = clamp(left, 0, count - 1);
+    return lerpColor(gradient[left], gradient[right], index - left);
   },
 
-  getNamedColor: function(name, asIs = false) {
-    var color = this.namedColors[name];
+  getNamedColor(name, asIs = false) {
+    const color = this.namedColors[name];
     return color === undefined && !asIs ? this.defaultNamedColor : color;
   },
 };
 
-var namedColorsArray = Palette.prototype.namedColorsArray;
-var namedColors = Palette.prototype.namedColors;
+const { namedColorsArray, namedColors } = Palette.prototype;
 
-for (var i = 0, length = namedColorsArray.length; i < length; ++i) {
-  var namedColor = namedColorsArray[i];
-  namedColors[namedColor[0]] = namedColor[1];
+for (let i = 0, { length } = namedColorsArray; i < length; ++i) {
+  const [name, value] = namedColorsArray[i];
+  namedColors[name] = value;
 }
 
 export default Palette;
-

@@ -3,10 +3,6 @@ import Mode from './Mode';
 class TraceMode extends Mode {
   static id = 'TR';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   calcStickRadius() {
     return this.opts.radius;
   }

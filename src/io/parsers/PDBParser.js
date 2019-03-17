@@ -1,21 +1,20 @@
-
-
-import Parser from './Parser';
-import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
+import Parser from './Parser';
+import chem from '../../chem';
 import Remark290 from './pdb/Remark290';
 import Remark350 from './pdb/Remark350';
 import PDBStream from './PDBStream';
 
-const
-  Complex = chem.Complex,
-  Element = chem.Element,
-  Helix = chem.Helix,
-  Sheet = chem.Sheet,
-  Strand = chem.Strand,
-  Bond = chem.Bond,
-  Molecule = chem.Molecule;
+const {
+  Complex,
+  Element,
+  Helix,
+  Sheet,
+  Strand,
+  Bond,
+  Molecule,
+} = chem;
 
 const TAG_LENGTH = 6;
 
@@ -70,25 +69,19 @@ class PDBParser extends Parser {
   }
 
 
-  ////////////////////////////////////////////////////////////////////////////
-  // Class methods
-
   /** @deprecated */
   static canParse(data, options) {
     if (!data) {
       return false;
     }
-    return (typeof data === 'string') &&
-      (Parser.checkDataTypeOptions(options, 'pdb') || Parser.checkDataTypeOptions(options, 'pdb', '.ent'));
+    return (typeof data === 'string')
+      && (Parser.checkDataTypeOptions(options, 'pdb') || Parser.checkDataTypeOptions(options, 'pdb', '.ent'));
   }
 
 
   static canProbablyParse(data) {
     return _.isString(data) && pdbStartRegexp.test(data);
   }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Instance methods
 
   _finalize() {
     // console.time('PDBParser._finalize');
@@ -111,9 +104,8 @@ class PDBParser extends Parser {
       needAutoBonding: true,
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
-      serialAtomMap: this._serialAtomMap
+      serialAtomMap: this._serialAtomMap,
     });
-
   }
 
   _finalizeMolecules() {
@@ -146,7 +138,7 @@ class PDBParser extends Parser {
     const idChainMap = {};
     const complex = this._complex;
 
-    //prepare
+    // prepare
     for (let i = 0; i < complex._chains.length; i++) {
       const chain = complex._chains[i];
       idChainMap[chain._name.charCodeAt(0)] = chain;
@@ -178,16 +170,14 @@ class PDBParser extends Parser {
     const complex = this._complex;
 
     const atoms = complex._atoms;
-    let i = 0, ni = atoms.length;
-    for (; i < ni; ++i) {
+    for (let i = 0, ni = atoms.length; i < ni; ++i) {
       const atom = atoms[i];
       serialAtomMap[atom._serial] = atom;
     }
 
     const bonds = complex._bonds;
-    let j = 0, nj = bonds.length;
-    const logger = this.logger;
-    for (; j < nj; ++j) {
+    const { logger } = this;
+    for (let j = 0, nj = bonds.length; j < nj; ++j) {
       const bond = bonds[j];
       if (bond._right < bond._left) {
         logger.debug('_fixBondsArray: Logic error.');
@@ -208,19 +198,19 @@ class PDBParser extends Parser {
     // field names according to wwPDB Format
     // NOTE: Chimera allows (nonstandard) use of columns 6-11 for the integer atom serial number in ATOM records.
     const serial = het ? stream.readInt(7, 11) : stream.readInt(6, 11);
-    let name       = stream.readString(13, 16);
-    const altLoc     = stream.readChar(17);
-    const resName    = stream.readString(18, 20).trim();
-    const chainID    = stream.readChar(22);
-    const resSeq     = stream.readInt(23, 26);
-    const iCode      = stream.readChar(27);
-    const x          = stream.readFloat(31, 38);
-    const y          = stream.readFloat(39, 46);
-    const z          = stream.readFloat(47, 54);
-    const occupancy  = stream.readFloat(55, 60);
+    let name = stream.readString(13, 16);
+    const altLoc = stream.readChar(17);
+    const resName = stream.readString(18, 20).trim();
+    const chainID = stream.readChar(22);
+    const resSeq = stream.readInt(23, 26);
+    const iCode = stream.readChar(27);
+    const x = stream.readFloat(31, 38);
+    const y = stream.readFloat(39, 46);
+    const z = stream.readFloat(47, 54);
+    const occupancy = stream.readFloat(55, 60);
     const tempFactor = stream.readFloat(61, 66);
-    const element    = stream.readString(77, 78).trim() || nameToElement(name);
-    const charge     = stream.readInt(79, 80) || 0;
+    const element = stream.readString(77, 78).trim() || nameToElement(name);
+    const charge = stream.readInt(79, 80) || 0;
     /* eslint-enable no-magic-numbers */
     // skip waters (there may be lots of them)
     if (this.settings.now.nowater) {
@@ -250,7 +240,7 @@ class PDBParser extends Parser {
     }
 
     // TODO: optimize atom positions storage? what for? (and occupancy? tempFactor?)
-    let xyz = new THREE.Vector3(x, y, z);
+    const xyz = new THREE.Vector3(x, y, z);
     residue.addAtom(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
   }
 
@@ -288,12 +278,12 @@ class PDBParser extends Parser {
     /* eslint-disable no-magic-numbers */
     const str = stream.readString(11, 80);
     const tokenIdx = str.indexOf(':');
-    this._compndCurrToken  = tokenIdx > 0 ? str.substring(0, tokenIdx).trim() : this._compndCurrToken;
+    this._compndCurrToken = tokenIdx > 0 ? str.substring(0, tokenIdx).trim() : this._compndCurrToken;
     /* eslint-enable no-magic-numbers */
 
     // start reading new molecule
     if (this._compndCurrToken === 'MOL_ID') {
-      this._molecule = {_index: '', _chains: []};
+      this._molecule = { _index: '', _chains: [] };
       this._molecule._index = parseInt(str.substring(tokenIdx + 1, str.indexOf(';')), 10);
       this._molecules.push(this._molecule);
       // parse molecule name
@@ -336,32 +326,31 @@ class PDBParser extends Parser {
     /* eslint-disable no-magic-numbers */
     const fields = [20, 22, 32, 34];
     /* eslint-enable no-magic-numbers */
-    this._parseSTRUCTURE(stream, fields, function(obj) {
+    this._parseSTRUCTURE(stream, fields, (obj) => {
       this._complex.addHelix(obj);
       this._complex.structures.push(obj);
-    }.bind(this));
+    });
   }
 
   _parseSHEET(stream) {
     /* eslint-disable no-magic-numbers */
     const fields = [22, 23, 33, 34];
     /* eslint-enable no-magic-numbers */
-    this._parseSTRUCTURE(stream, fields, function(obj) {
+    this._parseSTRUCTURE(stream, fields, (obj) => {
       this._complex.addSheet(obj);
-    }.bind(this));
+    });
   }
 
   _parseSTRUCTURE(stream, pars, adder) { // FIXME: HELIX and SHEET have nothing in common
-
     const startId = 0;
     const startIndex = 1;
     const endId = 2;
     const endIndex = 3;
 
-    //identify fields: debugging and stuff
+    // identify fields: debugging and stuff
     /* eslint-disable no-magic-numbers */
     const codeOfS = 0x53;
-    //var twoLinesMaxLen = 2 * 80;
+    // var twoLinesMaxLen = 2 * 80;
     const serialNumber = stream.readInt(8, 10);
     const structureName = stream.readString(12, 14).trim(); // FIXME: LString(3) forbids trim()
     const comment = stream.readString(41, 70).trim();
@@ -371,7 +360,7 @@ class PDBParser extends Parser {
     const shCur = stream.readInt(42, 45);
     const shPrev = stream.readInt(57, 60);
     /* eslint-enable no-magic-numbers */
-    //file fields
+    // file fields
     const startChainID = stream.readString(pars[startId], pars[endId] + 1).charCodeAt(0); // FIXME: no need in these
     const endChainID = stream.readString(pars[endId], pars[endId] + 1).charCodeAt(0);
     const startSequenceNumber = stream.readInt(pars[startIndex], pars[startIndex] + 3);
@@ -405,7 +394,7 @@ class PDBParser extends Parser {
         obj,
         this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode),
         this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode),
-        helixClass, shCur, shPrev
+        helixClass, shCur, shPrev,
       );
       obj.addStrand(strand);
       this._complex.structures.push(strand);
@@ -414,14 +403,14 @@ class PDBParser extends Parser {
         helixClass,
         this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode),
         this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode),
-        serialNumber, structureName, comment, helLength
+        serialNumber, structureName, comment, helLength,
       );
       adder(obj);
     }
   }
 
   _parseHEADER(stream) {
-    const metadata = this._complex.metadata;
+    const { metadata } = this._complex;
     metadata.classification = stream.readString(11, 50).trim();
     metadata.date = stream.readString(51, 59).trim();
 
@@ -434,7 +423,7 @@ class PDBParser extends Parser {
   }
 
   _parseTITLE(stream) {
-    const metadata = this._complex.metadata;
+    const { metadata } = this._complex;
     metadata.title = metadata.title || [];
 
     const line = stream.readInt(9, 10) || 1;
@@ -442,14 +431,14 @@ class PDBParser extends Parser {
   }
 
   static tagParsers = {
-    'HEADER': PDBParser.prototype._parseHEADER,
+    HEADER: PDBParser.prototype._parseHEADER,
     'TITLE ': PDBParser.prototype._parseTITLE,
     'ATOM  ': PDBParser.prototype._parseATOM,
-    'HETATM': PDBParser.prototype._parseATOM,
-    'ENDMDL': PDBParser.prototype._parseENDMDL,
-    'CONECT': PDBParser.prototype._parseCONECT,
-    'COMPND': PDBParser.prototype._parseCOMPND,
-    'REMARK': PDBParser.prototype._parseREMARK,
+    HETATM: PDBParser.prototype._parseATOM,
+    ENDMDL: PDBParser.prototype._parseENDMDL,
+    CONECT: PDBParser.prototype._parseCONECT,
+    COMPND: PDBParser.prototype._parseCOMPND,
+    REMARK: PDBParser.prototype._parseREMARK,
     // 'SOURCE': PDBParser.prototype._parseSOURCE,
     'HELIX ': PDBParser.prototype._parseHELIX,
     'SHEET ': PDBParser.prototype._parseSHEET,

@@ -23,7 +23,7 @@ class CrossGeometry extends SphereCollisionGeo(ChunkedLinesGeometry) {
   setItem(itemIdx, itemPos, itemRad) {
     this.setSphere(itemIdx, itemPos, itemRad);
 
-    //const offset = itemIdx * this._chunkSize;
+    // const offset = itemIdx * this._chunkSize;
     for (let i = 0; i < vecCount / 2; ++i) {
       const first = i * 2;
       tempPos1.x = itemPos.x + vectors[first].x * itemRad;

@@ -1,16 +1,16 @@
 import webdriver from 'selenium-webdriver';
 import ieDriver from 'selenium-webdriver/ie';
 
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import _ from 'lodash';
 
 import MiewPage from './pages/miew.page';
 import golden from './golden';
 
-chai.use(dirtyChai);
-
 import goldenCfg from './golden.cfg';
+
+chai.use(dirtyChai);
 
 const cfg = Object.assign({}, goldenCfg, {
   title: 'Representations Tests',
@@ -20,12 +20,11 @@ const cfg = Object.assign({}, goldenCfg, {
 let driver;
 let page;
 
-describe('As a power user, I want to', function() {
-
+describe('As a power user, I want to', function () {
   this.timeout(0);
   this.slow(1000);
 
-  before(function() {
+  before(() => {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
@@ -41,27 +40,25 @@ describe('As a power user, I want to', function() {
       });
   });
 
-  after(function() {
-    return golden.shutdown();
-  });
+  after(() => golden.shutdown());
 
-  beforeEach(function() {
+  beforeEach(function () {
     golden.report.context.desc = this.currentTest.title;
   });
 
-  it('see 1CRN by default', function() {
+  it('see 1CRN by default', function () {
     return page.waitUntilTitleContains('1CRN')
       .then(() => page.waitUntilRebuildIsDone())
       .then(() => golden.shouldMatch('1crn', this));
   });
 
-  let retrieve = {};
+  const retrieve = {};
   [
     ['modes', 'BS'],
     ['colorers', 'EL'],
     ['materials', 'SF'],
   ].forEach(([listName, sampleId]) => {
-    it(`retrieve a list of ${listName} including "${sampleId}"`, function() {
+    it(`retrieve a list of ${listName} including "${sampleId}"`, () => {
       const func = 'function(x){return{id:Array.isArray(x.id)?x.id[0]:x.id,name:x.prototype?x.prototype.name:x.name};}';
       retrieve[listName] = page.getValueFor(`miew.constructor.${listName}.all.map(${func})`);
       return retrieve[listName].then((list) => {
@@ -75,7 +72,7 @@ describe('As a power user, I want to', function() {
     });
   });
 
-  it('load 1AID with an appropriate orientation and scale', function() {
+  it('load 1AID with an appropriate orientation and scale', function () {
     return page.openTerminal()
       .then(() => page.runScript(`\
 set interpolateViews false
@@ -86,63 +83,54 @@ view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
       .then(() => golden.shouldMatch('1aid', this));
   });
 
-  describe('assign all combinations of modes and colorers via terminal, i.e.', function() {
-
-    it('apply "small" preset', function() {
+  describe('assign all combinations of modes and colorers via terminal, i.e.', function () {
+    it('apply "small" preset', function () {
       return page.runScript('preset small')
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
     });
 
     const suite = this;
-    before(function() {
-      return Promise.all([retrieve.modes, retrieve.colorers]).then(([modes, colorers]) => {
-        _.each(modes, (mode) => {
-          _.each(colorers, (colorer) => {
-            suite.addTest(it(`set ${mode.name} mode with ${colorer.name} coloring`, function() {
-              return page.runScript(`clear\nrep 0 m=${mode.id} c=${colorer.id}`)
-                .then(() => page.waitUntilRepresentationIs(0, mode.id, colorer.id))
-                .then(() => golden.shouldMatch(`1aid_${mode.id}_${colorer.id}`, this));
-            }));
-          });
+    before(() => Promise.all([retrieve.modes, retrieve.colorers]).then(([modes, colorers]) => {
+      _.each(modes, (mode) => {
+        _.each(colorers, (colorer) => {
+          suite.addTest(it(`set ${mode.name} mode with ${colorer.name} coloring`, function () {
+            return page.runScript(`clear\nrep 0 m=${mode.id} c=${colorer.id}`)
+              .then(() => page.waitUntilRepresentationIs(0, mode.id, colorer.id))
+              .then(() => golden.shouldMatch(`1aid_${mode.id}_${colorer.id}`, this));
+          }));
         });
       });
-    });
-
+    }));
   });
 
-  describe('assign all materials via terminal, i.e.', function() {
-
-    it('apply "small" preset', function() {
+  describe('assign all materials via terminal, i.e.', function () {
+    it('apply "small" preset', function () {
       return page.runScript('preset small')
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_BS_EL', this));
     });
 
-    it('add a surface', function() {
+    it('add a surface', function () {
       return page.runScript('add m=QS')
         .then(() => page.waitUntilRebuildIsDone())
         .then(() => golden.shouldMatch('1aid_QS_EL', this));
     });
 
     const suite = this;
-    before(function() {
-      return retrieve.materials.then((materials) => {
-        _.each(materials, (material) => {
-          suite.addTest(it(`set ${material.name} material`, function() {
-            return page.runScript(`clear\nrep 1 m=QS mt=${material.id}`)
-              .then(() => page.waitUntilRepresentationIs(1, 'QS', 'EL'))
-              .then(() => golden.shouldMatch(`1aid_QS_EL_${material.id}`, this));
-          }));
-        });
+    before(() => retrieve.materials.then((materials) => {
+      _.each(materials, (material) => {
+        suite.addTest(it(`set ${material.name} material`, function () {
+          return page.runScript(`clear\nrep 1 m=QS mt=${material.id}`)
+            .then(() => page.waitUntilRepresentationIs(1, 'QS', 'EL'))
+            .then(() => golden.shouldMatch(`1aid_QS_EL_${material.id}`, this));
+        }));
       });
-    });
-
+    }));
   });
 
-  describe('check correct color parameters work', function() {
-
-    it('load 4V4F with an appropriate orientation and scale', function() {
+  describe('check correct color parameters work', () => {
+    it('load 4V4F with an appropriate orientation and scale', function () {
       return page.runScript(`\
 clear
 load "mmtf:4v4f"
@@ -153,7 +141,7 @@ view "1HM0iwbqdTz5fQpPCZaEBPfgFibut+Q0/vYEbwA=="`)
         .then(() => golden.shouldMatch('4v4f', this));
     });
 
-    it('prepare the molecule', function() {
+    it('prepare the molecule', function () {
       return page.runScript(`\
 set autobuild false
 rep 0 s = "chain AA" m = "CA" c = "HY" mt = "SF"
@@ -169,7 +157,7 @@ build all`)
         .then(() => golden.shouldMatch('4v4f_precolors', this));
     });
 
-    it('change color parameters', function() {
+    it('change color parameters', function () {
       return page.runScript(`\
 set autobuild false
 rep 0 c=HY gradient = "hot"
@@ -184,12 +172,10 @@ build all`)
         .then(() => page.waitUntilRepresentationIs(7, 'BS', 'EL'))
         .then(() => golden.shouldMatch('4v4f_colors', this));
     });
-
   });
 
-  describe('check correct mode parameters work', function() {
-
-    it('prepare the molecule', function() {
+  describe('check correct mode parameters work', () => {
+    it('prepare the molecule', function () {
       return page.runScript(`\
 set autobuild false
 rep 0 s = "chain AA" m = "BS" c = "EL"
@@ -208,7 +194,7 @@ build all`)
         .then(() => golden.shouldMatch('4v4f_prepare', this));
     });
 
-    it('change mode parameters', function() {
+    it('change mode parameters', function () {
       return page.runScript(`\
 set autobuild false
 rep 0 m=BS atom = 0.15 bond = 0.4 space = 0.8 multibond = false
@@ -226,11 +212,10 @@ build all`)
         .then(() => page.waitUntilRepresentationIs(10, 'TX', 'RT'))
         .then(() => golden.shouldMatch('4v4f_params', this));
     });
-
   });
 
-  describe('assign combinations of selectors and modes via terminal, i. e.', function() {
-    it('build selectors pattern', function() {
+  describe('assign combinations of selectors and modes via terminal, i. e.', function () {
+    it('build selectors pattern', function () {
       return page.runScript(`\
 set autobuild false
 rep 0 s="sequence -1:71 and chain AA" m=CA c=SQ mt=SF
@@ -258,25 +243,21 @@ build all`)
         .then(() => golden.shouldMatch('4v4f_selectors', this));
     });
 
-    let repNumbers = Array.from(Array(20).keys());
+    const repNumbers = Array.from(Array(20).keys());
     const suite = this;
-    before(function() {
-      return Promise.all([retrieve.modes]).then(([modes]) => {
-        _.each(modes, (mode) => {
-          const command = repNumbers.map(number => `rep ${number} m=${mode.id}`).join('\n');
-          suite.addTest(it(`set ${mode.name} mode with all selectors`, function() {
-            return page.runScript(`\
+    before(() => Promise.all([retrieve.modes]).then(([modes]) => {
+      _.each(modes, (mode) => {
+        const command = repNumbers.map(number => `rep ${number} m=${mode.id}`).join('\n');
+        suite.addTest(it(`set ${mode.name} mode with all selectors`, function () {
+          return page.runScript(`\
 clear
 set autobuild false
 ${command}
 build all`)
-              .then(() => page.waitUntilRepresentationIs(19, mode.id, 'EL'))
-              .then(() => golden.shouldMatch(`4v4f_${mode.id}`, this));
-          }));
-        });
+            .then(() => page.waitUntilRepresentationIs(19, mode.id, 'EL'))
+            .then(() => golden.shouldMatch(`4v4f_${mode.id}`, this));
+        }));
       });
-    });
-
+    }));
   });
-
 });

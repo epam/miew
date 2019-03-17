@@ -8,16 +8,12 @@ import BaseLinesGeometry from './ThickLinesGeometry';
  * @param {number}  segmentsCount   Number of segments per chunk.
  */
 class LinesGeometry extends BaseLinesGeometry {
-  constructor(segmentsCount) {
-    super(segmentsCount);
-  }
-
   startUpdate() {
     return true;
   }
 
   computeBoundingSphere() {
-    const boundingBox = this.boundingBox;
+    const { boundingBox } = this;
     // Build bounding sphere
     let radiusSquared = 0.0;
     const center = new THREE.Vector3();

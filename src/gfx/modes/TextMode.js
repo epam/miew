@@ -4,10 +4,6 @@ import Mode from './Mode';
 class TextMode extends Mode {
   static id = 'TX';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getTemplateOptions() {
     return this.opts.template;
   }

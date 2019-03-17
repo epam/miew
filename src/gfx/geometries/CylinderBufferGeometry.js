@@ -11,9 +11,8 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
     height,
     radialSegments,
     heightSegments,
-    openEnded
+    openEnded,
   ) {
-
     super();
 
     const thetaStart = 0;
@@ -23,19 +22,19 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
     this.type = 'CylinderBufferGeometry';
 
     this.parameters = {
-      radiusTop: radiusTop,
-      radiusBottom: radiusBottom,
-      height: height,
-      radialSegments: radialSegments,
-      heightSegments: heightSegments,
-      openEnded: openEnded
+      radiusTop,
+      radiusBottom,
+      height,
+      radialSegments,
+      heightSegments,
+      openEnded,
     };
 
     const hasTop = openEnded === false && radiusTop > 0;
     const hasBottom = openEnded === false && radiusBottom > 0;
-    const vertexCount = (heightSegments + 1) * radialSegments +
-      hasTop * (radialSegments + 1) +
-      hasBottom * (radialSegments + 1);
+    const vertexCount = (heightSegments + 1) * radialSegments
+      + hasTop * (radialSegments + 1)
+      + hasBottom * (radialSegments + 1);
     const facesCount = (2 * heightSegments + hasTop + hasBottom) * radialSegments;
 
     const heightHalf = height / 2;
@@ -60,8 +59,8 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
         for (let i = 0; i < radialSegments; i++) {
           const v1 = currVtxIdx + i;
           const v2 = currVtxIdx + radialSegments + i;
-          const v3 = currVtxIdx + radialSegments + (i + 1) % radialSegments;
-          const v4 = currVtxIdx + (i + 1) % radialSegments;
+          const v3 = currVtxIdx + radialSegments + ((i + 1) % radialSegments);
+          const v4 = currVtxIdx + ((i + 1) % radialSegments);
 
           indices.setXYZ(currFaceIdx * PTS_PER_TRIANGLE, v1, v4, v2);
           currFaceIdx++;
@@ -75,7 +74,6 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
       const radius = v * (radiusBottom - radiusTop) + radiusTop;
 
       for (let x = 0; x < radialSegments; x++) {
-
         const u = x / radialSegments;
 
         const vx = radius * Math.sin(u * thetaLength + thetaStart);
@@ -85,7 +83,7 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
         const normal = new THREE.Vector3(
           vx,
           Math.sqrt(vx * vx + vz * vz) * tanTheta,
-          vz
+          vz,
         ).normalize();
 
         positions.setXYZ(currVtxIdx, vx, vy, vz);
@@ -105,13 +103,13 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
           currVtxIdx,
           positions.getX(currSrcIdx),
           positions.getY(currSrcIdx),
-          positions.getZ(currSrcIdx)
+          positions.getZ(currSrcIdx),
         );
         normals.setXYZ(currVtxIdx, 0, 1, 0);
         uvs.setXY(currVtxIdx, 1, 1);
 
 
-        const nextTVtx = startTIdx + (fTIdx + 1) % radialSegments;
+        const nextTVtx = startTIdx + ((fTIdx + 1) % radialSegments);
         indices.setXYZ(currFaceIdx * PTS_PER_TRIANGLE, currVtxIdx, nextTVtx, lastIdx);
         currFaceIdx++;
         currVtxIdx++;
@@ -131,13 +129,13 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
         const currSrcBIdx = fBIdx;
         positions.setXYZ(
           currVtxIdx,
-          positions.getX(currSrcBIdx), positions.getY(currSrcBIdx), positions.getZ(currSrcBIdx)
+          positions.getX(currSrcBIdx), positions.getY(currSrcBIdx), positions.getZ(currSrcBIdx),
         );
         normals.setXYZ(currVtxIdx, 0, -1, 0);
         uvs.setXY(currVtxIdx, 0, 0);
 
 
-        const nextBVtx = startBIdx + (fBIdx + 1) % radialSegments;
+        const nextBVtx = startBIdx + ((fBIdx + 1) % radialSegments);
         indices.setXYZ(currFaceIdx * PTS_PER_TRIANGLE, nextBVtx, currVtxIdx, lastBIdx);
         currFaceIdx++;
         currVtxIdx++;
@@ -155,8 +153,7 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
   }
 
   clone() {
-
-    const parameters = this.parameters;
+    const { parameters } = this;
 
     return new CylinderBufferGeometry(
       parameters.radiusTop,
@@ -164,7 +161,7 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
       parameters.height,
       parameters.radialSegments,
       parameters.heightSegments,
-      parameters.openEnded
+      parameters.openEnded,
     );
   }
 }

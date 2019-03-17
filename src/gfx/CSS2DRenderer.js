@@ -1,17 +1,14 @@
-
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-import CSS2DObject from './CSS2DObject';
 import * as THREE from 'three';
+import CSS2DObject from './CSS2DObject';
 
 const tempColor = new THREE.Color();
 
 class CSS2DRenderer {
   constructor() {
-
     this._width = 0;
     this._height = 0;
     this._widthHalf = 0;
@@ -25,7 +22,7 @@ class CSS2DRenderer {
     this._domElement.style.overflow = 'hidden';
     this._domElement.style.position = 'absolute';
     this._domElement.style.top = '0';
-    this._domElement.style.zIndex = '0';  // start a new Stacking Context to enclose all z-ordered children
+    this._domElement.style.zIndex = '0'; // start a new Stacking Context to enclose all z-ordered children
     this._domElement.style.pointerEvents = 'none';
   }
 
@@ -47,28 +44,27 @@ class CSS2DRenderer {
     this._widthHalf = this._width / 2;
     this._heightHalf = this._height / 2;
 
-    this._domElement.style.width = width + 'px';
-    this._domElement.style.height = height + 'px';
+    this._domElement.style.width = `${width}px`;
+    this._domElement.style.height = `${height}px`;
   }
 
   _renderObject(object, camera, scene) {
-
     function lerpColorAsHex(a, b, t) {
       tempColor.setHex(a);
       tempColor.lerp(b, t);
-      return '#' + tempColor.getHexString();
+      return `#${tempColor.getHexString()}`;
     }
 
     function colorAsHex(a) {
       tempColor.setHex(a);
-      return '#' + tempColor.getHexString();
+      return `#${tempColor.getHexString()}`;
     }
 
     if (object instanceof CSS2DObject) {
       this._vector.setFromMatrixPosition(object.matrixWorld);
 
       if (object.userData !== undefined && object.userData.offset !== undefined) {
-        let localOffset = new THREE.Vector3(object.userData.offset.x, object.userData.offset.y, 0);
+        const localOffset = new THREE.Vector3(object.userData.offset.x, object.userData.offset.y, 0);
         this._vector.add(localOffset.multiplyScalar(object.matrixWorld.getMaxScaleOnAxis()));
       }
 
@@ -93,9 +89,9 @@ class CSS2DRenderer {
 
       this._vector.applyMatrix4(this._projectionMatrix);
 
-      const style = (object.userData !== {} ? object.userData.translation : 'translate(-50%, -50%) ') +
-        'translate(' + (this._vector.x * this._widthHalf + this._widthHalf) + 'px,' +
-        (-this._vector.y * this._heightHalf + this._heightHalf) + 'px)';
+      const style = `${object.userData !== {} ? object.userData.translation : 'translate(-50%, -50%) '
+      }translate(${this._vector.x * this._widthHalf + this._widthHalf}px,${
+        -this._vector.y * this._heightHalf + this._heightHalf}px)`;
       element.style.visibility = visibility;
       element.style.WebkitTransform = style;
       element.style.MozTransform = style;
@@ -129,4 +125,3 @@ class CSS2DRenderer {
   }
 }
 export default CSS2DRenderer;
-

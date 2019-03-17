@@ -1,8 +1,8 @@
+import * as THREE from 'three';
 import utils from './utils';
 import VolumeMesh from './gfx/VolumeMesh';
 import Visual from './Visual';
 import VolumeMaterial from './gfx/shaders/VolumeMaterial';
-import * as THREE from 'three';
 import gfxutils from './gfx/gfxutils';
 import meshes from './gfx/meshes/meshes';
 
@@ -22,7 +22,7 @@ utils.deriveClass(VolumeVisual, Visual);
 // cube. In cut place of cube there is no correct data in BFTexture and volume rendering integral is calculated
 // with errors.
 // Far plane cuts the cube in case of large volume scale (zoom), because farplane doesn't change
-VolumeVisual.prototype.buildFarPlane = function() {
+VolumeVisual.prototype.buildFarPlane = function () {
   // create plane with unit corners coords (for future rescale in vshader according to camera properties)
   const planeGeo = new THREE.PlaneGeometry(2, 2, 1, 1); // FIXME create custom plane geometry (without normals and uvs)
   const mat = VolumeMaterial.BackFacePosMaterialFarPlane();
@@ -31,10 +31,10 @@ VolumeVisual.prototype.buildFarPlane = function() {
   this._plane.doubleSided = true;
   const matWorldToVolume = new THREE.Matrix4();
 
-  this._plane._onBeforeRender = function(_renderer, _scene, camera, _geometry, _material, _group) {
+  this._plane._onBeforeRender = function (_renderer, _scene, camera, _geometry, _material, _group) {
     const volume = this.parent.getObjectByName('VolumeMesh');
-    const material = this.material;
-    if (!volume  || !material) {
+    const { material } = this;
+    if (!volume || !material) {
       return;
     }
 
@@ -65,20 +65,19 @@ VolumeVisual.prototype.buildFarPlane = function() {
   this._plane.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
 };
 
-VolumeVisual.prototype.getBoundaries = function() {
-  var box = this._dataSource.getBox();
-  var sphere = new THREE.Sphere();
+VolumeVisual.prototype.getBoundaries = function () {
+  const box = this._dataSource.getBox();
+  const sphere = new THREE.Sphere();
   box.getBoundingSphere(sphere);
 
   return {
     boundingBox: box,
-    boundingSphere: sphere
+    boundingSphere: sphere,
   };
 };
 
-VolumeVisual.prototype.getMesh = function() {
+VolumeVisual.prototype.getMesh = function () {
   return this._mesh;
 };
 
 export default VolumeVisual;
-

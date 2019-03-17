@@ -10,13 +10,13 @@ import utils from '../utils';
  * @param {number} zMax - upper bound of the slice
  */
 function _getSphereSliceRadiusRange(center, radius, zMin, zMax) {
-  var dzMin = zMin - center.z;
-  var dzMax = zMax - center.z;
-  var rzMin = Math.sqrt(Math.max(radius * radius - dzMin * dzMin, 0.0));
-  var rzMax = Math.sqrt(Math.max(radius * radius - dzMax * dzMax, 0.0));
+  const dzMin = zMin - center.z;
+  const dzMax = zMax - center.z;
+  const rzMin = Math.sqrt(Math.max(radius * radius - dzMin * dzMin, 0.0));
+  const rzMax = Math.sqrt(Math.max(radius * radius - dzMax * dzMax, 0.0));
 
-  var rMin = Math.min(rzMin, rzMax);
-  var rMax;
+  const rMin = Math.min(rzMin, rzMax);
+  let rMax;
 
   if (zMin <= center.z && zMax >= center.z) {
     // sphere's main diameter is inside slice
@@ -41,13 +41,13 @@ function _getSphereSliceRadiusRange(center, radius, zMin, zMax) {
  * @returns {Array} - array of two numbers (min & max radius, or half-width)
  */
 function _getCircleSliceRadiusRange(center, radius, yMin, yMax) {
-  var dyMin = yMin - center.y;
-  var dyMax = yMax - center.y;
-  var ryMin = Math.sqrt(Math.max(radius * radius - dyMin * dyMin, 0.0));
-  var ryMax = Math.sqrt(Math.max(radius * radius - dyMax * dyMax, 0.0));
+  const dyMin = yMin - center.y;
+  const dyMax = yMax - center.y;
+  const ryMin = Math.sqrt(Math.max(radius * radius - dyMin * dyMin, 0.0));
+  const ryMax = Math.sqrt(Math.max(radius * radius - dyMax * dyMax, 0.0));
 
-  var rMin = Math.min(ryMin, ryMax);
-  var rMax;
+  const rMin = Math.min(ryMin, ryMax);
+  let rMax;
 
   if (yMin <= center.y && yMax >= center.y) {
     // slice's main diameter is inside slice
@@ -101,7 +101,7 @@ class VoxelWorld {
     // resize array of atoms
     this._atoms.length = this._atoms.length + 2 * complex.getAtomCount();
 
-    complex.forEachAtom(function(atom) {
+    complex.forEachAtom((atom) => {
       // find which voxel contains this atom
       const voxelIdx = self._findVoxel(atom._position);
 
@@ -163,9 +163,9 @@ class VoxelWorld {
   static _zRange = new THREE.Vector2();
 
   _forEachVoxelWithinRadius(center, radius, process) {
-    let xRange = VoxelWorld._xRange;
-    let yRange = VoxelWorld._yRange;
-    let zRange = VoxelWorld._zRange;
+    const xRange = VoxelWorld._xRange;
+    const yRange = VoxelWorld._yRange;
+    const zRange = VoxelWorld._zRange;
 
     // switch to a faster method unless cell size is much smaller than sphere radius
     if (radius / this._cellInnerR < 10) {
@@ -173,7 +173,14 @@ class VoxelWorld {
       return;
     }
 
-    let rRangeXY, rRangeX, xVal, yVal, zVal, isInsideX, isInsideY, isInsideZ;
+    let rRangeXY;
+    let rRangeX;
+    let xVal;
+    let yVal;
+    let zVal;
+    let isInsideX;
+    let isInsideY;
+    let isInsideZ;
 
     zRange.set(center.z - radius, center.z + radius);
     zRange.subScalar(this._box.min.z)
@@ -209,7 +216,7 @@ class VoxelWorld {
           .floor()
           .clampScalar(0, this._count.x - 1);
 
-        for (let x = xRange.x; x <= xRange.y; ++x) {
+        for (let { x } = xRange; x <= xRange.y; ++x) {
           xVal = [this._box.min.x + x * this._cellSize.x,
             this._box.min.x + (x + 1) * this._cellSize.x];
           isInsideX = (center.x - rRangeX[0] <= xVal[0]) && (xVal[1] <= center.x + rRangeX[0]);
@@ -235,12 +242,12 @@ class VoxelWorld {
   static _vCenter = new THREE.Vector3();
 
   _forEachVoxelWithinRadiusSimple(center, radius, process) {
-    let xRange = VoxelWorld._xRange;
-    let yRange = VoxelWorld._yRange;
-    let zRange = VoxelWorld._zRange;
-    let vCenter = VoxelWorld._vCenter;
+    const xRange = VoxelWorld._xRange;
+    const yRange = VoxelWorld._yRange;
+    const zRange = VoxelWorld._zRange;
+    const vCenter = VoxelWorld._vCenter;
 
-    let distTouch2 = (radius + this._cellOuterR) * (radius + this._cellOuterR);
+    const distTouch2 = (radius + this._cellOuterR) * (radius + this._cellOuterR);
     let distInside2 = -1.0;
     if (radius > this._cellOuterR) {
       distInside2 = (radius - this._cellOuterR) * (radius - this._cellOuterR);
@@ -269,21 +276,21 @@ class VoxelWorld {
     zRange.y = Math.min(Math.max(zRange.y, 0), this._count.z - 1);
 
     for (let z = zRange.x; z <= zRange.y; ++z) {
-      let zVal = [this._box.min.z + z * this._cellSize.z,
+      const zVal = [this._box.min.z + z * this._cellSize.z,
         this._box.min.z + (z + 1) * this._cellSize.z];
       vCenter.z = 0.5 * (zVal[0] + zVal[1]);
 
       for (let y = yRange.x; y <= yRange.y; ++y) {
-        let yVal = [this._box.min.y + y * this._cellSize.y,
+        const yVal = [this._box.min.y + y * this._cellSize.y,
           this._box.min.y + (y + 1) * this._cellSize.y];
         vCenter.y = 0.5 * (yVal[0] + yVal[1]);
 
-        for (let x = xRange.x; x <= xRange.y; ++x) {
-          let xVal = [this._box.min.x + x * this._cellSize.x,
+        for (let { x } = xRange; x <= xRange.y; ++x) {
+          const xVal = [this._box.min.x + x * this._cellSize.x,
             this._box.min.x + (x + 1) * this._cellSize.x];
           vCenter.x = 0.5 * (xVal[0] + xVal[1]);
 
-          let d2 = center.distanceToSquared(vCenter);
+          const d2 = center.distanceToSquared(vCenter);
           if (d2 <= distTouch2) {
             process(x + this._count.x * (y + this._count.y * z), d2 <= distInside2);
           }
@@ -303,11 +310,11 @@ class VoxelWorld {
     const self = this;
     const r2 = radius * radius;
 
-    self._forEachVoxelWithinRadius(center, radius, function(voxel, isInside) {
+    self._forEachVoxelWithinRadius(center, radius, (voxel, isInside) => {
       if (isInside) {
         self._forEachAtomInVoxel(voxel, process);
       } else {
-        self._forEachAtomInVoxel(voxel, function(atom) {
+        self._forEachAtomInVoxel(voxel, (atom) => {
           if (center.distanceToSquared(atom._position) <= r2) {
             process(atom);
           }
@@ -325,8 +332,8 @@ class VoxelWorld {
    * @param {function(Atom)} process - function to call
    */
   forEachAtomWithinDistFromMasked(complex, mask, dist, process) {
-    this._forEachAtomWithinDistFromGroup(function(atomProc) {
-      complex.forEachAtom(function(atom) {
+    this._forEachAtomWithinDistFromGroup((atomProc) => {
+      complex.forEachAtom((atom) => {
         if ((atom._mask & mask) !== 0) {
           atomProc(atom);
         }
@@ -343,8 +350,8 @@ class VoxelWorld {
    * @param {function(Atom)} process - function to call
    */
   forEachAtomWithinDistFromSelected(complex, selector, dist, process) {
-    this._forEachAtomWithinDistFromGroup(function(atomProc) {
-      complex.forEachAtom(function(atom) {
+    this._forEachAtomWithinDistFromGroup((atomProc) => {
+      complex.forEachAtom((atom) => {
         if (selector.includesAtom(atom)) {
           atomProc(atom);
         }
@@ -368,8 +375,8 @@ class VoxelWorld {
     let idx = 0;
 
     // build "within radius" atom list for each voxel
-    forEachAtom(function(atom) {
-      self._forEachVoxelWithinRadius(atom._position, dist, function(voxel, isInside) {
+    forEachAtom((atom) => {
+      self._forEachVoxelWithinRadius(atom._position, dist, (voxel, isInside) => {
         if (isInside) {
           // this voxel is inside circle -- no check will be required
           voxels[voxel] = -1;
@@ -391,7 +398,7 @@ class VoxelWorld {
 
     let voxel;
 
-    const processIfWithin = function(atom) {
+    const processIfWithin = function (atom) {
       if (typeof voxels[voxel] === 'undefined') {
         return;
       }
@@ -422,4 +429,3 @@ class VoxelWorld {
 }
 
 export default VoxelWorld;
-

@@ -3,10 +3,6 @@ import SurfaceMode from './SurfaceMode';
 class QuickSurfaceMode extends SurfaceMode {
   static id = 'QS';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getSurfaceOpts() {
     return {
       useBeads: false,

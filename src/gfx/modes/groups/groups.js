@@ -10,17 +10,18 @@ import ResiduesSubseqGroup from './ResiduesSubseqGroup';
 import ResiduesTraceGroup from './ResiduesTraceGroup';
 import BondsCylinderGroup from './BondsCylinderGroup';
 import BondsLinesGroup from './BondsLinesGroup';
+
 export default {
-  AtomsSphereGroup: AtomsSphereGroup,
-  AtomsSurfaceGroup: AtomsSurfaceGroup,
-  AtomsSASSESGroupStub: AtomsSASSESGroupStub,
-  AtomsTextGroup: AtomsTextGroup,
-  AromaticTorusGroup: AromaticTorusGroup,
-  AromaticLinesGroup: AromaticLinesGroup,
-  NucleicCylindersGroup: NucleicCylindersGroup,
-  NucleicSpheresGroup: NucleicSpheresGroup,
-  ResiduesSubseqGroup: ResiduesSubseqGroup,
-  ResiduesTraceGroup: ResiduesTraceGroup,
-  BondsCylinderGroup: BondsCylinderGroup,
-  BondsLinesGroup: BondsLinesGroup
+  AtomsSphereGroup,
+  AtomsSurfaceGroup,
+  AtomsSASSESGroupStub,
+  AtomsTextGroup,
+  AromaticTorusGroup,
+  AromaticLinesGroup,
+  NucleicCylindersGroup,
+  NucleicSpheresGroup,
+  ResiduesSubseqGroup,
+  ResiduesTraceGroup,
+  BondsCylinderGroup,
+  BondsLinesGroup,
 };

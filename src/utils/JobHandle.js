@@ -8,7 +8,7 @@ export default class JobHandle extends EventDispatcher {
 
   cancel() {
     this._shouldCancel = true;
-    this.dispatchEvent({type: 'cancel'});
+    this.dispatchEvent({ type: 'cancel' });
   }
 
   shouldCancel() {
@@ -18,6 +18,6 @@ export default class JobHandle extends EventDispatcher {
   // slaves use this to notify master about their events
   // master routes these notifications to a single event slot
   notify(event) {
-    this.dispatchEvent({type: 'notification', slaveEvent: event});
+    this.dispatchEvent({ type: 'notification', slaveEvent: event });
   }
 }

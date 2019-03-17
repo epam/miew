@@ -26,7 +26,7 @@ const exports = {
   list: loaderList,
 
   /** @deprecated */
-  Loader: Loader,
+  Loader,
 
   /**
    * Create a loader instance.
@@ -35,11 +35,12 @@ const exports = {
    * @param {object} options - Loader options object overriding defaults.
    * @returns {Loader} New loader object.
    */
-  create: function(context, source, options) {
-    var loader = new Loader(source, options);// this behaviour was copied from the previous version
-    var i = 0, n = loaderList.length;
+  create(context, source, options) {
+    let loader = new Loader(source, options);// this behaviour was copied from the previous version
+    let i = 0;
+    const n = loaderList.length;
     for (; i < n; ++i) {
-      var SomeLoader = loaderList[i];
+      const SomeLoader = loaderList[i];
       if (SomeLoader.canLoad && SomeLoader.canLoad(source, options)) {
         loader = new SomeLoader(source, options);
         break;
@@ -54,4 +55,3 @@ const exports = {
 };
 
 export default exports;
-

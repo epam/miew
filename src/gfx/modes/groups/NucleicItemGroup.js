@@ -2,7 +2,7 @@ import ResiduesGroup from './ResiduesGroup';
 
 class NucleicItemGroup extends ResiduesGroup {
   raycast(raycaster, intersects) {
-    const residues = this._selection.residues;
+    const { residues } = this._selection;
     const inters = [];
     this._mesh.raycast(raycaster, inters);
     const chunksIdc = this._chunksIdc;
@@ -20,8 +20,7 @@ class NucleicItemGroup extends ResiduesGroup {
   }
 
   _build() {
-    const residues = this._selection.residues;
-    const parent = this._selection.parent;
+    const { residues, parent } = this._selection;
     const colorer = this._colorer;
     const geo = this._geo;
     const stickRad = this._mode.calcStickRadius();
@@ -39,7 +38,7 @@ class NucleicItemGroup extends ResiduesGroup {
   _calcChunksList(mask) {
     const chunksList = [];
     let chunkIdx = 0;
-    const residues = this._selection.residues;
+    const { residues } = this._selection;
     const resIdc = this._chunksIdc;
 
     for (let i = 0, n = resIdc.length; i < n; ++i) {
@@ -56,7 +55,7 @@ class NucleicItemGroup extends ResiduesGroup {
     // TODO This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
     const residues = frameData.getResidues();
-    const parent = this._selection.parent;
+    const { parent } = this._selection;
     const colorer = this._colorer;
     const geo = this._geo;
     const stickRad = this._mode.calcStickRadius();

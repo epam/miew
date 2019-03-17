@@ -1,9 +1,8 @@
-import FileLoader from './FileLoader';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
+import FileLoader from './FileLoader';
 
 chai.use(dirtyChai);
 chai.use(sinonChai);
@@ -17,7 +16,6 @@ class FileStub extends BlobStub {
 }
 
 describe('FileLoader', () => {
-
   const fakeSource = new FileStub();
 
   before(() => {
@@ -31,7 +29,6 @@ describe('FileLoader', () => {
   });
 
   describe('#load()', () => {
-
     const fakeProgress = {
       type: 'progress',
       lengthComputable: true,
@@ -60,7 +57,8 @@ describe('FileLoader', () => {
           if (this._shouldAbort) {
             this._listeners.abort();
             return true;
-          } else if (this._shouldError) {
+          }
+          if (this._shouldError) {
             this._listeners.error();
             return true;
           }
@@ -109,9 +107,7 @@ describe('FileLoader', () => {
       delete global.FileReader;
     });
 
-    it('resolves a promise on success', () => {
-      return expect(loader.load()).to.be.fulfilled();
-    });
+    it('resolves a promise on success', () => expect(loader.load()).to.be.fulfilled());
 
     it('rejects a promise on failure', () => {
       fileReaderStub._shouldError = true;
@@ -137,41 +133,35 @@ describe('FileLoader', () => {
       });
     });
 
-    it('reads a string by default', () => {
-      return expect(loader.load()).to.be.fulfilled().then((data) => {
-        expect(data).to.equal(fakeText);
-      });
-    });
+    it('reads a string by default', () => expect(loader.load()).to.be.fulfilled().then((data) => {
+      expect(data).to.equal(fakeText);
+    }));
 
     it('reads an ArrayBuffer if requested', () => {
-      loader = new FileLoader(fakeSource, {binary: true});
+      loader = new FileLoader(fakeSource, { binary: true });
       return expect(loader.load()).to.be.fulfilled().then((data) => {
         expect(data).to.equal(fakeBinary);
       });
     });
-
   });
 
   describe('.canLoad()', () => {
-
     it('accepts a File', () => {
       expect(FileLoader.canLoad(fakeSource, {})).to.equal(true);
     });
 
     it('rejects a non-File object', () => {
       expect(FileLoader.canLoad('foo', {})).to.equal(false);
-      expect(FileLoader.canLoad({name: 'foo'}, {})).to.equal(false);
+      expect(FileLoader.canLoad({ name: 'foo' }, {})).to.equal(false);
     });
 
     it('requires the source type to be "file"', () => {
-      expect(FileLoader.canLoad(fakeSource, {sourceType: 'url'})).to.equal(false);
-      expect(FileLoader.canLoad(fakeSource, {sourceType: 'file'})).to.equal(true);
+      expect(FileLoader.canLoad(fakeSource, { sourceType: 'url' })).to.equal(false);
+      expect(FileLoader.canLoad(fakeSource, { sourceType: 'file' })).to.equal(true);
     });
-
   });
 
   describe('.canProbablyLoad()', () => {
-
     it('accepts a File or Blob', () => {
       expect(FileLoader.canProbablyLoad(new File())).to.equal(true);
       expect(FileLoader.canProbablyLoad(new Blob())).to.equal(true);
@@ -179,22 +169,18 @@ describe('FileLoader', () => {
 
     it('rejects a string or a plain object', () => {
       expect(FileLoader.canProbablyLoad('foo')).to.equal(false);
-      expect(FileLoader.canProbablyLoad({name: 'foo'})).to.equal(false);
+      expect(FileLoader.canProbablyLoad({ name: 'foo' })).to.equal(false);
     });
-
   });
 
   describe('.extractName()', () => {
-
     it('returns .name field if present', () => {
-      expect(FileLoader.extractName({name: 'foo'})).to.equal('foo');
+      expect(FileLoader.extractName({ name: 'foo' })).to.equal('foo');
       expect(FileLoader.extractName({})).to.equal(undefined);
     });
 
     it('returns undefined for undefined sources', () => {
       expect(FileLoader.extractName(undefined)).to.equal(undefined);
     });
-
   });
-
 });

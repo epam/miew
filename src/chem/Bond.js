@@ -1,10 +1,10 @@
-var cBondTypes = {
+const cBondTypes = {
   /** Was generated manually */
   UNKNOWN: 0,
   /** Simple covalent bond */
   COVALENT: 1,
   /** Aromatic bond */
-  AROMATIC: 2
+  AROMATIC: 2,
 };
 
 function getAtomPos(atom) {
@@ -62,13 +62,13 @@ class Bond {
   forEachLevelOne(process) {
     const left = this._left;
     const right = this._right;
-    this._forEachNeighbour(left, function(atom) {
+    this._forEachNeighbour(left, (atom) => {
       if (atom === right) {
         return;
       }
       process(atom);
     });
-    this._forEachNeighbour(right, function(atom) {
+    this._forEachNeighbour(right, (atom) => {
       if (atom === left) {
         return;
       }
@@ -81,22 +81,22 @@ class Bond {
     const left = this._left;
     const right = this._right;
     const self = this;
-    self._forEachNeighbour(left, function(atom) {
+    self._forEachNeighbour(left, (atom) => {
       if (atom === right) {
         return;
       }
-      self._forEachNeighbour(atom, function(l2Atom) {
+      self._forEachNeighbour(atom, (l2Atom) => {
         if (l2Atom === left) {
           return;
         }
         process(l2Atom);
       });
     });
-    self._forEachNeighbour(right, function(atom) {
+    self._forEachNeighbour(right, (atom) => {
       if (atom === left) {
         return;
       }
-      self._forEachNeighbour(atom, function(l2Atom) {
+      self._forEachNeighbour(atom, (l2Atom) => {
         if (l2Atom === right) {
           return;
         }
@@ -137,7 +137,8 @@ class Bond {
       stages[stageId][0].call(this, stages[stageId][1]);
       if (leftCount > rightCount) {
         return currDir.multiplyScalar(-1);
-      } else if (leftCount < rightCount) {
+      }
+      if (leftCount < rightCount) {
         return currDir;
       }
     }
@@ -190,4 +191,3 @@ class Bond {
 Bond.prototype.BondType = cBondTypes;
 
 export default Bond;
-

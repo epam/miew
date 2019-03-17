@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import SceneObject from './SceneObject';
 import gfxutils from '../gfxutils';
@@ -13,8 +11,7 @@ class LinesObj extends SceneObject {
     if (params.length < 2) {
       throw new Error('Wrong number of argumets on line object creation!');
     }
-    this._id1 = params[0];
-    this._id2 = params[1];
+    [this._id1, this._id2] = params;
   }
 
   _getAtomFromName(complex, atomId) {
@@ -27,7 +24,7 @@ class LinesObj extends SceneObject {
   }
 
   build(complex) {
-    let geom = new THREE.Geometry();
+    const geom = new THREE.Geometry();
     this._atom1 = this._getAtomFromName(complex, this._id1);
     this._atom2 = this._getAtomFromName(complex, this._id2);
 
@@ -40,7 +37,7 @@ class LinesObj extends SceneObject {
       lights: false,
       overrideColor: true,
       dashedLine: true,
-      fogTransparent: settings.now.bg.transparent
+      fogTransparent: settings.now.bg.transparent,
     }));
     this._line.computeLineDistances();
     this._line.material.setUberOptions({
@@ -50,7 +47,7 @@ class LinesObj extends SceneObject {
     });
     this._line.material.updateUniforms();
 
-    this._line.raycast = function(_raycaster, _intersects) {};
+    this._line.raycast = function (_raycaster, _intersects) {};
     this._mesh = this._line;
     const transforms = complex.getTransforms();
     if (transforms.length > 0) {
@@ -69,7 +66,7 @@ class LinesObj extends SceneObject {
     geo.vertices[0].copy(frameData.getAtomPos(this._atom1._index));
     geo.vertices[1].copy(frameData.getAtomPos(this._atom2._index));
     this._line.computeLineDistances();
-    //geo.computeBoundingBox();
+    // geo.computeBoundingBox();
     geo.computeBoundingSphere();
 
     geo.verticesNeedUpdate = true;
@@ -80,4 +77,3 @@ LinesObj.prototype.constructor = LinesObj;
 LinesObj.prototype.type = 'line';
 
 export default LinesObj;
-

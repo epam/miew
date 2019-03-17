@@ -1,7 +1,7 @@
 import VolumeSurfaceGeometry from './VolumeSurfaceGeometry';
 import chem from '../../chem';
 
-const Volume = chem.Volume;
+const { Volume } = chem;
 
 /**
  * This class implements 'quick' isosurface geometry generation algorithm.
@@ -11,10 +11,6 @@ const Volume = chem.Volume;
  */
 
 class QuickSurfGeometry extends VolumeSurfaceGeometry {
-  constructor(spheresCount, opts) {
-    super(spheresCount, opts);
-  }
-
   _computeSurface(packedArrays, box, boundaries, params) {
     // FIXME beware of shifting this multiple times!
     this._shiftByOrigin(packedArrays.posRad);
@@ -35,21 +31,17 @@ class QuickSurfGeometry extends VolumeSurfaceGeometry {
 
   gaussdensity(surface, packedArrays, atomicNum, params) {
     const numAtoms = packedArrays.posRad.length / 4;
-    const posRad = packedArrays.posRad;
-    const colors = packedArrays.colors;
-    const numVoxels = this.numVoxels;
-    const radScale = params.radScale;
-    const gaussLim = params.gaussLim;
-    const gridSpacing = params.gridSpacing;
+    const { posRad, colors } = packedArrays;
+    const { numVoxels } = this;
+    const { radScale, gaussLim, gridSpacing } = params;
     const invIsoValue = 1.0 / params.isoValue;
     const invGridSpacing = 1.0 / gridSpacing;
     const maxVoxelX = numVoxels[0] - 1;
     const maxVoxelY = numVoxels[1] - 1;
     const maxVoxelZ = numVoxels[2] - 1;
-    //TODO is densityMap and volTexMap initialized?
+    // TODO is densityMap and volTexMap initialized?
 
-    const volMap = surface.volMap;
-    const volTexMap = surface.volTexMap;
+    const { volMap, volTexMap } = surface;
     const volData = volMap.getData();
     const strideX = volMap.getStrideX();
 
@@ -61,7 +53,7 @@ class QuickSurfGeometry extends VolumeSurfaceGeometry {
       atomWeightData = surface.atomWeightMap.getData();
     }
 
-    const atomMap = surface.atomMap;
+    const { atomMap } = surface;
 
     for (let i = 0; i < numAtoms; ++i) {
       const ind = i * 4;
@@ -103,8 +95,8 @@ class QuickSurfGeometry extends VolumeSurfaceGeometry {
             let density = Math.exp(expVal) * atomicNumFactor;
 
             // store most relevant atom (with highest density)
-            if (this._visibilitySelector != null &&
-              density > atomWeightData[addr]) { //NOSONAR
+            if (this._visibilitySelector != null
+              && density > atomWeightData[addr]) { // NOSONAR
               atomWeightData[addr] = density;
               // we use same index into atom map and atomWeightMap
               atomMap[addr] = packedArrays.atoms[i];

@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import SecondaryStructureColorer from './colorers/SecondaryStructureColorer';
 
@@ -24,7 +22,7 @@ const cSecNames = ['fs', 'ps', 'ns', 'us'];
 function _createSecondary(strArray, complex) {
   const residues = complex._residues;
   const nRes = residues.length;
-  let resid = new Uint8Array(nRes);
+  const resid = new Uint8Array(nRes);
 
   const atoms = complex._atoms;
   for (let i = 0, n = strArray.length; i < n; ++i) {
@@ -38,11 +36,11 @@ function _createSecondary(strArray, complex) {
     if (resid[rIdx] !== 0) {
       const start = rIdx;
       const val = resid[rIdx];
-      while (rIdx < nRes - 1 && resid[rIdx + 1] === val &&
-      residues[rIdx].isConnected(residues[rIdx + 1])) {
+      while (rIdx < nRes - 1 && resid[rIdx + 1] === val
+      && residues[rIdx].isConnected(residues[rIdx + 1])) {
         ++rIdx;
       }
-      secondary.push({start: start, end: rIdx, type: secTypes[val - 1]});
+      secondary.push({ start, end: rIdx, type: secTypes[val - 1] });
     }
     ++rIdx;
   }
@@ -60,7 +58,7 @@ class FrameInfo {
     this.isLoading = false;
     this._framesRange = {
       start: 0,
-      end: -1
+      end: -1,
     };
     this.frameIsReady = false;
     this._buffer = null;
@@ -88,16 +86,16 @@ class FrameInfo {
     }
     if (this._downloadDataFn) {
       const self = this;
-      const onDone = function(data) {
+      const onDone = function (data) {
         self.isLoading = false;
         if (self._callbacks && typeof self._callbacks.onLoadStatusChanged === 'function') {
           self._callbacks.onLoadStatusChanged();
         }
         self._buffer = {
-          data: data,
+          data,
           state: 'ready',
           start: framesStart,
-          end: framesEnd
+          end: framesEnd,
         };
         if (self._frameRequest !== null) {
           const idx = self._frameRequest;
@@ -105,7 +103,7 @@ class FrameInfo {
           self.setFrame(idx);
         }
       };
-      const onFail = function() {
+      const onFail = function () {
         self.isLoading = false;
         if (self._callbacks && typeof self._callbacks.onError === 'function') {
           self._callbacks.onError('Streaming failed');
@@ -119,7 +117,7 @@ class FrameInfo {
       if (self._callbacks && typeof self._callbacks.onLoadStatusChanged === 'function') {
         self._callbacks.onLoadStatusChanged();
       }
-      this._downloadDataFn({start: framesStart, end: framesEnd + 1}, onDone, onFail);
+      this._downloadDataFn({ start: framesStart, end: framesEnd + 1 }, onDone, onFail);
     }
   }
 
@@ -127,7 +125,7 @@ class FrameInfo {
     if (this._buffer && this._buffer.state === 'ready') {
       this._framesRange = {
         start: this._buffer.start,
-        end: this._buffer.end
+        end: this._buffer.end,
       };
       this.parseBinaryData(this._buffer.data, false);
       let _bufferRequestStart = (this._buffer.end + 1) % this._framesCount;
@@ -135,7 +133,7 @@ class FrameInfo {
         _bufferRequestStart = 0;
       }
       this._buffer = {
-        state: 'none'
+        state: 'none',
       };
       this._prepareBuffer(_bufferRequestStart, _bufferRequestStart + this._framesRequestLength);
       if (this._frameRequest !== null) {
@@ -147,21 +145,21 @@ class FrameInfo {
   }
 
   parseBinaryData(arrayBuffer) {
-    let dataView = new DataView(arrayBuffer);
+    const dataView = new DataView(arrayBuffer);
     let offset = 0;
     const atomsCount = dataView.getUint32(offset, true);
     offset += 4;
     const framesCount = dataView.getUint32(offset, true);
     this._framesCount = framesCount;
-    this._framesRange.end = this._framesRange.end > 0 ?
-      Math.min(this._framesRange.end, framesCount - 1) : framesCount - 1;
+    this._framesRange.end = this._framesRange.end > 0
+      ? Math.min(this._framesRange.end, framesCount - 1) : framesCount - 1;
     offset += 4;
     this._atomsCount = atomsCount;
     const maxSize = 1024 * 1024; // 1 MB
     this._framesRequestLength = Math.ceil(maxSize / (atomsCount * 8));
     const chunkedFramesCount = this._framesRange.end - this._framesRange.start + 1;
-    if (atomsCount !== this._complex._atoms.length ||
-      arrayBuffer.byteLength !== cDataOffset + chunkedFramesCount * atomsCount * 8) {
+    if (atomsCount !== this._complex._atoms.length
+      || arrayBuffer.byteLength !== cDataOffset + chunkedFramesCount * atomsCount * 8) {
       throw new Error();
     }
     const complex = this._complex;
@@ -172,12 +170,12 @@ class FrameInfo {
       ++iName;
     }
 
-    this._timeStep = timeStep.toString() + ' ' + cSecNames[iName];
+    this._timeStep = `${timeStep.toString()} ${cSecNames[iName]}`;
     offset += 4;
     const secondary = [];
     const posData = new Float32Array(chunkedFramesCount * atomsCount * 3);
     let coordIdx = 0;
-    let secondaryArr = new Int8Array(atomsCount);
+    const secondaryArr = new Int8Array(atomsCount);
     for (let j = 0; j < chunkedFramesCount; ++j) {
       for (let i = 0; i < atomsCount; ++i) {
         const hiWord = dataView.getUint32(offset, true);
@@ -186,8 +184,8 @@ class FrameInfo {
         offset += 4;
         const str = (loWord & cStrMask) >>> cStrShift;
         const x = fromUInt20ToInt20(((loWord & cFirstMask) >>> cFirstShift) >> 0);
-        const y = fromUInt20ToInt20((((loWord & cSecMask1) << cSecShift1) |
-          ((hiWord & cSecMask2) >>> cSecShift2)) >> 0);
+        const y = fromUInt20ToInt20((((loWord & cSecMask1) << cSecShift1)
+          | ((hiWord & cSecMask2) >>> cSecShift2)) >> 0);
         const z = fromUInt20ToInt20((hiWord & cThirdMask) >> 0);
         secondaryArr[i] = 0;
         if (str > 0 && str < 4) {
@@ -231,8 +229,7 @@ class FrameInfo {
     const sec = this._secondaryData[this._currFrame - this._framesRange.start];
     for (i = 0, n = sec.length; i < n; ++i) {
       const oldSec = sec[i];
-      const start = oldSec.start;
-      const end = oldSec.end;
+      const { start, end } = oldSec;
       const nSec = {
         _start: myResidues[start],
         _end: myResidues[end],
@@ -250,7 +247,7 @@ class FrameInfo {
     const n = compRes.length;
     this._residues = new Array(n);
     const myResidues = this._residues;
-    const getSec = function() {
+    const getSec = function () {
       return this._secondary;
     };
     for (let i = 0; i < n; ++i) {
@@ -279,14 +276,14 @@ class FrameInfo {
       } else {
         const self = this;
         switch (this._buffer.state) {
-        case 'none':
-          this._prepareBuffer(frameIdx);
-          break;
-        case 'ready':
-          self._parseBuffer();
-          break;
-        default:
-          break;
+          case 'none':
+            this._prepareBuffer(frameIdx);
+            break;
+          case 'ready':
+            self._parseBuffer();
+            break;
+          default:
+            break;
         }
       }
     }
@@ -319,7 +316,5 @@ class FrameInfo {
     this._complex.updateToFrame(this);
     return this._residues;
   }
-
 }
 export default FrameInfo;
-

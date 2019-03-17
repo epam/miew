@@ -15,12 +15,8 @@ import Colorer from './Colorer';
 class OccupancyColorer extends Colorer {
   static id = 'OC';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, _complex) {
-    const opts = this.opts;
+    const { opts } = this;
     if (atom._occupancy && opts) {
       const factor = 1 - atom._occupancy;
       return this.palette.getGradientColor(factor, opts.gradient);
@@ -29,7 +25,7 @@ class OccupancyColorer extends Colorer {
   }
 
   getResidueColor(residue, _complex) {
-    const opts = this.opts;
+    const { opts } = this;
     if (!opts) {
       return this.palette.defaultGradientColor;
     }
@@ -41,7 +37,7 @@ class OccupancyColorer extends Colorer {
   }
 }
 
-OccupancyColorer.prototype.id = 'OC';  //[OC]cupancy
+OccupancyColorer.prototype.id = 'OC'; // [OC]cupancy
 OccupancyColorer.prototype.name = 'Occupancy';
 OccupancyColorer.prototype.shortName = 'Occupancy';
 

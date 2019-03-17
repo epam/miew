@@ -1,14 +1,11 @@
 import * as THREE from 'three';
 import UberObject from './UberObject';
+
 const Mesh = UberObject(THREE.Mesh);
 
 class ThickLineMesh extends Mesh {
-  constructor(geometry, material) {
-    super(geometry, material);
-  }
-
   _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
-    const material = this.material;
+    const { material } = this;
     if (!material.uberOptions) {
       return;
     }

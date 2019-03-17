@@ -1,7 +1,6 @@
-import PDBStream from './PDBStream';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
+import PDBStream from './PDBStream';
 
 chai.use(dirtyChai);
 
@@ -17,9 +16,7 @@ const sourceLines = [
 const source = sourceLines.join('\n');
 
 describe('PDBStream', () => {
-
   describe('constructor', () => {
-
     it('accepts an empty string', () => {
       expect(() => new PDBStream('')).to.not.throw();
     });
@@ -31,7 +28,6 @@ describe('PDBStream', () => {
     it('accepts a multi-line source', () => {
       expect(() => new PDBStream(source)).to.not.throw();
     });
-
   });
 
   let stream = null;
@@ -41,7 +37,6 @@ describe('PDBStream', () => {
   });
 
   describe('.readLine()', () => {
-
     it('returns the entire line', () => {
       expect(stream.readLine()).to.equal(sourceLines[0]);
     });
@@ -50,11 +45,9 @@ describe('PDBStream', () => {
       const emptyStream = new PDBStream('');
       expect(emptyStream.readLine()).to.equal('');
     });
-
   });
 
   describe('.readChar()', () => {
-
     it('returns the specified character', () => {
       expect(stream.readChar(5)).to.equal('1');
     });
@@ -62,11 +55,9 @@ describe('PDBStream', () => {
     it('returns a space for missing positions', () => {
       expect(stream.readChar(42)).to.equal(' ');
     });
-
   });
 
   describe('.readCharCode()', () => {
-
     it('returns the specified character code', () => {
       expect(String.fromCharCode(stream.readCharCode(5))).to.equal('1');
     });
@@ -74,11 +65,9 @@ describe('PDBStream', () => {
     it('returns a space code for missing positions', () => {
       expect(String.fromCharCode(stream.readCharCode(42))).to.equal(' ');
     });
-
   });
 
   describe('.readString()', () => {
-
     it('returns the specified substring', () => {
       expect(stream.readString(5, 7)).to.equal('1st');
     });
@@ -98,11 +87,9 @@ describe('PDBStream', () => {
     it('crops at the end of a line', () => {
       expect(stream.readString(34, 40)).to.equal('75');
     });
-
   });
 
   describe('.readInt()', () => {
-
     it('returns the specified decimal number', () => {
       expect(stream.readInt(23, 24)).to.equal(42);
     });
@@ -119,11 +106,9 @@ describe('PDBStream', () => {
       expect(stream.readInt(22, 22)).to.be.NaN();
       expect(stream.readInt(42, 45)).to.be.NaN();
     });
-
   });
 
   describe('.readFloat()', () => {
-
     it('returns the specified real number', () => {
       expect(stream.readFloat(30, 35)).to.equal(-12.75);
     });
@@ -145,11 +130,9 @@ describe('PDBStream', () => {
       stream = new PDBStream(sourceLines[3]);
       expect(stream.readFloat(46, 54)).to.be.closeTo(98710.234, 0.0005);
     });
-
   });
 
   describe('.end()', () => {
-
     it('returns true for an empty stream', () => {
       const emptyStream = new PDBStream('');
       expect(emptyStream.end()).to.be.true();
@@ -158,11 +141,9 @@ describe('PDBStream', () => {
     it('returns false at the start of non-empty stream', () => {
       expect(stream.end()).to.be.false();
     });
-
   });
 
   describe('.next()', () => {
-
     it('is silently ignored for an empty stream', () => {
       const emptyStream = new PDBStream('');
       expect(() => emptyStream.next()).to.not.throw();
@@ -189,11 +170,9 @@ describe('PDBStream', () => {
     });
 
     it('ignores the last EOL in a stream', () => {
-      const shortStream = new PDBStream(sourceLines[0] + '\n');
+      const shortStream = new PDBStream(`${sourceLines[0]}\n`);
       shortStream.next();
       expect(shortStream.end()).to.be.true();
     });
-
   });
-
 });

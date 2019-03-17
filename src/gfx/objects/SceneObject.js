@@ -1,5 +1,3 @@
-
-
 import _ from 'lodash';
 import settings from '../../settings';
 import utils from '../../utils';
@@ -32,7 +30,7 @@ class SceneObject {
     this.params = params;
     this.opts = _.merge(utils.deriveDeep(settings.now.objects[this.type], true), opts);
     this.needsRebuild = false;
-    this._mesh = NULL;
+    this._mesh = null;
     this.id = null;
   }
 
@@ -45,7 +43,7 @@ class SceneObject {
   identify() {
     const result = {
       type: this.type,
-      params: this.params
+      params: this.params,
     };
     const diff = utils.objectsDiff(this.opts, settings.now.modes[this.id]);
     if (!_.isEmpty(diff)) {
@@ -55,7 +53,7 @@ class SceneObject {
   }
 
   toString() {
-    const paramsStr = 'o=' + this.type + ',' + this.params.join(',');
+    const paramsStr = `o=${this.type},${this.params.join(',')}`;
     const optsStr = utils.compareOptionsWithDefaults(this.opts, settings.defaults.objects[this.type]);
     return paramsStr + optsStr;
   }
@@ -64,7 +62,7 @@ class SceneObject {
     return this._mesh;
   }
 
-  destroy()  {
+  destroy() {
     if (this._mesh) {
       gfxutils.destroyObject(this._mesh);
     }
@@ -78,4 +76,3 @@ class SceneObject {
 SceneObject.prototype.type = '__';
 
 export default SceneObject;
-

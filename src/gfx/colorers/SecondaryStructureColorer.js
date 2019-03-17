@@ -4,10 +4,6 @@ import ResidueType from '../../chem/ResidueType';
 class SecondaryStructureColorer extends Colorer {
   static id = 'SS';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, complex) {
     return this.getResidueColor(atom._residue, complex);
   }
@@ -15,7 +11,8 @@ class SecondaryStructureColorer extends Colorer {
   getResidueColor(residue, _complex) {
     if (residue._type.flags & ResidueType.Flags.DNA) {
       return this.palette.getSecondaryColor('dna');
-    } else if (residue._type.flags & ResidueType.Flags.RNA) {
+    }
+    if (residue._type.flags & ResidueType.Flags.RNA) {
       return this.palette.getSecondaryColor('rna');
     }
     const secondary = residue.getSecondary();

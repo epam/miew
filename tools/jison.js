@@ -21,12 +21,12 @@ function wrapModule(text) {
     '// DO NOT EDIT! Automatically generated from .jison',
     text,
     'module.exports = {parser: parser};',
-    ''
+    '',
   ].join(os.EOL);
 }
 
 function convertFile(src, dst) {
-  fs.readFile(src, {encoding: 'utf8'}, function(readError, grammar) {
+  fs.readFile(src, { encoding: 'utf8' }, (readError, grammar) => {
     if (readError) {
       throw readError;
     }
@@ -39,7 +39,7 @@ function convertFile(src, dst) {
     parserSource = replaceNewlines(parserSource);
     parserSource = wrapModule(parserSource);
 
-    fs.writeFile(dst, parserSource, function(writeError) {
+    fs.writeFile(dst, parserSource, (writeError) => {
       if (writeError) {
         throw writeError;
       }
@@ -48,13 +48,13 @@ function convertFile(src, dst) {
 }
 
 const sources = process.argv.slice(2);
-sources.forEach(function(arg) {
-  glob(arg, function(matchError, filenames) {
+sources.forEach((arg) => {
+  glob(arg, (matchError, filenames) => {
     if (matchError) {
       throw matchError;
     }
-    filenames.forEach(function(src) {
-      const dst = src.replace(/\.jison$/i, '') + '.js';
+    filenames.forEach((src) => {
+      const dst = `${src.replace(/\.jison$/i, '')}.js`;
       console.log(src);
       convertFile(src, dst);
     });

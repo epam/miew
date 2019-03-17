@@ -1,13 +1,9 @@
-
-
-import Parser from './Parser';
-import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
+import Parser from './Parser';
+import chem from '../../chem';
 
-const
-  Complex = chem.Complex,
-  Element = chem.Element;
+const { Complex, Element } = chem;
 
 class PubChemParser extends Parser {
   constructor(data, options) {
@@ -22,8 +18,8 @@ class PubChemParser extends Parser {
     }
     const type = options.fileType;
     return (
-      _.isString(data) &&
-      (type === 'pubchem+json' || (!type && data[0] === '{'))
+      _.isString(data)
+      && (type === 'pubchem+json' || (!type && data[0] === '{'))
     );
   }
 
@@ -37,7 +33,7 @@ class PubChemParser extends Parser {
   }
 
   _toComplex(jsonData) {
-    let complex = new Complex();
+    const complex = new Complex();
     const complexData = jsonData.PC_Compounds && jsonData.PC_Compounds[0];
     if (complexData) {
       this._extractAtoms(complex, complexData);
@@ -61,9 +57,9 @@ class PubChemParser extends Parser {
 
     const coords = complexData.coords && complexData.coords[0];
     const model = coords && coords.conformers && coords.conformers[0];
-    let xs = model && model.x;
-    let ys = model && model.y;
-    const zs = model && model.z || [];
+    const xs = model && model.x;
+    const ys = model && model.y;
+    const zs = (model && model.z) || [];
     aids = coords && coords.aid;
     if (!aids || !xs || !ys) {
       throw new Error('Coordinates are not found in the file');
@@ -75,13 +71,13 @@ class PubChemParser extends Parser {
     for (let i = 0, n = aids.length; i < n; ++i) {
       const aid = aids[i];
       const element = Element.ByAtomicNumber[elements[aid]];
-      let xyz = new THREE.Vector3(xs[i], ys[i], zs[i] || 0.0);
+      const xyz = new THREE.Vector3(xs[i], ys[i], zs[i] || 0.0);
       atoms[aid] = residue.addAtom(element.name, element, xyz, undefined, true, aid, ' ', 1.0, 0.0, 0);
     }
 
-    let aids1 = complexData.bonds && complexData.bonds.aid1;
-    let aids2 = complexData.bonds && complexData.bonds.aid2;
-    const orders = complexData.bonds && complexData.bonds.order || [];
+    const aids1 = complexData.bonds && complexData.bonds.aid1;
+    const aids2 = complexData.bonds && complexData.bonds.aid2;
+    const orders = (complexData.bonds && complexData.bonds.order) || [];
     if (!aids1 || !aids2 || aids1.length !== aids2.length) {
       return;
     }

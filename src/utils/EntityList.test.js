@@ -1,20 +1,18 @@
-import EntityList from './EntityList';
-
-import chai, {expect} from 'chai';
+import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
+import EntityList from './EntityList';
 
 chai.use(dirtyChai);
 
 function getSomeEntity(id = 'some') {
-  return {id};
+  return { id };
 }
 
 function getMultiEntity(id) {
-  return {id1: `${id}1`, id2: `${id}2`};
+  return { id1: `${id}1`, id2: `${id}2` };
 }
 
 describe('EntityList', () => {
-
   const A = getSomeEntity('a');
   const B = getSomeEntity('b');
   const C = getSomeEntity('See');
@@ -23,7 +21,6 @@ describe('EntityList', () => {
   const MB = getMultiEntity('b');
 
   describe('constructor', () => {
-
     it('creates an empty list', () => {
       const entityList = new EntityList();
       expect(entityList.all).to.be.empty();
@@ -33,11 +30,9 @@ describe('EntityList', () => {
       const entityList = new EntityList([A, B, C]);
       expect(entityList.all).to.deep.equal([A, B, C]);
     });
-
   });
 
   describe('#register()', () => {
-
     it('adds an entity to the list in order', () => {
       const entityList = new EntityList();
       entityList.register(A);
@@ -58,11 +53,9 @@ describe('EntityList', () => {
       entityList.register(A2);
       expect(entityList.all).to.deep.equal([A, A2]);
     });
-
   });
 
   describe('#unregister()', () => {
-
     it('removes an entity from the list', () => {
       const entityList = new EntityList([A, B]);
       entityList.unregister(A);
@@ -83,11 +76,9 @@ describe('EntityList', () => {
       entityList.unregister(A);
       expect(entityList.all).to.be.empty();
     });
-
   });
 
   describe('#all', () => {
-
     it('gives a new copy of the real list', () => {
       const entityList = new EntityList([A]);
 
@@ -102,11 +93,9 @@ describe('EntityList', () => {
       expect(listA2).to.not.deep.equal(listA1);
       expect(listA3).to.deep.equal(listA1);
     });
-
   });
 
   describe('#first', () => {
-
     it('gives the first registered entity', () => {
       const entityList = new EntityList([A2, A]);
       expect(entityList.first).to.equal(A2);
@@ -116,11 +105,9 @@ describe('EntityList', () => {
       const entityList = new EntityList();
       expect(entityList.first).to.be.an('undefined');
     });
-
   });
 
   describe('#keys()', () => {
-
     it('returns a list of unique keys', () => {
       const entityList = new EntityList([A, B, A2]);
       expect(entityList.keys().sort()).to.deep.equal(['a', 'b']);
@@ -130,11 +117,9 @@ describe('EntityList', () => {
       const entityList = new EntityList([MA, MB], ['id1', 'id2']);
       expect(entityList.keys('id2').sort()).to.deep.equal(['a2', 'b2']);
     });
-
   });
 
   describe('#get()', () => {
-
     let entityList;
     let secondList;
 
@@ -186,7 +171,5 @@ describe('EntityList', () => {
     it('ignores mismatching index', () => {
       expect(secondList.get('b1', 'id')).to.be.an('undefined');
     });
-
   });
-
 });

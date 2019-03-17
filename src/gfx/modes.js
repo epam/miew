@@ -31,30 +31,29 @@ const modes = new EntityList([
 
 /** @deprecated */
 Object.defineProperty(modes, 'list', {
-  get: function() {
+  get() {
     return this.all;
   },
 });
 
 /** @deprecated */
 Object.defineProperty(modes, 'any', {
-  get: function() {
+  get() {
     return this.first;
   },
 });
 
 /** @deprecated */
 Object.defineProperty(modes, 'descriptions', {
-  get: function() {
-    return _.map(this._list, (m) => _.pick(m.prototype, ['id', 'name']));
+  get() {
+    return _.map(this._list, m => _.pick(m.prototype, ['id', 'name']));
   },
 });
 
 /** @deprecated */
-modes.create = function(mode, opts) {
+modes.create = function (mode, opts) {
   if (!opts && mode instanceof Array) {
-    opts = mode[1];
-    mode = mode[0];
+    [mode, opts] = mode;
   }
   const Mode = this.get(mode) || this.first;
   return new Mode(opts);

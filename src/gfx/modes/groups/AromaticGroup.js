@@ -16,8 +16,7 @@ class AromaticGroup extends AtomsGroup {
     const leprStep = 1.0 / segmentsHeight;
     const colorer = this._colorer;
 
-    const cycles = this._selection.cycles;
-    const parent = this._selection.parent;
+    const { cycles, parent } = this._selection;
     let chunkIdx = 0;
     let currAtomIdx = chunksToIdx[chunkIdx];
 
@@ -26,7 +25,7 @@ class AromaticGroup extends AtomsGroup {
       const cycAtoms = cycle.atoms;
       const chunkPoints = [];
       const tmpDir = [];
-      const center = cycle.center;
+      const { center } = cycle;
       const cycleRad = cycle.radius - radOffset;
       const n = cycAtoms.length;
       let i = 0;

@@ -8,21 +8,20 @@ class TextMesh extends THREE.Group {
     super();
     this.geometry = geometry;
 
-    let self = this;
+    const self = this;
     self.initialized = false;
-    this.geometry.addEventListener('update', function() {
+    this.geometry.addEventListener('update', () => {
       self.update();
     });
   }
 
   init() {
-    const children = this.children;
+    const { children } = this;
     for (let i = children.length - 1; i >= 0; --i) {
       this.remove(children[i]);
     }
 
-    const items = this.geometry.items;
-    const userData = this.geometry.userData;
+    const { items, userData } = this.geometry;
     for (let i = 0, n = items.length; i < n; ++i) {
       const srcItem = items[i];
       if (!srcItem) {
@@ -44,7 +43,7 @@ class TextMesh extends THREE.Group {
     if (!geo.needsUpdate) {
       return;
     }
-    const children = this.children;
+    const { children } = this;
     if (!this.initialized) {
       this.init();
     }

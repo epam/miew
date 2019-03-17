@@ -8,7 +8,7 @@ class SubseqsProcessor extends RCGroup {
     const residues = complex.getResidues();
     const transforms = complex.getTransforms();
 
-    complex.forEachComponent(function(component) {
+    complex.forEachComponent((component) => {
       const subDivs = component.getMaskedSubdivSequences(mask);
 
       let chunksCount = 0;
@@ -26,10 +26,10 @@ class SubseqsProcessor extends RCGroup {
         return;
       }
       const residuesGroup = new ResidueGroup(geoParams, {
-        residues: residues,
+        residues,
         chunks: resIdc,
         subdivs: subDivs,
-        parent: complex
+        parent: complex,
       }, colorer, mode, transforms, polyComplexity, material);
       residuesGroup._component = component;
       self.add(residuesGroup);
@@ -38,7 +38,7 @@ class SubseqsProcessor extends RCGroup {
 
   getSubset(mask, innerOnly) {
     const totalSubset = [];
-    const children = this.children;
+    const { children } = this;
     let meshIdx = 0;
     for (let i = 0, n = children.length; i < n; ++i) {
       if (children[i].getSubset) {

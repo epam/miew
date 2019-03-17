@@ -1,5 +1,3 @@
-
-
 import Strand from './Strand';
 
 /**
@@ -46,10 +44,9 @@ class Sheet {
       this._width = s.length;
     }
     if (s.length !== this._width) {
-      throw new Error('Sheet ' + this._name + ' is inconsistent.');
+      throw new Error(`Sheet ${this._name} is inconsistent.`);
     }
   }
 }
 
 export default Sheet;
-

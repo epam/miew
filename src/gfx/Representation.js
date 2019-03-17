@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 import materials from './materials';
 import UberMaterial from './shaders/UberMaterial';
@@ -8,6 +6,12 @@ import settings from '../settings';
 
 class Representation {
   constructor(index, mode, colorer, selector) {
+    const startMaterialValues = {
+      clipPlane: settings.now.draft.clipPlane,
+      fogTransparent: settings.now.bg.transparent,
+      shadowmap: settings.now.shadow.on,
+      shadowmapType: settings.now.shadow.type,
+    };
     this.index = index;
     this.mode = mode;
     this.colorer = colorer;
@@ -15,8 +19,8 @@ class Representation {
     this.selectorString = ''; // FIXME
     this.count = 0;
     this.material = new UberMaterial();
-    this.material.setValues({clipPlane: settings.now.draft.clipPlane, fogTransparent: settings.now.bg.transparent});
-    this.material.setUberOptions({fogAlpha: settings.now.fogAlpha});
+    this.material.setValues(startMaterialValues);
+    this.material.setUberOptions({ fogAlpha: settings.now.fogAlpha });
     this.materialPreset = materials.first;
     this.needsRebuild = true;
     this.visible = true;
@@ -58,7 +62,7 @@ class Representation {
     this.needsRebuild = false;
 
     if (settings.now.ao) {
-      this.material.setValues({normalsToGBuffer:settings.now.ao});
+      this.material.setValues({ normalsToGBuffer: settings.now.ao });
     }
 
     this.geo = this.mode.buildGeometry(complex, this.colorer, 1 << this.index, this.material);
@@ -68,6 +72,8 @@ class Representation {
     }
     // console.timeEnd('buildGeometry');
     this.geo.visible = this.visible;
+
+    gfxutils.processMaterialForShadow(this.geo, this.material);
 
     return this.geo;
   }
@@ -138,4 +144,3 @@ class Representation {
 }
 
 export default Representation;
-

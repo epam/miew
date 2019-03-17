@@ -22,4 +22,3 @@ class DataSource {
 DataSource.prototype.id = '__';
 
 export default DataSource;
-

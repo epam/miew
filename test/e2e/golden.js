@@ -3,17 +3,17 @@ import fs from 'fs';
 import express from 'express';
 import resemble from 'node-resemble-js';
 import Handlebars from 'handlebars';
-import {expect} from 'chai';
+import { expect } from 'chai';
 
 resemble.outputSettings({
-  transparency: 0.25
+  transparency: 0.25,
 });
 
 let driver = null;
 let localhost = null;
 
 function _zeroes(num, len) {
-  return ('000000' + num).slice(-len);
+  return (`000000${num}`).slice(-len);
 }
 
 const report = {
@@ -30,9 +30,9 @@ const report = {
     index: 0,
   },
 
-  getExpectedPath: (id) => path.join(report.path.golden, `${id}.png`),
-  getActualPath: (id) => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.png`),
-  getDifferencePath: (id) => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.diff.png`),
+  getExpectedPath: id => path.join(report.path.golden, `${id}.png`),
+  getActualPath: id => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.png`),
+  getDifferencePath: id => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.diff.png`),
 
   getHtmlPath(filename) {
     const relative = path.relative(path.dirname(report.path.html), filename);
@@ -81,7 +81,7 @@ const report = {
 function _prepareBrowser(width = 1024, height = 768) {
   const getPadding = 'return[window.outerWidth-window.innerWidth,window.outerHeight-window.innerHeight];';
   return driver.executeScript(getPadding)
-    .then((pad) => driver.manage().window().setRect({width: width + pad[0], height: height + pad[1]}))
+    .then(pad => driver.manage().window().setRect({ width: width + pad[0], height: height + pad[1] }))
     .then(() => driver.getCapabilities())
     .then((caps) => {
       const browserName = caps.get('browserName').replace(/\b\w/g, c => c.toUpperCase());
@@ -140,12 +140,12 @@ function _matchAsPromised(first, second) {
   return new Promise((resolve, reject) => {
     try {
       if (!fs.existsSync(second)) {
-        reject(new URIError('Golden image not found: ' + path.basename(second)));
+        reject(new URIError(`Golden image not found: ${path.basename(second)}`));
       } else {
         resemble(first)
           .compareTo(second)
           .ignoreNothing()
-          .onComplete((diff) => resolve(diff));
+          .onComplete(diff => resolve(diff));
       }
     } catch (err) {
       reject(err);

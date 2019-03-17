@@ -1,35 +1,31 @@
-/* global PRESET_SERVER:false */
-
-
-//////////////////////////////////////////////////////////////////////////////
+/* global PRESET_SERVER:false READONLY_SERVER */
 import $ from 'jquery';
 import _ from 'lodash';
-import Miew from 'Miew';
+import Miew from 'Miew'; // eslint-disable-line import/no-unresolved
 
 
-var
-  settings = Miew.settings,
-  selectors = Miew.chem.selectors,
-  JSONConverter = Miew.JSONConverter;
+const {
+  settings,
+  JSONConverter,
+  chem: { selectors },
+} = Miew;
 
 settings.setPluginOpts('srv', {
-  url: typeof PRESET_SERVER !== 'undefined' && PRESET_SERVER || '/restapi/',
+  url: (typeof PRESET_SERVER !== 'undefined' && PRESET_SERVER) || '/restapi/',
 });
 
 /* FIXME This is a hacky solution */
 function resetSettings() {
-  var plugins = _.cloneDeep(settings.now.plugins);
+  const plugins = _.cloneDeep(settings.now.plugins);
   settings.reset();
-  settings.set({plugins});
+  settings.set({ plugins });
 }
-
-//////////////////////////////////////////////////////////////////////////////
 
 // ATTENTION! Exactly this address is used in gulpfile.js, don't forget to change there too.
 function getBaseUrl() {
   return settings.now.plugins.srv.url;
 }
-var LOCAL_DEBUG = true;
+const LOCAL_DEBUG = true;
 
 function srvNormalizeSource(source) {
   // special translation for local data files
@@ -42,7 +38,7 @@ function srvNormalizeSource(source) {
       source = source.substr(5, 4).toUpperCase();
     } else {
       // otherwise use neat hack to restore the full url (https://gist.github.com/jlong/2428561)
-      var ref = document.createElement('a');
+      const ref = document.createElement('a');
       ref.href = source;
       source = ref.href;
     }
@@ -50,14 +46,14 @@ function srvNormalizeSource(source) {
   return source;
 }
 
-Miew.prototype.srvPluginRegister = function() {
+Miew.prototype.srvPluginRegister = function () {
   this.addEventListener('load', (event) => {
     const opts = event && event.options;
     this._srvTopologyFile = opts && opts.topologyFile ? opts.topologyFile : null;
     this._srvAnimationFile = opts && opts.animationFile ? opts.animationFile : null;
     this._srvPreset = opts && opts.preset ? opts.preset : null;
 
-    const source = event.source;
+    const { source } = event;
     if (source instanceof File && source.name.match(/.man$/i)) {
       this._srvAnimSource = srvNormalizeSource(source);
     } else {
@@ -71,9 +67,9 @@ Miew.prototype.srvPluginRegister = function() {
 
 Miew.registeredPlugins.push(Miew.prototype.srvPluginRegister);
 
-Miew.prototype.srvTopologyAll = function(done, fail) {
-  var self = this;
-  var request = $.get(getBaseUrl() + 'topology/all', function(result) {
+Miew.prototype.srvTopologyAll = function (done, fail) {
+  const self = this;
+  const request = $.get(`${getBaseUrl()}topology/all`, (result) => {
     if (result && result.status === 'OK' && result.payload) {
       self._topologyList = result.payload;
     } else {
@@ -81,14 +77,14 @@ Miew.prototype.srvTopologyAll = function(done, fail) {
     }
   });
 
-  var state = 'DONE';
-  var message = null;
+  let state = 'DONE';
+  let message = null;
 
-  return request.fail(function() {
+  return request.fail(() => {
     self._topologyList = [];
     state = 'FAILED';
     message = 'HTTP Request failed';
-  }).always(function() {
+  }).always(() => {
     if (state === 'FAILED' && typeof fail === 'function') {
       fail(message);
     } else if (typeof done === 'function') {
@@ -97,13 +93,11 @@ Miew.prototype.srvTopologyAll = function(done, fail) {
   });
 };
 
-Miew.prototype.srvTopologyFilter = function(criteria, done, fail) {
-  var self = this;
-  var filterFn = function(list) {
+Miew.prototype.srvTopologyFilter = function (criteria, done, fail) {
+  const self = this;
+  const filterFn = function (list) {
     if (typeof done === 'function') {
-      done(_.filter(list, function(item) {
-        return item.name.toLowerCase().indexOf(criteria.toLowerCase()) === 0;
-      }));
+      done(_.filter(list, item => item.name.toLowerCase().indexOf(criteria.toLowerCase()) === 0));
     }
   };
   if (!self._topologyList) {
@@ -113,17 +107,16 @@ Miew.prototype.srvTopologyFilter = function(criteria, done, fail) {
   }
 };
 
-Miew.prototype.srvTopologyFind = function(name, done, fail) {
+Miew.prototype.srvTopologyFind = function (name, done, fail) {
   if (!name) {
     done(null);
     return;
   }
-  var self = this;
-  var filterFn = function(list) {
+  const self = this;
+  const filterFn = function (list) {
     if (typeof done === 'function') {
-      done(_.filter(list, function(item) {
-        return item.name.toLowerCase() === name.toLowerCase() || item.source.toLowerCase() === name.toLowerCase();
-      }));
+      done(_.filter(list, item => item.name.toLowerCase() === name.toLowerCase()
+        || item.source.toLowerCase() === name.toLowerCase()));
     }
   };
   if (!self._topologyList) {
@@ -133,16 +126,14 @@ Miew.prototype.srvTopologyFind = function(name, done, fail) {
   }
 };
 
-Miew.prototype.srvTopologyGetById = function(id, done, fail) {
+Miew.prototype.srvTopologyGetById = function (id, done, fail) {
   if (!id) {
     done(null);
     return;
   }
-  var self = this;
-  var filterFn = function(list) {
-    var filterResult = _.filter(list, function(item) {
-      return +(item.id) === +id;
-    });
+  const self = this;
+  const filterFn = function (list) {
+    const filterResult = _.filter(list, item => +(item.id) === +id);
     if (filterResult && filterResult.length === 1 && typeof done === 'function') {
       done(filterResult[0]);
     } else if ((!filterResult || filterResult.length !== 1) && typeof fail === 'function') {
@@ -156,22 +147,22 @@ Miew.prototype.srvTopologyGetById = function(id, done, fail) {
   }
 };
 
-Miew.prototype.srvCurrentTopologyIsRegistered = function(registered, notRegistered, onFail) {
+Miew.prototype.srvCurrentTopologyIsRegistered = function (registered, notRegistered, onFail) {
   if (this._srvTopoSource && !this._srvTopologyFile) {
-    var extractFileNameWithExtension = function(name) {
-      var parts = name.toUpperCase().split('/');
-      var lastPart = parts[parts.length - 1];
+    const extractFileNameWithExtension = function (name) {
+      let parts = name.toUpperCase().split('/');
+      let lastPart = parts[parts.length - 1];
       parts = lastPart.split('\\');
       lastPart = parts[parts.length - 1];
       parts = lastPart.split('.');
       if (parts.length === 1) {
         return parts[0]; // PDB ID
       }
-      return parts[parts.length - 2] + '.' + parts[parts.length - 1];
+      return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`;
     };
-    var fName = extractFileNameWithExtension(this._srvTopoSource instanceof File ?
-      this._srvTopoSource.name : this._srvTopoSource);
-    this.srvTopologyFind(fName, function(findResult) {
+    const fName = extractFileNameWithExtension(this._srvTopoSource instanceof File
+      ? this._srvTopoSource.name : this._srvTopoSource);
+    this.srvTopologyFind(fName, (findResult) => {
       if (findResult && findResult.length > 0) {
         registered(fName, findResult[0]);
       } else {
@@ -185,20 +176,20 @@ Miew.prototype.srvCurrentTopologyIsRegistered = function(registered, notRegister
   }
 };
 
-Miew.prototype.srvTopologyRegister = function(done, fail) {
+Miew.prototype.srvTopologyRegister = function (done, fail) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return;
   }
 
-  var self = this;
+  const self = this;
 
-  var topoSource = self._srvTopoSource;
-  var animSource = self._srvAnimSource;
+  const topoSource = self._srvTopoSource;
+  const animSource = self._srvAnimSource;
 
-  var onDone = function(success, state, message) {
+  const onDone = function (success, state, message) {
     if (LOCAL_DEBUG) {
-      var desc = state + (self._srvTopologyFile ? ' at #' + String(self._srvTopologyFile.id) : '') +
-          (message ? ' : ' + message : '');
+      const desc = state + (self._srvTopologyFile ? ` at #${String(self._srvTopologyFile.id)}` : '')
+          + (message ? ` : ${message}` : '');
       self.logger.report(desc);
     }
     if (success) {
@@ -208,15 +199,15 @@ Miew.prototype.srvTopologyRegister = function(done, fail) {
     }
   };
 
-  var notRegisteredFn = function() {
-    var request;
+  const notRegisteredFn = function () {
+    let request;
     if (topoSource instanceof File) {
       // upload file contents via FormData
       request = $.ajax({
         type: 'POST',
-        url: getBaseUrl() + 'file/upload',
-        data: (function() {
-          var form = new FormData();
+        url: `${getBaseUrl()}file/upload`,
+        data: (function () {
+          const form = new FormData();
           form.append('topologyFile', topoSource);
           if (animSource) {
             form.append('mdFile', animSource);
@@ -229,12 +220,12 @@ Miew.prototype.srvTopologyRegister = function(done, fail) {
       });
     } else {
       // send just a file reference
-      request = $.post(getBaseUrl() + 'file/upload', {
-        topologyFile: topoSource
+      request = $.post(`${getBaseUrl()}file/upload`, {
+        topologyFile: topoSource,
       });
     }
-    return request.done(function(result) {
-      var message = result && result.message ? result.message : null;
+    return request.done((result) => {
+      const message = result && result.message ? result.message : null;
       if (result && result.status === 'OK' && result.payload && result.payload.pdbFile) {
         self._srvTopologyFile = result.payload.pdbFile;
         self._srvAnimationFile = result.payload.mdFile;
@@ -245,34 +236,34 @@ Miew.prototype.srvTopologyRegister = function(done, fail) {
       } else {
         onDone(false, 'FAILED', message);
       }
-    }).fail(function() {
+    }).fail(() => {
       self._srvTopologyFile = null;
       self._srvAnimationFile = null;
       onDone(false, 'FAILED', 'HTTP Request failed');
     });
   };
 
-  var registeredFn = function(name) {
-    onDone(false, 'FAILED', name + ' is already registered');
+  const registeredFn = function (name) {
+    onDone(false, 'FAILED', `${name} is already registered`);
   };
 
-  var onFail = function(message) {
+  const onFail = function (message) {
     onDone(false, 'FAILED', message);
   };
 
   self.srvCurrentTopologyIsRegistered(registeredFn, notRegisteredFn, onFail);
 };
 
-Miew.prototype.srvTopologyConvert = function(topologyFile, mdFile, done) {
+Miew.prototype.srvTopologyConvert = function (topologyFile, mdFile, done) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return null;
   }
 
-  var request = $.ajax({
+  const request = $.ajax({
     type: 'POST',
-    url: getBaseUrl() + 'file/convert',
-    data: (function() {
-      var form = new FormData();
+    url: `${getBaseUrl()}file/convert`,
+    data: (function () {
+      const form = new FormData();
       form.append('topologyFile', topologyFile);
       form.append('mdFile', mdFile);
       return form;
@@ -282,43 +273,41 @@ Miew.prototype.srvTopologyConvert = function(topologyFile, mdFile, done) {
     cache: false,
   });
 
-  return request.done(function(result) {
-    var success = true;
-    var message = null;
-    var data = result;
+  return request.done((result) => {
+    let success = true;
+    let message = null;
+    const data = result;
     if (result.status && result.status === 'ERROR') {
-      message = result.message;
+      ({ message } = result);
       success = false;
     }
     done(success, data, message);
-  }).fail(function() {
+  }).fail(() => {
     done(false, null, 'HTTP Request failed');
   });
 };
 
-Miew.prototype.srvTopologyDelete = function(id, force, done, fail) {
+Miew.prototype.srvTopologyDelete = function (id, force, done, fail) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return;
   }
 
-  var self = this;
-  var onTopologyFound = function(topology) {
-    var request = $.ajax({
+  const self = this;
+  const onTopologyFound = function (topology) {
+    const request = $.ajax({
       type: 'DELETE',
-      url: getBaseUrl() + 'topology/' + topology.id + '?force=' + (force ? 'true' : 'false'),
+      url: `${getBaseUrl()}topology/${topology.id}?force=${force ? 'true' : 'false'}`,
       contentType: '',
-      data: ''
+      data: '',
     });
-    return request.done(function(result) {
-      var responseMessage = result && result.message ? result.message : null;
-      var success = false;
+    return request.done((result) => {
+      const responseMessage = result && result.message ? result.message : null;
+      let success = false;
       if (result && result.status === 'OK') {
         success = true;
-        var listElement = self._topologyList.filter(function(x) {
-          return x.id === +id;
-        })[0];
+        const listElement = self._topologyList.filter(x => x.id === +id)[0];
         if (listElement) {
-          var index = self._topologyList.indexOf(listElement);
+          const index = self._topologyList.indexOf(listElement);
           if (index >= 0) {
             self._topologyList.splice(index, 1);
           }
@@ -332,7 +321,7 @@ Miew.prototype.srvTopologyDelete = function(id, force, done, fail) {
       } else if (!success && typeof fail === 'function') {
         fail(responseMessage);
       }
-    }).fail(function() {
+    }).fail(() => {
       if (typeof fail === 'function') {
         fail('HTTP Request failed');
       }
@@ -341,13 +330,13 @@ Miew.prototype.srvTopologyDelete = function(id, force, done, fail) {
   self.srvTopologyGetById(id, onTopologyFound, fail);
 };
 
-Miew.prototype.srvQuery = function(done, fail) {
-  var self = this;
-  var onDone = function(topology, state, message) {
+Miew.prototype.srvQuery = function (done, fail) {
+  const self = this;
+  const onDone = function (topology, state, message) {
     self._srvTopologyFile = topology;
     if (LOCAL_DEBUG) {
-      var desc = state + (topology ? ' at #' + String(topology.id) : '') +
-          (message ? ' : ' + message : '');
+      const desc = state + (topology ? ` at #${String(topology.id)}` : '')
+          + (message ? ` : ${message}` : '');
       self.logger.debug(desc);
     }
     if (topology && typeof done === 'function') {
@@ -356,31 +345,31 @@ Miew.prototype.srvQuery = function(done, fail) {
       fail(message);
     }
   };
-  var registered = function(name, topology) {
+  const registered = function (name, topology) {
     onDone(topology, 'REGISTERED', null);
   };
-  var notRegistered = function() {
+  const notRegistered = function () {
     onDone(null, 'MISSING', null);
   };
-  var onFail = function(message) {
+  const onFail = function (message) {
     onDone(null, 'FAILURE', message);
   };
   this.srvCurrentTopologyIsRegistered(registered, notRegistered, onFail);
 };
 
-Miew.prototype.srvPresetList = function(pdbId, done, fail) {
-  var presetsList = [];
-  var error = null;
-  var request = $.get(getBaseUrl() + 'preset/pdb/' + pdbId, function(result) {
+Miew.prototype.srvPresetList = function (pdbId, done, fail) {
+  let presetsList = [];
+  let error = null;
+  const request = $.get(`${getBaseUrl()}preset/pdb/${pdbId}`, (result) => {
     if (result && result.status === 'OK' && result.payload) {
       presetsList = result.payload;
     }
   });
 
-  return request.fail(function() {
+  return request.fail(() => {
     presetsList = [];
     error = 'HTTP Request failed';
-  }).always(function() {
+  }).always(() => {
     if (!error && typeof done === 'function') {
       done(presetsList);
     } else if (error && typeof fail === 'function') {
@@ -389,19 +378,19 @@ Miew.prototype.srvPresetList = function(pdbId, done, fail) {
   });
 };
 
-Miew.prototype.srvPresetGetById = function(id, done, fail) {
-  var preset = null;
-  var error = null;
-  var request = $.get(getBaseUrl() + 'preset/' + id, function(result) {
+Miew.prototype.srvPresetGetById = function (id, done, fail) {
+  let preset = null;
+  let error = null;
+  const request = $.get(`${getBaseUrl()}preset/${id}`, (result) => {
     if (result && result.status === 'OK' && result.payload) {
       preset = result.payload;
     }
   });
 
-  return request.fail(function() {
+  return request.fail(() => {
     preset = null;
     error = 'HTTP Request failed';
-  }).always(function() {
+  }).always(() => {
     if (preset && typeof done === 'function') {
       done(preset);
     } else if (!preset && typeof fail === 'function') {
@@ -414,28 +403,28 @@ Miew.prototype.srvPresetGetById = function(id, done, fail) {
   });
 };
 
-Miew.prototype.srvPresetRename = function(id, newName, done, fail) {
+Miew.prototype.srvPresetRename = function (id, newName, done, fail) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return;
   }
 
-  var presetFoundFn = function(preset) {
-    var request = $.ajax({
+  const presetFoundFn = function (preset) {
+    const request = $.ajax({
       type: 'POST',
-      url: getBaseUrl() + 'preset',
+      url: `${getBaseUrl()}preset`,
       contentType: 'application/json; charset=utf-8',
       data: JSON.stringify({
         id: preset.id,
         name: newName,
         expression: preset.expression,
         pdbFile: {
-          id: preset.pdbFile.id
-        }
-      })
+          id: preset.pdbFile.id,
+        },
+      }),
     });
-    return request.done(function(result) {
-      var responseMessage = result && result.message ? result.message : null;
-      var success = false;
+    return request.done((result) => {
+      const responseMessage = result && result.message ? result.message : null;
+      let success = false;
       if (result && result.status === 'OK') {
         success = true;
       }
@@ -444,7 +433,7 @@ Miew.prototype.srvPresetRename = function(id, newName, done, fail) {
       } else if (!success && typeof fail === 'function') {
         fail(responseMessage);
       }
-    }).fail(function() {
+    }).fail(() => {
       if (typeof fail === 'function') {
         fail('HTTP Request failed');
       }
@@ -453,31 +442,31 @@ Miew.prototype.srvPresetRename = function(id, newName, done, fail) {
   this.srvPresetGetById(id, presetFoundFn, fail);
 };
 
-Miew.prototype.srvPresetUpdate = function(id, done, fail) {
+Miew.prototype.srvPresetUpdate = function (id, done, fail) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return;
   }
 
-  var self = this;
-  var presetFoundFn = function(preset) {
+  const self = this;
+  const presetFoundFn = function (preset) {
     // generate preset data from the current state
-    var opts = self.getState({settings: true, view: true});
+    const opts = self.getState({ settings: true, view: true });
     delete opts.load;
 
     // convert selector strings to JSON
     if (opts.reps) {
-      for (var i = 0, n = opts.reps.length; i < n; ++i) {
-        var rep = opts.reps[i];
+      for (let i = 0, n = opts.reps.length; i < n; ++i) {
+        const rep = opts.reps[i];
         if (rep.hasOwnProperty('selector')) {
           rep.selector = selectors.parse(rep.selector).selector;
           if (rep.selector.toJSON) {
             rep.selector = rep.selector.toJSON();
           }
         }
-        if (rep.hasOwnProperty('mode') &&
-            Array.isArray(rep.mode) &&
-            rep.mode[1].hasOwnProperty('subset')) {
-          var selector = selectors.parse(rep.mode[1].subset).selector;
+        if (rep.hasOwnProperty('mode')
+            && Array.isArray(rep.mode)
+            && rep.mode[1].hasOwnProperty('subset')) {
+          const { selector } = selectors.parse(rep.mode[1].subset);
           if (selector.toJSON) {
             rep.mode[1].subset = selector.toJSON();
           }
@@ -487,23 +476,23 @@ Miew.prototype.srvPresetUpdate = function(id, done, fail) {
 
     preset.expression = JSON.stringify(opts);
 
-    var request = $.ajax({
+    const request = $.ajax({
       type: 'POST',
-      url: getBaseUrl() + 'preset',
+      url: `${getBaseUrl()}preset`,
       contentType: 'application/json; charset=utf-8',
       data: JSON.stringify({
         id: preset.id,
         name: preset.name,
         expression: preset.expression,
         pdbFile: {
-          id: preset.pdbFile.id
-        }
-      })
+          id: preset.pdbFile.id,
+        },
+      }),
     });
 
-    return request.done(function(result) {
-      var responseMessage = result && result.message ? result.message : null;
-      var success = false;
+    return request.done((result) => {
+      const responseMessage = result && result.message ? result.message : null;
+      let success = false;
       if (result && result.status === 'OK') {
         success = true;
       }
@@ -512,7 +501,7 @@ Miew.prototype.srvPresetUpdate = function(id, done, fail) {
       } else if (!success && typeof fail === 'function') {
         fail(responseMessage);
       }
-    }).fail(function() {
+    }).fail(() => {
       if (typeof fail === 'function') {
         fail('HTTP Request failed');
       }
@@ -527,29 +516,29 @@ Miew.prototype.srvPresetUpdate = function(id, done, fail) {
   }
 };
 
-Miew.prototype.srvPresetCreate = function(name, done, fail) {
+Miew.prototype.srvPresetCreate = function (name, done, fail) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return null;
   }
 
   // generate preset data from the current state
-  var opts = this.getState({settings: true, view: true});
+  const opts = this.getState({ settings: true, view: true });
   delete opts.load;
 
   // convert selector strings to JSON
   if (opts.reps) {
-    for (var i = 0, n = opts.reps.length; i < n; ++i) {
-      var rep = opts.reps[i];
+    for (let i = 0, n = opts.reps.length; i < n; ++i) {
+      const rep = opts.reps[i];
       if (rep.hasOwnProperty('selector')) {
         rep.selector = selectors.parse(rep.selector).selector;
         if (rep.selector.toJSON) {
           rep.selector = rep.selector.toJSON();
         }
       }
-      if (rep.hasOwnProperty('mode') &&
-          Array.isArray(rep.mode) &&
-          rep.mode[1].hasOwnProperty('subset')) {
-        var selector = selectors.parse(rep.mode[1].subset).selector;
+      if (rep.hasOwnProperty('mode')
+          && Array.isArray(rep.mode)
+          && rep.mode[1].hasOwnProperty('subset')) {
+        const { selector } = selectors.parse(rep.mode[1].subset);
         if (selector.toJSON) {
           rep.mode[1].subset = selector.toJSON();
         }
@@ -557,12 +546,12 @@ Miew.prototype.srvPresetCreate = function(name, done, fail) {
     }
   }
 
-  var self = this;
+  const self = this;
 
-  var onDone = function(id, state, message) {
+  const onDone = function (id, state, message) {
     if (LOCAL_DEBUG) {
-      var desc = state + (id !== -1 ? ' at #' + String(id) : '') +
-          (message ? ' : ' + message : '');
+      const desc = state + (id !== -1 ? ` at #${String(id)}` : '')
+          + (message ? ` : ${message}` : '');
       self.logger.debug(desc);
     }
     if (id !== -1 && typeof done === 'function') {
@@ -572,72 +561,72 @@ Miew.prototype.srvPresetCreate = function(name, done, fail) {
     }
   };
 
-  var request;
+  let request;
   if (!this._srvTopologyFile) {
     // skip if not correctly initialized yet
     request = $.Deferred().reject().promise(); // eslint-disable-line new-cap
   } else {
-    var jsonData = {
-      name: name,
+    const jsonData = {
+      name,
       expression: JSON.stringify(opts),
       pdbFile: {
-        id: this._srvTopologyFile.id
+        id: this._srvTopologyFile.id,
       },
     };
     if (this._srvAnimationFile) {
-      jsonData.mdFile = {id: this._srvAnimationFile.id};
+      jsonData.mdFile = { id: this._srvAnimationFile.id };
     }
     request = $.ajax({
       type: 'POST',
-      url: getBaseUrl() + 'preset',
+      url: `${getBaseUrl()}preset`,
       contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(jsonData)
+      data: JSON.stringify(jsonData),
     });
   }
 
-  return request.done(function(result) {
-    var responseMessage = result && result.message ? result.message : null;
-    var responseState = 'FAILURE';
-    var id = -1;
+  return request.done((result) => {
+    const responseMessage = result && result.message ? result.message : null;
+    let responseState = 'FAILURE';
+    let id = -1;
     if (result && result.status === 'OK') {
       responseState = 'ADDED';
       id = result.payload ? result.payload.id : -1;
     }
     onDone(id, responseState, responseMessage);
-  }).fail(function() {
+  }).fail(() => {
     onDone(-1, 'FAILURE', 'HTTP Request failed');
   });
 };
 
-Miew.prototype.srvPresetApply = function(id, done, fail) {
-  var self = this;
-  var onPresetFoundFn = function(preset) {
+Miew.prototype.srvPresetApply = function (id, done, fail) {
+  const self = this;
+  const onPresetFoundFn = function (preset) {
     resetSettings();
     if (!self._srvTopologyFile || self._srvTopologyFile.id !== preset.pdbFile.id) {
       self.reset();
       self._opts.reps = null;
       self.applyPreset('empty'); // FIXME: Quick hack to solve double rebuild problem
-      self.load(getBaseUrl() + 'topology/' + preset.pdbFile.id + '/download', {
+      self.load(`${getBaseUrl()}topology/${preset.pdbFile.id}/download`, {
         fileType: 'pdb',
         sourceType: 'url',
         fileName: preset.pdbFile.path,
         topologyFile: preset.pdbFile,
         animationFile: preset.mdFile,
-        preset: preset
+        preset,
       });
       return;
     }
     self._srvPreset = preset;
     // load electron density if available
     if (preset.elDensityFile) {
-      self.loadEd(getBaseUrl() + 'edensity/' + preset.elDensityFile.id + '/download');
+      self.loadEd(`${getBaseUrl()}edensity/${preset.elDensityFile.id}/download`);
     } else {
       self.resetEd();
     }
     // rebuild options for miew
-    var opts = JSON.parse(preset.expression);
+    const opts = JSON.parse(preset.expression);
     // choose miew "preset" for base options
-    var miewPreset;
+    let miewPreset;
     if (opts.hasOwnProperty('preset') && typeof settings.now.presets[opts.preset] !== 'undefined') {
       miewPreset = settings.now.presets[opts.preset];
     } else {
@@ -645,10 +634,10 @@ Miew.prototype.srvPresetApply = function(id, done, fail) {
     }
     // build miew representations list
     if (opts.reps) {
-      var converter = new JSONConverter();
-      for (var i = 0, n = opts.reps.length; i < n; ++i) {
-        var rep = opts.reps[i];
-        var miewPresetRep = miewPreset[Math.min(i, miewPreset.length - 1)];
+      const converter = new JSONConverter();
+      for (let i = 0, n = opts.reps.length; i < n; ++i) {
+        const rep = opts.reps[i];
+        const miewPresetRep = miewPreset[Math.min(i, miewPreset.length - 1)];
         rep.colorer = rep.colorer || miewPresetRep.colorer;
         rep.mode = rep.mode || miewPresetRep.mode;
         rep.material = rep.material || miewPresetRep.material;
@@ -657,10 +646,10 @@ Miew.prototype.srvPresetApply = function(id, done, fail) {
         } else {
           rep.selector = miewPresetRep.selector;
         }
-        if (rep.hasOwnProperty('mode') &&
-            Array.isArray(rep.mode) &&
-            rep.mode[1].hasOwnProperty('subset')) {
-          var selector = converter.createSelectorFromNode(rep.mode[1].subset);
+        if (rep.hasOwnProperty('mode')
+            && Array.isArray(rep.mode)
+            && rep.mode[1].hasOwnProperty('subset')) {
+          const selector = converter.createSelectorFromNode(rep.mode[1].subset);
           if (selector !== null) {
             rep.mode[1].subset = selector.toString();
           }
@@ -682,7 +671,7 @@ Miew.prototype.srvPresetApply = function(id, done, fail) {
     if (typeof done === 'function') {
       done('Preset applied');
     } else {
-      self.dispatchEvent({type: 'presetApplyFinished', msg: 'Preset applied'});
+      self.dispatchEvent({ type: 'presetApplyFinished', msg: 'Preset applied' });
     }
   };
 
@@ -694,43 +683,43 @@ Miew.prototype.srvPresetApply = function(id, done, fail) {
   }
 };
 
-Miew.prototype.srvPresetDelete = function(id, done, fail) {
+Miew.prototype.srvPresetDelete = function (id, done, fail) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return null;
   }
 
-  var request = $.ajax({
+  const request = $.ajax({
     type: 'DELETE',
-    url: getBaseUrl() + 'preset/' + id,
+    url: `${getBaseUrl()}preset/${id}`,
     contentType: '',
-    data: ''
+    data: '',
   });
 
-  return request.done(function(result) {
-    var responseMessage = result && result.message ? result.message : null;
-    var success = result && result.status === 'OK';
+  return request.done((result) => {
+    const responseMessage = result && result.message ? result.message : null;
+    const success = result && result.status === 'OK';
     if (success && typeof done === 'function') {
       done(responseMessage);
     } else if (!success && typeof fail === 'function') {
       fail(responseMessage);
     }
-  }).fail(function() {
+  }).fail(() => {
     if (typeof fail === 'function') {
       fail('HTTP Request failed');
     }
   });
 };
 
-Miew.prototype.srvScenarioAdd = function(id, name, script, done, fail) {
+Miew.prototype.srvScenarioAdd = function (id, name, script, done, fail) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return null;
   }
 
-  var self = this;
-  var onDone = function(idLocal, state, message) {
+  const self = this;
+  const onDone = function (idLocal, state, message) {
     if (LOCAL_DEBUG) {
-      var desc = state + (idLocal !== -1 ? ' at #' + String(idLocal) : '') +
-          (message ? ' : ' + message : '');
+      const desc = state + (idLocal !== -1 ? ` at #${String(idLocal)}` : '')
+          + (message ? ` : ${message}` : '');
       self.logger.debug(desc);
     }
     if (idLocal !== -1 && typeof done === 'function') {
@@ -740,76 +729,76 @@ Miew.prototype.srvScenarioAdd = function(id, name, script, done, fail) {
     }
   };
 
-  var jsonData = {
-    'name': name,
-    'script' : script
+  const jsonData = {
+    name,
+    script,
   };
 
   if (id >= 0) {
     jsonData.id = id;
   }
 
-  var request = $.ajax({
+  const request = $.ajax({
     type: 'POST',
-    url: getBaseUrl() + 'scenario',
+    url: `${getBaseUrl()}scenario`,
     contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify(jsonData)
+    data: JSON.stringify(jsonData),
   });
 
-  return request.done(function(result) {
-    var responseMessage = result && result.message ? result.message : null;
-    var responseState = 'FAILURE';
-    var idLocal = -1;
+  return request.done((result) => {
+    const responseMessage = result && result.message ? result.message : null;
+    let responseState = 'FAILURE';
+    let idLocal = -1;
     if (result && result.status === 'OK') {
       responseState = 'ADDED';
       idLocal = result.payload ? result.payload.id : -1;
     }
     onDone(idLocal, responseState, responseMessage);
-  }).fail(function() {
+  }).fail(() => {
     onDone(-1, 'FAILURE', 'HTTP Request failed');
   });
 };
 
-Miew.prototype.srvScenarioDelete = function(id, done, fail) {
+Miew.prototype.srvScenarioDelete = function (id, done, fail) {
   if (typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER) {
     return null;
   }
 
-  var request = $.ajax({
+  const request = $.ajax({
     type: 'DELETE',
-    url: getBaseUrl() + 'scenario/?scenarioId=' + id,
+    url: `${getBaseUrl()}scenario/?scenarioId=${id}`,
     contentType: '',
-    data: ''
+    data: '',
   });
 
-  return request.done(function(result) {
-    var responseMessage = result && result.message ? result.message : null;
-    var success = result && result.status === 'OK';
+  return request.done((result) => {
+    const responseMessage = result && result.message ? result.message : null;
+    const success = result && result.status === 'OK';
     if (success && typeof done === 'function') {
       done(responseMessage);
     } else if (!success && typeof fail === 'function') {
       fail(responseMessage);
     }
-  }).fail(function() {
+  }).fail(() => {
     if (typeof fail === 'function') {
       fail('HTTP Request failed');
     }
   });
 };
 
-Miew.prototype.srvScenarioList = function(done, fail) {
-  var scenarioList = [];
-  var error = null;
-  var request = $.get(getBaseUrl() + 'scenario', function(result) {
+Miew.prototype.srvScenarioList = function (done, fail) {
+  let scenarioList = [];
+  let error = null;
+  const request = $.get(`${getBaseUrl()}scenario`, (result) => {
     if (result && result.status === 'OK' && result.payload) {
       scenarioList = result.payload;
     }
   });
 
-  return request.fail(function() {
+  return request.fail(() => {
     scenarioList = [];
     error = 'HTTP Request failed';
-  }).always(function() {
+  }).always(() => {
     if (!error && typeof done === 'function') {
       done(scenarioList);
     } else if (error && typeof fail === 'function') {
@@ -818,33 +807,33 @@ Miew.prototype.srvScenarioList = function(done, fail) {
   });
 };
 
-Miew.prototype.srvStreamMdFn = function(mdFile, pdbFile) {
-  var streamRegisteredMdFn = function(params, done, fail) {
-    var everyFrame = params && params.everyFrame !== undefined ? params.everyFrame : 1;
-    var recalculateSecondaryStructure = params && params.recalculateSecondaryStructure !== undefined ?
-      params.recalculateSecondaryStructure : 0;
-    var start = params && params.start !== undefined ? params.start : null;
-    var end = params && params.end !== undefined ? params.end : null;
-    var requestUrl = getBaseUrl() +
-        'md/' + mdFile.id +
-        '/download?pdbId=' + pdbFile.id +
-        '&everyFrame=' + everyFrame +
-        '&recalculateSecondaryStructure=' + recalculateSecondaryStructure;
+Miew.prototype.srvStreamMdFn = function (mdFile, pdbFile) {
+  const streamRegisteredMdFn = function (params, done, fail) {
+    const everyFrame = params && params.everyFrame !== undefined ? params.everyFrame : 1;
+    const recalculateSecondaryStructure = params && params.recalculateSecondaryStructure !== undefined
+      ? params.recalculateSecondaryStructure : 0;
+    const start = params && params.start !== undefined ? params.start : null;
+    const end = params && params.end !== undefined ? params.end : null;
+    let requestUrl = `${getBaseUrl()
+    }md/${mdFile.id
+    }/download?pdbId=${pdbFile.id
+    }&everyFrame=${everyFrame
+    }&recalculateSecondaryStructure=${recalculateSecondaryStructure}`;
     if (start) {
-      requestUrl += '&start=' + start;
+      requestUrl += `&start=${start}`;
     }
     if (end) {
-      requestUrl += '&end=' + end;
+      requestUrl += `&end=${end}`;
     }
 
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.responseType = 'arraybuffer';
-    xhr.onerror = function(error) {
+    xhr.onerror = function (error) {
       if (typeof fail === 'function') {
         fail(error);
       }
     };
-    xhr.onload = function() {
+    xhr.onload = function () {
       if (xhr.status === 200) {
         if (typeof done === 'function') {
           done(xhr.response);
@@ -857,14 +846,14 @@ Miew.prototype.srvStreamMdFn = function(mdFile, pdbFile) {
     xhr.send();
   };
 
-  var streamNotRegisteredMdFn = function(params, done, fail) {
-    var everyFrame = params && params.everyFrame !== undefined ? params.everyFrame : 1;
-    var recalculateSecondaryStructure = params && params.recalculateSecondaryStructure !== undefined ?
-      params.recalculateSecondaryStructure : 0;
-    var start = params && params.start !== undefined ? params.start : null;
-    var end = params && params.end !== undefined ? params.end : null;
+  const streamNotRegisteredMdFn = function (params, done, fail) {
+    const everyFrame = params && params.everyFrame !== undefined ? params.everyFrame : 1;
+    const recalculateSecondaryStructure = params && params.recalculateSecondaryStructure !== undefined
+      ? params.recalculateSecondaryStructure : 0;
+    const start = params && params.start !== undefined ? params.start : null;
+    const end = params && params.end !== undefined ? params.end : null;
 
-    var form = new FormData();
+    const form = new FormData();
     form.append('topologyFile', pdbFile);
     form.append('mdFile', mdFile);
     form.append('everyFrame', everyFrame);
@@ -872,14 +861,14 @@ Miew.prototype.srvStreamMdFn = function(mdFile, pdbFile) {
     form.append('start', start);
     form.append('end', end);
 
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.responseType = 'arraybuffer';
-    xhr.onerror = function(error) {
+    xhr.onerror = function (error) {
       if (typeof fail === 'function') {
         fail(error);
       }
     };
-    xhr.onload = function() {
+    xhr.onload = function () {
       if (xhr.status === 200) {
         if (typeof done === 'function') {
           done(xhr.response);
@@ -888,14 +877,12 @@ Miew.prototype.srvStreamMdFn = function(mdFile, pdbFile) {
         fail('HTTP Request error');
       }
     };
-    xhr.open('POST', getBaseUrl() + 'md/stream', true);
+    xhr.open('POST', `${getBaseUrl()}md/stream`, true);
     xhr.send(form);
   };
 
   if (typeof mdFile === 'string' && pdbFile instanceof File) {
     return streamNotRegisteredMdFn;
-  } else {
-    return streamRegisteredMdFn;
   }
+  return streamRegisteredMdFn;
 };
-

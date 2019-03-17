@@ -43,11 +43,11 @@ class Component {
     let resCnt = 0;
     for (let i = 0, n = subDivs.length; i < n; ++i) {
       if (i === n - 1 || subDivs[i].end + 1 !== subDivs[i + 1].start) {
-        const start = subDivs[curr].start;
-        const end = subDivs[i].end;
+        const { start } = subDivs[curr];
+        const { end } = subDivs[i];
         resIdc[resIdc.length] = {
-          start: start,
-          end: end
+          start,
+          end,
         };
         resCnt += end - start + 1;
         curr = i + 1;
@@ -74,13 +74,13 @@ class Component {
   }
 
   update() {
-    this.forEachCycle(function(cycle) {
+    this.forEachCycle((cycle) => {
       cycle.update();
     });
   }
 
   forEachAtom(process) {
-    this.forEachResidue(function(residue) {
+    this.forEachResidue((residue) => {
       residue.forEachAtom(process);
     });
   }
@@ -98,7 +98,7 @@ class Component {
 
   markResidues() {
     const self = this;
-    self.forEachResidue(function(residue) {
+    self.forEachResidue((residue) => {
       residue._component = self;
     });
   }
@@ -127,8 +127,8 @@ class Component {
   getMaskedSequences(mask) {
     const subs = [];
     let idx = 0;
-    this._forEachSubChain(mask, function(_subIdx, start, end) {
-      subs[idx++] = {start: start, end: end};
+    this._forEachSubChain(mask, (_subIdx, start, end) => {
+      subs[idx++] = { start, end };
     });
 
     return subs;
@@ -140,16 +140,16 @@ class Component {
     let lastSubIdx = -1;
     const subDivs = this._subDivs;
 
-    this._forEachSubChain(mask, function(subIdx, start, end) {
+    this._forEachSubChain(mask, (subIdx, start, end) => {
       if (lastSubIdx !== subIdx) {
         ++currIdx;
         subs[currIdx] = {
           arr: [],
-          boundaries: subDivs[subIdx]
+          boundaries: subDivs[subIdx],
         };
         lastSubIdx = subIdx;
       }
-      subs[currIdx].arr[subs[currIdx].arr.length] = {start: start, end: end};
+      subs[currIdx].arr[subs[currIdx].arr.length] = { start, end };
     });
 
     return subs;
@@ -157,4 +157,3 @@ class Component {
 }
 
 export default Component;
-

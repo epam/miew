@@ -1,41 +1,38 @@
 import Parser from './Parser';
-import * as THREE from 'three';
-import VolumeModel from './VolumeModel';
-import {valueType} from './VolumeModel';
+import VolumeModel, { valueType } from './VolumeModel';
 
 const CCP4Header = {
   extent: [valueType.array, 'u32', 0],
-  type:   [valueType.singular, 'u32', 3],
+  type: [valueType.singular, 'u32', 3],
   nstart: [valueType.array, 'i32', 4],
-  grid:   [valueType.array, 'u32', 7],
+  grid: [valueType.array, 'u32', 7],
   cellDims: [valueType.vector, 'f32', 10],
-  angles:   [valueType.vector, 'f32', 13],
-  crs2xyz:  [valueType.array, 'i32', 16],
-  dmin:   [valueType.singular, 'f32', 19],
-  dmax:   [valueType.singular, 'f32', 20],
-  dmean:  [valueType.singular, 'f32', 21],
-  ispg:   [valueType.singular, 'u32', 22],
+  angles: [valueType.vector, 'f32', 13],
+  crs2xyz: [valueType.array, 'i32', 16],
+  dmin: [valueType.singular, 'f32', 19],
+  dmax: [valueType.singular, 'f32', 20],
+  dmean: [valueType.singular, 'f32', 21],
+  ispg: [valueType.singular, 'u32', 22],
   nsymbt: [valueType.singular, 'u32', 23],
   lksflg: [valueType.singular, 'u32', 24],
   customData: [valueType.buffer, 'buffer', 25, 9],
   origin: [valueType.vector, 'f32', 34],
   map: [valueType.buffer, 'buffer', 52, 1],
   machine: [valueType.singular, 'u32', 53],
-  sd:   [valueType.singular, 'f32', 54],
+  sd: [valueType.singular, 'f32', 54],
   nlabel: [valueType.singular, 'f32', 55],
   label: [valueType.buffer, 'buffer', 56, 200],
 };
 
 class Ccp4Model extends VolumeModel {
-
   // read header (http://www.ccp4.ac.uk/html/maplib.html)
   _parseHeader(_buffer) {
     this._buff = _buffer;
     this._typedCheck();
     const arrays = {};
-    arrays.u32 = new Uint32Array(this._buff);
-    arrays.i32 = new Int32Array(this._buff);
-    arrays.f32 = new Float32Array(this._buff);
+    arrays.u32 = new Uint32Array(this._buff, 0, 56);
+    arrays.i32 = new Int32Array(this._buff, 0, 56);
+    arrays.f32 = new Float32Array(this._buff, 0, 56);
     arrays.buffer = this._buff;
     const header = this._header;
 
@@ -53,7 +50,7 @@ class Ccp4Model extends VolumeModel {
     }
     // Apply header conversion
     // Mapping between CCP4 column, row, section and VMD x, y, z.
-    const crs2xyz = this._header.crs2xyz;
+    const { crs2xyz } = this._header;
     if (crs2xyz[0] === 0 && crs2xyz[1] === 0 && crs2xyz[2] === 0) {
       crs2xyz[0] = 1;
       crs2xyz[1] = 2;
@@ -68,7 +65,7 @@ class Ccp4Model extends VolumeModel {
 
 
   _setOrigins() {
-    let [xaxis, yaxis, zaxis] = this._getAxis();
+    const [xaxis, yaxis, zaxis] = this._getAxis();
     this._setAxisIndices();
 
     const header = this._header;
@@ -93,10 +90,10 @@ class Ccp4Model extends VolumeModel {
       this._data = new Float32Array(
         this._buff,
         1024 + header.nsymbt,
-        header.extent[0] * header.extent[1] * header.extent[2]
+        header.extent[0] * header.extent[1] * header.extent[2],
       );
     } else {
-      throw new Error('CCP4: Unsupported format ' + header.type);
+      throw new Error(`CCP4: Unsupported format ${header.type}`);
     }
 
     this._setBoxParams(xaxis, yaxis, zaxis);
@@ -114,7 +111,9 @@ class Ccp4Model extends VolumeModel {
 
     let crsIdx = 0;
     const coord = [];
-    let x, y, z;
+    let x;
+    let y;
+    let z;
     for (coord[2] = 0; coord[2] < header.extent[2]; coord[2]++) { // Site
       for (coord[1] = 0; coord[1] < header.extent[1]; coord[1]++) { // Row
         for (coord[0] = 0; coord[0] < header.extent[0]; coord[0]++, crsIdx++) { // Column
@@ -136,9 +135,6 @@ class CCP4Parser extends Parser {
     this._options.fileType = 'ccp4';
     this.model = new Ccp4Model();
   }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Class methods
 
   /** @deprecated */
   static canParse(data, options) {

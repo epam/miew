@@ -1,9 +1,7 @@
-
-
 import _ from 'lodash';
 import logger from './utils/logger';
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Timer
 
 function Timer() {
@@ -13,34 +11,34 @@ function Timer() {
   this.running = false;
 }
 
-Timer.now = (function() {
-  var p = typeof window !== 'undefined' && window.performance;
+Timer.now = (function () {
+  const p = typeof window !== 'undefined' && window.performance;
   return (p && p.now) ? p.now.bind(p) : Date.now;
-})();
+}());
 
 Timer.prototype = {
   constructor: Timer,
 
-  start: function() {
+  start() {
     this.startTime = Timer.now();
     this.oldTime = this.startTime;
     this.running = true;
   },
 
-  stop: function() {
+  stop() {
     this.getElapsedTime();
     this.running = false;
   },
 
-  getElapsedTime: function() {
+  getElapsedTime() {
     this.update();
     return this.elapsedTime;
   },
 
-  update: function() {
-    var delta = 0;
+  update() {
+    let delta = 0;
     if (this.running) {
-      var newTime = Timer.now();
+      const newTime = Timer.now();
       delta = 0.001 * (newTime - this.oldTime);
       this.oldTime = newTime;
       this.elapsedTime += delta;
@@ -50,7 +48,7 @@ Timer.prototype = {
   },
 };
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Query string
 
 /**
@@ -70,9 +68,8 @@ Timer.prototype = {
  * @returns {string} encoded string
  */
 function encodeQueryComponent(text, excludeExp) {
-  return encodeURIComponent(text).replace(excludeExp, function(code) {
-    return String.fromCharCode(parseInt(code.substr(1), 16));
-  }).replace(/%20/g, '+');
+  const encode = code => String.fromCharCode(parseInt(code.substr(1), 16));
+  return encodeURIComponent(text).replace(excludeExp, encode).replace(/%20/g, '+');
 }
 
 /**
@@ -94,12 +91,12 @@ function decodeQueryComponent(text) {
 function getUrlParameters(url) {
   url = url || window.location.search;
 
-  var query = url.substring(url.indexOf('?') + 1);
-  var search = /([^&=]+)=?([^&]*)/g;
-  var result = [];
-  var match;
+  const query = url.substring(url.indexOf('?') + 1);
+  const search = /([^&=]+)=?([^&]*)/g;
+  const result = [];
+  let match;
 
-  while ((match = search.exec(query)) !== null) {
+  while ((match = search.exec(query)) !== null) { // eslint-disable-line no-cond-assign
     result.push([decodeQueryComponent(match[1]), decodeQueryComponent(match[2])]);
   }
 
@@ -112,10 +109,11 @@ function getUrlParameters(url) {
  * @returns {Object}
  */
 function getUrlParametersAsDict(url) {
-  var result = {};
-  var a = getUrlParameters(url);
-  for (var i = 0; i < a.length; ++i) {
-    result[a[i][0]] = a[i][1];
+  const result = {};
+  const a = getUrlParameters(url);
+  for (let i = 0; i < a.length; ++i) {
+    const [key, value] = a[i];
+    result[key] = value;
   }
   return result;
 }
@@ -125,9 +123,8 @@ function resolveURL(str) {
     try {
       if (typeof window !== 'undefined') {
         return new URL(str, window.location).href;
-      } else {
-        return new URL(str).href;
       }
+      return new URL(str).href;
     } catch (error) {
       // IE 11 has a URL object with no constructor available so just try a different approach instead
     }
@@ -147,27 +144,28 @@ function resolveURL(str) {
  * @returns {RegExp} - Regular expression.
  */
 function generateRegExp(symbolStr) {
-  var symbolList = [];
+  const symbolList = [];
 
-  for (var i = 0, n = symbolStr.length; i < n; ++i) {
+  for (let i = 0, n = symbolStr.length; i < n; ++i) {
     symbolList[symbolList.length] = symbolStr[i].charCodeAt(0).toString(16);
   }
 
-  var listStr = symbolList.join('|');
+  const listStr = symbolList.join('|');
 
-  return new RegExp('%(?:' + listStr + ')', 'gi');
+  return new RegExp(`%(?:${listStr})`, 'gi');
 }
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Create HTML element
 
 function createElement(tag, attrs, content) {
-  var element = document.createElement(tag);
-  var i, n;
+  const element = document.createElement(tag);
+  let i;
+  let n;
   if (attrs) {
-    var keys = Object.keys(attrs);
+    const keys = Object.keys(attrs);
     for (i = 0, n = keys.length; i < n; ++i) {
-      var key = keys[i];
+      const key = keys[i];
       element.setAttribute(key, attrs[key]);
     }
   }
@@ -176,7 +174,7 @@ function createElement(tag, attrs, content) {
       content = [content];
     }
     for (i = 0, n = content.length; i < n; ++i) {
-      var child = content[i];
+      const child = content[i];
       if (typeof child === 'string') {
         element.appendChild(document.createTextNode(child));
       } else if (child instanceof HTMLElement) {
@@ -187,7 +185,7 @@ function createElement(tag, attrs, content) {
   return element;
 }
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Easy inheritance
 
 /**
@@ -199,19 +197,20 @@ function createElement(tag, attrs, content) {
  * @returns {function} Original class.
  */
 function deriveClass(cls, base, members, statics) {
-  cls.prototype = _.assign(Object.create(base.prototype), {constructor: cls}, members);
+  cls.prototype = _.assign(Object.create(base.prototype), { constructor: cls }, members);
   if (statics) {
     _.assign(cls, statics);
   }
   return cls;
 }
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Deep prototyping
 
 function deriveDeep(obj, needZeroOwnProperties) {
-  var res = obj;
-  var i, n;
+  let res = obj;
+  let i;
+  let n;
   if (obj instanceof Array) {
     res = new Array(obj.length);
     for (i = 0, n = obj.length; i < n; ++i) {
@@ -219,11 +218,11 @@ function deriveDeep(obj, needZeroOwnProperties) {
     }
   } else if (obj instanceof Object) {
     res = Object.create(obj);
-    var keys = Object.keys(obj);
+    const keys = Object.keys(obj);
     for (i = 0, n = keys.length; i < n; ++i) {
-      var key = keys[i];
-      var value = obj[key];
-      var copy = deriveDeep(value);
+      const key = keys[i];
+      const value = obj[key];
+      const copy = deriveDeep(value);
       if (copy !== value) {
         res[key] = copy;
       }
@@ -235,46 +234,46 @@ function deriveDeep(obj, needZeroOwnProperties) {
   return res;
 }
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Colors
 
 function hexColor(color) {
-  var hex = ('0000000' + color.toString(16)).substr(-6);
-  return '#' + hex;
+  const hex = (`0000000${color.toString(16)}`).substr(-6);
+  return `#${hex}`;
 }
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Debug tracing
 
 function DebugTracer(namespace) {
-  var enabled = false;
+  let enabled = false;
 
-  this.enable = function(on) {
+  this.enable = function (on) {
     enabled = on;
   };
 
-  var indent = 0;
-  var methods = Object.keys(namespace);
+  let indent = 0;
+  const methods = Object.keys(namespace);
 
   function wrap(method_, name_) {
-    return function() {
-      var spaces = DebugTracer.spaces.substr(0, indent * 2);
+    return function (...args) {
+      const spaces = DebugTracer.spaces.substr(0, indent * 2);
       if (enabled) {
-        logger.debug(spaces + name_ + ' {');
+        logger.debug(`${spaces + name_} {`);
       }
       indent++;
-      var result = method_.apply(this, arguments); // eslint-disable-line no-invalid-this
+      const result = method_.apply(this, args); // eslint-disable-line no-invalid-this
       indent--;
       if (enabled) {
-        logger.debug(spaces + '} // ' + name_);
+        logger.debug(`${spaces}} // ${name_}`);
       }
       return result;
     };
   }
 
-  for (var i = 0, n = methods.length; i < n; ++i) {
-    var name = methods[i];
-    var method = namespace[name];
+  for (let i = 0, n = methods.length; i < n; ++i) {
+    const name = methods[i];
+    const method = namespace[name];
     if (method instanceof Function && name !== 'constructor') {
       namespace[name] = wrap(method, name);
     }
@@ -292,7 +291,7 @@ function OutOfMemoryError(message) {
 OutOfMemoryError.prototype = Object.create(Error.prototype);
 
 function allocateTyped(TypedArrayName, size) {
-  var result = null;
+  let result = null;
   try {
     result = new TypedArrayName(size);
   } catch (e) {
@@ -305,22 +304,22 @@ function allocateTyped(TypedArrayName, size) {
   return result;
 }
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Float array conversion
 
 function bytesToBase64(/** ArrayBuffer */ buffer) {
-  var bytes = new Uint8Array(buffer);
-  var binary = '';
-  for (var i = 0; i < bytes.byteLength; i++) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
   return window.btoa(binary);
 }
 
 function bytesFromBase64(/** string */ str) {
-  var binary = window.atob(str);
-  var bytes = new Uint8Array(binary.length);
-  for (var i = 0; i < bytes.length; ++i) {
+  const binary = window.atob(str);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < bytes.length; ++i) {
     bytes[i] = binary[i].charCodeAt(0);
   }
   return bytes.buffer;
@@ -334,21 +333,21 @@ function arrayFromBase64(/** string */ str, /** function */ TypedArrayClass) {
   return Array.prototype.slice.call(new TypedArrayClass(bytesFromBase64(str)));
 }
 
-//NOTE: this is 1-level comparison
+// NOTE: this is 1-level comparison
 function compareOptionsWithDefaults(opts, defOpts) {
-  var optsStr = [];
+  const optsStr = [];
   if (defOpts && opts) {
-    var keys = Object.keys(opts);
-    for (var p = 0; p < keys.length; ++p) {
-      var key = keys[p];
-      var value = opts[key];
+    const keys = Object.keys(opts);
+    for (let p = 0; p < keys.length; ++p) {
+      const key = keys[p];
+      const value = opts[key];
       // TODO add processing for tree structure
       if (!(value instanceof Object) && typeof defOpts[key] !== 'undefined' && defOpts[key] !== value) {
-        optsStr.push(key + ':' + value);
+        optsStr.push(`${key}:${value}`);
       }
     }
     if (optsStr.length > 0) {
-      return '!' + optsStr.join();
+      return `!${optsStr.join()}`;
     }
   }
   return '';
@@ -371,10 +370,10 @@ function isAlmostPlainObject(o) {
  */
 function objectsDiff(src, dst) {
   const diff = {};
-  _.forIn(src, function(srcValue, key) {
+  _.forIn(src, (srcValue, key) => {
     const dstValue = dst[key];
     if (isAlmostPlainObject(srcValue) && isAlmostPlainObject(dstValue)) {
-      var deepDiff = objectsDiff(srcValue, dstValue);
+      const deepDiff = objectsDiff(srcValue, dstValue);
       if (!_.isEmpty(deepDiff)) {
         diff[key] = deepDiff;
       }
@@ -387,12 +386,11 @@ function objectsDiff(src, dst) {
 
 function forInRecursive(object, callback) {
   function iterateThrough(obj, prefix) {
-    _.forIn(obj, function(value, key) {
-      var newPref = prefix + (prefix.length > 0 ? '.' : '');
+    _.forIn(obj, (value, key) => {
+      const newPref = prefix + (prefix.length > 0 ? '.' : '');
       if (value instanceof Object) {
         iterateThrough(value, newPref + key);
       } else if (value !== undefined) {
-
         callback(value, newPref + key);
       }
     });
@@ -402,7 +400,7 @@ function forInRecursive(object, callback) {
 
 function enquoteString(value) {
   if (_.isString(value)) {
-    return '"' + value.replace(/"/g, '\\"') + '"';
+    return `"${value.replace(/"/g, '\\"')}"`;
   }
   return value;
 }
@@ -433,8 +431,8 @@ function splitFileName(fileName) {
 }
 
 function dataUrlToBlob(url) {
-  var parts = url.split(/[:;,]/);
-  var partsCount = parts.length;
+  const parts = url.split(/[:;,]/);
+  const partsCount = parts.length;
   if (partsCount >= 3 && parts[partsCount - 2] === 'base64') {
     return new Blob([bytesFromBase64(parts[partsCount - 1])]);
   }
@@ -443,7 +441,7 @@ function dataUrlToBlob(url) {
 
 function shotOpen(url) {
   if (typeof window !== 'undefined') {
-    window.open().document.write('<body style="margin:0"><img src="' + url + '" /></body>');
+    window.open().document.write(`<body style="margin:0"><img src="${url}" /></body>`);
   }
 }
 
@@ -457,7 +455,7 @@ function shotDownload(dataUrl, filename) {
   if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveBlob) {
     window.navigator.msSaveBlob(dataUrlToBlob(dataUrl), filename);
   } else if (typeof document !== 'undefined') {
-    var link = document.createElement('a');
+    const link = document.createElement('a');
     link.download = filename;
     link.innerHTML = 'download';
     link.href = window.URL.createObjectURL(dataUrlToBlob(dataUrl));
@@ -467,16 +465,42 @@ function shotDownload(dataUrl, filename) {
   }
 }
 
+function download(data, filename, type) {
+  const blobData = new Blob([data]);
+
+  if (!filename) {
+    filename = ['data', +new Date()].join('');
+  }
+
+  if (!type) {
+    filename += blobData.type || '.bin';
+  } else {
+    filename += `.${type}`;
+  }
+
+  if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveBlob) {
+    window.navigator.msSaveBlob(blobData, filename);
+  } else if (typeof document !== 'undefined') {
+    const link = document.createElement('a');
+    link.download = filename;
+    link.innerHTML = 'download';
+    link.href = window.URL.createObjectURL(blobData);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
+
 function copySubArrays(src, dst, indices, itemSize) {
-  for (var i = 0, n = indices.length; i < n; ++i) {
-    for (var j = 0; j < itemSize; ++j) {
+  for (let i = 0, n = indices.length; i < n; ++i) {
+    for (let j = 0; j < itemSize; ++j) {
       dst[i * itemSize + j] = src[indices[i] * itemSize + j];
     }
   }
 }
 
 function shallowCloneNode(node) {
-  var newNode = node.cloneNode(true);
+  const newNode = node.cloneNode(true);
   newNode.worldPos = node.worldPos;
   // .style property is readonly, so "newNode.style = node.style;" won't work (and we don't need it, right?)
   return newNode;
@@ -495,38 +519,39 @@ function correctSelectorIdentifier(value) {
   return enquoteHelper.join('');
 }
 
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------
 // Exports
 
 export default {
-  Timer: Timer,
-  encodeQueryComponent: encodeQueryComponent,
-  decodeQueryComponent: decodeQueryComponent,
-  getUrlParameters: getUrlParameters,
-  getUrlParametersAsDict: getUrlParametersAsDict,
+  Timer,
+  encodeQueryComponent,
+  decodeQueryComponent,
+  getUrlParameters,
+  getUrlParametersAsDict,
   resolveURL,
-  generateRegExp: generateRegExp,
-  createElement: createElement,
-  deriveClass: deriveClass,
-  deriveDeep: deriveDeep,
-  hexColor: hexColor,
-  DebugTracer: DebugTracer,
-  OutOfMemoryError: OutOfMemoryError,
-  allocateTyped: allocateTyped,
-  bytesFromBase64 : bytesFromBase64,
-  bytesToBase64 : bytesToBase64,
-  arrayFromBase64 : arrayFromBase64,
-  arrayToBase64 : arrayToBase64,
-  compareOptionsWithDefaults: compareOptionsWithDefaults,
-  objectsDiff: objectsDiff,
-  forInRecursive: forInRecursive,
-  enquoteString: enquoteString,
-  unquoteString: unquoteString,
-  shotOpen: shotOpen,
-  shotDownload: shotDownload,
-  copySubArrays: copySubArrays,
-  shallowCloneNode: shallowCloneNode,
-  correctSelectorIdentifier: correctSelectorIdentifier,
+  generateRegExp,
+  createElement,
+  deriveClass,
+  deriveDeep,
+  hexColor,
+  DebugTracer,
+  OutOfMemoryError,
+  allocateTyped,
+  bytesFromBase64,
+  bytesToBase64,
+  arrayFromBase64,
+  arrayToBase64,
+  compareOptionsWithDefaults,
+  objectsDiff,
+  forInRecursive,
+  enquoteString,
+  unquoteString,
+  shotOpen,
+  shotDownload,
+  copySubArrays,
+  shallowCloneNode,
+  correctSelectorIdentifier,
   getFileExtension,
   splitFileName,
+  download,
 };

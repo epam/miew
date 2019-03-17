@@ -1,11 +1,7 @@
 /* global PACKAGE_VERSION:false */
-
-
-//////////////////////////////////////////////////////////////////////////////
-
 import _ from 'lodash';
 import * as THREE from 'three';
-import {Spinner} from 'spin.js';
+import { Spinner } from 'spin.js';
 import Stats from './gfx/Stats';
 import utils from './utils';
 import JobHandle from './utils/JobHandle';
@@ -27,6 +23,7 @@ import ObjectControls from './ui/ObjectControls';
 import Picker from './ui/Picker';
 import Axes from './gfx/Axes';
 import gfxutils from './gfx/gfxutils';
+import noise from './gfx/noiseTexture';
 import FrameInfo from './gfx/FrameInfo';
 import meshes from './gfx/meshes/meshes';
 import LinesObject from './gfx/objects/LinesObj';
@@ -44,18 +41,17 @@ import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
 import WebVRPoC from './gfx/vr/WebVRPoC';
 
-//////////////////////////////////////////////////////////////////////////////
+const {
+  selectors,
+  Atom,
+  Residue,
+  Chain,
+  Molecule,
+} = chem;
 
-var
-  selectors = chem.selectors,
-  Atom = chem.Atom,
-  Residue = chem.Residue,
-  Chain = chem.Chain,
-  Molecule = chem.Molecule;
+const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 
-var EDIT_MODE = {COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2};
-
-var createElement = utils.createElement;
+const { createElement } = utils;
 
 function updateFogRange(fog, center, radius) {
   fog.near = center - radius * settings.now.fogNearFactor;
@@ -63,7 +59,7 @@ function updateFogRange(fog, center, radius) {
 }
 
 function removeExtension(fileName) {
-  var dot = fileName.lastIndexOf('.');
+  const dot = fileName.lastIndexOf('.');
   if (dot >= 0) {
     fileName = fileName.substr(0, dot);
   }
@@ -71,9 +67,9 @@ function removeExtension(fileName) {
 }
 
 function hasValidResidues(complex) {
-  var hasValidRes = false;
-  complex.forEachComponent(function(component) {
-    component.forEachResidue(function(residue) {
+  let hasValidRes = false;
+  complex.forEachComponent((component) => {
+    component.forEachResidue((residue) => {
       if (residue._isValid) {
         hasValidRes = true;
       }
@@ -83,11 +79,11 @@ function hasValidResidues(complex) {
 }
 
 function reportProgress(log, action, percent) {
-  var TOTAL_PERCENT = 100;
+  const TOTAL_PERCENT = 100;
   if (percent !== undefined) {
-    log.debug(action + '... ' + Math.floor(percent * TOTAL_PERCENT) + '%');
+    log.debug(`${action}... ${Math.floor(percent * TOTAL_PERCENT)}%`);
   } else {
-    log.debug(action + '...');
+    log.debug(`${action}...`);
   }
 }
 
@@ -95,7 +91,7 @@ function chooseFogColor() {
   return settings.now.fogColorEnable ? settings.now.fogColor : settings.now.bg.color;
 }
 
-//////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////
 
 /**
  * Main 3D Molecular Viewer class.
@@ -118,10 +114,10 @@ function Miew(opts) {
   /** @type {?object} */
   this._gfx = null;
   /** @type {HTMLElement} */
-  this._container = (opts && opts.container) ||
-    document.getElementById('miew-container') ||
-    _.head(document.getElementsByClassName('miew-container')) ||
-    document.body;
+  this._container = (opts && opts.container)
+    || document.getElementById('miew-container')
+    || _.head(document.getElementsByClassName('miew-container'))
+    || document.body;
   /** @type {HTMLElement} */
   this._containerRoot = this._container;
 
@@ -139,7 +135,7 @@ function Miew(opts) {
   /** @type {Settings} */
   this.settings = settings;
   const log = logger; // TODO: add .instantiate() when migration to the "context" paradigm is finished
-  log.console  = DEBUG;
+  log.console = DEBUG;
   log.level = DEBUG ? 'debug' : 'info';
   /**
    * @type {Logger}
@@ -182,11 +178,11 @@ function Miew(opts) {
   this.reset();
 
   if (this._repr) {
-    log.debug('Selected ' + this._repr.mode.name + ' mode with ' + this._repr.colorer.name + ' colorer.');
+    log.debug(`Selected ${this._repr.mode.name} mode with ${this._repr.colorer.name} colorer.`);
   }
 
-  var self = this;
-  Miew.registeredPlugins.forEach(function(plugin) {
+  const self = this;
+  Miew.registeredPlugins.forEach((plugin) => {
     plugin.call(self);
   });
 
@@ -196,9 +192,23 @@ function Miew(opts) {
 Miew.prototype = Object.create(EventDispatcher.prototype);
 Miew.prototype.constructor = Miew;
 
-Miew.prototype.getMaxRepresentationCount = function() {
+Miew.prototype.getMaxRepresentationCount = function () {
   return ComplexVisual.NUM_REPRESENTATION_BITS;
 };
+
+/**
+ * Replace viewer container contents with a DOM element.
+ * @param {HTMLElement} container - parent container.
+ * @param {HTMLElement} element - DOM element to show.
+ * @private
+ */
+function _setContainerContents(container, element) {
+  const parent = container;
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+  parent.appendChild(element);
+}
 
 /**
  * Initialize the viewer.
@@ -206,31 +216,30 @@ Miew.prototype.getMaxRepresentationCount = function() {
  * @throws Forwards exception raised during initialization.
  * @see Miew#term
  */
-Miew.prototype.init = function() {
-  var container = this._container;
-  var elem = utils.createElement('div', {'class': 'miew-canvas'});
+Miew.prototype.init = function () {
+  const container = this._container;
+  const elem = utils.createElement('div', { class: 'miew-canvas' });
   _setContainerContents(container, elem);
   this._container = elem;
 
-  var frag = document.createDocumentFragment();
+  const frag = document.createDocumentFragment();
   frag.appendChild(this._msgMode = createElement(
-    'div', {'class': 'mode-message overlay'},
-    createElement('p', {}, 'COMPONENT EDIT MODE')
+    'div', { class: 'mode-message overlay' },
+    createElement('p', {}, 'COMPONENT EDIT MODE'),
   ));
   frag.appendChild(this._msgAtomInfo = createElement(
-    'div', {'class': 'atom-info overlay'},
-    createElement('p', {}, '')
+    'div', { class: 'atom-info overlay' },
+    createElement('p', {}, ''),
   ));
   container.appendChild(frag);
 
-  if (this._gfx !== null) { //block double init
+  if (this._gfx !== null) { // block double init
     return true;
   }
 
-  var self = this;
+  const self = this;
   this._showMessage('Viewer is being initialized...');
   try {
-
     this._initGfx();
 
     this._initListeners();
@@ -240,44 +249,42 @@ Miew.prototype.init = function() {
       width: 14,
       radius: 42,
       color: '#fff',
-      zIndex: 700
+      zIndex: 700,
     });
 
-    window.top.addEventListener('keydown', function(event) {
+    window.top.addEventListener('keydown', (event) => {
       self._onKeyDown(event);
     });
 
-    window.top.addEventListener('keyup', function(event) {
+    window.top.addEventListener('keyup', (event) => {
       self._onKeyUp(event);
     });
 
     this._objectControls = new ObjectControls(
       this._gfx.root, this._gfx.pivot,
-      this._gfx.camera, this._gfx.renderer.domElement, function() {
-        return self._getAltObj();
-      }
+      this._gfx.camera, this._gfx.renderer.domElement, (() => self._getAltObj()),
     );
-    this._objectControls.addEventListener('change', function(e) {
+    this._objectControls.addEventListener('change', (e) => {
       // route rotate and zoom events to the external API
       switch (e.action) {
-      case 'rotate':
-        self.dispatchEvent({type: 'rotate', angle: e.angle});
-        break;
-      case 'zoom':
-        self.dispatchEvent({type: 'zoom', factor: e.factor});
-        break;
-      default:
+        case 'rotate':
+          self.dispatchEvent({ type: 'rotate', angle: e.angle });
+          break;
+        case 'zoom':
+          self.dispatchEvent({ type: 'zoom', factor: e.factor });
+          break;
+        default:
       }
-      self.dispatchEvent({type: 'transform'});
+      self.dispatchEvent({ type: 'transform' });
       self._needRender = true;
     });
 
-    var gfx = this._gfx;
+    const gfx = this._gfx;
     this._picker = new Picker(gfx.root, gfx.camera, gfx.renderer.domElement);
-    this._picker.addEventListener('newpick', function(event) {
+    this._picker.addEventListener('newpick', (event) => {
       self._onPick(event);
     });
-    this._picker.addEventListener('dblclick', function(event) {
+    this._picker.addEventListener('dblclick', (event) => {
       self._onDblClick(event);
     });
 
@@ -296,10 +303,10 @@ Miew.prototype.init = function() {
   }
 
   // automatically load default file
-  var file = this._opts && this._opts.load;
+  const file = this._opts && this._opts.load;
   if (file) {
-    var type = this._opts && this._opts.type;
-    this.load(file, {fileType: type, keepRepsInfo: true});
+    const type = this._opts && this._opts.type;
+    this.load(file, { fileType: type, keepRepsInfo: true });
   }
 
   return true;
@@ -309,7 +316,7 @@ Miew.prototype.init = function() {
  * Terminate the viewer completely.
  * @see Miew#init
  */
-Miew.prototype.term = function() {
+Miew.prototype.term = function () {
   this._showMessage('Viewer has been terminated.');
   this._loading.forEach((job) => {
     job.cancel();
@@ -320,25 +327,11 @@ Miew.prototype.term = function() {
 };
 
 /**
- * Replace viewer container contents with a DOM element.
- * @param {HTMLElement} container - parent container.
- * @param {HTMLElement} element - DOM element to show.
- * @private
- */
-function _setContainerContents(container, element) {
-  const parent = container;
-  while (parent.firstChild) {
-    parent.removeChild(parent.firstChild);
-  }
-  parent.appendChild(element);
-}
-
-/**
  * Display message inside the viewer container, hiding WebGL canvas.
  * @param {string} msg - Message to show.
  * @private
  */
-Miew.prototype._showMessage = function(msg) {
+Miew.prototype._showMessage = function (msg) {
   const element = document.createElement('div');
   element.setAttribute('class', 'miew-message');
   element.appendChild(document.createElement('p')).appendChild(document.createTextNode(msg));
@@ -349,7 +342,7 @@ Miew.prototype._showMessage = function(msg) {
  * Display WebGL canvas inside the viewer container, hiding any message shown.
  * @private
  */
-Miew.prototype._showCanvas = function() {
+Miew.prototype._showCanvas = function () {
   _setContainerContents(this._container, this._gfx.renderer.domElement);
 };
 
@@ -357,13 +350,13 @@ Miew.prototype._showCanvas = function() {
  * Initialize WebGL and set 3D scene up.
  * @private
  */
-Miew.prototype._initGfx = function() {
-  var gfx = {
-    width:  this._container.clientWidth,
-    height: this._container.clientHeight
+Miew.prototype._initGfx = function () {
+  const gfx = {
+    width: this._container.clientWidth,
+    height: this._container.clientHeight,
   };
 
-  var webGLOptions = {preserveDrawingBuffer: true, alpha: true, premultipliedAlpha: false};
+  const webGLOptions = { preserveDrawingBuffer: true, alpha: true, premultipliedAlpha: false };
   if (settings.now.antialias) {
     webGLOptions.antialias = true;
   }
@@ -371,6 +364,8 @@ Miew.prototype._initGfx = function() {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
+  gfx.renderer.shadowMap.enabled = false;
+  gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
   capabilities.init(gfx.renderer);
 
   // z-sprites and ambient occlusion possibility
@@ -378,8 +373,8 @@ Miew.prototype._initGfx = function() {
     settings.set('zSprites', false);
   }
   if (
-    !gfx.renderer.getContext().getExtension('WEBGL_depth_texture') ||
-    !gfx.renderer.getContext().getExtension('WEBGL_draw_buffers')
+    !gfx.renderer.getContext().getExtension('WEBGL_depth_texture')
+    || !gfx.renderer.getContext().getExtension('WEBGL_draw_buffers')
   ) {
     settings.set('ao', false);
   }
@@ -387,14 +382,14 @@ Miew.prototype._initGfx = function() {
   gfx.renderer.autoClear = false;
   gfx.renderer.setPixelRatio(window.devicePixelRatio);
   gfx.renderer.setSize(gfx.width, gfx.height);
-  gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
+  gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
   gfx.renderer.clearColor();
 
   gfx.renderer2d.setSize(gfx.width, gfx.height);
 
   gfx.camera = new THREE.PerspectiveCamera(
     settings.now.camFov, gfx.width / gfx.height,
-    settings.now.camNear, settings.now.camFar
+    settings.now.camNear, settings.now.camFar,
   );
   gfx.camera.setMinimalFov(settings.now.camFov);
   gfx.camera.position.z = settings.now.camDistance;
@@ -407,7 +402,7 @@ Miew.prototype._initGfx = function() {
 
   gfx.scene = new THREE.Scene();
 
-  var color = chooseFogColor();
+  const color = chooseFogColor();
   gfx.scene.fog = new THREE.Fog(color, settings.now.camNear, settings.now.camFar);
 
   gfx.root = new gfxutils.RCGroup();
@@ -426,12 +421,19 @@ Miew.prototype._initGfx = function() {
   gfx.selectionRoot.add(gfx.selectionPivot);
 
   // TODO: Either stay with a single light or revert this commit
-  var light12 = new THREE.DirectionalLight(0xffffff, 0.45);
+  const light12 = new THREE.DirectionalLight(0xffffff, 0.45);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
+  light12.castShadow = true;
+  light12.shadow = new THREE.DirectionalLightShadow();
+  light12.shadow.bias = 0.09;
+  light12.shadow.radius = settings.now.shadow.radius;
+  const shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
+  light12.shadow.mapSize.width = shadowMapSize;
+  light12.shadow.mapSize.height = shadowMapSize;
   gfx.scene.add(light12);
 
-  var light3 = new THREE.AmbientLight(0x666666);
+  const light3 = new THREE.AmbientLight(0x666666);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   gfx.scene.add(light3);
 
@@ -442,8 +444,8 @@ Miew.prototype._initGfx = function() {
     gfx.width * window.devicePixelRatio,
     gfx.height * window.devicePixelRatio,
     {
-      minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, depthBuffer: true
-    }
+      minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, depthBuffer: true,
+    },
   );
 
   if (gfx.renderer.getContext().getExtension('WEBGL_depth_texture')) {
@@ -455,24 +457,24 @@ Miew.prototype._initGfx = function() {
     gfx.width * window.devicePixelRatio,
     gfx.height * window.devicePixelRatio,
     {
-      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false
-    }
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
+    },
   );
 
   gfx.offscreenBuf3 = new THREE.WebGLRenderTarget(
     gfx.width * window.devicePixelRatio,
     gfx.height * window.devicePixelRatio,
     {
-      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false
-    }
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
+    },
   );
 
   gfx.offscreenBuf4 = new THREE.WebGLRenderTarget(
     gfx.width * window.devicePixelRatio,
     gfx.height * window.devicePixelRatio,
     {
-      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false
-    }
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
+    },
   );
 
   gfx.volBFTex = gfx.offscreenBuf3;
@@ -485,27 +487,36 @@ Miew.prototype._initGfx = function() {
       gfx.width * window.devicePixelRatio,
       gfx.height * window.devicePixelRatio,
       {
-        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, type: THREE.FloatType,
-        depthBuffer: false
-      }
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat,
+        type: THREE.FloatType,
+        depthBuffer: false,
+      },
     );
 
     gfx.offscreenBuf6 = new THREE.WebGLRenderTarget(
       gfx.width * window.devicePixelRatio,
       gfx.height * window.devicePixelRatio,
       {
-        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, type: THREE.FloatType,
-        depthBuffer: false
-      }
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat,
+        type: THREE.FloatType,
+        depthBuffer: false,
+      },
     );
 
     gfx.offscreenBuf7 = new THREE.WebGLRenderTarget(
       gfx.width * window.devicePixelRatio,
       gfx.height * window.devicePixelRatio,
       {
-        minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, type: THREE.FloatType,
-        depthBuffer: true
-      }
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBAFormat,
+        type: THREE.FloatType,
+        depthBuffer: true,
+      },
     );
 
     gfx.volBFTex = gfx.offscreenBuf5;
@@ -519,16 +530,16 @@ Miew.prototype._initGfx = function() {
     gfx.width * window.devicePixelRatio,
     gfx.height * window.devicePixelRatio,
     {
-      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false
-    }
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
+    },
   );
 
   gfx.stereoBufR = new THREE.WebGLRenderTarget(
     gfx.width * window.devicePixelRatio,
     gfx.height * window.devicePixelRatio,
     {
-      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false
-    }
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
+    },
   );
 
   this._gfx = gfx;
@@ -545,7 +556,7 @@ Miew.prototype._initGfx = function() {
   this._container.appendChild(gfx.renderer2d.getElement());
 
   // add FPS counter
-  var stats = new Stats();
+  const stats = new Stats();
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.right = '0';
   stats.domElement.style.bottom = '0';
@@ -558,9 +569,9 @@ Miew.prototype._initGfx = function() {
  * Setup event listeners.
  * @private
  */
-Miew.prototype._initListeners = function() {
-  var self = this;
-  window.addEventListener('resize', function _onResize() {
+Miew.prototype._initListeners = function () {
+  const self = this;
+  window.addEventListener('resize', () => {
     self._onResize();
   });
 };
@@ -569,15 +580,15 @@ Miew.prototype._initListeners = function() {
  * Try to add numbers to the base name to make it unique among visuals
  * @private
  */
-Miew.prototype._makeUniqueVisualName = function(baseName) {
+Miew.prototype._makeUniqueVisualName = function (baseName) {
   if (!baseName) {
     return Math.random().toString();
   }
 
-  var name = baseName;
-  var suffix = 1;
+  let name = baseName;
+  let suffix = 1;
   while (this._visuals.hasOwnProperty(name)) {
-    name = baseName + ' (' + suffix.toString() + ')';
+    name = `${baseName} (${suffix.toString()})`;
     suffix++;
   }
 
@@ -588,13 +599,13 @@ Miew.prototype._makeUniqueVisualName = function(baseName) {
  * Add visual to the viewer
  * @private
  */
-Miew.prototype._addVisual = function(visual) {
+Miew.prototype._addVisual = function (visual) {
   if (!visual) {
     return null;
   }
 
   // change visual name in order to make it unique
-  var name = this._makeUniqueVisualName(visual.name);
+  const name = this._makeUniqueVisualName(visual.name);
   visual.name = name;
 
   this._visuals[name] = visual;
@@ -610,11 +621,11 @@ Miew.prototype._addVisual = function(visual) {
  * Remove visual from the viewer
  * @private
  */
-Miew.prototype._removeVisual = function(visual) {
-  var name = '';
-  var obj = null;
+Miew.prototype._removeVisual = function (visual) {
+  let name = '';
+  let obj = null;
   if (visual instanceof Visual) {
-    name = visual.name;
+    ({ name } = visual);
     obj = visual;
   } else if (typeof visual === 'string') {
     name = visual;
@@ -639,8 +650,8 @@ Miew.prototype._removeVisual = function(visual) {
  * Call specified function for each Visual
  * @private
  */
-Miew.prototype._forEachVisual = function(callback) {
-  for (var name in this._visuals) {
+Miew.prototype._forEachVisual = function (callback) {
+  for (const name in this._visuals) {
     if (this._visuals.hasOwnProperty(name)) {
       callback(this._visuals[name]);
     }
@@ -651,12 +662,12 @@ Miew.prototype._forEachVisual = function(callback) {
  * Release (destroy) all visuals in the scene
  * @private
  */
-Miew.prototype._releaseAllVisuals = function() {
+Miew.prototype._releaseAllVisuals = function () {
   if (!this._gfx || !this._gfx.pivot) {
     return;
   }
 
-  for (var name in this._visuals) {
+  for (const name in this._visuals) {
     if (this._visuals.hasOwnProperty(name)) {
       this._visuals[name].release();
     }
@@ -669,14 +680,14 @@ Miew.prototype._releaseAllVisuals = function() {
  * Call specified function for each ComplexVisual
  * @private
  */
-Miew.prototype._forEachComplexVisual = function(callback) {
+Miew.prototype._forEachComplexVisual = function (callback) {
   if (!this._gfx || !this._gfx.pivot) {
     return;
   }
 
-  for (var name in this._visuals) {
-    if (this._visuals.hasOwnProperty(name) &&
-          this._visuals[name] instanceof ComplexVisual) {
+  for (const name in this._visuals) {
+    if (this._visuals.hasOwnProperty(name)
+          && this._visuals[name] instanceof ComplexVisual) {
       callback(this._visuals[name]);
     }
   }
@@ -686,11 +697,11 @@ Miew.prototype._forEachComplexVisual = function(callback) {
  * Returns ComplexVisual with specified name, or current (if not found), or any, or null
  * @private
  */
-Miew.prototype._getComplexVisual = function(name) {
+Miew.prototype._getComplexVisual = function (name) {
   name = name || this._curVisualName;
-  var any = null;
-  var named = null;
-  this._forEachComplexVisual(function(visual) {
+  let any = null;
+  let named = null;
+  this._forEachComplexVisual((visual) => {
     any = visual;
     if (visual.name === name) {
       named = visual;
@@ -703,9 +714,9 @@ Miew.prototype._getComplexVisual = function(name) {
  * Returns first found VolumeVisual (no more than one should be present actually)
  * @private
  */
-Miew.prototype._getVolumeVisual = function() {
-  var any = null;
-  this._forEachVisual(function(visual) {
+Miew.prototype._getVolumeVisual = function () {
+  let any = null;
+  this._forEachVisual((visual) => {
     if (visual instanceof VolumeVisual) {
       any = visual;
     }
@@ -717,13 +728,13 @@ Miew.prototype._getVolumeVisual = function() {
  * Returns ComplexVisual corresponding to specified complex
  * @private
  */
-Miew.prototype._getVisualForComplex = function(complex) {
+Miew.prototype._getVisualForComplex = function (complex) {
   if (!complex) {
     return null;
   }
 
-  var found = null;
-  this._forEachComplexVisual(function(visual) {
+  let found = null;
+  this._forEachComplexVisual((visual) => {
     if (visual.getComplex() === complex) {
       found = visual;
     }
@@ -734,14 +745,14 @@ Miew.prototype._getVisualForComplex = function(complex) {
 /*
    * Get a list of names of visuals currently shown by the viewer
    */
-Miew.prototype.getVisuals = function() {
+Miew.prototype.getVisuals = function () {
   return Object.keys(this._visuals);
 };
 
 /*
    * Get current visual
    */
-Miew.prototype.getCurrentVisual = function() {
+Miew.prototype.getCurrentVisual = function () {
   return this._curVisualName;
 };
 
@@ -749,7 +760,7 @@ Miew.prototype.getCurrentVisual = function() {
    * Set current visual.
    * All further operations will be performed on this visual (complex) if not stated otherwise.
    */
-Miew.prototype.setCurrentVisual = function(name) {
+Miew.prototype.setCurrentVisual = function (name) {
   if (!this._visuals[name]) {
     return;
   }
@@ -762,7 +773,7 @@ Miew.prototype.setCurrentVisual = function(name) {
  * Has no effect if already running.
  * @see Miew#halt
  */
-Miew.prototype.run = function() {
+Miew.prototype.run = function () {
   if (!this._running) {
     this._running = true;
     if (this._halting) {
@@ -782,7 +793,7 @@ Miew.prototype.run = function() {
  * Will be processed during the next frame.
  * @see Miew#run
  */
-Miew.prototype.halt = function() {
+Miew.prototype.halt = function () {
   if (this._running) {
     this._discardComponentEdit();
     this._discardFragmentEdit();
@@ -796,7 +807,7 @@ Miew.prototype.halt = function() {
  * on hot keys.
  * @param enabled - start (true) or stop (false) response on hot keys.
  */
-Miew.prototype.enableHotKeys = function(enabled) {
+Miew.prototype.enableHotKeys = function (enabled) {
   this._hotKeysEnabled = enabled;
   this._objectControls.enableHotkeys(enabled);
 };
@@ -805,10 +816,10 @@ Miew.prototype.enableHotKeys = function(enabled) {
  * Callback which processes window resize.
  * @private
  */
-Miew.prototype._onResize = function() {
+Miew.prototype._onResize = function () {
   this._needRender = true;
 
-  var gfx = this._gfx;
+  const gfx = this._gfx;
   gfx.width = this._container.clientWidth;
   gfx.height = this._container.clientHeight;
 
@@ -819,14 +830,14 @@ Miew.prototype._onResize = function() {
   gfx.renderer.setSize(gfx.width, gfx.height);
   gfx.renderer2d.setSize(gfx.width, gfx.height);
 
-  this.dispatchEvent({type: 'resize'});
+  this.dispatchEvent({ type: 'resize' });
 };
 
-Miew.prototype._resizeOffscreenBuffers = function(width, height, stereo) {
-  var gfx = this._gfx;
+Miew.prototype._resizeOffscreenBuffers = function (width, height, stereo) {
+  const gfx = this._gfx;
   stereo = stereo || 'NONE';
-  var isAnaglyph = (stereo === 'NONE' || stereo === 'ANAGLYPH');
-  var multi = isAnaglyph ? 1 : 0.5;
+  const isAnaglyph = (stereo === 'NONE' || stereo === 'ANAGLYPH');
+  const multi = isAnaglyph ? 1 : 0.5;
   gfx.offscreenBuf.setSize(multi * width, height);
   gfx.offscreenBuf2.setSize(multi * width, height);
   gfx.offscreenBuf3.setSize(multi * width, height);
@@ -850,7 +861,7 @@ Miew.prototype._resizeOffscreenBuffers = function(width, height, stereo) {
  * Callback which processes update/render frames.
  * @private
  */
-Miew.prototype._onTick = function() {
+Miew.prototype._onTick = function () {
   if (this._halting) {
     this._running = false;
     this._halting = false;
@@ -869,41 +880,39 @@ Miew.prototype._onTick = function() {
   }
 };
 
-Miew.prototype._getBSphereRadius = function() {
+Miew.prototype._getBSphereRadius = function () {
   // calculate radius that would include all visuals
-  var radius = 0;
-  this._forEachVisual(function(visual) {
+  let radius = 0;
+  this._forEachVisual((visual) => {
     radius = Math.max(radius, visual.getBoundaries().boundingSphere.radius);
   });
   return radius * this._objectControls.getScale();
 };
 
-Miew.prototype._updateFog = function() {
-  var gfx = this._gfx;
+Miew.prototype._updateFog = function () {
+  const gfx = this._gfx;
 
   if (settings.now.fog) {
     if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
-      var color = chooseFogColor();
+      const color = chooseFogColor();
       gfx.scene.fog = new THREE.Fog(color);
-      this._setUberMaterialValues({fog: settings.now.fog});
+      this._setUberMaterialValues({ fog: settings.now.fog });
     }
     updateFogRange(gfx.scene.fog, gfx.camera.position.z, this._getBSphereRadius());
   } else if (gfx.scene.fog) {
     gfx.scene.fog = undefined;
-    this._setUberMaterialValues({fog: settings.now.fog});
+    this._setUberMaterialValues({ fog: settings.now.fog });
   }
-  this._needRender = true;
 };
 
-Miew.prototype._onUpdate = function() {
-
+Miew.prototype._onUpdate = function () {
   if (this.isScriptingCommandAvailable !== undefined && this.isScriptingCommandAvailable() && !this._building) {
     this.callNextCmd();
   }
 
   this._objectControls.update();
 
-  this._forEachComplexVisual(function(visual) {
+  this._forEachComplexVisual((visual) => {
     visual.getComplex().update();
   });
 
@@ -922,14 +931,15 @@ Miew.prototype._onUpdate = function() {
   }
 };
 
-Miew.prototype._onRender = function() {
-  var gfx = this._gfx;
+Miew.prototype._onRender = function () {
+  const gfx = this._gfx;
 
   // update all matrices
   gfx.scene.updateMatrixWorld();
   gfx.camera.updateMatrixWorld();
 
   this._clipPlaneUpdateValue(this._getBSphereRadius());
+  this._updateShadow(this._getBSphereRadius());
   this._fogFarUpdateValue();
 
   gfx.renderer.setRenderTarget(null);
@@ -938,13 +948,12 @@ Miew.prototype._onRender = function() {
   this._renderFrame(settings.now.stereo);
 };
 
-Miew.prototype._renderFrame = (function() {
+Miew.prototype._renderFrame = (function () {
+  const _anaglyphMat = new AnaglyphMaterial();
 
-  var _anaglyphMat = new AnaglyphMaterial();
-
-  return function(stereo) {
-    var gfx = this._gfx;
-    var renderer = gfx.renderer;
+  return function (stereo) {
+    const gfx = this._gfx;
+    const { renderer } = gfx;
 
     if (stereo !== 'NONE') {
       // in anaglyph mode we render full-size image for each eye
@@ -955,38 +964,38 @@ Miew.prototype._renderFrame = (function() {
       gfx.stereoCam.update(gfx.camera);
     }
 
-    var size = renderer.getSize();
+    const size = renderer.getSize();
 
     // resize offscreen buffers to match the target
     this._resizeOffscreenBuffers(size.width * window.devicePixelRatio, size.height * window.devicePixelRatio, stereo);
 
     switch (stereo) {
-    case 'WEBVR':
-    case 'NONE':
-      this._renderScene(gfx.camera, false);
-      break;
-    case 'SIMPLE':
-    case 'DISTORTED':
-      renderer.setScissorTest(true);
+      case 'WEBVR':
+      case 'NONE':
+        this._renderScene(gfx.camera, false);
+        break;
+      case 'SIMPLE':
+      case 'DISTORTED':
+        renderer.setScissorTest(true);
 
-      renderer.setScissor(0, 0, size.width / 2, size.height);
-      renderer.setViewport(0, 0, size.width / 2, size.height);
-      this._renderScene(this._gfx.stereoCam.cameraL, stereo === 'DISTORTED');
+        renderer.setScissor(0, 0, size.width / 2, size.height);
+        renderer.setViewport(0, 0, size.width / 2, size.height);
+        this._renderScene(this._gfx.stereoCam.cameraL, stereo === 'DISTORTED');
 
-      renderer.setScissor(size.width / 2, 0, size.width / 2, size.height);
-      renderer.setViewport(size.width / 2, 0, size.width / 2, size.height);
-      this._renderScene(this._gfx.stereoCam.cameraR, stereo === 'DISTORTED');
+        renderer.setScissor(size.width / 2, 0, size.width / 2, size.height);
+        renderer.setViewport(size.width / 2, 0, size.width / 2, size.height);
+        this._renderScene(this._gfx.stereoCam.cameraR, stereo === 'DISTORTED');
 
-      renderer.setScissorTest(false);
-      break;
-    case 'ANAGLYPH':
-      this._renderScene(this._gfx.stereoCam.cameraL, false, gfx.stereoBufL);
-      this._renderScene(this._gfx.stereoCam.cameraR, false, gfx.stereoBufR);
-      _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL;
-      _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR;
-      gfx.renderer.renderScreenQuad(_anaglyphMat);
-      break;
-    default:
+        renderer.setScissorTest(false);
+        break;
+      case 'ANAGLYPH':
+        this._renderScene(this._gfx.stereoCam.cameraL, false, gfx.stereoBufL);
+        this._renderScene(this._gfx.stereoCam.cameraR, false, gfx.stereoBufR);
+        _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL;
+        _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR;
+        gfx.renderer.renderScreenQuad(_anaglyphMat);
+        break;
+      default:
     }
 
     gfx.renderer2d.render(gfx.scene, gfx.camera);
@@ -995,34 +1004,33 @@ Miew.prototype._renderFrame = (function() {
       gfx.axes.render(renderer);
     }
   };
-
-})();
+}());
 /** @deprecated - use _onBgColorChanged */
-Miew.prototype._onThemeChanged = (function() {
-  var themeRE = /\s*theme-\w+\b/g;
-  return function() {
-    var theme = settings.now.theme;
-    var div = this._containerRoot;
-    div.className = div.className.replace(themeRE, '') + ' theme-' + theme;
+Miew.prototype._onThemeChanged = (function () {
+  const themeRE = /\s*theme-\w+\b/g;
+  return function () {
+    const { theme } = settings.now;
+    const div = this._containerRoot;
+    div.className = `${div.className.replace(themeRE, '')} theme-${theme}`;
 
     settings.set('bg.color', settings.now.themes[theme]);
     this._needRender = true;
   };
-})();
+}());
 
-Miew.prototype._onBgColorChanged  = function() {
+Miew.prototype._onBgColorChanged = function () {
   const gfx = this._gfx;
   const color = chooseFogColor();
   if (gfx) {
     if (gfx.scene.fog) {
       gfx.scene.fog.color.set(color);
     }
-    gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
+    gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
   }
   this._needRender = true;
 };
 
-Miew.prototype._onFogColorChanged = function() {
+Miew.prototype._onFogColorChanged = function () {
   const gfx = this._gfx;
   const color = chooseFogColor();
   if (gfx && gfx.scene.fog) {
@@ -1031,65 +1039,66 @@ Miew.prototype._onFogColorChanged = function() {
   this._needRender = true;
 };
 
-Miew.prototype._setUberMaterialValues = function(values) {
-  this._gfx.root.traverse(function(obj) {
-    if ((obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments || obj instanceof THREE.Line) &&
-        obj.material instanceof UberMaterial) {
+Miew.prototype._setUberMaterialValues = function (values) {
+  this._gfx.root.traverse((obj) => {
+    if ((obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments || obj instanceof THREE.Line)
+        && obj.material instanceof UberMaterial) {
       obj.material.setValues(values);
       obj.material.needsUpdate = true;
     }
   });
 };
 
-Miew.prototype._setMRT = function(renderBuffer, textureBuffer) {
+Miew.prototype._setMRT = function (renderBuffer, textureBuffer) {
   const gfx = this._gfx;
   const gl = gfx.renderer.getContext();
-  const ext =  gl.getExtension('WEBGL_draw_buffers');
-  const properties = gfx.renderer.properties;
+  const ext = gl.getExtension('WEBGL_draw_buffers');
+  const { properties } = gfx.renderer;
 
-  //take extra texture from Texture Buffer
+  // take extra texture from Texture Buffer
   gfx.renderer.setRenderTarget(textureBuffer);
   const tx8 = properties.get(textureBuffer.texture).__webglTexture;
   gl.bindTexture(gl.TEXTURE_2D, tx8);
 
-  //take texture and farmebuffer from renderbuffer
+  // take texture and farmebuffer from renderbuffer
   gfx.renderer.setRenderTarget(renderBuffer);
   const fb = properties.get(renderBuffer).__webglFramebuffer;
   const tx = properties.get(renderBuffer.texture).__webglTexture;
 
-  //set framebuffer
+  // set framebuffer
   gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
   fb.width = renderBuffer.width;
   fb.height = renderBuffer.height;
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tx, 0);
   gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, tx8, 0);
 
-  //mapping textures
+  // mapping textures
   ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
 };
 
-Miew.prototype._renderScene = (function() {
-  return function(camera, distortion, target) {
+Miew.prototype._renderScene = (function () {
+  return function (camera, distortion, target) {
     distortion = distortion || false;
     target = target || null;
 
-    var gfx = this._gfx;
+    const gfx = this._gfx;
 
     // render to offscreen buffer
-    gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
+    gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     gfx.renderer.setRenderTarget(target);
     gfx.renderer.clear();
     if (gfx.renderer.vr.enabled) {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.setRenderTarget(gfx.offscreenBuf);   // FIXME clean up targets in render selection
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf); // FIXME clean up targets in render selection
     gfx.renderer.clear();
 
-    var bHaveComplexes = (this._getComplexVisual() !== null);
-    var volumeVisual = this._getVolumeVisual();
+    const bHaveComplexes = (this._getComplexVisual() !== null);
+    const volumeVisual = this._getVolumeVisual();
+    const ssao = bHaveComplexes && settings.now.ao;
 
-    if (bHaveComplexes && settings.now.ao) {
+    if (ssao) {
       this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
@@ -1101,27 +1110,30 @@ Miew.prototype._renderScene = (function() {
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
     // otherwise we render to canvas
-    var outline = bHaveComplexes && settings.now.outline.on;
-    var fxaa = bHaveComplexes && settings.now.fxaa;
-    var volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
-    var dstBuffer = (outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
-    var srcBuffer = gfx.offscreenBuf;
+    const outline = bHaveComplexes && settings.now.outline.on;
+    const fxaa = bHaveComplexes && settings.now.fxaa;
+    const volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
+    let dstBuffer = (ssao || outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
+    let srcBuffer = gfx.offscreenBuf;
 
-    if (bHaveComplexes && settings.now.ao) {
+    if (ssao) {
       this._performAO(
         srcBuffer,
         gfx.offscreenBuf4,
         gfx.offscreenBuf.depthTexture,
         dstBuffer,
         gfx.offscreenBuf3,
-        gfx.offscreenBuf2
+        gfx.offscreenBuf2,
       );
+      if (!fxaa && !distortion && !volume && !outline) {
+        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, target);
+      }
     } else {
       // just copy color buffer to dst buffer
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
     }
 
-    //outline
+    // outline
     if (outline) {
       srcBuffer = dstBuffer;
       dstBuffer = (volume || fxaa || distortion) ? gfx.offscreenBuf3 : target;
@@ -1159,40 +1171,38 @@ Miew.prototype._renderScene = (function() {
       this._performDistortion(srcBuffer, dstBuffer, true);
     }
   };
-})();
+}());
 
-Miew.prototype._performDistortion = (function() {
+Miew.prototype._performDistortion = (function () {
+  const _scene = new THREE.Scene();
+  const _camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000);
 
-  var _scene = new THREE.Scene();
-  var _camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000);
-
-  var _material = new THREE.ShaderMaterial({
+  const _material = new THREE.ShaderMaterial({
     uniforms: {
-      srcTex: {type: 't', value: null},
-      aberration: {type: 'fv3', value: new THREE.Vector3(1.0)}
+      srcTex: { type: 't', value: null },
+      aberration: { type: 'fv3', value: new THREE.Vector3(1.0) },
     },
-    vertexShader: 'varying vec2 vUv; ' +
-      'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform vec3 aberration;' +
-      'void main() {' +
-      'vec2 uv = vUv * 2.0 - 1.0;' +
-      'gl_FragColor.r = texture2D(srcTex, 0.5 * (uv * aberration[0] + 1.0)).r;' +
-      'gl_FragColor.g = texture2D(srcTex, 0.5 * (uv * aberration[1] + 1.0)).g;' +
-      'gl_FragColor.b = texture2D(srcTex, 0.5 * (uv * aberration[2] + 1.0)).b;' +
-      'gl_FragColor.a = 1.0;' +
-      '}',
+    vertexShader: 'varying vec2 vUv; '
+      + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform vec3 aberration;'
+      + 'void main() {'
+      + 'vec2 uv = vUv * 2.0 - 1.0;'
+      + 'gl_FragColor.r = texture2D(srcTex, 0.5 * (uv * aberration[0] + 1.0)).r;'
+      + 'gl_FragColor.g = texture2D(srcTex, 0.5 * (uv * aberration[1] + 1.0)).g;'
+      + 'gl_FragColor.b = texture2D(srcTex, 0.5 * (uv * aberration[2] + 1.0)).b;'
+      + 'gl_FragColor.a = 1.0;'
+      + '}',
     transparent: false,
     depthTest: false,
-    depthWrite: false
+    depthWrite: false,
   });
 
-  var _geo = gfxutils.buildDistorionMesh(10, 10, settings.now.debug.stereoBarrel);
+  const _geo = gfxutils.buildDistorionMesh(10, 10, settings.now.debug.stereoBarrel);
   _scene.add(new meshes.Mesh(_geo, _material));
 
-  return function(srcBuffer, targetBuffer, mesh) {
-
-    gfx.renderer.setRenderTarget(targetBuffer);
-    gfx.renderer.clear();
+  return function (srcBuffer, targetBuffer, mesh) {
+    this._gfx.renderer.setRenderTarget(targetBuffer);
+    this._gfx.renderer.clear();
 
     if (mesh) {
       _material.uniforms.srcTex.value = srcBuffer.texture;
@@ -1201,20 +1211,18 @@ Miew.prototype._performDistortion = (function() {
     } else {
       this._gfx.renderer.renderScreenQuadFromTexWithDistortion(
         srcBuffer,
-        settings.now.debug.stereoBarrel, targetBuffer
+        settings.now.debug.stereoBarrel, targetBuffer,
       );
     }
   };
 }());
 
-Miew.prototype._renderOutline = (function() {
+Miew.prototype._renderOutline = (function () {
+  const _outlineMaterial = new OutlineMaterial({ depth: true });
 
-  var _outlineMaterial = new OutlineMaterial({depth: true});
-
-  return function(camera, srcDepthBuffer, srcColorBuffer, targetBuffer) {
-
-    var self = this;
-    var gfx = self._gfx;
+  return function (camera, srcDepthBuffer, srcColorBuffer, targetBuffer) {
+    const self = this;
+    const gfx = self._gfx;
 
     // apply Sobel filter -- draw outline
     _outlineMaterial.uniforms.srcTex.value = srcColorBuffer.texture;
@@ -1225,17 +1233,14 @@ Miew.prototype._renderOutline = (function() {
 
     gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
   };
+}());
 
-})();
+Miew.prototype._renderSelection = (function () {
+  const _outlineMaterial = new OutlineMaterial();
 
-Miew.prototype._renderSelection = (function() {
-
-  var _outlineMaterial = new OutlineMaterial();
-
-  return function(camera, srcBuffer, targetBuffer) {
-
-    var self = this;
-    var gfx = self._gfx;
+  return function (camera, srcBuffer, targetBuffer) {
+    const self = this;
+    const gfx = self._gfx;
 
     // clear offscreen buffer (leave z-buffer intact)
     gfx.renderer.setClearColor('black', 0);
@@ -1260,10 +1265,9 @@ Miew.prototype._renderSelection = (function() {
     _outlineMaterial.uniforms.srcTexSize.value.set(srcBuffer.width, srcBuffer.height);
     gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
   };
+}());
 
-})();
-
-Miew.prototype._checkVolumeRenderingSupport = function(renderTarget) {
+Miew.prototype._checkVolumeRenderingSupport = function (renderTarget) {
   if (!renderTarget) {
     return false;
   }
@@ -1275,24 +1279,22 @@ Miew.prototype._checkVolumeRenderingSupport = function(renderTarget) {
   const result = context.checkFramebufferStatus(context.FRAMEBUFFER);
   gfx.renderer.setRenderTarget(oldRT);
   if (result !== context.FRAMEBUFFER_COMPLETE) {
-    //floatFrameBufferWarning = ;
+    // floatFrameBufferWarning = ;
     this.logger.warn('Device doesn\'t support electron density rendering');
     return false;
-  } else {
-    return true;
   }
+  return true;
 };
 
-Miew.prototype._renderVolume = (function() {
+Miew.prototype._renderVolume = (function () {
+  const volumeBFMat = new VolumeMaterial.BackFacePosMaterial();
+  const volumeFFMat = new VolumeMaterial.FrontFacePosMaterial();
+  const cubeOffsetMat = new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5);
+  const world2colorMat = new THREE.Matrix4();
 
-  var volumeBFMat = new VolumeMaterial.BackFacePosMaterial();
-  var volumeFFMat = new VolumeMaterial.FrontFacePosMaterial();
-  var cubeOffsetMat = new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5);
-  var world2colorMat = new THREE.Matrix4();
+  let volumeRenderingSupported;
 
-  var volumeRenderingSupported;
-
-  return function(volumeVisual, camera, dstBuf, tmpBuf1, tmpBuf2, tmpBuf3) {
+  return function (volumeVisual, camera, dstBuf, tmpBuf1, tmpBuf2, tmpBuf3) {
     const gfx = this._gfx;
 
     if (typeof volumeRenderingSupported === 'undefined') {
@@ -1335,12 +1337,12 @@ Miew.prototype._renderVolume = (function() {
     // prepare texture that contains molecule positions
     world2colorMat.getInverse(mesh.matrixWorld);
     UberMaterial.prototype.uberOptions.world2colorMatrix.multiplyMatrices(cubeOffsetMat, world2colorMat);
-    this._setUberMaterialValues({colorFromPos: true});
+    this._setUberMaterialValues({ colorFromPos: true });
     gfx.renderer.render(gfx.scene, camera, tmpBuf3);
-    this._setUberMaterialValues({colorFromPos: false});
+    this._setUberMaterialValues({ colorFromPos: false });
 
     // render volume
-    var vm = mesh.material;
+    const vm = mesh.material;
     vm.uniforms._BFRight.value = tmpBuf1.texture;
     vm.uniforms._FFRight.value = tmpBuf2.texture;
     vm.uniforms._WFFRight.value = tmpBuf3.texture;
@@ -1348,7 +1350,7 @@ Miew.prototype._renderVolume = (function() {
     gfx.renderer.render(gfx.scene, camera, dstBuf);
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
   };
-})();
+}());
 
 /*  Render scene with 'ZPrepass transparency Effect'
    * Idea: transparent objects are rendered in two passes. The first one writes result only into depth buffer.
@@ -1359,10 +1361,9 @@ Miew.prototype._renderVolume = (function() {
    * 2. Realization doesn't use camera layers because scene traversing is used for material changes and
    * we can use it to select needed meshes and don't complicate meshes builders with layers
   */
-Miew.prototype._renderWithPrepassTransparency = (function() {
-
-  return function(camera, targetBuffer) {
-    var gfx = this._gfx;
+Miew.prototype._renderWithPrepassTransparency = (function () {
+  return function (camera, targetBuffer) {
+    const gfx = this._gfx;
 
     // opaque objects
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
@@ -1381,14 +1382,12 @@ Miew.prototype._renderWithPrepassTransparency = (function() {
     // restore default layer
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
   };
-})();
+}());
 
-Miew.prototype._performFXAA = (function() {
-
+Miew.prototype._performFXAA = (function () {
   const _fxaaMaterial = new FXAAMaterial();
 
-  return function(srcBuffer, targetBuffer) {
-
+  return function (srcBuffer, targetBuffer) {
     if (typeof srcBuffer === 'undefined' || typeof targetBuffer === 'undefined') {
       return;
     }
@@ -1396,7 +1395,7 @@ Miew.prototype._performFXAA = (function() {
     const gfx = this._gfx;
 
     // clear canvas
-    gfx.renderer.setClearColor(settings.now.bg.color,  Number(!settings.now.bg.transparent));
+    gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.clear();
 
@@ -1406,39 +1405,19 @@ Miew.prototype._performFXAA = (function() {
     _fxaaMaterial.uniforms.bgColor.value.set(settings.now.bg.color);
 
     if (_fxaaMaterial.bgTransparent !== settings.now.bg.transparent) {
-      _fxaaMaterial.setValues({bgTransparent: settings.now.bg.transparent});
+      _fxaaMaterial.setValues({ bgTransparent: settings.now.bg.transparent });
       _fxaaMaterial.needsUpdate = true;
     }
     gfx.renderer.renderScreenQuad(_fxaaMaterial, targetBuffer);
   };
+}());
 
-})();
+Miew.prototype._performAO = (function () {
+  const _aoMaterial = new ao.AOMaterial();
+  const _horBlurMaterial = new ao.HorBilateralBlurMaterial();
+  const _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
 
-Miew.prototype._performAO = (function() {
-
-  var _aoMaterial = new ao.AOMaterial();
-  var _horBlurMaterial = new ao.HorBilateralBlurMaterial();
-  var _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
-
-  var _noiseWidth = 4, _noiseHeight = 4;
-  var _noiseData = new Uint8Array([
-    0, 0, 0, 66, 0, 0, 77, 0, 0, 155, 62, 0,
-    0, 247, 0, 33, 0, 0, 0, 0, 0, 235, 0, 0,
-    0, 0, 0, 176, 44, 0, 232, 46, 0, 0, 29, 0,
-    0, 0, 0, 78, 197, 0, 93, 0, 0, 0, 0, 0
-  ]);
-  var _noiseWrapS = THREE.RepeatWrapping;
-  var _noiseWrapT = THREE.RepeatWrapping;
-  var _noiseMinFilter = THREE.NearestFilter;
-  var _noiseMagFilter = THREE.NearestFilter;
-  var _noiseMapping = THREE.UVMapping;
-  var _noiseTexture = new THREE.DataTexture(
-    _noiseData, _noiseWidth, _noiseHeight, THREE.RGBFormat,
-    THREE.UnsignedByteType, _noiseMapping, _noiseWrapS, _noiseWrapT, _noiseMagFilter, _noiseMinFilter, 1
-  );
-  _noiseTexture.needsUpdate = true;
-
-  var _samplesKernel = [
+  const _samplesKernel = [
     // hemisphere samples adopted to sphere (FIXME remove minus from Z)
     new THREE.Vector3(0.295184, 0.077723, 0.068429),
     new THREE.Vector3(-0.271976, -0.365221, 0.838363),
@@ -1471,22 +1450,21 @@ Miew.prototype._performAO = (function() {
     new THREE.Vector3(-0.727050, -0.329192, 0.369826),
     new THREE.Vector3(-0.090731, 0.533820, 0.463767),
     new THREE.Vector3(-0.323457, -0.876559, 0.238524),
-    new THREE.Vector3(-0.663277, -0.372384, 0.342856)
+    new THREE.Vector3(-0.663277, -0.372384, 0.342856),
   ];
   // var _kernelOffsets = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0];
-  var _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
+  const _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
 
-  return function(srcColorBuffer, normalBuffer, srcDepthTexture, targetBuffer, tempBuffer, tempBuffer1) {
-
+  return function (srcColorBuffer, normalBuffer, srcDepthTexture, targetBuffer, tempBuffer, tempBuffer1) {
     if (!srcColorBuffer || !normalBuffer || !srcDepthTexture || !targetBuffer || !tempBuffer || !tempBuffer1) {
       return;
     }
 
-    var self = this;
-    var gfx = self._gfx;
+    const self = this;
+    const gfx = self._gfx;
 
     // clear canvasFMatrix4
-    //gfx.renderer.setClearColor(THREE.aliceblue, 1);
+    // gfx.renderer.setClearColor(THREE.aliceblue, 1);
     // gfx.renderer.setRenderTarget(targetBuffer);
     // gfx.renderer.clear(true, false);
 
@@ -1500,14 +1478,16 @@ Miew.prototype._performAO = (function() {
     _aoMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
     _aoMaterial.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
     _aoMaterial.uniforms.samplesKernel.value = _samplesKernel;
-    var translation = new THREE.Vector3(), quaternion = new THREE.Quaternion(), scale = new THREE.Vector3();
+    const translation = new THREE.Vector3();
+    const quaternion = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
     gfx.root.matrix.decompose(translation, quaternion, scale);
     _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
-    _aoMaterial.uniforms.noiseTexture.value = _noiseTexture;
-    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / _noiseWidth, 1.0 / _noiseHeight);
-    var fog = gfx.scene.fog;
+    _aoMaterial.uniforms.noiseTexture.value = noise.noiseTexture;
+    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight);
+    const { fog } = gfx.scene;
     if (fog) {
       _aoMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
     }
@@ -1528,14 +1508,13 @@ Miew.prototype._performAO = (function() {
     _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.renderScreenQuad(_vertBlurMaterial, targetBuffer);
   };
-
-})();
+}());
 
 /**
  * Reset the viewer, unload molecules.
  * @param {boolean=} keepReps - Keep representations while resetting viewer state.
  */
-Miew.prototype.reset = function(/* keepReps */) {
+Miew.prototype.reset = function (/* keepReps */) {
   if (this._picker) {
     this._picker.reset();
   }
@@ -1555,7 +1534,7 @@ Miew.prototype.reset = function(/* keepReps */) {
   this.setNeedRender();
 };
 
-Miew.prototype._resetScene = function() {
+Miew.prototype._resetScene = function () {
   this._objectControls.reset();
   this._objectControls.allowTranslation(true);
   this._objectControls.allowAltObjFreeRotation(true);
@@ -1564,7 +1543,7 @@ Miew.prototype._resetScene = function() {
   this.rebuildAll();
 };
 
-Miew.prototype.resetView = function() {
+Miew.prototype.resetView = function () {
   // reset controls
   if (this._picker) {
     this._picker.reset();
@@ -1573,11 +1552,287 @@ Miew.prototype.resetView = function() {
   this._resetScene();
 
   // reset selection
-  this._forEachComplexVisual(function(visual) {
+  this._forEachComplexVisual((visual) => {
     visual.updateSelectionMask({});
     visual.rebuildSelectionGeometry();
   });
 };
+
+Miew.prototype._export = function (format) {
+  const TheExporter = _.head(io.exporters.find({ format }));
+  // let result;
+  if (!TheExporter) {
+    this.logger.error('Could not find suitable exporter for this source');
+    return Promise.reject(new Error('Could not find suitable exporter for this source'));
+  }
+
+  if (this._visuals[this._curVisualName] instanceof ComplexVisual) {
+    const dataSource = this._visuals[this._curVisualName]._complex;
+    const exporter = new TheExporter(dataSource, { binary: true });
+    return exporter.export().then(data => data);
+  }
+  if (this._visuals[this._curVisualName] instanceof VolumeVisual) {
+    return Promise.reject(new Error('Sorry, exporter for volume data not implemented yet'));
+  }
+  return Promise.reject(new Error('Unexpected format of data'));
+};
+
+const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
+const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
+const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
+
+function resolveSourceShortcut(source, opts) {
+  if (!_.isString(source)) {
+    return source;
+  }
+
+  // e.g. "mmtf:1CRN"
+  const matchesPdbId = rePdbId.exec(source);
+  if (matchesPdbId) {
+    let [, format = 'pdb', id] = matchesPdbId;
+
+    format = format.toLowerCase();
+    id = id.toUpperCase();
+
+    switch (format) {
+      case 'pdb':
+        source = `https://files.rcsb.org/download/${id}.pdb`;
+        break;
+      case 'cif':
+        source = `https://files.rcsb.org/download/${id}.cif`;
+        break;
+      case 'mmtf':
+        source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
+        break;
+      case 'ccp4':
+        source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
+        break;
+      case 'dsn6':
+        source = `https://edmaps.rcsb.org/maps/${id.toLowerCase()}_2fofc.dsn6`;
+        break;
+      default:
+        throw new Error('Unexpected data format shortcut');
+    }
+
+    opts.fileType = format;
+    opts.fileName = `${id}.${format}`;
+    opts.sourceType = 'url';
+    return source;
+  }
+
+  // e.g. "pc:aspirin"
+  const matchesPubchem = rePubchem.exec(source);
+  if (matchesPubchem) {
+    const compound = matchesPubchem[1].toLowerCase();
+    source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
+    opts.fileType = 'pubchem';
+    opts.fileName = `${compound}.json`;
+    opts.sourceType = 'url';
+    return source;
+  }
+
+  // otherwise is should be an URL
+  if (opts.sourceType === 'url' || opts.sourceType === undefined) {
+    opts.sourceType = 'url';
+
+    // e.g. "./data/1CRN.pdb"
+    if (!reUrlScheme.test(source)) {
+      source = utils.resolveURL(source);
+    }
+  }
+
+  return source;
+}
+
+function updateBinaryMode(opts) {
+  let { binary } = opts;
+
+  // detect by format
+  if (opts.fileType !== undefined) {
+    const TheParser = _.head(io.parsers.find({ format: opts.fileType }));
+    if (TheParser) {
+      binary = TheParser.binary || false;
+    } else {
+      throw new Error('Could not find suitable parser for this format');
+    }
+  }
+
+  // detect by file extension
+  if (binary === undefined && opts.fileExt !== undefined) {
+    const TheParser = _.head(io.parsers.find({ ext: opts.fileExt }));
+    if (TheParser) {
+      binary = TheParser.binary || false;
+    }
+  }
+
+  // temporary workaround for animation
+  if (opts.fileExt !== undefined && opts.fileExt.toLowerCase() === '.man') {
+    opts.binary = true;
+    opts.animation = true; // who cares?
+  }
+
+  // update if detected
+  if (binary !== undefined) {
+    if (opts.binary !== undefined && opts.binary !== binary) {
+      opts.context.logger.warn('Overriding incorrect binary mode');
+    }
+  }
+
+  opts.binary = binary || false;
+}
+
+function _fetchData(source, opts, job) {
+  return new Promise(((resolve) => {
+    if (job.shouldCancel()) {
+      throw new Error('Operation cancelled');
+    }
+
+    // allow for source shortcuts
+    source = resolveSourceShortcut(source, opts);
+
+    // detect a proper loader
+    const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
+    if (!TheLoader) {
+      throw new Error('Could not find suitable loader for this source');
+    }
+
+    // split file name
+    const fileName = opts.fileName || TheLoader.extractName(source);
+    if (fileName) {
+      const [name, fileExt] = utils.splitFileName(fileName);
+      _.defaults(opts, { name, fileExt, fileName });
+    }
+
+    // should it be text or binary?
+    updateBinaryMode(opts);
+
+    // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
+    // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
+    // all hacks and everybody's happy.
+    let newOptions = _.get(opts, 'preset.expression');
+    if (!_.isUndefined(newOptions)) {
+      newOptions = JSON.parse(newOptions);
+      if (newOptions && newOptions.settings) {
+        const keys = ['singleUnit', 'draft.waterBondingHack'];
+        for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
+          const key = keys[keyIndex];
+          const value = _.get(newOptions.settings, key);
+          if (!_.isUndefined(value)) {
+            settings.set(key, value);
+          }
+        }
+      }
+    }
+
+    // create a loader
+    const loader = new TheLoader(source, opts);
+    loader.context = opts.context;
+    job.addEventListener('cancel', () => loader.abort());
+
+    loader.addEventListener('progress', (event) => {
+      if (event.lengthComputable && event.total > 0) {
+        reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
+      } else {
+        reportProgress(loader.logger, 'Fetching');
+      }
+    });
+
+    console.time('fetch');
+    const promise = loader.load()
+      .then((data) => {
+        console.timeEnd('fetch');
+        opts.context.logger.info('Fetching finished');
+        job.notify({ type: 'fetchingFinished', data });
+        return data;
+      })
+      .catch((error) => {
+        console.timeEnd('fetch');
+        opts.context.logger.debug(error.message);
+        if (error.stack) {
+          opts.context.logger.debug(error.stack);
+        }
+        opts.context.logger.error('Fetching failed');
+        job.notify({ type: 'fetchingFinished', error });
+        throw error;
+      });
+    resolve(promise);
+  }));
+}
+
+function _convertData(data, opts, job) {
+  return new Promise(((resolve, reject) => {
+    if (job.shouldCancel()) {
+      throw new Error('Operation cancelled');
+    }
+    job.notify({ type: 'convert' });
+
+    if (opts.mdFile) {
+      const byteNumbers = new Array(data.length);
+      for (let i = 0; i < data.length; i++) {
+        byteNumbers[i] = data.charCodeAt(i);
+      }
+      const bytes = new Uint8Array(byteNumbers);
+      const blob = new File([bytes], opts.fileName);
+      console.time('convert');
+      Miew.prototype.srvTopologyConvert(blob, opts.mdFile, (success, newData, message) => {
+        console.timeEnd('convert');
+        if (success) {
+          opts.converted = true;
+          opts.amberFileName = opts.fileName;
+          opts.convertedFile = new File([bytes], opts.fileName);
+          opts.fileName = null;
+          opts.fileType = 'pdb';
+          job.notify({ type: 'convertingFinished' });
+          resolve(newData);
+        } else {
+          opts.converted = false;
+          logger.error(message);
+          opts.error = message;
+          job.notify({ type: 'convertingFinished', error: message });
+          reject(new Error(message));
+        }
+      });
+    } else {
+      opts.converted = true;
+      resolve(data);
+    }
+  }));
+}
+
+function _parseData(data, opts, job) {
+  if (job.shouldCancel()) {
+    return Promise.reject(new Error('Operation cancelled'));
+  }
+  job.notify({ type: 'parse' });
+
+  const TheParser = _.head(io.parsers.find({ format: opts.fileType, ext: opts.fileExt, data }));
+  if (!TheParser) {
+    return Promise.reject(new Error('Could not find suitable parser'));
+  }
+
+  const parser = new TheParser(data, opts);
+  parser.context = opts.context;
+  job.addEventListener('cancel', () => parser.abort());
+
+  console.time('parse');
+  return parser.parse()
+    .then((dataSet) => {
+      console.timeEnd('parse');
+      job.notify({ type: 'parsingFinished', data: dataSet });
+      return dataSet;
+    })
+    .catch((error) => {
+      console.timeEnd('parse');
+      opts.error = error;
+      opts.context.logger.debug(error.message);
+      if (error.stack) {
+        opts.context.logger.debug(error.stack);
+      }
+      opts.context.logger.error('Parsing failed');
+      job.notify({ type: 'parsingFinished', error });
+      throw error;
+    });
+}
 
 /**
  * Load molecule asynchronously.
@@ -1589,14 +1844,13 @@ Miew.prototype.resetView = function() {
  * @param {boolean=} opts.keepRepsInfo - prevent reset of object and reps information.
  * @returns {Promise} name of the visual that was added to the viewer
  */
-Miew.prototype.load = function(source, opts) {
+Miew.prototype.load = function (source, opts) {
   opts = _.merge({}, opts, {
     context: this,
   });
 
   // for a single-file scenario
   if (!this.settings.now.use.multiFile) {
-
     // abort all loaders in progress
     if (this._loading.length) {
       this._loading.forEach((job) => {
@@ -1611,7 +1865,7 @@ Miew.prototype.load = function(source, opts) {
     }
   }
 
-  this.dispatchEvent({type: 'load', options: opts, source});
+  this.dispatchEvent({ type: 'load', options: opts, source });
 
   const job = new JobHandle();
   this._loading.push(job);
@@ -1649,15 +1903,15 @@ Miew.prototype.load = function(source, opts) {
  * Unload molecule (delete corresponding visual).
  * @param {string=} name - name of the visual
  */
-Miew.prototype.unload = function(name) {
+Miew.prototype.unload = function (name) {
   this._removeVisual(name || this.getCurrentVisual());
   this.resetPivot();
 };
 
-Miew.prototype._startAnimation = function(fileData) {
+Miew.prototype._startAnimation = function (fileData) {
   this._stopAnimation();
-  var self = this;
-  var visual = this._getComplexVisual();
+  const self = this;
+  const visual = this._getComplexVisual();
   if (visual === null) {
     this.logger.error('Unable to start animation - no molecule is loaded.');
     return;
@@ -1666,20 +1920,20 @@ Miew.prototype._startAnimation = function(fileData) {
     this._frameInfo = new FrameInfo(
       visual.getComplex(), fileData,
       {
-        onLoadStatusChanged: function() {
+        onLoadStatusChanged() {
           self.dispatchEvent({
             type: 'mdPlayerStateChanged',
             state: {
               isPlaying: self._isAnimating,
-              isLoading: self._frameInfo ? self._frameInfo.isLoading : true
-            }
+              isLoading: self._frameInfo ? self._frameInfo.isLoading : true,
+            },
           });
         },
-        onError: function(message) {
+        onError(message) {
           self._stopAnimation();
           self.logger.error(message);
-        }
-      }
+        },
+      },
     );
   } catch (e) {
     this.logger.error('Animation file does not fit to current complex!');
@@ -1688,10 +1942,10 @@ Miew.prototype._startAnimation = function(fileData) {
   this._continueAnimation();
 };
 
-Miew.prototype._startMdAnimation = function(mdFile, pdbFile) {
+Miew.prototype._startMdAnimation = function (mdFile, pdbFile) {
   this._stopAnimation();
-  var self = this;
-  var visual = this._getComplexVisual();
+  const self = this;
+  const visual = this._getComplexVisual();
   if (visual === null) {
     this.logger.error('Unable to start animation - no molecule is loaded.');
     return;
@@ -1700,20 +1954,20 @@ Miew.prototype._startMdAnimation = function(mdFile, pdbFile) {
     this._frameInfo = new FrameInfo(
       visual.getComplex(), this.srvStreamMdFn(mdFile, pdbFile),
       {
-        onLoadStatusChanged: function() {
+        onLoadStatusChanged() {
           self.dispatchEvent({
             type: 'mdPlayerStateChanged',
             state: {
               isPlaying: self._isAnimating,
-              isLoading: self._frameInfo ? self._frameInfo.isLoading : true
-            }
+              isLoading: self._frameInfo ? self._frameInfo.isLoading : true,
+            },
           });
         },
-        onError: function(message) {
+        onError(message) {
           self._stopAnimation();
           self.logger.error(message);
-        }
-      }
+        },
+      },
     );
   } catch (e) {
     this.logger.error('Animation file does not fit to current complex!');
@@ -1722,7 +1976,7 @@ Miew.prototype._startMdAnimation = function(mdFile, pdbFile) {
   this._continueAnimation();
 };
 
-Miew.prototype._pauseAnimation = function() {
+Miew.prototype._pauseAnimation = function () {
   if (this._animInterval === null) {
     return;
   }
@@ -1734,38 +1988,38 @@ Miew.prototype._pauseAnimation = function() {
       type: 'mdPlayerStateChanged',
       state: {
         isPlaying: this._isAnimating,
-        isLoading: this._frameInfo.isLoading
-      }
+        isLoading: this._frameInfo.isLoading,
+      },
     });
   }
 };
 
-Miew.prototype._continueAnimation = function() {
+Miew.prototype._continueAnimation = function () {
   this._isAnimating = true;
-  var minFrameTime = 1000 / settings.now.maxfps;
+  let minFrameTime = 1000 / settings.now.maxfps;
   minFrameTime = Number.isNaN(minFrameTime) ? 0 : minFrameTime;
-  var self = this;
-  var pivot = self._gfx.pivot;
+  const self = this;
+  const { pivot } = self._gfx;
   // TODO take care of all complex visuals ?
-  var visual = this._getComplexVisual();
+  const visual = this._getComplexVisual();
   if (visual) {
     visual.resetSelectionMask();
     visual.rebuildSelectionGeometry();
     this._msgAtomInfo.style.opacity = 0.0;
   }
-  this._animInterval = setInterval(function() {
+  this._animInterval = setInterval(() => {
     self.dispatchEvent({
       type: 'mdPlayerStateChanged',
       state: {
         isPlaying: self._isAnimating,
-        isLoading: self._frameInfo.isLoading
-      }
+        isLoading: self._frameInfo.isLoading,
+      },
     });
     if (self._frameInfo.frameIsReady) {
       pivot.updateToFrame(self._frameInfo);
       self._updateObjsToFrame(self._frameInfo);
-      self._refreshTitle(' Frame ' + self._frameInfo._currFrame + ' of ' + self._frameInfo._framesCount +
-          ' time interval - ' + self._frameInfo._timeStep);
+      self._refreshTitle(` Frame ${self._frameInfo._currFrame} of ${self._frameInfo._framesCount
+      } time interval - ${self._frameInfo._timeStep}`);
       try {
         self._frameInfo.nextFrame();
       } catch (e) {
@@ -1778,7 +2032,7 @@ Miew.prototype._continueAnimation = function() {
   }, minFrameTime);
 };
 
-Miew.prototype._stopAnimation = function() {
+Miew.prototype._stopAnimation = function () {
   if (this._animInterval === null) {
     return;
   }
@@ -1789,7 +2043,7 @@ Miew.prototype._stopAnimation = function() {
   this._srvAnimSource = null;
   this.dispatchEvent({
     type: 'mdPlayerStateChanged',
-    state: null
+    state: null,
   });
 };
 
@@ -1799,24 +2053,24 @@ Miew.prototype._stopAnimation = function() {
  * @param {object} opts - TODO: Options.
  * @private
  */
-Miew.prototype._onLoad = function(dataSource, opts) {
-  var gfx = this._gfx;
-  var visualName = null;
+Miew.prototype._onLoad = function (dataSource, opts) {
+  const gfx = this._gfx;
+  let visualName = null;
 
   if (opts.animation) {
     this._refreshTitle();
     this._startAnimation(dataSource);
     return null;
-  } else {
-    this._stopAnimation();
-    if (!opts || !opts.keepRepsInfo) {
-      this._opts.reps = null;
-      this._opts._objects = null;
-    }
+  }
+  this._stopAnimation();
+  if (!opts || !opts.keepRepsInfo) {
+    this._opts.reps = null;
+    this._opts._objects = null;
   }
 
+
   if (dataSource.id === 'Complex') {
-    var complex = dataSource;
+    const complex = dataSource;
 
     // update title
     if (opts.fileName) {
@@ -1824,18 +2078,18 @@ Miew.prototype._onLoad = function(dataSource, opts) {
     } else if (opts.amberFileName) {
       complex.name = complex.name || removeExtension(opts.amberFileName).toUpperCase();
     } else {
-      complex.name = 'Dynamic ' + opts.fileType + ' molecule';
+      complex.name = `Dynamic ${opts.fileType} molecule`;
     }
 
     visualName = this._addVisual(new ComplexVisual(complex.name, complex));
     this._curVisualName = visualName;
 
-    var desc = this.info();
-    this.logger.info('Parsed ' + opts.fileName + ' (' +
-        desc.atoms + ' atoms, ' +
-        desc.bonds + ' bonds, ' +
-        desc.residues + ' residues, ' +
-        desc.chains + ' chains).');
+    const desc = this.info();
+    this.logger.info(`Parsed ${opts.fileName} (${
+      desc.atoms} atoms, ${
+      desc.bonds} bonds, ${
+      desc.residues} residues, ${
+      desc.chains} chains).`);
 
     if (_.isNumber(this._opts.unit)) {
       complex.setCurrentUnit(this._opts.unit);
@@ -1845,21 +2099,21 @@ Miew.prototype._onLoad = function(dataSource, opts) {
       this.srvPresetApply(opts.preset);
     } else if (settings.now.autoPreset) {
       switch (opts.fileType) {
-      case 'cml':
-        this.resetReps('small');
-        break;
-      case 'pdb':
-      case 'mmtf':
-      case 'cif':
-        if (hasValidResidues(complex)) {
-          this.resetReps('macro');
-        } else {
+        case 'cml':
           this.resetReps('small');
-        }
-        break;
-      default:
-        this.resetReps('default');
-        break;
+          break;
+        case 'pdb':
+        case 'mmtf':
+        case 'cif':
+          if (hasValidResidues(complex)) {
+            this.resetReps('macro');
+          } else {
+            this.resetReps('small');
+          }
+          break;
+        default:
+          this.resetReps('default');
+          break;
       }
     } else {
       this.resetReps('default');
@@ -1892,9 +2146,9 @@ Miew.prototype._onLoad = function(dataSource, opts) {
   }
 
   if (opts.error) {
-    this.dispatchEvent({type: 'onParseError', error: opts.error});
+    this.dispatchEvent({ type: 'onParseError', error: opts.error });
   } else {
-    this.dispatchEvent({type: 'onParseDone'});
+    this.dispatchEvent({ type: 'onParseDone' });
   }
 
   this._refreshTitle();
@@ -1906,7 +2160,7 @@ Miew.prototype._onLoad = function(dataSource, opts) {
   return visualName;
 };
 
-Miew.prototype.resetEd = function() {
+Miew.prototype.resetEd = function () {
   if (this._edLoader) {
     this._edLoader.abort();
     this._edLoader = null;
@@ -1918,19 +2172,19 @@ Miew.prototype.resetEd = function() {
   this._needRender = true;
 };
 
-Miew.prototype.loadEd = function(source) {
+Miew.prototype.loadEd = function (source) {
   this.resetEd();
 
-  const TheLoader = _.head(io.loaders.find({source}));
+  const TheLoader = _.head(io.loaders.find({ source }));
   if (!TheLoader) {
     this.logger.error('Could not find suitable loader for this source');
     return Promise.reject(new Error('Could not find suitable loader for this source'));
   }
 
-  const loader = this._edLoader = new TheLoader(source, {binary: true});
+  const loader = this._edLoader = new TheLoader(source, { binary: true });
   loader.context = this;
   return loader.load().then((data) => {
-    const TheParser = _.head(io.parsers.find({format: 'ccp4'}));
+    const TheParser = _.head(io.parsers.find({ format: 'ccp4' }));
     if (!TheParser) {
       throw new Error('Could not find suitable parser for this source');
     }
@@ -1945,34 +2199,35 @@ Miew.prototype.loadEd = function(source) {
   });
 };
 
-Miew.prototype._onLoadEd = function(dataSource) {
+Miew.prototype._onLoadEd = function (dataSource) {
   dataSource.normalize();
 
-  var volumeVisual = new VolumeVisual('volume', dataSource);
+  const volumeVisual = new VolumeVisual('volume', dataSource);
   volumeVisual.getMesh().layers.set(gfxutils.LAYERS.VOLUME); // volume mesh is not visible to common render
-  var visualName = this._addVisual(volumeVisual);
+  const visualName = this._addVisual(volumeVisual);
 
   this._needRender = true;
   return visualName;
 };
 
-Miew.prototype._needRebuild = function() {
-  var needsRebuild = false;
-  this._forEachComplexVisual(function(visual) {
+Miew.prototype._needRebuild = function () {
+  let needsRebuild = false;
+  this._forEachComplexVisual((visual) => {
     needsRebuild = needsRebuild || visual.needsRebuild();
   });
   return needsRebuild;
 };
 
-Miew.prototype._rebuildObjects = function() {
-  var self = this;
-  var gfx = this._gfx;
-  var i, n;
+Miew.prototype._rebuildObjects = function () {
+  const self = this;
+  const gfx = this._gfx;
+  let i;
+  let n;
 
   // remove old object geometry
-  var toRemove = [];
+  const toRemove = [];
   for (i = 0; i < gfx.pivot.children.length; ++i) {
-    var child = gfx.pivot.children[i];
+    const child = gfx.pivot.children[i];
     if (!(child instanceof Visual)) {
       toRemove.push(child);
     }
@@ -1981,10 +2236,10 @@ Miew.prototype._rebuildObjects = function() {
     toRemove[i].parent.remove(toRemove[i]);
   }
 
-  setTimeout(function _rebuild() {
-    var objList = self._objects;
+  setTimeout(() => {
+    const objList = self._objects;
     for (i = 0, n = objList.length; i < n; ++i) {
-      var obj = objList[i];
+      const obj = objList[i];
       if (obj.needsRebuild) {
         obj.build();
       }
@@ -1995,7 +2250,7 @@ Miew.prototype._rebuildObjects = function() {
   }, 10);
 };
 
-Miew.prototype.changeUnit = function(unitIdx, name) {
+Miew.prototype.changeUnit = function (unitIdx, name) {
   const visual = this._getComplexVisual(name);
   if (!visual) {
     throw new Error('There is no complex to change!');
@@ -2003,8 +2258,8 @@ Miew.prototype.changeUnit = function(unitIdx, name) {
 
   function currentUnitInfo() {
     const unit = visual ? visual.getComplex().getCurrentUnit() : 0;
-    const type = unit > 0 ? ('Bio molecule ' + unit) : 'Asymmetric unit';
-    return 'Current unit: ' + unit + ' (' + type + ')';
+    const type = unit > 0 ? (`Bio molecule ${unit}`) : 'Asymmetric unit';
+    return `Current unit: ${unit} (${type})`;
   }
 
   if (unitIdx === undefined) {
@@ -2022,35 +2277,33 @@ Miew.prototype.changeUnit = function(unitIdx, name) {
 /**
  * Start to rebuild geometry asynchronously.
  */
-Miew.prototype.rebuild = function() {
+Miew.prototype.rebuild = function () {
   if (this._building) {
     this.logger.warn('Miew.rebuild(): already building!');
     return;
   }
   this._building = true;
 
-  this.dispatchEvent({type: 'rebuild'});
+  this.dispatchEvent({ type: 'rebuild' });
 
   this._rebuildObjects();
 
   this._gfx.renderer2d.reset();
 
-  var rebuildActions = [];
-  this._forEachComplexVisual(function(visual) {
+  const rebuildActions = [];
+  this._forEachComplexVisual((visual) => {
     if (visual.needsRebuild()) {
-      rebuildActions.push(visual.rebuild().then(function() {
-        return new Promise(function(resolve) {
-          visual.rebuildSelectionGeometry();
-          resolve();
-        });
-      }));
+      rebuildActions.push(visual.rebuild().then(() => new Promise(((resolve) => {
+        visual.rebuildSelectionGeometry();
+        resolve();
+      }))));
     }
   });
 
   // Start asynchronous rebuild
-  var self = this;
+  const self = this;
   this._spinner.spin(this._container);
-  Promise.all(rebuildActions).then(function() {
+  Promise.all(rebuildActions).then(() => {
     self._spinner.stop();
 
 
@@ -2063,34 +2316,34 @@ Miew.prototype.rebuild = function() {
 };
 
 /** Mark all representations for rebuilding */
-Miew.prototype.rebuildAll = function() {
-  this._forEachComplexVisual(function(visual) {
+Miew.prototype.rebuildAll = function () {
+  this._forEachComplexVisual((visual) => {
     visual.setNeedsRebuild();
   });
   // this.rebuild(); // TODO: isn't implicit rebuild enough?
 };
 
-Miew.prototype._refreshTitle = function(appendix) {
-  var title;
+Miew.prototype._refreshTitle = function (appendix) {
+  let title;
   appendix = appendix === undefined ? '' : appendix;
-  var visual = this._getComplexVisual();
+  const visual = this._getComplexVisual();
   if (visual) {
     title = visual.getComplex().name;
-    var rep = visual.repGet(visual.repCurrent());
-    title += (rep ? ' – ' + rep.mode.name + ' Mode' : '');
+    const rep = visual.repGet(visual.repCurrent());
+    title += (rep ? ` – ${rep.mode.name} Mode` : '');
   } else {
     title = Object.keys(this._visuals).length > 0 ? 'Unknown' : 'No Data';
   }
   title += appendix;
 
-  this.dispatchEvent({type: 'titleChanged', data: title});
+  this.dispatchEvent({ type: 'titleChanged', data: title });
 };
 
-Miew.prototype.setNeedRender = function() {
+Miew.prototype.setNeedRender = function () {
   this._needRender = true;
 };
 
-Miew.prototype._extractRepresentation = function() {
+Miew.prototype._extractRepresentation = function () {
   const changed = [];
 
   this._forEachComplexVisual((visual) => {
@@ -2101,9 +2354,10 @@ Miew.prototype._extractRepresentation = function() {
     const selector = visual.buildSelectorFromMask(1 << visual.getSelectionBit());
     const defPreset = settings.now.presets.default;
     const idx = visual.repAdd({
-      selector: selector, mode: defPreset[0].mode.id,
+      selector,
+      mode: defPreset[0].mode.id,
       colorer: defPreset[0].colorer.id,
-      material: defPreset[0].material.id
+      material: defPreset[0].material.id,
     });
     if (idx < 0) {
       if (visual.repCount() === ComplexVisual.NUM_REPRESENTATION_BITS) {
@@ -2119,7 +2373,7 @@ Miew.prototype._extractRepresentation = function() {
 
   if (changed.length > 0) {
     this.logger.report(`New representation from selection for complexes: ${changed.join(', ')}`);
-    this.dispatchEvent({type: 'repAdd'});
+    this.dispatchEvent({ type: 'repAdd' });
   }
 };
 
@@ -2127,7 +2381,7 @@ Miew.prototype._extractRepresentation = function() {
  * Change current representation list.
  * @param {array} reps - Representation list.
  */
-Miew.prototype._setReps = function(reps) {
+Miew.prototype._setReps = function (reps) {
   reps = reps || (this._opts && this._opts.reps) || [];
   this._forEachComplexVisual(visual => visual.resetReps(reps));
 };
@@ -2136,8 +2390,8 @@ Miew.prototype._setReps = function(reps) {
  * Apply existing preset to current scene.
  * @param preset
  */
-Miew.prototype.applyPreset = function(preset) {
-  const presets = settings.now.presets;
+Miew.prototype.applyPreset = function (preset) {
+  const { presets } = settings.now;
   const presList = [
     preset || settings.defaults.preset,
     settings.defaults.preset,
@@ -2148,7 +2402,7 @@ Miew.prototype.applyPreset = function(preset) {
     settings.set('preset', presList[i]);
     reps = presets[settings.now.preset];
     if (!reps) {
-      this.logger.warn('Unknown preset "' + settings.now.preset + '"');
+      this.logger.warn(`Unknown preset "${settings.now.preset}"`);
     }
   }
   this._setReps(reps);
@@ -2158,8 +2412,8 @@ Miew.prototype.applyPreset = function(preset) {
  * Reset current representation list to initial values.
  * @param {string} [preset] - The source preset in case of uninitialized representation list.
  */
-Miew.prototype.resetReps = function(preset) {
-  let reps = this._opts && this._opts.reps;
+Miew.prototype.resetReps = function (preset) {
+  const reps = this._opts && this._opts.reps;
   if (reps) {
     this._setReps(reps);
   } else {
@@ -2171,8 +2425,8 @@ Miew.prototype.resetReps = function(preset) {
  * Get number of representations created so far.
  * @returns {number} Number of reps.
  */
-Miew.prototype.repCount = function(name) {
-  var visual = this._getComplexVisual(name);
+Miew.prototype.repCount = function (name) {
+  const visual = this._getComplexVisual(name);
   return visual ? visual.repCount() : 0;
 };
 
@@ -2182,7 +2436,7 @@ Miew.prototype.repCount = function(name) {
  * @param {string=} [name] - Complex name. Defaults to the current one.
  * @returns {number} The current index.
  */
-Miew.prototype.repCurrent = function(index, name) {
+Miew.prototype.repCurrent = function (index, name) {
   const visual = this._getComplexVisual(name);
   const newIdx = visual ? visual.repCurrent(index) : -1;
   if (index && newIdx !== index) {
@@ -2201,7 +2455,7 @@ Miew.prototype.repCurrent = function(index, name) {
  * @param {string=} rep.material - Material id.
  * @returns {?object} Representation description.
  */
-Miew.prototype.rep = function(index, rep) {
+Miew.prototype.rep = function (index, rep) {
   // FIXME support targeting visual by name
   const visual = this._getComplexVisual('');
   return visual ? visual.rep(index, rep) : null;
@@ -2212,8 +2466,8 @@ Miew.prototype.rep = function(index, rep) {
  * @param {number=} index - Zero-based index, up to {@link Miew#repCount}(). Defaults to the current one.
  * @returns {?object} Representation.
  */
-Miew.prototype.repGet = function(index, name) {
-  var visual = this._getComplexVisual(name);
+Miew.prototype.repGet = function (index, name) {
+  const visual = this._getComplexVisual(name);
   return visual ? visual.repGet(index) : null;
 };
 
@@ -2222,8 +2476,8 @@ Miew.prototype.repGet = function(index, name) {
  * @param {object=} rep - Representation description.
  * @returns {number} Index of the new representation.
  */
-Miew.prototype.repAdd = function(rep, name) {
-  var visual = this._getComplexVisual(name);
+Miew.prototype.repAdd = function (rep, name) {
+  const visual = this._getComplexVisual(name);
   return visual ? visual.repAdd(rep) : -1;
 };
 
@@ -2231,8 +2485,8 @@ Miew.prototype.repAdd = function(rep, name) {
  * Remove representation.
  * @param {number=} index - Zero-based representation index.
  */
-Miew.prototype.repRemove = function(index, name) {
-  var visual = this._getComplexVisual(name);
+Miew.prototype.repRemove = function (index, name) {
+  const visual = this._getComplexVisual(name);
   return visual ? visual.repRemove(index) : null;
 };
 
@@ -2241,38 +2495,36 @@ Miew.prototype.repRemove = function(index, name) {
  * @param {number} index - Zero-based representation index.
  * @param {boolean=} hide - Specify false to make rep visible, true to hide (by default).
  */
-Miew.prototype.repHide = function(index, hide, name) {
+Miew.prototype.repHide = function (index, hide, name) {
   this._needRender = true;
-  var visual = this._getComplexVisual(name);
+  const visual = this._getComplexVisual(name);
   return visual ? visual.repHide(index, hide) : null;
 };
 
-Miew.prototype._setEditMode = function(mode) {
-
+Miew.prototype._setEditMode = function (mode) {
   this._editMode = mode;
 
-  var elem = this._msgMode;
+  const elem = this._msgMode;
   if (elem) {
     elem.style.opacity = (mode === EDIT_MODE.COMPLEX) ? 0.0 : 1.0;
 
     if (mode !== EDIT_MODE.COMPLEX) {
-      var t = elem.getElementsByTagName('p')[0];
+      const t = elem.getElementsByTagName('p')[0];
       t.innerHTML = (mode === EDIT_MODE.COMPONENT) ? 'COMPONENT EDIT MODE' : 'FRAGMENT EDIT MODE';
     }
   }
 
-  this.dispatchEvent({type: 'editModeChanged', data: mode === EDIT_MODE.COMPLEX});
+  this.dispatchEvent({ type: 'editModeChanged', data: mode === EDIT_MODE.COMPLEX });
 };
 
-Miew.prototype._enterComponentEditMode = function() {
-
+Miew.prototype._enterComponentEditMode = function () {
   if (this._editMode !== EDIT_MODE.COMPLEX) {
     return;
   }
 
-  var editors = [];
-  this._forEachComplexVisual(function(visual) {
-    var editor = visual.beginComponentEdit();
+  const editors = [];
+  this._forEachComplexVisual((visual) => {
+    const editor = visual.beginComponentEdit();
     if (editor) {
       editors.push(editor);
     }
@@ -2289,7 +2541,7 @@ Miew.prototype._enterComponentEditMode = function() {
   this._objectControls.keysTranslateObj(true);
 };
 
-Miew.prototype._applyComponentEdit = function() {
+Miew.prototype._applyComponentEdit = function () {
   if (this._editMode !== EDIT_MODE.COMPONENT) {
     return;
   }
@@ -2297,7 +2549,7 @@ Miew.prototype._applyComponentEdit = function() {
   this._objectControls.stop();
   this._objectControls.keysTranslateObj(false);
 
-  for (var i = 0; i < this._editors.length; ++i) {
+  for (let i = 0; i < this._editors.length; ++i) {
     this._editors[i].apply();
   }
   this._editors = [];
@@ -2308,7 +2560,7 @@ Miew.prototype._applyComponentEdit = function() {
   this.rebuildAll();
 };
 
-Miew.prototype._discardComponentEdit = function() {
+Miew.prototype._discardComponentEdit = function () {
   if (this._editMode !== EDIT_MODE.COMPONENT) {
     return;
   }
@@ -2316,7 +2568,7 @@ Miew.prototype._discardComponentEdit = function() {
   this._objectControls.stop();
   this._objectControls.keysTranslateObj(false);
 
-  for (var i = 0; i < this._editors.length; ++i) {
+  for (let i = 0; i < this._editors.length; ++i) {
     this._editors[i].discard();
   }
   this._editors = [];
@@ -2327,16 +2579,15 @@ Miew.prototype._discardComponentEdit = function() {
   this._needRender = true;
 };
 
-Miew.prototype._enterFragmentEditMode = function() {
-
+Miew.prototype._enterFragmentEditMode = function () {
   if (this._editMode !== EDIT_MODE.COMPLEX) {
     return;
   }
 
-  var selectedVisuals = [];
-  this._forEachComplexVisual(function(visual) {
-    if (visual instanceof ComplexVisual &&
-          visual.getSelectionCount() > 0) {
+  const selectedVisuals = [];
+  this._forEachComplexVisual((visual) => {
+    if (visual instanceof ComplexVisual
+          && visual.getSelectionCount() > 0) {
       selectedVisuals.push(visual);
     }
   });
@@ -2347,7 +2598,7 @@ Miew.prototype._enterFragmentEditMode = function() {
     return;
   }
 
-  var editor = selectedVisuals[0].beginFragmentEdit();
+  const editor = selectedVisuals[0].beginFragmentEdit();
   if (!editor) {
     return;
   }
@@ -2361,14 +2612,14 @@ Miew.prototype._enterFragmentEditMode = function() {
   this._needRender = true;
 };
 
-Miew.prototype._applyFragmentEdit = function() {
+Miew.prototype._applyFragmentEdit = function () {
   if (this._editMode !== EDIT_MODE.FRAGMENT) {
     return;
   }
 
   this._objectControls.stop();
 
-  for (var i = 0; i < this._editors.length; ++i) {
+  for (let i = 0; i < this._editors.length; ++i) {
     this._editors[i].apply();
   }
   this._editors = [];
@@ -2381,14 +2632,14 @@ Miew.prototype._applyFragmentEdit = function() {
   this.rebuildAll();
 };
 
-Miew.prototype._discardFragmentEdit = function() {
+Miew.prototype._discardFragmentEdit = function () {
   if (this._editMode !== EDIT_MODE.FRAGMENT) {
     return;
   }
 
   this._objectControls.stop();
 
-  for (var i = 0; i < this._editors.length; ++i) {
+  for (let i = 0; i < this._editors.length; ++i) {
     this._editors[i].discard();
   }
   this._editors = [];
@@ -2402,13 +2653,13 @@ Miew.prototype._discardFragmentEdit = function() {
 };
 
 /** @deprecated  Move object instead of panning the camera */
-Miew.prototype.resetPan = function() {
+Miew.prototype.resetPan = function () {
   this._gfx.camera.position.x = 0.0;
   this._gfx.camera.position.y = 0.0;
-  this.dispatchEvent({type: 'transform'});
+  this.dispatchEvent({ type: 'transform' });
 };
 
-Miew.prototype._onPick = function(event) {
+Miew.prototype._onPick = function (event) {
   if (!settings.now.picking) {
     // picking is disabled
     return;
@@ -2430,7 +2681,7 @@ Miew.prototype._onPick = function(event) {
   }
 
   // update last pick & find complex
-  var complex = null;
+  let complex = null;
   if (event.obj.atom) {
     complex = event.obj.atom.getResidue().getChain().getComplex();
     this._lastPick = event.obj.atom;
@@ -2454,7 +2705,7 @@ Miew.prototype._onPick = function(event) {
 
   // update visual
   if (complex) {
-    var visual = this._getVisualForComplex(complex);
+    const visual = this._getVisualForComplex(complex);
     if (visual) {
       _updateSelection(visual);
       this._needRender = true;
@@ -2467,7 +2718,7 @@ Miew.prototype._onPick = function(event) {
   this._updateInfoPanel();
 };
 
-Miew.prototype._onDblClick = function(event) {
+Miew.prototype._onDblClick = function (event) {
   if ('atom' in event.obj) {
     this.setPivotAtom(event.obj.atom);
   } else if ('residue' in event.obj) {
@@ -2480,67 +2731,67 @@ Miew.prototype._onDblClick = function(event) {
   this._needRender = true;
 };
 
-Miew.prototype._onKeyDown = function(event) {
+Miew.prototype._onKeyDown = function (event) {
   if (!this._running || !this._hotKeysEnabled) {
     return;
   }
 
   switch (event.keyCode) {
-  case 'C'.charCodeAt(0):
-    if (settings.now.editing) {
-      this._enterComponentEditMode();
-    }
-    break;
-  case 'F'.charCodeAt(0):
-    if (settings.now.editing) {
-      this._enterFragmentEditMode();
-    }
-    break;
-  case 'A'.charCodeAt(0):
-    switch (this._editMode) {
-    case EDIT_MODE.COMPONENT: this._applyComponentEdit(); break;
-    case EDIT_MODE.FRAGMENT: this._applyFragmentEdit(); break;
-    default: break;
-    }
-    break;
-  case 'D'.charCodeAt(0):
-    switch (this._editMode) {
-    case EDIT_MODE.COMPONENT: this._discardComponentEdit(); break;
-    case EDIT_MODE.FRAGMENT: this._discardFragmentEdit(); break;
-    default: break;
-    }
-    break;
-  case 'S'.charCodeAt(0):
-    event.preventDefault();
-    event.stopPropagation();
-    settings.set('ao', !settings.now.ao);
-    this._needRender = true;
-    break;
-  case 107:
-    event.preventDefault();
-    event.stopPropagation();
-    this._forEachComplexVisual(function(visual) {
-      visual.expandSelection();
-      visual.rebuildSelectionGeometry();
-    });
-    this._updateInfoPanel();
-    this._needRender = true;
-    break;
-  case 109:
-    event.preventDefault();
-    event.stopPropagation();
-    this._forEachComplexVisual(function(visual) {
-      visual.shrinkSelection();
-      visual.rebuildSelectionGeometry();
-    });
-    this._updateInfoPanel();
-    this._needRender = true;
-    break;
-  default:
+    case 'C'.charCodeAt(0):
+      if (settings.now.editing) {
+        this._enterComponentEditMode();
+      }
+      break;
+    case 'F'.charCodeAt(0):
+      if (settings.now.editing) {
+        this._enterFragmentEditMode();
+      }
+      break;
+    case 'A'.charCodeAt(0):
+      switch (this._editMode) {
+        case EDIT_MODE.COMPONENT: this._applyComponentEdit(); break;
+        case EDIT_MODE.FRAGMENT: this._applyFragmentEdit(); break;
+        default: break;
+      }
+      break;
+    case 'D'.charCodeAt(0):
+      switch (this._editMode) {
+        case EDIT_MODE.COMPONENT: this._discardComponentEdit(); break;
+        case EDIT_MODE.FRAGMENT: this._discardFragmentEdit(); break;
+        default: break;
+      }
+      break;
+    case 'S'.charCodeAt(0):
+      event.preventDefault();
+      event.stopPropagation();
+      settings.set('ao', !settings.now.ao);
+      this._needRender = true;
+      break;
+    case 107:
+      event.preventDefault();
+      event.stopPropagation();
+      this._forEachComplexVisual((visual) => {
+        visual.expandSelection();
+        visual.rebuildSelectionGeometry();
+      });
+      this._updateInfoPanel();
+      this._needRender = true;
+      break;
+    case 109:
+      event.preventDefault();
+      event.stopPropagation();
+      this._forEachComplexVisual((visual) => {
+        visual.shrinkSelection();
+        visual.rebuildSelectionGeometry();
+      });
+      this._updateInfoPanel();
+      this._needRender = true;
+      break;
+    default:
   }
 };
 
-Miew.prototype._onKeyUp = function(event) {
+Miew.prototype._onKeyUp = function (event) {
   if (!this._running || !this._hotKeysEnabled) {
     return;
   }
@@ -2550,12 +2801,13 @@ Miew.prototype._onKeyUp = function(event) {
   }
 };
 
-Miew.prototype._updateInfoPanel = function() {
-  var info = this._msgAtomInfo.getElementsByTagName('p')[0];
-  var atom, residue;
+Miew.prototype._updateInfoPanel = function () {
+  const info = this._msgAtomInfo.getElementsByTagName('p')[0];
+  let atom;
+  let residue;
 
-  var count = 0;
-  this._forEachComplexVisual(function(visual) {
+  let count = 0;
+  this._forEachComplexVisual((visual) => {
     count += visual.getSelectionCount();
   });
 
@@ -2580,13 +2832,13 @@ Miew.prototype._updateInfoPanel = function() {
     atom = this._lastPick;
     residue = atom._residue;
 
-    var an = atom.getName();
+    const an = atom.getName();
     if (an.getNode() !== null) {
       aName = an.getNode();
     } else {
       aName = an.getString();
     }
-    var location = (atom._location !== 32) ? String.fromCharCode(atom._location) : ''; // 32 is code of white-space
+    const location = (atom._location !== 32) ? String.fromCharCode(atom._location) : ''; // 32 is code of white-space
     secondLine = `${atom.element.fullName} #${atom._serial}${location}: \
       ${residue._chain._name}.${residue._type._name}${residue._sequence}${residue._icode.trim()}.`;
     if (typeof aName === 'string') {
@@ -2597,7 +2849,6 @@ Miew.prototype._updateInfoPanel = function() {
     coordLine = `Coord: (${atom._position.x.toFixed(2).toString()},\
      ${atom._position.y.toFixed(2).toString()},\
      ${atom._position.z.toFixed(2).toString()})`;
-
   } else if (this._lastPick instanceof Residue) {
     residue = this._lastPick;
 
@@ -2631,11 +2882,11 @@ Miew.prototype._updateInfoPanel = function() {
   this._msgAtomInfo.style.opacity = 1.0;
 };
 
-Miew.prototype._getAltObj = function() {
+Miew.prototype._getAltObj = function () {
   if (this._editors) {
-    var altObj = null;
-    for (var i = 0; i < this._editors.length; ++i) {
-      var nextAltObj = this._editors[i].getAltObj();
+    let altObj = null;
+    for (let i = 0; i < this._editors.length; ++i) {
+      const nextAltObj = this._editors[i].getAltObj();
       if (nextAltObj.objects.length > 0) {
         if (altObj) {
           // we have selected atoms in two or more visuals -- not supported
@@ -2652,35 +2903,37 @@ Miew.prototype._getAltObj = function() {
 
   return {
     objects: [],
-    pivot: new THREE.Vector3(0, 0, 0)
+    pivot: new THREE.Vector3(0, 0, 0),
   };
 };
 
-Miew.prototype.resetPivot = function() {
-  var boundingBox = new THREE.Box3();
-  this._forEachVisual(function(visual) {
+Miew.prototype.resetPivot = function () {
+  const boundingBox = new THREE.Box3();
+  this._forEachVisual((visual) => {
     boundingBox.union(visual.getBoundaries().boundingBox);
   });
 
   boundingBox.getCenter(this._gfx.pivot.position);
   this._gfx.pivot.position.negate();
-  this.dispatchEvent({type: 'transform'});
+  this.dispatchEvent({ type: 'transform' });
 };
 
-Miew.prototype.setPivotResidue = function(residue) {
-  var visual = this._getVisualForComplex(residue.getChain().getComplex());
+Miew.prototype.setPivotResidue = function (residue) {
+  const visual = this._getVisualForComplex(residue.getChain().getComplex());
   if (!visual) {
     return;
   }
 
-  var pos = this._gfx.pivot.position;
+  const pos = this._gfx.pivot.position;
   if (residue._controlPoint) {
     pos.copy(residue._controlPoint);
   } else {
-    var x = 0, y = 0, z = 0;
-    var amount = residue._atoms.length;
-    for (var i = 0; i < amount; ++i) {
-      var p = residue._atoms[i]._position;
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    const amount = residue._atoms.length;
+    for (let i = 0; i < amount; ++i) {
+      const p = residue._atoms[i]._position;
       x += p.x / amount;
       y += p.y / amount;
       z += p.z / amount;
@@ -2689,36 +2942,36 @@ Miew.prototype.setPivotResidue = function(residue) {
   }
   pos.applyMatrix4(visual.matrix);
   pos.negate();
-  this.dispatchEvent({type: 'transform'});
+  this.dispatchEvent({ type: 'transform' });
 };
 
-Miew.prototype.setPivotAtom = function(atom) {
-  var visual = this._getVisualForComplex(atom.getResidue().getChain().getComplex());
+Miew.prototype.setPivotAtom = function (atom) {
+  const visual = this._getVisualForComplex(atom.getResidue().getChain().getComplex());
   if (!visual) {
     return;
   }
 
-  var pos = this._gfx.pivot.position;
+  const pos = this._gfx.pivot.position;
   pos.copy(atom._position);
   pos.applyMatrix4(visual.matrix);
   pos.negate();
-  this.dispatchEvent({type: 'transform'});
+  this.dispatchEvent({ type: 'transform' });
 };
 
-Miew.prototype.benchmarkGfx = function(force) {
-  var self = this;
-  var prof = new GfxProfiler(this._gfx.renderer);
+Miew.prototype.benchmarkGfx = function (force) {
+  const self = this;
+  const prof = new GfxProfiler(this._gfx.renderer);
 
-  return new Promise(function(resolve) {
+  return new Promise(((resolve) => {
     if (!force && !settings.now.autoResolution) {
       resolve();
       return;
     }
 
-    self.dispatchEvent({type: 'profile'});
+    self.dispatchEvent({ type: 'profile' });
 
     self._spinner.spin(self._container);
-    prof.runOnTicks(50, 1000, 2000).then(function(numResults) {
+    prof.runOnTicks(50, 1000, 2000).then((numResults) => {
       self._gfxScore = 0.0;
       if (numResults >= 5) {
         self._gfxScore = 1000.0 / prof.mean();
@@ -2731,7 +2984,7 @@ Miew.prototype.benchmarkGfx = function(force) {
       self._spinner.stop();
       resolve();
     });
-  });
+  }));
 };
 
 /**
@@ -2741,7 +2994,7 @@ Miew.prototype.benchmarkGfx = function(force) {
  *        if width is omitted too.
  * @returns {string} Data URL representing the image contents.
  */
-Miew.prototype.screenshot = function(width, height) {
+Miew.prototype.screenshot = function (width, height) {
   const gfx = this._gfx;
 
   function fov2Tan(fov) {
@@ -2761,7 +3014,6 @@ Miew.prototype.screenshot = function(width, height) {
     // copy current canvas to screenshot
     screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
   } else {
-
     const originalAspect = gfx.camera.aspect;
     const originalFov = gfx.camera.fov;
     const originalTanFov2 = fov2Tan(gfx.camera.fov);
@@ -2802,29 +3054,39 @@ Miew.prototype.screenshot = function(width, height) {
  * @param {number} [height] - Height of an image. Defaults to the width (square) or canvas height,
  *        if width is omitted too.
  */
-Miew.prototype.screenshotSave = function(filename, width, height) {
-  var uri = this.screenshot(width, height);
+Miew.prototype.screenshotSave = function (filename, width, height) {
+  const uri = this.screenshot(width, height);
   utils.shotDownload(uri, filename);
 };
 
-Miew.prototype._tweakResolution = function() {
-  var maxPerf = [
+Miew.prototype.save = function (opts) {
+  this._export(opts.fileType).then((dataString) => {
+    const filename = this._visuals[this._curVisualName]._complex.name;
+    utils.download(dataString, filename, opts.fileType);
+  }).catch((error) => {
+    this.logger.error('Could not export data');
+    this.logger.debug(error);
+  });
+};
+
+Miew.prototype._tweakResolution = function () {
+  const maxPerf = [
     ['poor', 100],
     ['low', 500],
     ['medium', 1000],
     ['high', 5000],
-    ['ultra', Number.MAX_VALUE]
+    ['ultra', Number.MAX_VALUE],
   ];
 
-  var atomCount = 0;
-  this._forEachComplexVisual(function(visual) {
+  let atomCount = 0;
+  this._forEachComplexVisual((visual) => {
     atomCount += visual.getComplex().getAtomCount();
   });
 
   if (atomCount > 0) {
-    var performance = this._gfxScore * 10e5 / atomCount;
+    const performance = this._gfxScore * 10e5 / atomCount;
     // set resolution based on estimated performance
-    for (var i = 0; i < maxPerf.length; ++i) {
+    for (let i = 0; i < maxPerf.length; ++i) {
       if (performance < maxPerf[i][1]) {
         this._autoChangeResolution(maxPerf[i][0]);
         break;
@@ -2833,9 +3095,9 @@ Miew.prototype._tweakResolution = function() {
   }
 };
 
-Miew.prototype._autoChangeResolution = function(resolution) {
+Miew.prototype._autoChangeResolution = function (resolution) {
   if (resolution !== settings.now.resolution) {
-    this.logger.report('Your rendering resolution was changed to "' + resolution + '" for best performance.');
+    this.logger.report(`Your rendering resolution was changed to "${resolution}" for best performance.`);
   }
   settings.now.resolution = resolution;
 };
@@ -2843,27 +3105,27 @@ Miew.prototype._autoChangeResolution = function(resolution) {
 /**
  * Save current settings to cookies.
  */
-Miew.prototype.saveSettings = function() {
+Miew.prototype.saveSettings = function () {
   this._cookies.setCookie(this._opts.settingsCookie, JSON.stringify(this.settings.getDiffs(true)));
 };
 
 /**
  * Load settings from cookies.
  */
-Miew.prototype.restoreSettings = function() {
+Miew.prototype.restoreSettings = function () {
   try {
     const cookie = this._cookies.getCookie(this._opts.settingsCookie);
     const diffs = cookie ? JSON.parse(cookie) : {};
     this.settings.applyDiffs(diffs, true);
   } catch (e) {
-    this.logger.error('Cookies parse error: ' + e.message);
+    this.logger.error(`Cookies parse error: ${e.message}`);
   }
 };
 
 /**
  * Reset current settings to the defaults.
  */
-Miew.prototype.resetSettings = function() {
+Miew.prototype.resetSettings = function () {
   this.settings.reset();
 };
 
@@ -2872,7 +3134,7 @@ Miew.prototype.resetSettings = function() {
    * @param {string|object} opts - See {@link Miew} constructor.
    * @see {@link Miew#set}, {@link Miew#repAdd}, {@link Miew#rep}.
    */
-Miew.prototype.setOptions = function(opts) {
+Miew.prototype.setOptions = function (opts) {
   if (typeof opts === 'string') {
     opts = Miew.options.fromAttr(opts);
   }
@@ -2888,7 +3150,7 @@ Miew.prototype.setOptions = function(opts) {
   this._resetObjects();
 
   if (opts.load) {
-    this.load(opts.load, {fileType: opts.type});
+    this.load(opts.load, { fileType: opts.type });
   }
 
   if (opts.preset) {
@@ -2916,16 +3178,16 @@ Miew.prototype.setOptions = function(opts) {
   }
 };
 
-Miew.prototype.info = function(name) {
-  var visual = this._getComplexVisual(name);
+Miew.prototype.info = function (name) {
+  const visual = this._getComplexVisual(name);
   if (!visual) {
     return {};
   }
-  var complex = visual.getComplex();
-  var metadata = complex.metadata;
+  const complex = visual.getComplex();
+  const { metadata } = complex;
   return {
     id: metadata.id || complex.name || 'UNKNOWN',
-    title: metadata.title && metadata.title.join(' ') || 'UNKNOWN DATA',
+    title: (metadata.title && metadata.title.join(' ')) || 'UNKNOWN DATA',
     atoms: complex.getAtomCount(),
     bonds: complex.getBondCount(),
     residues: complex.getResidueCount(),
@@ -2937,8 +3199,8 @@ Miew.prototype.info = function(name) {
    * OBJECTS SEGMENT
    */
 
-Miew.prototype.addObject = function(objData, bThrow) {
-  var Ctor = null;
+Miew.prototype.addObject = function (objData, bThrow) {
+  let Ctor = null;
 
   // TODO change this to factory when better times come.
   if (objData.type === LinesObject.prototype.type) {
@@ -2946,15 +3208,15 @@ Miew.prototype.addObject = function(objData, bThrow) {
   }
 
   if (Ctor === null) {
-    throw new Error('Unknown scene object type - ' + objData.type);
+    throw new Error(`Unknown scene object type - ${objData.type}`);
   }
 
   try {
-    var newObj = new Ctor(objData.params, objData.opts);
+    const newObj = new Ctor(objData.params, objData.opts);
     this._addSceneObject(newObj);
   } catch (error) {
     if (!bThrow) {
-      this.logger.debug('Error during scene object creation: ' + error.message);
+      this.logger.debug(`Error during scene object creation: ${error.message}`);
     } else {
       throw error;
     }
@@ -2962,40 +3224,40 @@ Miew.prototype.addObject = function(objData, bThrow) {
   this._needRender = true;
 };
 
-Miew.prototype._addSceneObject = function(sceneObject) {
-  var visual = this._getComplexVisual();
+Miew.prototype._addSceneObject = function (sceneObject) {
+  const visual = this._getComplexVisual();
   if (sceneObject.build && visual) {
     sceneObject.build(visual.getComplex());
     this._gfx.pivot.add(sceneObject.getGeometry());
   }
-  var objects = this._objects;
+  const objects = this._objects;
   objects[objects.length] = sceneObject;
 };
 
-Miew.prototype._updateObjsToFrame = function(frameData) {
-  var objs = this._objects;
-  for (var i = 0, n = objs.length; i < n; ++i) {
+Miew.prototype._updateObjsToFrame = function (frameData) {
+  const objs = this._objects;
+  for (let i = 0, n = objs.length; i < n; ++i) {
     if (objs[i].updateToFrame) {
       objs[i].updateToFrame(frameData);
     }
   }
 };
 
-Miew.prototype._resetObjects = function() {
-  var objs = this._opts._objects;
+Miew.prototype._resetObjects = function () {
+  const objs = this._opts._objects;
 
   this._objects = [];
   if (objs) {
-    for (var i = 0, n = objs.length; i < n; ++i) {
+    for (let i = 0, n = objs.length; i < n; ++i) {
       this.addObject(objs[i], false);
     }
   }
 };
 
-Miew.prototype.removeObject = function(index) {
-  var obj = this._objects[index];
+Miew.prototype.removeObject = function (index) {
+  const obj = this._objects[index];
   if (!obj) {
-    throw new Error('Scene object with index ' + index + ' does not exist');
+    throw new Error(`Scene object with index ${index} does not exist`);
   }
   obj.destroy();
   this._objects.splice(index, 1);
@@ -3011,7 +3273,7 @@ Miew.prototype.removeObject = function(index) {
  * @param {boolean} [opts.view=false] - when this flag is true, a view information is included
  * @returns {string} URL
  */
-Miew.prototype.getURL = function(opts) {
+Miew.prototype.getURL = function (opts) {
   return options.toURL(this.getState(_.defaults(opts, {
     compact: true,
     settings: false,
@@ -3028,7 +3290,7 @@ Miew.prototype.getURL = function(opts) {
  * @param {boolean} [opts.view=true] - when this flag is true, a view information is included
  * @returns {string} script
  */
-Miew.prototype.getScript = function(opts) {
+Miew.prototype.getScript = function (opts) {
   return options.toScript(this.getState(_.defaults(opts, {
     compact: true,
     settings: true,
@@ -3041,16 +3303,16 @@ Miew.prototype.getScript = function(opts) {
    * @param {boolean} compareWithDefaults - when this flag is true, reps list is compared (if possible)
    * to preset's defaults and only diffs are generated
    */
-Miew.prototype._compareReps = function(complexVisual, compareWithDefaults) {
-  var ans = {};
-  var repCount = 0;
+Miew.prototype._compareReps = function (complexVisual, compareWithDefaults) {
+  const ans = {};
+  let repCount = 0;
 
   if (complexVisual) {
     repCount = complexVisual.repCount();
   }
 
-  var currPreset = settings.defaults.presets[settings.now.preset];
-  var compare = compareWithDefaults;
+  const currPreset = settings.defaults.presets[settings.now.preset];
+  let compare = compareWithDefaults;
   if (currPreset === undefined || currPreset.length > repCount) {
     compare = false;
     ans.preset = 'empty';
@@ -3058,9 +3320,9 @@ Miew.prototype._compareReps = function(complexVisual, compareWithDefaults) {
     ans.preset = settings.now.preset;
   }
 
-  var repsDiff = [];
-  var emptyReps = true;
-  for (var i = 0, n = repCount; i < n; ++i) {
+  const repsDiff = [];
+  let emptyReps = true;
+  for (let i = 0, n = repCount; i < n; ++i) {
     repsDiff[i] = complexVisual.repGet(i).compare(compare ? currPreset[i] : null);
     if (!_.isEmpty(repsDiff[i])) {
       emptyReps = false;
@@ -3080,7 +3342,7 @@ Miew.prototype._compareReps = function(complexVisual, compareWithDefaults) {
    * @param {boolean} [opts.view=false] - when this flag is true, a view information is included
    * @returns {Object} State object.
    */
-Miew.prototype.getState = function(opts) {
+Miew.prototype.getState = function (opts) {
   const state = {};
 
   opts = _.defaults(opts, {
@@ -3096,7 +3358,7 @@ Miew.prototype.getState = function(opts) {
   if (visual !== null) {
     // TODO type?
     const complex = visual.getComplex();
-    const metadata = complex.metadata;
+    const { metadata } = complex;
     if (metadata.id) {
       const format = metadata.format ? `${metadata.format}:` : '';
       state.load = format + metadata.id;
@@ -3149,22 +3411,45 @@ Miew.prototype.getState = function(opts) {
  * @param {*=} value - Default value.
  * @returns {*} Parameter value.
  */
-Miew.prototype.get = function(param, value) {
+Miew.prototype.get = function (param, value) {
   return settings.get(param, value);
 };
 
-Miew.prototype._clipPlaneUpdateValue = function(radius) {
-  var clipPlaneValue = Math.max(
+Miew.prototype._updateShadow = function (radius) {
+  for (let i = 0; i < this._gfx.scene.children.length; i++) {
+    if (this._gfx.scene.children[i].shadow !== undefined) {
+      const light = this._gfx.scene.children[i];
+
+      light.shadow.bias = 0.09 * radius;
+
+      light.shadow.camera.bottom = -radius;
+      light.shadow.camera.top = radius;
+      light.shadow.camera.left = -radius;
+      light.shadow.camera.right = radius;
+
+      const distToOrigin = light.position.length();
+      const extraShift = 10; // if it's smaller there are artefacts in shadow
+      light.shadow.camera.far = distToOrigin + radius + extraShift;
+      light.shadow.camera.near = distToOrigin - radius - extraShift;
+      light.shadow.camera.near = light.shadow.camera.near > 0.1 ? light.shadow.camera.near : 0.1;
+
+      light.shadow.camera.updateProjectionMatrix();
+    }
+  }
+};
+
+Miew.prototype._clipPlaneUpdateValue = function (radius) {
+  const clipPlaneValue = Math.max(
     this._gfx.camera.position.z - radius * settings.now.draft.clipPlaneFactor,
-    settings.now.camNear
+    settings.now.camNear,
   );
 
-  var opts = {clipPlaneValue: clipPlaneValue};
-  this._forEachComplexVisual(function(visual) {
+  const opts = { clipPlaneValue };
+  this._forEachComplexVisual((visual) => {
     visual.setUberOptions(opts);
   });
-  for (var i = 0, n = this._objects.length; i < n; ++i) {
-    var obj = this._objects[i];
+  for (let i = 0, n = this._objects.length; i < n; ++i) {
+    const obj = this._objects[i];
     if (obj._line) {
       obj._line.material.setUberOptions(opts);
     }
@@ -3174,7 +3459,7 @@ Miew.prototype._clipPlaneUpdateValue = function(radius) {
   }
 };
 
-Miew.prototype._fogFarUpdateValue = function() {
+Miew.prototype._fogFarUpdateValue = function () {
   if (this._picker !== null) {
     if (this._gfx.scene.fog) {
       this._picker.fogFarValue = this._gfx.scene.fog.far;
@@ -3184,15 +3469,26 @@ Miew.prototype._fogFarUpdateValue = function() {
   }
 };
 
-Miew.prototype._fogAlphaChanged = function() {
-  this._forEachComplexVisual(function(visual) {
+Miew.prototype._updateMaterials = function (values) {
+  this._forEachComplexVisual(visual => visual.setMaterialValues(values));
+  for (let i = 0, n = this._objects.length; i < n; ++i) {
+    const obj = this._objects[i];
+    if (obj._line) {
+      obj._line.material.setValues(values);
+      obj._line.material.needsUpdate = true;
+    }
+  }
+};
+
+Miew.prototype._fogAlphaChanged = function () {
+  this._forEachComplexVisual((visual) => {
     visual.setUberOptions({
-      fogAlpha: settings.now.fogAlpha
+      fogAlpha: settings.now.fogAlpha,
     });
   });
 };
 
-Miew.prototype._initOnSettingsChanged = function() {
+Miew.prototype._initOnSettingsChanged = function () {
   const on = (props, func) => {
     props = _.isArray(props) ? props : [props];
     props.forEach((prop) => {
@@ -3210,7 +3506,7 @@ Miew.prototype._initOnSettingsChanged = function() {
   });
 
   on('ao', () => {
-    this._setUberMaterialValues({normalsToGBuffer: settings.now.ao});
+    this._setUberMaterialValues({ normalsToGBuffer: settings.now.ao });
   });
 
   on('fogColor', () => {
@@ -3226,31 +3522,43 @@ Miew.prototype._initOnSettingsChanged = function() {
     if (gfx) {
       gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     }
-    // TODO: update materials
-    const values = {fogTransparent: evt.value};
-    this._forEachComplexVisual(visual => visual.setMaterialValues(values));
-    for (let i = 0, n = this._objects.length; i < n; ++i) {
-      const obj = this._objects[i];
-      if (obj._line) {
-        obj._line.material.setValues(values);
-        obj._line.material.needsUpdate = true;
-      }
-    }
+    // update materials
+    this._updateMaterials({ fogTransparent: evt.value });
     this.rebuildAll();
   });
 
   on('draft.clipPlane', (evt) => {
-    // TODO: update materials
-    const values = {clipPlane: evt.value};
-    this._forEachComplexVisual(visual => visual.setMaterialValues(values));
-    for (let i = 0, n = this._objects.length; i < n; ++i) {
-      const obj = this._objects[i];
-      if (obj._line) {
-        obj._line.material.setValues(values);
-        obj._line.material.needsUpdate = true;
+    // update materials
+    this._updateMaterials({ clipPlane: evt.value });
+    this.rebuildAll();
+  });
+
+  on('shadow.on', (evt) => {
+    // update materials and rebuild all
+    const values = { shadowmap: evt.value, shadowmapType: settings.now.shadow.type };
+    const gfx = this._gfx;
+    if (gfx) {
+      gfx.renderer.shadowMap.enabled = values.shadowmap;
+    }
+    this._updateMaterials(values);
+    this.rebuildAll();
+  });
+
+  on('shadow.type', (evt) => {
+    // update materials and rebuild all if shadowmap are enable
+    if (settings.now.shadow.on) {
+      this._updateMaterials({ shadowmapType: evt.value });
+      this.rebuildAll();
+    }
+  });
+
+  on('shadow.radius', (evt) => {
+    for (let i = 0; i < this._gfx.scene.children.length; i++) {
+      if (this._gfx.scene.children[i].shadow !== undefined) {
+        const light = this._gfx.scene.children[i];
+        light.shadow.radius = evt.value;
       }
     }
-    this.rebuildAll();
   });
 
   on('fps', () => {
@@ -3259,6 +3567,7 @@ Miew.prototype._initOnSettingsChanged = function() {
 
   on(['fog', 'fogNearFactor', 'fogFarFactor'], () => {
     this._updateFog();
+    this._needRender = true;
   });
 
   on('fogAlpha', () => {
@@ -3267,8 +3576,8 @@ Miew.prototype._initOnSettingsChanged = function() {
 
   on('autoResolution', (evt) => {
     if (evt.value && !this._gfxScore) {
-      this.logger.warn('Benchmarks are missed, autoresolution will not work! ' +
-        'Autoresolution should be set during miew startup.');
+      this.logger.warn('Benchmarks are missed, autoresolution will not work! '
+        + 'Autoresolution should be set during miew startup.');
     }
   });
 
@@ -3298,7 +3607,7 @@ Miew.prototype._initOnSettingsChanged = function() {
  * @param {string|object} params - Parameter name or path (e.g. 'modes.BS.atom') or even settings object.
  * @param {*=} value - Value.
  */
-Miew.prototype.set = function(params, value) {
+Miew.prototype.set = function (params, value) {
   settings.set(params, value);
 };
 
@@ -3307,13 +3616,13 @@ Miew.prototype.set = function(params, value) {
  * @param {string} expression - string expression of selection
  * @param {boolean=} append - true to append selection atoms to current selection, false to rewrite selection
  */
-Miew.prototype.select = function(expression, append) {
-  var visual = this._getComplexVisual();
+Miew.prototype.select = function (expression, append) {
+  const visual = this._getComplexVisual();
   if (!visual) {
     return;
   }
 
-  var sel = expression;
+  let sel = expression;
   if (_.isString(expression)) {
     sel = selectors.parse(expression).selector;
   }
@@ -3323,7 +3632,7 @@ Miew.prototype.select = function(expression, append) {
   this._needRender = true;
 };
 
-var VIEW_VERSION = '1';
+const VIEW_VERSION = '1';
 
 /**
  * Get or set view info packed into string.
@@ -3332,21 +3641,21 @@ var VIEW_VERSION = '1';
  *
  * @param {string=} expression - Optional string encoded the view
  */
-Miew.prototype.view = function(expression) {
-  var self = this;
-  var pivot = this._gfx.pivot;
-  var transform = [];
-  var eulerOrder = 'ZXY';
+Miew.prototype.view = function (expression) {
+  const self = this;
+  const { pivot } = this._gfx;
+  let transform = [];
+  const eulerOrder = 'ZXY';
 
   function encode() {
-    var pos = pivot.position;
-    var scale = self._objectControls.getScale() / settings.now.radiusToFit;
-    var euler = new THREE.Euler();
+    const pos = pivot.position;
+    const scale = self._objectControls.getScale() / settings.now.radiusToFit;
+    const euler = new THREE.Euler();
     euler.setFromQuaternion(self._objectControls.getOrientation(), eulerOrder);
     transform = [
       pos.x, pos.y, pos.z,
       scale,
-      euler.x, euler.y, euler.z
+      euler.x, euler.y, euler.z,
     ];
     return VIEW_VERSION + utils.arrayToBase64(transform, Float32Array);
   }
@@ -3354,10 +3663,10 @@ Miew.prototype.view = function(expression) {
   function decode() {
     // HACK: old non-versioned view is the 0th version
     if (expression.length === 40) { // TODO: remove when db migration is finished
-      expression = '0' + expression;
+      expression = `0${expression}`;
     }
 
-    var version = expression[0];
+    const version = expression[0];
     transform = utils.arrayFromBase64(expression.substr(1), Float32Array);
 
     // apply adapter for old versions
@@ -3367,17 +3676,17 @@ Miew.prototype.view = function(expression) {
         transform[3] /= 8.0;
       } else {
         // do nothing
-        self.logger.warn('Encoded view version mismatch, stored as ' + version + ' vs ' + VIEW_VERSION + ' expected');
+        self.logger.warn(`Encoded view version mismatch, stored as ${version} vs ${VIEW_VERSION} expected`);
         return;
       }
     }
 
-    var srcView = viewInterpolator.createView();
+    const srcView = viewInterpolator.createView();
     srcView.position.copy(pivot.position);
     srcView.scale = self._objectControls.getScale();
     srcView.orientation.copy(self._objectControls.getOrientation());
 
-    var dstView = viewInterpolator.createView();
+    const dstView = viewInterpolator.createView();
     dstView.position.set(transform[0], transform[1], transform[2]);
 
     // hack to make preset views work after we moved centering offset to visual nodes
@@ -3386,7 +3695,7 @@ Miew.prototype.view = function(expression) {
       dstView.position.sub(self._getComplexVisual().position);
     }
 
-    dstView.scale = transform[3];
+    dstView.scale = transform[3]; // eslint-disable-line prefer-destructuring
     dstView.orientation.setFromEuler(new THREE.Euler(transform[4], transform[5], transform[6], eulerOrder));
 
     viewInterpolator.setup(srcView, dstView);
@@ -3394,18 +3703,18 @@ Miew.prototype.view = function(expression) {
 
   if (typeof expression === 'undefined') {
     return encode();
-  } else {
-    decode();
   }
+  decode();
+
   return expression;
 };
 
 /*
    * Update current view due to viewinterpolator state
    */
-Miew.prototype._updateView = function() {
-  var self = this;
-  var pivot = this._gfx.pivot;
+Miew.prototype._updateView = function () {
+  const self = this;
+  const { pivot } = this._gfx;
 
   if (!viewInterpolator.wasStarted()) {
     viewInterpolator.start();
@@ -3415,14 +3724,14 @@ Miew.prototype._updateView = function() {
     return;
   }
 
-  //var curr = viewInterpolator.createView();
-  var res = viewInterpolator.getCurrentView();
+  // var curr = viewInterpolator.createView();
+  const res = viewInterpolator.getCurrentView();
   if (res.success) {
-    var curr = res.view;
+    const curr = res.view;
     pivot.position.copy(curr.position);
     self._objectControls.setScale(curr.scale * settings.now.radiusToFit);
     self._objectControls.setOrientation(curr.orientation);
-    this.dispatchEvent({type: 'transform'});
+    this.dispatchEvent({ type: 'transform' });
     self._needRender = true;
   }
 };
@@ -3433,9 +3742,9 @@ Miew.prototype._updateView = function() {
  * @param {number} y - translation value (Ang) along model's Y axis
  * @param {number} z - translation value (Ang) along model's Z axis
  */
-Miew.prototype.translate = function(x, y, z) {
+Miew.prototype.translate = function (x, y, z) {
   this._objectControls.translatePivot(x, y, z);
-  this.dispatchEvent({type: 'transform'});
+  this.dispatchEvent({ type: 'transform' });
   this._needRender = true;
 };
 
@@ -3445,9 +3754,9 @@ Miew.prototype.translate = function(x, y, z) {
  * @param {number} y - rotation angle around Y axis in radians
  * @param {number} z - rotation angle around Z axis in radians
  */
-Miew.prototype.rotate = function(x, y, z) {
+Miew.prototype.rotate = function (x, y, z) {
   this._objectControls.rotate(new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z, 'XYZ')));
-  this.dispatchEvent({type: 'transform'});
+  this.dispatchEvent({ type: 'transform' });
   this._needRender = true;
 };
 
@@ -3455,12 +3764,12 @@ Miew.prototype.rotate = function(x, y, z) {
  * Scale object by factor
  * @param {number} factor - scale multiplier, should greater than zero
  */
-Miew.prototype.scale = function(factor) {
+Miew.prototype.scale = function (factor) {
   if (factor <= 0) {
     throw new RangeError('Scale should be greater than zero');
   }
   this._objectControls.scale(factor);
-  this.dispatchEvent({type: 'transform'});
+  this.dispatchEvent({ type: 'transform' });
   this._needRender = true;
 };
 
@@ -3470,7 +3779,7 @@ Miew.prototype.scale = function(factor) {
    * @param {number} y - vertical panning
    * @deprecated  Move object instead of panning the camera
    */
-Miew.prototype.pan = function(x, y) {
+Miew.prototype.pan = function (x, y) {
   this._gfx.camera.translateX(x);
   this._gfx.camera.translateY(y);
   this._needRender = true;
@@ -3482,8 +3791,8 @@ Miew.prototype.pan = function(x, y) {
  * @param {number} radius - distance
  * @returns {Selector} selector describing result group of atoms
  */
-Miew.prototype.within = function(selector, radius) {
-  var visual = this._getComplexVisual();
+Miew.prototype.within = function (selector, radius) {
+  const visual = this._getComplexVisual();
   if (!visual) {
     return selectors.None();
   }
@@ -3492,7 +3801,7 @@ Miew.prototype.within = function(selector, radius) {
     selector = selectors.parse(selector);
   }
 
-  var res = visual.within(selector, radius);
+  const res = visual.within(selector, radius);
   if (res) {
     visual.rebuildSelectionGeometry();
     this._needRender = true;
@@ -3505,18 +3814,18 @@ Miew.prototype.within = function(selector, radius) {
  * @param {string} fullAtomName - full atom name, like A.38.CG
  * @returns {Object} {x, y} or false if atom not found
  */
-Miew.prototype.projected = function(fullAtomName, complexName) {
-  var visual = this._getComplexVisual(complexName);
+Miew.prototype.projected = function (fullAtomName, complexName) {
+  const visual = this._getComplexVisual(complexName);
   if (!visual) {
     return false;
   }
 
-  var atom = visual.getComplex().getAtomByFullname(fullAtomName);
+  const atom = visual.getComplex().getAtomByFullname(fullAtomName);
   if (atom === null) {
     return false;
   }
 
-  var pos = atom._position.clone();
+  const pos = atom._position.clone();
   // we consider atom position to be affected only by common complex transform
   // ignoring any transformations that may add during editing
   this._gfx.pivot.updateMatrixWorldRecursive();
@@ -3526,7 +3835,7 @@ Miew.prototype.projected = function(fullAtomName, complexName) {
 
   return {
     x: (pos.x + 1.0) * 0.5 * this._gfx.width,
-    y: (1.0 - pos.y) * 0.5 * this._gfx.height
+    y: (1.0 - pos.y) * 0.5 * this._gfx.height,
   };
 };
 
@@ -3540,7 +3849,7 @@ Miew.prototype.projected = function(fullAtomName, complexName) {
  *
  * @param {string=} complexName - complex name
  */
-Miew.prototype.dssp = function(complexName) {
+Miew.prototype.dssp = function (complexName) {
   const visual = this._getComplexVisual(complexName);
   if (!visual) {
     return;
@@ -3555,261 +3864,7 @@ Miew.prototype.dssp = function(complexName) {
   });
 };
 
-const rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
-const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
-const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
-
-function resolveSourceShortcut(source, opts) {
-  if (!_.isString(source)) {
-    return source;
-  }
-
-  // e.g. "mmtf:1CRN"
-  const matchesPdbId = rePdbId.exec(source);
-  if (matchesPdbId) {
-    let [, format = 'pdb', id] = matchesPdbId;
-
-    format = format.toLowerCase();
-    id = id.toUpperCase();
-
-    switch (format) {
-    case 'pdb':
-      source = `http://files.rcsb.org/download/${id}.pdb`;
-      break;
-    case 'cif':
-      source = `http://files.rcsb.org/download/${id}.cif`;
-      break;
-    case 'mmtf':
-      source = `http://mmtf.rcsb.org/v1.0/full/${id}`;
-      break;
-    case 'ccp4':
-      source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
-      break;
-    default:
-      throw new Error('Unexpected data format shortcut');
-    }
-
-    opts.fileType = format;
-    opts.fileName = `${id}.${format}`;
-    opts.sourceType = 'url';
-    return source;
-  }
-
-  // e.g. "pc:aspirin"
-  const matchesPubchem = rePubchem.exec(source);
-  if (matchesPubchem) {
-    let compound = matchesPubchem[1].toLowerCase();
-    source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
-    opts.fileType = 'pubchem';
-    opts.fileName = `${compound}.json`;
-    opts.sourceType = 'url';
-    return source;
-  }
-
-  // otherwise is should be an URL
-  if (opts.sourceType === 'url' || opts.sourceType === undefined) {
-    opts.sourceType = 'url';
-
-    // e.g. "./data/1CRN.pdb"
-    if (!reUrlScheme.test(source)) {
-      source = utils.resolveURL(source);
-    }
-  }
-
-  return source;
-}
-
-function updateBinaryMode(opts) {
-  let binary = opts.binary;
-
-  // detect by format
-  if (opts.fileType !== undefined) {
-    const TheParser = _.head(io.parsers.find({format: opts.fileType}));
-    if (TheParser) {
-      binary = TheParser.binary || false;
-    } else {
-      throw new Error('Could not find suitable parser for this format');
-    }
-  }
-
-  // detect by file extension
-  if (binary === undefined && opts.fileExt !== undefined) {
-    const TheParser = _.head(io.parsers.find({ext: opts.fileExt}));
-    if (TheParser) {
-      binary = TheParser.binary || false;
-    }
-  }
-
-  // temporary workaround for animation
-  if (opts.fileExt !== undefined && opts.fileExt.toLowerCase() === '.man') {
-    opts.binary = true;
-    opts.animation = true; // who cares?
-  }
-
-  // update if detected
-  if (binary !== undefined) {
-    if (opts.binary !== undefined && opts.binary !== binary) {
-      opts.context.logger.warn('Overriding incorrect binary mode');
-    }
-  }
-
-  opts.binary = binary || false;
-}
-
-function _fetchData(source, opts, job) {
-  return new Promise(function(resolve) {
-    if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
-    }
-
-    // allow for source shortcuts
-    source = resolveSourceShortcut(source, opts);
-
-    // detect a proper loader
-    const TheLoader = _.head(io.loaders.find({type: opts.sourceType, source}));
-    if (!TheLoader) {
-      throw new Error('Could not find suitable loader for this source');
-    }
-
-    // split file name
-    const fileName = opts.fileName || TheLoader.extractName(source);
-    if (fileName) {
-      const [name, fileExt] = utils.splitFileName(fileName);
-      _.defaults(opts, {name, fileExt, fileName});
-    }
-
-    // should it be text or binary?
-    updateBinaryMode(opts);
-
-    // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
-    // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
-    // all hacks and everybody's happy.
-    var newOptions = _.get(opts, 'preset.expression');
-    if (!_.isUndefined(newOptions)) {
-      newOptions = JSON.parse(newOptions);
-      if (newOptions && newOptions.settings) {
-        var keys = ['singleUnit', 'draft.waterBondingHack'];
-        for (var keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
-          var key = keys[keyIndex];
-          var value = _.get(newOptions.settings, key);
-          if (!_.isUndefined(value)) {
-            settings.set(key, value);
-          }
-        }
-      }
-    }
-
-    // create a loader
-    const loader = new TheLoader(source, opts);
-    loader.context = opts.context;
-    job.addEventListener('cancel', () => loader.abort());
-
-    loader.addEventListener('progress', (event) => {
-      if (event.lengthComputable && event.total > 0) {
-        reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
-      } else {
-        reportProgress(loader.logger, 'Fetching');
-      }
-    });
-
-    console.time('fetch');
-    const promise = loader.load()
-      .then((data) => {
-        console.timeEnd('fetch');
-        opts.context.logger.info('Fetching finished');
-        job.notify({type: 'fetchingFinished', data});
-        return data;
-      })
-      .catch((error) => {
-        console.timeEnd('fetch');
-        opts.context.logger.debug(error.message);
-        if (error.stack) {
-          opts.context.logger.debug(error.stack);
-        }
-        opts.context.logger.error('Fetching failed');
-        job.notify({type: 'fetchingFinished', error});
-        throw error;
-      });
-    resolve(promise);
-  });
-}
-
-function _convertData(data, opts, job) {
-  return new Promise(function(resolve, reject) {
-    if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
-    }
-    job.notify({type: 'convert'});
-
-    if (opts.mdFile) {
-      var byteNumbers = new Array(data.length);
-      for (var i = 0; i < data.length; i++) {
-        byteNumbers[i] = data.charCodeAt(i);
-      }
-      var bytes = new Uint8Array(byteNumbers);
-      var blob = new File([bytes], opts.fileName);
-      console.time('convert');
-      Miew.prototype.srvTopologyConvert(blob, opts.mdFile, function(success, newData, message) {
-        console.timeEnd('convert');
-        if (success) {
-          opts.converted = true;
-          opts.amberFileName = opts.fileName;
-          opts.convertedFile = new File([bytes], opts.fileName);
-          opts.fileName = null;
-          opts.fileType = 'pdb';
-          job.notify({type: 'convertingFinished'});
-          resolve(newData);
-        } else {
-          opts.converted = false;
-          logger.error(message);
-          opts.error = message;
-          job.notify({type: 'convertingFinished', error: message});
-          reject(new Error(message));
-        }
-      });
-    } else {
-      opts.converted = true;
-      resolve(data);
-    }
-  });
-}
-
-function _parseData(data, opts, job) {
-  if (job.shouldCancel()) {
-    return Promise.reject(new Error('Operation cancelled'));
-  }
-  job.notify({type: 'parse'});
-
-  const TheParser = _.head(io.parsers.find({format: opts.fileType, ext: opts.fileExt, data}));
-  if (!TheParser) {
-    return Promise.reject(new Error('Could not find suitable parser'));
-  }
-
-  const parser = new TheParser(data, opts);
-  parser.context = opts.context;
-  job.addEventListener('cancel', () => parser.abort());
-
-  console.time('parse');
-  return parser.parse()
-    .then((dataSet) => {
-      console.timeEnd('parse');
-      job.notify({type: 'parsingFinished', data: dataSet});
-      return dataSet;
-    })
-    .catch((error) => {
-      console.timeEnd('parse');
-      opts.error = error;
-      opts.context.logger.debug(error.message);
-      if (error.stack) {
-        opts.context.logger.debug(error.stack);
-      }
-      opts.context.logger.error('Parsing failed');
-      job.notify({type: 'parsingFinished', error});
-      throw error;
-    });
-}
-
-Miew.prototype.exportCML = function() {
+Miew.prototype.exportCML = function () {
   const self = this;
 
   function extractRotation(m) {
@@ -3827,7 +3882,7 @@ Miew.prototype.exportCML = function() {
   }
 
   function updateCMLData(complex) {
-    const root = self._gfx.root;
+    const { root } = self._gfx;
     const mat = extractRotation(root.matrixWorld);
     const v4 = new THREE.Vector4(0, 0, 0, 0);
     const vCenter = new THREE.Vector4(0, 0, 0, 0);
@@ -3835,7 +3890,7 @@ Miew.prototype.exportCML = function() {
     let ap = null;
 
     // update atoms in cml
-    complex.forEachAtom(function(atom) {
+    complex.forEachAtom((atom) => {
       if (atom.xmlNodeRef && atom.xmlNodeRef.xmlNode) {
         xml = atom.xmlNodeRef.xmlNode;
         ap = atom.getPosition();
@@ -3849,7 +3904,7 @@ Miew.prototype.exportCML = function() {
       }
     });
     // update stereo groups in cml
-    complex.forEachSGroup(function(sGroup) {
+    complex.forEachSGroup((sGroup) => {
       if (sGroup.xmlNodeRef && sGroup.xmlNodeRef.xmlNode) {
         xml = sGroup.xmlNodeRef.xmlNode;
         ap = sGroup.getPosition();
@@ -3891,37 +3946,34 @@ Miew.prototype.exportCML = function() {
  *
  * @see http://pdb101.rcsb.org/motm/motm-about
  */
-Miew.prototype.motm = function() {
+Miew.prototype.motm = function () {
   settings.set('theme', 'light');
   settings.set({
     fogColorEnable: true,
     fogColor: 0x000000,
-    outline: {on:true, threshold: 0.01},
-    bg: {color: 0xffffff},
+    outline: { on: true, threshold: 0.01 },
+    bg: { color: 0xffffff },
   });
 
   this._forEachComplexVisual((visual) => {
-    var rep = [];
-    var complex = visual.getComplex();
-    var palette = palettes.get(settings.now.palette);
+    const rep = [];
+    const complex = visual.getComplex();
+    const palette = palettes.get(settings.now.palette);
     for (let i = 0; i < complex.getChainCount(); i++) {
-      var curChainName = complex._chains[i]._name;
-      var curChainColor = palette.getChainColor(curChainName);
+      const curChainName = complex._chains[i]._name;
+      const curChainColor = palette.getChainColor(curChainName);
       rep[i] = {
-        selector: 'chain ' + curChainName,
+        selector: `chain ${curChainName}`,
         mode: 'VW',
-        colorer: ['CB', {color: curChainColor, factor: 0.9}],
-        material: 'FL'
+        colorer: ['CB', { color: curChainColor, factor: 0.9 }],
+        material: 'FL',
       };
     }
     visual.resetReps(rep);
   });
 };
 
-////////////////////////////////////////////////////////////////////////////
-// Additional exports
-
-Miew.prototype.VERSION = typeof PACKAGE_VERSION !== 'undefined' && PACKAGE_VERSION || '0.0.0-dev';
+Miew.prototype.VERSION = (typeof PACKAGE_VERSION !== 'undefined' && PACKAGE_VERSION) || '0.0.0-dev';
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 _.assign(Miew, /** @lends Miew */ {
@@ -3930,18 +3982,18 @@ _.assign(Miew, /** @lends Miew */ {
   registeredPlugins: [],
 
   // export namespaces // TODO: WIP: refactoring external interface
-  chem: chem,
-  io: io,
-  modes: modes,
-  colorers: colorers,
-  materials: materials,
-  palettes: palettes,
-  options: options,
-  settings: settings,
-  utils: utils,
+  chem,
+  io,
+  modes,
+  colorers,
+  materials,
+  palettes,
+  options,
+  settings,
+  utils,
   gfx: {
-    Representation: Representation,
-    fbxExport: fbxExport,
+    Representation,
+    fbxExport,
   },
 
   /**

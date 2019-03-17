@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 
 /**
@@ -39,7 +37,7 @@ class Remark290 {
         this.matrices[this.matrices.length] = matrix;
       }
 
-      const elements = matrix.elements;
+      const { elements } = matrix;
       elements[matrixRow] = parseFloat(matrixData[1]);
       elements[matrixRow + 4] = parseFloat(matrixData[2]);
       elements[matrixRow + 8] = parseFloat(matrixData[3]);
@@ -51,4 +49,3 @@ class Remark290 {
 Remark290.prototype.id = 290;
 
 export default Remark290;
-

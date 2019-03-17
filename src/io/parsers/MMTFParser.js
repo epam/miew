@@ -1,24 +1,23 @@
-
-
-import Parser from './Parser';
-import chem from '../../chem';
 import * as THREE from 'three';
 import _ from 'lodash';
+import Parser from './Parser';
+import chem from '../../chem';
 import MMTF from '../../../vendor/js/mmtf';
 import StructuralElement from '../../chem/StructuralElement';
 
-const
-  Complex = chem.Complex,
-  Chain = chem.Chain,
-  Atom = chem.Atom,
-  AtomName = chem.AtomName,
-  Element = chem.Element,
-  Helix = chem.Helix,
-  Sheet = chem.Sheet,
-  Strand = chem.Strand,
-  Bond = chem.Bond,
-  Assembly = chem.Assembly,
-  Molecule = chem.Molecule;
+const {
+  Complex,
+  Chain,
+  Atom,
+  AtomName,
+  Element,
+  Helix,
+  Sheet,
+  Strand,
+  Bond,
+  Assembly,
+  Molecule,
+} = chem;
 
 class ArrayComparator {
   constructor(original) {
@@ -37,7 +36,8 @@ class ArrayComparator {
       return false;
     }
 
-    let sum = 0, i;
+    let sum = 0;
+    let i;
     for (i = 0; i < len; ++i) {
       sum += candidate[i];
     }
@@ -65,14 +65,14 @@ const StructuralElementType = StructuralElement.Type;
 
 // see https://github.com/rcsb/mmtf-javascript/blob/master/src/mmtf-traverse.js
 const secStructToType = [
-  StructuralElementType.HELIX_PI,    // 0
-  StructuralElementType.BEND,        // 1
+  StructuralElementType.HELIX_PI, // 0
+  StructuralElementType.BEND, // 1
   StructuralElementType.HELIX_ALPHA, // 2
-  StructuralElementType.STRAND,      // 3
-  StructuralElementType.HELIX_310,   // 4
-  StructuralElementType.BRIDGE,      // 5
-  StructuralElementType.TURN,        // 6
-  StructuralElementType.COIL,        // 7
+  StructuralElementType.STRAND, // 3
+  StructuralElementType.HELIX_310, // 4
+  StructuralElementType.BRIDGE, // 5
+  StructuralElementType.TURN, // 6
+  StructuralElementType.COIL, // 7
 ];
 
 function getFirstByte(buf) {
@@ -85,9 +85,6 @@ class MMTFParser extends Parser {
     super(data, options);
     this._options.fileType = 'mmtf';
   }
-
-  ////////////////////////////////////////////////////////////////////////////
-  // Class methods
 
   /** @deprecated */
   static canParse(data, options) {
@@ -111,7 +108,7 @@ class MMTFParser extends Parser {
       return;
     }
 
-    let chain = new Chain(this._complex, chainData.chainName);
+    const chain = new Chain(this._complex, chainData.chainName);
     this._complex._chains[chainData.chainIndex] = chain;
     chain._index = chainData.chainIndex;
   }
@@ -142,7 +139,7 @@ class MMTFParser extends Parser {
     }
 
     const altLoc = !atomData.altLoc.charCodeAt(0) ? '' : atomData.altLoc;
-    let atom = new Atom(
+    const atom = new Atom(
       atomData.groupIndex, // we store residue index here to replace it later with actual reference
       new AtomName(atomData.atomName),
       Element.getByName(atomData.element.toUpperCase()),
@@ -153,7 +150,7 @@ class MMTFParser extends Parser {
       altLoc,
       atomData.occupancy,
       atomData.bFactor,
-      atomData.formalCharge
+      atomData.formalCharge,
     );
 
     this._complex._atoms[atomData.atomIndex] = atom;
@@ -170,7 +167,7 @@ class MMTFParser extends Parser {
     const left = Math.min(bondData.atomIndex1, bondData.atomIndex2);
     this._complex.addBond(
       this._complex._atoms[left], this._complex._atoms[right],
-      bondData.bondOrder, Bond.BondType.UNKNOWN, true
+      bondData.bondOrder, Bond.BondType.UNKNOWN, true,
     );
   }
 
@@ -193,25 +190,26 @@ class MMTFParser extends Parser {
 
       let struct = null;
       switch (this._ssType) {
-      case -1: // undefined
-      case 7:  // coil
-        break;
-      case 0:  // pi helix
-      case 2:  // alpha helix
-      case 4:  // 3-10 helix
-        struct = new Helix(helixClasses[this._ssType], residue, residue, 0, '', '', 0);
-        complex._helices.push(struct);
-        break;
-      case 3:  // extended
-        var sheet = new Sheet('', 0);
-        complex._sheets.push(sheet);
-        struct = new Strand(sheet, residue, residue, 0, null, null);
-        break;
-      default:
-        if (type !== undefined) {
-          struct = new StructuralElement(type, residue, residue);
+        case -1: // undefined
+        case 7: // coil
+          break;
+        case 0: // pi helix
+        case 2: // alpha helix
+        case 4: // 3-10 helix
+          struct = new Helix(helixClasses[this._ssType], residue, residue, 0, '', '', 0);
+          complex._helices.push(struct);
+          break;
+        case 3: { // extended
+          const sheet = new Sheet('', 0);
+          complex._sheets.push(sheet);
+          struct = new Strand(sheet, residue, residue, 0, null, null);
+          break;
         }
-        break;
+        default:
+          if (type !== undefined) {
+            struct = new StructuralElement(type, residue, residue);
+          }
+          break;
       }
 
       this._ssStruct = struct;
@@ -253,7 +251,7 @@ class MMTFParser extends Parser {
     const self = this;
 
     // get metadata
-    const metadata = this._complex.metadata;
+    const { metadata } = this._complex;
     metadata.id = mmtfData.structureId;
     metadata.title = [];
     metadata.title[0] = mmtfData.title;
@@ -262,21 +260,21 @@ class MMTFParser extends Parser {
 
     // create event callback functions
     const eventCallbacks = {
-      onModel: function(modelData) {
+      onModel(modelData) {
         self._onModel(modelData);
       },
-      onChain: function(chainData) {
+      onChain(chainData) {
         self._onChain(chainData);
       },
-      onGroup: function(groupData) {
+      onGroup(groupData) {
         self._onGroup(groupData);
       },
-      onAtom: function(atomData) {
+      onAtom(atomData) {
         self._onAtom(atomData);
       },
-      onBond: function(bondData) {
+      onBond(bondData) {
         self._onBond(bondData);
-      }
+      },
     };
 
     // temporary variables used during traversal to track secondary structures
@@ -322,9 +320,11 @@ class MMTFParser extends Parser {
 
   // NOTE: This function relies on original chain indices, so it must be called before any magic happens to chains.
   _parseAssemblyInfo(mmtfData) {
-    let i, j, k;
+    let i;
+    let j;
+    let k;
     const assemblies = [];
-    const logger = this.logger;
+    const { logger } = this;
 
     for (i = 0; i < mmtfData.bioAssemblyList.length; ++i) {
       const baInfo = mmtfData.bioAssemblyList[i];
@@ -423,7 +423,8 @@ class MMTFParser extends Parser {
 
   // joins chains with the same name into single chain
   _joinSynonymousChains() {
-    let i, j;
+    let i;
+    let j;
 
     const primaryChainsArray = [];
     const primaryChainsHash = {};
@@ -471,7 +472,7 @@ class MMTFParser extends Parser {
       needAutoBonding: false,
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
-      serialAtomMap: this._serialAtomMap
+      serialAtomMap: this._serialAtomMap,
     });
 
     return this._complex;

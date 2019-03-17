@@ -3,10 +3,6 @@ import Mode from './Mode';
 class VanDerWaalsMode extends Mode {
   static id = 'VW';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   calcAtomRadius(atom) {
     return atom.element.radius;
   }

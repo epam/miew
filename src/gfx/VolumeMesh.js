@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-//import utils from '../utils';
+// import utils from '../utils';
 import VolumeMaterial from './shaders/VolumeMaterial';
 import settings from '../settings';
 
@@ -7,38 +7,38 @@ class VolumeMesh extends THREE.Mesh {
   volumeInfo = {}; // data for noise filter
 
   constructor() {
-    let geo = new THREE.BufferGeometry();
+    const geo = new THREE.BufferGeometry();
     super(geo);
     this.clipPlane = new THREE.Plane();
-    let size = new THREE.Vector3(0.5, 0.5, 0.5);
+    const size = new THREE.Vector3(0.5, 0.5, 0.5);
     this.size = size;
 
     this.cullFlag = [
       true, true, true, true,
       true, true, true, true,
-      false, false, false, false, false, false
+      false, false, false, false, false, false,
     ];
 
     this.faces = [
-      {indices: [], norm: new THREE.Vector3(0, 0, -1)},
-      {indices: [], norm: new THREE.Vector3(0, 0, 1)},
-      {indices: [], norm: new THREE.Vector3(0, -1, 0)},
-      {indices: [], norm: new THREE.Vector3(0, 1, 0)},
-      {indices: [], norm: new THREE.Vector3(-1, 0, 0)},
-      {indices: [], norm: new THREE.Vector3(1, 0, 0)},
-      {indices: [], norm: new THREE.Vector3(0, 0, 0)},
+      { indices: [], norm: new THREE.Vector3(0, 0, -1) },
+      { indices: [], norm: new THREE.Vector3(0, 0, 1) },
+      { indices: [], norm: new THREE.Vector3(0, -1, 0) },
+      { indices: [], norm: new THREE.Vector3(0, 1, 0) },
+      { indices: [], norm: new THREE.Vector3(-1, 0, 0) },
+      { indices: [], norm: new THREE.Vector3(1, 0, 0) },
+      { indices: [], norm: new THREE.Vector3(0, 0, 0) },
     ];
 
     this.vertices = [
       new THREE.Vector3(-size.x, -size.y, -size.z),
-      new THREE.Vector3(-size.x,  size.y, -size.z),
+      new THREE.Vector3(-size.x, size.y, -size.z),
       new THREE.Vector3(size.x, -size.y, -size.z),
-      new THREE.Vector3(size.x,  size.y, -size.z),
-      new THREE.Vector3(-size.x, -size.y,  size.z),
-      new THREE.Vector3(-size.x,  size.y,  size.z),
-      new THREE.Vector3(size.x, -size.y,  size.z),
-      new THREE.Vector3(size.x,  size.y,  size.z),
-      new THREE.Vector3(0.0, 0.0, 0.0),    // Placeholder for section
+      new THREE.Vector3(size.x, size.y, -size.z),
+      new THREE.Vector3(-size.x, -size.y, size.z),
+      new THREE.Vector3(-size.x, size.y, size.z),
+      new THREE.Vector3(size.x, -size.y, size.z),
+      new THREE.Vector3(size.x, size.y, size.z),
+      new THREE.Vector3(0.0, 0.0, 0.0), // Placeholder for section
       new THREE.Vector3(0.0, 0.0, 0.0),
       new THREE.Vector3(0.0, 0.0, 0.0),
       new THREE.Vector3(0.0, 0.0, 0.0),
@@ -60,7 +60,7 @@ class VolumeMesh extends THREE.Mesh {
     [-1, -1, 1, 2, 6, 8],
     [1, -1, 1, 2, 7, 9],
     [1, 1, 1, 3, 7, 10],
-    [-1, 1, 1, 3, 6, 11]
+    [-1, 1, 1, 3, 6, 11],
   ];
 
   static _edges = [
@@ -76,10 +76,10 @@ class VolumeMesh extends THREE.Mesh {
     [0, 4, -1, -1, 0],
     [1, 5, 1, -1, 0],
     [2, 6, -1, 1, 0],
-    [3, 7, 1, 1, 0]
+    [3, 7, 1, 1, 0],
   ];
 
-  static _edgeIntersections = (function() {
+  static _edgeIntersections = (function () {
     const edgeIntersections = [];
     for (let j = 0; j < 12; ++j) {
       edgeIntersections.push(new THREE.Vector3());
@@ -102,7 +102,7 @@ class VolumeMesh extends THREE.Mesh {
     const D = this.clipPlane.constant;
 
     const vert = this.vertices;
-    const size = this.size;
+    const { size } = this;
 
     const cornerMark = [0, 0, 0, 0, 0, 0, 0, 0];
     const edgeMark = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
@@ -173,7 +173,7 @@ class VolumeMesh extends THREE.Mesh {
 
     const face = {
       indices: [],
-      norm: norm.clone().negate()
+      norm: norm.clone().negate(),
     };
 
     let nextVertex = 8;
@@ -202,8 +202,8 @@ class VolumeMesh extends THREE.Mesh {
 
     this.faces[6] = face;
 
-    let diff = new THREE.Vector3();
-    let coplanarPoint = new THREE.Vector3();
+    const diff = new THREE.Vector3();
+    const coplanarPoint = new THREE.Vector3();
     this.clipPlane.coplanarPoint(coplanarPoint);
     for (i = 0; i < vert.length; ++i) {
       this.cullFlag[i] = false;
@@ -240,11 +240,12 @@ class VolumeMesh extends THREE.Mesh {
   }
 
   _sortIndices(face, right) {
-    let i, j;
+    let i;
+    let j;
     const vert = this.vertices;
     const angle = [];
 
-    let dir = new THREE.Vector3();
+    const dir = new THREE.Vector3();
     for (i = 1; i < face.indices.length; ++i) {
       dir.subVectors(vert[face.indices[i]], vert[face.indices[0]]);
       dir.normalize();
@@ -277,20 +278,22 @@ class VolumeMesh extends THREE.Mesh {
     // 3. Sort vertices using Graham-like method
     // 4. Create indices
 
-    let i, faceIdx, face;
+    let i;
+    let faceIdx;
+    let face;
     const vert = this.vertices;
-    const size = this.size;
+    const { size } = this;
 
-    this._collectVertices(this.faces[0], function(vertex) { return vertex.z === -size.z; });
-    this._collectVertices(this.faces[1], function(vertex) { return vertex.z === size.z; });
-    this._collectVertices(this.faces[2], function(vertex) { return vertex.y === -size.y; });
-    this._collectVertices(this.faces[3], function(vertex) { return vertex.y === size.y; });
-    this._collectVertices(this.faces[4], function(vertex) { return vertex.x === -size.x; });
-    this._collectVertices(this.faces[5], function(vertex) { return vertex.x === size.x; });
+    this._collectVertices(this.faces[0], vertex => vertex.z === -size.z);
+    this._collectVertices(this.faces[1], vertex => vertex.z === size.z);
+    this._collectVertices(this.faces[2], vertex => vertex.y === -size.y);
+    this._collectVertices(this.faces[3], vertex => vertex.y === size.y);
+    this._collectVertices(this.faces[4], vertex => vertex.x === -size.x);
+    this._collectVertices(this.faces[5], vertex => vertex.x === size.x);
 
-    let vCenter = new THREE.Vector3();
-    let vRight = new THREE.Vector3();
-    let vDir = new THREE.Vector3();
+    const vCenter = new THREE.Vector3();
+    const vRight = new THREE.Vector3();
+    const vDir = new THREE.Vector3();
 
     for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
       face = this.faces[faceIdx];
@@ -317,7 +320,7 @@ class VolumeMesh extends THREE.Mesh {
           rightProj[0] = rightProj[i];
           rightProj[i] = t;
 
-          t = face.indices[0];
+          [t] = face.indices;
           face.indices[0] = face.indices[i];
           face.indices[i] = t;
         }
@@ -334,11 +337,11 @@ class VolumeMesh extends THREE.Mesh {
       }
     }
     let offset = 0;
-    let indices = new Uint16Array(numIndices);
+    const indices = new Uint16Array(numIndices);
     for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
       face = this.faces[faceIdx];
       for (i = 0; i < face.indices.length - 2; ++i) {
-        indices[offset + 0] = face.indices[0];
+        indices[offset] = face.indices[0]; // eslint-disable-line prefer-destructuring
         indices[offset + 1] = face.indices[i + 1];
         indices[offset + 2] = face.indices[i + 2];
         offset += 3;
@@ -349,7 +352,7 @@ class VolumeMesh extends THREE.Mesh {
   }
 
   setDataSource(dataSource) {
-    let vm = new VolumeMaterial.VolumeMaterial();
+    const vm = new VolumeMaterial.VolumeMaterial();
     const dim = dataSource.getDimensions();
     const stride = dataSource.getTiledTextureStride();
     const texture = dataSource.buildTiledTexture();
@@ -358,12 +361,13 @@ class VolumeMesh extends THREE.Mesh {
     vm.uniforms.tileTex.value = texture;
     vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
     vm.uniforms.tileStride.value.set(stride[0], stride[1]);
-    vm.uniforms.boxSize.value.set(bbox.getSize().x, bbox.getSize().y, bbox.getSize().z)
+    vm.uniforms.boxSize.value.set(bbox.getSize().x, bbox.getSize().y, bbox.getSize().z);
     Object.assign(this.volumeInfo, dataSource.getVolumeInfo());
     vm.uniforms.deltaXY.value = this.volumeInfo.delta.XY;
     vm.uniforms.deltaXZ.value = this.volumeInfo.delta.XZ;
     vm.uniforms.deltaYZ.value = this.volumeInfo.delta.YZ;
     vm.uniforms.boxAngles.value.set(this.volumeInfo.angles.x, this.volumeInfo.angles.y, this.volumeInfo.angles.z);
+
     this.material = vm;
 
     bbox.getSize(this.scale);
@@ -371,10 +375,12 @@ class VolumeMesh extends THREE.Mesh {
   }
 
   _updateIsoLevel() {
-    const kSigma = settings.now.modes.VD.kSigma;
+    const { kSigma, kSigmaMed, kSigmaMax } = settings.now.modes.VD;
     const volInfo = this.volumeInfo;
-    this.material.uniforms._isoLevel0.value = (volInfo.dmean + kSigma * volInfo.sd - volInfo.dmin) /
-      (volInfo.dmax - volInfo.dmin);
+    const mean = volInfo.dmean - volInfo.dmin;
+    const span = volInfo.dmax - volInfo.dmin;
+    const level = k => (mean + k * volInfo.sd) / span;
+    this.material.uniforms._isoLevel0.value.set(level(kSigma), level(kSigmaMed), level(kSigmaMax));
   }
 
   static _nearClipPlaneOffset = 0.2;
@@ -390,7 +396,6 @@ class VolumeMesh extends THREE.Mesh {
   static _clipPlane = new THREE.Plane();
 
   rebuild(camera) {
-
     const nearClipPlaneOffset = VolumeMesh._nearClipPlaneOffset;
     const pos = VolumeMesh._pos;
     const norm = VolumeMesh._norm;
@@ -411,7 +416,7 @@ class VolumeMesh extends THREE.Mesh {
     pos.applyMatrix4(matrixWorldToLocal);
 
     // transform norm to local CS
-    norm4D.set(norm.x, norm.y, norm.z, 0.0);  // NOTE: use homogeneous norm for proper transformation
+    norm4D.set(norm.x, norm.y, norm.z, 0.0); // NOTE: use homogeneous norm for proper transformation
     norm4D.applyMatrix4(matrixWorldToLocal);
     norm.copy(norm4D);
     norm.normalize();
@@ -428,4 +433,3 @@ class VolumeMesh extends THREE.Mesh {
 
 
 export default VolumeMesh;
-

@@ -1,8 +1,6 @@
-
-
 import utils from '../utils';
 
-const now = utils.Timer.now;
+const { now } = utils.Timer;
 
 function createElement(tag, id, css) {
   const element = document.createElement(tag);

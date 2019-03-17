@@ -11,12 +11,12 @@ class AromaticProcessor extends RCGroup {
       return;
     }
 
-    complex.forEachComponent(function(component) {
+    complex.forEachComponent((component) => {
       const atomsIdc = [];
       let chunksCount = 0;
       const cycles = [];
       let cycleIdx = 0;
-      component.forEachCycle(function(cycle) {
+      component.forEachCycle((cycle) => {
         const cycAtoms = cycle.atoms;
         let perCycle = 0;
         for (let i = 0, n = cycAtoms.length; i < n; ++i) {
@@ -31,10 +31,10 @@ class AromaticProcessor extends RCGroup {
       });
 
       const atomsGroup = new AromaticGroup(geoParams, {
-        cycles: cycles,
-        atoms: atoms,
+        cycles,
+        atoms,
         chunks: atomsIdc,
-        parent: complex
+        parent: complex,
       }, colorer, mode, transforms, polyComplexity, material);
       atomsGroup._component = component;
       self.add(atomsGroup);
@@ -43,7 +43,7 @@ class AromaticProcessor extends RCGroup {
 
   getSubset(mask, innerOnly) {
     const totalSubset = [];
-    const children = this.children;
+    const { children } = this;
     let meshIdx = 0;
     for (let i = 0, n = children.length; i < n; ++i) {
       if (children[i].getSubset) {

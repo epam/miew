@@ -1,8 +1,5 @@
 import * as THREE from 'three';
 
-//////////////////////////////////////////////////////////////////////////////
-
-
 class CollisionSphere {
   constructor(position, radius) {
     this._position = position;
@@ -12,7 +9,6 @@ class CollisionSphere {
   static _sphere = new THREE.Sphere();
 
   raycast(raycaster) {
-
     const sphere = CollisionSphere._sphere;
     sphere.set(this._position, this._radius);
 
@@ -20,16 +16,14 @@ class CollisionSphere {
     if (raycaster.ray.intersectSphere(sphere, p)) {
       return {
         distance: raycaster.ray.origin.distanceTo(p),
-        point: p
+        point: p,
       };
     }
     return null;
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////z
-
-const SphereCollisionGeo = (base) => class extends base {
+const SphereCollisionGeo = base => class extends base {
   constructor(count, ...args) {
     super(...args);
     this._objects = new Array(count);
@@ -54,7 +48,7 @@ const SphereCollisionGeo = (base) => class extends base {
 
   computeBoundingBox() {
     const objects = this._objects;
-    let boundingBox = this.boundingBox;
+    let { boundingBox } = this;
     if (boundingBox === null) {
       this.boundingBox = boundingBox = new THREE.Box3();
     }
@@ -67,7 +61,7 @@ const SphereCollisionGeo = (base) => class extends base {
   computeBoundingSphere() {
     this.computeBoundingBox();
     const objects = this._objects;
-    const boundingBox = this.boundingBox;
+    const { boundingBox } = this;
     // Build bounding sphere
     let radiusSquared = 0.0;
     const center = new THREE.Vector3();

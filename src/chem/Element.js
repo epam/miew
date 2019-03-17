@@ -17,17 +17,17 @@ class Element {
     Lead: 2,
     U2: 3,
     Wing: 4,
-    U18: 18
+    U18: 18,
     /* eslint-enable no-magic-numbers */
   };
 
   static Role = {
     /* eslint-disable no-magic-numbers */
-    N  : Element.Constants.U1,
-    CA : Element.Constants.Lead,
-    C  : Element.Constants.U2,
-    O  : Element.Constants.Wing,
-    SG : Element.Constants.U18
+    N: Element.Constants.U1,
+    CA: Element.Constants.Lead,
+    C: Element.Constants.U2,
+    O: Element.Constants.Wing,
+    SG: Element.Constants.U18,
     /* eslint-enable no-magic-numbers */
   };
 
@@ -151,19 +151,19 @@ class Element {
   static ByName = {
     // Duplicate atomic numbers (isotopes)
     /* eslint-disable no-magic-numbers */
-    'D': new Element(1, 'D', 'Deuterium', 2.014, 1.2, 0.23, [1]),
-    'T': new Element(1, 'T', 'Tritium', 3.016, 1.2, 0.23, [1]),
+    D: new Element(1, 'D', 'Deuterium', 2.014, 1.2, 0.23, [1]),
+    T: new Element(1, 'T', 'Tritium', 3.016, 1.2, 0.23, [1]),
     /* eslint-enable no-magic-numbers */
 
     // All regular elements will be added later, automatically
   };
 }
 
-(function() {
-  var byAtomicNumber = Element.ByAtomicNumber;
-  var byName = Element.ByName;
-  for (var i = 0, n = byAtomicNumber.length; i < n; ++i) {
-    var element = byAtomicNumber[i];
+(function () {
+  const byAtomicNumber = Element.ByAtomicNumber;
+  const byName = Element.ByName;
+  for (let i = 0, n = byAtomicNumber.length; i < n; ++i) {
+    const element = byAtomicNumber[i];
     if (element) {
       byName[element.name] = element;
     }
@@ -171,8 +171,8 @@ class Element {
 }());
 
 // find atom type by chemical element (or create if missing)
-Element.getByName = function(element) {
-  var type = Element.ByName[element];
+Element.getByName = function (element) {
+  let type = Element.ByName[element];
   if (!type) {
     type = Element.ByName[element] = new Element(0, element, 'Unknown', 0, 1.0, 0.01, [0]);
   }
@@ -180,4 +180,3 @@ Element.getByName = function(element) {
 };
 
 export default Element;
-

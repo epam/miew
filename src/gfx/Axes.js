@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 
 class Axes {
@@ -15,7 +13,7 @@ class Axes {
   }
 
   _update() {
-    const fov = this._targetCamera.fov;
+    const { fov } = this._targetCamera;
     const camera = this._camera;
     camera.aspect = this._targetCamera.aspect;
     camera.setMinimalFov(fov);
@@ -32,7 +30,7 @@ class Axes {
     const width = full.width * 0.25;
     const height = full.height * 0.25;
 
-    const autoClear = renderer.autoClear;
+    const { autoClear } = renderer;
     renderer.autoClear = false;
     renderer.setViewport(0.0, full.height - height, width, height); // use left bottom corner
     renderer.clear(false, true, false);
@@ -42,6 +40,3 @@ class Axes {
   }
 }
 export default Axes;
-
-
-

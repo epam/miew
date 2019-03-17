@@ -1,5 +1,6 @@
 import UberMaterial from '../shaders/UberMaterial';
-export default function(SuperClass) {
+
+export default function (SuperClass) {
   class NewObjectType extends SuperClass {
     constructor(...rest) {
       super(...rest);
@@ -11,11 +12,11 @@ export default function(SuperClass) {
       this._update();
     }
 
-    _onBeforeRender(_renderer, _scene, _camera, _geometry, _material, _group) {
+    _onBeforeRender() {
     }
 
     _update() {
-      const material = this.material;
+      const { material } = this;
       if (!material) {
         return;
       }

@@ -2,13 +2,13 @@ import * as THREE from 'three';
 import Bond from './Bond';
 import Element from './Element';
 
-var cCrossThresh = 0.1;
-var cAromaticType = Bond.BondType.AROMATIC;
-var cAromaticAtoms = [
+const cCrossThresh = 0.1;
+const cAromaticType = Bond.BondType.AROMATIC;
+const cAromaticAtoms = [
   Element.ByName.C.number,
-  Element.ByName.N.number
-  /*Element.ByName.O.number,
-    Element.ByName.S.number,*/
+  Element.ByName.N.number,
+  // Element.ByName.O.number,
+  // Element.ByName.S.number,
 ];
 
 
@@ -18,11 +18,11 @@ var cAromaticAtoms = [
    *   - If there is more than one candidates we try them in ascending order of angle values
    */
 
-var _coDirVectors = (function() {
-  var v1Tmp = new THREE.Vector3();
-  var v2Tmp = new THREE.Vector3();
-  var cp = new THREE.Vector3();
-  return function(v1, v2) {
+const _coDirVectors = (function () {
+  const v1Tmp = new THREE.Vector3();
+  const v2Tmp = new THREE.Vector3();
+  const cp = new THREE.Vector3();
+  return function (v1, v2) {
     v1Tmp.copy(v1).normalize();
     v2Tmp.copy(v2).normalize();
     cp.crossVectors(v1Tmp, v2Tmp);
@@ -35,7 +35,7 @@ var _coDirVectors = (function() {
 }());
 
 function _insertAscending(arr, val) {
-  var idx = 0;
+  let idx = 0;
   while (idx < arr.length && arr[idx] < val) {
     ++idx;
   }
@@ -47,7 +47,7 @@ function _anotherAtom(bond, currAtom) {
 }
 
 function _cosBetween(v1, v2) {
-  var theta = v1.dot(v2) / (Math.sqrt(v1.lengthSq() * v2.lengthSq()));
+  const theta = v1.dot(v2) / (Math.sqrt(v1.lengthSq() * v2.lengthSq()));
   return THREE.Math.clamp(theta, -1, 1);
 }
 
@@ -62,7 +62,7 @@ class Cycle {
   }
 
   update() {
-    const atoms = this.atoms;
+    const { atoms } = this;
     const center = new THREE.Vector3();
     const nA = atoms.length;
     for (let j = 0; j < nA; ++j) {
@@ -74,7 +74,7 @@ class Cycle {
   }
 
   forEachBond(process) {
-    const atoms = this.atoms;
+    const { atoms } = this;
     const nA = atoms.length;
     let currAtom = atoms[0];
     let nextAtom;
@@ -101,8 +101,8 @@ function _isPossibleAromatic(bond) {
   if (bond.type === cAromaticType) {
     return true;
   }
-  var rightIdx = cAromaticAtoms.indexOf(bond._right.element.number);
-  var leftIdx = cAromaticAtoms.indexOf(bond._left.element.number);
+  const rightIdx = cAromaticAtoms.indexOf(bond._right.element.number);
+  const leftIdx = cAromaticAtoms.indexOf(bond._left.element.number);
   return rightIdx !== -1 && leftIdx !== -1;
 }
 
@@ -165,11 +165,11 @@ class AromaticLoopsMarker {
     let checkAromatic = this._checkBond;
     bondMarks[prevBond._index] = true;
     checkAromatic = checkAromatic === undefined ? _isAromatic : checkAromatic;
-    currRight.forEachBond(function(newBond) {
-      if (!checkAromatic(newBond) ||
-        newBond === prevBond ||
-        bondMarks[newBond._index] ||
-        self._haveSameCycle(bondsData, prevBond, newBond)) {
+    currRight.forEachBond((newBond) => {
+      if (!checkAromatic(newBond)
+        || newBond === prevBond
+        || bondMarks[newBond._index]
+        || self._haveSameCycle(bondsData, prevBond, newBond)) {
         return;
       }
       const anotherAtom = _anotherAtom(newBond, currRight);
@@ -183,11 +183,11 @@ class AromaticLoopsMarker {
       while (idx < bondsOrder.length && bondsOrder[idx].val < val) {
         ++idx;
       }
-      bondsOrder.splice(idx, 0, {bond: newBond, val: val, dir: newDir});
+      bondsOrder.splice(idx, 0, { bond: newBond, val, dir: newDir });
     });
 
     for (let i = 0, n = bondsOrder.length; i < n; ++i) {
-      const bond = bondsOrder[i].bond;
+      const { bond } = bondsOrder[i];
       const newRight = bond._left === currRight ? bond._right : bond._left;
       if (newRight === startAtomRef) {
         ++this._currIdx;
@@ -220,9 +220,9 @@ class AromaticLoopsMarker {
     const complex = this._complex;
     const self = this;
 
-    complex.forEachComponent(function(component) {
+    complex.forEachComponent((component) => {
       self._resetCycles();
-      component.forEachBond(function(bond) {
+      component.forEachBond((bond) => {
         if (checkBond(bond)) {
           self._startCycle(bond);
         }
@@ -233,7 +233,7 @@ class AromaticLoopsMarker {
         if (!checkCycle(cycle)) {
           continue;
         }
-        let newCycle = new Cycle(cycle);
+        const newCycle = new Cycle(cycle);
         newCycle.forEachBond(_markAromatic);
         component.addCycle(newCycle);
       }
@@ -250,4 +250,3 @@ class AromaticLoopsMarker {
 }
 
 export default AromaticLoopsMarker;
-

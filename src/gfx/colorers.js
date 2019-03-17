@@ -33,30 +33,29 @@ const colorers = new EntityList([
 
 /** @deprecated */
 Object.defineProperty(colorers, 'list', {
-  get: function() {
+  get() {
     return this.all;
   },
 });
 
 /** @deprecated */
 Object.defineProperty(colorers, 'any', {
-  get: function() {
+  get() {
     return this.first;
   },
 });
 
 /** @deprecated */
 Object.defineProperty(colorers, 'descriptions', {
-  get: function() {
-    return _.map(this._list, (m) => _.pick(m.prototype, ['id', 'name']));
+  get() {
+    return _.map(this._list, m => _.pick(m.prototype, ['id', 'name']));
   },
 });
 
 /** @deprecated */
-colorers.create = function(colorer, opts) {
+colorers.create = function (colorer, opts) {
   if (!opts && colorer instanceof Array) {
-    opts = colorer[1];
-    colorer = colorer[0];
+    [colorer, opts] = colorer;
   }
   const Colorer = this.get(colorer) || this.first;
   return new Colorer(opts);

@@ -3,10 +3,6 @@ import Colorer from './Colorer';
 class MoleculeColorer extends Colorer {
   static id = 'MO';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, complex) {
     return this.getResidueColor(atom._residue, complex);
   }

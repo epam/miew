@@ -42,7 +42,7 @@ function AVHash(posRad, min, max, maxDistance) {
 
 
   /* Get cellID for cartesian x,y,z */
-  const cellID = function(x, y, z) {
+  const cellID = function (x, y, z) {
     return (((hashFunc(x, minX) * jDim) + hashFunc(y, minY)) * kDim) + hashFunc(z, minZ);
   };
 
@@ -60,7 +60,6 @@ function AVHash(posRad, min, max, maxDistance) {
     } else {
       preHash[cid].push(i);
     }
-
   }
 
   const cellOffsets = utils.allocateTyped(Uint32Array, nCells);
@@ -106,7 +105,7 @@ function AVHash(posRad, min, max, maxDistance) {
    * @param  {Float32Array} out - pre-allocated output array
    * @return {undefined}
    */
-  this.withinRadii = function(x, y, z, rExtra, out) {
+  this.withinRadii = function (x, y, z, rExtra, out) {
     let outIdx = 0;
 
     const nearI = hashFunc(x, minX);
@@ -122,22 +121,18 @@ function AVHash(posRad, min, max, maxDistance) {
     const hiK = Math.min(kDim - 1, nearK + 1);
 
     for (i = loI; i <= hiI; ++i) {
-
       const iOffset = i * jkDim;
 
       for (j = loJ; j <= hiJ; ++j) {
-
         const jOffset = j * kDim;
 
         for (let k = loK; k <= hiK; ++k) {
-
           cid = iOffset + jOffset + k;
 
           const cellStart = cellOffsets[cid];
           const cellEnd = cellStart + cellLengths[cid];
 
           for (let dataIndex = cellStart; dataIndex < cellEnd; dataIndex++) {
-
             const atomIndex = data[dataIndex];
             const baseIndex = itemSize * atomIndex;
             const dx = posRad[baseIndex] - x;
@@ -157,7 +152,6 @@ function AVHash(posRad, min, max, maxDistance) {
   };
 }
 function ContactSurface(packedArrays, boundaries, params, _indexList) {
-
   // Field generation method adapted from AstexViewer (Mike Hartshorn)
   // by Fred Ludlow.
   // Other parts based heavily on NGL (Alexander Rose) EDT Surface class
@@ -166,36 +160,43 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   // the EDT paramters are not relevant in this method).
 
   const itemSize = 4;
-  const posRad = packedArrays.posRad;
-  const colors = packedArrays.colors;
-  const atoms = packedArrays.atoms;
+  const { posRad, colors, atoms } = packedArrays;
   const nAtoms = posRad.length / itemSize;
 
-  const bbox = boundaries.bbox;
+  const { bbox } = boundaries;
 
   const min = bbox.minPosRad;
   const max = bbox.maxPosRad;
 
-  let r2;  // Atom positions, expanded radii (squared)
+  let r2; // Atom positions, expanded radii (squared)
   let maxRadius;
 
   // Parameters
-  let probeRadius, scaleFactor, probePositions;
+  let probeRadius;
+  let scaleFactor;
+  let probePositions;
 
   // Cache last value for obscured test
   let lastClip = -1;
 
   // Grid params
-  let dim, grid;
-  let volTex, weights, weightsMap = null, atomMap = null;
+  let dim;
+  let grid;
+  let volTex;
+  let weights;
+  let weightsMap = null;
+  let atomMap = null;
   let visibilitySelector = null;
 
 
   // grid indices -> xyz coords
-  let gridx, gridy, gridz;
+  let gridx;
+  let gridy;
+  let gridz;
 
   // Lookup tables:
-  let sinTable, cosTable;
+  let sinTable;
+  let cosTable;
 
   // Spatial Hash
   let hash;
@@ -210,29 +211,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
 
   let ngTorus;
 
-  function init() {
-    probeRadius = params.probeRadius;
-    scaleFactor = params.scaleFactor;
-    probePositions = params.probePositions;
-    visibilitySelector = params.visibilitySelector;
-
-    r2 = utils.allocateTyped(Float32Array, nAtoms);
-    maxRadius = 0;
-    for (let innI = 0; innI < nAtoms; ++innI) {
-      const rExt = posRad[innI * itemSize + 3] += probeRadius;
-      if (rExt > maxRadius) {
-        maxRadius = rExt;
-      }
-      r2[innI] = rExt * rExt;
-    }
-
-    initializeGrid();
-    initializeAngleTables();
-    initializeHash();
-
-    lastClip = -1;
-  }
-
   function uniformArray(TypeName, n, a) {
     const array = utils.allocateTyped(TypeName, n);
     for (let innI = 0; innI < n; ++innI) {
@@ -242,7 +220,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     return array;
   }
 
-
   function fillGridDim(a, start, step) {
     for (let innI = 0; innI < a.length; innI++) {
       a[innI] = start + (step * innI);
@@ -250,8 +227,8 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   }
 
   function initializeGrid() {
-    scaleFactor = params.scaleFactor;
-    dim = boundaries.dim;
+    ({ scaleFactor } = params);
+    ({ dim } = boundaries);
 
     ngTorus = Math.min(5, 2 + Math.floor(probeRadius * scaleFactor));
 
@@ -292,6 +269,41 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     neighbours = new Int32Array(hash.neighbourListLength);
   }
 
+  function init() {
+    ({
+      probeRadius,
+      scaleFactor,
+      probePositions,
+      visibilitySelector,
+    } = params);
+    r2 = utils.allocateTyped(Float32Array, nAtoms);
+    maxRadius = 0;
+    for (let innI = 0; innI < nAtoms; ++innI) {
+      const rExt = posRad[innI * itemSize + 3] += probeRadius;
+      if (rExt > maxRadius) {
+        maxRadius = rExt;
+      }
+      r2[innI] = rExt * rExt;
+    }
+
+    initializeGrid();
+    initializeAngleTables();
+    initializeHash();
+
+    lastClip = -1;
+  }
+
+  function singleAtomObscures(ai, innX, innY, innZ) {
+    const innCI = itemSize * ai;
+    const ra2 = r2[ai];
+    const dx = posRad[innCI] - innX;
+    const dy = posRad[innCI + 1] - innY;
+    const dz = posRad[innCI + 2] - innZ;
+    const d2 = dx * dx + dy * dy + dz * dz;
+
+    return d2 < ra2;
+  }
+
   function obscured(innX, innY, innZ, a, b) {
     // Is the point at x,y,z obscured by any of the atoms
     // specifeid by indices in neighbours. Ignore indices
@@ -305,9 +317,8 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
       ai = lastClip;
       if (ai !== a && ai !== b && singleAtomObscures(ai, innX, innY, innZ)) {
         return ai;
-      } else {
-        lastClip = -1;
       }
+      lastClip = -1;
     }
 
     let ni = 0;
@@ -325,19 +336,7 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     return -1;
   }
 
-  function singleAtomObscures(ai, innX, innY, innZ) {
-    const innCI = itemSize * ai;
-    const ra2 = r2[ai];
-    const dx = posRad[innCI] - innX;
-    const dy = posRad[innCI + 1] - innY;
-    const dz = posRad[innCI + 2] - innZ;
-    const d2 = dx * dx + dy * dy + dz * dz;
-
-    return d2 < ra2;
-  }
-
   function projectPoints() {
-
     // For each atom:
     //     Iterate over a subsection of the grid, for each point:
     //         If current value < 0.0, unvisited, set positive
@@ -394,7 +393,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
         const zOffset = dim[1] * dim[0] * iz;
 
         for (let iy = miny; iy < maxy; iy++) {
-
           const dy = gridy[iy] - ay;
           const dzy2 = dz * dz + dy * dy;
           const zyOffset = zOffset + dim[0] * iy;
@@ -444,29 +442,21 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
         }
       }
     }
-
   }
 
-  function projectTorii() {
-    for (let innI = 0; innI < nAtoms; innI++) {
-      const innIdx = itemSize * innI;
-      hash.withinRadii(
-        posRad[innIdx], posRad[innIdx + 1], posRad[innIdx + 2],
-        posRad[innIdx + 3], neighbours
-      );
-      let ia = 0;
-      let ni = neighbours[ia];
-      while (ni >= 0) {
-        if (innI < ni) {
-          projectTorus(innI, ni);
-        }
-        ni = neighbours[++ia];
-      }
+  function normalToLine(out, p) {
+    out.x = out.y = out.z = 1.0;
+    if (p.x !== 0) {
+      out.x = (p.y + p.z) / -p.x;
+    } else if (p.y !== 0) {
+      out.y = (p.x + p.z) / -p.y;
+    } else if (p.z !== 0) {
+      out.z = (p.x + p.y) / -p.z;
     }
+    return out;
   }
 
   function projectTorus(a, b) {
-
     const aIdx = itemSize * a;
     const bIdx = itemSize * b;
     const xa = posRad[aIdx];
@@ -517,7 +507,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     const ng = ngTorus;
 
     for (let innI = 0; innI < probePositions; innI++) {
-
       const cost = cosTable[innI];
       const sint = sinTable[innI];
 
@@ -526,7 +515,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
       const pz = mid.z + cost * n1.z + sint * n2.z;
 
       if (obscured(px, py, pz, a, b) === -1) {
-
         // As above, iterate over our grid...
         // px, py, pz in grid coords
         const iax = Math.floor(scaleFactor * (px - min[0]));
@@ -542,16 +530,13 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
         const maxz = Math.min(dim[2], iaz + ng + 2);
 
         for (let iz = minz; iz < maxz; iz++) {
-
           dz = pz - gridz[iz];
           const zOffset = dim[1] * dim[0] * iz;
           for (let iy = miny; iy < maxy; iy++) {
-
             dy = py - gridy[iy];
             const dzy2 = dz * dz + dy * dy;
             const zyOffset = zOffset + dim[0] * iy;
             for (let ix = minx; ix < maxx; ix++) {
-
               dx = px - gridx[ix];
               d2 = dzy2 + dx * dx;
               const idx = ix + zyOffset;
@@ -565,20 +550,24 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
         }
       }
     }
-
   }
 
-
-  function normalToLine(out, p) {
-    out.x = out.y = out.z = 1.0;
-    if (p.x !== 0) {
-      out.x = (p.y + p.z) / -p.x;
-    } else if (p.y !== 0) {
-      out.y = (p.x + p.z) / -p.y;
-    } else if (p.z !== 0) {
-      out.z = (p.x + p.y) / -p.z;
+  function projectTorii() {
+    for (let innI = 0; innI < nAtoms; innI++) {
+      const innIdx = itemSize * innI;
+      hash.withinRadii(
+        posRad[innIdx], posRad[innIdx + 1], posRad[innIdx + 2],
+        posRad[innIdx + 3], neighbours,
+      );
+      let ia = 0;
+      let ni = neighbours[ia];
+      while (ni >= 0) {
+        if (innI < ni) {
+          projectTorus(innI, ni);
+        }
+        ni = neighbours[++ia];
+      }
     }
-    return out;
   }
 
   function fixNegatives() {
@@ -596,7 +585,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   }
 
   function getVolume() {
-
     // Basic steps are:
     // 1) Initialize
     // 2) Project points
@@ -618,7 +606,7 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     console.timeEnd('ContactSurface.getVolume');
   }
 
-  this.build = function() {
+  this.build = function () {
     // type and cutoff left in for compatibility with EDTSurface.getSurface
     // function signature
     getVolume();
@@ -627,6 +615,5 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     this.atomMap = atomMap;
     this.volMap = grid;
   };
-
 }
 export default ContactSurface;

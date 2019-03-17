@@ -1,22 +1,22 @@
+import * as THREE from 'three';
 import Atom from './Atom';
 import Element from './Element';
-import * as THREE from 'three';
 import ResidueType from './ResidueType';
 
-var cNucleicControlNames = ['C3\'', 'C3*', 'P', 'H5T', 'H3T'];
-var cNucleicWing1Names = ['OP1', 'O1P'];
-var cNucleicWing2Names = ['OP2', 'O2P'];
+const cNucleicControlNames = ['C3\'', 'C3*', 'P', 'H5T', 'H3T'];
+const cNucleicWing1Names = ['OP1', 'O1P'];
+const cNucleicWing2Names = ['OP2', 'O2P'];
 
-var cCylinderSource = ['C3\'', 'C3*', 'C1', 'C1\'', 'C1*', 'P'];
-var cCylinderTarget =  [{
+const cCylinderSource = ['C3\'', 'C3*', 'C1', 'C1\'', 'C1*', 'P'];
+const cCylinderTarget = [{
   types: ['A', 'DA', 'G', 'DG'],
-  atoms: ['N1']
+  atoms: ['N1'],
 }, {
   types: ['C', 'DC'],
-  atoms: ['N3']
+  atoms: ['N3'],
 }, {
   types: ['T', 'DT', 'U', 'DU'],
-  atoms: ['O4']
+  atoms: ['O4'],
 }];
 
 /**
@@ -108,7 +108,7 @@ class Residue {
 
   _findAtomByName(name) {
     let res = null;
-    this.forEachAtom(function(atom) {
+    this.forEachAtom((atom) => {
       if (atom._name._name === name) {
         res = atom;
         return true;
@@ -201,10 +201,10 @@ class Residue {
       this._detectLeadWing(dst, nextRes, getAtomPosition);
       return;
     }
-    if (bFirstInChain) { //for first one in chain
+    if (bFirstInChain) { // for first one in chain
       dst._midPoint = getAtomPosition(this._firstAtom).clone();
     } else {
-      const prevLeadPos = prev._controlPoint; //lead point of previous monomer
+      const prevLeadPos = prev._controlPoint; // lead point of previous monomer
       dst._midPoint = prevLeadPos.clone().lerp(currLeadPos, 0.5);
       dst._wingVector = this.calcWing(prevLeadPos, currLeadPos, getAtomPosition(prevRes._wingAtom), prev._wingVector);
     }
@@ -212,8 +212,8 @@ class Residue {
   }
 
   _finalize2(prev, next) {
-    //Should be called AFTER first finalize
-    this._innerFinalize(prev, prev, next, this, function(atom) { return atom._position; });
+    // Should be called AFTER first finalize
+    this._innerFinalize(prev, prev, next, this, atom => atom._position);
   }
 
   isConnected(anotherResidue) {
@@ -224,7 +224,7 @@ class Residue {
       return true;
     }
     let res = false;
-    this.forEachAtom(function(atom) {
+    this.forEachAtom((atom) => {
       const bonds = atom._bonds;
       for (let i = 0, n = bonds.length; i < n; ++i) {
         const bond = bonds[i];
@@ -240,7 +240,7 @@ class Residue {
 
   _finalize() {
     const self = this;
-    this._firstAtom = this._atoms[0];
+    [this._firstAtom] = this._atoms;
     this._lastAtom = this._atoms[this._atoms.length - 1];
 
     this._leadAtom = null;
@@ -251,7 +251,7 @@ class Residue {
     let occupCount = 0;
     let occupancy = 0; // average occupancy
     // TODO: Is it correct? Is it fast?
-    this.forEachAtom(function(a) {
+    this.forEachAtom((a) => {
       if (self._leadAtom === null) {
         if (a._role === Element.Constants.Lead) {
           self._leadAtom = a;
@@ -280,7 +280,7 @@ class Residue {
       this.occupancy = occupancy / occupCount;
     }
 
-    //Still try to make monomer look valid
+    // Still try to make monomer look valid
     if (this._leadAtom === null || this._wingAtom === null) {
       this._isValid = false;
     }
@@ -294,4 +294,3 @@ class Residue {
 }
 
 export default Residue;
-

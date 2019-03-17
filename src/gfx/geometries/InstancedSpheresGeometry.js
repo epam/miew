@@ -7,16 +7,16 @@ const tmpColor = new THREE.Color();
 
 const OFFSET_SIZE = 4;
 const COLOR_SIZE = 3;
-const copySubArrays = utils.copySubArrays;
+const { copySubArrays } = utils;
 
 function setArrayXYZ(arr, idx, x, y, z) {
-  arr[idx]     = x;
+  arr[idx] = x;
   arr[idx + 1] = y;
   arr[idx + 2] = z;
 }
 
 function setArrayXYZW(arr, idx, x, y, z, w) {
-  arr[idx]     = x;
+  arr[idx] = x;
   arr[idx + 1] = y;
   arr[idx + 2] = z;
   arr[idx + 3] = w;
@@ -24,8 +24,8 @@ function setArrayXYZW(arr, idx, x, y, z, w) {
 class InstancedSpheresGeometry extends SphereCollisionGeo(THREE.InstancedBufferGeometry) {
   constructor(spheresCount, sphereComplexity, useZSprites) {
     super(spheresCount);
-    this._sphGeometry = useZSprites ? new THREE.PlaneBufferGeometry(2, 2, 1, 1) :
-      new THREE.SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
+    this._sphGeometry = useZSprites ? new THREE.PlaneBufferGeometry(2, 2, 1, 1)
+      : new THREE.SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
     this._init(spheresCount, this._sphGeometry);
   }
 

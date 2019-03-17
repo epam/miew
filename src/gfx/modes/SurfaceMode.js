@@ -1,7 +1,7 @@
 import chem from '../../chem';
 import Mode from './Mode';
 
-const selectors = chem.selectors;
+const { selectors } = chem;
 
 function getRenderParams() {
   return {

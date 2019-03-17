@@ -1,23 +1,20 @@
-import Parser from './Parser';
 import * as THREE from 'three';
-import VolumeModel from './VolumeModel';
-import {valueType} from './VolumeModel';
+import Parser from './Parser';
+import VolumeModel, { valueType } from './VolumeModel';
 
-
-//http://www.uoxray.uoregon.edu/tnt/manual/node104.html
+// http://www.uoxray.uoregon.edu/tnt/manual/node104.html
 const DSN6Header = {
   nstart: [valueType.array, 'i16', 0],
   extent: [valueType.array, 'i16', 3],
-  grid:   [valueType.array, 'i16', 6],
+  grid: [valueType.array, 'i16', 6],
   cellDims: [valueType.vector, 'i16', 9],
   angles: [valueType.vector, 'i16', 12],
-  div:    [valueType.singular, 'i16', 15],
-  adder:  [valueType.singular, 'i16', 16],
-  scaleFactor:  [valueType.singular, 'i16', 17]
+  div: [valueType.singular, 'i16', 15],
+  adder: [valueType.singular, 'i16', 16],
+  scaleFactor: [valueType.singular, 'i16', 17],
 };
 
 class DSN6Model extends VolumeModel {
-
   _parseHeader(_buffer) {
     this._buff = _buffer;
     this._typedCheck();
@@ -52,7 +49,7 @@ class DSN6Model extends VolumeModel {
 
   _setOrigins() {
     const header = this._header;
-    let [xaxis, yaxis, zaxis] = this._getAxis();
+    const [xaxis, yaxis, zaxis] = this._getAxis();
     this._setAxisIndices();
 
     this._origin.addScaledVector(xaxis, header.nstart[0]);
@@ -70,7 +67,7 @@ class DSN6Model extends VolumeModel {
     const header = this._header;
 
     if (x < header.extent[0] && y < header.extent[1] && z < header.extent[2]) {
-      let idx = x + header.extent[0] * (y + header.extent[1] * z);
+      const idx = x + header.extent[0] * (y + header.extent[1] * z);
       xyzData[idx] = (byteBuffer[pos.counter] - header.adder) / header.div;
       ++pos.counter;
     } else {
@@ -103,13 +100,13 @@ class DSN6Model extends VolumeModel {
 
     const blocks = new THREE.Vector3(header.extent[0] / 8, header.extent[1] / 8, header.extent[2] / 8);
 
-    let pos = {};
+    const pos = {};
     pos.counter = 512;
 
     for (let zBlock = 0; zBlock < blocks.z; ++zBlock) {
       for (let yBlock = 0; yBlock < blocks.y; ++yBlock) {
         for (let xBlock = 0; xBlock < blocks.x; ++xBlock) {
-          this._blockCalculate(xyzData, byteBuffer,  zBlock, yBlock, xBlock, pos);
+          this._blockCalculate(xyzData, byteBuffer, zBlock, yBlock, xBlock, pos);
         }
       }
     }
@@ -118,12 +115,12 @@ class DSN6Model extends VolumeModel {
   }
 
   _calculateInfoParams(xyzData) {
-    this._header.dmean /=  xyzData.length;
+    this._header.dmean /= xyzData.length;
     let dispersion = 0;
     let minDensity = xyzData[0];
     let maxDensity = xyzData[0];
     for (let j = 0; j < xyzData.length; j++) {
-      dispersion += Math.pow(this._header.dmean - xyzData[j], 2);
+      dispersion += (this._header.dmean - xyzData[j]) ** 2;
 
       if (xyzData[j] < minDensity) {
         minDensity = xyzData[j];
@@ -162,7 +159,7 @@ class DSN6Parser extends Parser {
 }
 
 DSN6Parser.formats = ['dsn6'];
-DSN6Parser.extensions = ['.dsn6'];
+DSN6Parser.extensions = ['.dsn6', '.omap'];
 DSN6Parser.binary = true;
 
 export default DSN6Parser;

@@ -3,10 +3,6 @@ import Colorer from './Colorer';
 class SequenceColorer extends Colorer {
   static id = ['SQ', 'RI']; // 'RI' is @deprecated backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, complex) {
     return this.getResidueColor(atom._residue, complex);
   }

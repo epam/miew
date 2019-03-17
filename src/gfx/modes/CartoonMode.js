@@ -77,10 +77,10 @@ class CartoonMode extends Mode {
     const secCache = {};
     const secData = this.opts.ss;
     /* eslint-disable guard-for-in */
-    for (let prop in secData) {
+    for (const prop in secData) {
       secCache[prop] = {
         center: new THREE.Vector2(secHeight, secData[prop].width),
-        start: new THREE.Vector2(secHeight, secData[prop].arrow)
+        start: new THREE.Vector2(secHeight, secData[prop].arrow),
       };
     }
     this.secCache = secCache;

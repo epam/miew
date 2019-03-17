@@ -23,6 +23,14 @@ varying vec3 vViewPosition;
   varying float alphaCol;
 #endif
 
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
+	#if NUM_DIR_LIGHTS > 0
+		uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];
+		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
+		varying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
+	#endif
+#endif
+
 #ifdef ATTR_COLOR
   attribute vec3 color;
   varying vec3 vColor;
@@ -204,11 +212,22 @@ void main() {
   #endif
 #endif
 
-
   gl_Position = projectionMatrix * mvPosition;
 
   vWorldPosition = worldPos.xyz;
   vViewPosition = - mvPosition.xyz;
+
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
+	#if NUM_DIR_LIGHTS > 0
+	  vec4 worldPosition;
+	  // see THREE.WebGLProgram.unrollLoops
+	  #pragma unroll_loop
+	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+      vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * vec4(vWorldPosition, 1.0);
+      vDirectionalShadowNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(objectNormal, 0.0))).xyz;
+	  }
+	#endif
+#endif
 
 #ifdef ATTR_COLOR
   vColor = color.xyz;

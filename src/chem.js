@@ -1,5 +1,3 @@
-
-
 import Atom from './chem/Atom';
 import Element from './chem/Element';
 import AtomName from './chem/AtomName';
@@ -17,23 +15,23 @@ import Volume from './chem/Volume';
 import VoxelWorld from './chem/VoxelWorld';
 import selectors from './chem/selectors';
 import Molecule from './chem/Molecule';
-export default {
-  Atom: Atom,
-  Element: Element,
-  AtomName: AtomName,
-  Bond: Bond,
-  Residue: Residue,
-  ResidueType: ResidueType,
-  Chain: Chain,
-  Helix: Helix,
-  Strand: Strand,
-  Sheet: Sheet,
-  SGroup: SGroup,
-  Assembly: Assembly,
-  Complex: Complex,
-  Volume: Volume,
-  VoxelWorld: VoxelWorld,
-  selectors: selectors,
-  Molecule: Molecule,
-};
 
+export default {
+  Atom,
+  Element,
+  AtomName,
+  Bond,
+  Residue,
+  ResidueType,
+  Chain,
+  Helix,
+  Strand,
+  Sheet,
+  SGroup,
+  Assembly,
+  Complex,
+  Volume,
+  VoxelWorld,
+  selectors,
+  Molecule,
+};

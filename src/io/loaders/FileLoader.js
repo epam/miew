@@ -36,12 +36,12 @@ export default class FileLoader extends Loader {
 
   /** @deprecated */
   static canLoad(source, options) {
-    const sourceType = options.sourceType;
+    const { sourceType } = options;
     return source instanceof File && (!sourceType || sourceType === 'file');
   }
 
   static canProbablyLoad(source) {
-    return File && source instanceof File || Blob && source instanceof Blob;
+    return (File && source instanceof File) || (Blob && source instanceof Blob);
   }
 
   static extractName(source) {

@@ -1,32 +1,30 @@
-
-
 import _ from 'lodash';
 import settings from './settings';
 import utils from './utils';
 import logger from './utils/logger';
 
-var repIndex = 0;
+let repIndex = 0;
 
 function asBoolean(value) {
   return !(!value || value === '0' || (_.isString(value) && value.toLowerCase() === 'false'));
 }
 
-var adapters = {
-  'string': String,
-  'number': Number,
-  'boolean': asBoolean,
+const adapters = {
+  string: String,
+  number: Number,
+  boolean: asBoolean,
 };
 
 // Level 1 assignment symbol
-var cL1Ass = '=';
+const cL1Ass = '=';
 
-var cOptsSep = '!';
+const cOptsSep = '!';
 // Level 2 (options) assignment symbol
-var cL2Ass = ':';
+const cL2Ass = ':';
 // Level 2 (options) separator symbol
-var cLSep  = ',';
+const cLSep = ',';
 
-var cCommonIgnoreSymbols = '$;@/?';
+const cCommonIgnoreSymbols = '$;@/?';
 /**
  * We may (and should) leave as is for better readability:
  *
@@ -36,7 +34,7 @@ var cCommonIgnoreSymbols = '$;@/?';
  * Generate regular expression for symbols excluded for first level encryption
  */
 function getLevel1ExcludedExpr() {
-  var cLevel1Ignores = ':,';
+  const cLevel1Ignores = ':,';
   return utils.generateRegExp(cCommonIgnoreSymbols + cLevel1Ignores);
 }
 
@@ -45,29 +43,29 @@ function getLevel1ExcludedExpr() {
  * (options, etc, ..)
  */
 function getLevel2ExcludedExpr() {
-  var cLevel2Ignores = ' ';
+  const cLevel2Ignores = ' ';
   return utils.generateRegExp(cCommonIgnoreSymbols + cLevel2Ignores);
 }
 
-var cL1ExclExpr = getLevel1ExcludedExpr();
+const cL1ExclExpr = getLevel1ExcludedExpr();
 function encodeQueryComponentL1(value) {
   return utils.encodeQueryComponent(value, cL1ExclExpr);
 }
 
-var cL2ExclExpr = getLevel2ExcludedExpr();
+const cL2ExclExpr = getLevel2ExcludedExpr();
 function encodeQueryComponentL2(value) {
   return utils.encodeQueryComponent(value, cL2ExclExpr);
 }
 
 function ensureRepList(opts) {
-  var reps = opts.reps;
+  let { reps } = opts;
   if (!reps) {
-    var presets = settings.now.presets;
-    var preset = opts.preset || settings.now.preset;
+    const { presets } = settings.now;
+    let preset = opts.preset || settings.now.preset;
     reps = presets[preset];
     if (!reps) {
-      logger.warn('Unknown preset "' + preset + '"');
-      preset = Object.keys(presets)[0];
+      logger.warn(`Unknown preset "${preset}"`);
+      [preset] = Object.keys(presets);
       reps = presets[preset]; // fall back to any preset
     }
     opts.preset = preset;
@@ -77,7 +75,7 @@ function ensureRepList(opts) {
 
 function ensureRepAssign(opts, prop, value) {
   ensureRepList(opts);
-  var rep = opts.reps[repIndex];
+  const rep = opts.reps[repIndex];
   // prop specified twice therefore start new rep by cloning the current
   if (rep.hasOwnProperty(prop)) {
     if (++repIndex >= opts.reps.length) {
@@ -94,20 +92,21 @@ function addObject(opts, params, options) {
     opts._objects = [];
   }
 
-  var newObj = {
-    type: options[0],
-    params: params
+  const [type, newOpts] = options;
+  const newObj = {
+    type,
+    params,
   };
 
-  if (options[1] !== undefined) {
-    newObj.opts = options[1];
+  if (newOpts !== undefined) {
+    newObj.opts = newOpts;
   }
 
   opts._objects[opts._objects.length] = newObj;
 }
 
 function parseParams(str, params) {
-  var sep = str.indexOf(',');
+  const sep = str.indexOf(',');
   if (sep >= 0) {
     params.push(str.substr(sep + 1).split(','));
     return str.substr(0, sep);
@@ -118,22 +117,23 @@ function parseParams(str, params) {
 
 function extractArgs(input, defaultsDict, params) {
   if (input) {
-    var bang = input.indexOf(cOptsSep);
-    var inputVal = parseParams(input.substr(0, bang >= 0 ? bang : undefined), params);
+    const bang = input.indexOf(cOptsSep);
+    const inputVal = parseParams(input.substr(0, bang >= 0 ? bang : undefined), params);
     if (bang >= 0) {
-      var args = input.substr(bang + 1).split(cLSep);
+      const args = input.substr(bang + 1).split(cLSep);
       input = inputVal;
       if (defaultsDict) {
-        var defaults = defaultsDict[input];
-        var opts = utils.deriveDeep(defaults, true);
-        args.forEach(function(arg) {
-          var pair = arg.split(cL2Ass, 2);
-          var key = decodeURIComponent(pair[0]), value = decodeURIComponent(pair[1]);
-          var adapter = adapters[typeof _.get(defaults, key)];
+        const defaults = defaultsDict[input];
+        const opts = utils.deriveDeep(defaults, true);
+        args.forEach((arg) => {
+          const pair = arg.split(cL2Ass, 2);
+          const key = decodeURIComponent(pair[0]);
+          const value = decodeURIComponent(pair[1]);
+          const adapter = adapters[typeof _.get(defaults, key)];
           if (adapter) {
             _.set(opts, key, adapter(value));
           } else {
-            logger.warn('Unknown argument "' + key + '" for option "' + input + '"');
+            logger.warn(`Unknown argument "${key}" for option "${input}"`);
           }
         });
         if (Object.keys(opts).length > 0) {
@@ -147,36 +147,39 @@ function extractArgs(input, defaultsDict, params) {
   return input;
 }
 
-var actions = {
+const actions = {
 
-  //////////////////////////////////////////////////////////////////////////////
-  // Options
+  l: 'load',
+  load: String,
+  t: 'type',
+  type: String,
+  v: 'view',
+  view: String,
+  u: 'unit',
+  unit: Number,
+  menu: asBoolean,
 
-  'l': 'load', 'load': String,
-  't': 'type', 'type': String,
-  'v': 'view', 'view': String,
-  'u': 'unit', 'unit': Number,
-  'menu': asBoolean,
-
-  //////////////////////////////////////////////////////////////////////////////
   // Commands
 
-  'o': 'object', 'object': function(value, opts) {
-    var params = [];
-    var options = extractArgs(value, settings.defaults.objects, params);
+  o: 'object',
+  object(value, opts) {
+    const params = [];
+    let options = extractArgs(value, settings.defaults.objects, params);
     if (!Array.isArray(options)) {
       options = [options];
     }
     addObject(opts, params[0], options);
   },
 
-  'p': 'preset', 'preset': function(value, opts) {
+  p: 'preset',
+  preset(value, opts) {
     opts.preset = value;
     opts.reps = null;
     ensureRepList(opts);
   },
 
-  'r': 'rep', 'rep': function(value, opts) {
+  r: 'rep',
+  rep(value, opts) {
     ensureRepList(opts);
     repIndex = Number(value);
     // clamp the index to one greater than the last
@@ -184,56 +187,58 @@ var actions = {
     // create a new rep if it is adjacent to the existing ones
     if (repIndex === opts.reps.length) {
       // if there is no rep to derive from, derive from the first rep of the default
-      opts.reps[repIndex] = repIndex > 0 ? utils.deriveDeep(opts.reps[repIndex - 1], true) :
-        utils.deriveDeep(settings.defaults.presets.default[0], true);
+      opts.reps[repIndex] = repIndex > 0 ? utils.deriveDeep(opts.reps[repIndex - 1], true)
+        : utils.deriveDeep(settings.defaults.presets.default[0], true);
     }
   },
 
-  's': 'select', 'select':  function(value, opts) {
+  s: 'select',
+  select(value, opts) {
     ensureRepAssign(opts, 'selector', value);
   },
 
-  'm': 'mode', 'mode': function(value, opts) {
+  m: 'mode',
+  mode(value, opts) {
     ensureRepAssign(opts, 'mode', extractArgs(value, settings.defaults.modes));
   },
 
-  'c': 'color', 'color':  function(value, opts) {
+  c: 'color',
+  color(value, opts) {
     ensureRepAssign(opts, 'colorer', extractArgs(value, settings.defaults.colorers));
   },
 
-  'mt': 'material', 'material':  function(value, opts) {
+  mt: 'material',
+  material(value, opts) {
     ensureRepAssign(opts, 'material', extractArgs(value, settings.defaults.materials));
   },
 
-  'dup': function(value, opts) {
+  dup(value, opts) {
     ensureRepList(opts);
-    var reps = opts.reps;
-    var rep = reps[repIndex];
+    const { reps } = opts;
+    const rep = reps[repIndex];
     if (++repIndex >= reps.length) {
       reps[repIndex] = utils.deriveDeep(rep, true);
     }
   },
 
-  //////////////////////////////////////////////////////////////////////////////
   // Settings shortcuts
 
-  'ar': 'autoResolution',
+  ar: 'autoResolution',
 
-  //////////////////////////////////////////////////////////////////////////////
   // Deprecated
 
-  'background': 'theme',
+  background: 'theme',
 };
 
 function _fromArray(entries) {
   repIndex = 0;
 
-  var opts = {};
-  for (var i = 0, n = entries.length; i < n; ++i) {
-    var /** string[] */ entry = entries[i];
-    var /** string? */ key = entry[0];
-    var /** string? */ value = entry[1];
-    var /** function|string? */ action = actions[key];
+  const opts = {};
+  for (let i = 0, n = entries.length; i < n; ++i) {
+    const /** string[] */ entry = entries[i];
+    let /** string? */ key = entry[0];
+    const /** string? */ value = entry[1];
+    let /** function|string? */ action = actions[key];
 
     // unwind shortcuts and aliases
     while (_.isString(action)) {
@@ -243,14 +248,14 @@ function _fromArray(entries) {
 
     // either set a property or use specialized parser
     if (!action) {
-      var adapter = adapters[typeof _.get(settings.defaults, key)];
+      const adapter = adapters[typeof _.get(settings.defaults, key)];
       if (adapter) {
-        _.set(opts, 'settings.' + key, adapter(value));
+        _.set(opts, `settings.${key}`, adapter(value));
       } else {
-        logger.warn('Unknown option "' + key + '"');
+        logger.warn(`Unknown option "${key}"`);
       }
     } else if (_.isFunction(action)) {
-      var result = action(value, opts);
+      const result = action(value, opts);
       if (result !== undefined) {
         opts[key] = result;
       }
@@ -261,7 +266,7 @@ function _fromArray(entries) {
 }
 
 function fromAttr(attr) {
-  return _fromArray(utils.getUrlParameters('?' + (attr || ''))); // TODO: We need different processing for attrs.
+  return _fromArray(utils.getUrlParameters(`?${attr || ''}`)); // TODO: We need different processing for attrs.
 }
 
 function fromURL(url) {
@@ -269,9 +274,9 @@ function fromURL(url) {
 }
 
 function _processOptsForURL(opts) {
-  var str = [];
-  var i = 0;
-  utils.forInRecursive(opts, function(value, key) {
+  const str = [];
+  let i = 0;
+  utils.forInRecursive(opts, (value, key) => {
     str[i++] = encodeQueryComponentL2(key) + cL2Ass + encodeQueryComponentL2(value);
   });
   return str.join(cLSep);
@@ -288,9 +293,9 @@ function _processObjForURL(objOpts) {
   if (!objOpts || !objOpts.type) {
     return undefined;
   }
-  var res = objOpts.type;
+  let res = objOpts.type;
   if (_.isArray(objOpts.params) && objOpts.params.length > 0) {
-    res += ',' + objOpts.params.join(',');
+    res += `,${objOpts.params.join(',')}`;
   }
   if (objOpts.opts) {
     res += cOptsSep + _processOptsForURL(objOpts.opts);
@@ -299,13 +304,13 @@ function _processObjForURL(objOpts) {
 }
 
 function toURL(opts) {
-  var stringList = [];
-  var idx = 0;
+  const stringList = [];
+  let idx = 0;
 
   function checkAndAdd(prefix, value) {
     if (value !== null && value !== undefined) {
-      stringList[idx++] = encodeQueryComponentL1(prefix) +
-                            cL1Ass + encodeQueryComponentL1(value);
+      stringList[idx++] = encodeQueryComponentL1(prefix)
+                            + cL1Ass + encodeQueryComponentL1(value);
     }
   }
 
@@ -313,7 +318,7 @@ function toURL(opts) {
     if (!repList) {
       return;
     }
-    for (var i = 0, n = repList.length; i < n; ++i) {
+    for (let i = 0, n = repList.length; i < n; ++i) {
       if (_.isEmpty(repList[i])) {
         continue;
       }
@@ -329,7 +334,7 @@ function toURL(opts) {
     if (!objList) {
       return;
     }
-    for (var i = 0, n = objList.length; i < n; ++i) {
+    for (let i = 0, n = objList.length; i < n; ++i) {
       checkAndAdd('o', _processObjForURL(objList[i]));
     }
   }
@@ -342,7 +347,7 @@ function toURL(opts) {
 
   checkAndAdd('v', opts.view);
 
-  utils.forInRecursive(opts.settings, function(value, key) {
+  utils.forInRecursive(opts.settings, (value, key) => {
     // I heard these lines in the whispers of the Gods
     // Handle preset setting in reps
     if (key === 'preset') { // TODO: remove 'preset' from settings, implement autodetection
@@ -351,23 +356,23 @@ function toURL(opts) {
     checkAndAdd(key, value);
   });
 
-  var url = '';
+  let url = '';
   if (typeof window !== 'undefined') {
-    var location = window.location;
-    url = location.protocol + '//' + location.host + location.pathname;
+    const { location } = window;
+    url = `${location.protocol}//${location.host}${location.pathname}`;
   }
   if (stringList.length > 0) {
-    url += '?' + stringList.join('&');
+    url += `?${stringList.join('&')}`;
   }
 
   return url;
 }
 
 function _processOptsForScript(opts) {
-  var str = [];
-  var i = 0;
-  utils.forInRecursive(opts, function(value, key) {
-    str[i++] = key + '=' + utils.enquoteString(value);
+  const str = [];
+  let i = 0;
+  utils.forInRecursive(opts, (value, key) => {
+    str[i++] = `${key}=${utils.enquoteString(value)}`;
   });
   return str.join(' ');
 }
@@ -376,26 +381,26 @@ function _processArgsForScript(args) {
   if (!_.isArray(args)) {
     return args;
   }
-  return args[0] + (args.length < 2 ? '' : ' ' + _processOptsForScript(args[1]));
+  return args[0] + (args.length < 2 ? '' : ` ${_processOptsForScript(args[1])}`);
 }
 
 function _processObjForScript(objOpts) {
   if (!objOpts || !objOpts.type) {
     return undefined;
   }
-  var res = objOpts.type;
+  let res = objOpts.type;
   if (_.isArray(objOpts.params) && objOpts.params.length > 0) {
-    res += ' ' + objOpts.params.map(utils.enquoteString).join(' ');
+    res += ` ${objOpts.params.map(utils.enquoteString).join(' ')}`;
   }
   if (objOpts.opts) {
-    res += ' ' + _processOptsForScript(objOpts.opts);
+    res += ` ${_processOptsForScript(objOpts.opts)}`;
   }
   return res;
 }
 
 function _processRepsForScript(rep, index) {
-  var repString = [];
-  var strIdx = 0;
+  const repString = [];
+  let strIdx = 0;
   function localAdd(prefix, value) {
     if (value !== null && value !== undefined) {
       repString[strIdx++] = prefix + value;
@@ -413,12 +418,12 @@ function _processRepsForScript(rep, index) {
 }
 
 function toScript(opts) {
-  let commandsList = [];
+  const commandsList = [];
   let idx = 0;
   function checkAndAdd(command, value, saveQuotes) {
     if (value !== null && value !== undefined) {
       const quote = (typeof value === 'string' && saveQuotes) ? '"' : '';
-      commandsList[idx++] = command + ' ' + quote + value + quote;
+      commandsList[idx++] = `${command} ${quote}${value}${quote}`;
     }
   }
 
@@ -448,13 +453,13 @@ function toScript(opts) {
   addReps(opts.reps);
   addObjects(opts._objects);
 
-  utils.forInRecursive(opts.settings, function(value, key) {
+  utils.forInRecursive(opts.settings, (value, key) => {
     // I heard these lines in the whispers of the Gods
     // Handle preset setting in reps
     if (key === 'preset') {
       return;
     }
-    checkAndAdd('set ' + key, value, true);
+    checkAndAdd(`set ${key}`, value, true);
   });
   checkAndAdd('view', opts.view);
 
@@ -464,10 +469,9 @@ function toScript(opts) {
 }
 
 export default {
-  fromURL: fromURL,
-  fromAttr: fromAttr,
-  adapters: adapters,
-  toURL: toURL,
-  toScript: toScript
+  fromURL,
+  fromAttr,
+  adapters,
+  toURL,
+  toScript,
 };
-

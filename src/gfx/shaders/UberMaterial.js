@@ -1,41 +1,51 @@
-
-
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
 import vertexShader from './Uber_vert.glsl';
 import fragmentShader from './Uber_frag.glsl';
-import capabilities from './../capabilities';
+import capabilities from '../capabilities';
+import noise from '../noiseTexture';
+
+const _samplesKernel = [
+  new THREE.Vector2(-0.541978, 0.840393),
+  new THREE.Vector2(0.125533, -0.992089),
+  new THREE.Vector2(0.374329, 0.927296),
+  new THREE.Vector2(-0.105475, 0.994422),
+];
 
 //  var INSTANCED_SPRITE_OVERSCALE = 1.3;
 
-var defaultUniforms = THREE.UniformsUtils.merge([
+const defaultUniforms = THREE.UniformsUtils.merge([
 
-  THREE.UniformsLib.common, //FIXME is it needed
+  THREE.UniformsLib.common, // FIXME is it needed
   THREE.UniformsLib.fog,
-  THREE.UniformsLib.lights, //FIXME simplify use only directional
+  THREE.UniformsLib.lights,
 
   {
-    'specular' :  {type: 'c', value: new THREE.Color(0x111111)},
-    'shininess':  {type: 'f', value: 30},
-    'fixedColor': {type: 'c', value: new THREE.Color(0xffffff)},
-    'zOffset':    {type: 'f', value: 0.0},
-    'zClipValue': {type: 'f', value: 0.0},
-    'clipPlaneValue': {type: 'f', value: 0.0},
-    'invModelViewMatrix': {type: '4fv', value: new THREE.Matrix4()},
-    'world2colorMatrix': {type: '4fv', value: new THREE.Matrix4()},
-    'dashedLineSize': {type: 'f', value: 0.1},
-    'dashedLinePeriod': {type: 'f', value: 0.2},
-    'projMatrixInv': {type: '4fv', value: new THREE.Matrix4()},
-    'viewport': {type: 'v2', value: new THREE.Vector2()},
-    'lineWidth': {type: 'f', value: 2.0},
-    //default value must be the same as settings
-    'fogAlpha': {type: 'f', value: 1.0}
-  }
+    specular: { type: 'c', value: new THREE.Color(0x111111) },
+    shininess: { type: 'f', value: 30 },
+    fixedColor: { type: 'c', value: new THREE.Color(0xffffff) },
+    zOffset: { type: 'f', value: 0.0 },
+    zClipValue: { type: 'f', value: 0.0 },
+    clipPlaneValue: { type: 'f', value: 0.0 },
+    invModelViewMatrix: { type: '4fv', value: new THREE.Matrix4() },
+    world2colorMatrix: { type: '4fv', value: new THREE.Matrix4() },
+    dashedLineSize: { type: 'f', value: 0.1 },
+    dashedLinePeriod: { type: 'f', value: 0.2 },
+    projMatrixInv: { type: '4fv', value: new THREE.Matrix4() },
+    viewport: { type: 'v2', value: new THREE.Vector2() },
+    lineWidth: { type: 'f', value: 2.0 },
+    // default value must be the same as settings
+    fogAlpha: { type: 'f', value: 1.0 },
+    samplesKernel: { type: 'v2v', value: null },
+    noiseTex: { type: 't', value: null },
+    noiseTexelSize: { type: 'v2', value: null },
+    srcTexelSize: { type: 'v2', value: null },
+  },
 
 ]);
 
-var uberOptionNames = [
+const uberOptionNames = [
   'shininess',
   'opacity',
   'zOffset',
@@ -51,7 +61,11 @@ var uberOptionNames = [
   'projMatrixInv',
   'viewport',
   'lineWidth',
-  'fogAlpha'
+  'fogAlpha',
+  'samplesKernel',
+  'noiseTex',
+  'noiseTexelSize',
+  'srcTexelSize',
 ];
 
 function UberMaterial(params) {
@@ -83,6 +97,12 @@ function UberMaterial(params) {
   this.prepassTransparancy = false;
   // used to render pixel positions
   this.colorFromPos = false;
+  // used to render shadowmap
+  this.shadowmap = false;
+  // used to describe shadowmap type
+  this.shadowmapType = 'random';
+  // used to render pixel view deph
+  this.colorFromDepth = false;
   // used to render dashed line
   this.dashedLine = false;
   // mark as transparent
@@ -93,7 +113,7 @@ function UberMaterial(params) {
   this.fogTransparent = false;
   // used to render surface normals to G buffer for ssao effect
   this.normalsToGBuffer = false;
-  //used for toon material
+  // used for toon material
   this.toonShading = false;
 
   // uber options of "root" materials are inherited from single uber-options object that resides in prototype
@@ -115,10 +135,10 @@ function UberMaterial(params) {
 UberMaterial.prototype = Object.create(THREE.RawShaderMaterial.prototype);
 UberMaterial.prototype.constructor = UberMaterial;
 
-UberMaterial.prototype.precisionString = function() {
-  const precision = capabilities.precision;
-  const str = 'precision ' + precision + ' float;\n' +
-    'precision ' + precision + ' int;\n\n';
+UberMaterial.prototype.precisionString = function () {
+  const { precision } = capabilities;
+  const str = `precision ${precision} float;\n`
+    + `precision ${precision} int;\n\n`;
   return str;
 };
 
@@ -140,8 +160,12 @@ UberMaterial.prototype.uberOptions = {
   viewport: new THREE.Vector2(800, 600),
   lineWidth: 2.0,
   fogAlpha: 1.0,
+  samplesKernel: _samplesKernel,
+  noiseTex: noise.noiseTexture,
+  noiseTexelSize: new THREE.Vector2(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight),
+  srcTexelSize: new THREE.Vector2(1.0 / 800.0, 1.0 / 600.0),
 
-  copy: function(source) {
+  copy(source) {
     this.diffuse.copy(source.diffuse);
     this.specular.copy(source.specular);
     this.shininess = source.shininess;
@@ -159,12 +183,15 @@ UberMaterial.prototype.uberOptions = {
     this.lineWidth = source.lineWidth; // used for thick lines only
     this.toonShading = source.toonShading;
     this.fogAlpha = source.fogAlpha;
-  }
+    this.samplesKernel = source.samplesKernel;
+    this.noiseTex = source.noiseTex;
+    this.noiseTexelSize = source.noiseTexelSize;
+    this.srcTexelSize = source.srcTexelSize;
+  },
 };
 
-UberMaterial.prototype.copy = function(source) {
-
-  //TODO Why not RawShaderMaterial?
+UberMaterial.prototype.copy = function (source) {
+  // TODO Why not RawShaderMaterial?
   THREE.ShaderMaterial.prototype.copy.call(this, source);
 
   this.fog = source.fog;
@@ -180,6 +207,9 @@ UberMaterial.prototype.copy = function(source) {
   this.clipPlane = source.clipPlane;
   this.fakeOpacity = source.fakeOpacity;
   this.colorFromPos = source.colorFromPos;
+  this.shadowmap = source.shadowmap;
+  this.shadowmapType = source.shadowmapType;
+  this.colorFromDepth = source.colorFromDepth;
   this.prepassTransparancy = source.prepassTransparancy;
   this.dashedLine = source.dashedLine;
   this.thickLine = source.thickLine;
@@ -194,14 +224,14 @@ UberMaterial.prototype.copy = function(source) {
 
 // create copy of this material
 // its options are prototyped after this material's options
-UberMaterial.prototype.createInstance = function() {
-  var inst = new UberMaterial();
+UberMaterial.prototype.createInstance = function () {
+  const inst = new UberMaterial();
   inst.copy(this);
   inst.uberOptions = Object.create(this.uberOptions);
   return inst;
 };
 
-UberMaterial.prototype.setValues = function(values) {
+UberMaterial.prototype.setValues = function (values) {
   if (typeof values === 'undefined') {
     return;
   }
@@ -209,8 +239,8 @@ UberMaterial.prototype.setValues = function(values) {
   // set direct values
   THREE.RawShaderMaterial.prototype.setValues.call(this, values);
 
-  var defines = {};
-  var extensions = {};
+  const defines = {};
+  const extensions = {};
 
   if (this.fog) {
     defines.USE_FOG = 1;
@@ -256,6 +286,19 @@ UberMaterial.prototype.setValues = function(values) {
   if (this.colorFromPos) {
     defines.COLOR_FROM_POS = 1;
   }
+  if (this.shadowmap) {
+    defines.SHADOWMAP = 1;
+    if (this.shadowmapType === 'pcf') {
+      defines.SHADOWMAP_PCF_SHARP = 1;
+    } else if (this.shadowmapType === 'random') {
+      defines.SHADOWMAP_PCF_RAND = 1;
+    } else {
+      defines.SHADOWMAP_BASIC = 1;
+    }
+  }
+  if (this.colorFromDepth) {
+    defines.COLOR_FROM_DEPTH = 1;
+  }
   if (this.prepassTransparancy) {
     defines.PREPASS_TRANSP = 1;
   }
@@ -280,12 +323,12 @@ UberMaterial.prototype.setValues = function(values) {
   this.extensions = extensions;
 };
 
-UberMaterial.prototype.setUberOptions = function(values) {
+UberMaterial.prototype.setUberOptions = function (values) {
   if (typeof values === 'undefined') {
     return;
   }
 
-  for (var key in values) {
+  for (const key in values) {
     if (!values.hasOwnProperty(key)) {
       continue;
     }
@@ -298,20 +341,20 @@ UberMaterial.prototype.setUberOptions = function(values) {
   }
 };
 
-UberMaterial.prototype.clone = function(shallow) {
+UberMaterial.prototype.clone = function (shallow) {
   if (!shallow) {
     return THREE.Material.prototype.clone.call(this);
   }
   return this.createInstance();
 };
 
-UberMaterial.prototype.updateUniforms = function() {
-  var self = this;
+UberMaterial.prototype.updateUniforms = function () {
+  const self = this;
 
-  uberOptionNames.forEach(function(p) {
+  uberOptionNames.forEach((p) => {
     if (self.uniforms.hasOwnProperty(p)) {
-      if (self.uberOptions[p] instanceof THREE.Color ||
-            self.uberOptions[p] instanceof THREE.Matrix4) {
+      if (self.uberOptions[p] instanceof THREE.Color
+            || self.uberOptions[p] instanceof THREE.Matrix4) {
         self.uniforms[p].value = self.uberOptions[p].clone();
       } else {
         self.uniforms[p].value = self.uberOptions[p];
@@ -321,4 +364,3 @@ UberMaterial.prototype.updateUniforms = function() {
 };
 
 export default UberMaterial;
-

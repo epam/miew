@@ -15,10 +15,6 @@ import Colorer from './Colorer';
 class ElementColorer extends Colorer {
   static id = ['EL', 'AT']; // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, _complex) {
     const type = atom.element.name;
     if (type === 'C' && this.opts.carbon >= 0) {

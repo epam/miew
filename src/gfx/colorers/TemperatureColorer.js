@@ -15,12 +15,8 @@ import Colorer from './Colorer';
 class TemperatureColorer extends Colorer {
   static id = 'TM';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(atom, _complex) {
-    const opts = this.opts;
+    const { opts } = this;
     let factor = 1;
     if (atom._temperature && opts) {
       if (opts.min === opts.max) {
@@ -34,7 +30,7 @@ class TemperatureColorer extends Colorer {
   }
 
   getResidueColor(residue, _complex) {
-    const opts = this.opts;
+    const { opts } = this;
     if (!opts) {
       return this.palette.defaultGradientColor;
     }

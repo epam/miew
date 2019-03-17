@@ -2,8 +2,8 @@ import RCGroup from '../../RCGroup';
 import TransformGroup from '../../meshes/TransformGroup';
 
 function wrapper(Name, args) {
-  var params = [Name].concat(args);
-  return Name.bind.apply(Name, params);
+  const params = [Name].concat(args);
+  return Name.bind(...params);
 }
 
 class ChemGroup extends RCGroup {

@@ -18,8 +18,8 @@ class SGroup {
     this._name = name;
     this._position = position || new THREE.Vector3();
     this._atoms = atoms || [];
-    this._charge = 0;  //default group charge
-    this._repeat = 1; //how many times group repeated: always > 0
+    this._charge = 0; // default group charge
+    this._repeat = 1; // how many times group repeated: always > 0
     this._center = null;
     this.xmlNodeRef = saveNode || null;
   }
@@ -43,7 +43,7 @@ class SGroup {
   _rebuildSGroupOnAtomChange() {
     const nLimon = 100000000;
     if (this._center === null) {
-      return;  //nothing to do if we are not relative
+      return; // nothing to do if we are not relative
     }
 
     const bLow = new THREE.Vector3(nLimon, nLimon, nLimon);
@@ -60,7 +60,7 @@ class SGroup {
   buildChemicalFormula(complex, part) {
     let calcCharge = 0;
     let atomsCount = 0;
-    let formula = complex._buildFormulaSimple(part, function(l, c) {
+    let formula = complex._buildFormulaSimple(part, (l, c) => {
       atomsCount = l;
       calcCharge = c;
     });
@@ -68,22 +68,22 @@ class SGroup {
     if (finalCharge !== 0) {
       if (this._repeat > 1) {
         if (atomsCount > 1) {
-          formula = this._repeat.toString() + '(' + formula + ')';
+          formula = `${this._repeat.toString()}(${formula})`;
         } else {
           formula = this._repeat.toString() + formula;
         }
       } else if (atomsCount > 1) {
-        formula = '(' + formula + ')';
+        formula = `(${formula})`;
       }
 
       if (finalCharge > 1) {
-        formula += '^' + finalCharge.toString() + '+';
+        formula += `^${finalCharge.toString()}+`;
       }
       if (finalCharge === 1) {
         formula += '^+';
       }
       if (finalCharge < -1) {
-        formula += '^' + Math.abs(finalCharge).toString() + '-';
+        formula += `^${Math.abs(finalCharge).toString()}-`;
       }
       if (finalCharge === -1) {
         formula += '^-';
@@ -96,4 +96,3 @@ class SGroup {
 }
 
 export default SGroup;
-

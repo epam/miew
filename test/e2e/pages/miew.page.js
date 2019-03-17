@@ -1,4 +1,4 @@
-import {By, Key, until} from 'selenium-webdriver';
+import { By, Key, until } from 'selenium-webdriver';
 
 const timeout = 10000;
 
@@ -15,7 +15,6 @@ const dom = {
 
 /** Class representing a Page Object for the Miew demo website. */
 export default class MiewPage {
-
   /**
    * Create a Page Object.
    * @param {ThenableWebDriver} driver - a Selenium WebDriver instance.
@@ -40,9 +39,8 @@ export default class MiewPage {
       if (!visible) {
         this.driver.findElement(dom.terminal.button).click();
         return this.driver.wait(until.elementIsVisible(terminal), timeout);
-      } else {
-        return Promise.resolve();
       }
+      return Promise.resolve();
     });
   }
 
@@ -74,7 +72,7 @@ export default class MiewPage {
 var miew = window && window.miew;
 var Miew = miew && miew.constructor;
 return miew && Miew && JSON.stringify(${expression});`)
-      .then((json) => JSON.parse(json));
+      .then(json => JSON.parse(json));
   }
 
   /**
@@ -121,5 +119,4 @@ var modeOk = rep && (rep.mode.id === '${mode.toUpperCase()}');
 var colorerOk = rep && (rep.colorer.id === '${colorer.toUpperCase()}');
 return modeOk && colorerOk && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
   }
-
 }

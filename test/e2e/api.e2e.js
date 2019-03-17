@@ -1,3 +1,4 @@
+/* global miew */
 import webdriver from 'selenium-webdriver';
 import ieDriver from 'selenium-webdriver/ie';
 
@@ -15,7 +16,7 @@ let page;
 
 function describeButHideTitle(title, fn) {
   const suite = describe(title, fn);
-  suite.fullTitle = function() {
+  suite.fullTitle = function () {
     return this.parent.fullTitle();
   };
   return suite;
@@ -25,7 +26,7 @@ const describeEpic = describeButHideTitle;
 const describeGroup = describeButHideTitle;
 
 function api(fn, id) {
-  return function() {
+  return function () {
     return page.reload()
       .then(() => page.waitForMiew())
       .then(() => driver.executeScript(fn))
@@ -34,12 +35,11 @@ function api(fn, id) {
   };
 }
 
-describe('As a third-party developer, I want to', function() {
-
+describe('As a third-party developer, I want to', function () {
   this.timeout(0);
   this.slow(1000);
 
-  before(function() {
+  before(() => {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
@@ -55,31 +55,25 @@ describe('As a third-party developer, I want to', function() {
       });
   });
 
-  after(function() {
-    return golden.shutdown();
-  });
+  after(() => golden.shutdown());
 
-  beforeEach(function() {
+  beforeEach(function () {
     golden.report.context.desc = this.currentTest.title;
   });
 
-  describeEpic('use the Miew to display a data set so that I add visualization to my app, i.e.', function() {
-
-    describeGroup('(embed the Miew)', function() {
-
+  describeEpic('use the Miew to display a data set so that I add visualization to my app, i.e.', () => {
+    describeGroup('(embed the Miew)', () => {
       it('embed the Miew in a DIV on my web page so that I show a data set there', api(() => {
         window.miew = new window.Miew();
         if (miew.init()) {
           miew.run();
         }
       }, 'empty'));
-
     });
 
-    describeGroup('(load a data set)', function() {
-
+    describeGroup('(load a data set)', () => {
       it('load a data set with the default appearance so that I save my time and effort on a proper setup', api(() => {
-        window.miew = new window.Miew({load: '../data/1CRN.pdb'});
+        window.miew = new window.Miew({ load: '../data/1CRN.pdb' });
         if (miew.init()) {
           miew.run();
         }
@@ -93,7 +87,7 @@ describe('As a third-party developer, I want to', function() {
             colorer: 'SQ',
           }, {
             mode: 'LN',
-            colorer: ['UN', {color: 0xFFFFFF}],
+            colorer: ['UN', { color: 0xFFFFFF }],
           }],
         });
         if (miew.init()) {
@@ -103,7 +97,7 @@ describe('As a third-party developer, I want to', function() {
 
       it('specify initial position and orientation so that exactly the same picture is reproduced', api(() => {
         window.miew = new window.Miew({
-          settings: {interpolateViews: false},
+          settings: { interpolateViews: false },
           load: '../data/1CRN.pdb',
           view: '1+n4pwTVeI8Erh8LAZHS5PcVcM70wyDlAXe38Pw==',
         });
@@ -117,18 +111,16 @@ describe('As a third-party developer, I want to', function() {
         if (miew.init()) {
           miew.run();
           miew.load('../data/1CRN.pdb').then((name) => {
-            miew.rep({mode: 'TU', colorer: 'SQ'});
-            miew.repAdd({mode: 'LN', colorer: ['UN', {color: 0xFFFFFF}]}, name);
+            miew.rep({ mode: 'TU', colorer: 'SQ' });
+            miew.repAdd({ mode: 'LN', colorer: ['UN', { color: 0xFFFFFF }] }, name);
           });
         }
       }, '1crn_TU_SQ_LN_UN'));
-
     });
 
-    describeGroup('(multiple data sets)', function() {
-
+    describeGroup('(multiple data sets)', () => {
       it('load a data set in place of an existing one so that I don\'t unload it explicitly', api(() => {
-        window.miew = new window.Miew({load: '../data/1CRN.pdb'});
+        window.miew = new window.Miew({ load: '../data/1CRN.pdb' });
         if (miew.init()) {
           miew.run();
           miew.load('../data/4FC1.mmtf');
@@ -168,27 +160,23 @@ describe('As a third-party developer, I want to', function() {
           });
         }
       }, '4fc1'));
-
     });
 
-    describeGroup('(data categories)', function() {
-
+    describeGroup('(data categories)', () => {
       it('load a molecular data set so that I examine molecules');
       it('load a volumetric data set so that I examine raw crystallographic data');
-
     });
 
-    describeGroup('(data providers)', function() {
-
+    describeGroup('(data providers)', () => {
       it('load from a remote URL so that I access both public and private resources', api(() => {
-        window.miew = new window.Miew({load: 'https://files.rcsb.org/view/1CRN.pdb'});
+        window.miew = new window.Miew({ load: 'https://files.rcsb.org/view/1CRN.pdb' });
         if (miew.init()) {
           miew.run();
         }
       }, '1crn'));
 
       it('load by PDB ID so that I display common data sets from the Protein Data Bank', api(() => {
-        window.miew = new window.Miew({load: '1CRN'});
+        window.miew = new window.Miew({ load: '1CRN' });
         if (miew.init()) {
           miew.run();
         }
@@ -197,22 +185,17 @@ describe('As a third-party developer, I want to', function() {
       it('load from a File object so that I handle local user files');
 
       it('load from an immediate text or binary buffer so that I handle data fetching myself');
-
     });
 
-    describeGroup('(data formats)', function() {
-
+    describeGroup('(data formats)', () => {
       it('rely on the data format auto detection during loading so that I don\'t detect this myself');
       it('specify the data format during loading so that I override auto detection algorithm');
-
     });
-
   });
 
-  describeEpic('control the appearance so that I change the picture in response to user actions, i.e.', function() {
+  describeEpic('control the appearance so that I change the picture in response to user actions, i.e.', () => {
   });
 
-  describeEpic('retrieve some properties so that I process them in my own way, i.e.', function() {
+  describeEpic('retrieve some properties so that I process them in my own way, i.e.', () => {
   });
-
 });

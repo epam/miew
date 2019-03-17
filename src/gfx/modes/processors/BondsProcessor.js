@@ -8,10 +8,10 @@ class BondsProcessor extends RCGroup {
     const bonds = complex.getBonds();
     const transforms = complex.getTransforms();
 
-    complex.forEachComponent(function(component) {
+    complex.forEachComponent((component) => {
       const bondsIdc = [];
       let bondsCount = 0;
-      component.forEachBond(function(bond) {
+      component.forEachBond((bond) => {
         const atom1 = bond._left;
         const atom2 = bond._right;
         if (!(atom1._mask & mask) || !(atom2._mask & mask)) {
@@ -23,9 +23,9 @@ class BondsProcessor extends RCGroup {
         return;
       }
       const bondsGroup = new BondsGroup(geoParams, {
-        bonds: bonds,
+        bonds,
         chunks: bondsIdc,
-        parent: complex
+        parent: complex,
       }, colorer, mode, transforms, polyComplexity, material);
       bondsGroup._component = component;
       self.add(bondsGroup);
@@ -34,7 +34,7 @@ class BondsProcessor extends RCGroup {
 
   getSubset(mask, innerOnly) {
     const totalSubset = [];
-    const children = this.children;
+    const { children } = this;
     let meshIdx = 0;
     for (let i = 0, n = children.length; i < n; ++i) {
       if (children[i].getSubset) {

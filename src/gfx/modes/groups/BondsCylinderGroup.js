@@ -4,10 +4,9 @@ import BondsGroup from './BondsGroup';
 class BondsCylinderGroup extends BondsGroup {
   _build() {
     const bondsIdc = this._selection.chunks;
-    const bonds = this._selection.bonds;
-    const parent = this._selection.parent;
+    const { bonds, parent } = this._selection;
     const mode = this._mode;
-    let colorer = this._colorer;
+    const colorer = this._colorer;
     const geo = this._geo;
     const drawMultiple = mode.drawMultiorderBonds();
     const showAromatic = mode.showAromaticLoops();
@@ -32,9 +31,9 @@ class BondsCylinderGroup extends BondsGroup {
       const currStickRad = drawMultiple ? Math.min(stickRad, dist * 0.5 * (1.0 - emptyOffset)) : stickRad;
 
       for (let j = 0; j < order; ++j) {
-        const scale = dist * (order % 2 === 0 ?
-          (((j / 2) | 0) + 0.5) * (1 - 2 * (j % 2)) :
-          (((j + 1) / 2) | 0) * (-1 + 2 * (j % 2)));
+        const scale = dist * (order % 2 === 0
+          ? (((j / 2) | 0) + 0.5) * (1 - 2 * (j % 2))
+          : (((j + 1) / 2) | 0) * (-1 + 2 * (j % 2)));
         chunksToIdx[currBondIdx] = bond._index;
         leftPos.copy(a1Pos);
         leftPos.addScaledVector(normDir, scale);
@@ -51,7 +50,7 @@ class BondsCylinderGroup extends BondsGroup {
 
   updateToFrame(frameData) {
     const bondsIdc = this._selection.chunks;
-    const bonds = this._selection.bonds;
+    const { bonds } = this._selection;
     const mode = this._mode;
     const colorer = this._colorer;
     const geo = this._geo;
@@ -78,9 +77,9 @@ class BondsCylinderGroup extends BondsGroup {
       const currStickRad = drawMultiple ? Math.min(stickRad, dist * 0.5 * (1.0 - emptyOffset)) : stickRad;
 
       for (let j = 0; j < order; ++j) {
-        const scale = dist * (order % 2 === 0 ?
-          (((j / 2) | 0) + 0.5) * (1 - 2 * (j % 2)) :
-          (((j + 1) / 2) | 0) * (-1 + 2 * (j % 2)));
+        const scale = dist * (order % 2 === 0
+          ? (((j / 2) | 0) + 0.5) * (1 - 2 * (j % 2))
+          : (((j + 1) / 2) | 0) * (-1 + 2 * (j % 2)));
         leftPos.copy(a1Pos);
         leftPos.addScaledVector(normDir, scale);
         rightPos.copy(a2Pos);

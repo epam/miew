@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import Volume from '../../chem/Volume';
 import _ from 'lodash';
+import Volume from '../../chem/Volume';
 
 export const valueType = {
   singular: 0,
   vector: 1,
   array: 2,
-  buffer: 3
+  buffer: 3,
 };
 
 class VolumeModel {
@@ -40,32 +40,31 @@ class VolumeModel {
   }
 
   _fillHeader(headerFormat, arrays) {
-    for (let key in headerFormat) {
+    for (const key in headerFormat) {
       if (headerFormat.hasOwnProperty(key)) {
         switch (headerFormat[key][0]) {
+          case valueType.singular:
+            this._header[key] = arrays[headerFormat[key][1]][headerFormat[key][2]];
+            break;
 
-        case valueType.singular:
-          this._header[key] = arrays[headerFormat[key][1]][headerFormat[key][2]];
-          break;
+          case valueType.array:
+            this._parseArray(this._header[key], arrays[headerFormat[key][1]], headerFormat[key][2]);
+            break;
 
-        case valueType.array:
-          this._parseArray(this._header[key], arrays[headerFormat[key][1]], headerFormat[key][2]);
-          break;
+          case valueType.vector:
+            this._parseVector(this._header[key], arrays[headerFormat[key][1]], headerFormat[key][2]);
+            break;
 
-        case valueType.vector:
-          this._parseVector(this._header[key], arrays[headerFormat[key][1]], headerFormat[key][2]);
-          break;
+          case valueType.buffer:
+            this._header[key] = new Uint8Array(
+              arrays[headerFormat[key][1]],
+              [headerFormat[key][2]] * 4,
+              [headerFormat[key][3]] * 4,
+            );
+            break;
 
-        case valueType.buffer:
-          this._header[key] = new Uint8Array(
-            arrays[headerFormat[key][1]],
-            [headerFormat[key][2]] * 4,
-            [headerFormat[key][3]] * 4
-          );
-          break;
-
-        default:
-          break;
+          default:
+            break;
         }
       }
     }
@@ -95,12 +94,13 @@ class VolumeModel {
     const zScale = header.cellDims.z / header.grid[2];
 
     const z1 = Math.cos(header.angles.y);
-    const z2 = (Math.cos(header.angles.x) - Math.cos(header.angles.y) *
-      Math.cos(header.angles.z)) / Math.sin(header.angles.z);
+    const z2 = (Math.cos(header.angles.x) - Math.cos(header.angles.y)
+      * Math.cos(header.angles.z)) / Math.sin(header.angles.z);
     const z3 = Math.sqrt(1.0 - z1 * z1 - z2 * z2);
-    let xaxis = new THREE.Vector3(xScale, 0, 0);
-    let yaxis = new THREE.Vector3(Math.cos(header.angles.z) * yScale, Math.sin(header.angles.z) * yScale, 0);
-    let zaxis = new THREE.Vector3(z1 * zScale, z2 * zScale, z3 * zScale);
+
+    const xaxis = new THREE.Vector3(xScale, 0, 0);
+    const yaxis = new THREE.Vector3(Math.cos(header.angles.z) * yScale, Math.sin(header.angles.z) * yScale, 0);
+    const zaxis = new THREE.Vector3(z1 * zScale, z2 * zScale, z3 * zScale);
 
     return [xaxis, yaxis, zaxis];
   }
@@ -117,7 +117,8 @@ class VolumeModel {
 
   _setBoxParams(xaxis, yaxis, zaxis) {
     // if axes are not orthogonal, the origins might not match with box coordinates - need to make shift
-    let shiftX = 0, shiftY = 0;
+    let shiftX = 0;
+    let shiftY = 0;
 
     if (this._header.angles.z >= Math.PI / 2) {
       shiftX += Math.abs(yaxis.x);
@@ -137,7 +138,7 @@ class VolumeModel {
     this._boxSize = new THREE.Vector3(
       Math.abs(xaxis.x) + Math.abs(yaxis.x) + Math.abs(zaxis.x),
       Math.abs(yaxis.y) + Math.abs(zaxis.y),
-      Math.abs(zaxis.z)
+      Math.abs(zaxis.z),
     );
   }
 

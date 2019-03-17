@@ -11,10 +11,6 @@ import utils from '../../utils';
  */
 
 class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
-  constructor(spheresCount, opts) {
-    super(spheresCount, opts);
-  }
-
   _build() {
     const params = this._opts;
     this.numVoxels = [128, 128, 128];
@@ -42,11 +38,11 @@ class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
         minPosRad[itemIdx] = Math.min(tmpVal, minPosRad[itemIdx]);
       }
     }
-    return {maxPosRad: maxPosRad, minPosRad: minPosRad};
+    return { maxPosRad, minPosRad };
   }
 
   _findNumVoxels(posRadArray, params) {
-    const numVoxels = this.numVoxels;
+    const { numVoxels } = this;
     const minMaxValues = this._findMinMax(posRadArray);
     const minCoordRad = minMaxValues.minPosRad;
     const maxCoordRad = minMaxValues.maxPosRad;
@@ -74,17 +70,15 @@ class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
     this.yAxis.y = (numVoxels[1] - 1) * params.gridSpacing;
     this.zAxis.z = (numVoxels[2] - 1) * params.gridSpacing;
 
-    this.origin.x = minCoordRad[0];
-    this.origin.y = minCoordRad[1];
-    this.origin.z = minCoordRad[2];
+    [this.origin.x, this.origin.y, this.origin.z] = minCoordRad;
 
-    return {bbox: minMaxValues, dim: numVoxels};
+    return { bbox: minMaxValues, dim: numVoxels };
   }
 
   _makeSurface(surface, params) {
     const isoSurf = new IsoSurface();
     isoSurf.compute(surface.volMap, this.origin, params.isoValue, 1);
-    isoSurf.vertexFusion(9, 9);//normalization is included
+    isoSurf.vertexFusion(9, 9);// normalization is included
 
     if (isoSurf._numTriangles > 0) {
       isoSurf.setColorVolTex(surface.volTexMap, surface.atomMap, surface.atomWeightMap, this._visibilitySelector);
@@ -111,7 +105,7 @@ class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
 
     const box = new THREE.Box3(
       this.origin,
-      new THREE.Vector3(this.xAxis.x, this.yAxis.y, this.zAxis.z).add(this.origin)
+      new THREE.Vector3(this.xAxis.x, this.yAxis.y, this.zAxis.z).add(this.origin),
     );
     const surface = this._computeSurface(packedArrays, box, boundaries, params);
 

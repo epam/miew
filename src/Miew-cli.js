@@ -1,39 +1,40 @@
 import _ from 'lodash';
 import Miew from './Miew';
-import {parser as parsercli} from './utils/MiewCLIParser';
+import { parser as parsercli } from './utils/MiewCLIParser';
 import clihelp from './utils/MiewCLIHelp';
 import JSONConverter from './utils/JSONtoSelectorConverter';
 import logger from './utils/logger';
 import utils from './utils';
 
-var
-  selectors = Miew.chem.selectors,
-  modes = Miew.modes,
-  colorers = Miew.colorers,
-  materials = Miew.materials,
-  palettes = Miew.palettes,
-  options = Miew.options,
-  settings = Miew.settings;
+const {
+  chem: { selectors },
+  modes,
+  colorers,
+  materials,
+  palettes,
+  options,
+  settings,
+} = Miew;
 
 function None() {
 }
 
-var NULL = (function() {
-  var obj = new None();
-  return function() {
+const NULL = (function () {
+  const obj = new None();
+  return function () {
     return obj;
   };
-})();
+}());
 
 function RepresentationMap() {
   this.representationMap = {};
   this.representationID = {};
 }
-RepresentationMap.prototype.get = function(strId) {
+RepresentationMap.prototype.get = function (strId) {
   return this.representationMap[strId] || this.representationID[strId] || '<no name>';
 };
 
-RepresentationMap.prototype.add = function(strId, index) {
+RepresentationMap.prototype.add = function (strId, index) {
   if (index !== undefined) {
     if (!this.representationMap.hasOwnProperty(strId)) {
       this.representationMap[strId.toString()] = index;
@@ -42,19 +43,19 @@ RepresentationMap.prototype.add = function(strId, index) {
       return 'This name has already existed, registered without name';
     }
   }
-  return 'Representation ' + strId + ' successfully added';
+  return `Representation ${strId} successfully added`;
 };
 
-RepresentationMap.prototype.remove = function(index) {
+RepresentationMap.prototype.remove = function (index) {
   if (index && this.representationID.hasOwnProperty(index)) {
     delete this.representationMap[this.representationID[index]];
     delete this.representationID[index];
   }
 
-  var sortedKeys = Object.keys(this.representationID).sort();
-  for (var i in sortedKeys) {
+  const sortedKeys = Object.keys(this.representationID).sort();
+  for (const i in sortedKeys) {
     if (sortedKeys.hasOwnProperty(i)) {
-      var id = sortedKeys[i];
+      const id = sortedKeys[i];
       if (id > index) {
         this.representationID[id - 1] = this.representationID[id];
         this.representationMap[this.representationID[id]] -= 1;
@@ -64,22 +65,22 @@ RepresentationMap.prototype.remove = function(index) {
   }
 };
 
-RepresentationMap.prototype.clear = function() {
+RepresentationMap.prototype.clear = function () {
   this.representationMap = {};
   this.representationID = {};
 };
-var representationsStorage = new RepresentationMap();
+const representationsStorage = new RepresentationMap();
 
 function CLIUtils() {
 }
-//repIndexOrRepMap could be RepresentationMap or index
-CLIUtils.prototype.list = function(miew, repMap, key) {
-  var ret = '';
+// repIndexOrRepMap could be RepresentationMap or index
+CLIUtils.prototype.list = function (miew, repMap, key) {
+  let ret = '';
   if (miew && repMap !== undefined) {
     if (key === undefined || key === '-e') {
-      var count = miew.repCount();
+      const count = miew.repCount();
 
-      for (var i = 0; i < count; i++) {
+      for (let i = 0; i < count; i++) {
         ret += this.listRep(miew, repMap, i, key);
       }
     }
@@ -87,7 +88,7 @@ CLIUtils.prototype.list = function(miew, repMap, key) {
   return ret;
 };
 
-CLIUtils.prototype.listRep = function(miew, repMap, repIndex, key) {
+CLIUtils.prototype.listRep = function (miew, repMap, repIndex, key) {
   let ret = '';
   const rep = miew.repGet(repIndex);
   if (!rep) {
@@ -97,67 +98,66 @@ CLIUtils.prototype.listRep = function(miew, repMap, repIndex, key) {
   const index = repIndex;
   const repName = repMap.get(index);
 
-  const mode = rep.mode;
+  const { mode, colorer } = rep;
   const selectionStr = rep.selectorString;
-  const colorer = rep.colorer;
   const material = rep.materialPreset;
 
-  ret += '#' + index + ' : ' + mode.name + (repName === '<no name>' ? '' : ', ' + repName) + '\n';
+  ret += `#${index} : ${mode.name}${repName === '<no name>' ? '' : `, ${repName}`}\n`;
 
   if (key !== undefined) {
-    ret += '    selection : "' + selectionStr + '"\n';
-    ret += '    mode      : (' + mode.id + '), ' + mode.name + '\n';
-    ret += '    colorer   : (' + colorer.id + '), ' + colorer.name + '\n';
-    ret += '    material  : (' + material.id + '), ' + material.name + '\n';
+    ret += `    selection : "${selectionStr}"\n`;
+    ret += `    mode      : (${mode.id}), ${mode.name}\n`;
+    ret += `    colorer   : (${colorer.id}), ${colorer.name}\n`;
+    ret += `    material  : (${material.id}), ${material.name}\n`;
   }
 
   return ret;
 };
 
-CLIUtils.prototype.listSelector = function(miew, context) {
-  var ret = '';
+CLIUtils.prototype.listSelector = function (miew, context) {
+  let ret = '';
 
-  for (var k in context) {
+  for (const k in context) {
     if (context.hasOwnProperty(k)) {
-      ret += k + ' : "' + context[k] + '"\n';
+      ret += `${k} : "${context[k]}"\n`;
     }
   }
 
   return ret;
 };
 
-CLIUtils.prototype.listObjs = function(miew) {
-  var objs = miew._objects;
+CLIUtils.prototype.listObjs = function (miew) {
+  const objs = miew._objects;
 
   if (!objs || !Array.isArray(objs) || objs.length === 0) {
     return 'There are no objects on the scene';
   }
 
-  var strList = [];
-  for (var i = 0, n = objs.length; i < n; ++i) {
-    strList[i] = '' + i + ': ' + objs[i].toString();
+  const strList = [];
+  for (let i = 0, n = objs.length; i < n; ++i) {
+    strList[i] = `${i}: ${objs[i].toString()}`;
   }
 
   return strList.join('\n');
 };
 
-CLIUtils.prototype.joinHelpStr = function(helpData) {
+CLIUtils.prototype.joinHelpStr = function (helpData) {
   if (helpData instanceof Array) {
     return helpData.join('\n');
   }
   return helpData;
 };
 
-CLIUtils.prototype.help = function(path) {
+CLIUtils.prototype.help = function (path) {
   if (_.isUndefined(path)) {
-    return this.joinHelpStr(clihelp.$help) + '\n' + _.slice(_.sortBy(_.keys(clihelp)), 1).join(', ') + '\n';
+    return `${this.joinHelpStr(clihelp.$help)}\n${_.slice(_.sortBy(_.keys(clihelp)), 1).join(', ')}\n`;
   }
 
-  var helpItem = _.get(clihelp, path);
-  return _.isUndefined(helpItem) ? this.help() : this.joinHelpStr(helpItem.$help) + '\n';
+  const helpItem = _.get(clihelp, path);
+  return _.isUndefined(helpItem) ? this.help() : `${this.joinHelpStr(helpItem.$help)}\n`;
 };
 
-CLIUtils.prototype.load = function(miew, arg) {
+CLIUtils.prototype.load = function (miew, arg) {
   if (miew === undefined || arg === undefined || arg === '-f') {
     return;
   }
@@ -166,13 +166,30 @@ CLIUtils.prototype.load = function(miew, arg) {
   miew.load(arg).then(finish, finish);
 };
 
-CLIUtils.prototype.checkArg = function(key, arg, modificate) {
+function keyRemap(key) {
+  const keys = {
+    s: 'selector',
+    m: 'mode',
+    c: 'colorer',
+    mt: 'material',
+    mode: 'modes',
+    color: 'colorers',
+    colorer: 'colorers',
+    select: 'selector',
+    material: 'materials',
+    selector: 'selector',
+  };
+  const ans = keys[key];
+  return ans === undefined ? key : ans;
+}
+
+CLIUtils.prototype.checkArg = function (key, arg, modificate) {
   if (key !== undefined && arg !== undefined) {
     if (keyRemap(key) === 'selector') {
       const res = selectors.parse(arg);
 
       if (res.error !== undefined) {
-        const selExc = {message: res.error};
+        const selExc = { message: res.error };
         throw selExc;
       }
 
@@ -183,19 +200,20 @@ CLIUtils.prototype.checkArg = function(key, arg, modificate) {
     }
 
     const modificators = {
-      'colorers' : colorers,
-      'modes' : modes,
-      'materials' : materials,
+      colorers,
+      modes,
+      materials,
     };
 
-    let modificator = key, temp;
+    let modificator = key;
+    let temp;
     while (modificator !== temp) {
       temp = modificator;
       modificator = keyRemap(temp);
     }
 
     if (modificators[modificator].get(arg) === undefined) {
-      const exc = {message: arg + ' is not existed in ' + modificator};
+      const exc = { message: `${arg} is not existed in ${modificator}` };
       throw exc;
     }
     return arg;
@@ -203,17 +221,17 @@ CLIUtils.prototype.checkArg = function(key, arg, modificate) {
   return NULL;
 };
 
-CLIUtils.prototype.propagateProp = function(path, arg) {
+CLIUtils.prototype.propagateProp = function (path, arg) {
   if (path !== undefined) {
     let argExc = {};
     const adapter = options.adapters[typeof _.get(settings.defaults, path)];
     if (adapter === undefined) {
-      const pathExc = {message: path + ' is not existed'};
+      const pathExc = { message: `${path} is not existed` };
       throw pathExc;
     }
 
-    if ((path.endsWith('.color') || path.endsWith('.baseColor') ||
-             path.endsWith('.EL.carbon')) && typeof arg !== 'number') {
+    if ((path.endsWith('.color') || path.endsWith('.baseColor')
+             || path.endsWith('.EL.carbon')) && typeof arg !== 'number') {
       arg = palettes.get(settings.now.palette).getNamedColor(arg);
     }
 
@@ -221,19 +239,19 @@ CLIUtils.prototype.propagateProp = function(path, arg) {
       if (typeof arg !== 'number') {
         const val = palettes.get(settings.now.palette).getNamedColor(arg, true);
         if (val !== undefined) {
-          arg = '0x' + val.toString(16);
+          arg = `0x${val.toString(16)}`;
         }
       } else {
-        arg = '0x' + arg.toString(16);
+        arg = `0x${arg.toString(16)}`;
       }
     }
 
     if (path.endsWith('.template')) {
-      arg = arg.replace(/\\n/g, '\n');//NOSONAR
+      arg = arg.replace(/\\n/g, '\n');// NOSONAR
     }
 
     if (arg !== undefined && adapter(arg) !== arg && adapter(arg) !== (arg > 0)) {
-      argExc = {message: path + ' must be a "' + (typeof _.get(settings.defaults, path)) + '"'};
+      argExc = { message: `${path} must be a "${typeof _.get(settings.defaults, path)}"` };
       throw argExc;
     }
 
@@ -247,7 +265,7 @@ CLIUtils.prototype.propagateProp = function(path, arg) {
         }
       }
       if (!isValid) {
-        argExc = {message: `${path} must be one of [${possibleThemes}]`};
+        argExc = { message: `${path} must be one of [${possibleThemes}]` };
         throw argExc;
       }
     }
@@ -255,11 +273,11 @@ CLIUtils.prototype.propagateProp = function(path, arg) {
   return arg;
 };
 
-CLIUtils.prototype.unquoteString = function(value) {
+CLIUtils.prototype.unquoteString = function (value) {
   return utils.unquoteString(value);
 };
 
-var utilFunctions = new CLIUtils();
+const utilFunctions = new CLIUtils();
 
 function SRVScenarioItem(_pdbID, _presetId, _delay, _description) {
   this.pdbId = -1;
@@ -293,7 +311,7 @@ function SRVScenarioScript() {
   return this;
 }
 
-SRVScenarioScript.prototype.addItem = function(id, item) {
+SRVScenarioScript.prototype.addItem = function (id, item) {
   this.scenarioId = id;
   this.data.push(item);
 };
@@ -311,16 +329,15 @@ function SRVProxy() {
   this.scenarioContext = new SRVScenarioContext();
 }
 
-SRVProxy.prototype.requestScenarioID = function(miew, name, done, fail) {
+SRVProxy.prototype.requestScenarioID = function (miew, name, done, fail) {
   const self = this;
 
   function doneFindScenario(scenarioList) {
     if (scenarioList instanceof Array) {
-      var availableItems = _.filter(scenarioList, function(item) {
-        return item.name !== undefined &&
-              item.name.toLowerCase() === name.toLowerCase() ||
-              item.id === Number(name);
-      });
+      const availableItems = _.filter(scenarioList, item => (
+        (item.name !== undefined && item.name.toLowerCase() === name.toLowerCase())
+        || item.id === Number(name)
+      ));
       if (availableItems.length < 1) {
         if (fail !== undefined) {
           fail('File not found');
@@ -357,8 +374,8 @@ SRVProxy.prototype.requestScenarioID = function(miew, name, done, fail) {
   }
 };
 
-SRVProxy.prototype.requestPdbID = function(miew, path, done, fail) {
-  var self = this;
+SRVProxy.prototype.requestPdbID = function (miew, path, done, fail) {
+  const self = this;
 
   function doneFindTopology(topologyList) {
     if (topologyList instanceof Array) {
@@ -391,7 +408,7 @@ SRVProxy.prototype.requestPdbID = function(miew, path, done, fail) {
     self.finish(miew);
   }
 
-  var pathParts = path.split('/');
+  const pathParts = path.split('/');
   miew.awaitWhileCMDisInProcess();
 
   if (pathParts.length !== 1) {
@@ -400,7 +417,7 @@ SRVProxy.prototype.requestPdbID = function(miew, path, done, fail) {
     }
     self.finish(miew);
   } else {
-    var pdbID = Number(pathParts[0]);
+    const pdbID = Number(pathParts[0]);
     if (!Number.isNaN(pdbID)) {
       done(pdbID);
     } else {
@@ -409,9 +426,9 @@ SRVProxy.prototype.requestPdbID = function(miew, path, done, fail) {
   }
 };
 
-SRVProxy.prototype.requestPresetId = function(miew, path, done, fail) {
-  var self = this;
-  var pathParts = path.split('/');
+SRVProxy.prototype.requestPresetId = function (miew, path, done, fail) {
+  const self = this;
+  const pathParts = path.split('/');
   miew.awaitWhileCMDisInProcess();
 
   function failPdb(message) {
@@ -423,15 +440,10 @@ SRVProxy.prototype.requestPresetId = function(miew, path, done, fail) {
     self.finish(miew);
   }
 
-  function donePdb(id) {
-    miew.srvPresetList(id, donePresetList, failPdb);
-  }
-
   function donePresetList(presetList) {
     if (presetList instanceof Array) {
-      var availableItems = _.filter(presetList, function(item) {
-        return item.name.toLowerCase() === pathParts[1].toLowerCase() || item.id === Number(pathParts[1]);
-      });
+      const suits = item => item.name.toLowerCase() === pathParts[1].toLowerCase() || item.id === Number(pathParts[1]);
+      const availableItems = _.filter(presetList, suits);
 
       if (availableItems.length < 1) {
         if (fail !== undefined) {
@@ -453,6 +465,10 @@ SRVProxy.prototype.requestPresetId = function(miew, path, done, fail) {
     }
   }
 
+  function donePdb(id) {
+    miew.srvPresetList(id, donePresetList, failPdb);
+  }
+
   if (pathParts.length !== 2) {
     if (fail !== undefined) {
       fail('Path can has 2 levels only (pdb/preset)');
@@ -463,16 +479,16 @@ SRVProxy.prototype.requestPresetId = function(miew, path, done, fail) {
   }
 };
 
-SRVProxy.prototype.createScenario = function(name) {
+SRVProxy.prototype.createScenario = function (name) {
   this.scenarioContext = new SRVScenarioContext(name);
 };
 
-SRVProxy.prototype.resetScenario = function() {
+SRVProxy.prototype.resetScenario = function () {
   this.scenarioContext = new SRVScenarioContext();
 };
 
-SRVProxy.prototype.deleteScenario = function(miew, echo, error, name) {
-  var self = this;
+SRVProxy.prototype.deleteScenario = function (miew, echo, error, name) {
+  const self = this;
 
   this.init(miew, echo);
   miew.awaitWhileCMDisInProcess();
@@ -503,31 +519,31 @@ SRVProxy.prototype.deleteScenario = function(miew, echo, error, name) {
   }
 };
 
-SRVProxy.prototype.listScenario = function(miew, echo, error, name) {
-  var self = this;
+SRVProxy.prototype.listScenario = function (miew, echo, error, name) {
+  const self = this;
 
   this.init(miew, echo);
   miew.awaitWhileCMDisInProcess();
 
   function done(scenarioList) {
     if (scenarioList instanceof Array) {
-      var res = '';
+      let res = '';
 
-      for (var i = 0, n = scenarioList.length; i < n; ++i) {
-        var draw = name === undefined;
-        var drawExpand = name === '-e' || scenarioList[i].id === Number(name) || scenarioList[i].name === name;
+      for (let i = 0, n = scenarioList.length; i < n; ++i) {
+        const draw = name === undefined;
+        const drawExpand = name === '-e' || scenarioList[i].id === Number(name) || scenarioList[i].name === name;
 
         if (draw || drawExpand) {
-          res += 'id : ' + scenarioList[i].id + ', name : ' + scenarioList[i].name + '\n';
+          res += `id : ${scenarioList[i].id}, name : ${scenarioList[i].name}\n`;
           if (drawExpand) {
-            var data = JSON.parse(scenarioList[i].script).data;
+            const { data } = JSON.parse(scenarioList[i].script);
             res += 'scenario : \n';
-            for (var j = 0, m = data.length; j < m; ++j) {
-              res += '    index : ' + j + '\n';
-              res += '        pdbId       : ' + data[j].pdbId + '\n';
-              res += '        presetId    : ' + data[j].presetId + '\n';
-              res += '        delay       : ' + data[j].delay + '\n';
-              res += '        description : ' + data[j].description + '\n';
+            for (let j = 0, m = data.length; j < m; ++j) {
+              res += `    index : ${j}\n`;
+              res += `        pdbId       : ${data[j].pdbId}\n`;
+              res += `        presetId    : ${data[j].presetId}\n`;
+              res += `        delay       : ${data[j].delay}\n`;
+              res += `        description : ${data[j].description}\n`;
             }
           }
         }
@@ -547,25 +563,22 @@ SRVProxy.prototype.listScenario = function(miew, echo, error, name) {
   miew.srvScenarioList(done, fail);
 };
 
-SRVProxy.prototype.addScenarioItem = function(miew, echo, error) {
-  var self = this;
-
-  var selfArguments = arguments;
+SRVProxy.prototype.addScenarioItem = function (...args) {
+  const { miew, echo, error } = args;
+  const self = this;
 
   this.init(miew, echo);
   miew.awaitWhileCMDisInProcess();
 
   function doneFindPdb(id) {
     if (id >= 0) {
-      selfArguments[3] = id;
-      self.addScenarioItem.apply(self, selfArguments);
+      self.addScenarioItem(...args, id);
     }
   }
 
   function doneFindPreset(id) {
     if (id >= 0) {
-      selfArguments[4] = id;
-      self.addScenarioItem.apply(self, selfArguments);
+      self.addScenarioItem(...args, id);
     }
   }
 
@@ -588,7 +601,7 @@ SRVProxy.prototype.addScenarioItem = function(miew, echo, error) {
     self.scenarioContext.script.addItem(self.scenarioContext.id, new SRVScenarioItem(pdbId, presetId, delay, desc));
     miew.srvScenarioAdd(
       self.scenarioContext.id, self.scenarioContext.name,
-      JSON.stringify(self.scenarioContext.script), done, fail
+      JSON.stringify(self.scenarioContext.script), done, fail,
     );
   }
 
@@ -599,17 +612,14 @@ SRVProxy.prototype.addScenarioItem = function(miew, echo, error) {
   }
 
 
-  if (arguments.length === 7) {
-    var _pdb = arguments[3];
-    var _preset = arguments[4];
-    var _delay = arguments[5];
-    var _desc = arguments[6];
+  if (args.length === 7) {
+    const [,,, _pdb, _preset, _delay, _desc] = args;
 
     if (_.isString(_pdb)) {
       this.requestPdbID(miew, _pdb, doneFindPdb, fail);
     } else if (_.isString(_preset)) {
-      this.requestPresetId(miew, _pdb + '/' + _preset, doneFindPreset, fail);
-    } else if (typeof  _pdb === 'number' && typeof  _preset === 'number') {
+      this.requestPresetId(miew, `${_pdb}/${_preset}`, doneFindPreset, fail);
+    } else if (typeof _pdb === 'number' && typeof _preset === 'number') {
       doAddItem(_pdb, _preset, _delay, _desc);
     } else {
       fail('Internal error');
@@ -617,7 +627,7 @@ SRVProxy.prototype.addScenarioItem = function(miew, echo, error) {
       return undefined;
     }
   } else if (arguments.length === 5) {
-    //proceed with pdb and preset id's
+    // proceed with pdb and preset id's
     error('not supported now');
     self.finish(miew);
     return undefined;
@@ -629,11 +639,11 @@ SRVProxy.prototype.addScenarioItem = function(miew, echo, error) {
   return undefined;
 };
 
-SRVProxy.prototype.init = function(miew, echo) {
-  var self = this;
+SRVProxy.prototype.init = function (miew, echo) {
+  const self = this;
 
   if (!this.isOnApllyPresetEventInitialized) {
-    miew.addEventListener('presetApplyFinished', function() {
+    miew.addEventListener('presetApplyFinished', () => {
       self.finish(miew);
       if (echo !== undefined) {
         echo('Preset applied');
@@ -643,21 +653,21 @@ SRVProxy.prototype.init = function(miew, echo) {
   }
 };
 
-SRVProxy.prototype.finish = function(miew) {
+SRVProxy.prototype.finish = function (miew) {
   miew.finishAwaitingCMDInProcess();
 };
 
-//repIndexOrRepMap could be RepresentationMap or index
-SRVProxy.prototype.fileList = function(miew, echo, error, fileId, idStarts) {
-  var self = this;
+// repIndexOrRepMap could be RepresentationMap or index
+SRVProxy.prototype.fileList = function (miew, echo, error, fileId, idStarts) {
+  const self = this;
 
   this.init(miew, echo);
 
   function done(list) {
     if (list !== undefined) {
-      for (var i = 0; i < list.length; i++) {
+      for (let i = 0; i < list.length; i++) {
         if (idStarts === undefined || list[i].name.toLowerCase().startsWith(idStarts.toLowerCase())) {
-          echo(list[i].name + ', id= ' + list[i].id);
+          echo(`${list[i].name}, id= ${list[i].id}`);
         }
       }
     }
@@ -666,7 +676,7 @@ SRVProxy.prototype.fileList = function(miew, echo, error, fileId, idStarts) {
 
   function fail(message) {
     if (message !== undefined) {
-      echo(message + '\n');
+      echo(`${message}\n`);
     }
     self.finish(miew);
   }
@@ -680,8 +690,15 @@ SRVProxy.prototype.fileList = function(miew, echo, error, fileId, idStarts) {
   }
 };
 
-SRVProxy.prototype.callSrvFunc = function(miew, echo, error, func) {
-  var self = this;
+SRVProxy.prototype.callSrvFunc = function (...args) {
+  const {
+    miew,
+    echo,
+    error,
+    funcName,
+    ...rest
+  } = args;
+  const self = this;
 
   this.init(miew, echo);
 
@@ -700,36 +717,21 @@ SRVProxy.prototype.callSrvFunc = function(miew, echo, error, func) {
   }
 
   miew.awaitWhileCMDisInProcess();
-  func =  miew[func];
-  if (func !== undefined) {
-    switch (arguments.length) {
-    case 4:
-      func.call(miew, done, fail);
-      break;
-    case 5:
-      func.call(miew, arguments[4], done, fail);
-      break;
-    case 6:
-      func.call(miew, arguments[4], arguments[5], done, fail);
-      break;
-    case 7:
-      func.call(miew, arguments[4], arguments[5], arguments[6], done, fail);
-      break;
-    default:
-      this.finish(miew);
-    }
+  const func = miew[funcName];
+  if (func !== undefined && args.length >= 4) {
+    func.call(miew, ...rest, done, fail);
   } else {
     this.finish(miew);
   }
 };
 
-SRVProxy.prototype.coroutineWithPresetPath = function(miew, echo, error, path, callBack, arg) {
-  var self = this;
+SRVProxy.prototype.coroutineWithPresetPath = function (miew, echo, error, path, callBack, arg) {
+  const self = this;
 
   this.init(miew, echo);
 
   miew.awaitWhileCMDisInProcess();
-  var pathParts = path.split('/');
+  const pathParts = path.split('/');
 
   function done(message) {
     if (message !== undefined) {
@@ -738,11 +740,17 @@ SRVProxy.prototype.coroutineWithPresetPath = function(miew, echo, error, path, c
     self.finish(miew);
   }
 
+  function fail(message) {
+    if (message !== undefined) {
+      error(message);
+    }
+    self.finish(miew);
+  }
+
   function donePresetList(presetList) {
     if (presetList instanceof Array) {
-      var availableItems = _.filter(presetList, function(item) {
-        return item.name.toLowerCase() === pathParts[1].toLowerCase() || item.id === Number(pathParts[1]);
-      });
+      const suits = item => item.name.toLowerCase() === pathParts[1].toLowerCase() || item.id === Number(pathParts[1]);
+      const availableItems = _.filter(presetList, suits);
 
       if (availableItems.length < 1) {
         error('Preset not found');
@@ -776,14 +784,6 @@ SRVProxy.prototype.coroutineWithPresetPath = function(miew, echo, error, path, c
     }
   }
 
-  function fail(message) {
-    if (message !== undefined) {
-      error(message);
-    }
-    self.finish(miew);
-  }
-
-
   if (pathParts.length !== 2) {
     error('Path can has 2 levels only (pdb/preset)');
     self.finish(miew);
@@ -792,18 +792,27 @@ SRVProxy.prototype.coroutineWithPresetPath = function(miew, echo, error, path, c
   }
 };
 
-SRVProxy.prototype.coroutineWithFileName = function(miew, echo, error, name, callBack) {
-  var self = this;
-  var selfArguments = arguments;
+SRVProxy.prototype.coroutineWithFileName = function (...args) {
+  const {
+    miew, echo, error, name, callBack,
+  } = args;
+  const self = this;
 
   this.init(miew);
 
   miew.awaitWhileCMDisInProcess();
-  var pathParts = name.split('/');
+  const pathParts = name.split('/');
 
   function done(message) {
     if (message !== undefined) {
       echo(message);
+    }
+    self.finish(miew);
+  }
+
+  function fail(message) {
+    if (message !== undefined) {
+      error(message);
     }
     self.finish(miew);
   }
@@ -815,35 +824,28 @@ SRVProxy.prototype.coroutineWithFileName = function(miew, echo, error, name, cal
       } else if (topologyList.length > 1) {
         error('There are two or more files, please specify one by file_id');
       } else {
-        switch (selfArguments.length) {
-        case 5:
-          callBack.call(miew, topologyList[0].id, done, fail);
-          break;
-        case 6:
-          callBack.call(miew, topologyList[0].id, selfArguments[5], done, fail);
-          break;
-        case 9:
-          callBack.call(selfArguments[5], selfArguments[6], selfArguments[7], selfArguments[8], topologyList[0].id);
-          break;
-        case 10:
-          callBack.call(
-            selfArguments[5], selfArguments[6], selfArguments[7],
-            selfArguments[8], topologyList[0].id, selfArguments[9]
-          );
-          break;
-        default:
-          self.finish(miew);
+        switch (args.length) {
+          case 5:
+            callBack.call(miew, topologyList[0].id, done, fail);
+            break;
+          case 6:
+            callBack.call(miew, topologyList[0].id, args[5], done, fail);
+            break;
+          case 9:
+            callBack.call(args[5], args[6], args[7], args[8], topologyList[0].id);
+            break;
+          case 10:
+            callBack.call(
+              args[5], args[6], args[7],
+              args[8], topologyList[0].id, args[9],
+            );
+            break;
+          default:
+            self.finish(miew);
         }
       }
     }
 
-    self.finish(miew);
-  }
-
-  function fail(message) {
-    if (message !== undefined) {
-      error(message);
-    }
     self.finish(miew);
   }
 
@@ -855,35 +857,19 @@ SRVProxy.prototype.coroutineWithFileName = function(miew, echo, error, name, cal
   }
 };
 
-var srvFunctions = new SRVProxy();
+const srvFunctions = new SRVProxy();
 
 function CreateObjectPair(a, b) {
-  var obj = {};
+  const obj = {};
   obj[a] = b;
   return obj;
-}
-
-function keyRemap(key) {
-  var keys = {
-    s:  'selector',
-    m:  'mode',
-    c:  'colorer',
-    mt: 'material',
-    mode: 'modes',
-    color: 'colorers',
-    colorer: 'colorers',
-    select : 'selector',
-    material: 'materials',
-    selector: 'selector',
-  };
-  var ans = keys[key];
-  return ans === undefined ? key : ans;
 }
 
 function ArgList(arg) {
   if (arg instanceof this.constructor) {
     return arg;
-  } else if (arg instanceof Array) {
+  }
+  if (arg instanceof Array) {
     this._values = arg.slice(0);
   } else if (arg) {
     this._values = [arg];
@@ -892,27 +878,27 @@ function ArgList(arg) {
   }
 }
 
-ArgList.prototype.append = function(value) {
-  var values = this._values;
+ArgList.prototype.append = function (value) {
+  const values = this._values;
   values[values.length] = value;
   return this;
 };
 
-ArgList.prototype.remove = function(value) {
-  var values = this._values;
-  var index = values.indexOf(value);
+ArgList.prototype.remove = function (value) {
+  const values = this._values;
+  const index = values.indexOf(value);
   if (index >= 0) {
     values.splice(index, 1);
   }
   return this;
 };
 
-ArgList.prototype.toJSO = function(cliUtils, cmd, arg) {
-  var res = {};
+ArgList.prototype.toJSO = function (cliUtils, cmd, arg) {
+  const res = {};
 
-  var list = this._values;
-  for (var i = 0, n = list.length; i < n; ++i) {
-    _.set(res, list[i].id, cliUtils.propagateProp(keyRemap(cmd) + '.' + arg + '.' + list[i].id, list[i].val));
+  const list = this._values;
+  for (let i = 0, n = list.length; i < n; ++i) {
+    _.set(res, list[i].id, cliUtils.propagateProp(`${keyRemap(cmd)}.${arg}.${list[i].id}`, list[i].val));
   }
 
   return res;
@@ -923,7 +909,7 @@ function Arg(_id, _val) {
   this.val = _val;
 }
 
-var cliutils = Object.create({});
+const cliutils = Object.create({});
 
 cliutils.Arg = Arg;
 cliutils.ArgList = ArgList;
@@ -932,7 +918,7 @@ cliutils.miew = null;
 cliutils.echo = null;
 cliutils.representations = representationsStorage;
 cliutils.utils = utilFunctions;
-cliutils.srv   = srvFunctions;
+cliutils.srv = srvFunctions;
 
 cliutils._ = _;
 cliutils.CreateObjectPair = CreateObjectPair;
@@ -942,11 +928,11 @@ cliutils.ClearContext = selectors.ClearContext;
 
 cliutils.NULL = NULL;
 
-cliutils.notimplemented = function() {
+cliutils.notimplemented = function () {
   return this.NULL;
 };
 
-Miew.prototype.script = function(script, _printCallback, _errorCallback) {
+Miew.prototype.script = function (script, _printCallback, _errorCallback) {
   parsercli.yy.miew = this;
   parsercli.yy.echo = _printCallback;
   parsercli.yy.error = _errorCallback;
@@ -961,26 +947,26 @@ Miew.prototype.script = function(script, _printCallback, _errorCallback) {
   this.cmdQueue = this.cmdQueue.concat(script.split('\n'));
 };
 
-Miew.prototype.awaitWhileCMDisInProcess = function() {
+Miew.prototype.awaitWhileCMDisInProcess = function () {
   this.commandInAction = true;
 };
 
-Miew.prototype.finishAwaitingCMDInProcess = function() {
+Miew.prototype.finishAwaitingCMDInProcess = function () {
   this.commandInAction = false;
 };
 
-Miew.prototype.isScriptingCommandAvailable = function() {
-  return this.commandInAction !== undefined &&
-         !this.commandInAction &&
-         this.cmdQueue !== undefined &&
-         this.cmdQueue.length > 0;
+Miew.prototype.isScriptingCommandAvailable = function () {
+  return this.commandInAction !== undefined
+         && !this.commandInAction
+         && this.cmdQueue !== undefined
+         && this.cmdQueue.length > 0;
 };
 
-Miew.prototype.callNextCmd = function() {
+Miew.prototype.callNextCmd = function () {
   if (this.isScriptingCommandAvailable()) {
-    var cmd = this.cmdQueue.shift();
+    const cmd = this.cmdQueue.shift();
 
-    var res = {};
+    const res = {};
     res.success = false;
     try {
       parsercli.parse(cmd);
@@ -1000,4 +986,3 @@ Miew.JSONConverter = JSONConverter;
 parsercli.yy = cliutils;
 // FIXME: workaround for incorrect JISON parser generator for AMD module
 parsercli.yy.parseError = parsercli.parseError;
-

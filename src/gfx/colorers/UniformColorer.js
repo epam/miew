@@ -3,10 +3,6 @@ import Colorer from './Colorer';
 class UniformColorer extends Colorer {
   static id = 'UN';
 
-  constructor(opts) {
-    super(opts);
-  }
-
   getAtomColor(_atom, _complex) {
     return this.opts.color;
   }

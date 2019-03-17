@@ -52,7 +52,7 @@ class StructuralElement {
     const end = complex.splitUnifiedSerial(this.term);
     for (let chainId = start.chain; chainId <= end.chain; chainId++) {
       for (let serialId = start.serial; serialId <= end.serial; serialId++) {
-        for (let iCode = start.iCode; iCode <= end.iCode; iCode++) {
+        for (let { iCode } = start; iCode <= end.iCode; iCode++) {
           const hashCode = complex.getUnifiedSerial(chainId, serialId, iCode);
           if (residueHash[hashCode]) {
             residueHash[hashCode]._secondary = this;

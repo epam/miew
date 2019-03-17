@@ -23,7 +23,7 @@ function createLabel(fieldTxt, className) {
     text.appendChild(spanText);
   } else {
     text.appendChild(fieldTxt);
-    //text.style.paddingTop = '10px';
+    // text.style.paddingTop = '10px';
   }
   text.worldPos = new THREE.Vector3();
   return text;
@@ -38,39 +38,39 @@ class LabelsGeometry extends EventDispatcher {
     let xTranslation = -50;
     let yTranslation = -50;
     switch (opts.horizontalAlign) {
-    case 'left':
-      xTranslation = 0;
-      break;
-    case 'right':
-      xTranslation = -100;
-      break;
-    default:
-      break;
+      case 'left':
+        xTranslation = 0;
+        break;
+      case 'right':
+        xTranslation = -100;
+        break;
+      default:
+        break;
     }
 
     switch (opts.verticalAlign) {
-    case 'top':
-      yTranslation = -100;
-      break;
-    case 'bottom':
-      yTranslation = 0;
-      break;
-    default:
-      break;
+      case 'top':
+        yTranslation = -100;
+        break;
+      case 'bottom':
+        yTranslation = 0;
+        break;
+      default:
+        break;
     }
 
     // TODO is code above OK?
     const deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
     this.userData = {
-      translation: 'translate(' + xTranslation + '%, ' + yTranslation + '%)',
+      translation: `translate(${xTranslation}%, ${yTranslation}%)`,
       offset: deltaPos,
     };
   }
 
   setItem(itemIdx, itemPos, fieldTxt) {
     const opts = this._opts;
-    const labels = opts.labels;
-    const text = this.items[itemIdx] || createLabel(fieldTxt, 'label label-' + labels);
+    const { labels } = opts;
+    const text = this.items[itemIdx] || createLabel(fieldTxt, `label label-${labels}`);
 
     text.worldPos.copy(itemPos);
     text.style.textAlign = opts.horizontalAlign;
@@ -92,7 +92,7 @@ class LabelsGeometry extends EventDispatcher {
 
   finishUpdate() {
     this.needsUpdate = true;
-    this.dispatchEvent({type: 'update'});
+    this.dispatchEvent({ type: 'update' });
   }
 
   finalize() {
