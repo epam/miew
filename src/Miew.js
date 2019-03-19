@@ -2716,6 +2716,7 @@ Miew.prototype._onPick = function (event) {
   }
 
   this._updateInfoPanel();
+  this.dispatchEvent(event);
 };
 
 Miew.prototype._onDblClick = function (event) {

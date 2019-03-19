@@ -812,6 +812,15 @@ ComplexVisual.prototype.getSelectedComponent = function () {
   return multiple ? null : component;
 };
 
+ComplexVisual.prototype.forSelectedResidues = function (process) {
+  const selectionMask = 1 << this._selectionBit;
+  this._complex.forEachResidue((residue) => {
+    if (residue._mask & selectionMask) {
+      process(residue);
+    }
+  });
+};
+
 ComplexVisual.prototype.beginComponentEdit = function () {
   if (this._editor) {
     return null;
