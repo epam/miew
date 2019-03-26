@@ -3610,7 +3610,8 @@ Miew.prototype._initOnSettingsChanged = function () {
     this.rebuildAll();
   });
 
-  on(['axes', 'fxaa', 'ao'], () => {
+  on(['axes', 'fxaa', 'ao',
+    'outline.on', 'outline.color', 'outline.threshold'], () => {
     this._needRender = true;
   });
 };
