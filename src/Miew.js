@@ -3481,6 +3481,17 @@ Miew.prototype._updateMaterials = function (values) {
   }
 };
 
+Miew.prototype._updateAllMaterials = function (values) {
+  this._forEachComplexVisual(visual => visual.setAllMaterialValues(values));
+  for (let i = 0, n = this._objects.length; i < n; ++i) {
+    const obj = this._objects[i];
+    if (obj._line) {
+      obj._line.material.setValues(values);
+      obj._line.material.needsUpdate = true;
+    }
+  }
+};
+
 Miew.prototype._fogAlphaChanged = function () {
   this._forEachComplexVisual((visual) => {
     visual.setUberOptions({
@@ -3535,21 +3546,21 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('shadow.on', (evt) => {
-    // update materials and rebuild all
+    // update materials
     const values = { shadowmap: evt.value, shadowmapType: settings.now.shadow.type };
     const gfx = this._gfx;
     if (gfx) {
       gfx.renderer.shadowMap.enabled = values.shadowmap;
     }
-    this._updateMaterials(values);
-    this.rebuildAll();
+    this._updateAllMaterials(values);
+    this._needRender = true;
   });
 
   on('shadow.type', (evt) => {
-    // update materials and rebuild all if shadowmap are enable
+    // update materials if shadowmap is enable
     if (settings.now.shadow.on) {
-      this._updateMaterials({ shadowmapType: evt.value });
-      this.rebuildAll();
+      this._updateAllMaterials({ shadowmapType: evt.value });
+      this._needRender = true;
     }
   });
 
@@ -3558,6 +3569,7 @@ Miew.prototype._initOnSettingsChanged = function () {
       if (this._gfx.scene.children[i].shadow !== undefined) {
         const light = this._gfx.scene.children[i];
         light.shadow.radius = evt.value;
+        this._needRender = true;
       }
     }
   });

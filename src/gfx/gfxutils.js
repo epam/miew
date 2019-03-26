@@ -407,6 +407,22 @@ function processTransparentMaterial(root, material) {
   }
 }
 
+function prepareObjMaterialForShadow(object) {
+  if (object.castShadow) { // add casting material for casters
+    const depthMaterial = object.material.createInstance();
+    depthMaterial.setValues({
+      colorFromDepth: true,
+      lights: false,
+      shadowmap: false,
+      fog: false,
+    });
+    object.customDepthMaterial = depthMaterial;
+  }
+  if (!object.receiveShadow && object.material.shadowmap) { // remove shaodow from non-receivers
+    object.material.setValues({ shadowmap: false });
+  }
+}
+
 function processMaterialForShadow(root, material) {
   if (!(material instanceof UberMaterial)) {
     return;
@@ -414,19 +430,7 @@ function processMaterialForShadow(root, material) {
 
   root.traverse((object) => {
     if (object instanceof THREE.Mesh) {
-      if (object.castShadow) { // add casting material for casters
-        const depthMaterial = object.material.createInstance();
-        depthMaterial.setValues({
-          colorFromDepth: true,
-          lights: false,
-          shadowmap: false,
-          fog: false,
-        });
-        object.customDepthMaterial = depthMaterial;
-      }
-      if (!object.receiveShadow && object.material.shadowmap) { // remove shaodow from non-receivers
-        object.material.setValues({ shadowmap: false });
-      }
+      prepareObjMaterialForShadow(object);
     }
   });
 }
@@ -477,6 +481,7 @@ export default {
   destroyObject,
   applyTransformsToMeshes,
   processTransparentMaterial,
+  prepareObjMaterialForShadow,
   processMaterialForShadow,
   makeVisibleMeshes,
   applySelectionMaterial,

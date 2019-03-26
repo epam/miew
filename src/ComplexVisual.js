@@ -861,6 +861,27 @@ ComplexVisual.prototype.setMaterialValues = function (values) {
   }
 };
 
+ComplexVisual.prototype.setAllMaterialValues = function (values) {
+  for (let i = 0, n = this._reprList.length; i < n; ++i) {
+    const rep = this._reprList[i];
+    rep.material.setValues(values);
+    rep.geo.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.material.setValues(values);
+
+        if (typeof values.shadowmap !== 'undefined') {
+          if (values.shadowmap === true) {
+            gfxutils.prepareObjMaterialForShadow(object);
+          } else {
+            object.customDepthMaterial = null;
+          }
+        }
+        object.material.needsUpdate = true;
+      }
+    });
+  }
+};
+
 ComplexVisual.prototype.setUberOptions = function (values) {
   for (let i = 0, n = this._reprList.length; i < n; ++i) {
     const rep = this._reprList[i];
