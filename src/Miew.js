@@ -3470,19 +3470,8 @@ Miew.prototype._fogFarUpdateValue = function () {
   }
 };
 
-Miew.prototype._updateMaterials = function (values) {
-  this._forEachComplexVisual(visual => visual.setMaterialValues(values));
-  for (let i = 0, n = this._objects.length; i < n; ++i) {
-    const obj = this._objects[i];
-    if (obj._line) {
-      obj._line.material.setValues(values);
-      obj._line.material.needsUpdate = true;
-    }
-  }
-};
-
-Miew.prototype._updateAllMaterials = function (values) {
-  this._forEachComplexVisual(visual => visual.setAllMaterialValues(values));
+Miew.prototype._updateMaterials = function (values, needTraverse = false, process) {
+  this._forEachComplexVisual(visual => visual.setMaterialValues(values, needTraverse, process));
   for (let i = 0, n = this._objects.length; i < n; ++i) {
     const obj = this._objects[i];
     if (obj._line) {
@@ -3552,14 +3541,20 @@ Miew.prototype._initOnSettingsChanged = function () {
     if (gfx) {
       gfx.renderer.shadowMap.enabled = values.shadowmap;
     }
-    this._updateAllMaterials(values);
+    this._updateMaterials(values, true, (object) => {
+      if (values.shadowmap === true) {
+        gfxutils.prepareObjMaterialForShadow(object);
+      } else {
+        object.customDepthMaterial = null;
+      }
+    });
     this._needRender = true;
   });
 
   on('shadow.type', (evt) => {
     // update materials if shadowmap is enable
     if (settings.now.shadow.on) {
-      this._updateAllMaterials({ shadowmapType: evt.value });
+      this._updateMaterials({ shadowmapType: evt.value }, true);
       this._needRender = true;
     }
   });
