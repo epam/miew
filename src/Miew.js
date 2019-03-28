@@ -3470,8 +3470,8 @@ Miew.prototype._fogFarUpdateValue = function () {
   }
 };
 
-Miew.prototype._updateMaterials = function (values) {
-  this._forEachComplexVisual(visual => visual.setMaterialValues(values));
+Miew.prototype._updateMaterials = function (values, needTraverse = false, process) {
+  this._forEachComplexVisual(visual => visual.setMaterialValues(values, needTraverse, process));
   for (let i = 0, n = this._objects.length; i < n; ++i) {
     const obj = this._objects[i];
     if (obj._line) {
@@ -3535,21 +3535,27 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('shadow.on', (evt) => {
-    // update materials and rebuild all
+    // update materials
     const values = { shadowmap: evt.value, shadowmapType: settings.now.shadow.type };
     const gfx = this._gfx;
     if (gfx) {
       gfx.renderer.shadowMap.enabled = values.shadowmap;
     }
-    this._updateMaterials(values);
-    this.rebuildAll();
+    this._updateMaterials(values, true, (object) => {
+      if (values.shadowmap === true) {
+        gfxutils.prepareObjMaterialForShadow(object);
+      } else {
+        object.customDepthMaterial = null;
+      }
+    });
+    this._needRender = true;
   });
 
   on('shadow.type', (evt) => {
-    // update materials and rebuild all if shadowmap are enable
+    // update materials if shadowmap is enable
     if (settings.now.shadow.on) {
-      this._updateMaterials({ shadowmapType: evt.value });
-      this.rebuildAll();
+      this._updateMaterials({ shadowmapType: evt.value }, true);
+      this._needRender = true;
     }
   });
 
@@ -3558,6 +3564,7 @@ Miew.prototype._initOnSettingsChanged = function () {
       if (this._gfx.scene.children[i].shadow !== undefined) {
         const light = this._gfx.scene.children[i];
         light.shadow.radius = evt.value;
+        this._needRender = true;
       }
     }
   });
@@ -3598,7 +3605,8 @@ Miew.prototype._initOnSettingsChanged = function () {
     this.rebuildAll();
   });
 
-  on(['axes', 'fxaa', 'ao'], () => {
+  on(['axes', 'fxaa', 'ao',
+    'outline.on', 'outline.color', 'outline.threshold'], () => {
     this._needRender = true;
   });
 };

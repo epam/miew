@@ -854,10 +854,23 @@ ComplexVisual.prototype.finalizeEdit = function () {
   this._editor = null;
 };
 
-ComplexVisual.prototype.setMaterialValues = function (values) {
+ComplexVisual.prototype.setMaterialValues = function (values, needTraverse = false, process) {
   for (let i = 0, n = this._reprList.length; i < n; ++i) {
     const rep = this._reprList[i];
     rep.material.setValues(values);
+    if (needTraverse) {
+      rep.geo.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          object.material.setValues(values);
+
+          if (process !== undefined) {
+            process(object);
+          }
+
+          object.material.needsUpdate = true;
+        }
+      });
+    }
   }
 };
 

@@ -73,7 +73,9 @@ class Representation {
     // console.timeEnd('buildGeometry');
     this.geo.visible = this.visible;
 
-    gfxutils.processMaterialForShadow(this.geo, this.material);
+    if (settings.now.shadow.on) {
+      gfxutils.processMaterialForShadow(this.geo, this.material);
+    }
 
     return this.geo;
   }
