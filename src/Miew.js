@@ -950,6 +950,7 @@ Miew.prototype._onRender = function () {
 
 Miew.prototype._renderFrame = (function () {
   const _anaglyphMat = new AnaglyphMaterial();
+  const _size = new THREE.Vector2();
 
   return function (stereo) {
     const gfx = this._gfx;
@@ -964,10 +965,10 @@ Miew.prototype._renderFrame = (function () {
       gfx.stereoCam.update(gfx.camera);
     }
 
-    const size = renderer.getSize();
+    renderer.getSize(_size);
 
     // resize offscreen buffers to match the target
-    this._resizeOffscreenBuffers(size.width * window.devicePixelRatio, size.height * window.devicePixelRatio, stereo);
+    this._resizeOffscreenBuffers(_size.width * window.devicePixelRatio, _size.height * window.devicePixelRatio, stereo);
 
     switch (stereo) {
       case 'WEBVR':
@@ -978,12 +979,12 @@ Miew.prototype._renderFrame = (function () {
       case 'DISTORTED':
         renderer.setScissorTest(true);
 
-        renderer.setScissor(0, 0, size.width / 2, size.height);
-        renderer.setViewport(0, 0, size.width / 2, size.height);
+        renderer.setScissor(0, 0, _size.width / 2, _size.height);
+        renderer.setViewport(0, 0, _size.width / 2, _size.height);
         this._renderScene(this._gfx.stereoCam.cameraL, stereo === 'DISTORTED');
 
-        renderer.setScissor(size.width / 2, 0, size.width / 2, size.height);
-        renderer.setViewport(size.width / 2, 0, size.width / 2, size.height);
+        renderer.setScissor(_size.width / 2, 0, _size.width / 2, _size.height);
+        renderer.setViewport(_size.width / 2, 0, _size.width / 2, _size.height);
         this._renderScene(this._gfx.stereoCam.cameraR, stereo === 'DISTORTED');
 
         renderer.setScissorTest(false);

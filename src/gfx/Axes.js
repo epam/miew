@@ -8,6 +8,7 @@ class Axes {
     this._object = new THREE.AxesHelper(1);
     this._scene = new THREE.Scene();
     this._scene.add(this._object);
+    this._full = new THREE.Vector2();
 
     this._update();
   }
@@ -26,16 +27,16 @@ class Axes {
   render(renderer) {
     this._update();
 
-    const full = renderer.getSize();
-    const width = full.width * 0.25;
-    const height = full.height * 0.25;
+    renderer.getSize(this._full);
+    const width = this._full.width * 0.25;
+    const height = this._full.height * 0.25;
 
     const { autoClear } = renderer;
     renderer.autoClear = false;
-    renderer.setViewport(0.0, full.height - height, width, height); // use left bottom corner
+    renderer.setViewport(0.0, 0.0, width, height);
     renderer.clear(false, true, false);
     renderer.render(this._scene, this._camera);
-    renderer.setViewport(0, 0, full.width, full.height);
+    renderer.setViewport(0, 0, this._full.width, this._full.height);
     renderer.autoClear = autoClear;
   }
 }
