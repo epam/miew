@@ -1106,7 +1106,8 @@ Miew.prototype._renderScene = (function () {
     if (settings.now.transparency === 'prepass') {
       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
-      gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
+      gfx.renderer.setRenderTarget(gfx.offscreenBuf);
+      gfx.renderer.render(gfx.scene, camera);
     }
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
@@ -1127,11 +1128,13 @@ Miew.prototype._renderScene = (function () {
         gfx.offscreenBuf2,
       );
       if (!fxaa && !distortion && !volume && !outline) {
-        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, target);
+        gfx.renderer.setRenderTarget(target);
+        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0);
       }
     } else {
       // just copy color buffer to dst buffer
-      gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
+      gfx.renderer.setRenderTarget(dstBuffer);
+      gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0);
     }
 
     // outline
@@ -1149,13 +1152,15 @@ Miew.prototype._renderScene = (function () {
     if (volume) {
       // copy current picture to the buffer that retains depth-data of the original molecule render
       // so that volume renderer could use depth-test
-      gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, gfx.offscreenBuf);
+      gfx.renderer.setRenderTarget(gfx.offscreenBuf);
+      gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0);
       dstBuffer = gfx.offscreenBuf;
       this._renderVolume(volumeVisual, camera, dstBuffer, gfx.volBFTex, gfx.volFFTex, gfx.volWFFTex);
 
       // if this is the last stage -- copy image to target
       if (!fxaa && !distortion) {
-        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, target);
+        gfx.renderer.setRenderTarget(target);
+        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0);
       }
     }
 
@@ -1208,12 +1213,9 @@ Miew.prototype._performDistortion = (function () {
     if (mesh) {
       _material.uniforms.srcTex.value = srcBuffer.texture;
       _material.uniforms.aberration.value.set(0.995, 1.0, 1.01);
-      this._gfx.renderer.render(_scene, _camera, targetBuffer);
+      this._gfx.renderer.render(_scene, _camera);
     } else {
-      this._gfx.renderer.renderScreenQuadFromTexWithDistortion(
-        srcBuffer,
-        settings.now.debug.stereoBarrel, targetBuffer,
-      );
+      this._gfx.renderer.renderScreenQuadFromTexWithDistortion(srcBuffer, settings.now.debug.stereoBarrel);
     }
   };
 }());
@@ -1232,7 +1234,8 @@ Miew.prototype._renderOutline = (function () {
     _outlineMaterial.uniforms.color.value = new THREE.Color(settings.now.outline.color);
     _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold;
 
-    gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.renderScreenQuad(_outlineMaterial);
   };
 }());
 
@@ -1245,26 +1248,28 @@ Miew.prototype._renderSelection = (function () {
 
     // clear offscreen buffer (leave z-buffer intact)
     gfx.renderer.setClearColor('black', 0);
-    gfx.renderer.setRenderTarget(srcBuffer);
-    gfx.renderer.clear(true, false, false);
 
     // render selection to offscreen buffer
     if (gfx.selectionPivot.children.length > 0) {
+      gfx.renderer.setRenderTarget(srcBuffer);
+      gfx.renderer.clear(true, false, false);
       gfx.selectionRoot.matrix = gfx.root.matrix;
       gfx.selectionPivot.matrix = gfx.pivot.matrix;
-      gfx.renderer.render(gfx.selectionScene, camera, srcBuffer);
-    } else {
+      gfx.renderer.render(gfx.selectionScene, camera);
+    } else { // FIXME the branch never works, why?
       // just render something to force "target clear" operation to finish
+      gfx.renderer.setRenderTarget(null);
       gfx.renderer.renderDummyQuad(srcBuffer);
     }
 
     // overlay to screen
-    gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 0.6, targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 0.6);
 
     // apply Sobel filter -- draw outline
     _outlineMaterial.uniforms.srcTex.value = srcBuffer.texture;
     _outlineMaterial.uniforms.srcTexSize.value.set(srcBuffer.width, srcBuffer.height);
-    gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
+    gfx.renderer.renderScreenQuad(_outlineMaterial);
   };
 }());
 
@@ -1320,17 +1325,19 @@ Miew.prototype._renderVolume = (function () {
     gfx.renderer.setRenderTarget(tmpBuf3);
     gfx.renderer.clear();
 
+    gfx.renderer.setRenderTarget(tmpBuf1);
     // draw plane with its own material, because it differs slightly from volumeBFMat
     camera.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
-    gfx.renderer.render(gfx.scene, camera, tmpBuf1);
+    gfx.renderer.render(gfx.scene, camera);
 
     camera.layers.set(gfxutils.LAYERS.VOLUME);
     gfx.scene.overrideMaterial = volumeBFMat;
-    gfx.renderer.render(gfx.scene, camera, tmpBuf1);
+    gfx.renderer.render(gfx.scene, camera);
 
+    gfx.renderer.setRenderTarget(tmpBuf2);
     camera.layers.set(gfxutils.LAYERS.VOLUME);
     gfx.scene.overrideMaterial = volumeFFMat;
-    gfx.renderer.render(gfx.scene, camera, tmpBuf2);
+    gfx.renderer.render(gfx.scene, camera);
 
     gfx.scene.overrideMaterial = null;
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
@@ -1339,7 +1346,8 @@ Miew.prototype._renderVolume = (function () {
     world2colorMat.getInverse(mesh.matrixWorld);
     UberMaterial.prototype.uberOptions.world2colorMatrix.multiplyMatrices(cubeOffsetMat, world2colorMat);
     this._setUberMaterialValues({ colorFromPos: true });
-    gfx.renderer.render(gfx.scene, camera, tmpBuf3);
+    gfx.renderer.setRenderTarget(tmpBuf3);
+    gfx.renderer.render(gfx.scene, camera);
     this._setUberMaterialValues({ colorFromPos: false });
 
     // render volume
@@ -1348,7 +1356,8 @@ Miew.prototype._renderVolume = (function () {
     vm.uniforms._FFRight.value = tmpBuf2.texture;
     vm.uniforms._WFFRight.value = tmpBuf3.texture;
     camera.layers.set(gfxutils.LAYERS.VOLUME);
-    gfx.renderer.render(gfx.scene, camera, dstBuf);
+    gfx.renderer.setRenderTarget(dstBuf);
+    gfx.renderer.render(gfx.scene, camera);
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
   };
 }());
@@ -1365,20 +1374,21 @@ Miew.prototype._renderVolume = (function () {
 Miew.prototype._renderWithPrepassTransparency = (function () {
   return function (camera, targetBuffer) {
     const gfx = this._gfx;
+    gfx.renderer.setRenderTarget(targetBuffer);
 
     // opaque objects
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
-    gfx.renderer.render(gfx.scene, camera, targetBuffer);
+    gfx.renderer.render(gfx.scene, camera);
 
     // transparent objects z prepass
     camera.layers.set(gfxutils.LAYERS.PREPASS_TRANSPARENT);
     gfx.renderer.context.colorMask(false, false, false, false); // don't update color buffer
-    gfx.renderer.render(gfx.scene, camera, targetBuffer);
+    gfx.renderer.render(gfx.scene, camera);
     gfx.renderer.context.colorMask(true, true, true, true); // update color buffer
 
     // transparent objects color pass
     camera.layers.set(gfxutils.LAYERS.TRANSPARENT);
-    gfx.renderer.render(gfx.scene, camera, targetBuffer);
+    gfx.renderer.render(gfx.scene, camera);
 
     // restore default layer
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
@@ -1409,7 +1419,7 @@ Miew.prototype._performFXAA = (function () {
       _fxaaMaterial.setValues({ bgTransparent: settings.now.bg.transparent });
       _fxaaMaterial.needsUpdate = true;
     }
-    gfx.renderer.renderScreenQuad(_fxaaMaterial, targetBuffer);
+    gfx.renderer.renderScreenQuad(_fxaaMaterial);
   };
 }());
 
@@ -1513,20 +1523,23 @@ Miew.prototype._performAO = (function () {
     }
     _aoMaterial.transparent = false;
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
-    gfx.renderer.renderScreenQuad(_aoMaterial, tempBuffer1);
+    gfx.renderer.setRenderTarget(tempBuffer1);
+    gfx.renderer.renderScreenQuad(_aoMaterial);
 
     _horBlurMaterial.uniforms.aoMap.value = tempBuffer1.texture;
     _horBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer1.width, 1.0 / tempBuffer1.height);
     _horBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _horBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
-    gfx.renderer.renderScreenQuad(_horBlurMaterial, tempBuffer);
+    gfx.renderer.setRenderTarget(tempBuffer);
+    gfx.renderer.renderScreenQuad(_horBlurMaterial);
 
     _vertBlurMaterial.uniforms.aoMap.value = tempBuffer.texture;
     _vertBlurMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _vertBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer.width, 1.0 / tempBuffer.height);
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
-    gfx.renderer.renderScreenQuad(_vertBlurMaterial, targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.renderScreenQuad(_vertBlurMaterial);
   };
 }());
 

@@ -26,7 +26,8 @@ GfxProfiler.prototype._prepareTest = function () {
 GfxProfiler.prototype.run = function () {
   for (let i = 0; i < 100; ++i) {
     this._prof.start();
-    this._renderer.render(this._scene, this._camera, this._target);
+    this._renderer.setRenderTarget(this._target);
+    this._renderer.render(this._scene, this._camera);
     this._prof.end();
   }
 };
