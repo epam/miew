@@ -1256,7 +1256,7 @@ Miew.prototype._renderSelection = (function () {
       gfx.selectionRoot.matrix = gfx.root.matrix;
       gfx.selectionPivot.matrix = gfx.pivot.matrix;
       gfx.renderer.render(gfx.selectionScene, camera);
-    } else { // FIXME the branch never works, why?
+    } else {
       // just render something to force "target clear" operation to finish
       gfx.renderer.setRenderTarget(null);
       gfx.renderer.renderDummyQuad(srcBuffer);
