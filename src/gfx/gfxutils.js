@@ -47,8 +47,8 @@ THREE.WebGLRenderer.prototype.renderDummyQuad = (function () {
   const _camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000);
   _camera.position.z = 100;
 
-  return function (renderTarget) {
-    this.render(_scene, _camera, renderTarget);
+  return function () {
+    this.render(_scene, _camera);
   };
 }());
 
@@ -61,9 +61,9 @@ THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
   _camera.position.z = 100;
 
 
-  return function (material, renderTarget) {
+  return function (material) {
     _quad.material = material;
-    this.render(_scene, _camera, renderTarget);
+    this.render(_scene, _camera);
   };
 }());
 
@@ -83,11 +83,11 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
   });
 
 
-  return function (srcTex, opacity, renderTarget) {
+  return function (srcTex, opacity) {
     _material.uniforms.srcTex.value = srcTex;
     _material.transparent = (opacity < 1.0);
     _material.uniforms.opacity.value = opacity;
-    this.renderScreenQuad(_material, renderTarget);
+    this.renderScreenQuad(_material);
   };
 }());
 
@@ -118,11 +118,11 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
     depthWrite: false,
   });
 
-  return function (srcTex, opacity, renderTarget) {
+  return function (srcTex, opacity) {
     _material.uniforms.srcTex.value = srcTex;
     _material.transparent = (opacity < 1.0);
     _material.uniforms.opacity.value = opacity;
-    this.renderScreenQuad(_material, renderTarget);
+    this.renderScreenQuad(_material);
   };
 }());
 
@@ -149,10 +149,10 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function 
   });
 
 
-  return function (srcTex, coef, renderTarget) {
+  return function (srcTex, coef) {
     _material.uniforms.srcTex.value = srcTex;
     _material.uniforms.coef.value = coef;
-    this.renderScreenQuad(_material, renderTarget);
+    this.renderScreenQuad(_material);
   };
 }());
 

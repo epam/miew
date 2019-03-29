@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import UberObject from './UberObject';
 
 const Mesh = UberObject(THREE.Mesh);
+const _viewport = new THREE.Vector2();
 
 class ThickLineMesh extends Mesh {
   _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
@@ -11,8 +12,8 @@ class ThickLineMesh extends Mesh {
     }
 
     material.uberOptions.projMatrixInv.getInverse(camera.projectionMatrix, true);
-    const viewport = renderer.getSize();
-    material.uberOptions.viewport.set(viewport.width, viewport.height);
+    renderer.getSize(_viewport);
+    material.uberOptions.viewport.set(_viewport.width, _viewport.height);
   }
 }
 
