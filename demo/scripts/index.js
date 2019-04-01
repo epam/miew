@@ -79,39 +79,41 @@ window.onerror = function (err, url, line, col, obj) {
 window.MIEWS = [];
 
 // create viewer (and run it) for each container element on the page
-$('.miew-container').each((i, container) => {
-  const viewer = window.miew = new Miew($.extend(
-    true,
-    {
-      container,
-      load: 'data/1CRN.pdb',
-      cookiePath: (typeof COOKIE_PATH !== 'undefined' && COOKIE_PATH) || '/',
-    },
-    Miew.options.fromAttr(container.getAttribute('data-miew')),
-    Miew.options.fromURL(window.location.search),
-  ));
+window.addEventListener('load', () => {
+  $('.miew-container').each((i, container) => {
+    const viewer = window.miew = new Miew($.extend(
+      true,
+      {
+        container,
+        load: 'data/1CRN.pdb',
+        cookiePath: (typeof COOKIE_PATH !== 'undefined' && COOKIE_PATH) || '/',
+      },
+      Miew.options.fromAttr(container.getAttribute('data-miew')),
+      Miew.options.fromURL(window.location.search),
+    ));
 
-  const convertLevel = {
-    error: 'error',
-    warn: 'warning',
-    report: 'info',
-  };
-  toastr.options.newestOnTop = false;
-  viewer.logger.addEventListener('message', (e) => {
-    const level = convertLevel[e.level];
-    if (level) {
-      toastr[level](e.message);
+    const convertLevel = {
+      error: 'error',
+      warn: 'warning',
+      report: 'info',
+    };
+    toastr.options.newestOnTop = false;
+    viewer.logger.addEventListener('message', (e) => {
+      const level = convertLevel[e.level];
+      if (level) {
+        toastr[level](e.message);
+      }
+    });
+
+    window.MIEWS.push(viewer);
+
+    const menu = new Menu(container, viewer);
+
+    if (viewer.init()) {
+      viewer.benchmarkGfx().then(() => {
+        menu.showOverlay();
+        viewer.run();
+      });
     }
   });
-
-  window.MIEWS.push(viewer);
-
-  const menu = new Menu(container, viewer);
-
-  if (viewer.init()) {
-    viewer.benchmarkGfx().then(() => {
-      menu.showOverlay();
-      viewer.run();
-    });
-  }
 });
