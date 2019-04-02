@@ -24,7 +24,7 @@ class VolumeModel {
     this._header.grid = [];
     this._header.crs2xyz = [];
     this._header.cellDims = new THREE.Vector3();
-    this._header.angles = new THREE.Vector3();
+    this._header.angles = [];
     this._header.origin = new THREE.Vector3(0, 0, 0);
     this._header.dmin = 0;
     this._header.dmean = 0;
@@ -93,13 +93,15 @@ class VolumeModel {
     const yScale = header.cellDims.y / header.grid[1];
     const zScale = header.cellDims.z / header.grid[2];
 
-    const z1 = Math.cos(header.angles.y);
-    const z2 = (Math.cos(header.angles.x) - Math.cos(header.angles.y)
-      * Math.cos(header.angles.z)) / Math.sin(header.angles.z);
+    const { 0: alpha, 1: beta, 2: gamma } = header.angles;
+
+    const z1 = Math.cos(beta);
+    const z2 = (Math.cos(alpha) - Math.cos(beta)
+      * Math.cos(gamma)) / Math.sin(gamma);
     const z3 = Math.sqrt(1.0 - z1 * z1 - z2 * z2);
 
     const xaxis = new THREE.Vector3(xScale, 0, 0);
-    const yaxis = new THREE.Vector3(Math.cos(header.angles.z) * yScale, Math.sin(header.angles.z) * yScale, 0);
+    const yaxis = new THREE.Vector3(Math.cos(gamma) * yScale, Math.sin(gamma) * yScale, 0);
     const zaxis = new THREE.Vector3(z1 * zScale, z2 * zScale, z3 * zScale);
 
     return [xaxis, yaxis, zaxis];
@@ -112,7 +114,10 @@ class VolumeModel {
   }
 
   _getVolumeInfo() {
-    return _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd', 'angles', 'delta']);
+    const volInfo = _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd', 'delta']);
+    volInfo.obtuseAngle = [];
+    this._header.angles.forEach((angle, i) => { volInfo.obtuseAngle[i] = Math.PI / 2 - angle > 0 ? 0 : 1; });
+    return volInfo;
   }
 
   _setBoxParams(xaxis, yaxis, zaxis) {
@@ -120,19 +125,15 @@ class VolumeModel {
     let shiftX = 0;
     let shiftY = 0;
 
-    if (this._header.angles.z >= Math.PI / 2) {
+    if (this._header.angles[2] >= Math.PI / 2) {
       shiftX += Math.abs(yaxis.x);
     }
-    if (this._header.angles.y >= Math.PI / 2) {
+    if (this._header.angles[1] >= Math.PI / 2) {
       shiftX += Math.abs(zaxis.x);
     }
-    if (this._header.angles.x >= Math.PI / 2) {
+    if (this._header.angles[0] >= Math.PI / 2) {
       shiftY += Math.abs(zaxis.y);
     }
-
-    this._header.delta.XY = Math.abs(yaxis.x) / (Math.abs(xaxis.x) + Math.abs(yaxis.x) + Math.abs(zaxis.x));
-    this._header.delta.XZ = Math.abs(zaxis.x) / (Math.abs(xaxis.x) + Math.abs(yaxis.x) + Math.abs(zaxis.x));
-    this._header.delta.YZ = Math.abs(zaxis.y) / (Math.abs(yaxis.y) + Math.abs(zaxis.y));
 
     this._boxStart = new THREE.Vector3(this._origin.x - shiftX, this._origin.y - shiftY, this._origin.z);
     this._boxSize = new THREE.Vector3(
@@ -140,6 +141,11 @@ class VolumeModel {
       Math.abs(yaxis.y) + Math.abs(zaxis.y),
       Math.abs(zaxis.z),
     );
+
+    const delta = (axe, proj) => (Math.abs(axe[proj]) / this._boxSize[proj]);
+    this._header.delta.x = delta(yaxis, 'x');
+    this._header.delta.y = delta(zaxis, 'x');
+    this._header.delta.z = delta(zaxis, 'y');
   }
 
   _getXYZbox() {

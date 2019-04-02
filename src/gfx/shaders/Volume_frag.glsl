@@ -6,11 +6,8 @@ uniform sampler2D tileTex; // tiled texture containing all Z-slices of a 3D data
 uniform vec2 tileTexSize;  // size of tiled texture, pixels
 uniform vec2 tileStride;   // UV stride between slices in tile tex, pixels
 
-uniform vec3 boxSize;
-uniform vec3 boxAngles;
-uniform float deltaXZ;
-uniform float deltaXY;
-uniform float deltaYZ;
+uniform vec3 boxAngles;//value of angles({x: alpha, y:beta, z:gamma}) types 1 - if angle is obtuse, 0 - if acute
+uniform vec3 delta; //Projection box delta's from non-orthogonal origin axes; {x: XY, y : XZ, z: YZ}
 
 uniform vec3 _isoLevel0;
 uniform float _flipV;
@@ -22,8 +19,6 @@ uniform sampler2D _WFFLeft;
 uniform sampler2D _WFFRight;
 
 varying vec4 screenSpacePos;
-
-const float PI = 3.1415926535898;
 
 vec4 sample3DTexture(vec3 texCoord)
 {
@@ -47,34 +42,28 @@ vec4 sample3DTexture(vec3 texCoord)
   return mix(colorSlice1, colorSlice2, weightSlice2);
 }
 
-vec4 boxToTextCoord(vec3 boxCoord) {
-  /***************** YOZ *********************/
-  float currDeltaYZ = (1. - boxCoord.z) * deltaYZ;
-  if (PI / 2. - boxAngles.x > 0.) {
-    currDeltaYZ = boxCoord.z * deltaYZ;
-  }
-  if (currDeltaYZ > boxCoord.y  || boxCoord.y > 1. - deltaYZ + currDeltaYZ)
+float currDeltaCalc(float angle, float side, float delta) {
+  return (angle + (-2. * angle + 1.) * side) * delta;
+}
+
+vec4 boxToTextCoord(vec3 boxCoord) { //delta:{ x: XY, y : XZ, z: YZ }
+  vec3 textCoord = boxCoord;
+
+  vec2 currDelta = vec2(mix(boxCoord.zz, vec2(1., 1.) - boxCoord.zz, boxAngles.yx) * delta.yz);
+
+  if (any(greaterThan(vec2(currDelta.y, boxCoord.y), vec2(boxCoord.y, 1. - delta.z + currDelta.y))))
     return vec4(0., 0., 0., 0);
-  boxCoord.y = (boxCoord.y   - currDeltaYZ) / (1. - deltaYZ);
 
-  /***************** XOZ *********************/
-  float currDeltaXZ = (1. - boxCoord.z) * deltaXZ;
-  if (PI / 2. - boxAngles.y > 0.) {
-    currDeltaXZ = boxCoord.z * deltaXZ;
-  }
-  if (currDeltaXZ > boxCoord.x  || boxCoord.x > 1. - deltaXZ + currDeltaXZ)
-       return vec4(0., 0., 0., 0);
+  textCoord.y = (boxCoord.y  - currDelta.y) / (1. - delta.z);
 
-  /***************** XOY *********************/
-  float currDeltaXY = (1. - boxCoord.y) * deltaXY;
-  if (PI / 2. - boxAngles.z > 0.) {
-    currDeltaXY = boxCoord.y * deltaXY;
-  }
-  if (currDeltaXY + currDeltaXZ > boxCoord.x  || boxCoord.x > 1. - deltaXY + currDeltaXY - deltaXZ + currDeltaXZ)
-       return vec4(0., 0., 0., 0);
-  boxCoord.x = (boxCoord.x   - currDeltaXY - currDeltaXZ) / (1. - deltaXY - deltaXZ);
+  currDelta.x += mix(textCoord.y, 1. - textCoord.y, boxAngles.z) * delta.x;
 
-  return sample3DTexture(boxCoord);
+  if(any(greaterThan(vec2(currDelta.x, boxCoord.x), vec2(boxCoord.x, 1. + currDelta.x - delta.x - delta.y))))
+      return vec4(0., 0., 0., 0);
+
+  textCoord.x = (boxCoord.x   - currDelta.x) / (1. - delta.x - delta.y);
+
+  return sample3DTexture(textCoord);
 }
 
 float CalcColor(vec3 iter, vec3 dir)

@@ -7,7 +7,7 @@ const CCP4Header = {
   nstart: [valueType.array, 'i32', 4],
   grid: [valueType.array, 'u32', 7],
   cellDims: [valueType.vector, 'f32', 10],
-  angles: [valueType.vector, 'f32', 13],
+  angles: [valueType.array, 'f32', 13],
   crs2xyz: [valueType.array, 'i32', 16],
   dmin: [valueType.singular, 'f32', 19],
   dmax: [valueType.singular, 'f32', 20],
@@ -39,7 +39,7 @@ class Ccp4Model extends VolumeModel {
     this._fillHeader(CCP4Header, arrays);
 
     // calculate non-orthogonal unit cell coordinates
-    header.angles.multiplyScalar(Math.PI / 180.0);
+    header.angles.forEach((angle, i) => { header.angles[i] = angle * Math.PI / 180.0; });
   }
 
   _setAxisIndices() {
