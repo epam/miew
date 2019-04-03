@@ -37,7 +37,7 @@ class DSN6Model extends VolumeModel {
 
     this._fillHeader(DSN6Header, arrays);
     header.cellDims.multiplyScalar(1.0 / header.scaleFactor);
-    header.angles.forEach((angle, i) => { header.angles[i] = ((angle * Math.PI) / 180.0) / header.scaleFactor; });
+    header.angles.forEach((angle, i, a) => { a[i] *= (Math.PI / 180.0) / header.scaleFactor; });
     header.div /= 100;
   }
 

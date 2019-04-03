@@ -42,26 +42,19 @@ vec4 sample3DTexture(vec3 texCoord)
   return mix(colorSlice1, colorSlice2, weightSlice2);
 }
 
-float currDeltaCalc(float angle, float side, float delta) {
-  return (angle + (-2. * angle + 1.) * side) * delta;
-}
-
-vec4 boxToTextCoord(vec3 boxCoord) { //delta:{ x: XY, y : XZ, z: YZ }
+vec4 sample3DTextureInclined(vec3 boxCoord) { //delta:{ x: XY, y : XZ, z: YZ }
   vec3 textCoord = boxCoord;
-
-  vec2 currDelta = vec2(mix(boxCoord.zz, vec2(1., 1.) - boxCoord.zz, boxAngles.yx) * delta.yz);
-
-  if (any(greaterThan(vec2(currDelta.y, boxCoord.y), vec2(boxCoord.y, 1. - delta.z + currDelta.y))))
-    return vec4(0., 0., 0., 0);
+  vec2 currDelta = mix(boxCoord.zz, vec2(1., 1.) - boxCoord.zz, boxAngles.yx) * delta.yz;
 
   textCoord.y = (boxCoord.y  - currDelta.y) / (1. - delta.z);
+  if (textCoord.y < 0.0 || textCoord.y > 1.0)
+    return vec4(0., 0., 0., 0);
 
-  currDelta.x += mix(textCoord.y, 1. - textCoord.y, boxAngles.z) * delta.x;
+  currDelta.x += mix(textCoord.y, 1.0 - textCoord.y, boxAngles.z) * delta.x;
 
-  if(any(greaterThan(vec2(currDelta.x, boxCoord.x), vec2(boxCoord.x, 1. + currDelta.x - delta.x - delta.y))))
-      return vec4(0., 0., 0., 0);
-
-  textCoord.x = (boxCoord.x   - currDelta.x) / (1. - delta.x - delta.y);
+  textCoord.x = (boxCoord.x - currDelta.x) / (1. - delta.x - delta.y);
+  if (textCoord.x < 0.0 || textCoord.x > 1.0)
+    return vec4(0., 0., 0., 0);
 
   return sample3DTexture(textCoord);
 }
@@ -73,9 +66,9 @@ float CalcColor(vec3 iter, vec3 dir)
   vec3 dy = vec3(0.0, d, 0.0);
   vec3 dz = vec3(0.0, 0.0, d);
   vec3 N;
-  N.x = boxToTextCoord(iter + dx).r - boxToTextCoord(iter - dx).r;
-  N.y = boxToTextCoord(iter + dy).r - boxToTextCoord(iter - dy).r;
-  N.z = boxToTextCoord(iter + dz).r - boxToTextCoord(iter - dz).r;
+  N.x = sample3DTextureInclined(iter + dx).r - sample3DTextureInclined(iter - dx).r;
+  N.y = sample3DTextureInclined(iter + dy).r - sample3DTextureInclined(iter - dy).r;
+  N.z = sample3DTextureInclined(iter + dz).r - sample3DTextureInclined(iter - dz).r;
   N = normalize(N);
   float dif = max(0.0, dot(N,dir));
   return dif;
@@ -86,7 +79,7 @@ vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
   for (int i = 0; i < 5; i++)
   {
     vec3 iterator = 0.5*(left + right);
-    float vol = boxToTextCoord(iterator).r;
+    float vol = sample3DTextureInclined(iterator).r;
     if ((volLeft - threshold)*(vol - threshold) < 0.)
       right = iterator;
     else
@@ -104,7 +97,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
     for (int i=0; i < 200; i++)
     {
       iterator = iterator + step;
-      vol = boxToTextCoord(iterator).r;
+      vol = sample3DTextureInclined(iterator).r;
       if (length(iterator - back) < stepSize || vol > tr)
         break;
     }
@@ -115,7 +108,7 @@ vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count
       for (int j = 0; j < 5; j++)
       {
         iterator = 0.5 * (left + right);
-        float vol = boxToTextCoord(iterator).r;
+        float vol = sample3DTextureInclined(iterator).r;
         if (vol > tr)
           right = iterator;
         else
@@ -150,7 +143,7 @@ vec3 CorrectIso(vec3 left, vec3 right, float tr)
   for (int j = 0; j < 5; j++)
   {
     vec3 iterator = 0.5*(left + right);
-    float vol = boxToTextCoord(iterator).r;
+    float vol = sample3DTextureInclined(iterator).r;
     if (vol < tr)
       right = iterator;
     else
@@ -189,13 +182,13 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     {
       iterator = iterator + step;
       molD = length(iterator - start);
-      vol = boxToTextCoord(iterator).r;
+      vol = sample3DTextureInclined(iterator).r;
       finish = distance(iterator, back) - stepSize;
       if (finish < 0.0 || vol < tr0 || (sumAlpha > 0.97) || molD > molDist)
         break;
       alpha = (1. - r);
       col = GetColSimple(vol);
-      vol = boxToTextCoord(iterator - 0.5*step).r;
+      vol = sample3DTextureInclined(iterator - 0.5*step).r;
       vec3 colMid = GetColSimple(vol);
       sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
       sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
@@ -207,7 +200,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     {
       curStepSize = stepSize - (molD - molDist);
       right = iterator - (molD - molDist)*dir;
-      vol = boxToTextCoord(right).r;
+      vol = sample3DTextureInclined(right).r;
     }
     else
     {
@@ -219,7 +212,7 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
     alpha = (1. - r)*curStepSize / stepSize;
     dif = 1.;// CalcColor(right, dir);
     col = GetColSimple(vol);
-    vol = boxToTextCoord(iterator - 0.5 * curStepSize / stepSize * step).r;
+    vol = sample3DTextureInclined(iterator - 0.5 * curStepSize / stepSize * step).r;
     vec3 colMid = GetColSimple(vol);
     sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;
     sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
@@ -243,8 +236,8 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
   {
     if (float(i) * stepSize > len) break;
     iterator = iterator + step;
-    if (boxToTextCoord(iterator).r > _isoLevel0.x)
-      acc += boxToTextCoord(iterator).r / 200.0;
+    if (sample3DTextureInclined(iterator).r > _isoLevel0.x)
+      acc += sample3DTextureInclined(iterator).r / 200.0;
   }
 
   return vec4(1,1,1, acc);
@@ -264,7 +257,7 @@ vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)
 
 vec4 VolRender3(vec3 start, vec3 back, float molDist, vec3 dir)
 {
-  return boxToTextCoord(start);
+  return sample3DTextureInclined(start);
 }
 
 void main()

@@ -93,7 +93,7 @@ class VolumeModel {
     const yScale = header.cellDims.y / header.grid[1];
     const zScale = header.cellDims.z / header.grid[2];
 
-    const { 0: alpha, 1: beta, 2: gamma } = header.angles;
+    const [alpha, beta, gamma] = header.angles;
 
     const z1 = Math.cos(beta);
     const z2 = (Math.cos(alpha) - Math.cos(beta)
@@ -115,8 +115,7 @@ class VolumeModel {
 
   _getVolumeInfo() {
     const volInfo = _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd', 'delta']);
-    volInfo.obtuseAngle = [];
-    this._header.angles.forEach((angle, i) => { volInfo.obtuseAngle[i] = (Math.PI / 2) - angle > 0 ? 0 : 1; });
+    volInfo.obtuseAngle = this._header.angles.map(angle => Number(angle >= (Math.PI / 2)));
     return volInfo;
   }
 
@@ -124,14 +123,15 @@ class VolumeModel {
     // if axes are not orthogonal, the origins might not match with box coordinates - need to make shift
     let shiftX = 0;
     let shiftY = 0;
+    const [alpha, beta, gamma] = this._header.angles;
 
-    if (this._header.angles[2] >= Math.PI / 2) {
+    if (gamma >= Math.PI / 2) {
       shiftX += Math.abs(yaxis.x);
     }
-    if (this._header.angles[1] >= Math.PI / 2) {
+    if (beta >= Math.PI / 2) {
       shiftX += Math.abs(zaxis.x);
     }
-    if (this._header.angles[0] >= Math.PI / 2) {
+    if (alpha >= Math.PI / 2) {
       shiftY += Math.abs(zaxis.y);
     }
 
