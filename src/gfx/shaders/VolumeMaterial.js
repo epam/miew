@@ -5,10 +5,14 @@ import volumeFrag from './Volume_frag.glsl';
 
 const volumeUniforms = THREE.UniformsUtils.merge([
   {
+
     volumeDim: { type: 'v3', value: new THREE.Vector3(512, 512, 512) },
     tileTex: { type: 't', value: null },
     tileTexSize: { type: 'v2', value: new THREE.Vector2(512, 512) },
     tileStride: { type: 'v2', value: new THREE.Vector2(512, 512) },
+
+    boxAngles: { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
+    delta: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
 
     _isoLevel0: { type: 'v2', value: new THREE.Vector3(0.5, 0.75, 1.0) },
     _flipV: { type: 'f', value: 0.0 },

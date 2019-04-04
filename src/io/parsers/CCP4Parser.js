@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import Parser from './Parser';
 import VolumeModel, { valueType } from './VolumeModel';
 
@@ -8,7 +7,7 @@ const CCP4Header = {
   nstart: [valueType.array, 'i32', 4],
   grid: [valueType.array, 'u32', 7],
   cellDims: [valueType.vector, 'f32', 10],
-  angles: [valueType.vector, 'f32', 13],
+  angles: [valueType.array, 'f32', 13],
   crs2xyz: [valueType.array, 'i32', 16],
   dmin: [valueType.singular, 'f32', 19],
   dmax: [valueType.singular, 'f32', 20],
@@ -31,16 +30,16 @@ class Ccp4Model extends VolumeModel {
     this._buff = _buffer;
     this._typedCheck();
     const arrays = {};
-    arrays.u32 = new Uint32Array(this._buff);
-    arrays.i32 = new Int32Array(this._buff);
-    arrays.f32 = new Float32Array(this._buff);
+    arrays.u32 = new Uint32Array(this._buff, 0, 56);
+    arrays.i32 = new Int32Array(this._buff, 0, 56);
+    arrays.f32 = new Float32Array(this._buff, 0, 56);
     arrays.buffer = this._buff;
     const header = this._header;
 
     this._fillHeader(CCP4Header, arrays);
 
     // calculate non-orthogonal unit cell coordinates
-    header.angles.multiplyScalar(Math.PI / 180.0);
+    header.angles.forEach((angle, i, a) => { a[i] *= Math.PI / 180.0; });
   }
 
   _setAxisIndices() {
@@ -63,6 +62,7 @@ class Ccp4Model extends VolumeModel {
     xyz2crs[crs2xyz[1] - 1] = 1; // row
     xyz2crs[crs2xyz[2] - 1] = 2; // section
   }
+
 
   _setOrigins() {
     const [xaxis, yaxis, zaxis] = this._getAxis();
@@ -96,7 +96,7 @@ class Ccp4Model extends VolumeModel {
       throw new Error(`CCP4: Unsupported format ${header.type}`);
     }
 
-    this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
+    this._setBoxParams(xaxis, yaxis, zaxis);
   }
 
   _toXYZData() {

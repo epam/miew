@@ -356,15 +356,19 @@ class VolumeMesh extends THREE.Mesh {
     const dim = dataSource.getDimensions();
     const stride = dataSource.getTiledTextureStride();
     const texture = dataSource.buildTiledTexture();
+    const bbox = dataSource.getBox();
     vm.uniforms.volumeDim.value.set(dim[0], dim[1], dim[2]);
     vm.uniforms.tileTex.value = texture;
     vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
     vm.uniforms.tileStride.value.set(stride[0], stride[1]);
-
     Object.assign(this.volumeInfo, dataSource.getVolumeInfo());
+
+    const volInfo = this.volumeInfo;
+    vm.uniforms.delta.value.copy(volInfo.delta);
+    vm.uniforms.boxAngles.value.set(volInfo.obtuseAngle[0], volInfo.obtuseAngle[1], volInfo.obtuseAngle[2]);
+
     this.material = vm;
 
-    const bbox = dataSource.getBox();
     bbox.getSize(this.scale);
     bbox.getCenter(this.position);
   }
