@@ -57,7 +57,7 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
     }
   }
 
-  setItem(itemIdx, matrices) {
+  setItem(itemIdx, matrices, hasSlope = false, hasCut = false) {
     const shape = this._chunkGeo._positions;
     const ptsCount = shape.length;
     let innerPtIdx = 0;
@@ -85,13 +85,66 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
         positions[vtxIdx + 1] = point.y;
         positions[vtxIdx + 2] = point.z;
 
-        tmpPrev.subVectors(point, prevPt).normalize();
-        tmpNext.subVectors(point, nextPt).normalize();
-        tmpPrev.add(tmpNext).normalize();
+        // Counting normals:
+        // - No slope
+        //   Radius doesn't change throught part => normals are parallel with the plane contains section points
+        //   normal = vToPrevPointInSection + vToNextPointInSection (all vectors are scaled for being 1 in length)
+        // - Slope
+        //   Radius changes throught part => normals aren't parallel with the plane contains section points
+        //   normal = vTangentInSectionPlane x vToSuchPointInPrevSection (all vectors are scaled for being 1 in length)
+        if (hasSlope) {
+          if (i !== 1) {
+            // zero and first sections are equal so we will have tmpNext = 0 for the first section
+            // so we count normals with another way for it
+            tmpPrev.subVectors(prevPt, nextPt).normalize();
+            tmpNext.x = point.x - positions[vtxIdx - ptsCount * 3 + 0];
+            tmpNext.y = point.y - positions[vtxIdx - ptsCount * 3 + 1];
+            tmpNext.z = point.z - positions[vtxIdx - ptsCount * 3 + 2];
+            tmpNext.normalize();
+            tmpPrev.crossVectors(tmpPrev, tmpNext).normalize();
+          } else {
+            // first section is equal to last section of previous part so we takes normals from it
+            tmpPrev.x = normals[vtxIdx - 2 * ptsCount * 3];
+            tmpPrev.y = normals[vtxIdx - 2 * ptsCount * 3 + 1];
+            tmpPrev.z = normals[vtxIdx - 2 * ptsCount * 3 + 2];
+          }
+        } else {
+          tmpPrev.subVectors(point, prevPt).normalize();
+          tmpNext.subVectors(point, nextPt).normalize();
+          tmpPrev.add(tmpNext).normalize();
+        }
 
         normals[vtxIdx] = tmpPrev.x;
         normals[vtxIdx + 1] = tmpPrev.y;
         normals[vtxIdx + 2] = tmpPrev.z;
+
+        // zero and first sections lies in one plane and normals for all their points are orthogonal with this plane
+        // second section points are shifted into first section points for having sharp angle on the end of cut
+        if (hasCut) {
+          switch (i) {
+            case 0:
+              tmpPrev.subVectors(point, prevPt).normalize();
+              tmpNext.subVectors(point, nextPt).normalize();
+              tmpPrev.crossVectors(tmpNext, tmpPrev).normalize();
+
+              normals[vtxIdx] = tmpPrev.x;
+              normals[vtxIdx + 1] = tmpPrev.y;
+              normals[vtxIdx + 2] = tmpPrev.z;
+              break;
+            case 1:
+              normals[vtxIdx] = normals[vtxIdx - ptsCount * 3];
+              normals[vtxIdx + 1] = normals[vtxIdx - ptsCount * 3 + 1];
+              normals[vtxIdx + 2] = normals[vtxIdx - ptsCount * 3 + 2];
+              break;
+            case 2:
+              positions[vtxIdx] = positions[vtxIdx - ptsCount * 3];
+              positions[vtxIdx + 1] = positions[vtxIdx - ptsCount * 3 + 1];
+              positions[vtxIdx + 2] = positions[vtxIdx - ptsCount * 3 + 2];
+              break;
+            default:
+              break;
+          }
+        }
         innerPtIdx += VEC_SIZE;
       }
     }

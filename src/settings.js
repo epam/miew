@@ -339,7 +339,7 @@ const defaults = {
       heightSegmentsRatio: 1.5,
       tension: -0.7,
       polyComplexity: {
-        poor: 5,
+        poor: 4,
         low: 6,
         medium: 10,
         high: 18,
@@ -365,6 +365,7 @@ const defaults = {
      * @proprety {number} ss.helix.arrow - Secondary structure's arrow width.
      * @proprety {object} ss.strand - Options for strands render.
      * @property {PolyComplexity} polyComplexity - Polygonal complexity settings for different resolutions.
+     * polyComplexity must be even for producing symmetric arrows.
      * @property {number} heightSegmentsRatio - Poly complexity multiplier for height segments.
      */
     CA: {
@@ -383,7 +384,7 @@ const defaults = {
       heightSegmentsRatio: 1.5,
       tension: -0.7,
       polyComplexity: {
-        poor: 5,
+        poor: 4,
         low: 6,
         medium: 10,
         high: 18,
