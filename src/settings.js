@@ -75,7 +75,7 @@ const defaults = {
       aromrad: 0.1,
       showarom: true,
       polyComplexity: {
-        poor: 2,
+        poor: 3,
         low: 4,
         medium: 6,
         high: 12,
