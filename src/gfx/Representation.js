@@ -67,8 +67,6 @@ class Representation {
 
     this.geo = this.mode.buildGeometry(complex, this.colorer, 1 << this.index, this.material);
 
-    gfxutils.processColFromPosMaterial(this.geo, this.material);
-
     if (this.material.uberOptions.opacity < 0.99 && settings.now.transparency === 'prepass') {
       gfxutils.processTransparentMaterial(this.geo, this.material);
     }
@@ -78,6 +76,8 @@ class Representation {
     if (settings.now.shadow.on) {
       gfxutils.processMaterialForShadow(this.geo, this.material);
     }
+
+    gfxutils.processColFromPosMaterial(this.geo, this.material);
 
     return this.geo;
   }
