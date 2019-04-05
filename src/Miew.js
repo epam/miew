@@ -364,7 +364,7 @@ Miew.prototype._initGfx = function () {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
-  gfx.renderer.shadowMap.enabled = false;
+  gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
   gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
   capabilities.init(gfx.renderer);
 
