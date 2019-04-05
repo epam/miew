@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.23] - 2019-04-05
+### Added
+- Support dsn6 prefix for ED maps loading by PDB ID.
+- Support non-orthogonal density volumes.
+- Host full-screen viewer at a `/v` server path and add a button to launch the app from the lite viewer.
+- Add an interactive example showing residue sequences.
+
+### Changed
+- Use `https` protocol for data requests.
+- Implement soft shadow edges, make the colors more natural and reduce self-shadowing artifacts.
+- Use URL options in the corresponding example.
+- Add titles to the examples.
+
+### Fixed
+- Fix excessive rendering in case if nothing changes.
+- Fix disappearing molecule after reloading the page.
+- Fix full geometry rebuild when switching shadows on/off.
+- Fix low performance of volumetric rendering in the case when a molecule is present in the scene.
+
 ## [0.7.22] - 2019-02-28
 ### Changed
 - Make "fullscreen.html" example really full-screen both for desktops and mobiles.
@@ -382,7 +401,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.22...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.23...HEAD
+[0.7.23]: https://github.com/epam/miew/compare/v0.7.23...v0.7.23
 [0.7.22]: https://github.com/epam/miew/compare/v0.7.21...v0.7.22
 [0.7.21]: https://github.com/epam/miew/compare/v0.7.20...v0.7.21
 [0.7.20]: https://github.com/epam/miew/compare/v0.7.19...v0.7.20
