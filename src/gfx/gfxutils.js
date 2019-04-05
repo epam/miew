@@ -1,11 +1,12 @@
 /* eslint-disable no-magic-numbers */
 import * as THREE from 'three';
+import _ from 'lodash';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
 import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {
-  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4,
+  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4, COLOR_FROM_POSITION: 5,
 };
 
 THREE.Object3D.prototype.resetTransform = function () {
@@ -340,19 +341,26 @@ function destroyObject(object) {
   }
 }
 
-function applyTransformsToMeshes(root, mtc) {
+function _getMeshesArr(root, meshTypes) {
   const meshes = [];
+  root.traverse((object) => {
+    for (let i = 0; i < meshTypes.length; i++) {
+      if (object instanceof meshTypes[i]) {
+        meshes[meshes.length] = object;
+        break;
+      }
+    }
+  });
+  return meshes;
+}
 
+function applyTransformsToMeshes(root, mtc) {
   const mtcCount = mtc.length;
   if (mtcCount < 1) {
     return;
   }
-  root.traverse((object) => {
-    if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments
-          || object instanceof THREE.Line) {
-      meshes[meshes.length] = object;
-    }
-  });
+
+  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments, THREE.Line]);
 
   for (let i = 0, n = meshes.length; i < n; ++i) {
     const mesh = meshes[i];
@@ -374,12 +382,7 @@ function processTransparentMaterial(root, material) {
     return;
   }
 
-  const meshes = [];
-  root.traverse((object) => {
-    if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
-      meshes[meshes.length] = object;
-    }
-  });
+  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
 
   for (let i = 0, n = meshes.length; i < n; ++i) {
     const mesh = meshes[i];
@@ -395,11 +398,10 @@ function processTransparentMaterial(root, material) {
     const prepassMat = mesh.material.createInstance();
     prepassMat.setValues({ prepassTransparancy: true, fakeOpacity: false });
     const prepassMesh = new mesh.constructor(mesh.geometry, prepassMat);
-    prepassMesh.material.transparent = false;
-    prepassMesh.material.colorFromDepth = false;
-    prepassMesh.material.lights = false;
-    prepassMesh.material.shadowmap = false;
-    prepassMesh.material.fog = false;
+    _.forEach(['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog'],
+      (value) => {
+        prepassMesh.material[value] = false;
+      });
     prepassMesh.material.needsUpdate = true;
     prepassMesh.applyMatrix(mesh.matrix);
     prepassMesh.layers.set(LAYERS.PREPASS_TRANSPARENT);
@@ -407,6 +409,36 @@ function processTransparentMaterial(root, material) {
   }
 }
 
+function processColFromPosMaterial(root, material) {
+  if (!(material instanceof UberMaterial)) {
+    return;
+  }
+
+  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
+
+  for (let i = 0, n = meshes.length; i < n; ++i) {
+    const mesh = meshes[i];
+    const { parent } = mesh;
+    if (!parent) {
+      continue;
+    }
+
+    // copy of geometry with colFromPosMat material
+    const colFromPosMat = mesh.material.createInstance();
+    colFromPosMat.setValues({ colorFromPos: true });
+    const colFromPosMesh = new mesh.constructor(mesh.geometry, colFromPosMat);
+    _.forEach(['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog', 'overrideColor', 'fogTransparent',
+      'attrColor', 'attrColor2', 'attrAlphaColor', 'fakeOpacity'],
+    (value) => {
+      colFromPosMesh.material[value] = false;
+    });
+
+    colFromPosMesh.material.needsUpdate = true;
+    colFromPosMesh.applyMatrix(mesh.matrix);
+    colFromPosMesh.layers.set(LAYERS.COLOR_FROM_POSITION);
+    parent.add(colFromPosMesh);
+  }
+}
 function prepareObjMaterialForShadow(object) {
   if (object.castShadow) { // add casting material for casters
     const depthMaterial = object.material.createInstance();
@@ -481,6 +513,7 @@ export default {
   destroyObject,
   applyTransformsToMeshes,
   processTransparentMaterial,
+  processColFromPosMaterial,
   prepareObjMaterialForShadow,
   processMaterialForShadow,
   makeVisibleMeshes,

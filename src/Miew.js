@@ -1345,10 +1345,9 @@ Miew.prototype._renderVolume = (function () {
     // prepare texture that contains molecule positions
     world2colorMat.getInverse(mesh.matrixWorld);
     UberMaterial.prototype.uberOptions.world2colorMatrix.multiplyMatrices(cubeOffsetMat, world2colorMat);
-    this._setUberMaterialValues({ colorFromPos: true });
+    camera.layers.set(gfxutils.LAYERS.COLOR_FROM_POSITION);
     gfx.renderer.setRenderTarget(tmpBuf3);
     gfx.renderer.render(gfx.scene, camera);
-    this._setUberMaterialValues({ colorFromPos: false });
 
     // render volume
     const vm = mesh.material;
