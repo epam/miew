@@ -3593,7 +3593,13 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('fogAlpha', () => {
+    if (settings.now.fogAlpha < 0 || settings.now.fogAlpha > 1) {
+      settings.now.fogAlpha = settings.now.fogAlpha < 0 ? 0 : settings.now.fogAlpha;
+      settings.now.fogAlpha = settings.now.fogAlpha > 1 ? 1 : settings.now.fogAlpha;
+      this.logger.warn('fogAlpha must belong range [0,1] so it is clamped');
+    }
     this._fogAlphaChanged();
+    this._needRender = true;
   });
 
   on('autoResolution', (evt) => {
