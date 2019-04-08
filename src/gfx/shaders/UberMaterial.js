@@ -6,6 +6,9 @@ import fragmentShader from './Uber_frag.glsl';
 import capabilities from '../capabilities';
 import noise from '../noiseTexture';
 
+// Length of _samplesKernel is used in Uber_frag.glsl
+// If you want to change length of _samplesKernel, please, remember change it in Uber_frag.glsl too.
+// You can easy find places for replace using word:_samplesKernel
 const _samplesKernel = [
   new THREE.Vector2(-0.541978, 0.840393),
   new THREE.Vector2(0.125533, -0.992089),

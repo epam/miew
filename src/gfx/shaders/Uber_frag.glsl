@@ -19,8 +19,10 @@
 		varying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
 
     #ifdef SHADOWMAP_PCF_RAND
-		  #define MAX_SAMPLES_COUNT 4
-      uniform vec2 samplesKernel[MAX_SAMPLES_COUNT];
+      // We use 4 instead uniform variable or define because this value is used in for(... i < value; ...) with
+      // unroll_loop and unroll_loop has pattern:
+      // /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g
+      uniform vec2 samplesKernel[4]; // 4 is length of _samplesKernel which is defined in UberMaterial.js
       uniform sampler2D noiseTex;
       uniform vec2 noiseTexelSize;
       uniform vec2 srcTexelSize;
@@ -309,13 +311,13 @@ float unpackRGBAToDepth( const in vec4 v ) {
           vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);
           mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);
 
-          // see THREE.WebGLProgram.unrollLoops
+          vec2 offset;
           #pragma unroll_loop
-            for ( int i = 0; i < MAX_SAMPLES_COUNT; i ++ ) {
-              vec2 offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );
-              shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );
-            }
-          shadow /= float( MAX_SAMPLES_COUNT );
+          for ( int i = 0; i < 4; i ++ ) { // 4 is length of _samplesKernel which is defined in UberMaterial.js
+            offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );
+            shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );
+          }
+          shadow /= float( 4 ); // 4 is length of _samplesKernel which is defined in UberMaterial.js
         #endif
       }
       return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);
