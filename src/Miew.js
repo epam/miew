@@ -3592,7 +3592,12 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('fogAlpha', () => {
+    const { fogAlpha } = settings.now;
+    if (fogAlpha < 0 || fogAlpha > 1) {
+      this.logger.warn('fogAlpha must belong range [0,1]');
+    }
     this._fogAlphaChanged();
+    this._needRender = true;
   });
 
   on('autoResolution', (evt) => {
