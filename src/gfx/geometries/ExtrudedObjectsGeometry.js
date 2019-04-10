@@ -65,6 +65,8 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
 
     const positions = this._positions;
     const normals = this._normals;
+    const nPtsInRing = ptsCount * VEC_SIZE;
+
 
     const tmpShape = this._tmpShape;
     for (let i = 0, n = matrices.length; i < n; ++i) {
@@ -80,6 +82,9 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
         const prevPt = tmpShape[(j + ptsCount - 1) % ptsCount];
 
         const vtxIdx = chunkStartIdx + innerPtIdx;
+        const vtxIdxInPrevRing = vtxIdx - nPtsInRing;
+        const vtxIdxInPrevPrevRing = vtxIdx - 2 * nPtsInRing;
+
 
         positions[vtxIdx] = point.x;
         positions[vtxIdx + 1] = point.y;
@@ -93,20 +98,20 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
         //   Radius changes throught part => normals aren't parallel with the plane contains section points
         //   normal = vTangentInSectionPlane x vToSuchPointInPrevSection (all vectors are scaled for being 1 in length)
         if (hasSlope) {
-          if (i !== 1) {
+          if (i === 1) {
+            // first section is equal to last section of previous part so we takes normals from it
+            tmpPrev.x = normals[vtxIdxInPrevPrevRing];
+            tmpPrev.y = normals[vtxIdxInPrevPrevRing + 1];
+            tmpPrev.z = normals[vtxIdxInPrevPrevRing + 2];
+          } else {
             // zero and first sections are equal so we will have tmpNext = 0 for the first section
             // so we count normals with another way for it
             tmpPrev.subVectors(prevPt, nextPt).normalize();
-            tmpNext.x = point.x - positions[vtxIdx - ptsCount * 3 + 0];
-            tmpNext.y = point.y - positions[vtxIdx - ptsCount * 3 + 1];
-            tmpNext.z = point.z - positions[vtxIdx - ptsCount * 3 + 2];
+            tmpNext.x = point.x - positions[vtxIdxInPrevRing];
+            tmpNext.y = point.y - positions[vtxIdxInPrevRing + 1];
+            tmpNext.z = point.z - positions[vtxIdxInPrevRing + 2];
             tmpNext.normalize();
             tmpPrev.crossVectors(tmpPrev, tmpNext).normalize();
-          } else {
-            // first section is equal to last section of previous part so we takes normals from it
-            tmpPrev.x = normals[vtxIdx - 2 * ptsCount * 3];
-            tmpPrev.y = normals[vtxIdx - 2 * ptsCount * 3 + 1];
-            tmpPrev.z = normals[vtxIdx - 2 * ptsCount * 3 + 2];
           }
         } else {
           tmpPrev.subVectors(point, prevPt).normalize();
@@ -132,14 +137,14 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
               normals[vtxIdx + 2] = tmpPrev.z;
               break;
             case 1:
-              normals[vtxIdx] = normals[vtxIdx - ptsCount * 3];
-              normals[vtxIdx + 1] = normals[vtxIdx - ptsCount * 3 + 1];
-              normals[vtxIdx + 2] = normals[vtxIdx - ptsCount * 3 + 2];
+              normals[vtxIdx] = normals[vtxIdxInPrevRing];
+              normals[vtxIdx + 1] = normals[vtxIdxInPrevRing + 1];
+              normals[vtxIdx + 2] = normals[vtxIdxInPrevRing + 2];
               break;
             case 2:
-              positions[vtxIdx] = positions[vtxIdx - ptsCount * 3];
-              positions[vtxIdx + 1] = positions[vtxIdx - ptsCount * 3 + 1];
-              positions[vtxIdx + 2] = positions[vtxIdx - ptsCount * 3 + 2];
+              positions[vtxIdx] = positions[vtxIdxInPrevRing];
+              positions[vtxIdx + 1] = positions[vtxIdxInPrevRing + 1];
+              positions[vtxIdx + 2] = positions[vtxIdxInPrevRing + 2];
               break;
             default:
               break;
