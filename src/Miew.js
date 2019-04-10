@@ -210,6 +210,31 @@ function _setContainerContents(container, element) {
   parent.appendChild(element);
 }
 
+Miew.prototype._updateShadowCamera = function () {
+  this._gfx.scene.updateMatrixWorld();
+  for (let i = 0; i < this._gfx.scene.children.length; i++) {
+    if (this._gfx.scene.children[i].type === 'DirectionalLight') {
+      const light = this._gfx.scene.children[i];
+      const shadowMatrix = new THREE.Matrix4().copy(light.shadow.matrix);
+      const bBox = this._getbBox(shadowMatrix);
+
+      const direction = new THREE.Vector3().subVectors(light.target.position, light.position);
+      light.position.subVectors(bBox.center, direction);
+      light.target.position.copy(bBox.center);
+
+      light.shadow.bias = 0.09;
+      light.shadow.camera.bottom = -bBox.halfSize.y;
+      light.shadow.camera.top = bBox.halfSize.y;
+      light.shadow.camera.right = bBox.halfSize.x;
+      light.shadow.camera.left = -bBox.halfSize.x;
+      light.shadow.camera.near = direction.length() - bBox.halfSize.z;
+      light.shadow.camera.far = direction.length() + bBox.halfSize.z;
+
+      light.shadow.camera.updateProjectionMatrix();
+    }
+  }
+};
+
 /**
  * Initialize the viewer.
  * @returns {boolean} true on success.
@@ -265,6 +290,9 @@ Miew.prototype.init = function () {
       this._gfx.camera, this._gfx.renderer.domElement, (() => self._getAltObj()),
     );
     this._objectControls.addEventListener('change', (e) => {
+      if (settings.now.shadow.on) {
+        self._updateShadowCamera();
+      }
       // route rotate and zoom events to the external API
       switch (e.action) {
         case 'rotate':
@@ -431,7 +459,9 @@ Miew.prototype._initGfx = function () {
   const shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
   light12.shadow.mapSize.width = shadowMapSize;
   light12.shadow.mapSize.height = shadowMapSize;
+  light12.target.position.set(0.0, 0.0, 0.0);
   gfx.scene.add(light12);
+  gfx.scene.add(light12.target);
 
   const light3 = new THREE.AmbientLight(0x666666);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
@@ -889,6 +919,40 @@ Miew.prototype._getBSphereRadius = function () {
   return radius * this._objectControls.getScale();
 };
 
+Miew.prototype._getbBox = function (matrix) {
+  // calculate bounding box that would include all visuals and being axis aligned in world defined by
+  // transformation matrix: matrix
+  const OBB = new THREE.Box3();
+  this._forEachVisual((visual) => {
+    const obb = new THREE.Box3().copy(visual.getBoundaries().boundingBox);
+    obb.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
+    OBB.union(obb);
+  });
+
+  const bBox = { center: new THREE.Vector3(), halfSize: new THREE.Vector3() };
+  OBB.getCenter(bBox.center);
+  const points = [
+    new THREE.Vector3(OBB.min.x, OBB.min.y, OBB.min.z), // 000
+    new THREE.Vector3(OBB.max.x, OBB.min.y, OBB.min.z), // 100
+    new THREE.Vector3(OBB.min.x, OBB.max.y, OBB.min.z), // 010
+    new THREE.Vector3(OBB.min.x, OBB.min.y, OBB.max.z), // 001
+  ];
+
+  const invMatrix = new THREE.Matrix4().getInverse(matrix);
+  bBox.center.applyMatrix4(invMatrix);
+  points[0].applyMatrix4(invMatrix);
+  points[1].applyMatrix4(invMatrix);
+  points[2].applyMatrix4(invMatrix);
+  points[3].applyMatrix4(invMatrix);
+
+  bBox.halfSize.setX(Math.abs(points[0].x - points[1].x));
+  bBox.halfSize.setY(Math.abs(points[0].y - points[2].y));
+  bBox.halfSize.setZ(Math.abs(points[0].z - points[3].z));
+  bBox.halfSize.multiplyScalar(0.5);
+
+  return bBox;
+};
+
 Miew.prototype._updateFog = function () {
   const gfx = this._gfx;
 
@@ -939,7 +1003,6 @@ Miew.prototype._onRender = function () {
   gfx.camera.updateMatrixWorld();
 
   this._clipPlaneUpdateValue(this._getBSphereRadius());
-  this._updateShadow(this._getBSphereRadius());
   this._fogFarUpdateValue();
 
   gfx.renderer.setRenderTarget(null);
@@ -1919,6 +1982,9 @@ Miew.prototype.load = function (source, opts) {
 Miew.prototype.unload = function (name) {
   this._removeVisual(name || this.getCurrentVisual());
   this.resetPivot();
+  if (settings.now.shadow.on) {
+    this._updateShadowCamera();
+  }
 };
 
 Miew.prototype._startAnimation = function (fileData) {
@@ -2151,6 +2217,10 @@ Miew.prototype._onLoad = function (dataSource, opts) {
 
   if (settings.now.autoResolution) {
     this._tweakResolution();
+  }
+
+  if (settings.now.shadow.on) {
+    this._updateShadowCamera();
   }
 
   if (this._opts.view) {
@@ -3429,29 +3499,6 @@ Miew.prototype.get = function (param, value) {
   return settings.get(param, value);
 };
 
-Miew.prototype._updateShadow = function (radius) {
-  for (let i = 0; i < this._gfx.scene.children.length; i++) {
-    if (this._gfx.scene.children[i].shadow !== undefined) {
-      const light = this._gfx.scene.children[i];
-
-      light.shadow.bias = 0.09 * radius;
-
-      light.shadow.camera.bottom = -radius;
-      light.shadow.camera.top = radius;
-      light.shadow.camera.left = -radius;
-      light.shadow.camera.right = radius;
-
-      const distToOrigin = light.position.length();
-      const extraShift = 10; // if it's smaller there are artefacts in shadow
-      light.shadow.camera.far = distToOrigin + radius + extraShift;
-      light.shadow.camera.near = distToOrigin - radius - extraShift;
-      light.shadow.camera.near = light.shadow.camera.near > 0.1 ? light.shadow.camera.near : 0.1;
-
-      light.shadow.camera.updateProjectionMatrix();
-    }
-  }
-};
-
 Miew.prototype._clipPlaneUpdateValue = function (radius) {
   const clipPlaneValue = Math.max(
     this._gfx.camera.position.z - radius * settings.now.draft.clipPlaneFactor,
@@ -3553,6 +3600,9 @@ Miew.prototype._initOnSettingsChanged = function () {
     const gfx = this._gfx;
     if (gfx) {
       gfx.renderer.shadowMap.enabled = values.shadowmap;
+    }
+    if (values.shadowmap === true) {
+      this._updateShadowCamera();
     }
     this._updateMaterials(values, true, (object) => {
       if (values.shadowmap === true) {
