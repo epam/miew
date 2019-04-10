@@ -432,13 +432,15 @@ const defaults = {
      *
      * @typedef VolumeDensityModeOptions
      *
-     * @property {number} kSigma - Noise threshold coefficient .
+     * @property {number} kSigma - Noise threshold coefficient.
+     * @property {boolean} frame - flag, that turns on box frame painting
      *
      */
     VD: {
       kSigma: 1.0,
       kSigmaMed: 2.0,
       kSigmaMax: 4.0,
+      frame: true,
     },
   },
 
