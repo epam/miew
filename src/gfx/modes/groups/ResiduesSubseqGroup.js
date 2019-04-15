@@ -6,7 +6,8 @@ function _createShape(rad, parts) {
   const pts = [];
 
   for (let i = 0; i < parts; ++i) {
-    const a = 2 * i / parts * Math.PI;
+    // starts from pi/2 because it's important that points are lied on the angles of arrows (visual issues if not)
+    const a = Math.PI / 2.0 + 2 * Math.PI * i / parts;
 
     pts.push(new THREE.Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0));
   }
@@ -23,6 +24,7 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
       let prevLast = null;
       const startIdx = subs[i].start * 2;
       const endIdx = subs[i].end * 2 + 1;
+      let prevSecondRad = mode.getResidueRadius(residues[0], 0);
       for (let idx = startIdx; idx <= endIdx; ++idx) {
         const resIdx = (idx / 2 | 0);
         const currRes = residues[resIdx];
@@ -32,8 +34,15 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
         const mtc = matrixHelper.prepareMatrices(idx - idc[0] * 2, firstRad, secondRad);
         mtc.unshift(prevLast === null ? mtc[0] : prevLast);
 
-        callback(currRes, mtc, resIdx);
+        // Slope - radius is changed along this residue part
+        const hasSlope = (firstRad.x !== secondRad.x) || (firstRad.y !== secondRad.y);
+        // Cut - end radius of previous part not equal to start radius of this part. First section of this part lies in the orthogonal plane
+        const hasCut = (firstRad.x !== prevSecondRad.x) || (firstRad.y !== prevSecondRad.y);
+
+        callback(currRes, mtc, hasSlope, hasCut);
+
         prevLast = mtc[segmentsHeight];
+        prevSecondRad = secondRad;
       }
     }
   }
@@ -54,10 +63,10 @@ class ResiduesSubseqGroup extends ResiduesGroup {
     const geo = this._geo;
     let chunkIdx = 0;
     const chunkIdc = [];
-    _loopThrough(this._selection.subdivs, residues, this._segmentsHeight, tension, mode, (currRes, mtc) => {
+    _loopThrough(this._selection.subdivs, residues, this._segmentsHeight, tension, mode, (currRes, mtc, hasSlope = false, hasCut = false) => {
       const color = colorer.getResidueColor(currRes, parent);
       chunkIdc[chunkIdx] = currRes._index;
-      geo.setItem(chunkIdx, mtc);
+      geo.setItem(chunkIdx, mtc, hasSlope, hasCut);
       geo.setColor(chunkIdx++, color);
     });
     this._chunksIdc = chunkIdc;
