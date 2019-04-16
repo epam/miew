@@ -1878,6 +1878,8 @@ Miew.prototype.load = function (source, opts) {
     }
   }
 
+  viewInterpolator._reset();
+
   this.dispatchEvent({ type: 'load', options: opts, source });
 
   const job = new JobHandle();
