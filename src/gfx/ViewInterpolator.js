@@ -53,7 +53,7 @@ class ViewInterpolator {
     const time = Date.now();
     if (time > this._endTime) {
       view = this._dstView;
-      this._reset();
+      this.reset();
       return { success: true, view };
     }
 
