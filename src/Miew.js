@@ -1880,7 +1880,7 @@ Miew.prototype.load = function (source, opts) {
     }
   }
 
-  viewInterpolator._reset();
+  viewInterpolator.reset();
 
   this.dispatchEvent({ type: 'load', options: opts, source });
 

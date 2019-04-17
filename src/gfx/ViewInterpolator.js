@@ -66,7 +66,7 @@ class ViewInterpolator {
     return { success: true, view };
   }
 
-  _reset() {
+  reset() {
     this._startTime = this._endTime = 0;
     this._isMoving = false;
   }
