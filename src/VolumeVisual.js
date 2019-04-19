@@ -15,8 +15,9 @@ function VolumeVisual(name, dataSource) {
   this._mesh.setDataSource(dataSource);
   this.add(this._mesh);
 
-  this._boundaries = new VolumeBounds(this);
-  this.showFrame(true);//settings.now.modes.VD.frame);
+  this._frame = new VolumeBounds(this.getBoundaries().boundingBox, this._mesh.volumeInfo);
+  this.add(this._frame.getMesh());
+  this.showFrame(settings.now.modes.VD.frame);
 
   this.buildFarPlane();
 }
@@ -86,11 +87,7 @@ VolumeVisual.prototype.getMesh = function () {
 };
 
 VolumeVisual.prototype.showFrame = function (needShow) {
-  if (needShow) {
-    this.add(this._boundaries.getMesh());
-  } else {
-    this.remove(this._boundaries.getMesh());
-  }
+  this._frame.getMesh().material.visible = needShow;
 };
 
 export default VolumeVisual;

@@ -325,7 +325,7 @@ function removeChildren(object) {
 
 function clearTree(object) {
   object.traverse((obj) => {
-    if (obj instanceof THREE.Mesh) {
+    if (obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments || obj instanceof THREE.Line) {
       obj.geometry.dispose();
     }
   });

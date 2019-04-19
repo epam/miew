@@ -1,31 +1,22 @@
-import * as THREE from 'three/src/Three';
+import * as THREE from 'three';
 
 class VolumeBounds {
-  constructor(volumeVisual) {
+  static _projectionTable = { // corresponds between (origin axes and angles between them) and between saving vector coordinates
+    XY: ['x', 2],
+    XZ: ['y', 1],
+    YZ: ['z', 0],
+  };
+
+  constructor(bBox, volInfo) {
+    const { delta } = volInfo; // {x: XY, y : XZ, z: YZ}
+    const { obtuseAngle } = volInfo; // 1 - obtuse, 0 - acute
+
+    const bSize = bBox.getSize().multiplyScalar(0.5);
+
+    const offsetVert = this._getBaseVertices(delta, obtuseAngle);
+
     const geometry = new THREE.Geometry();
 
-    const bBox = volumeVisual.getBoundaries().boundingBox;
-    const bSize = bBox.getSize().multiplyScalar(0.5);
-    const { delta } = volumeVisual.getMesh().volumeInfo; // {x: XY, y : XZ, z: YZ}
-    const { obtuseAngle } = volumeVisual.getMesh().volumeInfo;
-
-    const projTable = {
-      XY: ['x', 2],
-      XZ: ['y', 1],
-      YZ: ['z', 0],
-    };
-
-    const proj = ((index, inv) => {
-      const currDelta = delta[projTable[index][0]];
-      const angleValue = -0.5 * (inv - 1) + inv * obtuseAngle[projTable[index][1]];// inv = 1: alpha; inv = -1: 1 - alpha
-      return angleValue * currDelta;
-    });
-    const offsetVert = [
-      new THREE.Vector3(-1 + 2 * (proj('XZ', 1) + proj('XY', 1)), -1 + 2 * proj('YZ', 1), -1),
-      new THREE.Vector3(-1 + 2 * (proj('XZ', -1) + proj('XY', 1)), -1 + 2 * proj('YZ', -1), 1),
-      new THREE.Vector3(-1 + 2 * (proj('XZ', -1) + proj('XY', -1)), 1 - 2 * proj('YZ', 1), 1),
-      new THREE.Vector3(-1 + 2 * (proj('XZ', 1) + proj('XY', -1)), 1 - 2 * proj('YZ', -1), -1),
-    ];
     for (let i = 0; i < 4; i++) {
       geometry.vertices.push(offsetVert[i].clone().multiply(bSize));
       geometry.vertices.push(offsetVert[(i + 1) % 4].clone().multiply(bSize));
@@ -38,8 +29,29 @@ class VolumeBounds {
       geometry.vertices.push(geometry.vertices[i * 2].clone());
       geometry.vertices.push(geometry.vertices[i * 2 + 8].clone());
     }
-    geometry.vertices.forEach(vertex => vertex.add(bBox.getCenter()));
+    geometry.vertices.forEach(vertex => vertex.add(bBox.getCenter())); // pivot shift
+
     this._lines = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0xFFFFFF }));
+  }
+
+  // Set one edge (4 points) of frame, from which with parallel transfer  the rest of the frame points can be obtained
+  _getBaseVertices(delta, obtuseAngle) {
+    const projTable = VolumeBounds._projectionTable;
+
+    const proj = ((index, inv) => { // tricky function to take account of projections: their position(related to box) and sign
+      const currDelta = delta[projTable[index][0]];
+      const angleValue = -0.5 * (inv - 1) + inv * obtuseAngle[projTable[index][1]];// inv = 1: alpha; inv = -1: 1 - alpha
+      return angleValue * currDelta;
+    });
+
+    const offsetVert = [
+      new THREE.Vector3(-1 + 2 * (proj('XZ', 1) + proj('XY', 1)), -1 + 2 * proj('YZ', 1), -1),
+      new THREE.Vector3(-1 + 2 * (proj('XZ', -1) + proj('XY', 1)), -1 + 2 * proj('YZ', -1), 1),
+      new THREE.Vector3(-1 + 2 * (proj('XZ', -1) + proj('XY', -1)), 1 - 2 * proj('YZ', 1), 1),
+      new THREE.Vector3(-1 + 2 * (proj('XZ', 1) + proj('XY', -1)), 1 - 2 * proj('YZ', -1), -1),
+    ];
+
+    return offsetVert;
   }
 
   getMesh() {
