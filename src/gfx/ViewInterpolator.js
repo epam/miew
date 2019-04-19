@@ -21,6 +21,7 @@ class ViewInterpolator {
   setup(startView, endView) {
     this._startTime = undefined;
     this._endTime = undefined;
+    this._isPaused = false;
 
     this._srcView = startView;
     this._dstView = endView;
@@ -52,7 +53,7 @@ class ViewInterpolator {
     const time = Date.now();
     if (time > this._endTime) {
       view = this._dstView;
-      this._reset();
+      this.reset();
       return { success: true, view };
     }
 
@@ -65,9 +66,20 @@ class ViewInterpolator {
     return { success: true, view };
   }
 
-  _reset() {
+  reset() {
     this._startTime = this._endTime = 0;
     this._isMoving = false;
+  }
+
+  pause() {
+    if (!this._isPaused) {
+      this.setup(this.getCurrentView().view, this._dstView);
+      this._isPaused = true;
+    }
+  }
+
+  resume() {
+    this._isPaused = false;
   }
 
   createView() {

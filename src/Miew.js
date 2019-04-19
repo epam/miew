@@ -782,6 +782,7 @@ Miew.prototype.run = function () {
     }
 
     this._objectControls.enable(true);
+    viewInterpolator.resume();
 
     const device = this.webVR ? this.webVR.getDevice() : null;
     (device || window).requestAnimationFrame(() => this._onTick());
@@ -798,6 +799,7 @@ Miew.prototype.halt = function () {
     this._discardComponentEdit();
     this._discardFragmentEdit();
     this._objectControls.enable(false);
+    viewInterpolator.pause();
     this._halting = true;
   }
 };
@@ -1877,6 +1879,8 @@ Miew.prototype.load = function (source, opts) {
       this.reset(true);
     }
   }
+
+  viewInterpolator.reset();
 
   this.dispatchEvent({ type: 'load', options: opts, source });
 
