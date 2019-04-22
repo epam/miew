@@ -210,30 +210,35 @@ function _setContainerContents(container, element) {
   parent.appendChild(element);
 }
 
-Miew.prototype._updateShadowCamera = function () {
-  this._gfx.scene.updateMatrixWorld();
-  for (let i = 0; i < this._gfx.scene.children.length; i++) {
-    if (this._gfx.scene.children[i].type === 'DirectionalLight') {
-      const light = this._gfx.scene.children[i];
-      const shadowMatrix = new THREE.Matrix4().copy(light.shadow.matrix);
-      const bBox = this._getbBox(shadowMatrix);
+Miew.prototype._updateShadowCamera = (function () {
+  const shadowMatrix = new THREE.Matrix4();
+  const direction = new THREE.Vector3();
 
-      const direction = new THREE.Vector3().subVectors(light.target.position, light.position);
-      light.position.subVectors(bBox.center, direction);
-      light.target.position.copy(bBox.center);
+  return function () {
+    this._gfx.scene.updateMatrixWorld();
+    for (let i = 0; i < this._gfx.scene.children.length; i++) {
+      if (this._gfx.scene.children[i].type === 'DirectionalLight') {
+        const light = this._gfx.scene.children[i];
+        shadowMatrix.copy(light.shadow.matrix);
+        const bBox = this._getOBB(shadowMatrix);
 
-      light.shadow.bias = 0.09;
-      light.shadow.camera.bottom = -bBox.halfSize.y;
-      light.shadow.camera.top = bBox.halfSize.y;
-      light.shadow.camera.right = bBox.halfSize.x;
-      light.shadow.camera.left = -bBox.halfSize.x;
-      light.shadow.camera.near = direction.length() - bBox.halfSize.z;
-      light.shadow.camera.far = direction.length() + bBox.halfSize.z;
+        direction.subVectors(light.target.position, light.position);
+        light.position.subVectors(bBox.center, direction);
+        light.target.position.copy(bBox.center);
 
-      light.shadow.camera.updateProjectionMatrix();
+        light.shadow.bias = 0.09;
+        light.shadow.camera.bottom = -bBox.halfSize.y;
+        light.shadow.camera.top = bBox.halfSize.y;
+        light.shadow.camera.right = bBox.halfSize.x;
+        light.shadow.camera.left = -bBox.halfSize.x;
+        light.shadow.camera.near = direction.length() - bBox.halfSize.z;
+        light.shadow.camera.far = direction.length() + bBox.halfSize.z;
+
+        light.shadow.camera.updateProjectionMatrix();
+      }
     }
-  }
-};
+  };
+}());
 
 /**
  * Initialize the viewer.
@@ -919,39 +924,47 @@ Miew.prototype._getBSphereRadius = function () {
   return radius * this._objectControls.getScale();
 };
 
-Miew.prototype._getbBox = function (matrix) {
-  // calculate bounding box that would include all visuals and being axis aligned in world defined by
-  // transformation matrix: matrix
+// calculate bounding box that would include all visuals and being axis aligned in world defined by
+// transformation matrix: matrix
+Miew.prototype._getOBB = (function () {
   const OBB = new THREE.Box3();
-  this._forEachVisual((visual) => {
-    const obb = new THREE.Box3().copy(visual.getBoundaries().boundingBox);
-    obb.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
-    OBB.union(obb);
-  });
+  const obb = new THREE.Box3();
 
-  const bBox = { center: new THREE.Vector3(), halfSize: new THREE.Vector3() };
-  OBB.getCenter(bBox.center);
+  const invMatrix = new THREE.Matrix4();
   const points = [
-    new THREE.Vector3(OBB.min.x, OBB.min.y, OBB.min.z), // 000
-    new THREE.Vector3(OBB.max.x, OBB.min.y, OBB.min.z), // 100
-    new THREE.Vector3(OBB.min.x, OBB.max.y, OBB.min.z), // 010
-    new THREE.Vector3(OBB.min.x, OBB.min.y, OBB.max.z), // 001
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+    new THREE.Vector3(),
   ];
 
-  const invMatrix = new THREE.Matrix4().getInverse(matrix);
-  bBox.center.applyMatrix4(invMatrix);
-  points[0].applyMatrix4(invMatrix);
-  points[1].applyMatrix4(invMatrix);
-  points[2].applyMatrix4(invMatrix);
-  points[3].applyMatrix4(invMatrix);
+  const center = new THREE.Vector3();
+  const halfSize = new THREE.Vector3();
 
-  bBox.halfSize.setX(Math.abs(points[0].x - points[1].x));
-  bBox.halfSize.setY(Math.abs(points[0].y - points[2].y));
-  bBox.halfSize.setZ(Math.abs(points[0].z - points[3].z));
-  bBox.halfSize.multiplyScalar(0.5);
+  return function (matrix) {
+    OBB.makeEmpty();
+    this._forEachVisual((visual) => {
+      obb.copy(visual.getBoundaries().boundingBox);
+      obb.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
+      OBB.union(obb);
+    });
+    OBB.getCenter(center);
 
-  return bBox;
-};
+    invMatrix.getInverse(matrix);
+    center.applyMatrix4(invMatrix);
+    points[0].set(OBB.min.x, OBB.min.y, OBB.min.z).applyMatrix4(invMatrix); // 000
+    points[1].set(OBB.max.x, OBB.min.y, OBB.min.z).applyMatrix4(invMatrix); // 100
+    points[2].set(OBB.min.x, OBB.max.y, OBB.min.z).applyMatrix4(invMatrix); // 010
+    points[3].set(OBB.min.x, OBB.min.y, OBB.max.z).applyMatrix4(invMatrix); // 001
+
+    halfSize.setX(Math.abs(points[0].x - points[1].x));
+    halfSize.setY(Math.abs(points[0].y - points[2].y));
+    halfSize.setZ(Math.abs(points[0].z - points[3].z));
+    halfSize.multiplyScalar(0.5);
+
+    return { center, halfSize };
+  };
+}());
 
 Miew.prototype._updateFog = function () {
   const gfx = this._gfx;
