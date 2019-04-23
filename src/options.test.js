@@ -416,6 +416,19 @@ describe('options', () => {
     });
   });
 
+  // TODO think about making public fromArray function and tests firstly it (not fromAttr or fromURL)
+  describe('.fromAttr', () => {
+    function urlize(opts) {
+      return `?${opts || ''}`;
+    }
+
+    it('restores high level mode properties', () => {
+      const tmp = options.fromURL(urlize(simpleRepsStr));
+      const tmp1 = options.fromAttr(simpleRepsStr);
+      expect(options.toURL(tmp)).to.equal(options.toURL(tmp1));
+    });
+  });
+
   describe('.toScript', () => {
     function equalCommands(original, generated) {
       if (!_.isArray(original) || original.length !== generated.length + 2) {
