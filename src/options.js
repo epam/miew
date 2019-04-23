@@ -280,7 +280,10 @@ function _processArgsForURL(args) {
   if (!_.isArray(args)) {
     return args;
   }
-  return args[0] + (args.length < 2 ? '' : cOptsSep + _processOptsForURL(args[1]));
+  if (args.length < 2) {
+    return args[0];
+  }
+  return args[0] + cOptsSep + _processOptsForURL(args[1]);
 }
 
 function _processObjForURL(objOpts) {
@@ -375,7 +378,10 @@ function _processArgsForScript(args) {
   if (!_.isArray(args)) {
     return args;
   }
-  return args[0] + (args.length < 2 ? '' : ` ${_processOptsForScript(args[1])}`);
+  if (args.length < 2) {
+    return args[0];
+  }
+  return `${args[0]} ${_processOptsForScript(args[1])}`;
 }
 
 function _processObjForScript(objOpts) {
