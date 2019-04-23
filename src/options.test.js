@@ -12,6 +12,11 @@ describe('options', () => {
     colorer: 'EL',
   };
 
+  const simplestRep1 = {
+    mode: 'QS',
+    material: 'TR',
+  };
+
   const parameterRep = {
     mode: [
       'TR', {
@@ -96,6 +101,13 @@ describe('options', () => {
     'rep 0 m=BS c=EL',
     'rep 1 m=TR radius=0.5 c=EL carbon=0',
   ];
+
+  const duplicatedRepsOpts = {
+    preset: 'default',
+    reps: [simplestRep, parameterRep, simplestRep1],
+  };
+  const duplicatedRepsStr = 'p=default&r=0&c=EL&r=1&m=TR!radius:0.5&c=EL!carbon:0&rep=0&dup&m=QS&mt=TR&r=0&m=BS';
+  const doubleModeRepsStr = 'p=default&r=0&m=BS&c=EL&r=1&m=TR!radius:0.5&c=EL!carbon:0&rep=0&m=QS&mt=TR';
 
   /** ******** OBJECTS TEST SETS *********** */
   const objectsList = [
@@ -393,6 +405,14 @@ describe('options', () => {
 
     it('restores proper URL for complex text mode opts', () => {
       expect(options.fromURL(urlize(complexTextModeStr))).to.equalOptions(complexTextModeOpts);
+    });
+
+    it('restores proper URL for complex with using dup for duplicate similar reps', () => {
+      expect(options.fromURL(urlize(duplicatedRepsStr))).to.equalOptions(duplicatedRepsOpts);
+    });
+
+    it('restores proper URL for complex with using double mode for duplicatee similar reps', () => {
+      expect(options.fromURL(urlize(doubleModeRepsStr))).to.equalOptions(duplicatedRepsOpts);
     });
   });
 

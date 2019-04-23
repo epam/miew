@@ -78,9 +78,8 @@ function ensureRepAssign(opts, prop, value) {
   const rep = opts.reps[repIndex];
   // prop specified twice therefore start new rep by cloning the current
   if (rep.hasOwnProperty(prop)) {
-    if (++repIndex >= opts.reps.length) {
-      opts.reps[repIndex] = utils.deriveDeep(rep, true);
-    }
+    repIndex = opts.reps.length;
+    opts.reps[repIndex] = utils.deriveDeep(rep, true);
   }
   if (value !== undefined) {
     opts.reps[repIndex][prop] = value;
@@ -216,9 +215,8 @@ const actions = {
     ensureRepList(opts);
     const { reps } = opts;
     const rep = reps[repIndex];
-    if (++repIndex >= reps.length) {
-      reps[repIndex] = utils.deriveDeep(rep, true);
-    }
+    repIndex = reps.length;
+    reps[repIndex] = utils.deriveDeep(rep, true);
   },
 
   // Settings shortcuts
