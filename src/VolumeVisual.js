@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import utils from './utils';
 import VolumeMesh from './gfx/VolumeMesh';
+import VolumeBounds from './gfx/VolumeBounds';
 import Visual from './Visual';
 import VolumeMaterial from './gfx/shaders/VolumeMaterial';
 import gfxutils from './gfx/gfxutils';
 import meshes from './gfx/meshes/meshes';
+import settings from './settings';
 
 function VolumeVisual(name, dataSource) {
   Visual.call(this, name, dataSource);
@@ -12,6 +14,10 @@ function VolumeVisual(name, dataSource) {
   this._mesh = new VolumeMesh();
   this._mesh.setDataSource(dataSource);
   this.add(this._mesh);
+
+  this._frame = new VolumeBounds(this.getBoundaries().boundingBox, this._mesh.volumeInfo);
+  this.add(this._frame.getMesh());
+  this.showFrame(settings.now.modes.VD.frame);
 
   this.buildFarPlane();
 }
@@ -78,6 +84,10 @@ VolumeVisual.prototype.getBoundaries = function () {
 
 VolumeVisual.prototype.getMesh = function () {
   return this._mesh;
+};
+
+VolumeVisual.prototype.showFrame = function (needShow) {
+  this._frame.getMesh().material.visible = needShow;
 };
 
 export default VolumeVisual;

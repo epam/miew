@@ -3514,6 +3514,11 @@ Miew.prototype._initOnSettingsChanged = function () {
     });
   };
 
+  on('modes.VD.frame', () => {
+    this._getVolumeVisual().showFrame(settings.now.modes.VD.frame);
+    this._needRender = true;
+  });
+
   on('theme', () => {
     // TODO add warning
     this._onThemeChanged();
