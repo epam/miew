@@ -19,7 +19,7 @@
     "ci-fast": "run-s lint:js test:unit build:demo",
     "lint": "run-s lint:*",
     "lint-fix": "run-s \"lint:* -- --fix\"",
-    "lint:js": "eslint -f unix .*.js *.js src/ demo/ test/ tools/",
+    "lint:js": "eslint -f unix .*.js *.js src/ demo/ examples/ test/ tools/",
     "lint:css": "stylelint src/**/*.scss demo/**/*.scss",
     "test": "run-s test:unit",
     "test-cover": "cross-env NODE_ENV=coverage nyc mocha",

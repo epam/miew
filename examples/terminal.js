@@ -1,10 +1,11 @@
+/* global Miew:false, $:false */
 function initializeTerminal(viewer) {
   var _terminal = $('.miew-terminal');
   var _terminalWindow = _terminal.find('.terminal-window');
-  _terminalWindow.terminal(function(command, term) {
-    viewer.script(command, function(str) {
+  _terminalWindow.terminal(function (command, term) {
+    viewer.script(command, function (str) {
       term.echo(str);
-    }, function(str) {
+    }, function (str) {
       term.error(str);
     });
   }, {
@@ -13,27 +14,28 @@ function initializeTerminal(viewer) {
     name: 'miew',
     scrollOnEcho: true,
     height: '100%',
-    onInit: function(term) {
+    onInit: function (term) {
+      var colors;
       if (viewer) {
         // highlight logs with different colors
-        var colors = {
-          'error': '#f00',
-          'warn': '#990',
-          'report': '#1a9cb0',
+        colors = {
+          error: '#f00',
+          warn: '#990',
+          report: '#1a9cb0',
         };
-        viewer.logger.addEventListener('message', function(e) {
+        viewer.logger.addEventListener('message', function (e) {
           var msg = e.message.replace(/]/g, '\\]');
           term.echo('[[b;' + (colors[e.level] || '#666') + ';]' + msg + ']');
         });
       }
-    }
+    },
   });
   _terminal.show();
   _terminalWindow.focus();
   viewer.enableHotKeys(false);
 }
 
-(function() {
+(function () {
   var viewer = new Miew({
     container: document.getElementsByClassName('miew-container')[0],
     load: '1CRN',
@@ -43,4 +45,4 @@ function initializeTerminal(viewer) {
     initializeTerminal(viewer);
     viewer.run();
   }
-})();
+}());

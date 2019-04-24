@@ -11,6 +11,6 @@ function onMiewLoaded(Miew) {
   }
 }
 
-import(/* webpackChunkName: "Miew" */ '../dist/Miew.module').then(({default: Miew}) => {
+import(/* webpackChunkName: "Miew" */ '../dist/Miew.module').then(({ default: Miew }) => {
   onMiewLoaded(Miew);
 });
