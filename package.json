@@ -167,7 +167,7 @@
     "style-loader": "^0.23.1",
     "stylelint": "^10.0.0",
     "stylelint-config-standard": "^18.2.0",
-    "three": "0.103",
+    "three": "~0.104.0",
     "toastr": "^2.1.4",
     "uglify-js": "^3.5.3",
     "url-loader": "^1.1.2",
