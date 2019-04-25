@@ -21,7 +21,6 @@ class IsoSurfaceMode extends SurfaceMode {
       visibilitySelector: this.getVisibilitySelector(),
       probeRadius: this.opts.probeRadius,
       excludeProbe: this._excludeProbe,
-      clusterizationType: this._clusterViaKMeans,
     };
   }
 }
@@ -33,7 +32,6 @@ IsoSurfaceMode.prototype.surfaceNames = ['SASSESSurfaceGeo'];
 
 IsoSurfaceMode.prototype._radScale = 1;
 // TODO: move to advanced visualization UI next 3 params
-IsoSurfaceMode.prototype._clusterViaKMeans = 0; // 0: no cluster, 1: KMeans, 2: SimplestClusterization
 IsoSurfaceMode.prototype._excludeProbe = false;
 
 export default IsoSurfaceMode;
