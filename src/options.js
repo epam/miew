@@ -462,8 +462,6 @@ function toScript(opts) {
     checkAndAdd(`set ${key}`, value, true);
   });
   checkAndAdd('view', opts.view);
-
-  // this is kind of hack
   checkAndAdd('set', 'autobuild true');
   return commandsList.join('\n');
 }

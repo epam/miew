@@ -214,7 +214,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
         changed = true;
         logger.debug(`rep[${index}].mode changed to ${newMode}`);
 
-        // safety hack: lower resolution for surface modes
+        // safety trick: lower resolution for surface modes
         if (target.mode.isSurface
             && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
           logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
