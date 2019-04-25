@@ -134,7 +134,7 @@ function Miew(opts) {
 
   /** @type {Settings} */
   this.settings = settings;
-  const log = logger; // TODO: add .instantiate() when migration to the "context" paradigm is finished
+  const log = logger;
   log.console = DEBUG;
   log.level = DEBUG ? 'debug' : 'info';
   /**
@@ -169,8 +169,6 @@ function Miew(opts) {
 
   /** @type {object} */
   this._sourceWindow = null;
-
-  // TODO make this being not so ugly
 
   this._srvTopoSource = null;
   this._srvAnimSource = null;
@@ -420,7 +418,6 @@ Miew.prototype._initGfx = function () {
   gfx.selectionPivot.matrixAutoUpdate = false;
   gfx.selectionRoot.add(gfx.selectionPivot);
 
-  // TODO: Either stay with a single light or revert this commit
   const light12 = new THREE.DirectionalLight(0xffffff, 0.45);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
@@ -637,7 +634,7 @@ Miew.prototype._removeVisual = function (visual) {
   }
 
   if (name === this._curVisualName) {
-    this._curVisualName = undefined; // TODO: implement a proper way of handling visuals
+    this._curVisualName = undefined;
   }
 
   delete this._visuals[name];
@@ -2017,7 +2014,6 @@ Miew.prototype._continueAnimation = function () {
   minFrameTime = Number.isNaN(minFrameTime) ? 0 : minFrameTime;
   const self = this;
   const { pivot } = self._gfx;
-  // TODO take care of all complex visuals ?
   const visual = this._getComplexVisual();
   if (visual) {
     visual.resetSelectionMask();
@@ -2067,7 +2063,7 @@ Miew.prototype._stopAnimation = function () {
 /**
  * Invoked upon successful loading of some data source
  * @param {DataSource} dataSource - Data source for visualization (molecular complex or other)
- * @param {object} opts - TODO: Options.
+ * @param {object} opts - Options.
  * @private
  */
 Miew.prototype._onLoad = function (dataSource, opts) {
@@ -2326,7 +2322,6 @@ Miew.prototype.rebuild = function () {
 
     self._needRender = true;
 
-    // TODO: Gather geometry stats?
     self._refreshTitle();
     self._building = false;
   });
@@ -2337,7 +2332,6 @@ Miew.prototype.rebuildAll = function () {
   this._forEachComplexVisual((visual) => {
     visual.setNeedsRebuild();
   });
-  // this.rebuild(); // TODO: isn't implicit rebuild enough?
 };
 
 Miew.prototype._refreshTitle = function (appendix) {
@@ -3218,7 +3212,6 @@ Miew.prototype.info = function (name) {
 Miew.prototype.addObject = function (objData, bThrow) {
   let Ctor = null;
 
-  // TODO change this to factory when better times come.
   if (objData.type === LinesObject.prototype.type) {
     Ctor = LinesObject;
   }
@@ -3515,7 +3508,6 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('theme', () => {
-    // TODO add warning
     this._onThemeChanged();
   });
 

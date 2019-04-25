@@ -89,7 +89,6 @@ class MeshCreator {
     };
   }
 
-  // TODO thisnk about interface and responsibilities
   static create2CClosedCylinders(_caps, _settings) {
     return _createInstancedCylinders(false, false);
   }

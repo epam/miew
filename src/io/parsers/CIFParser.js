@@ -252,7 +252,6 @@ class CIFParser extends Parser {
       throw new AtomDataError('CIF parsing error: atom_site is not specified!');
     }
 
-    // TODO also add length chacks?
     for (let f = 0, n = cRequiredAtomFields.length; f < n; ++f) {
       if (!atomData[cRequiredAtomFields[f]]) {
         throw new AtomDataError(`CIF parsing error: requires field ${cRequiredAtomFields[f]} not found!`);
@@ -456,7 +455,6 @@ class CIFParser extends Parser {
       const length = lengths[i] || 0;
       const helixClass = helixClasses[i] || ' ';
       let struct;
-      // TODO Add turns and strands(!)?
       if (type === 'helix') {
         const idx = complex._helices.length;
         struct = new Helix(helixClass, start[0], end[0], idx, name, comment, length);

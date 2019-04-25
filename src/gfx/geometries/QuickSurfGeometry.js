@@ -91,7 +91,6 @@ class QuickSurfGeometry extends VolumeSurfaceGeometry {
             const r2 = dx * dx + dy2dz2;
             const expVal = -r2 * radInv;
 
-            // TODO use faster exp?
             let density = Math.exp(expVal) * atomicNumFactor;
 
             // store most relevant atom (with highest density)

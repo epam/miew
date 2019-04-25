@@ -220,7 +220,6 @@ class PDBParser extends Parser {
       this._residue = residue = chain.addResidue(resName, resSeq, iCode);
     }
 
-    // TODO: optimize atom positions storage? what for? (and occupancy? tempFactor?)
     const xyz = new THREE.Vector3(x, y, z);
     residue.addAtom(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
   }

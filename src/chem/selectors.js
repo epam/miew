@@ -366,7 +366,6 @@ defineOperator('Or', 3, class OrOperator extends InfixOperator {
 
 const selectors = Object.create(keywords);
 
-// TODO: Provide consistent module exports
 selectors.Selector = Selector;
 selectors.RangeListSelector = RangeListSelector;
 selectors.ValueListSelector = ValueListSelector;

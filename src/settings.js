@@ -978,7 +978,6 @@ utils.deriveClass(Settings, EventDispatcher, {
   },
 
   applyDiffs(diffs) {
-    // TODO Change inequality to >=?
     if (diffs.hasOwnProperty('VERSION') && diffs.VERSION !== VERSION) {
       throw new Error('Settings version does not match!');
     }

@@ -7,8 +7,8 @@ class ContactSurfaceMode extends SurfaceMode {
     return {
       probeRadius: this.opts.probeRadius,
       radScale: this.opts.polyComplexity[this.settings.now.resolution],
-      scaleFactor: this.opts.polyComplexity[this.settings.now.resolution], // TODO rename all params
-      gridSpacing: 1.0 / this.opts.polyComplexity[this.settings.now.resolution], // TODO rename all params
+      scaleFactor: this.opts.polyComplexity[this.settings.now.resolution],
+      gridSpacing: 1.0 / this.opts.polyComplexity[this.settings.now.resolution],
       isoValue: this.opts.isoValue,
       probePositions: this.opts.probePositions,
       zClip: this.opts.zClip,

@@ -42,7 +42,6 @@ class IsoSurfaceGeometry extends RaycastableBufferGeometry {
 
   finalize() {
     this.finishUpdate();
-    // TODO compute bounding box?
     this.computeBoundingSphere();
   }
 

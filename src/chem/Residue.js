@@ -40,7 +40,7 @@ class Residue {
     this._mask = 1 | 0;
     this._index = -1;
 
-    this._atoms = []; // TODO: change to range
+    this._atoms = [];
     this._secondary = null;
     this._firstAtom = null;
     this._leadAtom = null;
@@ -88,7 +88,7 @@ class Residue {
     const atom = new Atom(this, name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
     const complex = this._chain.getComplex();
     complex.addAtom(atom);
-    this._atoms.push(atom); // TODO: change to range
+    this._atoms.push(atom);
     this._het = this._het || het;
     return atom;
   }
@@ -250,7 +250,6 @@ class Residue {
     let temperature = 0; // average temperature
     let occupCount = 0;
     let occupancy = 0; // average occupancy
-    // TODO: Is it correct? Is it fast?
     this.forEachAtom((a) => {
       if (self._leadAtom === null) {
         if (a._role === Element.Constants.Lead) {

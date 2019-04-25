@@ -461,7 +461,6 @@ export default class SecondaryStructureMap {
   }
 
   // return true if any of the residues in bridge a is identical to any of the residues in bridge b
-  // TODO Optimize
   _areBridgesLinked(a, b) {
     const ai = new Set(a.i);
     const aj = new Set(a.j);

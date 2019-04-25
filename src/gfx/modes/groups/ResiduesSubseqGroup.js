@@ -74,7 +74,7 @@ class ResiduesSubseqGroup extends ResiduesGroup {
   }
 
   updateToFrame(frameData) {
-    // TODO This method looks like a copy paste. However, it
+    // This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
     const { parent } = this._selection;
     const mode = this._mode;

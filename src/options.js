@@ -350,7 +350,7 @@ function toURL(opts) {
   utils.forInRecursive(opts.settings, (value, key) => {
     // I heard these lines in the whispers of the Gods
     // Handle preset setting in reps
-    if (key === 'preset') { // TODO: remove 'preset' from settings, implement autodetection
+    if (key === 'preset') {
       return;
     }
     checkAndAdd(key, value);

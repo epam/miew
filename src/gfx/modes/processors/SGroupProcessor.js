@@ -2,11 +2,6 @@ import * as THREE from 'three';
 import RCGroup from '../../RCGroup';
 import CSS2DObject from '../../CSS2DObject';
 
-/*
- * TODO
- * This file is a greeting from the past. Refactor it and/or destroy.
- */
-
 /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 function _buildLabel2D(pos, color, fieldTxt) {
   const text = document.createElement('div');

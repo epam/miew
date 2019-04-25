@@ -59,7 +59,6 @@ class LabelsGeometry extends EventDispatcher {
         break;
     }
 
-    // TODO is code above OK?
     const deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
     this.userData = {
       translation: `translate(${xTranslation}%, ${yTranslation}%)`,

@@ -62,9 +62,6 @@ ComplexComponentEditor.prototype.apply = function () {
   this._resetComponentTransform();
 
   this._complexVisual.finalizeEdit();
-
-  // TODO: rebuild in Miew
-  // this.rebuildAll();
 };
 
 ComplexComponentEditor.prototype.discard = function () {
@@ -75,9 +72,6 @@ ComplexComponentEditor.prototype.discard = function () {
   this._resetComponentTransform();
 
   this._complexVisual.finalizeEdit();
-
-  // TODO: Make sure this is set in Miew
-  // this._needRender = true;
 };
 
 ComplexComponentEditor.prototype.getAltObj = function () {
@@ -266,9 +260,6 @@ ComplexFragmentEditor.prototype.begin = function () {
 
   gfxutils.applySelectionMaterial(this._fragmentSelectionGeo);
 
-  // TODO: Make sure this is set in Miew
-  // this._needRender = true;
-
   this._inProgress = true;
   return true;
 };
@@ -293,9 +284,6 @@ ComplexFragmentEditor.prototype.apply = function () {
   visual.getComplex().onAtomPositionChanged();
 
   visual.finalizeEdit();
-
-  // TODO: rebuild in Miew
-  // this.rebuildAll();
 };
 
 ComplexFragmentEditor.prototype.discard = function () {
@@ -322,9 +310,6 @@ ComplexFragmentEditor.prototype.discard = function () {
   }
 
   visual.finalizeEdit();
-
-  // TODO: Make sure this is set in Miew
-  // this._needRender = true;
 };
 
 ComplexFragmentEditor.prototype.isFreeRotationAllowed = function () {

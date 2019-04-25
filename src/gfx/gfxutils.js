@@ -157,8 +157,6 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function 
   };
 }());
 
-// TODO: move to a new Camera class?
-
 /**
  * @param {number} angle - Field of view in degrees.
  */

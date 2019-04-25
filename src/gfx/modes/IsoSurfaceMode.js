@@ -28,7 +28,6 @@ IsoSurfaceMode.prototype.shortName = 'Surface';
 IsoSurfaceMode.prototype.surfaceNames = ['SASSESSurfaceGeo'];
 
 IsoSurfaceMode.prototype._radScale = 1;
-// TODO: move to advanced visualization UI next 3 params
 IsoSurfaceMode.prototype._excludeProbe = false;
 
 export default IsoSurfaceMode;

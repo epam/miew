@@ -16,11 +16,10 @@ function FXAAMaterial(params) {
   THREE.ShaderMaterial.call(this);
   this.bgTransparent = false;
 
-  // TODO RawShaderMaterial? Why we use ShaderMaterial now ?
   // set default values
   THREE.ShaderMaterial.prototype.setValues.call(this, {
     uniforms: THREE.UniformsUtils.clone(defaultUniforms),
-    vertexShader, // TODO make texccord fo samples calculated in VS to reduce PS
+    vertexShader,
     fragmentShader,
     transparent: false,
     depthTest: false,

@@ -54,8 +54,6 @@ class CartoonMode extends Mode {
     return startRad.clone().lerp(endRad, val / 2.0);
   }
 
-  // TODO: remove when selection is rendered with actual geometry
-
   calcStickRadius(_res) {
     return this.opts.radius;
   }

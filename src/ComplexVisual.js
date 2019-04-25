@@ -609,7 +609,7 @@ ComplexVisual.prototype.rebuild = function () {
   // Destroy current geometry
   gfxutils.clearTree(this);
 
-  return new Promise(((resolve, _reject) => { // TODO: `reject` is not used
+  return new Promise(((resolve) => {
     // Nothing to do?
     const complex = self._complex;
     if (!complex) {

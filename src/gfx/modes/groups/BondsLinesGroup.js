@@ -63,7 +63,7 @@ class BondsLinesGroup extends BondsGroup {
   }
 
   updateToFrame(frameData) {
-    // TODO This method looks like a copy paste. However, it
+    // This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
     const bondsIdc = this._selection.chunks;
     const { bonds } = this._selection;

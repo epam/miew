@@ -1,5 +1,3 @@
-// TODO: See ResidueType and make this Element in similar way
-
 class Element {
   constructor(number, name, fullName, weight, radius, radiusBonding, hValency) {
     this.number = number;

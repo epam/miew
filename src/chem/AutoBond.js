@@ -29,13 +29,13 @@ function _isAtomEligible(atom) {
   return !atom.isHet() || (atom._bonds && atom._bonds.length === 0);
 }
 
+// @deprecated
 function _isAtomEligibleWithWaterBondingHack(atom) {
-  // TODO: remove this hack (requested by customer)
   const noHack = atom._residue._type._name !== 'HOH';
   return noHack && !atom.isHet();
 }
 
-// TODO: remove this hack (requested by customer)
+// @deprecated remove this hack (requested by customer)
 function _waterBondingHack(complex) {
   const t = Bond.BondType.UNKNOWN;
   const residues = complex._residues;
@@ -192,10 +192,8 @@ class AutoBond {
     if (cProfileBondBuilder) {
       console.time('Bonds Builder');
     }
-    // TODO verify that complex is ready
     this._buildInner();
 
-    // TODO: remove this hack (requested by customer)
     if (settings.now.draft.waterBondingHack && this._complex) {
       _waterBondingHack(this._complex);
     }

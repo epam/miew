@@ -1008,7 +1008,6 @@ Menu.prototype._init = function () {
     /** @this HTMLInputElement */ function () {
       const param = this.getAttribute('data-toggle');
       if (param === 'theme') {
-        // TODO use 'bg.color' instead of 'theme'
         self._viewer.set('theme', this.checked ? 'dark' : 'light');
       } else {
         self._viewer.set(param, this.checked);
@@ -2678,7 +2677,7 @@ Menu.prototype._onMenuOff = function () {
   this._updateReprList();
 
   // Apply changed settings
-  if (this._reprListChanged) { // TODO: list has changed, not rep!?
+  if (this._reprListChanged) {
     this._viewer.repGet().needsRebuild = true;
   }
 

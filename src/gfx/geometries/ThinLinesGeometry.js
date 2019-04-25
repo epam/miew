@@ -7,7 +7,6 @@ const POS_SIZE = 3;
 const COL_SIZE = 3;
 const tmpColor = new THREE.Color();
 
-// TODO move to utils
 function setArrayXYZ(arr, idx, x, y, z) {
   arr[idx] = x;
   arr[idx + 1] = y;
