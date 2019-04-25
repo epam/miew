@@ -2324,7 +2324,7 @@ Menu.prototype._initSelectionPanel = function () {
   selectionPanel.find('.help-block a').on('click', (e) => {
     const el = selectionPanel.find('input').get(0);
     el.value = e.target.textContent;
-    self._onSelectorChanged(selectionPanel); // FIXME
+    self._onSelectorChanged(selectionPanel);
     return false;
   });
 
@@ -2985,7 +2985,6 @@ Menu.prototype._updateReprList = function () {
         // change uniform colorer's color if applicable
         if (colorerId === 'UN' || colorerId === 'CB') {
           if (repr.colorer.opts.color !== ucColor) {
-            // FIXME: set color through shader uniform without rebuild
             repr.needsRebuild = true;
             repr.colorer.opts.color = ucColor;
           }

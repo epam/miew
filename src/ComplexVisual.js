@@ -108,7 +108,7 @@ ComplexVisual.prototype.resetReps = function (reps) {
 
     this._reprList[i] = new Representation(i, mode, colorer, selector);
     this._reprList[i].setMaterialPreset(material);
-    this._reprList[i].selectorString = selectorString; // FIXME: get rid of a separate selectorString
+    this._reprList[i].selectorString = selectorString;
 
     if (this._complex) {
       this._complex.markAtoms(selector, 1 << i);
@@ -182,7 +182,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
   // gather description
   const target = this._reprList[index];
   const desc = {
-    selector: target.selectorString, // FIXME: Hope it equals String(target.selector)
+    selector: target.selectorString,
     mode: target.mode.identify(),
     colorer: target.colorer.identify(),
     material: target.materialPreset.id,

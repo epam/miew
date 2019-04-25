@@ -20,7 +20,7 @@ const _samplesKernel = [
 
 const defaultUniforms = THREE.UniformsUtils.merge([
 
-  THREE.UniformsLib.common, // FIXME is it needed
+  THREE.UniformsLib.common, // is it needed?
   THREE.UniformsLib.fog,
   THREE.UniformsLib.lights,
 

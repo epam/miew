@@ -16,7 +16,7 @@ class Representation {
     this.mode = mode;
     this.colorer = colorer;
     this.selector = selector;
-    this.selectorString = ''; // FIXME
+    this.selectorString = '';
     this.count = 0;
     this.material = new UberMaterial();
     this.material.setValues(startMaterialValues);

@@ -74,7 +74,7 @@ class XYZParser extends Parser {
       const name = words[0];
       const xyz = new THREE.Vector3(parseFloat(words[1]), parseFloat(words[2]), parseFloat(words[3]));
       const type = Element.getByName(name);
-      const role = Element.Role[name]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
+      const role = undefined;
 
       residue.addAtom(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
     }

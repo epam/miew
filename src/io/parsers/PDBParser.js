@@ -145,25 +145,6 @@ class PDBParser extends Parser {
     }
   }
 
-  /* NOTE: Slow and clumsy. And only for badly formatted files.
-    PDBParser.prototype._atomNameScan = function(str) {
-      var i = 0;
-      var code = null;
-      var codeA = 'A'.charCodeAt(0);
-      var codeZ = 'Z'.charCodeAt(0);
-      var s = str.toUpperCase();
-      for (i = s.length - 1; i >= 0; i--) { // FIXME: What for?
-        code = s.charCodeAt(i);
-        if (codeA <= code && code <= codeZ) {
-          continue;
-        } else {
-          s = s.slice(0, i) + s.slice(i + 1, s.length);
-        }
-      }
-      return s;
-    };
-    */
-
   // FIXME: This function is redundant, CONECT records always follow ATOM and HETATM. Build the map online.
   _fixBondsArray() {
     const serialAtomMap = this._serialAtomMap = {};
@@ -341,7 +322,7 @@ class PDBParser extends Parser {
     });
   }
 
-  _parseSTRUCTURE(stream, pars, adder) { // FIXME: HELIX and SHEET have nothing in common
+  _parseSTRUCTURE(stream, pars, adder) {
     const startId = 0;
     const startIndex = 1;
     const endId = 2;
@@ -361,7 +342,7 @@ class PDBParser extends Parser {
     const shPrev = stream.readInt(57, 60);
     /* eslint-enable no-magic-numbers */
     // file fields
-    const startChainID = stream.readString(pars[startId], pars[endId] + 1).charCodeAt(0); // FIXME: no need in these
+    const startChainID = stream.readString(pars[startId], pars[endId] + 1).charCodeAt(0);
     const endChainID = stream.readString(pars[endId], pars[endId] + 1).charCodeAt(0);
     const startSequenceNumber = stream.readInt(pars[startIndex], pars[startIndex] + 3);
     let iCodeStr = stream.readString(pars[startIndex] + 4, pars[startIndex] + 4);
@@ -443,7 +424,7 @@ class PDBParser extends Parser {
     'HELIX ': PDBParser.prototype._parseHELIX,
     'SHEET ': PDBParser.prototype._parseSHEET,
 
-    // FIXME: HACK: nonstandard extension to allow range 100,000 - 999,999
+    // nonstandard extension to allow range 100,000 - 999,999
     'ATOM 1': PDBParser.prototype._parseATOM,
     'ATOM 2': PDBParser.prototype._parseATOM,
     'ATOM 3': PDBParser.prototype._parseATOM,

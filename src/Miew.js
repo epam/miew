@@ -1094,7 +1094,7 @@ Miew.prototype._renderScene = (function () {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.setRenderTarget(gfx.offscreenBuf); // FIXME clean up targets in render selection
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf);
     gfx.renderer.clear();
 
     const bHaveComplexes = (this._getComplexVisual() !== null);
@@ -1430,7 +1430,7 @@ Miew.prototype._performAO = (function () {
   const _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
 
   const _samplesKernel = [
-    // hemisphere samples adopted to sphere (FIXME remove minus from Z)
+    // hemisphere samples adopted to sphere
     new THREE.Vector3(0.295184, 0.077723, 0.068429),
     new THREE.Vector3(-0.271976, -0.365221, 0.838363),
     new THREE.Vector3(0.547713, 0.467576, 0.488515),
@@ -2473,7 +2473,6 @@ Miew.prototype.repCurrent = function (index, name) {
  * @returns {?object} Representation description.
  */
 Miew.prototype.rep = function (index, rep) {
-  // FIXME support targeting visual by name
   const visual = this._getComplexVisual('');
   return visual ? visual.rep(index, rep) : null;
 };
@@ -3184,7 +3183,6 @@ Miew.prototype.setOptions = function (opts) {
     delete this._opts.view;
   }
 
-  // FIXME we need a way to associate "unit" option with particular complex
   const visual = this._getComplexVisual();
   if (visual) {
     visual.getComplex().resetCurrentUnit();
@@ -3369,12 +3367,9 @@ Miew.prototype.getState = function (opts) {
     view: false,
   });
 
-  // FIXME state should include all complexes (not only current)
-
   // load
   const visual = this._getComplexVisual();
   if (visual !== null) {
-    // TODO type?
     const complex = visual.getComplex();
     const { metadata } = complex;
     if (metadata.id) {
@@ -3697,8 +3692,8 @@ Miew.prototype.view = function (expression) {
   }
 
   function decode() {
-    // HACK: old non-versioned view is the 0th version
-    if (expression.length === 40) { // TODO: remove when db migration is finished
+    // backwards compatible: old non-versioned view is the 0th version
+    if (expression.length === 40) {
       expression = `0${expression}`;
     }
 
@@ -3963,7 +3958,6 @@ Miew.prototype.exportCML = function () {
     });
   }
 
-  // FIXME save data for all complexes (not only current)
   const visual = self._getComplexVisual();
   const complex = visual ? visual.getComplex() : null;
   if (complex && complex.originalCML) {

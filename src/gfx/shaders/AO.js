@@ -9,7 +9,7 @@ import fragmentVertBilateralBlur5Shader from './AOVBlur_frag.glsl';
 const SSAOUniforms = THREE.UniformsUtils.merge([
   {
     noiseTexture: { type: 't', value: null },
-    noiseTexelSize: { type: 'v2', value: new THREE.Vector2(1.0 / 512.0, 1.0 / 512.0) }, // FIXME calc uvs in vshader
+    noiseTexelSize: { type: 'v2', value: new THREE.Vector2(1.0 / 512.0, 1.0 / 512.0) },
     diffuseTexture: { type: 't', value: null },
     normalTexture: { type: 't', value: null },
     depthTexture: { type: 't', value: null },

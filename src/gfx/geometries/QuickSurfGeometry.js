@@ -12,7 +12,7 @@ const { Volume } = chem;
 
 class QuickSurfGeometry extends VolumeSurfaceGeometry {
   _computeSurface(packedArrays, box, boundaries, params) {
-    // FIXME beware of shifting this multiple times!
+    // beware of shifting this multiple times!
     this._shiftByOrigin(packedArrays.posRad);
 
     const surface = {

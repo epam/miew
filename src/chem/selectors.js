@@ -405,6 +405,6 @@ selectors.parse = function (str) {
 };
 
 parser.yy = selectors;
-parser.yy.parseError = parser.parseError; // FIXME: workaround for incorrect JISON parser generator for AMD module
+parser.yy.parseError = parser.parseError; // workaround for incorrect JISON parser generator for AMD module
 
 export default selectors;

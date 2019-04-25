@@ -4,9 +4,6 @@ class IsoSurfaceMode extends SurfaceMode {
   constructor(excludeProbe, opts) {
     super(opts);
     this._excludeProbe = excludeProbe;
-
-    // this._isVertexNormalsRendered = false; FIXME are used?
-    // this._isSurfaceTransparent = false; FIXME are used?
   }
 
   calcAtomRadius(atom) {

@@ -984,5 +984,5 @@ Miew.prototype.callNextCmd = function () {
 Miew.JSONConverter = JSONConverter;
 
 parsercli.yy = cliutils;
-// FIXME: workaround for incorrect JISON parser generator for AMD module
+// workaround for incorrect JISON parser generator for AMD module
 parsercli.yy.parseError = parsercli.parseError;

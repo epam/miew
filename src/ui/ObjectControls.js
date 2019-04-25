@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */ // FIXME: Remove this?
 import * as THREE from 'three';
 import utils from '../utils';
 import settings from '../settings';
