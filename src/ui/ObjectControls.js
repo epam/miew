@@ -9,14 +9,11 @@ const VK_RIGHT = 39;
 const VK_DOWN = 40;
 
 const STATE = {
-  NONE: -1, ROTATE: 0, TRANSLATE: 1, SCALE_PAN: 2, TRANSLATE_PIVOT: 3,
+  NONE: -1, ROTATE: 0, TRANSLATE: 1, SCALE: 2, TRANSLATE_PIVOT: 3,
 };
 
 // pausing for this amount of time before releasing mouse button prevents inertial rotation (seconds)
 const FULL_STOP_THRESHOLD = 0.1;
-
-const PAN_SPEED = 10.0;
-const PINCH_PAN_COEF = 0.1;
 
 // pivot -- local offset of the rotation pivot point
 function ObjectHandler(objects, camera, pivot, options) {
@@ -247,8 +244,6 @@ function ObjectControls(object, objectPivot, camera, domElement, getAltObj) {
 
   this._mousePrevPos = new THREE.Vector2();
   this._mouseCurPos = new THREE.Vector2();
-
-  this._originalCameraPos = new THREE.Vector3();
 
   this._mainObj = new ObjectHandler([this.object], this.camera, new THREE.Vector3(0, 0, 0), this.options);
   this._altObj = new ObjectHandler([this.object], this.camera, new THREE.Vector3(0, 0, 0), this.options);
@@ -530,35 +525,26 @@ ObjectControls.prototype.update = function () {
   }
 
   // apply arrow keys
-  if (settings.now.panning || this._isKeysTranslatingObj) {
+  if (this._isKeysTranslatingObj) {
     const speedX = Number(this._pressedKeys[VK_RIGHT]) - Number(this._pressedKeys[VK_LEFT]);
     const speedY = Number(this._pressedKeys[VK_UP]) - Number(this._pressedKeys[VK_DOWN]);
     if (speedX !== 0.0 || speedY !== 0.0) {
-      let delta = timeSinceLastUpdate;
+      const delta = timeSinceLastUpdate;
 
-      if (this._isKeysTranslatingObj) {
-        // update object translation
-        const altObj = this.getAltObj();
-        if (altObj.objects.length > 0) {
-          this._altObj.setObjects(altObj.objects);
-          this._altObj.pivot = altObj.pivot;
+      // update object translation
+      const altObj = this.getAltObj();
+      if (altObj.objects.length > 0) {
+        this._altObj.setObjects(altObj.objects);
+        this._altObj.pivot = altObj.pivot;
 
-          if ('axis' in altObj) {
-            this._altObj.axis = altObj.axis.clone();
-          } else {
-            this._altObj.axis.set(0, 0, 1);
-          }
-
-          this._altObj.translate(new THREE.Vector2(delta * speedX, delta * speedY));
-          this.dispatchEvent({ type: 'change', action: 'translate' });
+        if ('axis' in altObj) {
+          this._altObj.axis = altObj.axis.clone();
+        } else {
+          this._altObj.axis.set(0, 0, 1);
         }
-      } else {
-        // update camera panning
-        // @deprecated
-        delta *= PAN_SPEED * (settings.now.inversePanning ? -1 : 1);
-        this.camera.translateX(delta * speedX);
-        this.camera.translateY(delta * speedY);
-        this.dispatchEvent({ type: 'change', action: 'pan' });
+
+        this._altObj.translate(new THREE.Vector2(delta * speedX, delta * speedY));
+        this.dispatchEvent({ type: 'change', action: 'translate' });
       }
     }
   }
@@ -709,20 +695,15 @@ ObjectControls.prototype.touchstartend = function (event) {
       break;
 
     case 2: {
-    // prevent inertial rotation
+      // prevent inertial rotation
       this._mainObj.stop();
       this._altObj.stop();
 
-      this._state = STATE.SCALE_PAN;
+      this._state = STATE.SCALE;
       const dx = event.touches[0].pageX - event.touches[1].pageX;
       const dy = event.touches[0].pageY - event.touches[1].pageY;
       this._touchDistanceCur = this._touchDistanceStart = Math.sqrt(dx * dx + dy * dy);
       this._scaleStart = this.object.scale.x;
-      this._originalPinchCenter = new THREE.Vector2(
-        0.5 * (event.touches[0].pageX + event.touches[1].pageX),
-        0.5 * (event.touches[0].pageY + event.touches[1].pageY),
-      );
-      this._originalCameraPos.copy(this.camera.position);
       break;
     }
 
@@ -748,9 +729,9 @@ ObjectControls.prototype.touchmove = function (event) {
       this._lastMouseMoveTime = this._clock.getElapsedTime();
       break;
 
-    case STATE.SCALE_PAN:
+    case STATE.SCALE:
       if (settings.now.zooming) {
-      // update scale
+        // update scale
         const dx = event.touches[0].pageX - event.touches[1].pageX;
         const dy = event.touches[0].pageY - event.touches[1].pageY;
         this._touchDistanceCur = Math.sqrt(dx * dx + dy * dy);
@@ -758,19 +739,6 @@ ObjectControls.prototype.touchmove = function (event) {
         const newScale = this._scaleStart * this._touchDistanceCur / this._touchDistanceStart;
         this.setScale(newScale);
         this.dispatchEvent({ type: 'change', action: 'zoom', factor: (oldScale === 0.0) ? 1.0 : newScale / oldScale });
-      }
-
-      // @deprecated: Move object instead of panning the camera
-      if (settings.now.panning) {
-      // update camera panning
-        const delta = new THREE.Vector2(
-          0.5 * (event.touches[0].pageX + event.touches[1].pageX),
-          0.5 * (event.touches[0].pageY + event.touches[1].pageY),
-        );
-        delta.sub(this._originalPinchCenter);
-        this.camera.position.x = this._originalCameraPos.x - PINCH_PAN_COEF * delta.x;
-        this.camera.position.y = this._originalCameraPos.y + PINCH_PAN_COEF * delta.y;
-        this.dispatchEvent({ type: 'change', action: 'pan' });
       }
       break;
 

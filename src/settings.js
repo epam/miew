@@ -841,12 +841,6 @@ const defaults = {
    */
   zooming: true,
 
-  /** @deprecated  Move object instead of panning the camera */
-  panning: false,
-
-  /** @deprecated  Move object instead of panning the camera */
-  inversePanning: false,
-
   /**
    * Enable picking atoms & residues with left mouse button or touch.
    * @type {boolean}

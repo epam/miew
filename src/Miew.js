@@ -2095,10 +2095,9 @@ Miew.prototype._onLoad = function (dataSource, opts) {
   gfx.camera.updateProjectionMatrix();
   this._updateFog();
 
-  // reset global transform & camera pan
+  // reset global transform
   gfx.root.resetTransform();
   this.resetPivot();
-  this.resetPan();
 
   // set scale to fit everything on the screen
   this._objectControls.setScale(settings.now.radiusToFit / this._getBSphereRadius());
@@ -2618,13 +2617,6 @@ Miew.prototype._discardFragmentEdit = function () {
   this._needRender = true;
 };
 
-/** @deprecated  Move object instead of panning the camera */
-Miew.prototype.resetPan = function () {
-  this._gfx.camera.position.x = 0.0;
-  this._gfx.camera.position.y = 0.0;
-  this.dispatchEvent({ type: 'transform' });
-};
-
 Miew.prototype._onPick = function (event) {
   if (!settings.now.picking) {
     // picking is disabled
@@ -2694,7 +2686,6 @@ Miew.prototype._onDblClick = function (event) {
     this.resetPivot();
   }
 
-  this.resetPan();
   this._needRender = true;
 };
 
@@ -3750,18 +3741,6 @@ Miew.prototype.scale = function (factor) {
   }
   this._objectControls.scale(factor);
   this.dispatchEvent({ type: 'transform' });
-  this._needRender = true;
-};
-
-/*
-   * Pan camera
-   * @param {number} x - horizontal panning
-   * @param {number} y - vertical panning
-   * @deprecated  Move object instead of panning the camera
-   */
-Miew.prototype.pan = function (x, y) {
-  this._gfx.camera.translateX(x);
-  this._gfx.camera.translateY(y);
   this._needRender = true;
 };
 
