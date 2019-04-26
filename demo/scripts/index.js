@@ -75,9 +75,6 @@ window.onerror = function (err, url, line, col, obj) {
 // Uncomment this to profile parsing
 // Miew.profile('data/4TNW.pdb', 10, $('miew-container').first.firstChild.firstChild);
 
-/** @deprecated */
-window.MIEWS = [];
-
 // create viewer (and run it) for each container element on the page
 window.addEventListener('load', () => {
   $('.miew-container').each((i, container) => {
@@ -104,8 +101,6 @@ window.addEventListener('load', () => {
         toastr[level](e.message);
       }
     });
-
-    window.MIEWS.push(viewer);
 
     const menu = new Menu(container, viewer);
 
