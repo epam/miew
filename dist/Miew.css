@@ -39,10 +39,8 @@
   position: relative;
 }
 
-/* FIXME: $back-gray */
-
 .miew-message {
-  /* hack for centered error-reporting*/
+  /* trick for centered error-reporting*/
   background-color: #ccc;
   display: table;
   width: 100%;

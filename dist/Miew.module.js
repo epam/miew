@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.7.23 Copyright (c) 2015-2019 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.7.24 Copyright (c) 2015-2019 EPAM Systems, Inc. */
 
 function _typeof(obj) {
   if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -67129,7 +67129,7 @@ var defaults$1 = {
       aromrad: 0.1,
       showarom: true,
       polyComplexity: {
-        poor: 2,
+        poor: 3,
         low: 4,
         medium: 6,
         high: 12,
@@ -67384,7 +67384,7 @@ var defaults$1 = {
       heightSegmentsRatio: 1.5,
       tension: -0.7,
       polyComplexity: {
-        poor: 5,
+        poor: 4,
         low: 6,
         medium: 10,
         high: 18,
@@ -67409,6 +67409,7 @@ var defaults$1 = {
      * @proprety {number} ss.helix.arrow - Secondary structure's arrow width.
      * @proprety {object} ss.strand - Options for strands render.
      * @property {PolyComplexity} polyComplexity - Polygonal complexity settings for different resolutions.
+     * polyComplexity must be even for producing symmetric arrows.
      * @property {number} heightSegmentsRatio - Poly complexity multiplier for height segments.
      */
     CA: {
@@ -67427,7 +67428,7 @@ var defaults$1 = {
       heightSegmentsRatio: 1.5,
       tension: -0.7,
       polyComplexity: {
-        poor: 5,
+        poor: 4,
         low: 6,
         medium: 10,
         high: 18,
@@ -67474,13 +67475,15 @@ var defaults$1 = {
      *
      * @typedef VolumeDensityModeOptions
      *
-     * @property {number} kSigma - Noise threshold coefficient .
+     * @property {number} kSigma - Noise threshold coefficient.
+     * @property {boolean} frame - flag, that turns on box frame painting
      *
      */
     VD: {
       kSigma: 1.0,
       kSigmaMed: 2.0,
-      kSigmaMax: 4.0
+      kSigmaMax: 4.0,
+      frame: true
     }
   },
 
@@ -68008,7 +68011,6 @@ utils.deriveClass(Settings, EventDispatcher$1, {
     this.set(other);
   },
   applyDiffs: function applyDiffs(diffs) {
-    // TODO Change inequality to >=?
     if (diffs.hasOwnProperty('VERSION') && diffs.VERSION !== VERSION) {
       throw new Error('Settings version does not match!');
     } // VERSION shouldn't be presented inside settings structure
@@ -68406,7 +68408,6 @@ function toURL(opts) {
     // I heard these lines in the whispers of the Gods
     // Handle preset setting in reps
     if (key === 'preset') {
-      // TODO: remove 'preset' from settings, implement autodetection
       return;
     }
 
@@ -68530,8 +68531,7 @@ function toScript(opts) {
 
     checkAndAdd("set ".concat(key), value, true);
   });
-  checkAndAdd('view', opts.view); // this is kind of hack
-
+  checkAndAdd('view', opts.view);
   checkAndAdd('set', 'autobuild true');
   return commandsList.join('\n');
 }
@@ -68592,7 +68592,6 @@ function () {
   return AtomName;
 }();
 
-// TODO: See ResidueType and make this Element in similar way
 var Element = function Element(number, name, fullName, weight, radius, radiusBonding, hValency) {
   _classCallCheck(this, Element);
 
@@ -69523,8 +69522,7 @@ function () {
     this._icode = icode;
     this._mask = 1 | 0;
     this._index = -1;
-    this._atoms = []; // TODO: change to range
-
+    this._atoms = [];
     this._secondary = null;
     this._firstAtom = null;
     this._leadAtom = null;
@@ -69582,8 +69580,7 @@ function () {
 
       complex.addAtom(atom);
 
-      this._atoms.push(atom); // TODO: change to range
-
+      this._atoms.push(atom);
 
       this._het = this._het || het;
       return atom;
@@ -69788,7 +69785,6 @@ function () {
 
       var occupCount = 0;
       var occupancy = 0; // average occupancy
-      // TODO: Is it correct? Is it fast?
 
       this.forEachAtom(function (a) {
         if (self._leadAtom === null) {
@@ -69862,8 +69858,7 @@ function () {
     this._name = name;
     this._mask = 1 | 0;
     this._index = -1;
-    this._residues = []; // TODO: change to range
-
+    this._residues = [];
     this.minSequence = Number.POSITIVE_INFINITY;
     this.maxSequence = Number.NEGATIVE_INFINITY;
   }
@@ -69979,8 +69974,7 @@ function () {
 
       this._complex.addResidue(residue);
 
-      this._residues.push(residue); // TODO: change to range
-
+      this._residues.push(residue);
 
       if (type.flags & (ResidueType.Flags.NUCLEIC | ResidueType.Flags.PROTEIN)) {
         if (this.maxSequence < sequence) {
@@ -72194,8 +72188,7 @@ function (_InfixOperator2) {
   return OrOperator;
 }(InfixOperator)); //----------------------------------------------------------------------------
 
-var selectors = Object.create(keywords); // TODO: Provide consistent module exports
-
+var selectors = Object.create(keywords);
 selectors.Selector = Selector;
 selectors.RangeListSelector = RangeListSelector;
 selectors.ValueListSelector = ValueListSelector;
@@ -72241,7 +72234,7 @@ selectors.parse = function (str) {
 };
 
 SelectionParser_1.yy = selectors;
-SelectionParser_1.yy.parseError = SelectionParser_1.parseError; // FIXME: workaround for incorrect JISON parser generator for AMD module
+SelectionParser_1.yy.parseError = SelectionParser_1.parseError; // workaround for incorrect JISON parser generator for AMD module
 
 /**
  * Basic biological unit class.
@@ -72277,8 +72270,7 @@ function () {
         boundingBox.expandByPoint(atoms[0]._position);
         var bbc = new Vector3();
         boundingBox.getCenter(bbc);
-        var s = 2 * atoms[0].element.radius; // *settings.now.modes.BS.atom; FIXME N: hack commented
-
+        var s = 2 * atoms[0].element.radius;
         boundingBox.setFromCenterAndSize(bbc, new Vector3(s, s, s));
       } else {
         for (var i = 0; i < n; ++i) {
@@ -72294,7 +72286,6 @@ function () {
       boundingBox.getCenter(center);
 
       if (n === 1) {
-        // * settings.now.modes.BS.atom); FIXME N: hack commented
         this._boundaries.boundingSphere.set(center, atoms[0].element.radius);
       } else {
         for (var _i = 0; _i < n; ++_i) {
@@ -72732,13 +72723,13 @@ function _getBondingRadius(atom) {
 function _isAtomEligible(atom) {
   // build for all non-hetatm and for hetatm without bonds
   return !atom.isHet() || atom._bonds && atom._bonds.length === 0;
-}
+} // @deprecated
+
 
 function _isAtomEligibleWithWaterBondingHack(atom) {
-  // TODO: remove this hack (requested by customer)
   var noHack = atom._residue._type._name !== 'HOH';
   return noHack && !atom.isHet();
-} // TODO: remove this hack (requested by customer)
+} // @deprecated remove this hack (requested by customer)
 
 
 function _waterBondingHack(complex) {
@@ -72923,9 +72914,7 @@ function () {
     key: "build",
     value: function build() {
 
-
-      this._buildInner(); // TODO: remove this hack (requested by customer)
-
+      this._buildInner();
 
       if (settings.now.draft.waterBondingHack && this._complex) {
         _waterBondingHack(this._complex);
@@ -73747,7 +73736,7 @@ function () {
   }, {
     key: "_build",
     value: function _build() {
-      var self = this; // TODO Replace quadratic algorithm with something better (use voxel grid?)
+      var self = this;
 
       for (var i = 0; i < this._complex._residues.length - 1; ++i) {
         var ri = this._complex._residues[i];
@@ -74589,7 +74578,6 @@ function () {
 
       return result;
     } // return true if any of the residues in bridge a is identical to any of the residues in bridge b
-    // TODO Optimize
 
   }, {
     key: "_areBridgesLinked",
@@ -74701,12 +74689,9 @@ function () {
     this._sheets = [];
     this.structures = [];
     this._residueTypes = Object.create(ResidueType.StandardTypes);
-    this._atoms = []; // TODO: preallocate
-
-    this._residues = []; // TODO: preallocate
-
-    this._bonds = []; // TODO: preallocate
-
+    this._atoms = [];
+    this._residues = [];
+    this._bonds = [];
     this._sgroups = [];
     this._molecules = [];
     this._maskNeedsUpdate = false;
@@ -74861,8 +74846,7 @@ function () {
     value: function addChain(name) {
       var result = new Chain(this, name);
 
-      this._chains.push(result); // TODO: keep chains in dictionary with an (ordered?) array of keys
-
+      this._chains.push(result);
 
       return result;
     }
@@ -76687,9 +76671,9 @@ function (_THREE$Group) {
   return RCGroup;
 }(Group);
 
-var vertexShader = "float INSTANCED_SPRITE_OVERSCALE = 1.3;\r\n\r\nattribute vec3 normal;\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  varying vec3 viewNormal;\r\n#endif\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  varying vec3 vNormal;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec4 position; // W contains vert pos or neg offset\r\n#else\r\n  attribute vec3 position;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition;\r\nvarying vec3 vViewPosition;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  attribute float alphaColor;\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t\tuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  attribute vec3 color;\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  attribute vec3 color2;\r\n  varying vec3 vColor2;\r\n  attribute vec2 uv;\r\n  #ifndef CYLINDER_SPRITE\r\n    varying vec2 vUv;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_POS\r\n  attribute vec4 offset;\r\n  #ifdef SPHERE_SPRITE\r\n    varying vec4 instOffset;\r\n  varying vec4 spritePosEye;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  attribute vec4 matVector1;\r\n  attribute vec4 matVector2;\r\n  attribute vec4 matVector3;\r\n  attribute vec4 invmatVector1;\r\n  attribute vec4 invmatVector2;\r\n  attribute vec4 invmatVector3;\r\n\r\n  #ifdef CYLINDER_SPRITE\r\n    varying vec4 matVec1;\r\n    varying vec4 matVec2;\r\n    varying vec4 matVec3;\r\n    varying vec4 invmatVec1;\r\n    varying vec4 invmatVec2;\r\n    varying vec4 invmatVec3;\r\n  #endif\r\n#endif\r\n\r\nuniform mat4 modelViewMatrix; // optional\r\nuniform mat4 projectionMatrix; // optional\r\nuniform mat3 normalMatrix; // optional\r\nuniform mat4 modelMatrix; // optional\r\nuniform mat4 projMatrixInv; // TODO move to thick line\r\n\r\n#ifdef DASHED_LINE\r\n  attribute float lineDistance;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec3 direction;\r\n  uniform vec2 viewport;\r\n  uniform float lineWidth;\r\n\r\n  vec4 transform(vec4 coord){\r\n    return projectionMatrix * modelViewMatrix * coord;\r\n  }\r\n\r\n  vec2 project(vec4 device){\r\n    vec3 device_normal = device.xyz/device.w;\r\n    vec2 clip_pos = (device_normal*0.5+0.5).xy;\r\n    return clip_pos * viewport;\r\n  }\r\n\r\n  vec4 unproject(vec2 screen, float z, float w){\r\n    vec2 clip_pos = screen/viewport;\r\n    vec2 device_normal = clip_pos*2.0-1.0;\r\n    return vec4(device_normal*w, z, w);\r\n  }\r\n#endif\r\n\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  alphaCol = alphaColor;\r\n#endif\r\n\r\n  vec3 objectNormal = vec3( normal );\r\n#ifdef INSTANCED_MATRIX\r\n  vec3 transformedNormal = vec3(\r\n    dot(objectNormal, matVector1.xyz),\r\n    dot(objectNormal, matVector2.xyz),\r\n    dot(objectNormal, matVector3.xyz));\r\n  transformedNormal = normalMatrix * transformedNormal;\r\n#else\r\n  vec3 transformedNormal = normalMatrix * objectNormal;\r\n#endif\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  vNormal = normalize(transformedNormal);\r\n#endif\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  viewNormal = normalize(mat3(modelViewMatrix)*objectNormal);\r\n#endif\r\n\r\n  vec4 localPos = vec4(position.xyz, 1.0);\r\n  vec4 worldPos = modelMatrix * localPos;\r\n  vec4 mvPosition = modelViewMatrix * localPos;\r\n\r\n// make thick line offset\r\n#ifdef THICK_LINE\r\n   // get screen pos\r\n   vec4 dPos = transform(vec4(position.xyz, 1.0));\r\n   vec2 sPos = project(dPos);\r\n   // move pos forward\r\n   vec3 position2 = position.xyz + direction.xyz * 0.5;\r\n   // get screen offset pos\r\n   vec4 dPos2 = transform(vec4(position2.xyz, 1.0));\r\n   vec2 sPos2 = project(dPos2);\r\n   // screen line direction\r\n   vec2 sDir = normalize(sPos2 - sPos);\r\n   // vertex offset (orthogonal to line direction)\r\n   vec2 offset1 = vec2(-sDir.y, sDir.x);\r\n   // move screen vertex\r\n   vec2 newPos = sPos + offset1 * position.w * lineWidth;\r\n   // get moved pos in view space\r\n   vec4 dNewPos =  unproject(newPos, dPos.z, dPos.w);\r\n   mvPosition.xyz = (projMatrixInv * dNewPos).xyz;\r\n#endif // THICK_LINE\r\n\r\n#ifdef INSTANCED_POS\r\n  #ifdef SPHERE_SPRITE\r\n    instOffset = offset;\r\n\r\n    vec4 posEye = modelViewMatrix * vec4( offset.xyz, 1.0 );\r\n    float scale = length(modelViewMatrix[0]);\r\n    mvPosition = posEye + vec4( position.xyz * offset.w * scale * INSTANCED_SPRITE_OVERSCALE, 0.0 );\r\n    posEye.w = offset.w * scale;\r\n\r\n    spritePosEye = posEye;\r\n #else\r\n    localPos = vec4( offset.xyz + position.xyz * offset.w, 1.0 );\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  #ifdef CYLINDER_SPRITE\r\n    matVec1 = matVector1;\r\n    matVec2 = matVector2;\r\n    matVec3 = matVector3;\r\n    invmatVec1 = invmatVector1;\r\n    invmatVec2 = invmatVector2;\r\n    invmatVec3 = invmatVector3;\r\n\r\n    // calculate eye coords of cylinder endpoints\r\n    vec4 v = vec4(0, -0.5, 0, 1);\r\n    vec4 p1 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n    v.y = 0.5;\r\n    vec4 p2 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n\r\n    // sprite is placed at the center of cylinder\r\n    vec4 posEye;\r\n    posEye.xyz = mix(p1.xyz, p2.xyz, 0.5);\r\n    posEye.w = 1.0;\r\n\r\n    // basic sprite size at screen plane (covers only cylinder axis)\r\n    vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);\r\n\r\n    // cylinder radius in eye space\r\n    float rad = length(modelViewMatrix[0]) * length(vec3(matVector1.x, matVector2.x, matVector3.x));\r\n\r\n    // full sprite size in eye coords\r\n    float minZ = min(abs(p1.z), abs(p2.z));\r\n    vec2 spriteSize = INSTANCED_SPRITE_OVERSCALE  * abs(posEye.z) *\r\n      (spriteSizeScreen + 2.0 * rad / minZ);\r\n\r\n    mvPosition = posEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );\r\n  #else\r\n    localPos = vec4(dot(localPos, matVector1), dot(localPos, matVector2), dot(localPos, matVector3), 1.0);\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n  gl_Position = projectionMatrix * mvPosition;\r\n\r\n  vWorldPosition = worldPos.xyz;\r\n  vViewPosition = - mvPosition.xyz;\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t  vec4 worldPosition;\r\n\t  // see THREE.WebGLProgram.unrollLoops\r\n\t  #pragma unroll_loop\r\n\t  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n      vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * vec4(vWorldPosition, 1.0);\r\n      vDirectionalShadowNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(objectNormal, 0.0))).xyz;\r\n\t  }\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  vColor = color.xyz;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  vColor2 = color2;\r\n  #ifndef CYLINDER_SPRITE\r\n    vUv = uv;\r\n  #endif\r\n#endif\r\n\r\n#ifdef DASHED_LINE\r\n  vLineDistance = lineDistance;\r\n#endif\r\n}\r\n";
+var vertexShader = "float INSTANCED_SPRITE_OVERSCALE = 1.3;\r\n\r\nattribute vec3 normal;\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  varying vec3 viewNormal;\r\n#endif\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  varying vec3 vNormal;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec4 position; // W contains vert pos or neg offset\r\n#else\r\n  attribute vec3 position;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition;\r\nvarying vec3 vViewPosition;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  attribute float alphaColor;\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t\tuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  attribute vec3 color;\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  attribute vec3 color2;\r\n  varying vec3 vColor2;\r\n  attribute vec2 uv;\r\n  #ifndef CYLINDER_SPRITE\r\n    varying vec2 vUv;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_POS\r\n  attribute vec4 offset;\r\n  #ifdef SPHERE_SPRITE\r\n    varying vec4 instOffset;\r\n  varying vec4 spritePosEye;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  attribute vec4 matVector1;\r\n  attribute vec4 matVector2;\r\n  attribute vec4 matVector3;\r\n  attribute vec4 invmatVector1;\r\n  attribute vec4 invmatVector2;\r\n  attribute vec4 invmatVector3;\r\n\r\n  #ifdef CYLINDER_SPRITE\r\n    varying vec4 matVec1;\r\n    varying vec4 matVec2;\r\n    varying vec4 matVec3;\r\n    varying vec4 invmatVec1;\r\n    varying vec4 invmatVec2;\r\n    varying vec4 invmatVec3;\r\n  #endif\r\n#endif\r\n\r\nuniform mat4 modelViewMatrix; // optional\r\nuniform mat4 projectionMatrix; // optional\r\nuniform mat3 normalMatrix; // optional\r\nuniform mat4 modelMatrix; // optional\r\n\r\n#ifdef DASHED_LINE\r\n  attribute float lineDistance;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec3 direction;\r\n  uniform mat4 projMatrixInv;\r\n  uniform vec2 viewport;\r\n  uniform float lineWidth;\r\n\r\n  vec4 transform(vec4 coord){\r\n    return projectionMatrix * modelViewMatrix * coord;\r\n  }\r\n\r\n  vec2 project(vec4 device){\r\n    vec3 device_normal = device.xyz/device.w;\r\n    vec2 clip_pos = (device_normal*0.5+0.5).xy;\r\n    return clip_pos * viewport;\r\n  }\r\n\r\n  vec4 unproject(vec2 screen, float z, float w){\r\n    vec2 clip_pos = screen/viewport;\r\n    vec2 device_normal = clip_pos*2.0-1.0;\r\n    return vec4(device_normal*w, z, w);\r\n  }\r\n#endif\r\n\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  alphaCol = alphaColor;\r\n#endif\r\n\r\n  vec3 objectNormal = vec3( normal );\r\n#ifdef INSTANCED_MATRIX\r\n  vec3 transformedNormal = vec3(\r\n    dot(objectNormal, matVector1.xyz),\r\n    dot(objectNormal, matVector2.xyz),\r\n    dot(objectNormal, matVector3.xyz));\r\n  transformedNormal = normalMatrix * transformedNormal;\r\n#else\r\n  vec3 transformedNormal = normalMatrix * objectNormal;\r\n#endif\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  vNormal = normalize(transformedNormal);\r\n#endif\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  viewNormal = normalize(mat3(modelViewMatrix)*objectNormal);\r\n#endif\r\n\r\n  vec4 localPos = vec4(position.xyz, 1.0);\r\n  vec4 worldPos = modelMatrix * localPos;\r\n  vec4 mvPosition = modelViewMatrix * localPos;\r\n\r\n// make thick line offset\r\n#ifdef THICK_LINE\r\n   // get screen pos\r\n   vec4 dPos = transform(vec4(position.xyz, 1.0));\r\n   vec2 sPos = project(dPos);\r\n   // move pos forward\r\n   vec3 position2 = position.xyz + direction.xyz * 0.5;\r\n   // get screen offset pos\r\n   vec4 dPos2 = transform(vec4(position2.xyz, 1.0));\r\n   vec2 sPos2 = project(dPos2);\r\n   // screen line direction\r\n   vec2 sDir = normalize(sPos2 - sPos);\r\n   // vertex offset (orthogonal to line direction)\r\n   vec2 offset1 = vec2(-sDir.y, sDir.x);\r\n   // move screen vertex\r\n   vec2 newPos = sPos + offset1 * position.w * lineWidth;\r\n   // get moved pos in view space\r\n   vec4 dNewPos =  unproject(newPos, dPos.z, dPos.w);\r\n   mvPosition.xyz = (projMatrixInv * dNewPos).xyz;\r\n#endif // THICK_LINE\r\n\r\n#ifdef INSTANCED_POS\r\n  #ifdef SPHERE_SPRITE\r\n    instOffset = offset;\r\n\r\n    vec4 posEye = modelViewMatrix * vec4( offset.xyz, 1.0 );\r\n    float scale = length(modelViewMatrix[0]);\r\n    mvPosition = posEye + vec4( position.xyz * offset.w * scale * INSTANCED_SPRITE_OVERSCALE, 0.0 );\r\n    posEye.w = offset.w * scale;\r\n\r\n    spritePosEye = posEye;\r\n #else\r\n    localPos = vec4( offset.xyz + position.xyz * offset.w, 1.0 );\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  #ifdef CYLINDER_SPRITE\r\n    matVec1 = matVector1;\r\n    matVec2 = matVector2;\r\n    matVec3 = matVector3;\r\n    invmatVec1 = invmatVector1;\r\n    invmatVec2 = invmatVector2;\r\n    invmatVec3 = invmatVector3;\r\n\r\n    // calculate eye coords of cylinder endpoints\r\n    vec4 v = vec4(0, -0.5, 0, 1);\r\n    vec4 p1 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n    v.y = 0.5;\r\n    vec4 p2 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n\r\n    // sprite is placed at the center of cylinder\r\n    vec4 posEye;\r\n    posEye.xyz = mix(p1.xyz, p2.xyz, 0.5);\r\n    posEye.w = 1.0;\r\n\r\n    // basic sprite size at screen plane (covers only cylinder axis)\r\n    vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);\r\n\r\n    // cylinder radius in eye space\r\n    float rad = length(modelViewMatrix[0]) * length(vec3(matVector1.x, matVector2.x, matVector3.x));\r\n\r\n    // full sprite size in eye coords\r\n    float minZ = min(abs(p1.z), abs(p2.z));\r\n    vec2 spriteSize = INSTANCED_SPRITE_OVERSCALE  * abs(posEye.z) *\r\n      (spriteSizeScreen + 2.0 * rad / minZ);\r\n\r\n    mvPosition = posEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );\r\n  #else\r\n    localPos = vec4(dot(localPos, matVector1), dot(localPos, matVector2), dot(localPos, matVector3), 1.0);\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n  gl_Position = projectionMatrix * mvPosition;\r\n\r\n  vWorldPosition = worldPos.xyz;\r\n  vViewPosition = - mvPosition.xyz;\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t  vec4 worldPosition;\r\n\t  // see THREE.WebGLProgram.unrollLoops\r\n\t  #pragma unroll_loop\r\n\t  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n      vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * vec4(vWorldPosition, 1.0);\r\n      vDirectionalShadowNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(objectNormal, 0.0))).xyz;\r\n\t  }\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  vColor = color.xyz;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  vColor2 = color2;\r\n  #ifndef CYLINDER_SPRITE\r\n    vUv = uv;\r\n  #endif\r\n#endif\r\n\r\n#ifdef DASHED_LINE\r\n  vLineDistance = lineDistance;\r\n#endif\r\n}\r\n";
 
-var fragmentShader = "#if defined (NORMALS_TO_G_BUFFER)\r\n  #define fragColor gl_FragData[0]\r\n#else\r\n  #define fragColor gl_FragColor\r\n#endif\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#ifdef COLOR_FROM_POS\r\n  uniform mat4 world2colorMatrix;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];\r\n\r\n    #ifdef SHADOWMAP_PCF_RAND\r\n\t\t  #define MAX_SAMPLES_COUNT 4\r\n      uniform vec2 samplesKernel[MAX_SAMPLES_COUNT];\r\n      uniform sampler2D noiseTex;\r\n      uniform vec2 noiseTexelSize;\r\n      uniform vec2 srcTexelSize;\r\n      uniform mat4 projectionMatrix;\r\n    #endif\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  varying vec3 vColor2;\r\n  #ifndef CYLINDER_SPRITE\r\n    varying vec2 vUv;\r\n  #endif\r\n#endif\r\n\r\nuniform vec3 diffuse;\r\nuniform vec3 emissive;\r\nuniform vec3 specular;\r\nuniform float shininess;\r\nuniform vec3 fixedColor;\r\nuniform float opacity;\r\nuniform float zClipValue;\r\nuniform float clipPlaneValue;\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  varying vec3 viewNormal;\r\n#endif\r\n\r\n#define PI 3.14159265359\r\n#define RECIPROCAL_PI 0.31830988618\r\n#define saturate(a) clamp( a, 0.0, 1.0 )\r\n\r\n#ifdef USE_FOG\r\n  uniform vec3 fogColor;\r\n  uniform float fogAlpha;\r\n  uniform float fogNear;\r\n  uniform float fogFar;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)\r\nvarying vec3 vViewPosition;\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  varying vec3 vNormal;\r\n#endif\r\n\r\n/////////////////////////////////////////// ZSprites ////////////////////////////////////////////////\r\n#ifdef SPHERE_SPRITE\r\n  varying vec4 spritePosEye;\r\n#endif\r\n\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  uniform float zOffset;\r\n  uniform mat4 projectionMatrix;\r\n\r\n  float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {\r\n    vec4 pixelPosScreen = projMatrix * pixelPosEye;\r\n    return 0.5 * (pixelPosScreen.z / pixelPosScreen.w + 1.0) + zOffset;\r\n  }\r\n#endif\r\n\r\n#ifdef SPHERE_SPRITE\r\n  varying vec4 instOffset;\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n\r\n  float intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray, ray);\r\n    float b = dot(ray, origin);\r\n    float c = dot(origin, origin) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    if (t1 >= 0.0) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_sphere_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into sphere local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = (v.xyz - instOffset.xyz) / instOffset.w;\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = normalize(v.xyz);\r\n\r\n    return intersect_ray_sphere(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  varying vec4 matVec1;\r\n  varying vec4 matVec2;\r\n  varying vec4 matVec3;\r\n  varying vec4 invmatVec1;\r\n  varying vec4 invmatVec2;\r\n  varying vec4 invmatVec3;\r\n\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n\r\n  float intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray.xz, ray.xz);\r\n    float b = dot(ray.xz, origin.xz);\r\n    float c = dot(origin.xz, origin.xz) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    float halfHeight = 0.5;\r\n    if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_cylinder_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into cylinder local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n    ray = normalize(ray);\r\n\r\n    return intersect_ray_cylinder(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n///////////////////////////////////// Pack and unpack ///////////////////////////////////////////////\r\nconst float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)\r\nconst float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)\r\n\r\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\r\n\r\n\r\nconst float ShiftRight8 = 1. / 256.;\r\n\r\nvec4 packDepthToRGBA( const in float v ) {\r\n  vec4 r = vec4( fract( v * PackFactors ), v );\r\n  r.yzw -= r.xyz * ShiftRight8; // tidy overflow\r\n  return r * PackUpscale;\r\n}\r\n\r\nfloat unpackRGBAToDepth( const in vec4 v ) {\r\n  return dot( v, UnpackFactors );\r\n}\r\n\r\n////////////////////////////////////////// All Lighting /////////////////////////////////////////////////\r\n#ifdef TOON_SHADING\r\n  #define LOW_TOON_BORDER 0.0\r\n  #define MEDIUM_TOON_BORDER 0.7\r\n  #define HIGH_TOON_BORDER 1.0\r\n\r\n  #define MEDIUM_TOON_RANGE 0.5\r\n  #define HIGH_TOON_RANGE 0.95\r\n#endif\r\n#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n  struct ReflectedLight {\r\n    vec3 directDiffuse;\r\n    vec3 directSpecular;\r\n    vec3 indirectDiffuse;\r\n  };\r\n\r\n  struct BlinnPhongMaterial {\r\n    vec3  diffuseColor;\r\n    vec3  specularColor;\r\n    float specularShininess;\r\n  };\r\n\r\n  struct GeometricContext {\r\n    vec3 normal;\r\n    vec3 viewDir;\r\n  };\r\n\r\n  struct DirectionalLight {\r\n    vec3 direction;\r\n    vec3 color;\r\n\r\n    int shadow;\r\n    vec2 shadowMapSize;\r\n    float shadowBias;\r\n    float shadowRadius;\r\n  };\r\n\r\n  uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\r\n  uniform vec3 ambientLightColor;\r\n\r\n  /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////\r\n\r\n  #if defined(SHADOWMAP)\r\n  \tfloat texture2DCompare( sampler2D depths, vec2 uv, float compare ) {\r\n  \t\treturn step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\r\n  \t}\r\n\r\n    float getShadow( sampler2D shadowMap, DirectionalLight dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {\r\n   \t  float shadow = 0.0;\r\n\r\n      shadowCoord.xyz += dirLight.shadowBias * vNormal; //TODO use normals as it done for G-buffer (for sprites)\r\n      shadowCoord.xyz /= shadowCoord.w;\r\n\r\n      bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\r\n      bool inFrustum = all( inFrustumVec );\r\n      bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\r\n      bool frustumTest = all( frustumTestVec );\r\n\r\n      if ( frustumTest ) {\r\n        #ifdef SHADOWMAP_BASIC\r\n      \t  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\r\n      \t#endif\r\n\r\n      \t#ifdef SHADOWMAP_PCF_SHARP\r\n      \t  vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;\r\n\r\n            float dx0 = - texelSize.x * dirLight.shadowRadius;\r\n            float dy0 = - texelSize.y * dirLight.shadowRadius;\r\n            float dx1 = + texelSize.x * dirLight.shadowRadius;\r\n            float dy1 = + texelSize.y * dirLight.shadowRadius;\r\n\r\n            shadow = (\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n            ) * ( 1.0 / 9.0 );\r\n        #endif\r\n\r\n        #ifdef SHADOWMAP_PCF_RAND\r\n          vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;\r\n\r\n          vec4 vUv = ((projectionMatrix * vec4(vViewPosition, 1.0)) + 1.0) / 2.0;\r\n          vec2 vUvNoise = vUv.xy / srcTexelSize * noiseTexelSize;\r\n\r\n          vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);\r\n          mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);\r\n\r\n          // see THREE.WebGLProgram.unrollLoops\r\n          #pragma unroll_loop\r\n            for ( int i = 0; i < MAX_SAMPLES_COUNT; i ++ ) {\r\n              vec2 offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );\r\n              shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );\r\n            }\r\n          shadow /= float( MAX_SAMPLES_COUNT );\r\n        #endif\r\n      }\r\n      return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);\r\n   }\r\n  #endif\r\n\r\n  /////////////////////////////////////////// Lighting /////////////////////////////////////////////////\r\n\r\n  vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\r\n    return RECIPROCAL_PI * diffuseColor;\r\n  } // validated\r\n\r\n  vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\r\n    // Original approximation by Christophe Schlick '94\r\n    //;float fresnel = pow( 1.0 - dotLH, 5.0 );\r\n    // Optimized variant (presented by Epic at SIGGRAPH '13)\r\n    float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\r\n    return ( 1.0 - specularColor ) * fresnel + specularColor;\r\n  } // validated\r\n\r\n  float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) {\r\n    // geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)\r\n    return 0.25;\r\n  }\r\n\r\n  float D_BlinnPhong( const in float shininess, const in float dotNH ) {\r\n    return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\r\n  }\r\n\r\n  vec3 BRDF_Specular_BlinnPhong( const in DirectionalLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\r\n    vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\r\n    float dotNH = saturate(dot( geometry.normal, halfDir ));\r\n    float dotLH = saturate(dot( incidentLight.direction, halfDir ));\r\n\r\n    vec3 F = F_Schlick( specularColor, dotLH );\r\n    float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );\r\n    float D = D_BlinnPhong( shininess, dotNH );\r\n\r\n    return F * ( G * D );\r\n  } // validated\r\n\r\n  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight, float penumbra ) {\r\n\r\n    float dotNL = saturate( dot( geometry.normal, directLight.direction ));\r\n    #ifdef TOON_SHADING\r\n      if(dotNL < MEDIUM_TOON_RANGE){\r\n        dotNL = LOW_TOON_BORDER;\r\n      }\r\n      else if(dotNL < HIGH_TOON_RANGE){\r\n        dotNL = MEDIUM_TOON_BORDER;\r\n      }\r\n      else{\r\n        dotNL = HIGH_TOON_BORDER;\r\n      }\r\n    #endif\r\n\r\n    vec3 irradiance = dotNL * directLight.color * PI;\r\n    reflectedLight.directDiffuse += penumbra * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n    reflectedLight.directSpecular += penumbra * irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );\r\n  }\r\n\r\n  void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\r\n    reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n  }\r\n\r\n  vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material, vec3 vViewPosition) {\r\n    ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));\r\n    vec3 irradiance = ambientLightColor * PI;\r\n\r\n    float shadowMask = 1.0;\r\n    // see THREE.WebGLProgram.unrollLoops\r\n  \t#pragma unroll_loop\r\n  \t  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n  \t    #ifdef SHADOWMAP\r\n  \t    if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );\r\n  \t    #endif\r\n\r\n  \t\t  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );\r\n  \t\t}\r\n\r\n    RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);\r\n\r\n    return saturate(reflectedLight.indirectDiffuse + reflectedLight.directDiffuse + reflectedLight.directSpecular);\r\n  }\r\n#endif\r\n\r\n/////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////\r\n#ifdef DASHED_LINE\r\n  uniform float dashedLineSize;\r\n  uniform float dashedLinePeriod;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef CLIP_PLANE\r\n  if (vViewPosition.z < clipPlaneValue) discard;\r\n#endif\r\n\r\n#ifdef ZCLIP\r\n  if (vViewPosition.z < zClipValue) discard;\r\n#endif\r\n\r\n  vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);\r\n  vec4 pixelPosEye;\r\n\r\n#ifdef SPHERE_SPRITE\r\n\r\n  vec3 viewNormalSprites;\r\n  vec3 normal;\r\n\r\n/* quick-and-dirty method\r\n  normal.xy = ' + INSTANCED_SPRITE_OVERSCALE + ' * (2.0 * vUv - 1.0);\r\n  float r2 = dot(normal.xy, normal.xy);\r\n  if (r2 > 1.0) discard;\r\n  float normalZ = sqrt(1.0 - r2);\r\n  normal.z = normalZ;\r\n  normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\r\n  pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n  pixelPosEye.z += spritePosEye.w * normalZ;\r\n*/\r\n\r\n  // ray-trace sphere surface\r\n  {\r\n    vec3 p;\r\n    if (get_sphere_point(-vViewPosition, p) < 0.0) discard;\r\n    pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n    pixelPosEye.z += instOffset.w *\r\n      (modelViewMatrix[0][2] * p.x +\r\n       modelViewMatrix[1][2] * p.y +\r\n       modelViewMatrix[2][2] * p.z);\r\n    normal = normalize(normalMatrix * p);\r\n    #ifdef NORMALS_TO_G_BUFFER\r\n      viewNormalSprites = normalize(mat3(modelViewMatrix)*p);\r\n    #endif\r\n  }\r\n\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  vec3 normal;\r\n  vec3 viewNormalSprites;\r\n  float cylinderY = 0.0;\r\n\r\n    // ray-trace cylinder surface\r\n    {\r\n      vec3 p;\r\n      if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;\r\n\r\n      cylinderY = 0.5 * (p.y + 1.0);\r\n\r\n      vec4 v = vec4(p, 1.0);\r\n      v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);\r\n      pixelPosWorld = modelMatrix * v;\r\n      pixelPosEye = modelViewMatrix * v;\r\n\r\n      vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));\r\n      normal = vec3(\r\n        dot(localNormal, matVec1.xyz),\r\n        dot(localNormal, matVec2.xyz),\r\n        dot(localNormal, matVec3.xyz));\r\n      #ifdef NORMALS_TO_G_BUFFER\r\n        viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);\r\n      #endif\r\n      normal = normalize(normalMatrix * normal);\r\n    }\r\n#endif\r\n\r\n  #ifdef ATTR_COLOR\r\n    vec3 vertexColor = vColor;\r\n  #else\r\n    vec3 vertexColor = vec3(1.0, 1.0, 1.0);\r\n  #endif\r\n\r\n  #ifdef ATTR_COLOR2\r\n    #ifdef CYLINDER_SPRITE\r\n      float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing\r\n    #else\r\n      float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord\r\n    #endif\r\n      // choose either color or color2\r\n    vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));\r\n  #endif\r\n\r\n  // negative red component is a special condition\r\n  if (vertexColor.x < 0.0) discard;\r\n\r\n  #ifdef DASHED_LINE\r\n    if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;\r\n  #endif\r\n\r\n  // transparency prepass writes only z, so we don't need to calc the color\r\n  #ifdef PREPASS_TRANSP\r\n    fragColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n    #endif\r\n    return;\r\n  #endif\r\n\r\n    float totalOpacity = opacity;\r\n\r\n  #ifdef ATTR_ALPHA_COLOR\r\n    totalOpacity *= alphaCol;\r\n  #endif\r\n\r\n  // discard fully transparent pixels\r\n  if (totalOpacity == 0.0) discard;\r\n\r\n  #ifdef FAKE_OPACITY\r\n    // discard pixels in checker pattern\r\n    vec2 dm_coord = floor(gl_FragCoord.xy);\r\n    dm_coord = fract(dm_coord * 0.5);\r\n    if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;\r\n    vec4 diffuseColor = vec4(diffuse, 1.0);\r\n  #else\r\n    vec4 diffuseColor = vec4(diffuse, totalOpacity);\r\n  #endif\r\n\r\n  #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n    #ifdef DOUBLE_SIDED\r\n      float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\r\n    #else\r\n      float flipNormal = 1.0;\r\n    #endif\r\n    vec3 normal = normalize( vNormal ) * flipNormal;\r\n  #endif\r\n\r\n    diffuseColor.rgb *= vertexColor;\r\n\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n  #endif\r\n\r\n  #ifdef NORMALS_TO_G_BUFFER\r\n    #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)\r\n      vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;\r\n    #else\r\n      vec3 viewNormaInColor = 0.5*viewNormal+0.5;\r\n    #endif\r\n    // [-1, 1] -> [0, 1]\r\n    gl_FragData[1] = vec4(viewNormaInColor, 1.0);\r\n  #endif\r\n\r\n  #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n    GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));\r\n    BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);\r\n    vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);\r\n  #else\r\n    vec3 outgoingLight = diffuseColor.rgb;\r\n  #endif\r\n\r\n  #ifdef COLOR_FROM_DEPTH\r\n    float depth = 0.0;\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n      depth = gl_FragDepthEXT;\r\n    #else\r\n      depth = gl_FragCoord.z;\r\n    #endif\r\n    fragColor = packDepthToRGBA(depth);\r\n    return;\r\n  #endif\r\n\r\n  #ifdef COLOR_FROM_POS\r\n    fragColor = world2colorMatrix * pixelPosWorld;\r\n  #else\r\n    #ifdef OVERRIDE_COLOR\r\n      fragColor = vec4(fixedColor, diffuseColor.a);\r\n    #else\r\n      fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);\r\n    #endif\r\n\r\n    #ifdef USE_FOG\r\n      float viewDistance;\r\n      #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n        viewDistance = abs(pixelPosEye.z);\r\n      #else\r\n        viewDistance = vViewPosition.z;\r\n      #endif\r\n      float fogFactor = smoothstep( fogNear, fogFar, viewDistance) * fogAlpha;\r\n      #ifdef FOG_TRANSPARENT\r\n        fragColor.a = fragColor.a * (1.0 - fogFactor);\r\n      #else\r\n        fragColor.rgb = mix( fragColor.rgb, fogColor, fogFactor );\r\n      #endif\r\n    #endif\r\n\r\n  #endif\r\n}\r\n";
+var fragmentShader = "#if defined (NORMALS_TO_G_BUFFER)\r\n  #define fragColor gl_FragData[0]\r\n#else\r\n  #define fragColor gl_FragColor\r\n#endif\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#ifdef COLOR_FROM_POS\r\n  uniform mat4 world2colorMatrix;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];\r\n\r\n    #ifdef SHADOWMAP_PCF_RAND\r\n      // We use 4 instead uniform variable or define because this value is used in for(... i < value; ...) with\r\n      // unroll_loop and unroll_loop has pattern:\r\n      // /#pragma unroll_loop[\\s]+?for \\( int i \\= (\\d+)\\; i < (\\d+)\\; i \\+\\+ \\) \\{([\\s\\S]+?)(?=\\})\\}/g\r\n      uniform vec2 samplesKernel[4]; // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n      uniform sampler2D noiseTex;\r\n      uniform vec2 noiseTexelSize;\r\n      uniform vec2 srcTexelSize;\r\n      uniform mat4 projectionMatrix;\r\n    #endif\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  varying vec3 vColor2;\r\n  #ifndef CYLINDER_SPRITE\r\n    varying vec2 vUv;\r\n  #endif\r\n#endif\r\n\r\nuniform vec3 diffuse;\r\nuniform vec3 emissive;\r\nuniform vec3 specular;\r\nuniform float shininess;\r\nuniform vec3 fixedColor;\r\nuniform float opacity;\r\nuniform float zClipValue;\r\nuniform float clipPlaneValue;\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  varying vec3 viewNormal;\r\n#endif\r\n\r\n#define PI 3.14159265359\r\n#define RECIPROCAL_PI 0.31830988618\r\n#define saturate(a) clamp( a, 0.0, 1.0 )\r\n\r\n#ifdef USE_FOG\r\n  uniform vec3 fogColor;\r\n  uniform float fogAlpha;\r\n  uniform float fogNear;\r\n  uniform float fogFar;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)\r\nvarying vec3 vViewPosition;\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  varying vec3 vNormal;\r\n#endif\r\n\r\n/////////////////////////////////////////// ZSprites ////////////////////////////////////////////////\r\n#ifdef SPHERE_SPRITE\r\n  varying vec4 spritePosEye;\r\n#endif\r\n\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  uniform float zOffset;\r\n  uniform mat4 projectionMatrix;\r\n\r\n  float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {\r\n    vec4 pixelPosScreen = projMatrix * pixelPosEye;\r\n    return 0.5 * (pixelPosScreen.z / pixelPosScreen.w + 1.0) + zOffset;\r\n  }\r\n#endif\r\n\r\n#ifdef SPHERE_SPRITE\r\n  varying vec4 instOffset;\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n\r\n  float intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray, ray);\r\n    float b = dot(ray, origin);\r\n    float c = dot(origin, origin) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    if (t1 >= 0.0) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_sphere_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into sphere local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = (v.xyz - instOffset.xyz) / instOffset.w;\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = normalize(v.xyz);\r\n\r\n    return intersect_ray_sphere(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  varying vec4 matVec1;\r\n  varying vec4 matVec2;\r\n  varying vec4 matVec3;\r\n  varying vec4 invmatVec1;\r\n  varying vec4 invmatVec2;\r\n  varying vec4 invmatVec3;\r\n\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n\r\n  float intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray.xz, ray.xz);\r\n    float b = dot(ray.xz, origin.xz);\r\n    float c = dot(origin.xz, origin.xz) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    float halfHeight = 0.5;\r\n    if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_cylinder_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into cylinder local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n    ray = normalize(ray);\r\n\r\n    return intersect_ray_cylinder(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n///////////////////////////////////// Pack and unpack ///////////////////////////////////////////////\r\nconst float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)\r\nconst float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)\r\n\r\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\r\n\r\n\r\nconst float ShiftRight8 = 1. / 256.;\r\n\r\nvec4 packDepthToRGBA( const in float v ) {\r\n  vec4 r = vec4( fract( v * PackFactors ), v );\r\n  r.yzw -= r.xyz * ShiftRight8; // tidy overflow\r\n  return r * PackUpscale;\r\n}\r\n\r\nfloat unpackRGBAToDepth( const in vec4 v ) {\r\n  return dot( v, UnpackFactors );\r\n}\r\n\r\n////////////////////////////////////////// All Lighting /////////////////////////////////////////////////\r\n#ifdef TOON_SHADING\r\n  #define LOW_TOON_BORDER 0.0\r\n  #define MEDIUM_TOON_BORDER 0.7\r\n  #define HIGH_TOON_BORDER 1.0\r\n\r\n  #define MEDIUM_TOON_RANGE 0.5\r\n  #define HIGH_TOON_RANGE 0.95\r\n#endif\r\n#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n  struct ReflectedLight {\r\n    vec3 directDiffuse;\r\n    vec3 directSpecular;\r\n    vec3 indirectDiffuse;\r\n  };\r\n\r\n  struct BlinnPhongMaterial {\r\n    vec3  diffuseColor;\r\n    vec3  specularColor;\r\n    float specularShininess;\r\n  };\r\n\r\n  struct GeometricContext {\r\n    vec3 normal;\r\n    vec3 viewDir;\r\n  };\r\n\r\n  struct DirectionalLight {\r\n    vec3 direction;\r\n    vec3 color;\r\n\r\n    int shadow;\r\n    vec2 shadowMapSize;\r\n    float shadowBias;\r\n    float shadowRadius;\r\n  };\r\n\r\n  uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\r\n  uniform vec3 ambientLightColor;\r\n\r\n  /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////\r\n\r\n  #if defined(SHADOWMAP)\r\n  \tfloat texture2DCompare( sampler2D depths, vec2 uv, float compare ) {\r\n  \t\treturn step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\r\n  \t}\r\n\r\n    float getShadow( sampler2D shadowMap, DirectionalLight dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {\r\n   \t  float shadow = 0.0;\r\n\r\n      shadowCoord.xyz += dirLight.shadowBias * vNormal; //TODO use normals as it done for G-buffer (for sprites)\r\n      shadowCoord.xyz /= shadowCoord.w;\r\n\r\n      bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\r\n      bool inFrustum = all( inFrustumVec );\r\n      bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\r\n      bool frustumTest = all( frustumTestVec );\r\n\r\n      if ( frustumTest ) {\r\n        #ifdef SHADOWMAP_BASIC\r\n      \t  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\r\n      \t#endif\r\n\r\n      \t#ifdef SHADOWMAP_PCF_SHARP\r\n      \t  vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;\r\n\r\n            float dx0 = - texelSize.x * dirLight.shadowRadius;\r\n            float dy0 = - texelSize.y * dirLight.shadowRadius;\r\n            float dx1 = + texelSize.x * dirLight.shadowRadius;\r\n            float dy1 = + texelSize.y * dirLight.shadowRadius;\r\n\r\n            shadow = (\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n            ) * ( 1.0 / 9.0 );\r\n        #endif\r\n\r\n        #ifdef SHADOWMAP_PCF_RAND\r\n          vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;\r\n\r\n          vec4 vUv = ((projectionMatrix * vec4(vViewPosition, 1.0)) + 1.0) / 2.0;\r\n          vec2 vUvNoise = vUv.xy / srcTexelSize * noiseTexelSize;\r\n\r\n          vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);\r\n          mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);\r\n\r\n          vec2 offset;\r\n          #pragma unroll_loop\r\n          for ( int i = 0; i < 4; i ++ ) { // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n            offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );\r\n            shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );\r\n          }\r\n          shadow /= float( 4 ); // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n        #endif\r\n      }\r\n      return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);\r\n   }\r\n  #endif\r\n\r\n  /////////////////////////////////////////// Lighting /////////////////////////////////////////////////\r\n\r\n  vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\r\n    return RECIPROCAL_PI * diffuseColor;\r\n  } // validated\r\n\r\n  vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\r\n    // Original approximation by Christophe Schlick '94\r\n    //;float fresnel = pow( 1.0 - dotLH, 5.0 );\r\n    // Optimized variant (presented by Epic at SIGGRAPH '13)\r\n    float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\r\n    return ( 1.0 - specularColor ) * fresnel + specularColor;\r\n  } // validated\r\n\r\n  float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) {\r\n    // geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)\r\n    return 0.25;\r\n  }\r\n\r\n  float D_BlinnPhong( const in float shininess, const in float dotNH ) {\r\n    return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\r\n  }\r\n\r\n  vec3 BRDF_Specular_BlinnPhong( const in DirectionalLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\r\n    vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\r\n    float dotNH = saturate(dot( geometry.normal, halfDir ));\r\n    float dotLH = saturate(dot( incidentLight.direction, halfDir ));\r\n\r\n    vec3 F = F_Schlick( specularColor, dotLH );\r\n    float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );\r\n    float D = D_BlinnPhong( shininess, dotNH );\r\n\r\n    return F * ( G * D );\r\n  } // validated\r\n\r\n  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight, float penumbra ) {\r\n\r\n    float dotNL = saturate( dot( geometry.normal, directLight.direction ));\r\n    #ifdef TOON_SHADING\r\n      if(dotNL < MEDIUM_TOON_RANGE){\r\n        dotNL = LOW_TOON_BORDER;\r\n      }\r\n      else if(dotNL < HIGH_TOON_RANGE){\r\n        dotNL = MEDIUM_TOON_BORDER;\r\n      }\r\n      else{\r\n        dotNL = HIGH_TOON_BORDER;\r\n      }\r\n    #endif\r\n\r\n    vec3 irradiance = dotNL * directLight.color * PI;\r\n    reflectedLight.directDiffuse += penumbra * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n    reflectedLight.directSpecular += penumbra * irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );\r\n  }\r\n\r\n  void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\r\n    reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n  }\r\n\r\n  vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material, vec3 vViewPosition) {\r\n    ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));\r\n    vec3 irradiance = ambientLightColor * PI;\r\n\r\n    float shadowMask = 1.0;\r\n    // see THREE.WebGLProgram.unrollLoops\r\n  \t#pragma unroll_loop\r\n  \t  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n  \t    #ifdef SHADOWMAP\r\n  \t    if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );\r\n  \t    #endif\r\n\r\n  \t\t  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );\r\n  \t\t}\r\n\r\n    RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);\r\n\r\n    return saturate(reflectedLight.indirectDiffuse + reflectedLight.directDiffuse + reflectedLight.directSpecular);\r\n  }\r\n#endif\r\n\r\n/////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////\r\n#ifdef DASHED_LINE\r\n  uniform float dashedLineSize;\r\n  uniform float dashedLinePeriod;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef CLIP_PLANE\r\n  if (vViewPosition.z < clipPlaneValue) discard;\r\n#endif\r\n\r\n#ifdef ZCLIP\r\n  if (vViewPosition.z < zClipValue) discard;\r\n#endif\r\n\r\n  vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);\r\n  vec4 pixelPosEye;\r\n\r\n#ifdef SPHERE_SPRITE\r\n\r\n  vec3 viewNormalSprites;\r\n  vec3 normal;\r\n\r\n/* quick-and-dirty method\r\n  normal.xy = ' + INSTANCED_SPRITE_OVERSCALE + ' * (2.0 * vUv - 1.0);\r\n  float r2 = dot(normal.xy, normal.xy);\r\n  if (r2 > 1.0) discard;\r\n  float normalZ = sqrt(1.0 - r2);\r\n  normal.z = normalZ;\r\n  normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\r\n  pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n  pixelPosEye.z += spritePosEye.w * normalZ;\r\n*/\r\n\r\n  // ray-trace sphere surface\r\n  {\r\n    vec3 p;\r\n    if (get_sphere_point(-vViewPosition, p) < 0.0) discard;\r\n    pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n    pixelPosEye.z += instOffset.w *\r\n      (modelViewMatrix[0][2] * p.x +\r\n       modelViewMatrix[1][2] * p.y +\r\n       modelViewMatrix[2][2] * p.z);\r\n    normal = normalize(normalMatrix * p);\r\n    #ifdef NORMALS_TO_G_BUFFER\r\n      viewNormalSprites = normalize(mat3(modelViewMatrix)*p);\r\n    #endif\r\n  }\r\n\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  vec3 normal;\r\n  vec3 viewNormalSprites;\r\n  float cylinderY = 0.0;\r\n\r\n    // ray-trace cylinder surface\r\n    {\r\n      vec3 p;\r\n      if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;\r\n\r\n      cylinderY = 0.5 * (p.y + 1.0);\r\n\r\n      vec4 v = vec4(p, 1.0);\r\n      v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);\r\n      pixelPosWorld = modelMatrix * v;\r\n      pixelPosEye = modelViewMatrix * v;\r\n\r\n      vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));\r\n      normal = vec3(\r\n        dot(localNormal, matVec1.xyz),\r\n        dot(localNormal, matVec2.xyz),\r\n        dot(localNormal, matVec3.xyz));\r\n      #ifdef NORMALS_TO_G_BUFFER\r\n        viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);\r\n      #endif\r\n      normal = normalize(normalMatrix * normal);\r\n    }\r\n#endif\r\n\r\n  #ifdef ATTR_COLOR\r\n    vec3 vertexColor = vColor;\r\n  #else\r\n    vec3 vertexColor = vec3(1.0, 1.0, 1.0);\r\n  #endif\r\n\r\n  #ifdef ATTR_COLOR2\r\n    #ifdef CYLINDER_SPRITE\r\n      float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing\r\n    #else\r\n      float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord\r\n    #endif\r\n      // choose either color or color2\r\n    vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));\r\n  #endif\r\n\r\n  // negative red component is a special condition\r\n  if (vertexColor.x < 0.0) discard;\r\n\r\n  #ifdef DASHED_LINE\r\n    if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;\r\n  #endif\r\n\r\n  // transparency prepass writes only z, so we don't need to calc the color\r\n  #ifdef PREPASS_TRANSP\r\n    fragColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n    #endif\r\n    return;\r\n  #endif\r\n\r\n    float totalOpacity = opacity;\r\n\r\n  #ifdef ATTR_ALPHA_COLOR\r\n    totalOpacity *= alphaCol;\r\n  #endif\r\n\r\n  // discard fully transparent pixels\r\n  if (totalOpacity == 0.0) discard;\r\n\r\n  #ifdef FAKE_OPACITY\r\n    // discard pixels in checker pattern\r\n    vec2 dm_coord = floor(gl_FragCoord.xy);\r\n    dm_coord = fract(dm_coord * 0.5);\r\n    if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;\r\n    vec4 diffuseColor = vec4(diffuse, 1.0);\r\n  #else\r\n    vec4 diffuseColor = vec4(diffuse, totalOpacity);\r\n  #endif\r\n\r\n  #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n    #ifdef DOUBLE_SIDED\r\n      float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );\r\n    #else\r\n      float flipNormal = 1.0;\r\n    #endif\r\n    vec3 normal = normalize( vNormal ) * flipNormal;\r\n  #endif\r\n\r\n    diffuseColor.rgb *= vertexColor;\r\n\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n  #endif\r\n\r\n  #ifdef NORMALS_TO_G_BUFFER\r\n    #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)\r\n      vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;\r\n    #else\r\n      vec3 viewNormaInColor = 0.5*viewNormal+0.5;\r\n    #endif\r\n    // [-1, 1] -> [0, 1]\r\n    gl_FragData[1] = vec4(viewNormaInColor, 1.0);\r\n  #endif\r\n\r\n  #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n    GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));\r\n    BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);\r\n    vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);\r\n  #else\r\n    vec3 outgoingLight = diffuseColor.rgb;\r\n  #endif\r\n\r\n  #ifdef COLOR_FROM_DEPTH\r\n    float depth = 0.0;\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n      depth = gl_FragDepthEXT;\r\n    #else\r\n      depth = gl_FragCoord.z;\r\n    #endif\r\n    fragColor = packDepthToRGBA(depth);\r\n    return;\r\n  #endif\r\n\r\n  #ifdef COLOR_FROM_POS\r\n    fragColor = world2colorMatrix * pixelPosWorld;\r\n  #else\r\n    #ifdef OVERRIDE_COLOR\r\n      fragColor = vec4(fixedColor, diffuseColor.a);\r\n    #else\r\n      fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);\r\n    #endif\r\n\r\n    #ifdef USE_FOG\r\n      float viewDistance;\r\n      #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n        viewDistance = abs(pixelPosEye.z);\r\n      #else\r\n        viewDistance = vViewPosition.z;\r\n      #endif\r\n      float fogFactor = smoothstep( fogNear, fogFar, viewDistance) * fogAlpha;\r\n      #ifdef FOG_TRANSPARENT\r\n        fragColor.a = fragColor.a * (1.0 - fogFactor);\r\n      #else\r\n        fragColor.rgb = mix( fragColor.rgb, fogColor, fogFactor );\r\n      #endif\r\n    #endif\r\n\r\n  #endif\r\n}\r\n";
 
 var capabilities = {
   precision: 'mediump',
@@ -76722,9 +76706,12 @@ var noise = {
 };
 
 /* eslint-disable no-magic-numbers */
+// If you want to change length of _samplesKernel, please, remember change it in Uber_frag.glsl too.
+// You can easy find places for replace using word:_samplesKernel
+
 var _samplesKernel = [new Vector2(-0.541978, 0.840393), new Vector2(0.125533, -0.992089), new Vector2(0.374329, 0.927296), new Vector2(-0.105475, 0.994422)]; //  var INSTANCED_SPRITE_OVERSCALE = 1.3;
 
-var defaultUniforms = UniformsUtils.merge([UniformsLib.common, // FIXME is it needed
+var defaultUniforms = UniformsUtils.merge([UniformsLib.common, // is it needed?
 UniformsLib.fog, UniformsLib.lights, {
   specular: {
     type: 'c',
@@ -77278,8 +77265,7 @@ WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = function () {
     _material.uniforms.coef.value = coef;
     this.renderScreenQuad(_material);
   };
-}(); // TODO: move to a new Camera class?
-
+}();
 /**
  * @param {number} angle - Field of view in degrees.
  */
@@ -77458,7 +77444,7 @@ function removeChildren(object) {
 
 function clearTree(object) {
   object.traverse(function (obj) {
-    if (obj instanceof Mesh) {
+    if (obj instanceof Mesh || obj instanceof LineSegments || obj instanceof Line) {
       obj.geometry.dispose();
     }
   });
@@ -77650,7 +77636,7 @@ function makeVisibleMeshes(object, checker) {
 function applySelectionMaterial(geo) {
   geo.traverse(function (node) {
     if ('material' in node) {
-      node.material = node.material.clone(true); // HACK: using z-offset to magically fix selection rendering artifact (on z-sprites)
+      node.material = node.material.clone(true); // using z-offset to magically fix selection rendering artifact (on z-sprites)
 
       node.material.setValues({
         depthFunc: LessEqualDepth,
@@ -78160,8 +78146,7 @@ function (_SphereCollisionGeo) {
   }, {
     key: "finalize",
     value: function finalize() {
-      this.finishUpdate(); // TODO compute bounding box?
-
+      this.finishUpdate();
       this.computeBoundingSphere();
     }
   }, {
@@ -78410,8 +78395,7 @@ function (_RaycastableBufferGeo) {
   }, {
     key: "finalize",
     value: function finalize() {
-      this.finishUpdate(); // TODO compute bounding box?
-
+      this.finishUpdate();
       this.computeBoundingSphere();
     }
   }, {
@@ -78433,8 +78417,7 @@ function (_RaycastableBufferGeo) {
     value: function raycast(raycaster, intersects) {
       var inters = [];
 
-      _get(_getPrototypeOf(ChunkedObjectsGeometry.prototype), "raycast", this).call(this, raycaster, inters); // TODO faceIdx to chunkIdx
-
+      _get(_getPrototypeOf(ChunkedObjectsGeometry.prototype), "raycast", this).call(this, raycaster, inters);
 
       var facesPerChunk = this._chunkGeo.index.count / 3;
 
@@ -78956,8 +78939,7 @@ function (_THREE$InstancedBuffe) {
   }, {
     key: "finalize",
     value: function finalize() {
-      this.finishUpdate(); // TODO compute bounding box?
-
+      this.finishUpdate();
       this.computeBoundingSphere();
     }
   }, {
@@ -79101,12 +79083,15 @@ function (_ChunkedObjectsGeomet) {
   _createClass(ExtrudedObjectsGeometry, [{
     key: "setItem",
     value: function setItem(itemIdx, matrices) {
+      var hasSlope = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var hasCut = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
       var shape = this._chunkGeo._positions;
       var ptsCount = shape.length;
       var innerPtIdx = 0;
       var chunkStartIdx = ptsCount * this._ringsCount * itemIdx * VEC_SIZE$3;
       var positions = this._positions;
       var normals = this._normals;
+      var nPtsInRing = ptsCount * VEC_SIZE$3;
       var tmpShape = this._tmpShape;
 
       for (var i = 0, n = matrices.length; i < n; ++i) {
@@ -79116,23 +79101,72 @@ function (_ChunkedObjectsGeomet) {
           tmpShape[j].copy(shape[j]).applyMatrix4(mtx);
         }
 
-        for (var _j = 0; _j < ptsCount; ++_j) {
+        for (var _j = 0; _j < ptsCount; ++_j, innerPtIdx += VEC_SIZE$3) {
           var point = tmpShape[_j];
-          var nextPt = tmpShape[(_j + 1) % ptsCount];
-          var prevPt = tmpShape[(_j + ptsCount - 1) % ptsCount];
+          var nxPt = tmpShape[(_j + 1) % ptsCount];
+          var prPt = tmpShape[(_j + ptsCount - 1) % ptsCount];
           var vtxIdx = chunkStartIdx + innerPtIdx;
-          positions[vtxIdx] = point.x;
-          positions[vtxIdx + 1] = point.y;
-          positions[vtxIdx + 2] = point.z;
-          tmpPrev.subVectors(point, prevPt).normalize();
-          tmpNext.subVectors(point, nextPt).normalize();
-          tmpPrev.add(tmpNext).normalize();
-          normals[vtxIdx] = tmpPrev.x;
-          normals[vtxIdx + 1] = tmpPrev.y;
-          normals[vtxIdx + 2] = tmpPrev.z;
-          innerPtIdx += VEC_SIZE$3;
+          var prRingPt = new Vector3().fromArray(positions, vtxIdx - nPtsInRing);
+          var normInPrevRingPt = new Vector3().fromArray(normals, vtxIdx - nPtsInRing);
+          var prPrRingNormal = new Vector3().fromArray(normals, vtxIdx - 2 * nPtsInRing);
+          point.toArray(positions, vtxIdx);
+
+          this._countNormals(point, nxPt, prPt, prRingPt, prPrRingNormal, i === 1, hasSlope).toArray(normals, vtxIdx);
+
+          if (!hasCut) {
+            continue;
+          } // zero and first sections lies in one plane and normals for all their points are orthogonal with this plane
+          // second section points are shifted into first section points for having sharp angle on the end of cut
+
+
+          switch (i) {
+            case 0:
+              tmpPrev.subVectors(point, prPt).normalize();
+              tmpNext.subVectors(point, nxPt).normalize();
+              tmpPrev.crossVectors(tmpNext, tmpPrev).normalize();
+              tmpPrev.toArray(normals, vtxIdx);
+              break;
+
+            case 1:
+              normInPrevRingPt.toArray(normals, vtxIdx);
+              break;
+
+            case 2:
+              prRingPt.toArray(positions, vtxIdx);
+              break;
+
+            default:
+              break;
+          }
         }
       }
+    } // Counting normals:
+    // - No slope
+    //   Radius doesn't change throught part => normals are parallel with the plane contains section points
+    //   normal = vToPrevPointInSection + vToNextPointInSection (all vectors are scaled for being 1 in length)
+    // - Slope
+    //   Radius changes throught part => normals aren't parallel with the plane contains section points
+    //   normal = vTangentInSectionPlane x vToSuchPointInPrevSection (all vectors are scaled for being 1 in length)
+
+  }, {
+    key: "_countNormals",
+    value: function _countNormals(point, nextPt, prevPt, prevRingPt, prevPrevRingNormal, isFirstRing, hasSlope) {
+      if (hasSlope) {
+        if (isFirstRing) {
+          // first section is equal to last section of previous part so we takes normals from it
+          return prevPrevRingNormal;
+        } // zero and first sections are equal so we will have tmpNext = 0 for the first section
+        // so we count normals with another way for it
+
+
+        tmpPrev.subVectors(prevPt, nextPt).normalize();
+        tmpNext.subVectors(point, prevRingPt).normalize();
+        return new Vector3().crossVectors(tmpPrev, tmpNext).normalize();
+      }
+
+      tmpPrev.subVectors(point, prevPt).normalize();
+      tmpNext.subVectors(point, nextPt).normalize();
+      return new Vector3().addVectors(tmpPrev, tmpNext).normalize();
     }
   }]);
 
@@ -79410,8 +79444,7 @@ function (_BaseLinesGeometry) {
   }, {
     key: "finalize",
     value: function finalize() {
-      this.finishUpdate(); // TODO compute bounding box?
-
+      this.finishUpdate();
       this.computeBoundingSphere();
     }
   }]);
@@ -79588,8 +79621,7 @@ function (_LinesGeometry) {
   }, {
     key: "finalize",
     value: function finalize() {
-      this.finishUpdate(); // TODO compute bounding box?
-
+      this.finishUpdate();
       this.computeBoundingSphere();
     }
   }, {
@@ -79796,8 +79828,7 @@ function (_RaycastableBufferGeo) {
   }, {
     key: "finalize",
     value: function finalize() {
-      this.finishUpdate(); // TODO compute bounding box?
-
+      this.finishUpdate();
       this.computeBoundingSphere();
     }
   }, {
@@ -80626,7 +80657,7 @@ function (_VolumeSurfaceGeometr) {
   _createClass(QuickSurfGeometry, [{
     key: "_computeSurface",
     value: function _computeSurface(packedArrays, box, boundaries, params) {
-      // FIXME beware of shifting this multiple times!
+      // beware of shifting this multiple times!
       this._shiftByOrigin(packedArrays.posRad);
 
       var surface = {
@@ -80707,8 +80738,7 @@ function (_VolumeSurfaceGeometr) {
 
             for (var x = xMin; x <= xMax; ++x, dx += gridSpacing, addr += strideX, texAddr += texStrideX) {
               var r2 = dx * dx + dy2dz2;
-              var expVal = -r2 * radInv; // TODO use faster exp?
-
+              var expVal = -r2 * radInv;
               var density = Math.exp(expVal) * atomicNumFactor; // store most relevant atom (with highest density)
 
               if (this._visibilitySelector != null && density > atomWeightData[addr]) {
@@ -81767,227 +81797,6 @@ function () {
   return IsosurfaceBuildNormals;
 }();
 
-var IsoSurfaceCluster =
-/*#__PURE__*/
-function () {
-  function IsoSurfaceCluster(fileIn, pdbAtomsIn, atomsIn, vBoxMinIn, vBoxMaxIn, numVoxelsIn, colorModeIn) {
-    _classCallCheck(this, IsoSurfaceCluster);
-
-    this.complex = fileIn;
-    this.atoms = atomsIn;
-    this.pdbAtoms = pdbAtomsIn;
-    this.numVoxels = numVoxelsIn;
-    this.colorMode = colorModeIn;
-    this.vBoxMin = new Vector3();
-    this.vBoxMax = new Vector3();
-    this.vBoxMin.copy(vBoxMinIn);
-    this.vBoxMax.copy(vBoxMaxIn);
-    this.voxelsRefs = null;
-    this.voxels = null;
-  }
-
-  _createClass(IsoSurfaceCluster, [{
-    key: "destroy",
-    value: function destroy() {
-      this.atoms = null;
-      this.vBoxMin = null;
-      this.vBoxMax = null;
-      this.voxelsRefs = null;
-      this.voxels = null;
-    }
-  }, {
-    key: "buildSimple",
-    value: function buildSimple(complex, colorer) {
-      var atomsClustered = [];
-      var indVoxel;
-      var indAtomRef;
-      var atom;
-      var vColorX = 0;
-      var vColorY = 0;
-      var vColorZ = 0;
-      var ind = 0;
-      var cNumNeighbours = 8;
-      var cMask = 7;
-      var histTypes = [];
-      histTypes.length = cNumNeighbours;
-      var numVoxels = this.numVoxels;
-      var n3 = numVoxels * numVoxels * numVoxels;
-      var numAtoms = this.atoms.length;
-      this.voxelsRefs = utils.allocateTyped(Int32Array, numAtoms * 2);
-      this.voxels = utils.allocateTyped(Int32Array, n3); // init atoms list
-
-      for (var i = 0, j = 0; i < numAtoms; i++, j += 2) {
-        this.voxelsRefs[j + 0] = i;
-        this.voxelsRefs[j + 1] = 0 - 1;
-      } // init voxel references (-1 means no atom)
-
-
-      for (var _i = 0; _i < n3; _i++) {
-        this.voxels[_i] = -1;
-      } // build atom list for each voxel
-
-
-      var xScale = 1.0 / (this.vBoxMax.x - this.vBoxMin.x);
-      var yScale = 1.0 / (this.vBoxMax.y - this.vBoxMin.y);
-      var zScale = 1.0 / (this.vBoxMax.z - this.vBoxMin.z);
-
-      for (var _i2 = 0; _i2 < numAtoms; _i2++) {
-        var v = this.atoms[_i2].coord;
-        var xVox = Math.floor((v.x - this.vBoxMin.x) * numVoxels * xScale);
-        var yVox = Math.floor((v.y - this.vBoxMin.y) * numVoxels * yScale);
-        var zVox = Math.floor((v.z - this.vBoxMin.z) * numVoxels * zScale);
-        indVoxel = xVox + yVox * numVoxels + zVox * numVoxels * numVoxels; // assert(indVoxel >= 0);
-        // assert(indVoxel < n3);
-
-        indAtomRef = this.voxels[indVoxel];
-
-        if (indAtomRef < 0) {
-          this.voxels[indVoxel] = _i2;
-          continue;
-        }
-
-        while (indAtomRef >= 0) {
-          if (this.voxelsRefs[indAtomRef * 2 + 1] < 0) {
-            break;
-          }
-
-          indAtomRef = this.voxelsRefs[indAtomRef * 2 + 1]; // assert(indAtomRef < numAtoms);
-        } // add new atom to list tail
-
-
-        this.voxelsRefs[indAtomRef * 2 + 1] = _i2;
-      } // for (i) all source atoms
-      // build Output atoms (clustered)
-
-
-      var numSpheres = 0;
-
-      for (var z = 0; z < numVoxels; z++) {
-        var indVoxelZ = z * numVoxels * numVoxels;
-
-        for (var y = 0; y < numVoxels; y++) {
-          var indVoxelY = y * numVoxels;
-
-          for (var x = 0; x < numVoxels; x++) {
-            indVoxel = x + indVoxelY + indVoxelZ;
-            indAtomRef = this.voxels[indVoxel];
-
-            if (indAtomRef < 0) {
-              continue;
-            } // get ave position
-
-
-            var vCenterX = 0.0;
-            var vCenterY = 0.0;
-            var vCenterZ = 0.0; // get num atoms in voxel
-
-            var numAtomsInVoxel = 0;
-
-            while (indAtomRef >= 0) {
-              atom = this.atoms[indAtomRef];
-              vCenterX += atom.coord.x;
-              vCenterY += atom.coord.y;
-              vCenterZ += atom.coord.z;
-              numAtomsInVoxel++;
-              indAtomRef = this.voxelsRefs[indAtomRef * 2 + 1];
-            }
-
-            vCenterX *= 1.0 / numAtomsInVoxel;
-            vCenterY *= 1.0 / numAtomsInVoxel;
-            vCenterZ *= 1.0 / numAtomsInVoxel; // find best color (most of in histogram)
-
-            for (var _i3 = 0; _i3 < cNumNeighbours; _i3++) {
-              histTypes[_i3] = 0;
-            }
-
-            var rad = 0.0;
-            indAtomRef = this.voxels[indVoxel];
-
-            while (indAtomRef >= 0) {
-              atom = this.atoms[indAtomRef];
-              var vx = atom.coord.x - vCenterX;
-              var vy = atom.coord.y - vCenterY;
-              var vz = atom.coord.z - vCenterZ;
-              var dist = Math.sqrt(vx * vx + vy * vy + vz * vz) + atom.radius;
-
-              if (dist > rad) {
-                rad = dist;
-              }
-
-              ind = colorer.getIndex(complex, this.atoms[indAtomRef]);
-              ind &= cMask;
-              histTypes[ind]++; // next atom in voxel
-
-              indAtomRef = this.voxelsRefs[indAtomRef * 2 + 1];
-            } // find maximum in histogram => this is most prevalent atom type in cluster
-
-
-            var indMax = 0;
-
-            for (var _i4 = 1; _i4 < cNumNeighbours; _i4++) {
-              if (histTypes[_i4] > histTypes[indMax]) {
-                indMax = _i4;
-              }
-            } // TODO: Earnol
-
-
-            var vCenter = new Color(colorer.getAtomColor(complex, this.atoms[indMax]));
-
-            if (this.colorMode === 0) {
-              vColorX = this.atomColors[indMax].x;
-              vColorY = this.atomColors[indMax].y;
-              vColorZ = this.atomColors[indMax].z;
-            }
-
-            if (this.colorMode === 1) {
-              var colRGB = this.complex.monomerTypeArray[ind].color; // FIXME: the array is missing
-
-              vColorX = colRGB.r;
-              vColorY = colRGB.g;
-              vColorZ = colRGB.b;
-            }
-
-            if (this.colorMode !== 1 && this.colorMode !== 0) {
-              vColorX = this.atomColors[indMax].x;
-              vColorY = this.atomColors[indMax].y;
-              vColorZ = this.atomColors[indMax].z;
-            }
-
-            vCenter.set(vCenterX, vCenterY, vCenterZ);
-            atomsClustered[numSpheres] = new IsoSurfaceAtomColored(vCenter, rad);
-            atomsClustered[numSpheres].colorX = vColorX;
-            atomsClustered[numSpheres].colorY = vColorY;
-            atomsClustered[numSpheres].colorZ = vColorZ;
-            numSpheres++;
-          } // for (x)
-
-        } // for (y)
-
-      } // for (z)
-
-
-      this.voxelsRefs = null;
-      this.voxels = null;
-      return atomsClustered;
-    }
-  }]);
-
-  return IsoSurfaceCluster;
-}();
-/* eslint-disable no-magic-numbers */
-
-
-IsoSurfaceCluster.prototype.atomColors = [new Vector3(0.80, 0.80, 0.80), // C
-new Vector3(0.99, 0.99, 0.99), // H
-new Vector3(0.90, 0.20, 0.20), // O
-new Vector3(0.20, 0.20, 0.90), // N
-new Vector3(0.30, 0.90, 0.20), // P
-new Vector3(0.90, 0.90, 0.20), // S
-new Vector3(0.0, 0.0, 0.0), // undefined
-new Vector3(0.60, 0.60, 0.60)];
-IsoSurfaceCluster.prototype.resiudeColors = [new Vector3(0.9, 0.9, 0.2), new Vector3(0.0, 0.9, 0.9), new Vector3(0.9, 0.1, 0.9), new Vector3(0.9, 0.4, 0.6), new Vector3(0.9, 0.6, 0.4), new Vector3(0.4, 0.6, 0.9), new Vector3(0.9, 0.4, 0.7), new Vector3(0.7, 0.3, 0.6)];
-IsoSurfaceCluster.prototype.chainColors = [new Vector3(0.1, 0.1, 0.1), new Vector3(0.3, 0.3, 0.3), new Vector3(0.7, 0.7, 0.7), new Vector3(0.9, 0.9, 0.9), new Vector3(0.5, 0.2, 0.2), new Vector3(0.3, 0.7, 0.7), new Vector3(0.7, 0.3, 0.7), new Vector3(0.8, 0.2, 0.5)];
-
 /**
  * Class for geometry (triangle mesh) representation
  *
@@ -82848,9 +82657,7 @@ function (_IsoSurfaceGeometry) {
     key: "_innerBuild",
     value: function _innerBuild() {
       var ok;
-      var oneHundered = 100;
-      var r35 = 3.5;
-      var r12 = 1.2; // performance test
+      var expandFactor = 1.2; // performance test
       // this.performanceTest();
       // Create temporary atoms (but colored)
 
@@ -82868,7 +82675,6 @@ function (_IsoSurfaceGeometry) {
       this.useVertexColors = true;
       this.excludeProbe = this._opts.excludeProbe;
       this.visibilitySelector = this._opts.visibilitySelector;
-      this.clusterizationType = this._opts.clusterizationType;
       this.geoOut = null;
       this.hashLines = null;
       this.hashEntries = null;
@@ -82887,48 +82693,9 @@ function (_IsoSurfaceGeometry) {
       var side = marCubeResoultion;
       var side2 = side * side;
       var side3 = side2 * side;
-      var corners = utils.allocateTyped(Float32Array, side3); // settings for Clusterization
-
-      var numVoxels = this.meshResolution; // Fix number of voxels (for clusterization) if too much
-
-      var numIdealVoxels = 4;
-      var numAtomsSrc = this.atoms.length;
-
-      if (numAtomsSrc >= oneHundered) {
-        numIdealVoxels = Math.floor(Math.pow(numAtomsSrc * 2, 1.0 / (1 + 2)));
-      }
-
-      if (numVoxels > numIdealVoxels) {
-        numVoxels = numIdealVoxels;
-      }
-
-      var rProbeRadius = this.probeRadius * this.atomRadiusScale; // build clustered atoms
-
-      var clusterBuilder = null;
-      var atomsClustered = null;
-
-      if (this.clusterizationType > 0) {
-        clusterBuilder = new IsoSurfaceCluster(this.complex, this.atoms, atomsColored, vBoxMin, vBoxMax, numVoxels, this.colorMode);
-
-        if (this.clusterizationType === 1) {
-          atomsClustered = clusterBuilder.buildKMeans();
-        } else {
-          atomsClustered = clusterBuilder.buildSimple();
-        } // redbuild bbox again due to increase of radius
-        // this.getBoundingBox(atomsClustered, vBoxMin, vBoxMax);
-
-
-        vBoxMin.x -= r35;
-        vBoxMin.y -= r35;
-        vBoxMin.z -= r35;
-        vBoxMax.x += r35;
-        vBoxMax.y += r35;
-        vBoxMax.z += r35;
-        this.calculateGridCorners(corners, side, vBoxMin, vBoxMax, atomsClustered, rProbeRadius);
-      } else {
-        this.calculateGridCorners(corners, side, vBoxMin, vBoxMax, atomsColored, rProbeRadius);
-      }
-
+      var corners = utils.allocateTyped(Float32Array, side3);
+      var rProbeRadius = this.probeRadius * this.atomRadiusScale;
+      this.calculateGridCorners(corners, side, vBoxMin, vBoxMax, atomsColored, rProbeRadius);
       var numCells = marCubeResoultion - 1;
       var cube = new IsoSurfaceMarchCube();
       ok = cube.create(numCells);
@@ -82943,8 +82710,8 @@ function (_IsoSurfaceGeometry) {
       vCellStep.y = (vBoxMax.y - vBoxMin.y) / numCells;
       vCellStep.z = (vBoxMax.z - vBoxMin.z) / numCells;
       var numIntersectedCellsEstim = this.getNumIntersectedCells(side, numCells, corners, cube);
-      var maxNumVertices = Math.floor(numIntersectedCellsEstim * r12);
-      var maxNumTriangles = Math.floor(numIntersectedCellsEstim * r12 * 2);
+      var maxNumVertices = Math.floor(numIntersectedCellsEstim * expandFactor);
+      var maxNumTriangles = Math.floor(numIntersectedCellsEstim * expandFactor * 2);
       this.geoOut = new IsoSurfaceGeo(maxNumVertices, maxNumTriangles, this.useVertexColors);
       ok = this.createVertexHash(maxNumVertices, maxNumTriangles);
 
@@ -82959,15 +82726,7 @@ function (_IsoSurfaceGeometry) {
         probeRadForNormalsColors = 0.01;
       }
 
-      this.voxelWorld = null;
-
-      if (this.clusterizationType > 0) {
-        this.voxelWorld = new IsosurfaceBuildNormals(atomsClustered.length, atomsClustered, // NOSONAR
-        vBoxMin, vBoxMax, probeRadForNormalsColors);
-      } else {
-        this.voxelWorld = new IsosurfaceBuildNormals(atomsColored.length, atomsColored, vBoxMin, vBoxMax, probeRadForNormalsColors);
-      }
-
+      this.voxelWorld = new IsosurfaceBuildNormals(atomsColored.length, atomsColored, vBoxMin, vBoxMax, probeRadForNormalsColors);
       this.voxelWorld.createVoxels();
       ok = this.buildGeoFromCorners(marCubeResoultion, vBoxMin, vBoxMax, corners, vCellStep, cube);
 
@@ -82985,8 +82744,8 @@ function (_IsoSurfaceGeometry) {
         this.geoOut = null; // estimage geo vertices budget again
 
         numIntersectedCellsEstim = this.getNumIntersectedCells(side, numCells, corners, cube);
-        maxNumVertices = Math.floor(numIntersectedCellsEstim * r12);
-        maxNumTriangles = Math.floor(numIntersectedCellsEstim * r12 * 2); // creates empty new geometry
+        maxNumVertices = Math.floor(numIntersectedCellsEstim * expandFactor);
+        maxNumTriangles = Math.floor(numIntersectedCellsEstim * expandFactor * 2); // creates empty new geometry
 
         this.geoOut = new IsoSurfaceGeo(maxNumVertices, maxNumTriangles, this.useVertexColors);
         ok = this.createVertexHash(maxNumVertices, maxNumTriangles);
@@ -83000,27 +82759,21 @@ function (_IsoSurfaceGeometry) {
       } // build vertex normals
 
 
-      if (this.voxelWorld !== null) {
-        this.voxelWorld.buildNormals(this.geoOut._vertices.length, this.geoOut._vertices, this.geoOut._normals); // More value : more smooth color mixing
-        // value about 0.7: very rough colors borders
+      this.voxelWorld.buildNormals(this.geoOut._vertices.length, this.geoOut._vertices, this.geoOut._normals); // More value : more smooth color mixing
+      // value about 0.7: very rough colors borders
 
-        var radiusColorSmoothness = 6.5;
+      var radiusColorSmoothness = 6.5;
 
-        if (this.excludeProbe) {
-          radiusColorSmoothness -= 1.5;
-        }
+      if (this.excludeProbe) {
+        radiusColorSmoothness -= 1.5;
+      }
 
-        if (this.useVertexColors) {
-          this.voxelWorld.buildColors(this.geoOut._vertices.length, this.geoOut._vertices, this.geoOut._colors, radiusColorSmoothness);
-        }
+      if (this.useVertexColors) {
+        this.voxelWorld.buildColors(this.geoOut._vertices.length, this.geoOut._vertices, this.geoOut._colors, radiusColorSmoothness);
       }
 
       this.voxelWorld.destroyVoxels();
       this.voxelWorld = null; // remove objects
-
-      if (clusterBuilder !== null) {
-        clusterBuilder.destroy();
-      }
 
       cube.destroy();
       return ok;
@@ -83100,8 +82853,7 @@ function (_EventDispatcher) {
 
       default:
         break;
-    } // TODO is code above OK?
-
+    }
 
     var deltaPos = new Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0);
     _this.userData = {
@@ -83546,8 +83298,7 @@ function () {
           sphereSprite: useZSprites
         })
       };
-    } // TODO thisnk about interface and responsibilities
-
+    }
   }, {
     key: "create2CClosedCylinders",
     value: function create2CClosedCylinders(_caps, _settings) {
@@ -83898,7 +83649,7 @@ function (_AtomsGroup) {
   }, {
     key: "updateToFrame",
     value: function updateToFrame(frameData) {
-      // TODO This method looks like a copy paste. However, it
+      // This method looks like a copy paste. However, it
       // was decided to postpone animation refactoring until GFX is fixed.
       var atomsIdc = this._selection.chunks;
       var atoms = this._selection.atoms;
@@ -84117,8 +83868,7 @@ function (_AtomsGroup) {
   }, {
     key: "_build",
     value: function _build() {
-      var opts = this._mode.getLabelOpts(); // TODO is it correct to filter atoms here?
-
+      var opts = this._mode.getLabelOpts();
 
       var atomsIdc = this._selection.chunks;
       var _this$_selection = this._selection,
@@ -84147,10 +83897,9 @@ function (_AtomsGroup) {
   }, {
     key: "updateToFrame",
     value: function updateToFrame(frameData) {
-      // TODO This method looks like a copy paste. However, it
+      // This method looks like a copy paste. However, it
       // was decided to postpone animation refactoring until GFX is fixed.
-      var opts = this._mode.getLabelOpts(); // TODO is it correct to filter atoms here?
-
+      var opts = this._mode.getLabelOpts();
 
       var atomsIdc = this._selection.chunks;
       var atoms = this._selection.atoms;
@@ -84503,7 +84252,7 @@ function (_ResiduesGroup) {
   }, {
     key: "updateToFrame",
     value: function updateToFrame(frameData) {
-      // TODO This method looks like a copy paste. However, it
+      // This method looks like a copy paste. However, it
       // was decided to postpone animation refactoring until GFX is fixed.
       var residues = frameData.getResidues();
       var parent = this._selection.parent;
@@ -84517,7 +84266,7 @@ function (_ResiduesGroup) {
 
       for (var i = 0, n = resIdc.length; i < n; ++i) {
         var res = residues[resIdc[i]];
-        var color = colorer.getResidueColor(res, parent); // TODO Pass color only when it has been changed?
+        var color = colorer.getResidueColor(res, parent);
 
         this._processItem(chunkIdx++, res._cylinders[0], res._cylinders[1], stickRad, color);
       }
@@ -85210,7 +84959,8 @@ function _createShape$1(rad, parts) {
   var pts = [];
 
   for (var i = 0; i < parts; ++i) {
-    var a = 2 * i / parts * Math.PI;
+    // starts from pi/2 because it's important that points are lied on the angles of arrows (visual issues if not)
+    var a = Math.PI / 2.0 + 2 * Math.PI * i / parts;
     pts.push(new Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0));
   }
 
@@ -85228,6 +84978,7 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
       var prevLast = null;
       var startIdx = subs[i].start * 2;
       var endIdx = subs[i].end * 2 + 1;
+      var prevSecondRad = mode.getResidueRadius(residues[0], 0);
 
       for (var idx = startIdx; idx <= endIdx; ++idx) {
         var resIdx = idx / 2 | 0;
@@ -85235,9 +84986,14 @@ function _loopThrough(subDiv, residues, segmentsHeight, tension, mode, callback)
         var firstRad = mode.getResidueRadius(currRes, idx % 2);
         var secondRad = mode.getResidueRadius(currRes, 1 + idx % 2);
         var mtc = matrixHelper.prepareMatrices(idx - idc[0] * 2, firstRad, secondRad);
-        mtc.unshift(prevLast === null ? mtc[0] : prevLast);
-        callback(currRes, mtc, resIdx);
+        mtc.unshift(prevLast === null ? mtc[0] : prevLast); // Slope - radius is changed along this residue part
+
+        var hasSlope = firstRad.x !== secondRad.x || firstRad.y !== secondRad.y; // Cut - end radius of previous part not equal to start radius of this part. First section of this part lies in the orthogonal plane
+
+        var hasCut = firstRad.x !== prevSecondRad.x || firstRad.y !== prevSecondRad.y;
+        callback(currRes, mtc, hasSlope, hasCut);
         prevLast = mtc[segmentsHeight];
+        prevSecondRad = secondRad;
       }
     }
   }
@@ -85276,9 +85032,11 @@ function (_ResiduesGroup) {
       var chunkIdc = [];
 
       _loopThrough(this._selection.subdivs, residues, this._segmentsHeight, tension, mode, function (currRes, mtc) {
+        var hasSlope = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+        var hasCut = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
         var color = colorer.getResidueColor(currRes, parent);
         chunkIdc[chunkIdx] = currRes._index;
-        geo.setItem(chunkIdx, mtc);
+        geo.setItem(chunkIdx, mtc, hasSlope, hasCut);
         geo.setColor(chunkIdx++, color);
       });
 
@@ -85288,7 +85046,7 @@ function (_ResiduesGroup) {
   }, {
     key: "updateToFrame",
     value: function updateToFrame(frameData) {
-      // TODO This method looks like a copy paste. However, it
+      // This method looks like a copy paste. However, it
       // was decided to postpone animation refactoring until GFX is fixed.
       var parent = this._selection.parent;
       var mode = this._mode;
@@ -85385,7 +85143,7 @@ function (_ChemGroup) {
   }, {
     key: "updateToFrame",
     value: function updateToFrame(frameData) {
-      // TODO This method looks like a copy paste. However, it
+      // This method looks like a copy paste. However, it
       // was decided to postpone animation refactoring until GFX is fixed.
       var residues = frameData.getResidues();
       var parent = this._selection.parent;
@@ -85751,7 +85509,7 @@ function (_BondsGroup) {
   }, {
     key: "updateToFrame",
     value: function updateToFrame(frameData) {
-      // TODO This method looks like a copy paste. However, it
+      // This method looks like a copy paste. However, it
       // was decided to postpone animation refactoring until GFX is fixed.
       var bondsIdc = this._selection.chunks;
       var bonds = this._selection.bonds;
@@ -86261,11 +86019,6 @@ function (_RCGroup) {
 
   return AromaticProcessor;
 }(RCGroup);
-
-/*
- * TODO
- * This file is a greeting from the past. Refactor it and/or destroy.
- */
 
 /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
 
@@ -86988,8 +86741,7 @@ function (_Mode) {
       }
 
       return startRad.clone().lerp(endRad, val / 2.0);
-    } // TODO: remove when selection is rendered with actual geometry
-
+    }
   }, {
     key: "calcStickRadius",
     value: function calcStickRadius(_res) {
@@ -87147,9 +86899,7 @@ function (_SurfaceMode) {
     _classCallCheck(this, IsoSurfaceMode);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(IsoSurfaceMode).call(this, opts));
-    _this._excludeProbe = excludeProbe; // this._isVertexNormalsRendered = false; FIXME are used?
-    // this._isSurfaceTransparent = false; FIXME are used?
-
+    _this._excludeProbe = excludeProbe;
     return _this;
   }
 
@@ -87167,8 +86917,7 @@ function (_SurfaceMode) {
         zClip: this.opts.zClip,
         visibilitySelector: this.getVisibilitySelector(),
         probeRadius: this.opts.probeRadius,
-        excludeProbe: this._excludeProbe,
-        clusterizationType: this._clusterViaKMeans
+        excludeProbe: this._excludeProbe
       };
     }
   }]);
@@ -87180,10 +86929,7 @@ IsoSurfaceMode.prototype.id = 'SU';
 IsoSurfaceMode.prototype.name = 'Surface';
 IsoSurfaceMode.prototype.shortName = 'Surface';
 IsoSurfaceMode.prototype.surfaceNames = ['SASSESSurfaceGeo'];
-IsoSurfaceMode.prototype._radScale = 1; // TODO: move to advanced visualization UI next 3 params
-
-IsoSurfaceMode.prototype._clusterViaKMeans = 0; // 0: no cluster, 1: KMeans, 2: SimplestClusterization
-
+IsoSurfaceMode.prototype._radScale = 1;
 IsoSurfaceMode.prototype._excludeProbe = false;
 
 var IsoSurfaceSASMode =
@@ -87244,9 +86990,7 @@ function (_SurfaceMode) {
         probeRadius: this.opts.probeRadius,
         radScale: this.opts.polyComplexity[this.settings.now.resolution],
         scaleFactor: this.opts.polyComplexity[this.settings.now.resolution],
-        // TODO rename all params
         gridSpacing: 1.0 / this.opts.polyComplexity[this.settings.now.resolution],
-        // TODO rename all params
         isoValue: this.opts.isoValue,
         probePositions: this.opts.probePositions,
         zClip: this.opts.zClip,
@@ -88741,8 +88485,7 @@ function () {
     this.mode = mode;
     this.colorer = colorer;
     this.selector = selector;
-    this.selectorString = ''; // FIXME
-
+    this.selectorString = '';
     this.count = 0;
     this.material = new UberMaterial();
     this.material.setValues(startMaterialValues);
@@ -88953,9 +88696,7 @@ ComplexComponentEditor.prototype.apply = function () {
 
   this._resetComponentTransform();
 
-  this._complexVisual.finalizeEdit(); // TODO: rebuild in Miew
-  // this.rebuildAll();
-
+  this._complexVisual.finalizeEdit();
 };
 
 ComplexComponentEditor.prototype.discard = function () {
@@ -88965,9 +88706,7 @@ ComplexComponentEditor.prototype.discard = function () {
 
   this._resetComponentTransform();
 
-  this._complexVisual.finalizeEdit(); // TODO: Make sure this is set in Miew
-  // this._needRender = true;
-
+  this._complexVisual.finalizeEdit();
 };
 
 ComplexComponentEditor.prototype.getAltObj = function () {
@@ -89165,9 +88904,7 @@ ComplexFragmentEditor.prototype.begin = function () {
     }
   }
 
-  gfxutils.applySelectionMaterial(this._fragmentSelectionGeo); // TODO: Make sure this is set in Miew
-  // this._needRender = true;
-
+  gfxutils.applySelectionMaterial(this._fragmentSelectionGeo);
   this._inProgress = true;
   return true;
 };
@@ -89190,8 +88927,7 @@ ComplexFragmentEditor.prototype.apply = function () {
 
   visual.enableSubset(1 << selectionBit, true);
   visual.getComplex().onAtomPositionChanged();
-  visual.finalizeEdit(); // TODO: rebuild in Miew
-  // this.rebuildAll();
+  visual.finalizeEdit();
 };
 
 ComplexFragmentEditor.prototype.discard = function () {
@@ -89218,8 +88954,7 @@ ComplexFragmentEditor.prototype.discard = function () {
     }
   }
 
-  visual.finalizeEdit(); // TODO: Make sure this is set in Miew
-  // this._needRender = true;
+  visual.finalizeEdit();
 };
 
 ComplexFragmentEditor.prototype.isFreeRotationAllowed = function () {
@@ -89398,7 +89133,7 @@ ComplexVisual.prototype.resetReps = function (reps) {
 
     this._reprList[i].setMaterialPreset(material);
 
-    this._reprList[i].selectorString = selectorString; // FIXME: get rid of a separate selectorString
+    this._reprList[i].selectorString = selectorString;
 
     if (this._complex) {
       this._complex.markAtoms(selector, 1 << i);
@@ -89478,7 +89213,6 @@ ComplexVisual.prototype.rep = function (index, rep) {
   var target = this._reprList[index];
   var desc = {
     selector: target.selectorString,
-    // FIXME: Hope it equals String(target.selector)
     mode: target.mode.identify(),
     colorer: target.colorer.identify(),
     material: target.materialPreset.id
@@ -89508,7 +89242,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
         desc.mode = newMode;
         target.setMode(lookupAndCreate(modes, rep.mode));
         changed = true;
-        logger.debug("rep[".concat(index, "].mode changed to ").concat(newMode)); // safety hack: lower resolution for surface modes
+        logger.debug("rep[".concat(index, "].mode changed to ").concat(newMode)); // safety trick: lower resolution for surface modes
 
         if (target.mode.isSurface && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
           logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
@@ -89921,8 +89655,7 @@ ComplexVisual.prototype.rebuild = function () {
   var self = this; // Destroy current geometry
 
   gfxutils.clearTree(this);
-  return new Promise(function (resolve, _reject) {
-    // TODO: `reject` is not used
+  return new Promise(function (resolve) {
     // Nothing to do?
     var complex = self._complex;
 
@@ -90172,7 +89905,7 @@ ComplexVisual.prototype.finalizeEdit = function () {
 
 ComplexVisual.prototype.setMaterialValues = function (values) {
   var needTraverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  var process = arguments.length > 2 ? arguments[2] : undefined;
+  var process = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
 
   for (var i = 0, n = this._reprList.length; i < n; ++i) {
     var rep = this._reprList[i];
@@ -90841,6 +90574,81 @@ _defineProperty(VolumeMesh, "_matrixWorldToLocal", new Matrix4());
 
 _defineProperty(VolumeMesh, "_clipPlane", new Plane());
 
+var VolumeBounds =
+/*#__PURE__*/
+function () {
+  function VolumeBounds(bBox, volInfo) {
+    _classCallCheck(this, VolumeBounds);
+
+    var delta = volInfo.delta; // {x: XY, y : XZ, z: YZ}
+
+    var obtuseAngle = volInfo.obtuseAngle; // 1 - obtuse, 0 - acute
+
+    var bSize = bBox.getSize().multiplyScalar(0.5);
+
+    var offsetVert = this._getBaseVertices(delta, obtuseAngle);
+
+    var geometry = new Geometry();
+
+    for (var i = 0; i < 4; i++) {
+      geometry.vertices.push(offsetVert[i].clone().multiply(bSize));
+      geometry.vertices.push(offsetVert[(i + 1) % 4].clone().multiply(bSize));
+    }
+
+    var translation = new Vector3(2 * bSize.x * (1 - delta.x - delta.y), 0, 0);
+
+    for (var _i = 0; _i < 8; _i++) {
+      geometry.vertices.push(geometry.vertices[_i].clone().add(translation));
+    }
+
+    for (var _i2 = 0; _i2 < 4; _i2++) {
+      geometry.vertices.push(geometry.vertices[_i2 * 2].clone());
+      geometry.vertices.push(geometry.vertices[_i2 * 2 + 8].clone());
+    }
+
+    geometry.vertices.forEach(function (vertex) {
+      return vertex.add(bBox.getCenter());
+    }); // pivot shift
+
+    this._lines = new LineSegments(geometry, new LineBasicMaterial({
+      color: 0xFFFFFF
+    }));
+  } // Set one edge (4 points) of frame, from which with parallel transfer  the rest of the frame points can be obtained
+
+
+  _createClass(VolumeBounds, [{
+    key: "_getBaseVertices",
+    value: function _getBaseVertices(delta, obtuseAngle) {
+      var projTable = VolumeBounds._projectionTable;
+
+      var proj = function proj(index, inv) {
+        // tricky function to take account of projections: their position(related to box) and sign
+        var currDelta = delta[projTable[index][0]];
+        var angleValue = -0.5 * (inv - 1) + inv * obtuseAngle[projTable[index][1]]; // inv = 1: alpha; inv = -1: 1 - alpha
+
+        return angleValue * currDelta;
+      };
+
+      var offsetVert = [new Vector3(-1 + 2 * (proj('XZ', 1) + proj('XY', 1)), -1 + 2 * proj('YZ', 1), -1), new Vector3(-1 + 2 * (proj('XZ', -1) + proj('XY', 1)), -1 + 2 * proj('YZ', -1), 1), new Vector3(-1 + 2 * (proj('XZ', -1) + proj('XY', -1)), 1 - 2 * proj('YZ', 1), 1), new Vector3(-1 + 2 * (proj('XZ', 1) + proj('XY', -1)), 1 - 2 * proj('YZ', -1), -1)];
+      return offsetVert;
+    }
+  }, {
+    key: "getMesh",
+    value: function getMesh() {
+      return this._lines;
+    }
+  }]);
+
+  return VolumeBounds;
+}();
+
+_defineProperty(VolumeBounds, "_projectionTable", {
+  // corresponds between (origin axes and angles between them) and between saving vector coordinates
+  XY: ['x', 2],
+  XZ: ['y', 1],
+  YZ: ['z', 0]
+});
+
 function VolumeVisual(name, dataSource) {
   Visual.call(this, name, dataSource);
   this._mesh = new VolumeMesh();
@@ -90848,6 +90656,9 @@ function VolumeVisual(name, dataSource) {
   this._mesh.setDataSource(dataSource);
 
   this.add(this._mesh);
+  this._frame = new VolumeBounds(this.getBoundaries().boundingBox, this._mesh.volumeInfo);
+  this.add(this._frame.getMesh());
+  this.showFrame(settings.now.modes.VD.frame);
   this.buildFarPlane();
 }
 
@@ -90858,8 +90669,7 @@ utils.deriveClass(VolumeVisual, Visual); // Thes geometric far plane is required
 
 VolumeVisual.prototype.buildFarPlane = function () {
   // create plane with unit corners coords (for future rescale in vshader according to camera properties)
-  var planeGeo = new PlaneGeometry(2, 2, 1, 1); // FIXME create custom plane geometry (without normals and uvs)
-
+  var planeGeo = new PlaneGeometry(2, 2, 1, 1);
   var mat = VolumeMaterial$1.BackFacePosMaterialFarPlane();
   this._plane = new meshes.Mesh(planeGeo, mat);
   this._plane.frustumCulled = false;
@@ -90911,6 +90721,10 @@ VolumeVisual.prototype.getBoundaries = function () {
 
 VolumeVisual.prototype.getMesh = function () {
   return this._mesh;
+};
+
+VolumeVisual.prototype.showFrame = function (needShow) {
+  this._frame.getMesh().material.visible = needShow;
 };
 
 function Profiler() {
@@ -91908,26 +91722,7 @@ function (_Parser) {
         var chain = complex._chains[i];
         idChainMap[chain._name.charCodeAt(0)] = chain;
       }
-    }
-    /* NOTE: Slow and clumsy. And only for badly formatted files.
-      PDBParser.prototype._atomNameScan = function(str) {
-        var i = 0;
-        var code = null;
-        var codeA = 'A'.charCodeAt(0);
-        var codeZ = 'Z'.charCodeAt(0);
-        var s = str.toUpperCase();
-        for (i = s.length - 1; i >= 0; i--) { // FIXME: What for?
-          code = s.charCodeAt(i);
-          if (codeA <= code && code <= codeZ) {
-            continue;
-          } else {
-            s = s.slice(0, i) + s.slice(i + 1, s.length);
-          }
-        }
-        return s;
-      };
-      */
-    // FIXME: This function is redundant, CONECT records always follow ATOM and HETATM. Build the map online.
+    } // FIXME: This function is redundant, CONECT records always follow ATOM and HETATM. Build the map online.
 
   }, {
     key: "_fixBondsArray",
@@ -92009,8 +91804,7 @@ function (_Parser) {
 
       if (!residue || residue.getSequence() !== resSeq || residue.getICode() !== iCode) {
         this._residue = residue = chain.addResidue(resName, resSeq, iCode);
-      } // TODO: optimize atom positions storage? what for? (and occupancy? tempFactor?)
-
+      }
 
       var xyz = new Vector3(x, y, z);
       residue.addAtom(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
@@ -92137,7 +91931,6 @@ function (_Parser) {
   }, {
     key: "_parseSTRUCTURE",
     value: function _parseSTRUCTURE(stream, pars, adder) {
-      // FIXME: HELIX and SHEET have nothing in common
       var startId = 0;
       var startIndex = 1;
       var endId = 2;
@@ -92159,8 +91952,7 @@ function (_Parser) {
       /* eslint-enable no-magic-numbers */
       // file fields
 
-      var startChainID = stream.readString(pars[startId], pars[endId] + 1).charCodeAt(0); // FIXME: no need in these
-
+      var startChainID = stream.readString(pars[startId], pars[endId] + 1).charCodeAt(0);
       var endChainID = stream.readString(pars[endId], pars[endId] + 1).charCodeAt(0);
       var startSequenceNumber = stream.readInt(pars[startIndex], pars[startIndex] + 3);
       var iCodeStr = stream.readString(pars[startIndex] + 4, pars[startIndex] + 4);
@@ -92290,7 +92082,7 @@ _defineProperty(PDBParser, "tagParsers", {
   // 'SOURCE': PDBParser.prototype._parseSOURCE,
   'HELIX ': PDBParser.prototype._parseHELIX,
   'SHEET ': PDBParser.prototype._parseSHEET,
-  // FIXME: HACK: nonstandard extension to allow range 100,000 - 999,999
+  // nonstandard extension to allow range 100,000 - 999,999
   'ATOM 1': PDBParser.prototype._parseATOM,
   'ATOM 2': PDBParser.prototype._parseATOM,
   'ATOM 3': PDBParser.prototype._parseATOM,
@@ -93907,8 +93699,7 @@ function (_Parser) {
 
       if (!atomData) {
         throw new AtomDataError('CIF parsing error: atom_site is not specified!');
-      } // TODO also add length chacks?
-
+      }
 
       for (var f = 0, n = cRequiredAtomFields.length; f < n; ++f) {
         if (!atomData[cRequiredAtomFields[f]]) {
@@ -94126,7 +93917,7 @@ function (_Parser) {
         var comment = comments[i] || '';
         var length = lengths[i] || 0;
         var helixClass = helixClasses[i] || ' ';
-        var struct = void 0; // TODO Add turns and strands(!)?
+        var struct = void 0;
 
         if (type === 'helix') {
           var idx = complex._helices.length;
@@ -95067,8 +94858,7 @@ function (_Parser) {
         var name = words[0];
         var xyz = new Vector3(parseFloat(words[1]), parseFloat(words[2]), parseFloat(words[3]));
         var type = Element$6.getByName(name);
-        var role = Element$6.Role[name]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
-
+        var role = undefined;
         residue.addAtom(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
       }
 
@@ -95433,7 +95223,7 @@ function (_Parser) {
         }
 
         this._atomsIndexes[name] += 1;
-        name += this._atomsIndexes[name]; // hack. every atom need to have unique name.
+        name += this._atomsIndexes[name]; // every atom need to have unique name.
 
         this._residue.addAtom(name, type, xyz, undefined, true, serial, ' ', 1.0, 0.0, charge);
       }
@@ -97549,8 +97339,6 @@ ObjectControls.prototype.translatePivot = function (x, y, z) {
   });
 };
 
-/* eslint-disable no-magic-numbers */
-
 function Picker(gfxObj, camera, domElement) {
   EventDispatcher$1.call(this);
   var self = this;
@@ -98552,13 +98340,11 @@ var defaultUniforms$2 = UniformsUtils.merge([{
 
 function FXAAMaterial(params) {
   ShaderMaterial.call(this);
-  this.bgTransparent = false; // TODO RawShaderMaterial? Why we use ShaderMaterial now ?
-  // set default values
+  this.bgTransparent = false; // set default values
 
   ShaderMaterial.prototype.setValues.call(this, {
     uniforms: UniformsUtils.clone(defaultUniforms$2),
     vertexShader: vertexShader$1,
-    // TODO make texccord fo samples calculated in VS to reduce PS
     fragmentShader: fragmentShader$2,
     transparent: false,
     depthTest: false,
@@ -98587,7 +98373,7 @@ FXAAMaterial.prototype.setValues = function (values) {
   this.defines = defines;
 };
 
-var fragmentSSAOShader = "#define MAX_SAMPLES_COUNT 32\r\n\r\nuniform vec3 samplesKernel[MAX_SAMPLES_COUNT];\r\nuniform sampler2D noiseTexture;\r\nuniform vec2      noiseTexelSize;\r\nuniform sampler2D diffuseTexture;\r\nuniform sampler2D depthTexture;\r\nuniform sampler2D normalTexture;\r\nuniform vec2      srcTexelSize;\r\nuniform vec2      camNearFar;\r\nuniform mat4      projMatrix;\r\n\r\nuniform float aspectRatio;\r\nuniform float tanHalfFOV;\r\n\r\nuniform float kernelRadius;\r\nuniform float depthThreshold;\r\nuniform float factor;\r\n\r\nuniform vec2 fogNearFar;\r\nvarying vec2 vUv;\r\n\r\nfloat CalcViewZ(vec2 screenPos)\r\n{\r\n  float depth = texture2D(depthTexture, screenPos).x;\r\n  // [0, 1]->[-1, 1]\r\n  float clipedZ = 2.0 * depth - 1.0;\r\n  // see THREE.js camera.makeFrustum for projection details\r\n  return (-projMatrix[3][2] / (clipedZ + projMatrix[2][2]));\r\n}\r\n\r\nvec3 ViewPosFromDepth(vec2 screenPos)\r\n{\r\n  vec3 viewPos;\r\n  viewPos.z = CalcViewZ(screenPos);\r\n  //[0, 1]->[-1, 1]\r\n  vec2 projPos = 2.0 * screenPos - 1.0;\r\n  // reconstruct viewposition in right-handed sc with z to viewer\r\n  viewPos.xy = vec2(\r\n                    projPos.x * aspectRatio * tanHalfFOV * abs(viewPos.z),\r\n                    projPos.y * tanHalfFOV * abs(viewPos.z)\r\n                   );\r\n  return viewPos;\r\n}\r\n\r\nvoid main() {\r\n  vec3 viewPos = ViewPosFromDepth(vUv);\r\n  // remap coordinates to prevent noise exture rescale\r\n  vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;\r\n  //[0, 1] -> [-1, 1]\r\n  vec3 normal = (texture2D(normalTexture, vUv).rgb * 2.0 - 1.0);\r\n  // get random vector for sampling sphere rotation\r\n  vec3 randN = texture2D(noiseTexture, vUvNoise).rgb * 2.0 - 1.0;\r\n  randN = normalize(randN);\r\n  // build TBN (randomly rotated around normal)\r\n  vec3 tangent   = normalize(randN - normal * dot(randN, normal));\r\n  vec3 bitangent = cross(tangent, normal);\r\n  mat3 TBN = mat3(tangent, bitangent, normal);\r\n  // calc AO value\r\n  float AO = 0.0;\r\n  for (int i = 0 ; i < MAX_SAMPLES_COUNT ; i++) {\r\n    // rotate sampling kernel around normal\r\n    vec3 reflectedSample = TBN * samplesKernel[i];\r\n    // get sample\r\n    vec3 samplePos = viewPos + reflectedSample * kernelRadius;\r\n\r\n    // project sample to screen to get sample's screen pos\r\n    vec4 SampleScrPos = vec4(samplePos, 1.0);\r\n    // eye -> clip\r\n    SampleScrPos = projMatrix * SampleScrPos;\r\n    // normalize\r\n    SampleScrPos.xy /= SampleScrPos.w;\r\n    //[-1, 1] -> [0, 1]\r\n    SampleScrPos.xy = (SampleScrPos.xy + vec2(1.0)) * 0.5;\r\n\r\n    // get view z for sample projected to the objct surface\r\n    float sampleDepth = CalcViewZ(SampleScrPos.xy);\r\n    // calc occlusion made by object surface at the sample\r\n    AO += step(samplePos.z, sampleDepth);\r\n  }\r\n  // add fog to the AO value\r\n  AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);\r\n  // calc result AO-map color\r\n  AO = 1.0 - max(0.0, AO / 32.0 * factor); // TODO use MAX_SAMPLES_COUNT\r\n  // check if the fragment doesn't belong to background(?)\r\n  if (abs(- viewPos.z - camNearFar.y) < 0.1) { // FIXME remove temporal fix for background darkening\r\n    gl_FragColor = vec4(1.0);\r\n    return;\r\n  }\r\n  // write value to AO-map\r\n  gl_FragColor = vec4(AO, AO, AO, 1.0);\r\n}\r\n";
+var fragmentSSAOShader = "#define MAX_SAMPLES_COUNT 32\r\n\r\nuniform vec3 samplesKernel[MAX_SAMPLES_COUNT];\r\nuniform sampler2D noiseTexture;\r\nuniform vec2      noiseTexelSize;\r\nuniform sampler2D diffuseTexture;\r\nuniform sampler2D depthTexture;\r\nuniform sampler2D normalTexture;\r\nuniform vec2      srcTexelSize;\r\nuniform vec2      camNearFar;\r\nuniform mat4      projMatrix;\r\n\r\nuniform float aspectRatio;\r\nuniform float tanHalfFOV;\r\n\r\nuniform float kernelRadius;\r\nuniform float depthThreshold;\r\nuniform float factor;\r\n\r\nuniform vec2 fogNearFar;\r\nvarying vec2 vUv;\r\n\r\nfloat CalcViewZ(vec2 screenPos)\r\n{\r\n  float depth = texture2D(depthTexture, screenPos).x;\r\n  // [0, 1]->[-1, 1]\r\n  float clipedZ = 2.0 * depth - 1.0;\r\n  // see THREE.js camera.makeFrustum for projection details\r\n  return (-projMatrix[3][2] / (clipedZ + projMatrix[2][2]));\r\n}\r\n\r\nvec3 ViewPosFromDepth(vec2 screenPos)\r\n{\r\n  vec3 viewPos;\r\n  viewPos.z = CalcViewZ(screenPos);\r\n  //[0, 1]->[-1, 1]\r\n  vec2 projPos = 2.0 * screenPos - 1.0;\r\n  // reconstruct viewposition in right-handed sc with z to viewer\r\n  viewPos.xy = vec2(\r\n                    projPos.x * aspectRatio * tanHalfFOV * abs(viewPos.z),\r\n                    projPos.y * tanHalfFOV * abs(viewPos.z)\r\n                   );\r\n  return viewPos;\r\n}\r\n\r\nvoid main() {\r\n  vec3 viewPos = ViewPosFromDepth(vUv);\r\n  // remap coordinates to prevent noise exture rescale\r\n  vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;\r\n  //[0, 1] -> [-1, 1]\r\n  vec3 normal = (texture2D(normalTexture, vUv).rgb * 2.0 - 1.0);\r\n  // get random vector for sampling sphere rotation\r\n  vec3 randN = texture2D(noiseTexture, vUvNoise).rgb * 2.0 - 1.0;\r\n  randN = normalize(randN);\r\n  // build TBN (randomly rotated around normal)\r\n  vec3 tangent   = normalize(randN - normal * dot(randN, normal));\r\n  vec3 bitangent = cross(tangent, normal);\r\n  mat3 TBN = mat3(tangent, bitangent, normal);\r\n  // calc AO value\r\n  float AO = 0.0;\r\n  for (int i = 0 ; i < MAX_SAMPLES_COUNT ; i++) {\r\n    // rotate sampling kernel around normal\r\n    vec3 reflectedSample = TBN * samplesKernel[i];\r\n    // get sample\r\n    vec3 samplePos = viewPos + reflectedSample * kernelRadius;\r\n\r\n    // project sample to screen to get sample's screen pos\r\n    vec4 SampleScrPos = vec4(samplePos, 1.0);\r\n    // eye -> clip\r\n    SampleScrPos = projMatrix * SampleScrPos;\r\n    // normalize\r\n    SampleScrPos.xy /= SampleScrPos.w;\r\n    //[-1, 1] -> [0, 1]\r\n    SampleScrPos.xy = (SampleScrPos.xy + vec2(1.0)) * 0.5;\r\n\r\n    // get view z for sample projected to the objct surface\r\n    float sampleDepth = CalcViewZ(SampleScrPos.xy);\r\n    // calc occlusion made by object surface at the sample\r\n    AO += step(samplePos.z, sampleDepth);\r\n  }\r\n  // add fog to the AO value\r\n  AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);\r\n  // calc result AO-map color\r\n  AO = 1.0 - max(0.0, AO / float(MAX_SAMPLES_COUNT) * factor);\r\n  // check if the fragment doesn't belong to background(?)\r\n  if (abs(-viewPos.z - camNearFar.y) < 0.1) { // should we remove temporal fix for background darkening\r\n    gl_FragColor = vec4(1.0);\r\n    return;\r\n  }\r\n  // write value to AO-map\r\n  gl_FragColor = vec4(AO, AO, AO, 1.0);\r\n}\r\n";
 
 var fragmentHorBilateralBlur5Shader = "#define MAX_SAMPLES_COUNT 5\r\nuniform float samplesOffsets[MAX_SAMPLES_COUNT];\r\nuniform sampler2D aoMap;\r\nuniform sampler2D depthTexture;\r\nuniform vec2      srcTexelSize;\r\n\r\nvarying vec2 vUv;\r\n\r\nvoid main() {\r\n  float x = vUv.x;\r\n  float y = vUv.y;\r\n  vec4 res = vec4(0.0);\r\n  float pixelDepth = texture2D(depthTexture, vec2(x, y)).x;\r\n  float weightSum = 0.0;\r\n  for (int i = 0; i < MAX_SAMPLES_COUNT; ++i) {\r\n    vec2 samplePos = vec2(x + samplesOffsets[i] * srcTexelSize.x, y);\r\n    float depth = texture2D(depthTexture, samplePos).x;\r\n    float weight = (1.0 / (0.0001 + abs(depth - pixelDepth)));\r\n    res += texture2D(aoMap, vec2(x + samplesOffsets[i] * srcTexelSize.x, y )) * weight;\r\n    weightSum += weight;\r\n  }\r\n  gl_FragColor = res / weightSum;\r\n}\r\n";
 
@@ -98603,7 +98389,6 @@ var SSAOUniforms = UniformsUtils.merge([{
     type: 'v2',
     value: new Vector2(1.0 / 512.0, 1.0 / 512.0)
   },
-  // FIXME calc uvs in vshader
   diffuseTexture: {
     type: 't',
     value: null
@@ -98825,6 +98610,7 @@ function () {
     value: function setup(startView, endView) {
       this._startTime = undefined;
       this._endTime = undefined;
+      this._isPaused = false;
       this._srcView = startView;
       this._dstView = endView;
       this._isMoving = false;
@@ -98861,9 +98647,7 @@ function () {
 
       if (time > this._endTime) {
         view = this._dstView;
-
-        this._reset();
-
+        this.reset();
         return {
           success: true,
           view: view
@@ -98882,10 +98666,23 @@ function () {
       };
     }
   }, {
-    key: "_reset",
-    value: function _reset() {
+    key: "reset",
+    value: function reset() {
       this._startTime = this._endTime = 0;
       this._isMoving = false;
+    }
+  }, {
+    key: "pause",
+    value: function pause() {
+      if (!this._isPaused) {
+        this.setup(this.getCurrentView().view, this._dstView);
+        this._isPaused = true;
+      }
+    }
+  }, {
+    key: "resume",
+    value: function resume() {
+      this._isPaused = false;
     }
   }, {
     key: "createView",
@@ -99909,8 +99706,7 @@ function Miew(opts) {
   /** @type {Settings} */
 
   this.settings = settings;
-  var log = logger; // TODO: add .instantiate() when migration to the "context" paradigm is finished
-
+  var log = logger;
   log.console = false;
   log.level = 'info';
   /**
@@ -99949,8 +99745,7 @@ function Miew(opts) {
   this._objects = [];
   /** @type {object} */
 
-  this._sourceWindow = null; // TODO make this being not so ugly
-
+  this._sourceWindow = null;
   this._srvTopoSource = null;
   this._srvAnimSource = null;
   this.reset();
@@ -100179,7 +99974,7 @@ Miew.prototype._initGfx = function () {
 
   gfx.renderer2d = new CSS2DRenderer();
   gfx.renderer = new WebGLRenderer(webGLOptions);
-  gfx.renderer.shadowMap.enabled = false;
+  gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
   gfx.renderer.shadowMap.type = PCFShadowMap;
   capabilities.init(gfx.renderer); // z-sprites and ambient occlusion possibility
 
@@ -100218,8 +100013,7 @@ Miew.prototype._initGfx = function () {
   gfx.selectionScene.add(gfx.selectionRoot);
   gfx.selectionPivot = new Group();
   gfx.selectionPivot.matrixAutoUpdate = false;
-  gfx.selectionRoot.add(gfx.selectionPivot); // TODO: Either stay with a single light or revert this commit
-
+  gfx.selectionRoot.add(gfx.selectionPivot);
   var light12 = new DirectionalLight(0xffffff, 0.45);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
@@ -100419,7 +100213,7 @@ Miew.prototype._removeVisual = function (visual) {
   }
 
   if (name === this._curVisualName) {
-    this._curVisualName = undefined; // TODO: implement a proper way of handling visuals
+    this._curVisualName = undefined;
   }
 
   delete this._visuals[name];
@@ -100584,6 +100378,7 @@ Miew.prototype.run = function () {
 
     this._objectControls.enable(true);
 
+    viewInterpolator.resume();
     var device = this.webVR ? this.webVR.getDevice() : null;
     (device || window).requestAnimationFrame(function () {
       return _this2._onTick();
@@ -100605,6 +100400,7 @@ Miew.prototype.halt = function () {
 
     this._objectControls.enable(false);
 
+    viewInterpolator.pause();
     this._halting = true;
   }
 };
@@ -100934,8 +100730,7 @@ Miew.prototype._renderScene = function () {
       return;
     }
 
-    gfx.renderer.setRenderTarget(gfx.offscreenBuf); // FIXME clean up targets in render selection
-
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf);
     gfx.renderer.clear();
     var bHaveComplexes = this._getComplexVisual() !== null;
 
@@ -101271,7 +101066,7 @@ Miew.prototype._performAO = function () {
 
   var _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
 
-  var _samplesKernel = [// hemisphere samples adopted to sphere (FIXME remove minus from Z)
+  var _samplesKernel = [// hemisphere samples adopted to sphere
   new Vector3(0.295184, 0.077723, 0.068429), new Vector3(-0.271976, -0.365221, 0.838363), new Vector3(0.547713, 0.467576, 0.488515), new Vector3(0.662808, -0.031733, 0.584758), new Vector3(-0.025717, 0.218955, 0.657094), new Vector3(-0.310153, -0.365223, 0.370701), new Vector3(-0.101407, -0.006313, 0.747665), new Vector3(-0.769138, 0.360399, 0.086847), new Vector3(-0.271988, -0.275140, 0.905353), new Vector3(0.096740, -0.566901, 0.700151), new Vector3(0.562872, -0.735136, 0.094647), new Vector3(0.379877, 0.359278, 0.190061), new Vector3(0.519064, -0.023055, 0.405068), new Vector3(-0.301036, 0.114696, 0.088885), new Vector3(-0.282922, 0.598305, 0.487214), new Vector3(-0.181859, 0.251670, 0.679702), new Vector3(-0.191463, -0.635818, 0.512919), new Vector3(-0.293655, 0.427423, 0.078921), new Vector3(-0.267983, 0.680534, 0.132880), new Vector3(0.139611, 0.319637, 0.477439), new Vector3(-0.352086, 0.311040, 0.653913), new Vector3(0.321032, 0.805279, 0.487345), new Vector3(0.073516, 0.820734, 0.414183), new Vector3(-0.155324, 0.589983, 0.411460), new Vector3(0.335976, 0.170782, 0.527627), new Vector3(0.463460, -0.355658, 0.167689), new Vector3(0.222654, 0.596550, 0.769406), new Vector3(0.922138, -0.042070, 0.147555), new Vector3(-0.727050, -0.329192, 0.369826), new Vector3(-0.090731, 0.533820, 0.463767), new Vector3(-0.323457, -0.876559, 0.238524), new Vector3(-0.663277, -0.372384, 0.342856)]; // var _kernelOffsets = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0];
 
   var _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
@@ -101781,6 +101576,7 @@ Miew.prototype.load = function (source, opts) {
     }
   }
 
+  viewInterpolator.reset();
   this.dispatchEvent({
     type: 'load',
     options: opts,
@@ -101937,7 +101733,7 @@ Miew.prototype._continueAnimation = function () {
   var minFrameTime = 1000 / settings.now.maxfps;
   minFrameTime = Number.isNaN(minFrameTime) ? 0 : minFrameTime;
   var self = this;
-  var pivot = self._gfx.pivot; // TODO take care of all complex visuals ?
+  var pivot = self._gfx.pivot;
 
   var visual = this._getComplexVisual();
 
@@ -101998,7 +101794,7 @@ Miew.prototype._stopAnimation = function () {
 /**
  * Invoked upon successful loading of some data source
  * @param {DataSource} dataSource - Data source for visualization (molecular complex or other)
- * @param {object} opts - TODO: Options.
+ * @param {object} opts - Options.
  * @private
  */
 
@@ -102293,7 +102089,7 @@ Miew.prototype.rebuild = function () {
   Promise.all(rebuildActions).then(function () {
     self._spinner.stop();
 
-    self._needRender = true; // TODO: Gather geometry stats?
+    self._needRender = true;
 
     self._refreshTitle();
 
@@ -102306,8 +102102,7 @@ Miew.prototype.rebuild = function () {
 Miew.prototype.rebuildAll = function () {
   this._forEachComplexVisual(function (visual) {
     visual.setNeedsRebuild();
-  }); // this.rebuild(); // TODO: isn't implicit rebuild enough?
-
+  });
 };
 
 Miew.prototype._refreshTitle = function (appendix) {
@@ -102466,7 +102261,6 @@ Miew.prototype.repCurrent = function (index, name) {
 
 
 Miew.prototype.rep = function (index, rep) {
-  // FIXME support targeting visual by name
   var visual = this._getComplexVisual('');
 
   return visual ? visual.rep(index, rep) : null;
@@ -103280,8 +103074,7 @@ Miew.prototype.setOptions = function (opts) {
   if (this._opts.view) {
     this.view(this._opts.view);
     delete this._opts.view;
-  } // FIXME we need a way to associate "unit" option with particular complex
-
+  }
 
   var visual = this._getComplexVisual();
 
@@ -103321,7 +103114,7 @@ Miew.prototype.info = function (name) {
 
 
 Miew.prototype.addObject = function (objData, bThrow) {
-  var Ctor = null; // TODO change this to factory when better times come.
+  var Ctor = null;
 
   if (objData.type === LinesObj.prototype.type) {
     Ctor = LinesObj;
@@ -103487,13 +103280,11 @@ Miew.prototype.getState = function (opts) {
     compact: true,
     settings: false,
     view: false
-  }); // FIXME state should include all complexes (not only current)
-  // load
+  }); // load
 
   var visual = this._getComplexVisual();
 
   if (visual !== null) {
-    // TODO type?
     var complex = visual.getComplex();
     var metadata = complex.metadata;
 
@@ -103615,7 +103406,7 @@ Miew.prototype._fogFarUpdateValue = function () {
 
 Miew.prototype._updateMaterials = function (values) {
   var needTraverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  var process = arguments.length > 2 ? arguments[2] : undefined;
+  var process = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
 
   this._forEachComplexVisual(function (visual) {
     return visual.setMaterialValues(values, needTraverse, process);
@@ -103650,8 +103441,12 @@ Miew.prototype._initOnSettingsChanged = function () {
     });
   };
 
+  on('modes.VD.frame', function () {
+    _this8._getVolumeVisual().showFrame(settings.now.modes.VD.frame);
+
+    _this8._needRender = true;
+  });
   on('theme', function () {
-    // TODO add warning
     _this8._onThemeChanged();
   });
   on('bg.color', function () {
@@ -103740,7 +103535,15 @@ Miew.prototype._initOnSettingsChanged = function () {
     _this8._needRender = true;
   });
   on('fogAlpha', function () {
+    var fogAlpha = settings.now.fogAlpha;
+
+    if (fogAlpha < 0 || fogAlpha > 1) {
+      _this8.logger.warn('fogAlpha must belong range [0,1]');
+    }
+
     _this8._fogAlphaChanged();
+
+    _this8._needRender = true;
   });
   on('autoResolution', function (evt) {
     if (evt.value && !_this8._gfxScore) {
@@ -103829,9 +103632,8 @@ Miew.prototype.view = function (expression) {
   }
 
   function decode() {
-    // HACK: old non-versioned view is the 0th version
+    // backwards compatible: old non-versioned view is the 0th version
     if (expression.length === 40) {
-      // TODO: remove when db migration is finished
       expression = "0".concat(expression);
     }
 
@@ -104128,8 +103930,7 @@ Miew.prototype.exportCML = function () {
         xml.setAttribute('z', v4.z.toString());
       }
     });
-  } // FIXME save data for all complexes (not only current)
-
+  }
 
   var visual = self._getComplexVisual();
 
@@ -104188,7 +103989,7 @@ Miew.prototype.motm = function () {
   });
 };
 
-Miew.prototype.VERSION = "0.7.23"; // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
+Miew.prototype.VERSION = "0.7.24"; // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 lodash.assign(Miew,
 /** @lends Miew */
@@ -106659,7 +106460,7 @@ Miew.prototype.callNextCmd = function () {
 };
 
 Miew.JSONConverter = JSONtoSelectorConverter;
-MiewCLIParser_1.yy = cliutils; // FIXME: workaround for incorrect JISON parser generator for AMD module
+MiewCLIParser_1.yy = cliutils; // workaround for incorrect JISON parser generator for AMD module
 
 MiewCLIParser_1.yy.parseError = MiewCLIParser_1.parseError;
 
