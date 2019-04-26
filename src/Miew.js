@@ -1681,7 +1681,7 @@ function _fetchData(source, opts, job) {
     if (!_.isUndefined(newOptions)) {
       newOptions = JSON.parse(newOptions);
       if (newOptions && newOptions.settings) {
-        const keys = ['singleUnit', 'draft.waterBondingHack'];
+        const keys = ['singleUnit'];
         for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
           const key = keys[keyIndex];
           const value = _.get(newOptions.settings, key);

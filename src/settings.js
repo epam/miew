@@ -714,7 +714,6 @@ const defaults = {
     clipPlane: false,
     clipPlaneFactor: 0.5,
     clipPlaneSpeed: 0.00003,
-    waterBondingHack: false,
   },
 
   /*
