@@ -3475,7 +3475,7 @@ Miew.prototype._fogFarUpdateValue = function () {
   }
 };
 
-Miew.prototype._updateMaterials = function (values, needTraverse = false, process) {
+Miew.prototype._updateMaterials = function (values, needTraverse = false, process = undefined) {
   this._forEachComplexVisual(visual => visual.setMaterialValues(values, needTraverse, process));
   for (let i = 0, n = this._objects.length; i < n; ++i) {
     const obj = this._objects[i];

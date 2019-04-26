@@ -854,7 +854,7 @@ ComplexVisual.prototype.finalizeEdit = function () {
   this._editor = null;
 };
 
-ComplexVisual.prototype.setMaterialValues = function (values, needTraverse = false, process) {
+ComplexVisual.prototype.setMaterialValues = function (values, needTraverse = false, process = undefined) {
   for (let i = 0, n = this._reprList.length; i < n; ++i) {
     const rep = this._reprList[i];
     rep.material.setValues(values);
