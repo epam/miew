@@ -68,8 +68,7 @@ class LabelsGeometry extends EventDispatcher {
 
   setItem(itemIdx, itemPos, fieldTxt) {
     const opts = this._opts;
-    const { labels } = opts;
-    const text = this.items[itemIdx] || createLabel(fieldTxt, `label label-${labels}`);
+    const text = this.items[itemIdx] || createLabel(fieldTxt, 'label');
 
     text.worldPos.copy(itemPos);
     text.style.textAlign = opts.horizontalAlign;

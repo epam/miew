@@ -5,7 +5,6 @@ import NucleicProcessor from './NucleicProcessor';
 import SubseqsProcessor from './SubseqsProcessor';
 import BondsProcessor from './BondsProcessor';
 import AromaticProcessor from './AromaticProcessor';
-import SGroupProcessor from './SGroupProcessor';
 
 export default {
   Atoms: AtomsProcessor,
@@ -15,5 +14,4 @@ export default {
   Subseqs: SubseqsProcessor,
   Bonds: BondsProcessor,
   Aromatic: AromaticProcessor,
-  SGroups: SGroupProcessor,
 };

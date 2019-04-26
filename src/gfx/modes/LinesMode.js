@@ -1,4 +1,4 @@
-import LabeledMode from './LabeledMode';
+import Mode from './Mode';
 
 function getRenderParams() {
   return {
@@ -6,7 +6,7 @@ function getRenderParams() {
   };
 }
 
-class LinesMode extends LabeledMode {
+class LinesMode extends Mode {
   static id = 'LN';
 
   constructor(opts) {
@@ -35,20 +35,6 @@ class LinesMode extends LabeledMode {
 
   showAromaticLoops() {
     return this.opts.showarom;
-  }
-
-  /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-
-  getLabelOpts() {
-    return {
-      fg: 'none',
-      bg: '0x202020',
-      showBg: true,
-      labels: this.settings.now.labels,
-      colors: true,
-      adjustColor: true,
-      transparent: true,
-    };
   }
 }
 

@@ -577,9 +577,6 @@ const defaults = {
     },
   },
 
-  /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-  labels: 'no', // can be one of: no, obj, fg, bg.
-
   /*
    * Use antialiasing in WebGL.
    * @type {boolean}
