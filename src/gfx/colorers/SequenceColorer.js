@@ -1,7 +1,7 @@
 import Colorer from './Colorer';
 
 class SequenceColorer extends Colorer {
-  static id = ['SQ', 'RI']; // 'RI' is @deprecated backward compatibility after renaming [R]esidue [I]d -> [S]e[Q]uence
+  static id = 'SQ';
 
   getAtomColor(atom, complex) {
     return this.getResidueColor(atom._residue, complex);
@@ -19,7 +19,6 @@ class SequenceColorer extends Colorer {
 }
 
 SequenceColorer.prototype.id = 'SQ';
-SequenceColorer.prototype.aliases = ['RI']; // @deprecated;
 SequenceColorer.prototype.name = 'Sequence';
 SequenceColorer.prototype.shortName = 'Sequence';
 
