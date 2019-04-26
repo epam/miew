@@ -737,7 +737,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
   _innerBuild() {
     let ok;
-    const numAtomsThreshold = 100;
     const expandFactor = 1.2;
 
     // performance test
@@ -783,19 +782,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const side2 = side * side;
     const side3 = side2 * side;
     const corners = utils.allocateTyped(Float32Array, side3);
-
-    // settings for Clusterization
-    let numVoxels = this.meshResolution;
-
-    // Fix number of voxels (for clusterization) if too much
-    let numIdealVoxels = 4;
-    const numAtomsSrc = this.atoms.length;
-    if (numAtomsSrc >= numAtomsThreshold) {
-      numIdealVoxels = Math.floor((numAtomsSrc * 2) ** (1.0 / (1 + 2)));
-    }
-    if (numVoxels > numIdealVoxels) {
-      numVoxels = numIdealVoxels;
-    }
     const rProbeRadius = this.probeRadius * this.atomRadiusScale;
 
     this.calculateGridCorners(corners, side, vBoxMin, vBoxMax, atomsColored, rProbeRadius);
