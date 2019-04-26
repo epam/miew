@@ -86,14 +86,6 @@ class MMTFParser extends Parser {
     this._options.fileType = 'mmtf';
   }
 
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'mmtf');
-  }
-
   static canProbablyParse(data) {
     // check if it's binary MessagePack format containing a map (dictionary)
     // see https://github.com/msgpack/msgpack/blob/master/spec.md

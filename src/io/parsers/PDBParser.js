@@ -68,17 +68,6 @@ class PDBParser extends Parser {
     this._options.fileType = 'pdb';
   }
 
-
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    return (typeof data === 'string')
-      && (Parser.checkDataTypeOptions(options, 'pdb') || Parser.checkDataTypeOptions(options, 'pdb', '.ent'));
-  }
-
-
   static canProbablyParse(data) {
     return _.isString(data) && pdbStartRegexp.test(data);
   }

@@ -32,20 +32,6 @@ class CMLParser extends Parser {
     this._options.fileType = 'cml';
   }
 
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    const re = new RegExp('^\\s*?\\<\\?xml');
-    const re1 = new RegExp('^\\s*?\\<cml');
-    const dataHasXML = (typeof data === 'string' || data instanceof String) && (data.match(re) || data.match(re1));
-    return (
-      dataHasXML
-      && Parser.checkDataTypeOptions(options, 'cml')
-    );
-  }
-
   static canProbablyParse(data) {
     return _.isString(data) && cmlStartRegexp.test(data);
   }

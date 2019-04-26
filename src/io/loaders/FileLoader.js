@@ -8,8 +8,12 @@ export default class FileLoader extends Loader {
     this._binary = options.binary === true;
   }
 
-  loadAsync() {
+  load() {
     return new Promise((resolve, reject) => {
+      if (this._abort) {
+        throw new Error('Loading aborted');
+      }
+
       const blob = this._source;
       const reader = this._agent = new FileReader();
 
@@ -32,12 +36,6 @@ export default class FileLoader extends Loader {
         reader.readAsText(blob);
       }
     });
-  }
-
-  /** @deprecated */
-  static canLoad(source, options) {
-    const { sourceType } = options;
-    return source instanceof File && (!sourceType || sourceType === 'file');
   }
 
   static canProbablyLoad(source) {
