@@ -993,11 +993,6 @@ utils.deriveClass(Settings, EventDispatcher, {
     return keys;
   },
 
-  /** @deprecated Use Settings#set instead */
-  override(other) {
-    this.set(other);
-  },
-
   applyDiffs(diffs) {
     if (diffs.hasOwnProperty('VERSION') && diffs.VERSION !== VERSION) {
       throw new Error('Settings version does not match!');
