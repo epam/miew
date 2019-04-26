@@ -49,12 +49,9 @@ function getNumAtomsBySelector(viewer, selector) {
 }
 
 function Menu(/** Node */ container, /** Miew */ viewer) {
-  const themeRE = /\s*theme-\w+\b/g;
-  const { theme } = settings.now;
   // Add proper DOM elements
   _.forEach($.parseHTML(menuHtml), element => container.parentNode.appendChild(element));
 
-  container.className = `${container.className.replace(themeRE, '')} theme-${theme}`;
   // Save some objects for future reference
   this._viewer = viewer;
   this._menuId = '#miew-menu';
@@ -1002,13 +999,14 @@ Menu.prototype._init = function () {
     }
   });
 
-  $(`${self._menuId} input[type=checkbox][data-dir=settings]`).bootstrapSwitch();
-  $(`${self._menuId} input[type=checkbox][data-dir=settings]`).on(
+  const dataDirSettings = $(`${self._menuId} input[type=checkbox][data-dir=settings]`);
+  dataDirSettings.bootstrapSwitch();
+  dataDirSettings.on(
     'switchChange.bootstrapSwitch',
     /** @this HTMLInputElement */ function () {
       const param = this.getAttribute('data-toggle');
-      if (param === 'theme') {
-        self._viewer.set('theme', this.checked ? 'dark' : 'light');
+      if (param === 'bg.color') {
+        self._viewer.set('bg.color', this.checked ? 0x202020 : 0xCCCCCC);
       } else {
         self._viewer.set(param, this.checked);
       }
@@ -2587,8 +2585,8 @@ Menu.prototype.show = function (panelID, menuItem) {
 
   $(`${self._menuId} input[type=checkbox][data-dir=settings]`).each((index, element) => {
     const param = element.getAttribute('data-toggle');
-    if (param === 'theme') {
-      $(`${self._menuId} [data-toggle="${param}"]`).bootstrapSwitch('state', settings.get(param) === 'dark');
+    if (param === 'bg.color') {
+      $(`${self._menuId} [data-toggle="${param}"]`).bootstrapSwitch('state', settings.get(param) === 0x202020);
     } else {
       $(`${self._menuId} [data-toggle="${param}"]`).bootstrapSwitch('state', settings.get(param));
     }

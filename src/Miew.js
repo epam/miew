@@ -286,10 +286,6 @@ Miew.prototype.init = function () {
     this._picker.addEventListener('dblclick', (event) => {
       self._onDblClick(event);
     });
-
-    if (!settings._changed['bg.color']) {
-      settings.set('bg.color', settings.now.themes[settings.now.theme]);
-    }
   } catch (error) {
     // FIXME: THREE.WebGLRenderer throws error AND catches it, so we receive different one. Some random crash.
     if (error.name === 'TypeError' && error.message === 'Cannot read property \'getExtension\' of null') {
@@ -1005,18 +1001,6 @@ Miew.prototype._renderFrame = (function () {
     if (settings.now.axes && gfx.axes && !gfx.renderer.vr.enabled) {
       gfx.axes.render(renderer);
     }
-  };
-}());
-/** @deprecated - use _onBgColorChanged */
-Miew.prototype._onThemeChanged = (function () {
-  const themeRE = /\s*theme-\w+\b/g;
-  return function () {
-    const { theme } = settings.now;
-    const div = this._containerRoot;
-    div.className = `${div.className.replace(themeRE, '')} theme-${theme}`;
-
-    settings.set('bg.color', settings.now.themes[theme]);
-    this._needRender = true;
   };
 }());
 
@@ -3454,10 +3438,6 @@ Miew.prototype._initOnSettingsChanged = function () {
     this._needRender = true;
   });
 
-  on('theme', () => {
-    this._onThemeChanged();
-  });
-
   on('bg.color', () => {
     this._onBgColorChanged();
   });
@@ -3905,7 +3885,6 @@ Miew.prototype.exportCML = function () {
  * @see http://pdb101.rcsb.org/motm/motm-about
  */
 Miew.prototype.motm = function () {
-  settings.set('theme', 'light');
   settings.set({
     fogColorEnable: true,
     fogColor: 0x000000,

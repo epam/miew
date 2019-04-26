@@ -254,21 +254,6 @@ CLIUtils.prototype.propagateProp = function (path, arg) {
       argExc = { message: `${path} must be a "${typeof _.get(settings.defaults, path)}"` };
       throw argExc;
     }
-
-    if (path === 'theme') {
-      const possibleThemes = Object.keys(settings.defaults.themes);
-      let isValid = false;
-      for (let i = 0; i < possibleThemes.length; i++) {
-        if (arg === possibleThemes[i]) {
-          isValid = true;
-          break;
-        }
-      }
-      if (!isValid) {
-        argExc = { message: `${path} must be one of [${possibleThemes}]` };
-        throw argExc;
-      }
-    }
   }
   return arg;
 };

@@ -224,10 +224,6 @@ const actions = {
   // Settings shortcuts
 
   ar: 'autoResolution',
-
-  // Deprecated
-
-  background: 'theme',
 };
 
 function _fromArray(entries) {

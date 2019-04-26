@@ -692,19 +692,6 @@ const defaults = {
 
   //----------------------------------------------------------------------------
 
-  /**
-   * Theme to use, 'dark' or 'light'.
-   * @type {string}
-   * @instance
-   * @deprecated Old-fashioned theme paradigma, to be removed in the next major version.
-   */
-  theme: 'dark',
-  /** @deprecated Old-fashioned theme paradigma, to be removed in the next major version. */
-  themes: {
-    dark: 0x202020,
-    light: 0xcccccc,
-  },
-
   bg: {
     color: 0x202020,
     transparent: false,
