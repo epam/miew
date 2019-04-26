@@ -2617,9 +2617,7 @@ Menu.prototype.showTerminal = function () {
 
 Menu.prototype._removeActiveFromCombo = function (comboName) {
   const selector = $(`${this._menuId} [data-toggle=${comboName}].active`);
-  if (selector) {
-    selector.removeClass('active');
-  }
+  selector.removeClass('active');
 };
 
 Menu.prototype.hide = function () {
@@ -2650,9 +2648,7 @@ Menu.prototype.hideTerminal = function () {
 
 Menu.prototype._hideToolbarPanel = function () {
   const toolbar = $(`${this._menuId} [data-toggle="toolbar"].active`);
-  if (toolbar) {
-    toolbar.click();
-  }
+  toolbar.trigger('click');
 };
 
 Menu.prototype._onMenuOn = function () {
