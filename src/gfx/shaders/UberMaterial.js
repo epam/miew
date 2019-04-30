@@ -194,8 +194,14 @@ UberMaterial.prototype.uberOptions = {
 };
 
 UberMaterial.prototype.copy = function (source) {
-  // TODO Why not RawShaderMaterial?
-  THREE.ShaderMaterial.prototype.copy.call(this, source);
+  THREE.RawShaderMaterial.prototype.copy.call(this, source);
+
+  this.fragmentShader = source.fragmentShader;
+  this.vertexShader = source.vertexShader;
+
+  this.uniforms = THREE.UniformsUtils.clone(source.uniforms);
+  this.defines = Object.assign({}, source.defines);
+  this.extensions = source.extensions;
 
   this.fog = source.fog;
   this.instancedPos = source.instancedPos;
