@@ -20,11 +20,14 @@ const _samplesKernel = [
 
 const defaultUniforms = THREE.UniformsUtils.merge([
 
-  THREE.UniformsLib.common, // is it needed?
   THREE.UniformsLib.fog,
   THREE.UniformsLib.lights,
 
   {
+    // are updated automatically by three.js (see THREE.ShaderLib.common)
+    diffuse: { value: new THREE.Color(0xeeeeee) },
+    opacity: { value: 1.0 },
+
     specular: { type: 'c', value: new THREE.Color(0x111111) },
     shininess: { type: 'f', value: 30 },
     fixedColor: { type: 'c', value: new THREE.Color(0xffffff) },
