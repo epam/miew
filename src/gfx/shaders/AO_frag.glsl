@@ -82,11 +82,6 @@ void main() {
   AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);
   // calc result AO-map color
   AO = 1.0 - max(0.0, AO / float(MAX_SAMPLES_COUNT) * factor);
-  // check if the fragment doesn't belong to background(?)
-  if (abs(-viewPos.z - camNearFar.y) < 0.1) { // should we remove temporal fix for background darkening
-    gl_FragColor = vec4(1.0);
-    return;
-  }
   // write value to AO-map
   gl_FragColor = vec4(AO, AO, AO, 1.0);
 }
