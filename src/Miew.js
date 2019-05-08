@@ -991,8 +991,9 @@ Miew.prototype._renderFrame = (function () {
       case 'ANAGLYPH':
         this._renderScene(this._gfx.stereoCam.cameraL, false, gfx.stereoBufL);
         this._renderScene(this._gfx.stereoCam.cameraR, false, gfx.stereoBufR);
-        _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL;
-        _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR;
+        renderer.setRenderTarget(null);
+        _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL.texture;
+        _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR.texture;
         gfx.renderer.renderScreenQuad(_anaglyphMat);
         break;
       default:
