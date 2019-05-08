@@ -581,27 +581,27 @@ const defaults = {
   labels: 'no', // can be one of: no, obj, fg, bg.
 
   /*
-     * Use antialiasing in WebGL.
-     * @type {boolean}
-     */
+   * Use antialiasing in WebGL.
+   * @type {boolean}
+   */
   antialias: true,
 
   /*
-     * Camera field of view in degrees.
-     * @type {number}
-     */
+   * Camera field of view in degrees.
+   * @type {number}
+   */
   camFov: 45.0,
 
   /*
-     * Camera near plane distance.
-     * @type {number}
-     */
+   * Camera near plane distance.
+   * @type {number}
+   */
   camNear: 0.5,
 
   /*
-     * Camera far plane distance.
-     * @type {number}
-     */
+   * Camera far plane distance.
+   * @type {number}
+   */
   camFar: 100.0,
 
   camDistance: 2.5,
@@ -623,16 +623,16 @@ const defaults = {
   fogColor: 0x000000,
   fogColorEnable: false,
 
-  /*
-     * Palette used for molecule coloring.
-     * @type {string}
-     */
+  /**
+   * Palette used for molecule coloring.
+   * @type {string}
+   */
   palette: 'JM',
 
   /*
-     * Geometry resolution.
-     * @type {string}
-     */
+   * Geometry resolution.
+   * @type {string}
+   */
   resolution: 'medium',
 
   autoResolution: false/* true */,
@@ -743,6 +743,11 @@ const defaults = {
    */
   fps: true,
 
+  /**
+   * Switch using of z-sprites for sphere and cylinder geometry
+   * @type {boolean}
+   * @instance
+   */
   zSprites: true,
 
   isoSurfaceFakeOpacity: true,
@@ -805,10 +810,18 @@ const defaults = {
    */
   autoRotation: 0.0,
 
-  // maximum fps for animation
+  /**
+   * Set maximum fps for animation.
+   * @type {number}
+   * @instance
+   */
   maxfps: 30,
 
-  // fbx output precision
+  /**
+   * Set fbx output precision.
+   * @type {number}
+   * @instance
+   */
   fbxprec: 4,
 
   /**
@@ -863,10 +876,15 @@ const defaults = {
    */
   aromatic: false,
 
-  // load only one biological unit from all those described in PDB file
+  /**
+   * Load only one biological unit from all those described in PDB file.
+   * @type {boolean}
+   * @instance
+   */
   singleUnit: true,
 
   /**
+   * Set stereo mode ('NONE', 'SIMPLE', 'DISTORTED', 'ANAGLYPH', 'WEBVR').
    * @type {string}
    * @instance
    */
@@ -879,7 +897,11 @@ const defaults = {
    */
   interpolateViews: true,
 
-  // switch transparency mode ('standard', 'prepass')
+  /**
+   * Set transparency mode ('standard', 'prepass').
+   * @type {string}
+   * @instance
+   */
   transparency: 'prepass',
 
   /**
