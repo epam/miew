@@ -1166,7 +1166,7 @@ Miew.prototype._renderScene = (function () {
     srcBuffer = dstBuffer;
 
     if (fxaa) {
-      dstBuffer = distortion ? gfx.offscreenBuf2 : target;
+      dstBuffer = distortion ? gfx.offscreenBuf3 : target;
       this._performFXAA(srcBuffer, dstBuffer);
       srcBuffer = dstBuffer;
     }
@@ -3613,6 +3613,7 @@ Miew.prototype._initOnSettingsChanged = function () {
     if (this.webVR) {
       this.webVR.toggle(settings.now.stereo === 'WEBVR', this._gfx);
     }
+    this._needRender = true;
   });
 
   on(['transparency', 'resolution', 'palette'], () => {
