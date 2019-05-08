@@ -1,3 +1,5 @@
+precision highp float;
+
 // edge end finding algorithm parameters
 #define FXAA_QUALITY_PS 8
 #define FXAA_QUALITY_P0 1.0

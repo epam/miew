@@ -59,7 +59,7 @@ function AOMaterial(params) {
     depthTest: false,
     depthWrite: false,
   };
-  return new THREE.ShaderMaterial(settings);
+  return new THREE.RawShaderMaterial(settings);
 }
 
 function HorBilateralBlurMaterial5(params) {
@@ -71,7 +71,7 @@ function HorBilateralBlurMaterial5(params) {
     depthTest: false,
     depthWrite: false,
   };
-  return new THREE.ShaderMaterial(settings);
+  return new THREE.RawShaderMaterial(settings);
 }
 
 function VertBilateralBlurMaterial5(params) {
@@ -83,7 +83,7 @@ function VertBilateralBlurMaterial5(params) {
     depthTest: false,
     depthWrite: false,
   };
-  return new THREE.ShaderMaterial(settings);
+  return new THREE.RawShaderMaterial(settings);
 }
 
 export default {

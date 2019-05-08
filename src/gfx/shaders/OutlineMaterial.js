@@ -26,7 +26,7 @@ function overrideUniforms(params) {
 }
 
 function OutlineMaterial(params) {
-  THREE.ShaderMaterial.call(this);
+  THREE.RawShaderMaterial.call(this);
 
   // add depth outline
   this.depth = false;
@@ -40,15 +40,15 @@ function OutlineMaterial(params) {
     depthWrite: false,
   };
 
-  THREE.ShaderMaterial.prototype.setValues.call(this, settings);
+  THREE.RawShaderMaterial.prototype.setValues.call(this, settings);
   this.setValues(params);
 }
 
-OutlineMaterial.prototype = Object.create(THREE.ShaderMaterial.prototype);
+OutlineMaterial.prototype = Object.create(THREE.RawShaderMaterial.prototype);
 OutlineMaterial.prototype.constructor = OutlineMaterial;
 
 OutlineMaterial.prototype.copy = function (source) {
-  THREE.ShaderMaterial.prototype.copy.call(this, source);
+  THREE.RawShaderMaterial.prototype.copy.call(this, source);
   this.depth = source.depth;
   return this;
 };
@@ -59,7 +59,7 @@ OutlineMaterial.prototype.setValues = function (values) {
   }
 
   // set direct values
-  THREE.ShaderMaterial.prototype.setValues.call(this, values);
+  THREE.RawShaderMaterial.prototype.setValues.call(this, values);
   const defines = {};
 
   if (this.depth) {

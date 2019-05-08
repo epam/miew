@@ -13,11 +13,11 @@ const defaultUniforms = THREE.UniformsUtils.merge([
 ]);
 
 function FXAAMaterial(params) {
-  THREE.ShaderMaterial.call(this);
+  THREE.RawShaderMaterial.call(this);
   this.bgTransparent = false;
 
   // set default values
-  THREE.ShaderMaterial.prototype.setValues.call(this, {
+  THREE.RawShaderMaterial.prototype.setValues.call(this, {
     uniforms: THREE.UniformsUtils.clone(defaultUniforms),
     vertexShader,
     fragmentShader,
@@ -29,7 +29,7 @@ function FXAAMaterial(params) {
   this.setValues(params);
 }
 
-FXAAMaterial.prototype = Object.create(THREE.ShaderMaterial.prototype);
+FXAAMaterial.prototype = Object.create(THREE.RawShaderMaterial.prototype);
 FXAAMaterial.prototype.constructor = FXAAMaterial;
 
 FXAAMaterial.prototype.setValues = function (values) {
@@ -38,7 +38,7 @@ FXAAMaterial.prototype.setValues = function (values) {
   }
 
   // set direct values
-  THREE.ShaderMaterial.prototype.setValues.call(this, values);
+  THREE.RawShaderMaterial.prototype.setValues.call(this, values);
 
   const defines = {};
 

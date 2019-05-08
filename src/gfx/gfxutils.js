@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import _ from 'lodash';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
+import vertexScreenQuadShader from './shaders/ScreenQuad_vert.glsl';
 import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {
@@ -69,15 +70,15 @@ THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
 }());
 
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
-  const _material = new THREE.ShaderMaterial({
+  const _material = new THREE.RawShaderMaterial({
     uniforms: {
       srcTex: { type: 't', value: null },
       opacity: { type: 'f', value: 1.0 },
     },
-    vertexShader: 'varying vec2 vUv; '
-      + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform float opacity;'
-     + 'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, color.a * opacity); }',
+    vertexShader: vertexScreenQuadShader,
+    fragmentShader: 'precision highp float;'
+      + 'varying vec2 vUv; uniform sampler2D srcTex; uniform float opacity;'
+      + 'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, color.a * opacity); }',
     transparent: true,
     depthTest: false,
     depthWrite: false,
@@ -94,26 +95,28 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
 
 // render texture with depth packed in RGBA (packing is from threejs)
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
-  const _material = new THREE.ShaderMaterial({
+  const _material = new THREE.RawShaderMaterial({
     uniforms: {
       srcTex: { type: 't', value: null },
       opacity: { type: 'f', value: 1.0 },
     },
-    vertexShader: 'varying vec2 vUv; '
-    + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
+    vertexShader: vertexScreenQuadShader,
     fragmentShader: ''
-    + 'const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1);\n'
-    + 'const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. )\n;'
-    + 'const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. )\n;'
-    + 'float unpackRGBAToDepth( const in vec4 v ) {\n'
-    + '  return dot( v, UnpackFactors );\n'
-    + '}\n'
-    + 'varying vec2 vUv; uniform sampler2D srcTex; uniform float opacity;\n'
-    + 'void main() { \n'
-    + '  vec4 color = texture2D(srcTex, vUv); \n'
-    + '  float depth = unpackRGBAToDepth(color);\n'
-    + '  gl_FragColor = vec4(depth, depth, depth, opacity);\n '
-    + '}\n',
+      + 'precision highp float;\n'
+      + 'const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1);\n'
+      + 'const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. )\n;'
+      + 'const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. )\n;'
+      + 'float unpackRGBAToDepth( const in vec4 v ) {\n'
+      + '  return dot( v, UnpackFactors );\n'
+      + '}\n'
+      + 'varying vec2 vUv;'
+      + 'uniform sampler2D srcTex;'
+      + 'uniform float opacity;\n'
+      + 'void main() { \n'
+      + '  vec4 color = texture2D(srcTex, vUv); \n'
+      + '  float depth = unpackRGBAToDepth(color);\n'
+      + '  gl_FragColor = vec4(depth, depth, depth, opacity);\n '
+      + '}\n',
     transparent: true,
     depthTest: false,
     depthWrite: false,
@@ -128,14 +131,14 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
 }());
 
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function () {
-  const _material = new THREE.ShaderMaterial({
+  const _material = new THREE.RawShaderMaterial({
     uniforms: {
       srcTex: { type: 't', value: null },
       coef: { type: 'f', value: 1.0 },
     },
-    vertexShader: 'varying vec2 vUv; '
-      + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform float coef;'
+    vertexShader: vertexScreenQuadShader,
+    fragmentShader: 'precision highp float;\n'
+      + 'varying vec2 vUv; uniform sampler2D srcTex; uniform float coef;'
       + 'void main() {'
       + 'vec2 uv = vUv * 2.0 - 1.0;'
       + 'float r2 = dot(uv, uv);'

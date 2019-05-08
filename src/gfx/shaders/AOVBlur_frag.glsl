@@ -1,3 +1,5 @@
+precision highp float;
+
 #define MAX_SAMPLES_COUNT 5
 uniform float samplesOffsets[MAX_SAMPLES_COUNT];
 uniform sampler2D diffuseTexture;

@@ -40,6 +40,7 @@ import logger from './utils/logger';
 import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
 import WebVRPoC from './gfx/vr/WebVRPoC';
+import vertexScreenQuadShader from './gfx/shaders/ScreenQuad_vert.glsl';
 
 const {
   selectors,
@@ -1183,21 +1184,21 @@ Miew.prototype._performDistortion = (function () {
   const _scene = new THREE.Scene();
   const _camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000);
 
-  const _material = new THREE.ShaderMaterial({
+  const _material = new THREE.RawShaderMaterial({
     uniforms: {
       srcTex: { type: 't', value: null },
       aberration: { type: 'fv3', value: new THREE.Vector3(1.0) },
     },
-    vertexShader: 'varying vec2 vUv; '
-      + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform vec3 aberration;'
-      + 'void main() {'
-      + 'vec2 uv = vUv * 2.0 - 1.0;'
-      + 'gl_FragColor.r = texture2D(srcTex, 0.5 * (uv * aberration[0] + 1.0)).r;'
-      + 'gl_FragColor.g = texture2D(srcTex, 0.5 * (uv * aberration[1] + 1.0)).g;'
-      + 'gl_FragColor.b = texture2D(srcTex, 0.5 * (uv * aberration[2] + 1.0)).b;'
-      + 'gl_FragColor.a = 1.0;'
-      + '}',
+    vertexShader: vertexScreenQuadShader,
+    fragmentShader: 'precision highp float;\n'
+      + 'varying vec2 vUv; uniform sampler2D srcTex; uniform vec3 aberration; \n'
+      + 'void main() { \n'
+      + 'vec2 uv = vUv * 2.0 - 1.0; \n'
+      + 'gl_FragColor.r = texture2D(srcTex, 0.5 * (uv * aberration[0] + 1.0)).r; \n'
+      + 'gl_FragColor.g = texture2D(srcTex, 0.5 * (uv * aberration[1] + 1.0)).g; \n'
+      + 'gl_FragColor.b = texture2D(srcTex, 0.5 * (uv * aberration[2] + 1.0)).b; \n'
+      + 'gl_FragColor.a = 1.0; \n'
+      + '} \n',
     transparent: false,
     depthTest: false,
     depthWrite: false,

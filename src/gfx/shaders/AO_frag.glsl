@@ -1,3 +1,5 @@
+precision highp float;
+
 #define MAX_SAMPLES_COUNT 32
 
 uniform vec3 samplesKernel[MAX_SAMPLES_COUNT];

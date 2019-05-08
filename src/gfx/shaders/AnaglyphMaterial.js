@@ -30,7 +30,7 @@ function AnaglyphMaterial(params) {
     depthTest: false,
     depthWrite: false,
   };
-  return new THREE.ShaderMaterial(settings);
+  return new THREE.RawShaderMaterial(settings);
 }
 
 export default AnaglyphMaterial;
