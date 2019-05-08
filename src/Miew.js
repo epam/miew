@@ -219,7 +219,7 @@ Miew.prototype._updateShadowCamera = (function () {
     for (let i = 0; i < this._gfx.scene.children.length; i++) {
       if (this._gfx.scene.children[i].type === 'DirectionalLight') {
         const light = this._gfx.scene.children[i];
-        shadowMatrix.copy(light.shadow.matrix);
+        shadowMatrix.copy(light.shadow.camera.matrixWorldInverse);
         const bBox = this._getOBB(shadowMatrix);
 
         direction.subVectors(light.target.position, light.position);
@@ -927,40 +927,43 @@ Miew.prototype._getBSphereRadius = function () {
 // calculate bounding box that would include all visuals and being axis aligned in world defined by
 // transformation matrix: matrix
 Miew.prototype._getOBB = (function () {
-  const OBB = new THREE.Box3();
-  const obb = new THREE.Box3();
+  const _bSphere = new THREE.Sphere();
+  const _bbox = new THREE.Box3();
+  const Bbox = new THREE.Box3();
 
   const invMatrix = new THREE.Matrix4();
+
   const points = [
     new THREE.Vector3(),
     new THREE.Vector3(),
     new THREE.Vector3(),
     new THREE.Vector3(),
   ];
-
-  const center = new THREE.Vector3();
   const halfSize = new THREE.Vector3();
+  const center = new THREE.Vector3();
 
   return function (matrix) {
-    OBB.makeEmpty();
+    Bbox.makeEmpty();
+
     this._forEachVisual((visual) => {
-      obb.copy(visual.getBoundaries().boundingBox);
-      obb.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
-      OBB.union(obb);
+      _bSphere.copy(visual.getBoundaries().boundingSphere);
+      _bSphere.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
+      _bSphere.getBoundingBox(_bbox);
+      Bbox.union(_bbox);
     });
-    OBB.getCenter(center);
+    Bbox.getCenter(center);
 
     invMatrix.getInverse(matrix);
     center.applyMatrix4(invMatrix);
-    points[0].set(OBB.min.x, OBB.min.y, OBB.min.z).applyMatrix4(invMatrix); // 000
-    points[1].set(OBB.max.x, OBB.min.y, OBB.min.z).applyMatrix4(invMatrix); // 100
-    points[2].set(OBB.min.x, OBB.max.y, OBB.min.z).applyMatrix4(invMatrix); // 010
-    points[3].set(OBB.min.x, OBB.min.y, OBB.max.z).applyMatrix4(invMatrix); // 001
 
-    halfSize.setX(Math.abs(points[0].x - points[1].x));
-    halfSize.setY(Math.abs(points[0].y - points[2].y));
-    halfSize.setZ(Math.abs(points[0].z - points[3].z));
-    halfSize.multiplyScalar(0.5);
+    points[0].set(Bbox.min.x, Bbox.min.y, Bbox.min.z).applyMatrix4(invMatrix); // 000
+    points[1].set(Bbox.max.x, Bbox.min.y, Bbox.min.z).applyMatrix4(invMatrix); // 100
+    points[2].set(Bbox.min.x, Bbox.max.y, Bbox.min.z).applyMatrix4(invMatrix); // 010
+    points[3].set(Bbox.min.x, Bbox.min.y, Bbox.max.z).applyMatrix4(invMatrix); // 001
+
+    halfSize.setX(Math.abs(points[0].x - points[1].x) / 2.0);
+    halfSize.setY(Math.abs(points[0].y - points[2].y) / 2.0);
+    halfSize.setZ(Math.abs(points[0].z - points[3].z) / 2.0);
 
     return { center, halfSize };
   };
