@@ -1,7 +1,5 @@
 /* eslint-env node */
 
-import yargs from 'yargs';
-
 export default {
   docs: {
     dst: 'docs/auto/',
@@ -51,5 +49,4 @@ export default {
     ],
     show: 'test/e2e/mismatch/*.html',
   },
-  roServer: Boolean(process.env.MIEW_READONLY_SERVER || yargs.argv.roServer),
 };

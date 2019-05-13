@@ -191,8 +191,6 @@ Command
     | TRANSLATE AxesList                  { for (var i = 0, n = $2.length; i < n; i++) {yy.miew.translate($2[i]['x'] || 0, $2[i]['y'] || 0, $2[i]['z'] || 0)} }
     | GetURLBranch
     | Screenshot
-    | SrvCMD
-    | SrvScenarioCMD
     | LINE STRING STRING                  -> yy.miew.addObject({type: 'line', params: [$2, $3]}, true)
     | LINE Path Path                      -> yy.miew.addObject({type: 'line', params: [$2, $3]}, true)
     | LINE STRING STRING ArgList          -> yy.miew.addObject({type: 'line', params: [$2, $3], opts:$4.toJSO(yy.utils, 'objects', 'line')}, true)
@@ -213,66 +211,6 @@ Screenshot
     : SCREENSHOT                          -> yy.miew.screenshotSave()
     | SCREENSHOT NUMBER                   -> yy.miew.screenshotSave('', Number($2))
     | SCREENSHOT NUMBER NUMBER            -> yy.miew.screenshotSave('', Number($2), Number($3))
-    ;
-
-SrvCMD
-    : FILE_LIST                            -> yy.srv.fileList(yy.miew, yy.echo, yy.error)
-    | FILE_LIST FILE_KEY STRING            -> yy.srv.fileList(yy.miew, yy.echo, yy.error, "", $3)
-    | FILE_LIST NUMBER                     -> yy.srv.fileList(yy.miew, yy.echo, yy.error, $2)
-    | FILE_LIST NUMBER FILE_KEY STRING     -> yy.srv.fileList(yy.miew, yy.echo, yy.error, $2, $4)
-    | FILE_LIST PresetPath                 -> yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $2, yy.srv.fileList, yy.srv, yy.miew, yy.echo, yy.error)
-    | FILE_LIST PresetPath FILE_KEY STRING -> yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $2, yy.srv.fileList, yy.srv, yy.miew, yy.echo, yy.error, $4)
-    | FILE_LIST STRING                     -> yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $2, yy.srv.fileList, yy.srv, yy.miew, yy.echo, yy.error)
-    | FILE_LIST STRING FILE_KEY STRING     -> yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $2, yy.srv.fileList, yy.srv, yy.miew, yy.echo, yy.error, $4)
-
-    | FILE_REGISTER                        -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvTopologyRegister")
-
-    | FILE_DELETE NUMBER                   -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvTopologyDelete", $2, false)
-    | FILE_DELETE STRING                   -> yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $2, yy.miew.srvTopologyDelete, false)
-    | FILE_DELETE PresetPath               -> yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $2, yy.miew.srvTopologyDelete, false)
-
-    | FILE_DELETE NUMBER FILE_KEY          -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvTopologyDelete", $2, true)
-    | FILE_DELETE STRING FILE_KEY          -> yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $2, yy.miew.srvTopologyDelete, true)
-    | FILE_DELETE PresetPath FILE_KEY      -> yy.srv.coroutineWithFileName(yy.miew, yy.echo, yy.error, $2, yy.miew.srvTopologyDelete, true)
-
-    | PRESET_ADD STRING                    -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetCreate", $2)
-    | PRESET_ADD Word                      -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetCreate", $2)
-
-    | PRESET_DELETE NUMBER                 -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetDelete", $2)
-    | PRESET_DELETE STRING                 -> yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $2, yy.miew.srvPresetDelete)
-    | PRESET_DELETE PresetPath             -> yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $2, yy.miew.srvPresetDelete)
-
-    | PRESET_UPDATE NUMBER                 -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetUpdate", $2)
-    | PRESET_UPDATE STRING                 -> yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $2, yy.miew.srvPresetUpdate)
-    | PRESET_UPDATE PresetPath             -> yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $2, yy.miew.srvPresetUpdate)
-
-    | PRESET_RENAME NUMBER STRING          -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetRename", $2, $3)
-    | PRESET_RENAME STRING STRING          -> yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $2, yy.miew.srvPresetRename, $3)
-    | PRESET_RENAME PresetPath STRING      -> yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $2, yy.miew.srvPresetRename, $3)
-
-    | PRESET_OPEN NUMBER                   -> yy.srv.callSrvFunc(yy.miew, yy.echo, yy.error, "srvPresetApply", $2); yy.representations.clear()
-    | PRESET_OPEN STRING                   -> yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $2, yy.miew.srvPresetApply); yy.representations.clear()
-    | PRESET_OPEN PresetPath               -> yy.srv.coroutineWithPresetPath(yy.miew, yy.echo, yy.error, $2, yy.miew.srvPresetApply); yy.representations.clear()
-    ;
-
-SrvScenarioCMD
-    : CREATE_SCENARIO STRING               -> yy.srv.createScenario($2)
-    | CREATE_SCENARIO Word                 -> yy.srv.createScenario($2)
-    | RESET_SCENARIO                       -> yy.srv.resetScenario()
-    | DELETE_SCENARIO STRING               -> yy.srv.deleteScenario(yy.miew, yy.echo, yy.error, $2)
-    | DELETE_SCENARIO Word                 -> yy.srv.deleteScenario(yy.miew, yy.echo, yy.error, $2)
-    | DELETE_SCENARIO NUMBER               -> yy.srv.deleteScenario(yy.miew, yy.echo, yy.error, Number($2))
-    | LIST_SCENARIO                        -> yy.srv.listScenario(yy.miew, yy.echo, yy.error)
-    | LIST_SCENARIO EXPAND_KEY             -> yy.srv.listScenario(yy.miew, yy.echo, yy.error, $2)
-    | LIST_SCENARIO EXPAND_KEY NUMBER      -> yy.srv.listScenario(yy.miew, yy.echo, yy.error, $3)
-    | LIST_SCENARIO EXPAND_KEY Word        -> yy.srv.listScenario(yy.miew, yy.echo, yy.error, $3)
-    | LIST_SCENARIO EXPAND_KEY STRING      -> yy.srv.listScenario(yy.miew, yy.echo, yy.error, $3)
-
-    | ADD_SCENARIO_ITEM DELAY_KEY '=' NUMBER DESCRIPTION_KEY '=' STRING                                          ->yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, Number($4), $7)
-    | ADD_SCENARIO_ITEM PDB_KEY '=' NUMBER PRST_KEY '=' NUMBER DELAY_KEY '=' NUMBER DESCRIPTION_KEY '=' STRING           ->yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, Number($4), Number($7), Number($10), $13)
-    | ADD_SCENARIO_ITEM PDB_KEY '=' IDENTIFIER PRST_KEY '=' NUMBER DELAY_KEY '=' NUMBER DESCRIPTION_KEY '=' STRING       ->yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, $4, Number($7), Number($10), $13)
-    | ADD_SCENARIO_ITEM PDB_KEY '=' NUMBER PRST_KEY '=' PresetPath DELAY_KEY '=' NUMBER DESCRIPTION_KEY '=' STRING       ->yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, Number($4), $7, Number($10), $13)
-    | ADD_SCENARIO_ITEM PDB_KEY '=' IDENTIFIER PRST_KEY '=' PresetPath DELAY_KEY '=' NUMBER DESCRIPTION_KEY '=' STRING   ->yy.srv.addScenarioItem(yy.miew, yy.echo, yy.error, $4, $7, Number($10), $13)
     ;
 
 OneArgCommand

@@ -3,7 +3,6 @@
 import yargs from 'yargs';
 import { spawnSync } from 'child_process';
 import packageJson from '../package.json';
-import config from './config';
 
 const version = {
   base: packageJson.version,
@@ -11,10 +10,6 @@ const version = {
     .replace(/[-:]|\..+/gi, '')
     .replace(/T/, '.'),
 };
-
-if (config.roServer) {
-  version.base += `${version.base.indexOf('-') === -1 ? '-' : '.'}ro`;
-}
 
 if (process.env.NODE_ENV === 'production' || yargs.argv.release) {
   version.combined = version.base;

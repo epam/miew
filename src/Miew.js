@@ -171,9 +171,6 @@ function Miew(opts) {
   /** @type {object} */
   this._sourceWindow = null;
 
-  this._srvTopoSource = null;
-  this._srvAnimSource = null;
-
   this.reset();
 
   if (this._repr) {
@@ -1711,46 +1708,6 @@ function _fetchData(source, opts, job) {
   }));
 }
 
-function _convertData(data, opts, job) {
-  return new Promise(((resolve, reject) => {
-    if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
-    }
-    job.notify({ type: 'convert' });
-
-    if (opts.mdFile) {
-      const byteNumbers = new Array(data.length);
-      for (let i = 0; i < data.length; i++) {
-        byteNumbers[i] = data.charCodeAt(i);
-      }
-      const bytes = new Uint8Array(byteNumbers);
-      const blob = new File([bytes], opts.fileName);
-      console.time('convert');
-      Miew.prototype.srvTopologyConvert(blob, opts.mdFile, (success, newData, message) => {
-        console.timeEnd('convert');
-        if (success) {
-          opts.converted = true;
-          opts.amberFileName = opts.fileName;
-          opts.convertedFile = new File([bytes], opts.fileName);
-          opts.fileName = null;
-          opts.fileType = 'pdb';
-          job.notify({ type: 'convertingFinished' });
-          resolve(newData);
-        } else {
-          opts.converted = false;
-          logger.error(message);
-          opts.error = message;
-          job.notify({ type: 'convertingFinished', error: message });
-          reject(new Error(message));
-        }
-      });
-    } else {
-      opts.converted = true;
-      resolve(data);
-    }
-  }));
-}
-
 function _parseData(data, opts, job) {
   if (job.shouldCancel()) {
     return Promise.reject(new Error('Operation cancelled'));
@@ -1840,7 +1797,6 @@ Miew.prototype.load = function (source, opts) {
   };
 
   return _fetchData(source, opts, job)
-    .then(data => _convertData(data, opts, job))
     .then(data => _parseData(data, opts, job))
     .then((object) => {
       const name = this._onLoad(object, opts);
@@ -1873,40 +1829,6 @@ Miew.prototype._startAnimation = function (fileData) {
   try {
     this._frameInfo = new FrameInfo(
       visual.getComplex(), fileData,
-      {
-        onLoadStatusChanged() {
-          self.dispatchEvent({
-            type: 'mdPlayerStateChanged',
-            state: {
-              isPlaying: self._isAnimating,
-              isLoading: self._frameInfo ? self._frameInfo.isLoading : true,
-            },
-          });
-        },
-        onError(message) {
-          self._stopAnimation();
-          self.logger.error(message);
-        },
-      },
-    );
-  } catch (e) {
-    this.logger.error('Animation file does not fit to current complex!');
-    return;
-  }
-  this._continueAnimation();
-};
-
-Miew.prototype._startMdAnimation = function (mdFile, pdbFile) {
-  this._stopAnimation();
-  const self = this;
-  const visual = this._getComplexVisual();
-  if (visual === null) {
-    this.logger.error('Unable to start animation - no molecule is loaded.');
-    return;
-  }
-  try {
-    this._frameInfo = new FrameInfo(
-      visual.getComplex(), this.srvStreamMdFn(mdFile, pdbFile),
       {
         onLoadStatusChanged() {
           self.dispatchEvent({
@@ -1993,7 +1915,6 @@ Miew.prototype._stopAnimation = function () {
   this._frameInfo.disableEvents();
   this._frameInfo = null;
   this._animInterval = null;
-  this._srvAnimSource = null;
   this.dispatchEvent({
     type: 'mdPlayerStateChanged',
     state: null,
@@ -2049,7 +1970,7 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     }
 
     if (opts.preset) {
-      this.srvPresetApply(opts.preset);
+      // ...removed server access...
     } else if (settings.now.autoPreset) {
       switch (opts.fileType) {
         case 'cml':
@@ -2104,10 +2025,6 @@ Miew.prototype._onLoad = function (dataSource, opts) {
   }
 
   this._refreshTitle();
-
-  if (opts.convertedFile && opts.mdFile) {
-    this._startMdAnimation(opts.mdFile, opts.convertedFile);
-  }
 
   return visualName;
 };

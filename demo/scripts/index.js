@@ -8,7 +8,7 @@ import '@babel/polyfill';
 
 import $ from 'jquery';
 import toastr from 'toastr';
-import Miew from './Miew.full';
+import Miew from 'Miew'; // eslint-disable-line import/no-unresolved
 import Menu from './ui/Menu';
 
 window.DEBUG = true;
