@@ -929,7 +929,7 @@ Miew.prototype._getBSphereRadius = function () {
 Miew.prototype._getOBB = (function () {
   const _bSphere = new THREE.Sphere();
   const _bbox = new THREE.Box3();
-  const Bbox = new THREE.Box3();
+  const OBB = new THREE.Box3();
 
   const invMatrix = new THREE.Matrix4();
 
@@ -943,23 +943,28 @@ Miew.prototype._getOBB = (function () {
   const center = new THREE.Vector3();
 
   return function (matrix) {
-    Bbox.makeEmpty();
+    OBB.makeEmpty();
 
     this._forEachVisual((visual) => {
       _bSphere.copy(visual.getBoundaries().boundingSphere);
       _bSphere.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
       _bSphere.getBoundingBox(_bbox);
-      Bbox.union(_bbox);
+      OBB.union(_bbox);
     });
-    Bbox.getCenter(center);
+    OBB.getCenter(center);
 
     invMatrix.getInverse(matrix);
     center.applyMatrix4(invMatrix);
 
-    points[0].set(Bbox.min.x, Bbox.min.y, Bbox.min.z).applyMatrix4(invMatrix); // 000
-    points[1].set(Bbox.max.x, Bbox.min.y, Bbox.min.z).applyMatrix4(invMatrix); // 100
-    points[2].set(Bbox.min.x, Bbox.max.y, Bbox.min.z).applyMatrix4(invMatrix); // 010
-    points[3].set(Bbox.min.x, Bbox.min.y, Bbox.max.z).applyMatrix4(invMatrix); // 001
+    const { min } = OBB;
+    const { max } = OBB;
+    points[0].set(min.x, min.y, min.z); // 000
+    points[1].set(max.x, min.y, min.z); // 100
+    points[2].set(min.x, max.y, min.z); // 010
+    points[3].set(min.x, min.y, max.z); // 001
+    for (let i = 0, l = points.length; i < l; i++) {
+      points[i].applyMatrix4(invMatrix);
+    }
 
     halfSize.setX(Math.abs(points[0].x - points[1].x) / 2.0);
     halfSize.setY(Math.abs(points[0].y - points[2].y) / 2.0);
