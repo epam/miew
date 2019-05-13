@@ -210,9 +210,14 @@ function _setContainerContents(container, element) {
   parent.appendChild(element);
 }
 
+/**
+ * Update Shadow Camera target position and frustum.
+ * @private
+ */
 Miew.prototype._updateShadowCamera = (function () {
   const shadowMatrix = new THREE.Matrix4();
   const direction = new THREE.Vector3();
+  const OBB = { center: new THREE.Vector3(), halfSize: new THREE.Vector3() };
 
   return function () {
     this._gfx.scene.updateMatrixWorld();
@@ -220,19 +225,19 @@ Miew.prototype._updateShadowCamera = (function () {
       if (this._gfx.scene.children[i].type === 'DirectionalLight') {
         const light = this._gfx.scene.children[i];
         shadowMatrix.copy(light.shadow.camera.matrixWorldInverse);
-        const bBox = this._getOBB(shadowMatrix);
+        this.getOBB(shadowMatrix, OBB);
 
         direction.subVectors(light.target.position, light.position);
-        light.position.subVectors(bBox.center, direction);
-        light.target.position.copy(bBox.center);
+        light.position.subVectors(OBB.center, direction);
+        light.target.position.copy(OBB.center);
 
         light.shadow.bias = 0.09;
-        light.shadow.camera.bottom = -bBox.halfSize.y;
-        light.shadow.camera.top = bBox.halfSize.y;
-        light.shadow.camera.right = bBox.halfSize.x;
-        light.shadow.camera.left = -bBox.halfSize.x;
-        light.shadow.camera.near = direction.length() - bBox.halfSize.z;
-        light.shadow.camera.far = direction.length() + bBox.halfSize.z;
+        light.shadow.camera.bottom = -OBB.halfSize.y;
+        light.shadow.camera.top = OBB.halfSize.y;
+        light.shadow.camera.right = OBB.halfSize.x;
+        light.shadow.camera.left = -OBB.halfSize.x;
+        light.shadow.camera.near = direction.length() - OBB.halfSize.z;
+        light.shadow.camera.far = direction.length() + OBB.halfSize.z;
 
         light.shadow.camera.updateProjectionMatrix();
       }
@@ -924,12 +929,19 @@ Miew.prototype._getBSphereRadius = function () {
   return radius * this._objectControls.getScale();
 };
 
-// calculate bounding box that would include all visuals and being axis aligned in world defined by
+// Calculate bounding box that would include all visuals and being axis aligned in world defined by
 // transformation matrix: matrix
-Miew.prototype._getOBB = (function () {
-  const _bSphere = new THREE.Sphere();
-  const _bbox = new THREE.Box3();
-  const OBB = new THREE.Box3();
+
+/**
+ * Calculate bounding box that would include all visuals and being axis aligned in world defined by
+ * transformation matrix: matrix
+ * @param {Matrix4} matrix - transformation matrix.
+ * @param {center: Vector3, halfSize: Vector3} OBB - calculating bounding box.
+ */
+Miew.prototype.getOBB = (function () {
+  const _bSphereForOneVisual = new THREE.Sphere();
+  const _bBoxForOneVisual = new THREE.Box3();
+  const bBox = new THREE.Box3();
 
   const invMatrix = new THREE.Matrix4();
 
@@ -939,25 +951,23 @@ Miew.prototype._getOBB = (function () {
     new THREE.Vector3(),
     new THREE.Vector3(),
   ];
-  const halfSize = new THREE.Vector3();
-  const center = new THREE.Vector3();
 
-  return function (matrix) {
-    OBB.makeEmpty();
+  return function (matrix, OBB) {
+    bBox.makeEmpty();
 
     this._forEachVisual((visual) => {
-      _bSphere.copy(visual.getBoundaries().boundingSphere);
-      _bSphere.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
-      _bSphere.getBoundingBox(_bbox);
-      OBB.union(_bbox);
+      _bSphereForOneVisual.copy(visual.getBoundaries().boundingSphere);
+      _bSphereForOneVisual.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
+      _bSphereForOneVisual.getBoundingBox(_bBoxForOneVisual);
+      bBox.union(_bBoxForOneVisual);
     });
-    OBB.getCenter(center);
+    bBox.getCenter(OBB.center);
 
     invMatrix.getInverse(matrix);
-    center.applyMatrix4(invMatrix);
+    OBB.center.applyMatrix4(invMatrix);
 
-    const { min } = OBB;
-    const { max } = OBB;
+    const { min } = bBox;
+    const { max } = bBox;
     points[0].set(min.x, min.y, min.z); // 000
     points[1].set(max.x, min.y, min.z); // 100
     points[2].set(min.x, max.y, min.z); // 010
@@ -966,11 +976,9 @@ Miew.prototype._getOBB = (function () {
       points[i].applyMatrix4(invMatrix);
     }
 
-    halfSize.setX(Math.abs(points[0].x - points[1].x) / 2.0);
-    halfSize.setY(Math.abs(points[0].y - points[2].y) / 2.0);
-    halfSize.setZ(Math.abs(points[0].z - points[3].z) / 2.0);
-
-    return { center, halfSize };
+    OBB.halfSize.setX(Math.abs(points[0].x - points[1].x) / 2.0);
+    OBB.halfSize.setY(Math.abs(points[0].y - points[2].y) / 2.0);
+    OBB.halfSize.setZ(Math.abs(points[0].z - points[3].z) / 2.0);
   };
 }());
 
