@@ -952,6 +952,8 @@ Miew.prototype.getOBB = (function () {
     new THREE.Vector3(),
   ];
 
+  const size = new THREE.Vector3();
+
   return function (matrix, OBB) {
     bBox.makeEmpty();
 
@@ -976,9 +978,10 @@ Miew.prototype.getOBB = (function () {
       points[i].applyMatrix4(invMatrix);
     }
 
-    OBB.halfSize.setX(Math.abs(points[0].x - points[1].x) / 2.0);
-    OBB.halfSize.setY(Math.abs(points[0].y - points[2].y) / 2.0);
-    OBB.halfSize.setZ(Math.abs(points[0].z - points[3].z) / 2.0);
+    size.setX(Math.abs(points[0].x - points[1].x));
+    size.setY(Math.abs(points[0].y - points[2].y));
+    size.setZ(Math.abs(points[0].z - points[3].z));
+    OBB.halfSize.copy(size).multiplyScalar(0.5);
   };
 }());
 
