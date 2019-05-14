@@ -929,59 +929,57 @@ Miew.prototype._getBSphereRadius = function () {
   return radius * this._objectControls.getScale();
 };
 
-// Calculate bounding box that would include all visuals and being axis aligned in world defined by
-// transformation matrix: matrix
-
 /**
  * Calculate bounding box that would include all visuals and being axis aligned in world defined by
  * transformation matrix: matrix
  * @param {Matrix4} matrix - transformation matrix.
- * @param {center: Vector3, halfSize: Vector3} OBB - calculating bounding box.
+ * @param {object}  OBB           - calculating bounding box.
+ * @param {Vector3} OBB.center    - OBB center.
+ * @param {Vector3} OBB.halfSize  - half magnitude of OBB sizes.
  */
 Miew.prototype.getOBB = (function () {
   const _bSphereForOneVisual = new THREE.Sphere();
   const _bBoxForOneVisual = new THREE.Box3();
-  const bBox = new THREE.Box3();
+  const _bBox = new THREE.Box3();
 
-  const invMatrix = new THREE.Matrix4();
+  const _invMatrix = new THREE.Matrix4();
 
-  const points = [
+  const _points = [
     new THREE.Vector3(),
     new THREE.Vector3(),
     new THREE.Vector3(),
     new THREE.Vector3(),
   ];
 
-  const size = new THREE.Vector3();
-
   return function (matrix, OBB) {
-    bBox.makeEmpty();
+    _bBox.makeEmpty();
 
     this._forEachVisual((visual) => {
       _bSphereForOneVisual.copy(visual.getBoundaries().boundingSphere);
       _bSphereForOneVisual.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
       _bSphereForOneVisual.getBoundingBox(_bBoxForOneVisual);
-      bBox.union(_bBoxForOneVisual);
+      _bBox.union(_bBoxForOneVisual);
     });
-    bBox.getCenter(OBB.center);
+    _bBox.getCenter(OBB.center);
 
-    invMatrix.getInverse(matrix);
-    OBB.center.applyMatrix4(invMatrix);
+    _invMatrix.getInverse(matrix);
+    OBB.center.applyMatrix4(_invMatrix);
 
-    const { min } = bBox;
-    const { max } = bBox;
-    points[0].set(min.x, min.y, min.z); // 000
-    points[1].set(max.x, min.y, min.z); // 100
-    points[2].set(min.x, max.y, min.z); // 010
-    points[3].set(min.x, min.y, max.z); // 001
-    for (let i = 0, l = points.length; i < l; i++) {
-      points[i].applyMatrix4(invMatrix);
+    const { min } = _bBox;
+    const { max } = _bBox;
+    _points[0].set(min.x, min.y, min.z); // 000
+    _points[1].set(max.x, min.y, min.z); // 100
+    _points[2].set(min.x, max.y, min.z); // 010
+    _points[3].set(min.x, min.y, max.z); // 001
+    for (let i = 0, l = _points.length; i < l; i++) {
+      _points[i].applyMatrix4(_invMatrix);
     }
 
-    size.setX(Math.abs(points[0].x - points[1].x));
-    size.setY(Math.abs(points[0].y - points[2].y));
-    size.setZ(Math.abs(points[0].z - points[3].z));
-    OBB.halfSize.copy(size).multiplyScalar(0.5);
+    OBB.halfSize.set(
+      Math.abs(_points[0].x - _points[1].x),
+      Math.abs(_points[0].y - _points[2].y),
+      Math.abs(_points[0].z - _points[3].z),
+    ).multiplyScalar(0.5);
   };
 }());
 
