@@ -5,7 +5,6 @@ import vertexShader from './ScreenQuad_vert.glsl';
 import fragmentShader from './FXAA_frag.glsl';
 
 class FXAAMaterial extends THREE.RawShaderMaterial {
-
   constructor(params) {
     super(params);
 
