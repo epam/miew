@@ -11,6 +11,7 @@ class LinesMode extends Mode {
 
   constructor(opts) {
     super(opts);
+    this.depGroups = this.depGroups.slice(0); // clone depGroups to prevent prototype edits
     const groups = this.depGroups;
     for (let i = 0, n = groups.length; i < n; ++i) {
       groups[i] = [groups[i], getRenderParams];
