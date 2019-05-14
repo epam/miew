@@ -4,70 +4,54 @@ import * as THREE from 'three';
 import vertexShader from './ScreenQuad_vert.glsl';
 import fragmentShader from './Outline_frag.glsl';
 
-const defaultUniforms = THREE.UniformsUtils.merge([
-  {
-    srcTex: { type: 't', value: null },
-    srcDepthTex: { type: 't', value: null },
-    srcTexSize: { type: 'v2', value: new THREE.Vector2(512, 512) },
-    color: { type: 'v3', value: null },
-    threshold: { type: 'f', value: null },
-    opacity: { type: 'f', value: 1.0 },
-  },
-]);
+class OutlineMaterial extends THREE.RawShaderMaterial {
+  constructor(params) {
+    // add depth outline
+    super(params);
 
-function overrideUniforms(params) {
-  const uniforms = THREE.UniformsUtils.clone(defaultUniforms);
-  for (const p in params) {
-    if (uniforms.hasOwnProperty(p)) {
-      uniforms[p].value = params[p];
+    const settings = {
+      uniforms: {
+        srcTex: { type: 't', value: null },
+        srcDepthTex: { type: 't', value: null },
+        srcTexSize: { type: 'v2', value: new THREE.Vector2(512, 512) },
+        color: { type: 'v3', value: null },
+        threshold: { type: 'f', value: null },
+        opacity: { type: 'f', value: 1.0 },
+      },
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    };
+
+    this.setValues(settings);
+    // this.setValues(params);
+  }
+
+  copy(source) {
+    super.copy(source);
+    this.depth = source.depth;
+  }
+
+  setValues(values) {
+    if (typeof values === 'undefined') {
+      return;
     }
+
+    // set direct values
+    super.setValues(values);
+    const defines = {};
+
+    if (this.depth) {
+      defines.DEPTH_OUTLINE = 1;
+    }
+
+    // set dependent values
+    this.defines = defines;
   }
-  return uniforms;
 }
 
-function OutlineMaterial(params) {
-  THREE.RawShaderMaterial.call(this);
-
-  // add depth outline
-  this.depth = false;
-
-  const settings = {
-    uniforms: overrideUniforms(params),
-    vertexShader,
-    fragmentShader,
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
-  };
-
-  THREE.RawShaderMaterial.prototype.setValues.call(this, settings);
-  this.setValues(params);
-}
-
-OutlineMaterial.prototype = Object.create(THREE.RawShaderMaterial.prototype);
-OutlineMaterial.prototype.constructor = OutlineMaterial;
-
-OutlineMaterial.prototype.copy = function (source) {
-  THREE.RawShaderMaterial.prototype.copy.call(this, source);
-  this.depth = source.depth;
-  return this;
-};
-
-OutlineMaterial.prototype.setValues = function (values) {
-  if (typeof values === 'undefined') {
-    return;
-  }
-
-  // set direct values
-  THREE.RawShaderMaterial.prototype.setValues.call(this, values);
-  const defines = {};
-
-  if (this.depth) {
-    defines.DEPTH_OUTLINE = 1;
-  }
-
-  // set dependent values
-  this.defines = defines;
-};
+OutlineMaterial.prototype.depth = false;
 
 export default OutlineMaterial;
