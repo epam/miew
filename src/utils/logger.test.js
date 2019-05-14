@@ -46,6 +46,8 @@ describe('utils/logger', () => {
   });
 
   describe('.message()', () => {
+    const testMessage = 'this is a message';
+
     it('emits signal when message level is above or higher than current', () => {
       const log = logger.instantiate();
       const levels = log.levels();
@@ -67,18 +69,43 @@ describe('utils/logger', () => {
       }
     });
 
-    it('passes message as an event field when it is being logged', () => {
+    for (let i = 0; i < logger.levels().length; i++) {
+      it(`passes message as an event field in ${logger.levels()[i]} mode`, () => {
+        const log = logger.instantiate();
+        const levels = log.levels();
+
+        const callback = sinon.spy();
+        const level = levels[i];
+        log.level = level;
+        log.addEventListener('message', callback);
+        log[level](testMessage);
+
+        expect(callback).to.be.always.calledWithExactly({ type: 'message', level, message: testMessage });
+      });
+    }
+  });
+
+  describe('console', () => {
+    const testMessage = 'this is a message';
+
+    for (let i = 0; i < logger.levels().length; i++) {
       const log = logger.instantiate();
       const levels = log.levels();
-      const callback = sinon.spy();
+      const level = levels[i];
 
-      const level = levels[0];
-      const testMessage = 'this is a message';
-      log.level = level;
-      log.addEventListener('message', callback);
-      log.message(level, testMessage);
+      it(`print message in console with ${level} mode`, () => {
+        let logMethod = level;
+        if (level !== 'error' && level !== 'warn') logMethod = 'log';
+        const cons = sinon.stub(console, logMethod);
 
-      expect(callback).to.be.always.calledWithExactly({ type: 'message', level, message: testMessage });
-    });
+        log.level = level;
+        log.console = true;
+
+        log.message(level, testMessage);
+        cons.restore();
+
+        expect(cons).to.calledOnceWith(`miew:${level}: ${testMessage}`);
+      });
+    }
   });
 });

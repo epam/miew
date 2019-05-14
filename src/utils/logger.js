@@ -42,6 +42,12 @@ Logger.prototype.instantiate = function () {
   return new Logger();
 };
 
+function isNumber(variable) {
+  if (!_.isNumber(variable)) {
+    throw new Error('Wrong log level specified!');
+  }
+}
+
 /**
  * @property {string} current threshold for signals and console output.
  * @name Logger#level
@@ -53,9 +59,7 @@ Object.defineProperty(Logger.prototype, 'level', {
   },
   set(strValue) {
     const lvlVal = logLevels[strValue];
-    if (!_.isNumber(lvlVal)) {
-      throw new Error('Wrong log level specified!');
-    }
+    isNumber(lvlVal);
     this._level = lvlVal;
   },
 });
@@ -76,9 +80,7 @@ Logger.prototype.levels = function () {
  */
 Logger.prototype.message = function (level, message) {
   const lvlVal = logLevels[level];
-  if (!_.isNumber(lvlVal)) {
-    throw new Error('Wrong log level specified!');
-  }
+  isNumber(lvlVal);
   this._message(lvlVal, message);
 };
 
@@ -138,7 +140,7 @@ Logger.prototype._message = function (levelVal, message) {
     const output = `miew:${level}: ${message}`;
     if (level === 'error') {
       console.error(output); // NOSONAR
-    } else if (level === 'warning') {
+    } else if (level === 'warn') {
       console.warn(output); // NOSONAR
     } else {
       console.log(output); // NOSONAR
