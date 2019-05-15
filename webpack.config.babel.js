@@ -32,7 +32,6 @@ const configure = prod => ({
           loader: 'css-loader',
           options: {
             importLoaders: 1,
-            minimize: prod,
           },
         },
         'postcss-loader',

@@ -1205,67 +1205,18 @@ Menu.prototype._displayGlobalErrorDialog = function (title, message) {
 };
 
 Menu.prototype.presetsPanel = {
-  pdbList: {
-    filteredItems: [],
-    pageSize: 10,
-    currentPageIndex: 0,
-    totalPagesCount: null,
-    pagination: {
-      minimumItemsCount: 5,
-    },
-  },
-  presetsList: {
-    pdb: null,
-    items: [],
-  },
   inputs: {
     main: null,
   },
   actions: {
     pdb: {
-      list: {
-        page: null,
-        refresh: null,
-        search: null,
-        display: null,
-        select: null,
-      },
       load: null,
-      register: null,
-      remove: {
-        ask: null,
-        confirm: null,
-      },
       inputs: {
         clear: null,
         refresh: null,
         file: null,
         text: null,
       },
-    },
-    preset: {
-      list: {
-        refresh: null,
-        display: null,
-      },
-      apply: null,
-      rename: {
-        ask: null,
-        confirm: null,
-      },
-      update: null,
-      remove: {
-        ask: null,
-        confirm: null,
-      },
-      input: {
-        clear: null,
-        refresh: null,
-      },
-      create: null,
-    },
-    navigate: {
-      back: null,
     },
   },
 };
@@ -1456,6 +1407,7 @@ Menu.prototype._initPresetsPanelActions = function () {
 };
 
 Menu.prototype._initPresetsPanel = function () {
+  this.presetsPanel.actions.pdb.inputs.refresh(this);
 };
 
 Menu.prototype._initRenderPanel = function () {
