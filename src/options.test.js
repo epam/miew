@@ -250,6 +250,14 @@ describe('options', () => {
     'rep 0 m=TX template="~-=!{{Chain}}.{{Residue}}:{{Sequence}},{{Name}}+"',
   ];
 
+  /** ******** ERROR INPUT TEST SETS *********** */
+
+  const repsOpts = {
+    reps: [simplestRep],
+  };
+  const errorArgumentRepsStr = 'r=0&m=BS&c=EL&w=w';
+  const errorKeyRepsStr = 'r=0&m=BS!radus:9&c=EL';
+
   describe('.toScript', () => {
     function equalCommands(original, generated) {
       if (!_.isArray(original) || original.length !== generated.length + 2) {
@@ -473,6 +481,11 @@ describe('options', () => {
     function urlize(opts) {
       return `?${opts}`;
     }
+
+    it('error input', () => {
+      expect(options.fromURL(urlize(errorArgumentRepsStr))).to.equalOptions(repsOpts);
+      expect(options.fromURL(urlize(errorKeyRepsStr))).to.equalOptions(repsOpts);
+    });
 
     it('restores high level mode properties', () => {
       expect(options.fromURL(urlize(simpleRepsStr))).to.equalOptions(simpleRepsOpts);
