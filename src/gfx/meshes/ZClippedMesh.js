@@ -27,13 +27,13 @@ class ZClippedMesh extends Mesh {
 
     const zClipCoef = 0.5;
 
-    let modelView = ZClippedMesh._modelView;
+    const modelView = ZClippedMesh._modelView;
     const mvLength = ZClippedMesh._mvLength;
-    let center = ZClippedMesh._center;
+    const center = ZClippedMesh._center;
 
-    modelView = modelView.multiplyMatrices(this.matrixWorld, camera.matrixWorldInverse);
+    modelView.multiplyMatrices(this.matrixWorld, camera.matrixWorldInverse);
     const s = mvLength.setFromMatrixColumn(modelView, 0).length();
-    center = center.copy(geo.boundingSphere.center);
+    center.copy(geo.boundingSphere.center);
 
     this.localToWorld(center);
     material.uberOptions.zClipValue = camera.position.z - center.z
