@@ -13,12 +13,14 @@ import Menu from './ui/Menu';
 
 window.DEBUG = true;
 
+const miewErrorId = 'miew-error';
+
 function onError(err) {
   const doc = document.createDocumentFragment();
 
   const containers = document.getElementsByClassName('miew-container');
   const parent = containers.length > 0 ? containers[0] : null;
-  let element = document.getElementById('miew-error');
+  let element = document.getElementById(miewErrorId);
 
   // on the first error
   if (!element) {
@@ -38,8 +40,8 @@ function onError(err) {
     par.appendChild(document.createElement('small')).textContent = 'for the failure';
 
     element = document.createElement('div');
-    element.setAttribute('class', 'miew-error');
-    element.id = 'miew-error';
+    element.setAttribute('class', miewErrorId);
+    element.id = miewErrorId;
     doc.appendChild(element);
   }
 

@@ -5,247 +5,250 @@ import utils from '../utils';
 import settings from '../settings';
 
 let prec = settings.now.fbxprec;
-const heading = ';  FBX 6.1.0 project file\n'
-  + '; Copyright (C) 1997-2007 Autodesk Inc. and/or its licensors.\n'
-  + '; All rights reserved.\n'
-  + '; ----------------------------------------------------\n'
-  + '\n'
-  + '  FBXHeaderExtension:  {\n'
-  + '  FBXHeaderVersion: 1003\n'
-  + '  FBXVersion: 6100\n'
-  + '  CreationTimeStamp:  {\n'
-  + '    Version: 1000\n'
-  + '    Year: 2015\n'
-  + '    Month: 12\n'
-  + '    Day: 7\n'
-  + '    Hour: 17\n'
-  + '    Minute: 34\n'
-  + '    Second: 53\n'
-  + '    Millisecond: 369\n'
-  + '  }\n'
-  + ' Creator: "FBX SDK/FBX Plugins build 20080212"\n'
-  + '  OtherFlags:  {\n'
-  + '    FlagPLE: 0\n'
-  + '  }\n'
-  + '}\n'
-  + 'reationTime: "2015-12-07 17:34:53:369"\n'
-  + 'reator: "FBX SDK/FBX Plugins build 20080212"\n'
-  + '\n'
-  + '; Document Description\n'
-  + ';------------------------------------------------------------------\n'
-  + '\n'
-  + '  Document:  {\n'
-  + ' Name: ""\n'
-  + '}\n'
-  + '\n'
-  + '; Document References\n'
-  + ';------------------------------------------------------------------\n'
-  + '\n'
-  + '  References:  {\n'
-  + '}\n'
-  + '\n'
-  + '; Object definitions\n'
-  + ';------------------------------------------------------------------\n'
-  + '\n'
-  + '  Definitions:  {\n'
-  + '  Version: 100\n'
-  + '  Count: 3\n'
-  + '  ObjectType: "Model" {\n'
-  + '    Count: 1\n'
-  + '  }\n'
-  + '  ObjectType: "SceneInfo" {\n'
-  + '    Count: 1\n'
-  + '  }\n'
-  + '  ObjectType: "GlobalSettings" {\n'
-  + '    Count: 1\n'
-  + '  }\n'
-  + '}\n'
-  + '\n'
-  + '; Object properties\n'
-  + ';------------------------------------------------------------------\n'
-  + '\n'
-  + '  Objects:  {\n'
-  + '  Model: "Model::Sphere01", "Mesh" {\n'
-  + '    Version: 232\n'
-  + '    Properties60:  {\n'
-  + '      Property: "QuaternionInterpolate", "bool", "",0\n'
-  + '      Property: "RotationOffset", "Vector3D", "",0,0,0\n'
-  + '      Property: "RotationPivot", "Vector3D", "",0,0,0\n'
-  + '      Property: "ScalingOffset", "Vector3D", "",0,0,0\n'
-  + '      Property: "ScalingPivot", "Vector3D", "",0,0,0\n'
-  + '      Property: "TranslationActive", "bool", "",0\n'
-  + '      Property: "TranslationMin", "Vector3D", "",0,0,0\n'
-  + '      Property: "TranslationMax", "Vector3D", "",0,0,0\n'
-  + '      Property: "TranslationMinX", "bool", "",0\n'
-  + '      Property: "TranslationMinY", "bool", "",0\n'
-  + '      Property: "TranslationMinZ", "bool", "",0\n'
-  + '      Property: "TranslationMaxX", "bool", "",0\n'
-  + '      Property: "TranslationMaxY", "bool", "",0\n'
-  + '      Property: "TranslationMaxZ", "bool", "",0\n'
-  + '      Property: "RotationOrder", "enum", "",0\n'
-  + '      Property: "RotationSpaceForLimitOnly", "bool", "",0\n'
-  + '      Property: "RotationStiffnessX", "double", "",0\n'
-  + '      Property: "RotationStiffnessY", "double", "",0\n'
-  + '      Property: "RotationStiffnessZ", "double", "",0\n'
-  + '      Property: "AxisLen", "double", "",10\n'
-  + '      Property: "PreRotation", "Vector3D", "",0,0,0\n'
-  + '      Property: "PostRotation", "Vector3D", "",0,0,0\n'
-  + '      Property: "RotationActive", "bool", "",0\n'
-  + '      Property: "RotationMin", "Vector3D", "",0,0,0\n'
-  + '      Property: "RotationMax", "Vector3D", "",0,0,0\n'
-  + '      Property: "RotationMinX", "bool", "",0\n'
-  + '      Property: "RotationMinY", "bool", "",0\n'
-  + '      Property: "RotationMinZ", "bool", "",0\n'
-  + '      Property: "RotationMaxX", "bool", "",0\n'
-  + '      Property: "RotationMaxY", "bool", "",0\n'
-  + '      Property: "RotationMaxZ", "bool", "",0\n'
-  + '      Property: "InheritType", "enum", "",1\n'
-  + '      Property: "ScalingActive", "bool", "",0\n'
-  + '      Property: "ScalingMin", "Vector3D", "",1,1,1\n'
-  + '      Property: "ScalingMax", "Vector3D", "",1,1,1\n'
-  + '      Property: "ScalingMinX", "bool", "",0\n'
-  + '      Property: "ScalingMinY", "bool", "",0\n'
-  + '      Property: "ScalingMinZ", "bool", "",0\n'
-  + '      Property: "ScalingMaxX", "bool", "",0\n'
-  + '      Property: "ScalingMaxY", "bool", "",0\n'
-  + '      Property: "ScalingMaxZ", "bool", "",0\n'
-  + '      Property: "GeometricTranslation", "Vector3D", "",0,0,0\n'
-  + '      Property: "GeometricRotation", "Vector3D", "",0,0,0\n'
-  + '      Property: "GeometricScaling", "Vector3D", "",1,1,1\n'
-  + '      Property: "MinDampRangeX", "double", "",0\n'
-  + '      Property: "MinDampRangeY", "double", "",0\n'
-  + '      Property: "MinDampRangeZ", "double", "",0\n'
-  + '      Property: "MaxDampRangeX", "double", "",0\n'
-  + '      Property: "MaxDampRangeY", "double", "",0\n'
-  + '      Property: "MaxDampRangeZ", "double", "",0\n'
-  + '      Property: "MinDampStrengthX", "double", "",0\n'
-  + '      Property: "MinDampStrengthY", "double", "",0\n'
-  + '      Property: "MinDampStrengthZ", "double", "",0\n'
-  + '      Property: "MaxDampStrengthX", "double", "",0\n'
-  + '      Property: "MaxDampStrengthY", "double", "",0\n'
-  + '      Property: "MaxDampStrengthZ", "double", "",0\n'
-  + '      Property: "PreferedAngleX", "double", "",0\n'
-  + '      Property: "PreferedAngleY", "double", "",0\n'
-  + '      Property: "PreferedAngleZ", "double", "",0\n'
-  + '      Property: "LookAtProperty", "object", ""\n'
-  + '      Property: "UpVectorProperty", "object", ""\n'
-  + '      Property: "Show", "bool", "",1\n'
-  + '      Property: "NegativePercentShapeSupport", "bool", "",1\n'
-  + '      Property: "DefaultAttributeIndex", "int", "",0\n'
-  + '      Property: "Lcl Translation", "Lcl Translation", "A+",-0.169204741716385,-0.507614195346832,0\n'
-  + '      Property: "Lcl Rotation", "Lcl Rotation", "A+",0,0,0\n'
-  + '      Property: "Lcl Scaling", "Lcl Scaling", "A+",1,1,1\n'
-  + '      Property: "Visibility", "Visibility", "A+",1\n'
-  + '      Property: "BBoxMin", "Vector3D", "N",0,0,0\n'
-  + '      Property: "BBoxMax", "Vector3D", "N",0,0,0\n'
-  + '    }\n'
-  + '    MultiLayer: 0\n'
-  + '    MultiTake: 1\n'
-  + '    Shading: T\n'
-  + '   Culling: "CullingOff"\n';
+const heading = `\
+;  FBX 6.1.0 project file
+; Copyright (C) 1997-2007 Autodesk Inc. and/or its licensors.
+; All rights reserved.
+; ----------------------------------------------------
 
-const ending = 'NodeAttributeName: "Geometry::Sphere01"\n'
-    + '}\n'
-    + 'ceneInfo: "SceneInfo::GlobalInfo", "UserData" {\n'
-    + ' Type: "UserData"\n'
-    + '  Version: 100\n'
-    + '  MetaData:  {\n'
-    + '    Version: 100\n'
-    + '   Title: ""\n'
-    + '   Subject: ""\n'
-    + '   Author: ""\n'
-    + '   Keywords: ""\n'
-    + '   Revision: ""\n'
-    + '   Comment: ""\n'
-    + '  }\n'
-    + '  Properties60:  {\n'
-    + '    Property: "DocumentUrl", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"\n'
-    + '    Property: "SrcDocumentUrl", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"\n'
-    + '   Property: "Original", "Compound", ""\n'
-    + '   Property: "Original|ApplicationVendor", "KString", "", "Autodesk"\n'
-    + '   Property: "Original|ApplicationName", "KString", "", "3ds Max"\n'
-    + '   Property: "Original|ApplicationVersion", "KString", "", "2009.0"\n'
-    + '   Property: "Original|DateTime_GMT", "DateTime", "", "07/12/2015 14:34:53.369"\n'
-    + '    Property: "Original|FileName", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"\n'
-    + '   Property: "LastSaved", "Compound", ""\n'
-    + '   Property: "LastSaved|ApplicationVendor", "KString", "", "Autodesk"\n'
-    + '   Property: "LastSaved|ApplicationName", "KString", "", "3ds Max"\n'
-    + '   Property: "LastSaved|ApplicationVersion", "KString", "", "2009.0"\n'
-    + '   Property: "LastSaved|DateTime_GMT", "DateTime", "", "07/12/2015 14:34:53.369"\n'
-    + '  }\n'
-    + '}\n'
-    + 'lobalSettings:  {\n'
-    + '  Version: 1000\n'
-    + '  Properties60:  {\n'
-    + '    Property: "UpAxis", "int", "",2\n'
-    + '    Property: "UpAxisSign", "int", "",1\n'
-    + '    Property: "FrontAxis", "int", "",1\n'
-    + '    Property: "FrontAxisSign", "int", "",-1\n'
-    + '    Property: "CoordAxis", "int", "",0\n'
-    + '    Property: "CoordAxisSign", "int", "",1\n'
-    + '    Property: "UnitScaleFactor", "double", "",2.54\n'
-    + '  }\n'
-    + '}\n'
-    + '}\n'
-    + '\n'
-    + '; Object relations\n'
-    + ';------------------------------------------------------------------\n'
-    + '\n'
-    + '  Relations:  {\n'
-    + '  Model: "Model::Sphere01", "Mesh" {\n'
-    + '  }\n'
-    + '  SceneInfo: "SceneInfo::GlobalInfo", "UserData" {\n'
-    + '  }\n'
-    + '}\n'
-    + '\n'
-    + '; Object connections\n'
-    + ';------------------------------------------------------------------\n'
-    + '\n'
-    + '  Connections:  {\n'
-    + ' Connect: "OO", "Model::Sphere01", "Model::Scene"\n'
-    + '}\n'
-    + '\n'
-    + ';Object data\n'
-    + ';------------------------------------------------------------------\n'
-    + '\n'
-    + '  ObjectData:  {\n'
-    + '}\n'
-    + ';Takes and animation section\n'
-    + ';----------------------------------------------------\n'
-    + '\n'
-    + '  Takes:  {\n'
-    + ' Current: "Take 001"\n'
-    + '}\n'
-    + ';Version 5 settings\n'
-    + ';------------------------------------------------------------------\n'
-    + '\n'
-    + '  Version5:  {\n'
-    + '  AmbientRenderSettings:  {\n'
-    + '    Version: 101\n'
-    + '    AmbientLightColor: 0.533333003520966,0.533333003520966,0.533333003520966,1\n'
-    + '  }\n'
-    + '  FogOptions:  {\n'
-    + '    FlogEnable: 0\n'
-    + '    FogMode: 0\n'
-    + '    FogDensity: 0.002\n'
-    + '    FogStart: 0.3\n'
-    + '    FogEnd: 1000\n'
-    + '    FogColor: 1,1,1,1\n'
-    + '  }\n'
-    + '  Settings:  {\n'
-    + '   FrameRate: "30"\n'
-    + '    TimeFormat: 1\n'
-    + '    SnapOnFrames: 0\n'
-    + '    ReferenceTimeIndex: -1\n'
-    + '    TimeLineStartTime: 0\n'
-    + '    TimeLineStopTime: 153953860000\n'
-    + '  }\n'
-    + '  RendererSetting:  {\n'
-    + '   DefaultCamera: ""\n'
-    + '    DefaultViewingMode: 0\n'
-    + '  }\n'
-    + '}\n'
-    + '\n';
+FBXHeaderExtension:  {
+  FBXHeaderVersion: 1003
+  FBXVersion: 6100
+  CreationTimeStamp:  {
+    Version: 1000
+    Year: 2015
+    Month: 12
+    Day: 7
+    Hour: 17
+    Minute: 34
+    Second: 53
+    Millisecond: 369
+  }
+  Creator: "FBX SDK/FBX Plugins build 20080212"
+  OtherFlags:  {
+    FlagPLE: 0
+  }
+}
+CreationTime: "2015-12-07 17:34:53:369"
+Creator: "FBX SDK/FBX Plugins build 20080212"
+
+; Document Description
+;------------------------------------------------------------------
+
+Document:  {
+  Name: ""
+}
+
+; Document References
+;------------------------------------------------------------------
+
+References:  {
+}
+
+; Object definitions
+;------------------------------------------------------------------
+
+Definitions:  {
+  Version: 100
+  Count: 3
+  ObjectType: "Model" {
+    Count: 1
+  }
+  ObjectType: "SceneInfo" {
+    Count: 1
+  }
+  ObjectType: "GlobalSettings" {
+    Count: 1
+  }
+}
+
+; Object properties
+;------------------------------------------------------------------
+
+Objects:  {
+  Model: "Model::Sphere01", "Mesh" {
+    Version: 232
+    Properties60:  {
+      Property: "QuaternionInterpolate", "bool", "",0
+      Property: "RotationOffset", "Vector3D", "",0,0,0
+      Property: "RotationPivot", "Vector3D", "",0,0,0
+      Property: "ScalingOffset", "Vector3D", "",0,0,0
+      Property: "ScalingPivot", "Vector3D", "",0,0,0
+      Property: "TranslationActive", "bool", "",0
+      Property: "TranslationMin", "Vector3D", "",0,0,0
+      Property: "TranslationMax", "Vector3D", "",0,0,0
+      Property: "TranslationMinX", "bool", "",0
+      Property: "TranslationMinY", "bool", "",0
+      Property: "TranslationMinZ", "bool", "",0
+      Property: "TranslationMaxX", "bool", "",0
+      Property: "TranslationMaxY", "bool", "",0
+      Property: "TranslationMaxZ", "bool", "",0
+      Property: "RotationOrder", "enum", "",0
+      Property: "RotationSpaceForLimitOnly", "bool", "",0
+      Property: "RotationStiffnessX", "double", "",0
+      Property: "RotationStiffnessY", "double", "",0
+      Property: "RotationStiffnessZ", "double", "",0
+      Property: "AxisLen", "double", "",10
+      Property: "PreRotation", "Vector3D", "",0,0,0
+      Property: "PostRotation", "Vector3D", "",0,0,0
+      Property: "RotationActive", "bool", "",0
+      Property: "RotationMin", "Vector3D", "",0,0,0
+      Property: "RotationMax", "Vector3D", "",0,0,0
+      Property: "RotationMinX", "bool", "",0
+      Property: "RotationMinY", "bool", "",0
+      Property: "RotationMinZ", "bool", "",0
+      Property: "RotationMaxX", "bool", "",0
+      Property: "RotationMaxY", "bool", "",0
+      Property: "RotationMaxZ", "bool", "",0
+      Property: "InheritType", "enum", "",1
+      Property: "ScalingActive", "bool", "",0
+      Property: "ScalingMin", "Vector3D", "",1,1,1
+      Property: "ScalingMax", "Vector3D", "",1,1,1
+      Property: "ScalingMinX", "bool", "",0
+      Property: "ScalingMinY", "bool", "",0
+      Property: "ScalingMinZ", "bool", "",0
+      Property: "ScalingMaxX", "bool", "",0
+      Property: "ScalingMaxY", "bool", "",0
+      Property: "ScalingMaxZ", "bool", "",0
+      Property: "GeometricTranslation", "Vector3D", "",0,0,0
+      Property: "GeometricRotation", "Vector3D", "",0,0,0
+      Property: "GeometricScaling", "Vector3D", "",1,1,1
+      Property: "MinDampRangeX", "double", "",0
+      Property: "MinDampRangeY", "double", "",0
+      Property: "MinDampRangeZ", "double", "",0
+      Property: "MaxDampRangeX", "double", "",0
+      Property: "MaxDampRangeY", "double", "",0
+      Property: "MaxDampRangeZ", "double", "",0
+      Property: "MinDampStrengthX", "double", "",0
+      Property: "MinDampStrengthY", "double", "",0
+      Property: "MinDampStrengthZ", "double", "",0
+      Property: "MaxDampStrengthX", "double", "",0
+      Property: "MaxDampStrengthY", "double", "",0
+      Property: "MaxDampStrengthZ", "double", "",0
+      Property: "PreferedAngleX", "double", "",0
+      Property: "PreferedAngleY", "double", "",0
+      Property: "PreferedAngleZ", "double", "",0
+      Property: "LookAtProperty", "object", ""
+      Property: "UpVectorProperty", "object", ""
+      Property: "Show", "bool", "",1
+      Property: "NegativePercentShapeSupport", "bool", "",1
+      Property: "DefaultAttributeIndex", "int", "",0
+      Property: "Lcl Translation", "Lcl Translation", "A+",-0.169204741716385,-0.507614195346832,0
+      Property: "Lcl Rotation", "Lcl Rotation", "A+",0,0,0
+      Property: "Lcl Scaling", "Lcl Scaling", "A+",1,1,1
+      Property: "Visibility", "Visibility", "A+",1
+      Property: "BBoxMin", "Vector3D", "N",0,0,0
+      Property: "BBoxMax", "Vector3D", "N",0,0,0
+    }
+    MultiLayer: 0
+    MultiTake: 1
+    Shading: T
+   Culling: "CullingOff"
+`;
+
+const ending = `\
+NodeAttributeName: "Geometry::Sphere01"
+}
+SceneInfo: "SceneInfo::GlobalInfo", "UserData" {
+ Type: "UserData"
+  Version: 100
+  MetaData:  {
+    Version: 100
+   Title: ""
+   Subject: ""
+   Author: ""
+   Keywords: ""
+   Revision: ""
+   Comment: ""
+  }
+  Properties60:  {
+    Property: "DocumentUrl", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"
+    Property: "SrcDocumentUrl", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"
+   Property: "Original", "Compound", ""
+   Property: "Original|ApplicationVendor", "KString", "", "Autodesk"
+   Property: "Original|ApplicationName", "KString", "", "3ds Max"
+   Property: "Original|ApplicationVersion", "KString", "", "2009.0"
+   Property: "Original|DateTime_GMT", "DateTime", "", "07/12/2015 14:34:53.369"
+    Property: "Original|FileName", "KString", "", "D:\\depot\\MolViewer\\Assets\\models\\test1.FBX"
+   Property: "LastSaved", "Compound", ""
+   Property: "LastSaved|ApplicationVendor", "KString", "", "Autodesk"
+   Property: "LastSaved|ApplicationName", "KString", "", "3ds Max"
+   Property: "LastSaved|ApplicationVersion", "KString", "", "2009.0"
+   Property: "LastSaved|DateTime_GMT", "DateTime", "", "07/12/2015 14:34:53.369"
+  }
+}
+GlobalSettings:  {
+  Version: 1000
+  Properties60:  {
+    Property: "UpAxis", "int", "",2
+    Property: "UpAxisSign", "int", "",1
+    Property: "FrontAxis", "int", "",1
+    Property: "FrontAxisSign", "int", "",-1
+    Property: "CoordAxis", "int", "",0
+    Property: "CoordAxisSign", "int", "",1
+    Property: "UnitScaleFactor", "double", "",2.54
+  }
+}
+}
+
+; Object relations
+;------------------------------------------------------------------
+
+Relations:  {
+  Model: "Model::Sphere01", "Mesh" {
+  }
+  SceneInfo: "SceneInfo::GlobalInfo", "UserData" {
+  }
+}
+
+; Object connections
+;------------------------------------------------------------------
+
+Connections:  {
+  Connect: "OO", "Model::Sphere01", "Model::Scene"
+}
+
+;Object data
+;------------------------------------------------------------------
+
+ObjectData:  {
+}
+;Takes and animation section
+;----------------------------------------------------
+
+Takes:  {
+  Current: "Take 001"
+}
+;Version 5 settings
+;------------------------------------------------------------------
+
+Version5:  {
+  AmbientRenderSettings:  {
+    Version: 101
+    AmbientLightColor: 0.533333003520966,0.533333003520966,0.533333003520966,1
+  }
+  FogOptions:  {
+    FlogEnable: 0
+    FogMode: 0
+    FogDensity: 0.002
+    FogStart: 0.3
+    FogEnd: 1000
+    FogColor: 1,1,1,1
+  }
+  Settings:  {
+   FrameRate: "30"
+    TimeFormat: 1
+    SnapOnFrames: 0
+    ReferenceTimeIndex: -1
+    TimeLineStartTime: 0
+    TimeLineStopTime: 153953860000
+  }
+  RendererSetting:  {
+   DefaultCamera: ""
+    DefaultViewingMode: 0
+  }
+}
+`;
 
 function _errorHandler(e) {
   let msg;
@@ -340,16 +343,21 @@ function _stringifyArray(arr) {
 }
 
 function _wrapValuesVector(queue, fname, layerName, vectorName, vectorData, layerData) {
-  queue.add(fname, `${layerName}: 0 {\n`
-    + 'Version: 101\n'
-    + 'Name: ""\n'
-    + 'MappingInformationType: "ByVertice"\n'
-    + `ReferenceInformationType: "Direct"\n${vectorName}: ${vectorData}\n`
-    + '}\n', false, true);
-  return `${layerData}LayerElement:  {\n`
-      + `Type: "${layerName}"\n`
-      + 'TypedIndex: 0\n'
-      + '}\n';
+  queue.add(fname, `\
+${layerName}: 0 {
+  Version: 101
+  Name: ""
+  MappingInformationType: "ByVertice"
+  ReferenceInformationType: "Direct"
+  ${vectorName}: ${vectorData}
+}
+`, false, true);
+  return `\
+${layerData}LayerElement: {
+  Type: "${layerName}"
+  TypedIndex: 0
+}
+`;
 }
 
 function _exportData(queue, indices, positions, normals, colors, uvs) {

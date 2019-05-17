@@ -52,6 +52,9 @@ const {
 
 const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 
+const LOADER_NOT_FOUND = 'Could not find suitable loader for this source';
+const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
+
 const { createElement } = utils;
 
 function updateFogRange(fog, center, radius) {
@@ -1642,7 +1645,7 @@ function _fetchData(source, opts, job) {
     // detect a proper loader
     const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
     if (!TheLoader) {
-      throw new Error('Could not find suitable loader for this source');
+      throw new Error(LOADER_NOT_FOUND);
     }
 
     // split file name
@@ -2046,8 +2049,8 @@ Miew.prototype.loadEd = function (source) {
 
   const TheLoader = _.head(io.loaders.find({ source }));
   if (!TheLoader) {
-    this.logger.error('Could not find suitable loader for this source');
-    return Promise.reject(new Error('Could not find suitable loader for this source'));
+    this.logger.error(LOADER_NOT_FOUND);
+    return Promise.reject(new Error(LOADER_NOT_FOUND));
   }
 
   const loader = this._edLoader = new TheLoader(source, { binary: true });
@@ -2055,7 +2058,7 @@ Miew.prototype.loadEd = function (source) {
   return loader.load().then((data) => {
     const TheParser = _.head(io.parsers.find({ format: 'ccp4' }));
     if (!TheParser) {
-      throw new Error('Could not find suitable parser for this source');
+      throw new Error(PARSER_NOT_FOUND);
     }
     const parser = new TheParser(data);
     parser.context = this;
