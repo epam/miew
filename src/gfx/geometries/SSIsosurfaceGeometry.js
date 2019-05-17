@@ -294,9 +294,9 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
           const indPointValues = indCell * (2 << (2 + 2));
           for (let i = 0, j = 0; i < cNumVerts; i++) {
-            cube.pointsValuesLinear[indPointValues + j] = vCorner.x; j++;
-            cube.pointsValuesLinear[indPointValues + j] = vCorner.y; j++;
-            cube.pointsValuesLinear[indPointValues + j] = vCorner.z; j++;
+            cube.pointsValuesLinear[indPointValues + j++] = vCorner.x;
+            cube.pointsValuesLinear[indPointValues + j++] = vCorner.y;
+            cube.pointsValuesLinear[indPointValues + j++] = vCorner.z;
           }
 
           cube.pointsValuesLinear[indPointValues + 3] += vCellStep.x;

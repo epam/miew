@@ -2610,15 +2610,23 @@ Miew.prototype._onKeyDown = function (event) {
       break;
     case 'A'.charCodeAt(0):
       switch (this._editMode) {
-        case EDIT_MODE.COMPONENT: this._applyComponentEdit(); break;
-        case EDIT_MODE.FRAGMENT: this._applyFragmentEdit(); break;
+        case EDIT_MODE.COMPONENT:
+          this._applyComponentEdit();
+          break;
+        case EDIT_MODE.FRAGMENT:
+          this._applyFragmentEdit();
+          break;
         default: break;
       }
       break;
     case 'D'.charCodeAt(0):
       switch (this._editMode) {
-        case EDIT_MODE.COMPONENT: this._discardComponentEdit(); break;
-        case EDIT_MODE.FRAGMENT: this._discardFragmentEdit(); break;
+        case EDIT_MODE.COMPONENT:
+          this._discardComponentEdit();
+          break;
+        case EDIT_MODE.FRAGMENT:
+          this._discardFragmentEdit();
+          break;
         default: break;
       }
       break;
