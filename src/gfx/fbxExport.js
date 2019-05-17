@@ -281,10 +281,9 @@ let fileSystem = null;
 function _writeToFile(filename, data, isBinary, append, callback) {
   fileSystem.root.getFile(filename, { create: !append }, (fileEntry) => {
     // Create a FileWriter object for our FileEntry (log.txt).
-    fileEntry.createWriter((fileWriter) => { //
+    fileEntry.createWriter((fileWriter) => {
       // Create a new Blob and write it to log.txt.
       const blob = new Blob([data], { type: isBinary ? 'octet/stream' : 'text/plain' });
-      // fileWriter.write(blob);
       if (append) {
         fileWriter.onwriteend = function () {
           callback();

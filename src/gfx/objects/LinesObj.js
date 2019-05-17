@@ -66,7 +66,6 @@ class LinesObj extends SceneObject {
     geo.vertices[0].copy(frameData.getAtomPos(this._atom1._index));
     geo.vertices[1].copy(frameData.getAtomPos(this._atom2._index));
     this._line.computeLineDistances();
-    // geo.computeBoundingBox();
     geo.computeBoundingSphere();
 
     geo.verticesNeedUpdate = true;

@@ -73,7 +73,6 @@ class PDBParser extends Parser {
   }
 
   _finalize() {
-    // console.time('PDBParser._finalize');
     this._fixBondsArray();
     this._fixChains();
 
@@ -319,7 +318,6 @@ class PDBParser extends Parser {
     // identify fields: debugging and stuff
     /* eslint-disable no-magic-numbers */
     const codeOfS = 0x53;
-    // var twoLinesMaxLen = 2 * 80;
     const serialNumber = stream.readInt(8, 10);
     const structureName = stream.readString(12, 14).trim(); // FIXME: LString(3) forbids trim()
     const comment = stream.readString(41, 70).trim();

@@ -849,11 +849,9 @@ class Complex {
     }
 
     if (opts.needAutoBonding) {
-      // console.time('AutoBonding');
       const autoConnector = new AutoBond(this);
       autoConnector.build();
       autoConnector.destroy();
-      // console.timeEnd('AutoBonding');
     }
 
     const chains = this._chains;

@@ -23,7 +23,6 @@ function createLabel(fieldTxt, className) {
     text.appendChild(spanText);
   } else {
     text.appendChild(fieldTxt);
-    // text.style.paddingTop = '10px';
   }
   text.worldPos = new THREE.Vector3();
   return text;

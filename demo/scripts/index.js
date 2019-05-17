@@ -61,8 +61,6 @@ function onError(err) {
   }
 }
 
-// requirejs.onError = onError;
-
 window.onerror = function (err, url, line, col, obj) {
   onError(obj = obj || {
     name: 'window.onerror',

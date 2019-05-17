@@ -2307,8 +2307,6 @@ Menu.prototype._updateReprList = function () {
 
         _fillModeOptionsFromMenu();
 
-        // repr.setMode(repr.mode.id);
-
         if (repr.visible !== isVisible) {
           self._viewer.setNeedRender();
         }

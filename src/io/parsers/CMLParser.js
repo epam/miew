@@ -496,8 +496,6 @@ class CMLParser extends Parser {
       atom.complexAtom = a;
     }
 
-    //    var nodeHText;
-
     let chains = {};
     // parse atoms in label order
     const reorder = [];
@@ -617,8 +615,6 @@ class CMLParser extends Parser {
   }
 
   parseSync() {
-    // console.time('CML parse');
-
     const complexes = [];
     const self = this;
     const moleculaSet = this._selectComponents(this._data);
@@ -632,7 +628,6 @@ class CMLParser extends Parser {
         complexes.push(self._parseSet(molSet, false));
       }
     });
-    // console.timeEnd('CML parse');
 
     let totalAtomsParsed = 0;
     complexes.forEach((c) => {

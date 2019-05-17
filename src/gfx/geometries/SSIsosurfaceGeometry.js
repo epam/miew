@@ -267,7 +267,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const numCells = meshRes - 1;
     const side = meshRes;
     const side2 = meshRes * meshRes;
-    // side3 = meshRes * meshRes * meshRes;
 
     const vaEdges = new Array(arrSize);
     for (let i = 0; i < arrSize; i++) {
@@ -277,8 +276,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     for (let i = 0; i < cNumVerts; i++) {
       sign[i] = 1.0;
     }
-    // const numCellsIntersected   = 0;
-    // const numTrianglesGenerated = 0;
     const vCorner = new THREE.Vector3();
     let indCell = 0;
     let indY = 0;
@@ -302,28 +299,16 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
             cube.pointsValuesLinear[indPointValues + j] = vCorner.z; j++;
           }
 
-          // cell._points[1].x += vCellStep.x;
-          // cell._points[2].x += vCellStep.x;
-          // cell._points[5].x += vCellStep.x;
-          // cell._points[6].x += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 2 * 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 5 * 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 6 * 3] += vCellStep.x;
 
-          // cell._points[2].z += vCellStep.z;
-          // cell._points[3].z += vCellStep.z;
-          // cell._points[6].z += vCellStep.z;
-          // cell._points[7].z += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 2 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 3 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 6 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 7 * 3 + 2] += vCellStep.z;
 
-          // cell._points[4].y += vCellStep.y;
-          // cell._points[5].y += vCellStep.y;
-          // cell._points[6].y += vCellStep.y;
-          // cell._points[7].y += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 4 * 3 + 1] += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 5 * 3 + 1] += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 6 * 3 + 1] += vCellStep.y;
@@ -365,9 +350,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
               return 0 - 2;
             }
           } // for numTri
-
-          // numCellsIntersected++;
-          // numTrianglesGenerated += numTri;
 
           // next cell (cube)
           indCell++;

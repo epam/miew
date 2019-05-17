@@ -1512,7 +1512,6 @@ Miew.prototype.resetView = function () {
 
 Miew.prototype._export = function (format) {
   const TheExporter = _.head(io.exporters.find({ format }));
-  // let result;
   if (!TheExporter) {
     this.logger.error('Could not find suitable exporter for this source');
     return Promise.reject(new Error('Could not find suitable exporter for this source'));
@@ -2841,7 +2840,6 @@ Miew.prototype.benchmarkGfx = function (force) {
       if (numResults > 0) {
         self._gfxScore = 0.5 * numResults;
       }
-      // document.getElementById('atom-info').innerHTML = 'GFX score: ' + self._gfxScore.toPrecision(2);
 
       self._spinner.stop();
       resolve();
@@ -3595,7 +3593,6 @@ Miew.prototype._updateView = function () {
     return;
   }
 
-  // var curr = viewInterpolator.createView();
   const res = viewInterpolator.getCurrentView();
   if (res.success) {
     const curr = res.view;
@@ -3831,6 +3828,8 @@ Miew.prototype.motm = function () {
 };
 
 Miew.prototype.VERSION = (typeof PACKAGE_VERSION !== 'undefined' && PACKAGE_VERSION) || '0.0.0-dev';
+
+// Uncomment this to get debug trace:
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 _.assign(Miew, /** @lends Miew */ {

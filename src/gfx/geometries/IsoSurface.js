@@ -114,8 +114,6 @@ class IsoSurface {
     const xDir = this._xDir;
     const yDir = this._yDir;
     const zDir = this._zDir;
-    //    volData.cellAxes(xAxis, yAxis, zAxis);
-    //    volData.cellDirs(xDir, yDir, zDir);
 
     xAxis.set(cellSize.x, 0, 0);
     yAxis.set(0, cellSize.y, 0);
