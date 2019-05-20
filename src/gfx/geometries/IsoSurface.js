@@ -140,10 +140,10 @@ class IsoSurface {
     }
 
     // check that the grid is axis-aligned
-    // TODO This is a VMD way. Is it correct in our case to compare with floating zero?
-    return !(xAxis.y !== 0 || xAxis.z !== 0
-      || yAxis.x !== 0 || yAxis.z !== 0
-      || zAxis.x !== 0 || zAxis.y !== 0);
+    const notZero = axe => Math.abs(axe) > Number.EPSILON;
+    return !(notZero(xAxis.y) || notZero(xAxis.z)
+          || notZero(yAxis.x) || notZero(yAxis.z)
+          || notZero(zAxis.x) || notZero(zAxis.y));
   }
 
   _vertexInterp(isoLevel, grid, ind1, ind2, vertex, normal) {
@@ -406,8 +406,7 @@ class IsoSurface {
       let matchedIndex = -1;
 
       for (let j = start; j < end; ++j) {
-        // TODO we are comparing floating number for exact match. What is wrong with us?
-        if (vertices[i].equals(vertices[j])) {
+        if (Math.abs(vertices[i] - vertices[j]) < Number.EPSILON) {
           matchedIndex = j;
           break;
         }
