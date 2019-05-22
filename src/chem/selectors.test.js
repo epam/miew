@@ -61,13 +61,13 @@ describe('selectors', () => {
 
     describe('contructor', () => {
       it('no arguments', () => {
-        expect(emptyRL).to.deep.equal({_values: []});
+        expect(emptyRL).to.deep.equal({ _values: [] });
       });
       it('from one range', () => {
-        expect(oneRangeRL).to.deep.equal({_values: [range0]});
+        expect(oneRangeRL).to.deep.equal({ _values: [range0] });
       });
       it('from array of ranges', () => {
-        expect(threeRangesRL).to.deep.equal({_values: [range0, range1, range2]});
+        expect(threeRangesRL).to.deep.equal({ _values: [range0, range1, range2] });
       });
     });
     describe('append', () => {
@@ -85,7 +85,7 @@ describe('selectors', () => {
     });
     describe('toString', () => {
       it('toString', () => {
-        expect(twoRangesRL.toString()).to.equal(range0.toString() + ',' + range2.toString());
+        expect(twoRangesRL.toString()).to.equal([range0.toString(), range2.toString()].join(','));
       });
     });
     describe('toJSON', () => {
