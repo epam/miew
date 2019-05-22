@@ -254,4 +254,33 @@ describe('selectors', () => {
       });
     });
   });
+
+  describe('includesAtom', () => {
+    const atom = { _het: true };
+    it('All', () => {
+      expect(selectors.all().includesAtom(atom)).to.equal(true);
+    });
+    it('None', () => {
+      expect(selectors.none().includesAtom(atom)).to.equal(false);
+    });
+    it('Hetatm', () => {
+      expect(selectors.hetatm().includesAtom(atom)).to.equal(true);
+    });
+    it('Not', () => {
+      expect(selectors.not(selectors.none()).includesAtom(atom)).to.equal(true);
+      expect(selectors.not(selectors.all()).includesAtom(atom)).to.equal(false);
+    });
+    it('And', () => {
+      expect(selectors.and(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
+      expect(selectors.and(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(false);
+      expect(selectors.and(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(false);
+      expect(selectors.and(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
+    });
+    it('Or', () => {
+      expect(selectors.and(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
+      expect(selectors.or(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(true);
+      expect(selectors.or(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(true);
+      expect(selectors.and(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
+    });
+  });
 });
