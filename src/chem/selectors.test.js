@@ -106,4 +106,62 @@ describe('selectors', () => {
       });
     });
   });
+
+  describe('class ValueList', () => {
+    const value0 = 'a';
+    const value1 = 'B';
+    const value2 = 12;
+
+    const emptyVL = new selectors.ValueList();
+    const oneValueVL = new selectors.ValueList(value0);
+    const twoValuesVL = new selectors.ValueList([value0, value2]);
+    const threeValuesVL = new selectors.ValueList([value0, value1, value2]);
+
+    describe('contructor', () => {
+      it('no arguments', () => {
+        expect(emptyVL).to.deep.equal({ _values: [] });
+      });
+      it('from one value', () => {
+        expect(oneValueVL).to.deep.equal({ _values: [value0] });
+      });
+      it('from array of values', () => {
+        expect(threeValuesVL).to.deep.equal({ _values: [value0, value1, value2] });
+      });
+      it('with toUpperCase setting', () => {
+        const valList = new selectors.ValueList(['ala', 12, 'B', 'c'], true);
+        expect(valList).to.deep.equal({ _values: ['ALA', 12, 'B', 'C'] });
+      });
+    });
+    describe('append', () => {
+      it('append value', () => {
+        expect(oneValueVL.append(value2)).to.deep.equal(twoValuesVL);
+      });
+    });
+    describe('remove', () => {
+      it('exist range', () => {
+        expect(threeValuesVL.remove(value1)).to.deep.equal(twoValuesVL);
+      });
+      it('fantastic range', () => {
+        expect(twoValuesVL.remove(value1)).to.deep.equal(twoValuesVL);
+      });
+    });
+    describe('toString', () => {
+      it('toString', () => {
+        expect(twoValuesVL.toString()).to.equal([value0.toString(), value2.toString()].join(','));
+      });
+    });
+    describe('toJSON', () => {
+      it('toJSON', () => {
+        expect(twoValuesVL.toJSON()).to.deep.equal([value0, value2]);
+      });
+    });
+    describe('includes', () => {
+      it('existed value', () => {
+        expect(twoValuesVL.includes(value0)).to.equal(true);
+      });
+      it('fantastic value', () => {
+        expect(twoValuesVL.includes(value1)).to.equal(false);
+      });
+    });
+  });
 });
