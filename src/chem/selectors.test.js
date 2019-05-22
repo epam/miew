@@ -195,4 +195,35 @@ describe('selectors', () => {
       });
     });
   });
+
+  describe('class RangeListSelector', () => {
+    const range0 = new selectors.Range(2, 8);
+    const range1 = new selectors.Range(1, 14);
+
+    const rangeList = new selectors.RangeList([range0, range1]);
+
+    const rangeListSelector = new selectors.RangeListSelector(rangeList);
+
+    describe('Selector prototype', () => {
+      it('keyword', () => {
+        expect(rangeListSelector.keyword).to.equal('error');
+      });
+      it('name', () => {
+        expect(rangeListSelector.name).to.equal('Error');
+      });
+      it('list', () => {
+        expect(rangeListSelector.list).to.deep.equal(rangeList);
+      });
+    });
+    describe('toString', () => {
+      it('toString', () => {
+        expect(rangeListSelector.toString()).to.equal(['error', rangeList.toString()].join(' '));
+      });
+    });
+    describe('toJSON', () => {
+      it('toJSON', () => {
+        expect(rangeListSelector.toJSON()).to.deep.equal(['Error', rangeList.toJSON()]);
+      });
+    });
+  });
 });
