@@ -164,4 +164,35 @@ describe('selectors', () => {
       });
     });
   });
+
+  describe('class Selector', () => {
+    const selector = new selectors.Selector();
+
+    describe('Selector prototype', () => {
+      it('keyword', () => {
+        expect(selector.keyword).to.equal('error');
+      });
+      it('name', () => {
+        expect(selector.name).to.equal('Error');
+      });
+    });
+    describe('toString', () => {
+      it('from prototype', () => {
+        expect(selector.toString()).to.equal('error');
+      });
+      it('from extention', () => {
+        selector.keyword = 'new keyword';
+        expect(selector.toString()).to.equal('new keyword');
+      });
+    });
+    describe('toJSON', () => {
+      it('from prototype', () => {
+        expect(selector.toJSON()).to.deep.equal(['Error']);
+      });
+      it('from extention', () => {
+        selector.name = 'new name';
+        expect(selector.toJSON()).to.deep.equal(['new name']);
+      });
+    });
+  });
 });
