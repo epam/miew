@@ -197,14 +197,10 @@ describe('selectors', () => {
   });
 
   describe('class RangeListSelector', () => {
-    const range0 = new selectors.Range(2, 8);
-    const range1 = new selectors.Range(1, 14);
+    const rangeList = new selectors.RangeList([new selectors.Range(2, 8), new selectors.Range(1, 14)]);
+    const rangeListSelector = new selectors.RangeListSelector([new selectors.Range(2, 8), new selectors.Range(1, 14)]);
 
-    const rangeList = new selectors.RangeList([range0, range1]);
-
-    const rangeListSelector = new selectors.RangeListSelector(rangeList);
-
-    describe('Selector prototype', () => {
+    describe('construcnor', () => {
       it('keyword', () => {
         expect(rangeListSelector.keyword).to.equal('error');
       });
@@ -223,6 +219,38 @@ describe('selectors', () => {
     describe('toJSON', () => {
       it('toJSON', () => {
         expect(rangeListSelector.toJSON()).to.deep.equal(['Error', rangeList.toJSON()]);
+      });
+    });
+  });
+
+  describe('class ValueListSelector', () => {
+    const valueList = new selectors.ValueList(['A', 'b'], false);
+    const valueListSelector = new selectors.ValueListSelector(['A', 'b'], true);
+
+    describe('construcnor', () => {
+      it('keyword', () => {
+        expect(valueListSelector.keyword).to.equal('error');
+      });
+      it('name', () => {
+        expect(valueListSelector.name).to.equal('Error');
+      });
+      it('list', () => {
+        expect(valueListSelector.list).to.deep.equal(valueList);
+      });
+      it('caseSensitive list', () => {
+        const vl = new selectors.ValueList(['A', 'b'], true);
+        const vls = new selectors.ValueListSelector(['A', 'b'], false);
+        expect(vls.list).to.deep.equal(vl);
+      });
+    });
+    describe('toString', () => {
+      it('toString', () => {
+        expect(valueListSelector.toString()).to.equal(['error', valueList.toString()].join(' '));
+      });
+    });
+    describe('toJSON', () => {
+      it('toJSON', () => {
+        expect(valueListSelector.toJSON()).to.deep.equal(['Error', valueList.toJSON()]);
       });
     });
   });
