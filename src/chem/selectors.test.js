@@ -255,32 +255,196 @@ describe('selectors', () => {
     });
   });
 
-  describe('includesAtom', () => {
-    const atom = { _het: true };
-    it('All', () => {
-      expect(selectors.all().includesAtom(atom)).to.equal(true);
+  describe('includesAtom function', () => {
+    class AtomName {
+      constructor(name, node) {
+        this._name = name || null;
+      }
+      
+      getString() {
+        return this._name || 'unknown';
+      }
+    }
+    const residue = { _type: { _name: 'ALA', flags: 0x0000 },  _chain: { _name: 'A' }, _icode: 'A', _index: 2, _sequence: 4 }
+    const atom = { _het: false, _location: 32, _name: new AtomName('CA'), _residue: residue, _serial: 5, element: { name: 'N'}};
+    
+    describe('base selectors', () => {
+      const Flags = {
+        HYDROGEN: 0x0008,
+        NONPOLARH: 0x1008,
+      };
+      
+      it('Serial', () => {
+        atom._serial = 5
+        expect(selectors.serial(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
+        expect(selectors.serial([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
+      });
+      it('Name', () => {
+        atom._name._name = 'CA';
+        expect(selectors.name('N').includesAtom(atom)).to.equal(false);
+        expect(selectors.name(['N', 'CA']).includesAtom(atom)).to.equal(true);
+      });
+      it('AltLoc', () => {
+        atom._location = 32
+        expect(selectors.altloc('A').includesAtom(atom)).to.equal(false);
+        expect(selectors.altloc(['A', ' ']).includesAtom(atom)).to.equal(true);
+      });
+      it('Elem', () => {
+        atom.element.name = 'N'
+        expect(selectors.elem('C').includesAtom(atom)).to.equal(false);
+        expect(selectors.elem(['N', 'C']).includesAtom(atom)).to.equal(true);
+      });
+      it('Residue', () => {
+        atom._residue._type._name = 'ALA'
+        expect(selectors.residue('CYS').includesAtom(atom)).to.equal(false);
+        expect(selectors.residue(['THR','ALA', 'CYS']).includesAtom(atom)).to.equal(true);
+      });
+      it('Sequence', () => {
+        atom._residue._sequence = 4
+        expect(selectors.sequence(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
+        expect(selectors.sequence([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
+      });
+      it('ICode', () => {
+        atom._residue._icode = 'A'
+        expect(selectors.icode('a').includesAtom(atom)).to.equal(false);
+        expect(selectors.icode(['A','b', 'C']).includesAtom(atom)).to.equal(true);
+      });
+      it('ResIdx', () => {
+        atom._residue._index = 2
+        expect(selectors.residx(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
+        expect(selectors.residx([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
+      });
+      it('Chain', () => {
+        atom._residue._chain._name = 'B'
+        expect(selectors.chain('b').includesAtom(atom)).to.equal(false);
+        expect(selectors.chain(['A','B', 'c']).includesAtom(atom)).to.equal(true);
+      });
+      it('Hetatm', () => {
+        atom._het = true;
+        expect(selectors.hetatm().includesAtom(atom)).to.equal(true);
+        atom._het = false;
+        expect(selectors.hetatm().includesAtom(atom)).to.equal(false);
+      });
+      it('PolarH', () => {
+        atom.flags = Flags.HYDROGEN;
+        expect(selectors.polarh().includesAtom(atom)).to.equal(true);
+        atom.flags = Flags.NONPOLARH;
+        expect(selectors.polarh().includesAtom(atom)).to.equal(false);
+      });
+      it('NonPolarH', () => {
+        atom.flags = Flags.NONPOLARH;
+        expect(selectors.nonpolarh().includesAtom(atom)).to.equal(true);
+        atom.flags = Flags.HYDROGEN;
+        expect(selectors.nonpolarh().includesAtom(atom)).to.equal(false);
+      });
+      it('All', () => {
+        expect(selectors.all().includesAtom(atom)).to.equal(true);
+      });
+      it('None', () => {
+        expect(selectors.none().includesAtom(atom)).to.equal(false);
+      });
     });
-    it('None', () => {
-      expect(selectors.none().includesAtom(atom)).to.equal(false);
+    describe('flag selectors', () => {
+      const Flags = {
+        PROTEIN: 0x0001,
+        BASIC: 0x0002,
+        ACIDIC: 0x0004,
+        POLAR: 0x0008,
+        NONPOLAR: 0x0010,
+        AROMATIC: 0x0020,
+        NUCLEIC: 0x0100,
+        PURINE: 0x0200,
+        PYRIMIDINE: 0x0400,
+        DNA: 0x0800,
+        RNA: 0x1000,
+        WATER: 0x10000,
+      };
+      it('Protein', () => {
+        atom._residue._type.flags = Flags.PROTEIN;
+        expect(selectors.protein().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.protein().includesAtom(atom)).to.equal(false);
+      });
+      it('Basic', () => {
+        atom._residue._type.flags = Flags.BASIC;
+        expect(selectors.basic().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.basic().includesAtom(atom)).to.equal(false);
+      });
+      it('Acidic', () => {
+        atom._residue._type.flags = Flags.ACIDIC;
+        expect(selectors.acidic().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.acidic().includesAtom(atom)).to.equal(false);
+      });
+      it('Charged', () => {
+        atom._residue._type.flags = Flags.ACIDIC;
+        expect(selectors.charged().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = Flags.BASIC;
+        expect(selectors.charged().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.charged().includesAtom(atom)).to.equal(false);
+      });
+      it('Polar', () => {
+        atom._residue._type.flags = Flags.POLAR;
+        expect(selectors.polar().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.polar().includesAtom(atom)).to.equal(false);
+      });
+      it('NonPolar', () => {
+        atom._residue._type.flags = Flags.NONPOLAR;
+        expect(selectors.nonpolar().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.nonpolar().includesAtom(atom)).to.equal(false);
+      });
+      it('Aromatic', () => {
+        atom._residue._type.flags = Flags.AROMATIC;
+        expect(selectors.aromatic().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.aromatic().includesAtom(atom)).to.equal(false);
+      });
+      it('Nucleic', () => {
+        atom._residue._type.flags = Flags.NUCLEIC;
+        expect(selectors.nucleic().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.nucleic().includesAtom(atom)).to.equal(false);
+      });
+      it('Purine', () => {
+        atom._residue._type.flags = Flags.PURINE;
+        expect(selectors.purine().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.purine().includesAtom(atom)).to.equal(false);
+      });
+      it('Pyrimidine', () => {
+        atom._residue._type.flags = Flags.PYRIMIDINE;
+        expect(selectors.pyrimidine().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.pyrimidine().includesAtom(atom)).to.equal(false);
+      });
+      it('Water', () => {
+        atom._residue._type.flags = Flags.WATER;
+        expect(selectors.water().includesAtom(atom)).to.equal(true);
+        atom._residue._type.flags = 0x0000;
+        expect(selectors.water().includesAtom(atom)).to.equal(false);
+      });
     });
-    it('Hetatm', () => {
-      expect(selectors.hetatm().includesAtom(atom)).to.equal(true);
-    });
-    it('Not', () => {
-      expect(selectors.not(selectors.none()).includesAtom(atom)).to.equal(true);
-      expect(selectors.not(selectors.all()).includesAtom(atom)).to.equal(false);
-    });
-    it('And', () => {
-      expect(selectors.and(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
-      expect(selectors.and(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(false);
-      expect(selectors.and(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(false);
-      expect(selectors.and(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
-    });
-    it('Or', () => {
-      expect(selectors.and(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
-      expect(selectors.or(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(true);
-      expect(selectors.or(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(true);
-      expect(selectors.and(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
+    describe('operators', () => {
+      it('Not', () => {
+        expect(selectors.not(selectors.none()).includesAtom(atom)).to.equal(true);
+        expect(selectors.not(selectors.all()).includesAtom(atom)).to.equal(false);
+      });
+      it('And', () => {
+        expect(selectors.and(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
+        expect(selectors.and(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(false);
+        expect(selectors.and(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(false);
+        expect(selectors.and(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
+      });
+      it('Or', () => {
+        expect(selectors.and(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
+        expect(selectors.or(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(true);
+        expect(selectors.or(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(true);
+        expect(selectors.and(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
+      });
     });
   });
 });
