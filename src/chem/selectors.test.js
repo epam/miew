@@ -1,6 +1,7 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import selectors from './selectors';
+import { Object3D } from 'three';
 
 chai.use(dirtyChai);
 
@@ -321,6 +322,27 @@ describe('selectors', () => {
     });
   });
 
+  describe('selectors functions', () => {
+    describe('GetSelector', () => {
+      let key = 'all';
+      selectors.Context['all'] = new selectors.all();
+      expect(selectors.GetSelector(key)).to.deep.equal(new selectors.all());
+    });
+
+    describe('ClearContext', () => {
+      let key = 'all';
+      selectors.Context['all'] = new selectors.all();
+      selectors.ClearContext();
+      expect(selectors.Context).to.deep.equal({});
+    });
+
+    describe('keyword', () => {
+    });
+
+    describe('parse', () => {
+    });
+
+  });
   describe('includesAtom function', () => {
     class AtomName {
       constructor(name, node) {
