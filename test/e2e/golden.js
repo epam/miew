@@ -100,6 +100,7 @@ function _prepareServer(cfg) {
   }
   const app = express();
   app.use('/', express.static(cfg.localPath));
+  app.use('/data', express.static(path.resolve(__dirname, '../data')));
   return new Promise((resolve) => {
     localhost = app.listen(cfg.localPort, () => {
       resolve(`http://localhost:${cfg.localPort}`);
