@@ -284,6 +284,43 @@ describe('selectors', () => {
     });
   });
 
+  describe('class InfixOperator', () => {
+    const letfSelector = new selectors.all();
+    const rightSelector = new selectors.hetatm();
+    const noneSelector = new selectors.none();
+    const selectorPO = new selectors.InfixOperator(letfSelector, rightSelector);
+    const halfSelectorPO = new selectors.InfixOperator(letfSelector);
+    const noneSelectorPO = new selectors.InfixOperator();
+
+    describe('construcnor', () => {
+      it('priority', () => {
+        expect(selectorPO.priority).to.equal(1000);
+      });
+      it('construcnor with two arguments', () => {
+        expect(selectorPO.lhs).to.deep.equal(letfSelector);
+        expect(selectorPO.rhs).to.deep.equal(rightSelector);
+      });
+      it('construcnor with one argument', () => {
+        expect(halfSelectorPO.lhs).to.deep.equal(letfSelector);
+        expect(halfSelectorPO.rhs).to.deep.equal(noneSelector);
+      });
+      it('construcnor without arguments', () => {
+        expect(noneSelectorPO.lhs).to.deep.equal(noneSelector);
+        expect(noneSelectorPO.rhs).to.deep.equal(noneSelector);
+      });
+    });
+    describe('toString', () => {
+      it('toString', () => {
+        expect(selectorPO.toString()).to.equal([letfSelector.toString(), 'error', rightSelector.toString()].join(' '));
+      });
+    });
+    describe('toJSON', () => {
+      it('toJSON', () => {
+        expect(selectorPO.toJSON()).to.deep.equal(['Error', letfSelector.toJSON(), rightSelector.toJSON()]);
+      });
+    });
+  });
+
   describe('includesAtom function', () => {
     class AtomName {
       constructor(name, node) {
