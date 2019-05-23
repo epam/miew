@@ -63,18 +63,28 @@ vec4 sample3DTextureInclined(vec3 boxCoord) { // delta:{ x: XY, y : XZ, z: YZ }
   return sample3DTexture(textCoord);
 }
 
-float CalcColor(vec3 iter, vec3 dir)
-{
-  float d = 1.0 / 128.0;
+float CalcColor(vec3 iter, vec3 dir) {
+  float d = 1. / 128.;
   vec3 dx = vec3(d, 0.0, 0.0);
   vec3 dy = vec3(0.0, d, 0.0);
   vec3 dz = vec3(0.0, 0.0, d);
-  vec3 N;
-  N.x = sample3DTextureInclined(iter + dx).r - sample3DTextureInclined(iter - dx).r;
-  N.y = sample3DTextureInclined(iter + dy).r - sample3DTextureInclined(iter - dy).r;
-  N.z = sample3DTextureInclined(iter + dz).r - sample3DTextureInclined(iter - dz).r;
-  N = normalize(N);
-  float dif = max(0.0, dot(N,dir));
+
+  vec3 coordInc = vec3(
+  // #Opt: coordInc.x:(iter + dx).x > 1. ? 0.: sample3DTextureInclined(iter + dx).x,
+  mix(sample3DTextureInclined(iter + dx).x, 0., floor((iter + dx).x)),
+  mix(sample3DTextureInclined(iter + dy).x, 0., floor((iter + dy).y)),
+  mix(sample3DTextureInclined(iter + dz).x, 0., floor((iter + dz).z))
+  );
+
+  vec3 coordDec = vec3(
+  // #Opt: coordDec.x:(iter - dx).x < 0. ? 0.: sample3DTextureInclined(iter - dx).x,
+  mix(0., sample3DTextureInclined(iter - dx).x, ceil((iter - dx).x)),
+  mix(0., sample3DTextureInclined(iter - dy).x, ceil((iter - dy).y)),
+  mix(0., sample3DTextureInclined(iter - dz).x, ceil((iter - dz).z))
+  );
+
+  vec3 N = normalize(coordInc - coordDec);
+  float dif = max(0.0, dot(N, dir));
   return dif;
 }
 
@@ -221,19 +231,19 @@ vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir) {
   return vec4(1.,1.,1., acc);
 }
 
-vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)
-{
-  vec4 tst = GetIso1(start, back, 2., dir, 0.28, 0);
-  vec4 col = vec4(0, 0., 0., 0.);
-  if (tst.a > 0.1)
-  {
-    float dif = CalcColor(tst.rgb, dir);
-    col = vec4(dif, 0., 0., 1.);
+vec4 IsoRender(vec3 start, vec3 back, float molDist, vec3 dir) {
+  vec4 tst = GetIso1(start, back, 2., dir, _isoLevel0.x, 0);
+  vec4 col = noColor;
+
+  if (length(tst.xyz - start) < molDist && tst.a > 0.1) {
+    float dif =  CalcColor(tst.xyz, dir);
+    dif = 0.9 * dif * dif;
+    col = vec4(dif, dif, dif, 1);
   }
   return col;
 }
 
-vec4 VolRender3(vec3 start, vec3 back, float molDist, vec3 dir) {
+vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir) {
   return sample3DTexture(start);
 }
 
@@ -264,5 +274,5 @@ void main() {
     molDist = distance(start, molBack);
   }
 
-  gl_FragColor = VolRender(start, back, molDist, dir);
+  gl_FragColor = IsoRender(start, back, molDist, dir);
 }
