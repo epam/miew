@@ -255,6 +255,35 @@ describe('selectors', () => {
     });
   });
 
+  describe('class PrefixOperator', () => {
+    const selector = new selectors.all();
+    const noneSelector = new selectors.none();
+    const selectorPO = new selectors.PrefixOperator(selector);
+    const noneSelectorPO = new selectors.PrefixOperator();
+
+    describe('construcnor', () => {
+      it('priority', () => {
+        expect(selectorPO.priority).to.equal(1);
+      });
+      it('construcnor with rhs', () => {
+        expect(selectorPO.rhs).to.deep.equal(selector);
+      });
+      it('construcnor without arguments', () => {
+        expect(noneSelectorPO.rhs).to.deep.equal(noneSelector);
+      });
+    });
+    describe('toString', () => {
+      it('toString', () => {
+        expect(selectorPO.toString()).to.equal(['error', selector.toString()].join(' '));
+      });
+    });
+    describe('toJSON', () => {
+      it('toJSON', () => {
+        expect(selectorPO.toJSON()).to.deep.equal(['Error', selector.toJSON()]);
+      });
+    });
+  });
+
   describe('includesAtom function', () => {
     class AtomName {
       constructor(name, node) {
@@ -273,7 +302,7 @@ describe('selectors', () => {
         HYDROGEN: 0x0008,
         NONPOLARH: 0x1008,
       };
-      
+
       it('Serial', () => {
         atom._serial = 5
         expect(selectors.serial(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
