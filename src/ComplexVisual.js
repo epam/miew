@@ -108,7 +108,7 @@ ComplexVisual.prototype.resetReps = function (reps) {
 
     this._reprList[i] = new Representation(i, mode, colorer, selector);
     this._reprList[i].setMaterialPreset(material);
-    this._reprList[i].selectorString = selectorString; // FIXME: get rid of a separate selectorString
+    this._reprList[i].selectorString = selectorString;
 
     if (this._complex) {
       this._complex.markAtoms(selector, 1 << i);
@@ -182,7 +182,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
   // gather description
   const target = this._reprList[index];
   const desc = {
-    selector: target.selectorString, // FIXME: Hope it equals String(target.selector)
+    selector: target.selectorString,
     mode: target.mode.identify(),
     colorer: target.colorer.identify(),
     material: target.materialPreset.id,
@@ -214,7 +214,7 @@ ComplexVisual.prototype.rep = function (index, rep) {
         changed = true;
         logger.debug(`rep[${index}].mode changed to ${newMode}`);
 
-        // safety hack: lower resolution for surface modes
+        // safety trick: lower resolution for surface modes
         if (target.mode.isSurface
             && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
           logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
@@ -609,7 +609,7 @@ ComplexVisual.prototype.rebuild = function () {
   // Destroy current geometry
   gfxutils.clearTree(this);
 
-  return new Promise(((resolve, _reject) => { // TODO: `reject` is not used
+  return new Promise(((resolve) => {
     // Nothing to do?
     const complex = self._complex;
     if (!complex) {
@@ -854,7 +854,7 @@ ComplexVisual.prototype.finalizeEdit = function () {
   this._editor = null;
 };
 
-ComplexVisual.prototype.setMaterialValues = function (values, needTraverse = false, process) {
+ComplexVisual.prototype.setMaterialValues = function (values, needTraverse = false, process = undefined) {
   for (let i = 0, n = this._reprList.length; i < n; ++i) {
     const rep = this._reprList[i];
     rep.material.setValues(values);

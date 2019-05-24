@@ -52,9 +52,9 @@ class Complex {
     this.structures = [];
 
     this._residueTypes = Object.create(ResidueType.StandardTypes);
-    this._atoms = []; // TODO: preallocate
-    this._residues = []; // TODO: preallocate
-    this._bonds = []; // TODO: preallocate
+    this._atoms = [];
+    this._residues = [];
+    this._bonds = [];
     this._sgroups = [];
     this._molecules = [];
     this._maskNeedsUpdate = false;
@@ -180,7 +180,7 @@ class Complex {
    */
   addChain(name) {
     const result = new Chain(this, name);
-    this._chains.push(result); // TODO: keep chains in dictionary with an (ordered?) array of keys
+    this._chains.push(result);
     return result;
   }
 
@@ -703,24 +703,6 @@ class Complex {
     return this._currentUnit;
   }
 
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#getCurrentUnit}
-   */
-  getCurrentStructure = Complex.prototype.getCurrentUnit;
-
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#resetCurrentUnit}
-   */
-  resetCurrentStructure = Complex.prototype.resetCurrentUnit;
-
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#setCurrentUnit}
-   */
-  setCurrentStructure = Complex.prototype.setCurrentUnit;
-
   getDefaultBoundaries() {
     return this.units[0].getBoundaries();
   }
@@ -867,11 +849,9 @@ class Complex {
     }
 
     if (opts.needAutoBonding) {
-      // console.time('AutoBonding');
       const autoConnector = new AutoBond(this);
       autoConnector.build();
       autoConnector.destroy();
-      // console.timeEnd('AutoBonding');
     }
 
     const chains = this._chains;

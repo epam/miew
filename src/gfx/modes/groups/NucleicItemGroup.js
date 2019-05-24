@@ -52,7 +52,7 @@ class NucleicItemGroup extends ResiduesGroup {
   }
 
   updateToFrame(frameData) {
-    // TODO This method looks like a copy paste. However, it
+    // This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
     const residues = frameData.getResidues();
     const { parent } = this._selection;
@@ -65,7 +65,6 @@ class NucleicItemGroup extends ResiduesGroup {
     for (let i = 0, n = resIdc.length; i < n; ++i) {
       const res = residues[resIdc[i]];
       const color = colorer.getResidueColor(res, parent);
-      // TODO Pass color only when it has been changed?
       this._processItem(chunkIdx++, res._cylinders[0], res._cylinders[1], stickRad, color);
     }
     geo.finishUpdate();

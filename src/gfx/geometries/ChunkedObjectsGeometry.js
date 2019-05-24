@@ -51,7 +51,6 @@ class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
 
   finalize() {
     this.finishUpdate();
-    // TODO compute bounding box?
     this.computeBoundingSphere();
   }
 
@@ -68,7 +67,6 @@ class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
   raycast(raycaster, intersects) {
     const inters = [];
     super.raycast(raycaster, inters);
-    // TODO faceIdx to chunkIdx
     const facesPerChunk = this._chunkGeo.index.count / 3;
     for (let i = 0, n = inters.length; i < n; ++i) {
       if (!inters[i].hasOwnProperty('faceIndex')) {

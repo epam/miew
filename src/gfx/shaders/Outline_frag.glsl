@@ -1,3 +1,5 @@
+precision highp float;
+
 uniform sampler2D srcTex;
 uniform vec2 srcTexSize;
 varying vec2 vUv;

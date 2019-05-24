@@ -1,3 +1,5 @@
+precision highp float;
+
 uniform sampler2D srcL;
 uniform sampler2D srcR;
 varying vec2 vUv;

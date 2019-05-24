@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import * as THREE from 'three';
 import EntityList from '../utils/EntityList';
 
@@ -170,26 +169,5 @@ const materialList = [
 ];
 
 const materials = new EntityList(materialList);
-
-/** @deprecated */
-Object.defineProperty(materials, 'list', {
-  get() {
-    return this.all;
-  },
-});
-
-/** @deprecated */
-Object.defineProperty(materials, 'any', {
-  get() {
-    return this.first;
-  },
-});
-
-/** @deprecated */
-Object.defineProperty(materials, 'descriptions', {
-  get() {
-    return _.map(this._list, m => _.pick(m, ['id', 'name']));
-  },
-});
 
 export default materials;

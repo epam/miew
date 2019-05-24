@@ -4,11 +4,11 @@ import makeContextDependent from './makeContextDependent';
 const MAX_COOKIE_LEN = 4000;
 const COUNT_SUFFIX = 'Cnt';
 
-function _chunkSrting(string, chunkLen) {
+function _chunkString(string, chunkLen) {
   const l = string.length;
   const chunks = [];
-  for (let lc = 0, c = 0; lc < l; c++) {
-    chunks[c] = string.slice(lc, lc += chunkLen);
+  for (let c = 0, lc = 0; lc < l; c++, lc += chunkLen) {
+    chunks[c] = string.slice(lc, lc + chunkLen);
   }
   return chunks;
 }
@@ -56,7 +56,7 @@ Cookies.prototype.removeCookie = function (key) {
 Cookies.prototype.setCookie = function (key, value) {
   this.removeCookie(key);
   value = encodeURIComponent(value);
-  const values = _chunkSrting(value, MAX_COOKIE_LEN - key.length - 1);
+  const values = _chunkString(value, MAX_COOKIE_LEN - key.length - 1);
   const cntVal = values.length;
   if (cntVal === 1) {
     this._setSimpleCookie(key, value);

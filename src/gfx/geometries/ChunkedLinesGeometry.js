@@ -81,7 +81,6 @@ class ChunkedLinesGeometry extends LinesGeometry {
 
   finalize() {
     this.finishUpdate();
-    // TODO compute bounding box?
     this.computeBoundingSphere();
   }
 

@@ -16,7 +16,7 @@ class Representation {
     this.mode = mode;
     this.colorer = colorer;
     this.selector = selector;
-    this.selectorString = ''; // FIXME
+    this.selectorString = '';
     this.count = 0;
     this.material = new UberMaterial();
     this.material.setValues(startMaterialValues);
@@ -57,7 +57,6 @@ class Representation {
   }
 
   buildGeometry(complex) {
-    // console.time('buildGeometry');
     this.reset();
     this.needsRebuild = false;
 
@@ -70,7 +69,6 @@ class Representation {
     if (this.material.uberOptions.opacity < 0.99 && settings.now.transparency === 'prepass') {
       gfxutils.processTransparentMaterial(this.geo, this.material);
     }
-    // console.timeEnd('buildGeometry');
     this.geo.visible = this.visible;
 
     if (settings.now.shadow.on) {

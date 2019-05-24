@@ -51,7 +51,6 @@ class LinesGeometry extends BaseLinesGeometry {
 
   finalize() {
     this.finishUpdate();
-    // TODO compute bounding box?
     this.computeBoundingSphere();
   }
 }

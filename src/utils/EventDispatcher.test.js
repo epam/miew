@@ -24,7 +24,6 @@ describe('utils/EventDispatcher', () => {
     });
 
     it('registers callback with same context only once', () => {
-      // TODO does this test has correct description?
       const dispatcher = new EventDispatcher();
       const callback = sinon.spy();
 

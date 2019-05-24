@@ -18,7 +18,7 @@ class Chain {
     this._mask = 1 | 0;
     this._index = -1;
 
-    this._residues = []; // TODO: change to range
+    this._residues = [];
 
     this.minSequence = Number.POSITIVE_INFINITY;
     this.maxSequence = Number.NEGATIVE_INFINITY;
@@ -117,7 +117,7 @@ class Chain {
     }
     const residue = new Residue(this, type, sequence, iCode);
     this._complex.addResidue(residue);
-    this._residues.push(residue); // TODO: change to range
+    this._residues.push(residue);
 
     if (type.flags & (ResidueType.Flags.NUCLEIC | ResidueType.Flags.PROTEIN)) {
       if (this.maxSequence < sequence) {

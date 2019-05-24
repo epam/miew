@@ -75,7 +75,6 @@ uniform mat4 modelViewMatrix; // optional
 uniform mat4 projectionMatrix; // optional
 uniform mat3 normalMatrix; // optional
 uniform mat4 modelMatrix; // optional
-uniform mat4 projMatrixInv; // TODO move to thick line
 
 #ifdef DASHED_LINE
   attribute float lineDistance;
@@ -84,6 +83,7 @@ uniform mat4 projMatrixInv; // TODO move to thick line
 
 #ifdef THICK_LINE
   attribute vec3 direction;
+  uniform mat4 projMatrixInv;
   uniform vec2 viewport;
   uniform float lineWidth;
 

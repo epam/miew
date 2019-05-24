@@ -1,3 +1,5 @@
+precision highp float;
+
 #define MAX_SAMPLES_COUNT 32
 
 uniform vec3 samplesKernel[MAX_SAMPLES_COUNT];
@@ -81,12 +83,7 @@ void main() {
   // add fog to the AO value
   AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);
   // calc result AO-map color
-  AO = 1.0 - max(0.0, AO / 32.0 * factor); // TODO use MAX_SAMPLES_COUNT
-  // check if the fragment doesn't belong to background(?)
-  if (abs(- viewPos.z - camNearFar.y) < 0.1) { // FIXME remove temporal fix for background darkening
-    gl_FragColor = vec4(1.0);
-    return;
-  }
+  AO = 1.0 - max(0.0, AO / float(MAX_SAMPLES_COUNT) * factor);
   // write value to AO-map
   gl_FragColor = vec4(AO, AO, AO, 1.0);
 }

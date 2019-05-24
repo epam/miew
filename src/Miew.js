@@ -40,6 +40,7 @@ import logger from './utils/logger';
 import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
 import WebVRPoC from './gfx/vr/WebVRPoC';
+import vertexScreenQuadShader from './gfx/shaders/ScreenQuad_vert.glsl';
 
 const {
   selectors,
@@ -50,6 +51,9 @@ const {
 } = chem;
 
 const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
+
+const LOADER_NOT_FOUND = 'Could not find suitable loader for this source';
+const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
 
 const { createElement } = utils;
 
@@ -134,7 +138,7 @@ function Miew(opts) {
 
   /** @type {Settings} */
   this.settings = settings;
-  const log = logger; // TODO: add .instantiate() when migration to the "context" paradigm is finished
+  const log = logger;
   log.console = DEBUG;
   log.level = DEBUG ? 'debug' : 'info';
   /**
@@ -169,11 +173,6 @@ function Miew(opts) {
 
   /** @type {object} */
   this._sourceWindow = null;
-
-  // TODO make this being not so ugly
-
-  this._srvTopoSource = null;
-  this._srvAnimSource = null;
 
   this.reset();
 
@@ -325,14 +324,11 @@ Miew.prototype.init = function () {
     this._picker.addEventListener('dblclick', (event) => {
       self._onDblClick(event);
     });
-
-    if (!settings._changed['bg.color']) {
-      settings.set('bg.color', settings.now.themes[settings.now.theme]);
-    }
   } catch (error) {
-    // FIXME: THREE.WebGLRenderer throws error AND catches it, so we receive different one. Some random crash.
     if (error.name === 'TypeError' && error.message === 'Cannot read property \'getExtension\' of null') {
       this._showMessage('Could not create WebGL context.');
+    } else if (error.message.search(/webgl/i) > 1) {
+      this._showMessage(error.message);
     } else {
       this._showMessage('Viewer initialization failed.');
       throw error;
@@ -402,7 +398,7 @@ Miew.prototype._initGfx = function () {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
-  gfx.renderer.shadowMap.enabled = false;
+  gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
   gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
   capabilities.init(gfx.renderer);
 
@@ -458,7 +454,6 @@ Miew.prototype._initGfx = function () {
   gfx.selectionPivot.matrixAutoUpdate = false;
   gfx.selectionRoot.add(gfx.selectionPivot);
 
-  // TODO: Either stay with a single light or revert this commit
   const light12 = new THREE.DirectionalLight(0xffffff, 0.45);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
@@ -677,7 +672,7 @@ Miew.prototype._removeVisual = function (visual) {
   }
 
   if (name === this._curVisualName) {
-    this._curVisualName = undefined; // TODO: implement a proper way of handling visuals
+    this._curVisualName = undefined;
   }
 
   delete this._visuals[name];
@@ -822,6 +817,7 @@ Miew.prototype.run = function () {
     }
 
     this._objectControls.enable(true);
+    viewInterpolator.resume();
 
     const device = this.webVR ? this.webVR.getDevice() : null;
     (device || window).requestAnimationFrame(() => this._onTick());
@@ -838,6 +834,7 @@ Miew.prototype.halt = function () {
     this._discardComponentEdit();
     this._discardFragmentEdit();
     this._objectControls.enable(false);
+    viewInterpolator.pause();
     this._halting = true;
   }
 };
@@ -1085,8 +1082,9 @@ Miew.prototype._renderFrame = (function () {
       case 'ANAGLYPH':
         this._renderScene(this._gfx.stereoCam.cameraL, false, gfx.stereoBufL);
         this._renderScene(this._gfx.stereoCam.cameraR, false, gfx.stereoBufR);
-        _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL;
-        _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR;
+        renderer.setRenderTarget(null);
+        _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL.texture;
+        _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR.texture;
         gfx.renderer.renderScreenQuad(_anaglyphMat);
         break;
       default:
@@ -1097,18 +1095,6 @@ Miew.prototype._renderFrame = (function () {
     if (settings.now.axes && gfx.axes && !gfx.renderer.vr.enabled) {
       gfx.axes.render(renderer);
     }
-  };
-}());
-/** @deprecated - use _onBgColorChanged */
-Miew.prototype._onThemeChanged = (function () {
-  const themeRE = /\s*theme-\w+\b/g;
-  return function () {
-    const { theme } = settings.now;
-    const div = this._containerRoot;
-    div.className = `${div.className.replace(themeRE, '')} theme-${theme}`;
-
-    settings.set('bg.color', settings.now.themes[theme]);
-    this._needRender = true;
   };
 }());
 
@@ -1185,7 +1171,7 @@ Miew.prototype._renderScene = (function () {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.setRenderTarget(gfx.offscreenBuf); // FIXME clean up targets in render selection
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf);
     gfx.renderer.clear();
 
     const bHaveComplexes = (this._getComplexVisual() !== null);
@@ -1260,7 +1246,7 @@ Miew.prototype._renderScene = (function () {
     srcBuffer = dstBuffer;
 
     if (fxaa) {
-      dstBuffer = distortion ? gfx.offscreenBuf2 : target;
+      dstBuffer = distortion ? gfx.offscreenBuf3 : target;
       this._performFXAA(srcBuffer, dstBuffer);
       srcBuffer = dstBuffer;
     }
@@ -1276,21 +1262,21 @@ Miew.prototype._performDistortion = (function () {
   const _scene = new THREE.Scene();
   const _camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000);
 
-  const _material = new THREE.ShaderMaterial({
+  const _material = new THREE.RawShaderMaterial({
     uniforms: {
       srcTex: { type: 't', value: null },
       aberration: { type: 'fv3', value: new THREE.Vector3(1.0) },
     },
-    vertexShader: 'varying vec2 vUv; '
-      + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform vec3 aberration;'
-      + 'void main() {'
-      + 'vec2 uv = vUv * 2.0 - 1.0;'
-      + 'gl_FragColor.r = texture2D(srcTex, 0.5 * (uv * aberration[0] + 1.0)).r;'
-      + 'gl_FragColor.g = texture2D(srcTex, 0.5 * (uv * aberration[1] + 1.0)).g;'
-      + 'gl_FragColor.b = texture2D(srcTex, 0.5 * (uv * aberration[2] + 1.0)).b;'
-      + 'gl_FragColor.a = 1.0;'
-      + '}',
+    vertexShader: vertexScreenQuadShader,
+    fragmentShader: 'precision highp float;\n'
+      + 'varying vec2 vUv; uniform sampler2D srcTex; uniform vec3 aberration; \n'
+      + 'void main() { \n'
+      + 'vec2 uv = vUv * 2.0 - 1.0; \n'
+      + 'gl_FragColor.r = texture2D(srcTex, 0.5 * (uv * aberration[0] + 1.0)).r; \n'
+      + 'gl_FragColor.g = texture2D(srcTex, 0.5 * (uv * aberration[1] + 1.0)).g; \n'
+      + 'gl_FragColor.b = texture2D(srcTex, 0.5 * (uv * aberration[2] + 1.0)).b; \n'
+      + 'gl_FragColor.a = 1.0; \n'
+      + '} \n',
     transparent: false,
     depthTest: false,
     depthWrite: false,
@@ -1520,43 +1506,9 @@ Miew.prototype._performAO = (function () {
   const _horBlurMaterial = new ao.HorBilateralBlurMaterial();
   const _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
 
-  const _samplesKernel = [
-    // hemisphere samples adopted to sphere (FIXME remove minus from Z)
-    new THREE.Vector3(0.295184, 0.077723, 0.068429),
-    new THREE.Vector3(-0.271976, -0.365221, 0.838363),
-    new THREE.Vector3(0.547713, 0.467576, 0.488515),
-    new THREE.Vector3(0.662808, -0.031733, 0.584758),
-    new THREE.Vector3(-0.025717, 0.218955, 0.657094),
-    new THREE.Vector3(-0.310153, -0.365223, 0.370701),
-    new THREE.Vector3(-0.101407, -0.006313, 0.747665),
-    new THREE.Vector3(-0.769138, 0.360399, 0.086847),
-    new THREE.Vector3(-0.271988, -0.275140, 0.905353),
-    new THREE.Vector3(0.096740, -0.566901, 0.700151),
-    new THREE.Vector3(0.562872, -0.735136, 0.094647),
-    new THREE.Vector3(0.379877, 0.359278, 0.190061),
-    new THREE.Vector3(0.519064, -0.023055, 0.405068),
-    new THREE.Vector3(-0.301036, 0.114696, 0.088885),
-    new THREE.Vector3(-0.282922, 0.598305, 0.487214),
-    new THREE.Vector3(-0.181859, 0.251670, 0.679702),
-    new THREE.Vector3(-0.191463, -0.635818, 0.512919),
-    new THREE.Vector3(-0.293655, 0.427423, 0.078921),
-    new THREE.Vector3(-0.267983, 0.680534, 0.132880),
-    new THREE.Vector3(0.139611, 0.319637, 0.477439),
-    new THREE.Vector3(-0.352086, 0.311040, 0.653913),
-    new THREE.Vector3(0.321032, 0.805279, 0.487345),
-    new THREE.Vector3(0.073516, 0.820734, 0.414183),
-    new THREE.Vector3(-0.155324, 0.589983, 0.411460),
-    new THREE.Vector3(0.335976, 0.170782, 0.527627),
-    new THREE.Vector3(0.463460, -0.355658, 0.167689),
-    new THREE.Vector3(0.222654, 0.596550, 0.769406),
-    new THREE.Vector3(0.922138, -0.042070, 0.147555),
-    new THREE.Vector3(-0.727050, -0.329192, 0.369826),
-    new THREE.Vector3(-0.090731, 0.533820, 0.463767),
-    new THREE.Vector3(-0.323457, -0.876559, 0.238524),
-    new THREE.Vector3(-0.663277, -0.372384, 0.342856),
-  ];
-  // var _kernelOffsets = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0];
-  const _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
+  const _translation = new THREE.Vector3();
+  const _quaternion = new THREE.Quaternion();
+  const _scale = new THREE.Vector3();
 
   return function (srcColorBuffer, normalBuffer, srcDepthTexture, targetBuffer, tempBuffer, tempBuffer1) {
     if (!srcColorBuffer || !normalBuffer || !srcDepthTexture || !targetBuffer || !tempBuffer || !tempBuffer1) {
@@ -1565,11 +1517,6 @@ Miew.prototype._performAO = (function () {
 
     const self = this;
     const gfx = self._gfx;
-
-    // clear canvasFMatrix4
-    // gfx.renderer.setClearColor(THREE.aliceblue, 1);
-    // gfx.renderer.setRenderTarget(targetBuffer);
-    // gfx.renderer.clear(true, false);
 
     // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
@@ -1580,12 +1527,8 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
     _aoMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
     _aoMaterial.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
-    _aoMaterial.uniforms.samplesKernel.value = _samplesKernel;
-    const translation = new THREE.Vector3();
-    const quaternion = new THREE.Quaternion();
-    const scale = new THREE.Vector3();
-    gfx.root.matrix.decompose(translation, quaternion, scale);
-    _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * scale.x;
+    gfx.root.matrix.decompose(_translation, _quaternion, _scale);
+    _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * _scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
     _aoMaterial.uniforms.noiseTexture.value = noise.noiseTexture;
@@ -1594,7 +1537,6 @@ Miew.prototype._performAO = (function () {
     if (fog) {
       _aoMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
     }
-    _aoMaterial.transparent = false;
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
     gfx.renderer.setRenderTarget(tempBuffer1);
     gfx.renderer.renderScreenQuad(_aoMaterial);
@@ -1602,7 +1544,6 @@ Miew.prototype._performAO = (function () {
     _horBlurMaterial.uniforms.aoMap.value = tempBuffer1.texture;
     _horBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer1.width, 1.0 / tempBuffer1.height);
     _horBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
-    _horBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.setRenderTarget(tempBuffer);
     gfx.renderer.renderScreenQuad(_horBlurMaterial);
 
@@ -1610,7 +1551,6 @@ Miew.prototype._performAO = (function () {
     _vertBlurMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _vertBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer.width, 1.0 / tempBuffer.height);
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
-    _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.renderScreenQuad(_vertBlurMaterial);
   };
@@ -1666,7 +1606,6 @@ Miew.prototype.resetView = function () {
 
 Miew.prototype._export = function (format) {
   const TheExporter = _.head(io.exporters.find({ format }));
-  // let result;
   if (!TheExporter) {
     this.logger.error('Could not find suitable exporter for this source');
     return Promise.reject(new Error('Could not find suitable exporter for this source'));
@@ -1799,7 +1738,7 @@ function _fetchData(source, opts, job) {
     // detect a proper loader
     const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
     if (!TheLoader) {
-      throw new Error('Could not find suitable loader for this source');
+      throw new Error(LOADER_NOT_FOUND);
     }
 
     // split file name
@@ -1819,7 +1758,7 @@ function _fetchData(source, opts, job) {
     if (!_.isUndefined(newOptions)) {
       newOptions = JSON.parse(newOptions);
       if (newOptions && newOptions.settings) {
-        const keys = ['singleUnit', 'draft.waterBondingHack'];
+        const keys = ['singleUnit'];
         for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
           const key = keys[keyIndex];
           const value = _.get(newOptions.settings, key);
@@ -1862,46 +1801,6 @@ function _fetchData(source, opts, job) {
         throw error;
       });
     resolve(promise);
-  }));
-}
-
-function _convertData(data, opts, job) {
-  return new Promise(((resolve, reject) => {
-    if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
-    }
-    job.notify({ type: 'convert' });
-
-    if (opts.mdFile) {
-      const byteNumbers = new Array(data.length);
-      for (let i = 0; i < data.length; i++) {
-        byteNumbers[i] = data.charCodeAt(i);
-      }
-      const bytes = new Uint8Array(byteNumbers);
-      const blob = new File([bytes], opts.fileName);
-      console.time('convert');
-      Miew.prototype.srvTopologyConvert(blob, opts.mdFile, (success, newData, message) => {
-        console.timeEnd('convert');
-        if (success) {
-          opts.converted = true;
-          opts.amberFileName = opts.fileName;
-          opts.convertedFile = new File([bytes], opts.fileName);
-          opts.fileName = null;
-          opts.fileType = 'pdb';
-          job.notify({ type: 'convertingFinished' });
-          resolve(newData);
-        } else {
-          opts.converted = false;
-          logger.error(message);
-          opts.error = message;
-          job.notify({ type: 'convertingFinished', error: message });
-          reject(new Error(message));
-        }
-      });
-    } else {
-      opts.converted = true;
-      resolve(data);
-    }
   }));
 }
 
@@ -1971,6 +1870,8 @@ Miew.prototype.load = function (source, opts) {
     }
   }
 
+  viewInterpolator.reset();
+
   this.dispatchEvent({ type: 'load', options: opts, source });
 
   const job = new JobHandle();
@@ -1992,7 +1893,6 @@ Miew.prototype.load = function (source, opts) {
   };
 
   return _fetchData(source, opts, job)
-    .then(data => _convertData(data, opts, job))
     .then(data => _parseData(data, opts, job))
     .then((object) => {
       const name = this._onLoad(object, opts);
@@ -2051,40 +1951,6 @@ Miew.prototype._startAnimation = function (fileData) {
   this._continueAnimation();
 };
 
-Miew.prototype._startMdAnimation = function (mdFile, pdbFile) {
-  this._stopAnimation();
-  const self = this;
-  const visual = this._getComplexVisual();
-  if (visual === null) {
-    this.logger.error('Unable to start animation - no molecule is loaded.');
-    return;
-  }
-  try {
-    this._frameInfo = new FrameInfo(
-      visual.getComplex(), this.srvStreamMdFn(mdFile, pdbFile),
-      {
-        onLoadStatusChanged() {
-          self.dispatchEvent({
-            type: 'mdPlayerStateChanged',
-            state: {
-              isPlaying: self._isAnimating,
-              isLoading: self._frameInfo ? self._frameInfo.isLoading : true,
-            },
-          });
-        },
-        onError(message) {
-          self._stopAnimation();
-          self.logger.error(message);
-        },
-      },
-    );
-  } catch (e) {
-    this.logger.error('Animation file does not fit to current complex!');
-    return;
-  }
-  this._continueAnimation();
-};
-
 Miew.prototype._pauseAnimation = function () {
   if (this._animInterval === null) {
     return;
@@ -2109,7 +1975,6 @@ Miew.prototype._continueAnimation = function () {
   minFrameTime = Number.isNaN(minFrameTime) ? 0 : minFrameTime;
   const self = this;
   const { pivot } = self._gfx;
-  // TODO take care of all complex visuals ?
   const visual = this._getComplexVisual();
   if (visual) {
     visual.resetSelectionMask();
@@ -2149,7 +2014,6 @@ Miew.prototype._stopAnimation = function () {
   this._frameInfo.disableEvents();
   this._frameInfo = null;
   this._animInterval = null;
-  this._srvAnimSource = null;
   this.dispatchEvent({
     type: 'mdPlayerStateChanged',
     state: null,
@@ -2159,7 +2023,7 @@ Miew.prototype._stopAnimation = function () {
 /**
  * Invoked upon successful loading of some data source
  * @param {DataSource} dataSource - Data source for visualization (molecular complex or other)
- * @param {object} opts - TODO: Options.
+ * @param {object} opts - Options.
  * @private
  */
 Miew.prototype._onLoad = function (dataSource, opts) {
@@ -2205,7 +2069,7 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     }
 
     if (opts.preset) {
-      this.srvPresetApply(opts.preset);
+      // ...removed server access...
     } else if (settings.now.autoPreset) {
       switch (opts.fileType) {
         case 'cml':
@@ -2235,10 +2099,9 @@ Miew.prototype._onLoad = function (dataSource, opts) {
   gfx.camera.updateProjectionMatrix();
   this._updateFog();
 
-  // reset global transform & camera pan
+  // reset global transform
   gfx.root.resetTransform();
   this.resetPivot();
-  this.resetPan();
 
   // set scale to fit everything on the screen
   this._objectControls.setScale(settings.now.radiusToFit / this._getBSphereRadius());
@@ -2266,10 +2129,6 @@ Miew.prototype._onLoad = function (dataSource, opts) {
 
   this._refreshTitle();
 
-  if (opts.convertedFile && opts.mdFile) {
-    this._startMdAnimation(opts.mdFile, opts.convertedFile);
-  }
-
   return visualName;
 };
 
@@ -2290,8 +2149,8 @@ Miew.prototype.loadEd = function (source) {
 
   const TheLoader = _.head(io.loaders.find({ source }));
   if (!TheLoader) {
-    this.logger.error('Could not find suitable loader for this source');
-    return Promise.reject(new Error('Could not find suitable loader for this source'));
+    this.logger.error(LOADER_NOT_FOUND);
+    return Promise.reject(new Error(LOADER_NOT_FOUND));
   }
 
   const loader = this._edLoader = new TheLoader(source, { binary: true });
@@ -2299,7 +2158,7 @@ Miew.prototype.loadEd = function (source) {
   return loader.load().then((data) => {
     const TheParser = _.head(io.parsers.find({ format: 'ccp4' }));
     if (!TheParser) {
-      throw new Error('Could not find suitable parser for this source');
+      throw new Error(PARSER_NOT_FOUND);
     }
     const parser = new TheParser(data);
     parser.context = this;
@@ -2422,7 +2281,6 @@ Miew.prototype.rebuild = function () {
 
     self._needRender = true;
 
-    // TODO: Gather geometry stats?
     self._refreshTitle();
     self._building = false;
   });
@@ -2433,7 +2291,6 @@ Miew.prototype.rebuildAll = function () {
   this._forEachComplexVisual((visual) => {
     visual.setNeedsRebuild();
   });
-  // this.rebuild(); // TODO: isn't implicit rebuild enough?
 };
 
 Miew.prototype._refreshTitle = function (appendix) {
@@ -2569,7 +2426,6 @@ Miew.prototype.repCurrent = function (index, name) {
  * @returns {?object} Representation description.
  */
 Miew.prototype.rep = function (index, rep) {
-  // FIXME support targeting visual by name
   const visual = this._getComplexVisual('');
   return visual ? visual.rep(index, rep) : null;
 };
@@ -2765,13 +2621,6 @@ Miew.prototype._discardFragmentEdit = function () {
   this._needRender = true;
 };
 
-/** @deprecated  Move object instead of panning the camera */
-Miew.prototype.resetPan = function () {
-  this._gfx.camera.position.x = 0.0;
-  this._gfx.camera.position.y = 0.0;
-  this.dispatchEvent({ type: 'transform' });
-};
-
 Miew.prototype._onPick = function (event) {
   if (!settings.now.picking) {
     // picking is disabled
@@ -2841,7 +2690,6 @@ Miew.prototype._onDblClick = function (event) {
     this.resetPivot();
   }
 
-  this.resetPan();
   this._needRender = true;
 };
 
@@ -2863,15 +2711,23 @@ Miew.prototype._onKeyDown = function (event) {
       break;
     case 'A'.charCodeAt(0):
       switch (this._editMode) {
-        case EDIT_MODE.COMPONENT: this._applyComponentEdit(); break;
-        case EDIT_MODE.FRAGMENT: this._applyFragmentEdit(); break;
+        case EDIT_MODE.COMPONENT:
+          this._applyComponentEdit();
+          break;
+        case EDIT_MODE.FRAGMENT:
+          this._applyFragmentEdit();
+          break;
         default: break;
       }
       break;
     case 'D'.charCodeAt(0):
       switch (this._editMode) {
-        case EDIT_MODE.COMPONENT: this._discardComponentEdit(); break;
-        case EDIT_MODE.FRAGMENT: this._discardFragmentEdit(); break;
+        case EDIT_MODE.COMPONENT:
+          this._discardComponentEdit();
+          break;
+        case EDIT_MODE.FRAGMENT:
+          this._discardFragmentEdit();
+          break;
         default: break;
       }
       break;
@@ -3093,7 +2949,6 @@ Miew.prototype.benchmarkGfx = function (force) {
       if (numResults > 0) {
         self._gfxScore = 0.5 * numResults;
       }
-      // document.getElementById('atom-info').innerHTML = 'GFX score: ' + self._gfxScore.toPrecision(2);
 
       self._spinner.stop();
       resolve();
@@ -3280,7 +3135,6 @@ Miew.prototype.setOptions = function (opts) {
     delete this._opts.view;
   }
 
-  // FIXME we need a way to associate "unit" option with particular complex
   const visual = this._getComplexVisual();
   if (visual) {
     visual.getComplex().resetCurrentUnit();
@@ -3316,7 +3170,6 @@ Miew.prototype.info = function (name) {
 Miew.prototype.addObject = function (objData, bThrow) {
   let Ctor = null;
 
-  // TODO change this to factory when better times come.
   if (objData.type === LinesObject.prototype.type) {
     Ctor = LinesObject;
   }
@@ -3465,12 +3318,9 @@ Miew.prototype.getState = function (opts) {
     view: false,
   });
 
-  // FIXME state should include all complexes (not only current)
-
   // load
   const visual = this._getComplexVisual();
   if (visual !== null) {
-    // TODO type?
     const complex = visual.getComplex();
     const { metadata } = complex;
     if (metadata.id) {
@@ -3560,7 +3410,7 @@ Miew.prototype._fogFarUpdateValue = function () {
   }
 };
 
-Miew.prototype._updateMaterials = function (values, needTraverse = false, process) {
+Miew.prototype._updateMaterials = function (values, needTraverse = false, process = undefined) {
   this._forEachComplexVisual(visual => visual.setMaterialValues(values, needTraverse, process));
   for (let i = 0, n = this._objects.length; i < n; ++i) {
     const obj = this._objects[i];
@@ -3587,9 +3437,9 @@ Miew.prototype._initOnSettingsChanged = function () {
     });
   };
 
-  on('theme', () => {
-    // TODO add warning
-    this._onThemeChanged();
+  on('modes.VD.frame', () => {
+    this._getVolumeVisual().showFrame(settings.now.modes.VD.frame);
+    this._needRender = true;
   });
 
   on('bg.color', () => {
@@ -3672,7 +3522,12 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('fogAlpha', () => {
+    const { fogAlpha } = settings.now;
+    if (fogAlpha < 0 || fogAlpha > 1) {
+      this.logger.warn('fogAlpha must belong range [0,1]');
+    }
     this._fogAlphaChanged();
+    this._needRender = true;
   });
 
   on('autoResolution', (evt) => {
@@ -3692,6 +3547,7 @@ Miew.prototype._initOnSettingsChanged = function () {
     if (this.webVR) {
       this.webVR.toggle(settings.now.stereo === 'WEBVR', this._gfx);
     }
+    this._needRender = true;
   });
 
   on(['transparency', 'resolution', 'palette'], () => {
@@ -3763,8 +3619,8 @@ Miew.prototype.view = function (expression) {
   }
 
   function decode() {
-    // HACK: old non-versioned view is the 0th version
-    if (expression.length === 40) { // TODO: remove when db migration is finished
+    // backwards compatible: old non-versioned view is the 0th version
+    if (expression.length === 40) {
       expression = `0${expression}`;
     }
 
@@ -3826,7 +3682,6 @@ Miew.prototype._updateView = function () {
     return;
   }
 
-  // var curr = viewInterpolator.createView();
   const res = viewInterpolator.getCurrentView();
   if (res.success) {
     const curr = res.view;
@@ -3872,18 +3727,6 @@ Miew.prototype.scale = function (factor) {
   }
   this._objectControls.scale(factor);
   this.dispatchEvent({ type: 'transform' });
-  this._needRender = true;
-};
-
-/*
-   * Pan camera
-   * @param {number} x - horizontal panning
-   * @param {number} y - vertical panning
-   * @deprecated  Move object instead of panning the camera
-   */
-Miew.prototype.pan = function (x, y) {
-  this._gfx.camera.translateX(x);
-  this._gfx.camera.translateY(y);
   this._needRender = true;
 };
 
@@ -4029,7 +3872,6 @@ Miew.prototype.exportCML = function () {
     });
   }
 
-  // FIXME save data for all complexes (not only current)
   const visual = self._getComplexVisual();
   const complex = visual ? visual.getComplex() : null;
   if (complex && complex.originalCML) {
@@ -4049,7 +3891,6 @@ Miew.prototype.exportCML = function () {
  * @see http://pdb101.rcsb.org/motm/motm-about
  */
 Miew.prototype.motm = function () {
-  settings.set('theme', 'light');
   settings.set({
     fogColorEnable: true,
     fogColor: 0x000000,
@@ -4076,6 +3917,8 @@ Miew.prototype.motm = function () {
 };
 
 Miew.prototype.VERSION = (typeof PACKAGE_VERSION !== 'undefined' && PACKAGE_VERSION) || '0.0.0-dev';
+
+// Uncomment this to get debug trace:
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 _.assign(Miew, /** @lends Miew */ {

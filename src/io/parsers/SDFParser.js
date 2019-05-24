@@ -113,7 +113,7 @@ export default class SDFParser extends Parser {
         this._atomsIndexes[name] = 0;
       }
       this._atomsIndexes[name] += 1;
-      name += this._atomsIndexes[name]; // hack. every atom need to have unique name.
+      name += this._atomsIndexes[name]; // every atom need to have unique name.
 
       this._residue.addAtom(name, type, xyz, undefined, true, serial, ' ', 1.0, 0.0, charge);
     }

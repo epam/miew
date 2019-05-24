@@ -1,8 +1,7 @@
 version: "{build}"
 environment:
   matrix:
-    - nodejs_version: "LTS"
-    - nodejs_version: "Stable"
+    - nodejs_version: "10"
 cache:
   - "%LOCALAPPDATA%\\Yarn"
   - node_modules

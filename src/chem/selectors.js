@@ -366,7 +366,6 @@ defineOperator('Or', 3, class OrOperator extends InfixOperator {
 
 const selectors = Object.create(keywords);
 
-// TODO: Provide consistent module exports
 selectors.Selector = Selector;
 selectors.RangeListSelector = RangeListSelector;
 selectors.ValueListSelector = ValueListSelector;
@@ -405,6 +404,6 @@ selectors.parse = function (str) {
 };
 
 parser.yy = selectors;
-parser.yy.parseError = parser.parseError; // FIXME: workaround for incorrect JISON parser generator for AMD module
+parser.yy.parseError = parser.parseError; // workaround for incorrect JISON parser generator for AMD module
 
 export default selectors;

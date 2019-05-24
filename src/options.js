@@ -224,10 +224,6 @@ const actions = {
   // Settings shortcuts
 
   ar: 'autoResolution',
-
-  // Deprecated
-
-  background: 'theme',
 };
 
 function _fromArray(entries) {
@@ -350,7 +346,7 @@ function toURL(opts) {
   utils.forInRecursive(opts.settings, (value, key) => {
     // I heard these lines in the whispers of the Gods
     // Handle preset setting in reps
-    if (key === 'preset') { // TODO: remove 'preset' from settings, implement autodetection
+    if (key === 'preset') {
       return;
     }
     checkAndAdd(key, value);
@@ -462,8 +458,6 @@ function toScript(opts) {
     checkAndAdd(`set ${key}`, value, true);
   });
   checkAndAdd('view', opts.view);
-
-  // this is kind of hack
   checkAndAdd('set', 'autobuild true');
   return commandsList.join('\n');
 }

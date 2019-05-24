@@ -60,5 +60,17 @@ module.exports = {
     rules: {
       'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     },
+  }, {
+    files: ['examples/*.js'],
+    env: {
+      browser: true,
+      es6: false,
+    },
+    rules: {
+      'no-var': 'off',
+      'prefer-arrow-callback': 'off',
+      'prefer-template': 'off',
+      'object-shorthand': 'off',
+    },
   }],
 };

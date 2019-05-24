@@ -17,8 +17,6 @@ body {
 // ...
 //////////////////////////////////////////////////////////////////////////////
 
-// TODO: include bootstrap partially (sometime in the distant future)
-
 $titlebar-color: silver;
 $titlebar-gray: 64;
 $titlebar-alpha: 0.75;
@@ -108,7 +106,6 @@ $selection-panel-row-height: 42px;
 }
 
 #miew-menu {
-  // TODO: add other selector combinations (see btn-default in bootstrap.css)
   .btn-titlebar,
   .btn-titlebar:hover,
   .btn-titlebar.hover,
@@ -395,10 +392,6 @@ $selection-panel-row-height: 42px;
 
           .list-group-item {
             height: $selection-panel-row-height;
-          }
-
-          .list-group-item.frequent {
-            // font-weight: bold; // FIXME: enable when there are any non-frequent words ;)
           }
         }
       }

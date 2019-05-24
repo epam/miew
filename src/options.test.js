@@ -120,7 +120,6 @@ describe('options', () => {
     camNear: 0.0,
     resolution: 'lowest',
     autoResolution: true,
-    labels: 'label',
   };
 
   const settingsOpts = {
@@ -128,7 +127,7 @@ describe('options', () => {
   };
 
   const settingsStr = 'colorers.EL.carbon=-3&colorers.UN.color=16711680&camFov=45'
-    + '&camNear=0&resolution=lowest&autoResolution=true&labels=label';
+    + '&camNear=0&resolution=lowest&autoResolution=true';
 
   const overallOpts = {
     preset: 'default',
@@ -142,7 +141,7 @@ describe('options', () => {
     + '&m=TX&c=EL&mt=SF&r=2&m=TR!radius:0.5&c=EL!carbon:0&r=3&m=CS!subset:chain+A+'
     + 'and+sequence+29+or+serial+196&o=line,A.38.CO1,A.38.CO2&o=line,A.38.CO1,A.38.CO2!'
     + 'color:4291624959,dashSize:0.5&colorers.EL.carbon=-3&colorers.UN.color=16711680&'
-    + 'camFov=45&camNear=0&resolution=lowest&autoResolution=true&labels=label';
+    + 'camFov=45&camNear=0&resolution=lowest&autoResolution=true';
 
   /** ******** SOPHISTICATED TEST SETS *********** */
   const complexSubsetOpts = {

@@ -2,9 +2,14 @@
 import webdriver from 'selenium-webdriver';
 import ieDriver from 'selenium-webdriver/ie';
 
+import chai from 'chai';
+import dirtyChai from 'dirty-chai';
+
 import EmptyPage from './pages/empty.page';
 import golden from './golden';
 import goldenCfg from './golden.cfg';
+
+chai.use(dirtyChai);
 
 const cfg = Object.assign({}, goldenCfg, {
   title: 'API Tests',

@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.24] - 2019-04-26
+### Added
+- Add wire frames for electron density volumes.
+
+### Fixed
+- Fix `unrol_loop` warning during shader compilation.
+- Use `shadow.on` setting to initialize shadowing state.
+- Fix some eslint and sonar code smells.
+
+### Changed
+- Build geometry with sharper edges for cartoon sheets and helices.
+- Reset view interpolator on file load, pause it when miew is paused.
+
+### Internal
+- Use only Node.js 10 (the current LTS) environment for CI/CD.
+- Remove unrelated TODO/FIXME/HACK comments and get rid of dead code in isosurfaces.
+
 ## [0.7.23] - 2019-04-05
 ### Added
 - Support dsn6 prefix for ED maps loading by PDB ID.
@@ -401,8 +418,9 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.23...HEAD
-[0.7.23]: https://github.com/epam/miew/compare/v0.7.23...v0.7.23
+[Unreleased]: https://github.com/epam/miew/compare/v0.7.24...HEAD
+[0.7.24]: https://github.com/epam/miew/compare/v0.7.23...v0.7.24
+[0.7.23]: https://github.com/epam/miew/compare/v0.7.22...v0.7.23
 [0.7.22]: https://github.com/epam/miew/compare/v0.7.21...v0.7.22
 [0.7.21]: https://github.com/epam/miew/compare/v0.7.20...v0.7.21
 [0.7.20]: https://github.com/epam/miew/compare/v0.7.19...v0.7.20

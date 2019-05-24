@@ -140,7 +140,6 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
 
   finalize() {
     this.finishUpdate();
-    // TODO compute bounding box?
     this.computeBoundingSphere();
   }
 

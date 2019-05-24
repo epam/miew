@@ -10,7 +10,6 @@ class TextMode extends Mode {
 
   getLabelOpts() {
     return _.merge(this.opts, {
-      labels: this.settings.now.labels,
       colors: true,
       adjustColor: true,
       transparent: true,

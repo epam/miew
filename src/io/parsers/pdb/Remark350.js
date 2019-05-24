@@ -60,8 +60,7 @@ class Remark350 {
         }
       }
     } else if (stream.readString(12, 23) === 'BIOMOLECULE:') {
-      // var molIndex = stream.readInt(24, 80);
-      // TODO: assert(molIndex === this.assemblies.length + 1);
+      // assert molIndex === this.assemblies.length + 1
       this._matrix = null;
       this._matrixIndex = -1;
       this._assembly = assembly = new Assembly(this._complex);

@@ -50,7 +50,6 @@ class InstancedSpheresGeometry extends SphereCollisionGeo(THREE.InstancedBufferG
 
   finalize() {
     this.finishUpdate();
-    // TODO compute bounding box?
     this.computeBoundingSphere();
   }
 
