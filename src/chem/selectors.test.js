@@ -1,7 +1,6 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import selectors from './selectors';
-import { Object3D } from 'three';
 
 chai.use(dirtyChai);
 
@@ -324,22 +323,45 @@ describe('selectors', () => {
 
   describe('selectors functions', () => {
     describe('GetSelector', () => {
-      let key = 'all';
-      selectors.Context['all'] = new selectors.all();
-      expect(selectors.GetSelector(key)).to.deep.equal(new selectors.all());
+      it('for exists selector', () => {
+        let key = 'all';
+        selectors.Context['all'] = selectors.all;
+        expect(selectors.GetSelector(key)).to.not.throw();
+        expect(new selectors.GetSelector(key)()).to.deep.equal(new selectors.all());
+      });
+      it('for fantastic selector', () => {
+        let key = 'p';
+        selectors.Context['all'] = selectors.all;
+        expect(() => selectors.GetSelector(key)).to.throw();
+      });
     });
 
     describe('ClearContext', () => {
-      let key = 'all';
-      selectors.Context['all'] = new selectors.all();
-      selectors.ClearContext();
-      expect(selectors.Context).to.deep.equal({});
+      it('for exists selector', () => {
+        let key = 'all';
+        selectors.Context['all'] = new selectors.all();
+        selectors.ClearContext();
+        expect(selectors.Context).to.deep.equal({});
+      });
     });
 
     describe('keyword', () => {
+      it('for exists selector', () => {
+        expect(selectors.keyword('ALL')).to.deep.equal(selectors.all);
+      });
+      it('for fantastic selector', () => {
+        expect(selectors.keyword('hh')).to.deep.equal(selectors.none);
+      });
     });
 
     describe('parse', () => {
+      it('for incorrect selector string', () => {
+        expect(selectors.parse('seal 1:10').selector).to.deep.equal(selectors.none());
+        expect(selectors.parse('seal 1:10')).to.have.a.property('error');
+      });
+      it('for correct selector string', () => {
+        expect(selectors.parse('serial 1:10')).to.deep.equal({ selector: selectors.serial(new selectors.Range(1, 10)) });
+      });
     });
 
   });
