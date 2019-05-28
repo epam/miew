@@ -210,6 +210,41 @@ function _setContainerContents(container, element) {
 }
 
 /**
+ * Update Shadow Camera target position and frustum.
+ * @private
+ */
+Miew.prototype._updateShadowCamera = (function () {
+  const shadowMatrix = new THREE.Matrix4();
+  const direction = new THREE.Vector3();
+  const OBB = { center: new THREE.Vector3(), halfSize: new THREE.Vector3() };
+
+  return function () {
+    this._gfx.scene.updateMatrixWorld();
+    for (let i = 0; i < this._gfx.scene.children.length; i++) {
+      if (this._gfx.scene.children[i].type === 'DirectionalLight') {
+        const light = this._gfx.scene.children[i];
+        shadowMatrix.copy(light.shadow.camera.matrixWorldInverse);
+        this.getOBB(shadowMatrix, OBB);
+
+        direction.subVectors(light.target.position, light.position);
+        light.position.subVectors(OBB.center, direction);
+        light.target.position.copy(OBB.center);
+
+        light.shadow.bias = 0.09;
+        light.shadow.camera.bottom = -OBB.halfSize.y;
+        light.shadow.camera.top = OBB.halfSize.y;
+        light.shadow.camera.right = OBB.halfSize.x;
+        light.shadow.camera.left = -OBB.halfSize.x;
+        light.shadow.camera.near = direction.length() - OBB.halfSize.z;
+        light.shadow.camera.far = direction.length() + OBB.halfSize.z;
+
+        light.shadow.camera.updateProjectionMatrix();
+      }
+    }
+  };
+}());
+
+/**
  * Initialize the viewer.
  * @returns {boolean} true on success.
  * @throws Forwards exception raised during initialization.
@@ -264,6 +299,9 @@ Miew.prototype.init = function () {
       this._gfx.camera, this._gfx.renderer.domElement, (() => self._getAltObj()),
     );
     this._objectControls.addEventListener('change', (e) => {
+      if (settings.now.shadow.on) {
+        self._updateShadowCamera();
+      }
       // route rotate and zoom events to the external API
       switch (e.action) {
         case 'rotate':
@@ -426,7 +464,9 @@ Miew.prototype._initGfx = function () {
   const shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
   light12.shadow.mapSize.width = shadowMapSize;
   light12.shadow.mapSize.height = shadowMapSize;
+  light12.target.position.set(0.0, 0.0, 0.0);
   gfx.scene.add(light12);
+  gfx.scene.add(light12.target);
 
   const light3 = new THREE.AmbientLight(0x666666);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
@@ -886,6 +926,60 @@ Miew.prototype._getBSphereRadius = function () {
   return radius * this._objectControls.getScale();
 };
 
+/**
+ * Calculate bounding box that would include all visuals and being axis aligned in world defined by
+ * transformation matrix: matrix
+ * @param {Matrix4} matrix - transformation matrix.
+ * @param {object}  OBB           - calculating bounding box.
+ * @param {Vector3} OBB.center    - OBB center.
+ * @param {Vector3} OBB.halfSize  - half magnitude of OBB sizes.
+ */
+Miew.prototype.getOBB = (function () {
+  const _bSphereForOneVisual = new THREE.Sphere();
+  const _bBoxForOneVisual = new THREE.Box3();
+  const _bBox = new THREE.Box3();
+
+  const _invMatrix = new THREE.Matrix4();
+
+  const _points = [
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+  ];
+
+  return function (matrix, OBB) {
+    _bBox.makeEmpty();
+
+    this._forEachVisual((visual) => {
+      _bSphereForOneVisual.copy(visual.getBoundaries().boundingSphere);
+      _bSphereForOneVisual.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
+      _bSphereForOneVisual.getBoundingBox(_bBoxForOneVisual);
+      _bBox.union(_bBoxForOneVisual);
+    });
+    _bBox.getCenter(OBB.center);
+
+    _invMatrix.getInverse(matrix);
+    OBB.center.applyMatrix4(_invMatrix);
+
+    const { min } = _bBox;
+    const { max } = _bBox;
+    _points[0].set(min.x, min.y, min.z); // 000
+    _points[1].set(max.x, min.y, min.z); // 100
+    _points[2].set(min.x, max.y, min.z); // 010
+    _points[3].set(min.x, min.y, max.z); // 001
+    for (let i = 0, l = _points.length; i < l; i++) {
+      _points[i].applyMatrix4(_invMatrix);
+    }
+
+    OBB.halfSize.set(
+      Math.abs(_points[0].x - _points[1].x),
+      Math.abs(_points[0].y - _points[2].y),
+      Math.abs(_points[0].z - _points[3].z),
+    ).multiplyScalar(0.5);
+  };
+}());
+
 Miew.prototype._updateFog = function () {
   const gfx = this._gfx;
 
@@ -936,7 +1030,6 @@ Miew.prototype._onRender = function () {
   gfx.camera.updateMatrixWorld();
 
   this._clipPlaneUpdateValue(this._getBSphereRadius());
-  this._updateShadow(this._getBSphereRadius());
   this._fogFarUpdateValue();
 
   gfx.renderer.setRenderTarget(null);
@@ -1819,6 +1912,9 @@ Miew.prototype.load = function (source, opts) {
 Miew.prototype.unload = function (name) {
   this._removeVisual(name || this.getCurrentVisual());
   this.resetPivot();
+  if (settings.now.shadow.on) {
+    this._updateShadowCamera();
+  }
 };
 
 Miew.prototype._startAnimation = function (fileData) {
@@ -2014,6 +2110,10 @@ Miew.prototype._onLoad = function (dataSource, opts) {
 
   if (settings.now.autoResolution) {
     this._tweakResolution();
+  }
+
+  if (settings.now.shadow.on) {
+    this._updateShadowCamera();
   }
 
   if (this._opts.view) {
@@ -3279,29 +3379,6 @@ Miew.prototype.get = function (param, value) {
   return settings.get(param, value);
 };
 
-Miew.prototype._updateShadow = function (radius) {
-  for (let i = 0; i < this._gfx.scene.children.length; i++) {
-    if (this._gfx.scene.children[i].shadow !== undefined) {
-      const light = this._gfx.scene.children[i];
-
-      light.shadow.bias = 0.09 * radius;
-
-      light.shadow.camera.bottom = -radius;
-      light.shadow.camera.top = radius;
-      light.shadow.camera.left = -radius;
-      light.shadow.camera.right = radius;
-
-      const distToOrigin = light.position.length();
-      const extraShift = 10; // if it's smaller there are artefacts in shadow
-      light.shadow.camera.far = distToOrigin + radius + extraShift;
-      light.shadow.camera.near = distToOrigin - radius - extraShift;
-      light.shadow.camera.near = light.shadow.camera.near > 0.1 ? light.shadow.camera.near : 0.1;
-
-      light.shadow.camera.updateProjectionMatrix();
-    }
-  }
-};
-
 Miew.prototype._clipPlaneUpdateValue = function (radius) {
   const clipPlaneValue = Math.max(
     this._gfx.camera.position.z - radius * settings.now.draft.clipPlaneFactor,
@@ -3403,6 +3480,9 @@ Miew.prototype._initOnSettingsChanged = function () {
     const gfx = this._gfx;
     if (gfx) {
       gfx.renderer.shadowMap.enabled = values.shadowmap;
+    }
+    if (values.shadowmap === true) {
+      this._updateShadowCamera();
     }
     this._updateMaterials(values, true, (object) => {
       if (values.shadowmap === true) {
