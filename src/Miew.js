@@ -1153,7 +1153,7 @@ Miew.prototype._renderScene = (function () {
     srcBuffer = dstBuffer;
 
     if (fxaa) {
-      dstBuffer = distortion ? gfx.offscreenBuf3 : target;
+      dstBuffer = distortion ? gfx.offscreenBuf4 : target;
       this._performFXAA(srcBuffer, dstBuffer);
       srcBuffer = dstBuffer;
     }
