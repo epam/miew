@@ -2,10 +2,10 @@
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
 import volumeFrag from './Volume_frag.glsl';
+import globalSettings from '../../settings';
 
 const volumeUniforms = THREE.UniformsUtils.merge([
   {
-
     volumeDim: { type: 'v3', value: new THREE.Vector3(512, 512, 512) },
     tileTex: { type: 't', value: null },
     tileTexSize: { type: 'v2', value: new THREE.Vector2(512, 512) },
@@ -116,21 +116,34 @@ function FrontFacePosMaterial(params) {
   return new THREE.ShaderMaterial(settings);
 }
 
-function VolumeMaterial(params) {
-  const settings = {
-    uniforms: overrideUniforms(params, volumeUniforms),
-    vertexShader: 'varying vec4 screenSpacePos; '
-      + 'void main() {'
-      + 'screenSpacePos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);'
-      + 'gl_Position = screenSpacePos;'
-      + '}',
-    fragmentShader: volumeFrag,
-    transparent: true,
-    depthTest: true,
-    depthWrite: false,
-    side: THREE.FrontSide,
-  };
-  return new THREE.ShaderMaterial(settings);
+class VolumeMaterial extends THREE.ShaderMaterial {
+  constructor(params) {
+    super();
+    this.settings = {
+      uniforms: overrideUniforms(params, volumeUniforms),
+      vertexShader: 'varying vec4 screenSpacePos; '
+        + 'void main() {'
+        + 'screenSpacePos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);'
+        + 'gl_Position = screenSpacePos;'
+        + '}',
+      fragmentShader: volumeFrag,
+      transparent: true,
+      depthTest: true,
+      depthWrite: false,
+      side: THREE.FrontSide,
+    };
+
+    super.setValues(this.settings);
+    this.updateDefines();
+  }
+
+  updateDefines() {
+    const defines = {};
+    defines.ISO_MODE = globalSettings.now.modes.VD.IsoMode;
+
+    this.defines = defines;
+    this.needsUpdate = true;
+  }
 }
 
 export default {

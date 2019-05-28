@@ -3463,6 +3463,12 @@ Miew.prototype._initOnSettingsChanged = function () {
     this._needRender = true;
   });
 
+  on('modes.VD.IsoMode', () => {
+    const mesh = this._getVolumeVisual().getMesh();
+    mesh.material.updateDefines();
+    this._needRender = true;
+  });
+
   on('theme', () => {
     this._onThemeChanged();
   });

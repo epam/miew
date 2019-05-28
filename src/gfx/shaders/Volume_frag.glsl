@@ -20,9 +20,8 @@ uniform sampler2D _WFFRight;
 
 varying vec4 screenSpacePos;
 
-#define stepsCount 800
+#define stepsCount 600
 
-#define red vec4(1., 0., 0., 1.)
 #define noColor vec4(0., 0., 0., 0.)
 
 vec4 sample3DTexture(vec3 texCoord) {
@@ -70,17 +69,17 @@ float CalcColor(vec3 iter, vec3 dir) {
   vec3 dz = vec3(0.0, 0.0, d);
 
   vec3 coordInc = vec3(
-  // #Opt: coordInc.x:(iter + dx).x > 1. ? 0.: sample3DTextureInclined(iter + dx).x,
-  mix(sample3DTextureInclined(iter + dx).x, 0., floor((iter + dx).x)),
-  mix(sample3DTextureInclined(iter + dy).x, 0., floor((iter + dy).y)),
-  mix(sample3DTextureInclined(iter + dz).x, 0., floor((iter + dz).z))
+    // #Opt: coordInc.x:(iter + dx).x > 1. ? 0.: sample3DTextureInclined(iter + dx).x,
+    mix(sample3DTextureInclined(iter + dx).x, 0., floor((iter + dx).x)),
+    mix(sample3DTextureInclined(iter + dy).x, 0., floor((iter + dy).y)),
+    mix(sample3DTextureInclined(iter + dz).x, 0., floor((iter + dz).z))
   );
 
   vec3 coordDec = vec3(
-  // #Opt: coordDec.x:(iter - dx).x < 0. ? 0.: sample3DTextureInclined(iter - dx).x,
-  mix(0., sample3DTextureInclined(iter - dx).x, ceil((iter - dx).x)),
-  mix(0., sample3DTextureInclined(iter - dy).x, ceil((iter - dy).y)),
-  mix(0., sample3DTextureInclined(iter - dz).x, ceil((iter - dz).z))
+    // #Opt: coordDec.x:(iter - dx).x < 0. ? 0.: sample3DTextureInclined(iter - dx).x,
+    mix(0., sample3DTextureInclined(iter - dx).x, ceil((iter - dx).x)),
+    mix(0., sample3DTextureInclined(iter - dy).x, ceil((iter - dy).y)),
+    mix(0., sample3DTextureInclined(iter - dz).x, ceil((iter - dz).z))
   );
 
   vec3 N = normalize(coordInc - coordDec);
@@ -274,5 +273,9 @@ void main() {
     molDist = distance(start, molBack);
   }
 
-  gl_FragColor = IsoRender(start, back, molDist, dir);
+  #ifdef ISO_MODE
+    gl_FragColor = IsoRender(start, back, molDist, dir);
+  #else
+    gl_FragColor = VolRender(start, back, molDist, dir);
+  #endif
 }
