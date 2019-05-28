@@ -1114,8 +1114,10 @@ Miew.prototype._renderScene = (function () {
         gfx.offscreenBuf2,
       );
       if (!fxaa && !distortion && !volume && !outline) {
-        gfx.renderer.setRenderTarget(target);
-        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0);
+        srcBuffer = dstBuffer;
+        dstBuffer = target;
+        gfx.renderer.setRenderTarget(dstBuffer);
+        gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0);
       }
     } else {
       // just copy color buffer to dst buffer
