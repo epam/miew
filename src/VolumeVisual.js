@@ -31,7 +31,7 @@ utils.deriveClass(VolumeVisual, Visual);
 VolumeVisual.prototype.buildFarPlane = function () {
   // create plane with unit corners coords (for future rescale in vshader according to camera properties)
   const planeGeo = new THREE.PlaneGeometry(2, 2, 1, 1);
-  const mat = VolumeMaterial.BackFacePosMaterialFarPlane();
+  const mat = new VolumeMaterial.BackFacePosMaterialFarPlane();
   this._plane = new meshes.Mesh(planeGeo, mat);
   this._plane.frustumCulled = false;
   this._plane.doubleSided = true;
