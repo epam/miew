@@ -16,7 +16,6 @@
 
 $dark-gray: rgba(64, 64, 64, 0.75);
 $titlebar-color: silver;
-$dark-color: #202020;
 $light-color: #ccc;
 
 .miew-message {
@@ -57,30 +56,4 @@ $light-color: #ccc;
 
 .overlay {
   pointer-events: none;
-}
-
-.theme-dark {
-  .label-obj,
-  .label-fg {
-    color: $light-color;
-    background-color: $dark-color;
-  }
-
-  .label-bg {
-    color: $dark-color;
-    background-color: $light-color;
-  }
-}
-
-.theme-light {
-  .label-obj,
-  .label-fg {
-    color: $dark-color;
-    background-color: $light-color;
-  }
-
-  .label-bg {
-    color: $light-color;
-    background-color: $dark-color;
-  }
 }

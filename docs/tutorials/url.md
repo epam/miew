@@ -19,7 +19,7 @@ var viewer = new Miew({
   }],
   settings: {
     autoRotation: -0.5,
-    theme: 'light',
+    bg: { color: 0xCCCCCC },
     axes: false,
     fps: false,
   },
@@ -38,16 +38,16 @@ var viewer = new Miew(_.merge({
 ));
 ```
 
-and then [pass the same values using a URL](http://miew.opensource.epam.com/?m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&theme=light&axes=0&fps=0):
+and then [pass the same values using a URL](http://miew.opensource.epam.com/?m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&bg.color=0xCCCCCC&axes=0&fps=0):
 
 ```
-?m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&theme=light&axes=0&fps=0
+?m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&bg.color=0xCCCCCC&axes=0&fps=0
 ```
 
 You may also apply the same options from any source, e.g. data attribute of the container: 
 
 ```html
-<div class="miew-container" data-miew="m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&theme=light&axes=0&fps=0"></div>
+<div class="miew-container" data-miew="m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&bg.color=0xCCCCCC&axes=0&fps=0"></div>
 ```
 
 It does not happen automatically, you need to retrieve and transform the string to an options object. Then combine
@@ -74,11 +74,11 @@ You may replace a space with a plus sign (`+`) instead of a `%20` code for bette
 ### Change Settings
 
 The query string consists of ampersand-separated `key=value` pairs. By default, the application treats them as a global setting
-assignment. Use [`theme=light`] to select light background, or [`fog=0`] to switch the fog off. You may even adjust
+assignment. Use [`autoRotation=0.1`] to enable rotation and set the speed, or [`fog=0`] to switch the fog off. You may even adjust
 nested settings such as [`modes.CA.radius=0.05`] to change default tube radius in Cartoon Mode.
 See `Settings` object for details.
 
-[`theme=light`]: http://miew.opensource.epam.com/?theme=light
+[`autoRotation=0.1`]: http://miew.opensource.epam.com/?autoRotation=0.1
 [`fog=0`]: http://miew.opensource.epam.com/?fog=0
 [`modes.CA.radius=0.05`]: http://miew.opensource.epam.com/?modes.CA.radius=0.05
 
@@ -153,14 +153,14 @@ A complex example follows (whitespaces are for better readability):
 s=not+hetatm & m=CA & c=SS &  
 s=hetatm+and+not+water & m=LC & c=EL &  
 s=sequence+6:7,17:19,43:45,62:64,77,95:99 & m=CS & mt=PL &  
-theme=light](http://miew.opensource.epam.com/?l=mmtf:1rx1&s=not+hetatm&m=CA&c=SS&s=hetatm+and+not+water&m=LC&c=EL&s=sequence+6:7,17:19,43:45,62:64,77,95:99&m=CS&mt=PL&theme=light)
+bg.color=0xCCCCCC](http://miew.opensource.epam.com/?l=mmtf:1rx1&s=not+hetatm&m=CA&c=SS&s=hetatm+and+not+water&m=LC&c=EL&s=sequence+6:7,17:19,43:45,62:64,77,95:99&m=CS&mt=PL&bg.color=0xCCCCCC)
 
   - load 1RX1 in mmtf format;
   - select "`not hetatm`", set Cartoon mode with Secondary Structure coloring;
   - select "`hetatm and not water`", set Licorice mode with coloring by Element;
   - select residues by their sequential numbers, set Contact Surface mode with the previous coloring (by Element)
     and a Plastic material;
-  - set `theme` global setting to "`light`" (set light background).
+  - set `bg.color` global setting to "`0xCCCCCC`" (set light background).
 
 ### Compressed Representations
 

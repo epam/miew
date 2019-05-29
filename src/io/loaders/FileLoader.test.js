@@ -145,22 +145,6 @@ describe('FileLoader', () => {
     });
   });
 
-  describe('.canLoad()', () => {
-    it('accepts a File', () => {
-      expect(FileLoader.canLoad(fakeSource, {})).to.equal(true);
-    });
-
-    it('rejects a non-File object', () => {
-      expect(FileLoader.canLoad('foo', {})).to.equal(false);
-      expect(FileLoader.canLoad({ name: 'foo' }, {})).to.equal(false);
-    });
-
-    it('requires the source type to be "file"', () => {
-      expect(FileLoader.canLoad(fakeSource, { sourceType: 'url' })).to.equal(false);
-      expect(FileLoader.canLoad(fakeSource, { sourceType: 'file' })).to.equal(true);
-    });
-  });
-
   describe('.canProbablyLoad()', () => {
     it('accepts a File or Blob', () => {
       expect(FileLoader.canProbablyLoad(new File())).to.equal(true);

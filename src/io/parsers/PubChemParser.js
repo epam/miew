@@ -11,18 +11,6 @@ class PubChemParser extends Parser {
     this._options.fileType = 'pubchem+json';
   }
 
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    const type = options.fileType;
-    return (
-      _.isString(data)
-      && (type === 'pubchem+json' || (!type && data[0] === '{'))
-    );
-  }
-
   static canProbablyParse(data) {
     return _.isString(data) && data[0] === '{';
   }

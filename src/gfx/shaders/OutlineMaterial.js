@@ -26,7 +26,6 @@ class OutlineMaterial extends THREE.RawShaderMaterial {
     };
 
     this.setValues(settings);
-    // this.setValues(params);
   }
 
   copy(source) {

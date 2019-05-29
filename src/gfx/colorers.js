@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import EntityList from '../utils/EntityList';
 
 import ElementColorer from './colorers/ElementColorer';
@@ -30,35 +29,5 @@ const colorers = new EntityList([
   MoleculeColorer,
   CarbonColorer,
 ]);
-
-/** @deprecated */
-Object.defineProperty(colorers, 'list', {
-  get() {
-    return this.all;
-  },
-});
-
-/** @deprecated */
-Object.defineProperty(colorers, 'any', {
-  get() {
-    return this.first;
-  },
-});
-
-/** @deprecated */
-Object.defineProperty(colorers, 'descriptions', {
-  get() {
-    return _.map(this._list, m => _.pick(m.prototype, ['id', 'name']));
-  },
-});
-
-/** @deprecated */
-colorers.create = function (colorer, opts) {
-  if (!opts && colorer instanceof Array) {
-    [colorer, opts] = colorer;
-  }
-  const Colorer = this.get(colorer) || this.first;
-  return new Colorer(opts);
-};
 
 export default colorers;

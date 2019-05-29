@@ -13,7 +13,6 @@ const vectors = [
 const vecCount = vectors.length;
 const tempPos1 = new THREE.Vector3();
 const tempPos2 = new THREE.Vector3();
-// const VEC_SIZE = 3;
 
 class CrossGeometry extends SphereCollisionGeo(ChunkedLinesGeometry) {
   constructor(chunksCount) {
@@ -23,7 +22,6 @@ class CrossGeometry extends SphereCollisionGeo(ChunkedLinesGeometry) {
   setItem(itemIdx, itemPos, itemRad) {
     this.setSphere(itemIdx, itemPos, itemRad);
 
-    // const offset = itemIdx * this._chunkSize;
     for (let i = 0; i < vecCount / 2; ++i) {
       const first = i * 2;
       tempPos1.x = itemPos.x + vectors[first].x * itemRad;

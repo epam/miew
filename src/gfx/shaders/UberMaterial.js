@@ -16,8 +16,6 @@ const _samplesKernel = [
   new THREE.Vector2(-0.105475, 0.994422),
 ];
 
-//  var INSTANCED_SPRITE_OVERSCALE = 1.3;
-
 const defaultUniforms = THREE.UniformsUtils.merge([
 
   THREE.UniformsLib.fog,

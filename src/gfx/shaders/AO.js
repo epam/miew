@@ -41,7 +41,6 @@ const _samplesKernel = [
   new THREE.Vector3(-0.323457, -0.876559, 0.238524),
   new THREE.Vector3(-0.663277, -0.372384, 0.342856),
 ];
-// var _kernelOffsets = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0];
 const _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
 
 function AOMaterial() {

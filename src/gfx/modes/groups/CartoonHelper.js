@@ -103,8 +103,8 @@ function _calcPoints(residues, firstIdx, lastIdx, boundaries) {
     return idx < right && residues[idx + 1]._isValid ? idx + 1 : idx;
   }
 
-  const topPoints = []; // new Array(lastIdx - firstIdx + 5);
-  const centerPoints = []; // new Array(lastIdx - firstIdx + 5);
+  const topPoints = [];
+  const centerPoints = [];
   let arrIdx = 0;
   function _extrapolate2(currIdx, otherIdx) {
     const cp = residues[currIdx]._controlPoint.clone().lerp(residues[otherIdx]._controlPoint, -0.25);

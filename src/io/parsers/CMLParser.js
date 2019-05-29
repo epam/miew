@@ -32,20 +32,6 @@ class CMLParser extends Parser {
     this._options.fileType = 'cml';
   }
 
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    const re = new RegExp('^\\s*?\\<\\?xml');
-    const re1 = new RegExp('^\\s*?\\<cml');
-    const dataHasXML = (typeof data === 'string' || data instanceof String) && (data.match(re) || data.match(re1));
-    return (
-      dataHasXML
-      && Parser.checkDataTypeOptions(options, 'cml')
-    );
-  }
-
   static canProbablyParse(data) {
     return _.isString(data) && cmlStartRegexp.test(data);
   }
@@ -510,8 +496,6 @@ class CMLParser extends Parser {
       atom.complexAtom = a;
     }
 
-    //    var nodeHText;
-
     let chains = {};
     // parse atoms in label order
     const reorder = [];
@@ -631,8 +615,6 @@ class CMLParser extends Parser {
   }
 
   parseSync() {
-    // console.time('CML parse');
-
     const complexes = [];
     const self = this;
     const moleculaSet = this._selectComponents(this._data);
@@ -646,7 +628,6 @@ class CMLParser extends Parser {
         complexes.push(self._parseSet(molSet, false));
       }
     });
-    // console.timeEnd('CML parse');
 
     let totalAtomsParsed = 0;
     complexes.forEach((c) => {

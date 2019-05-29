@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-// import utils from '../utils';
 import VolumeMaterial from './shaders/VolumeMaterial';
 import settings from '../settings';
 

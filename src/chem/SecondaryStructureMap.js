@@ -169,8 +169,8 @@ export default class SecondaryStructureMap {
   }
 
   _cosinusAngle(p1, p2, p3, p4) {
-    const v12 = p1.clone(); v12.sub(p2);
-    const v34 = p3.clone(); v34.sub(p4);
+    const v12 = p1.clone().sub(p2);
+    const v34 = p3.clone().sub(p4);
 
     let result = 0;
 

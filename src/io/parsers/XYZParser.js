@@ -16,14 +16,6 @@ class XYZParser extends Parser {
     this._fileName = options.name;
   }
 
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'xyz');
-  }
-
   static canProbablyParse(data) {
     return _.isString(data) && /^\s*\d+ *\n[^\n]*\n\s*\w{1,3}\s+-?\d/.test(data);
   }

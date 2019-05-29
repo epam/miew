@@ -152,14 +152,6 @@ class CIFParser extends Parser {
     this._options.fileType = 'cif';
   }
 
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'cif');
-  }
-
   static canProbablyParse(data) {
     return _.isString(data) && /^\s*data_/i.test(data);
   }

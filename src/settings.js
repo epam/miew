@@ -579,9 +579,6 @@ const defaults = {
     },
   },
 
-  /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-  labels: 'no', // can be one of: no, obj, fg, bg.
-
   /*
    * Use antialiasing in WebGL.
    * @type {boolean}
@@ -694,19 +691,6 @@ const defaults = {
 
   //----------------------------------------------------------------------------
 
-  /**
-   * Theme to use, 'dark' or 'light'.
-   * @type {string}
-   * @instance
-   * @deprecated Old-fashioned theme paradigma, to be removed in the next major version.
-   */
-  theme: 'dark',
-  /** @deprecated Old-fashioned theme paradigma, to be removed in the next major version. */
-  themes: {
-    dark: 0x202020,
-    light: 0xcccccc,
-  },
-
   bg: {
     color: 0x202020,
     transparent: false,
@@ -716,7 +700,6 @@ const defaults = {
     clipPlane: false,
     clipPlaneFactor: 0.5,
     clipPlaneSpeed: 0.00003,
-    waterBondingHack: false,
   },
 
   /*
@@ -843,12 +826,6 @@ const defaults = {
    * @instance
    */
   zooming: true,
-
-  /** @deprecated  Move object instead of panning the camera */
-  panning: false,
-
-  /** @deprecated  Move object instead of panning the camera */
-  inversePanning: false,
 
   /**
    * Enable picking atoms & residues with left mouse button or touch.
@@ -994,11 +971,6 @@ utils.deriveClass(Settings, EventDispatcher, {
     const { old, now } = this;
     const keys = _.filter(Object.keys(this._changed), key => _.get(old, key) !== _.get(now, key));
     return keys;
-  },
-
-  /** @deprecated Use Settings#set instead */
-  override(other) {
-    this.set(other);
   },
 
   applyDiffs(diffs) {
