@@ -3450,10 +3450,6 @@ Miew.prototype._initOnSettingsChanged = function () {
     this._needRender = true;
   });
 
-  on('theme', () => {
-    this._onThemeChanged();
-  });
-
   on('bg.color', () => {
     this._onBgColorChanged();
   });
