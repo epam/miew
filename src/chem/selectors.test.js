@@ -257,6 +257,7 @@ describe('selectors', () => {
 
   describe('class PrefixOperator', () => {
     const selector = new selectors.all();
+    selector.keyword = 'selector';
     const noneSelector = new selectors.none();
     const selectorPO = new selectors.PrefixOperator(selector);
     const noneSelectorPO = new selectors.PrefixOperator();
@@ -273,8 +274,24 @@ describe('selectors', () => {
       });
     });
     describe('toString', () => {
-      it('toString', () => {
+      it('easy prefix operator toString', () => {
         expect(selectorPO.toString()).to.equal(['error', selector.toString()].join(' '));
+      });
+      describe('complex prefix operator toString', () => {
+        const middlePriorityPO = new selectors.PrefixOperator(selector);
+        middlePriorityPO.keyword = 'middle';
+        it('lower from higher priority selector', () => {
+          const lowPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
+          lowPriorityPO.priority = selectors.PrefixOperator.prototype.priority - 1;
+          lowPriorityPO.keyword = 'low';
+          expect(lowPriorityPO.toString()).to.equal('low (middle selector)');
+        });
+        it('higher from lower priority selector', () => {
+          const highPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
+          highPriorityPO.priority = selectors.PrefixOperator.prototype.priority + 1;
+          highPriorityPO.keyword = 'high';
+          expect(highPriorityPO.toString()).to.equal('high middle selector');
+        });
       });
     });
     describe('toJSON', () => {
@@ -286,7 +303,9 @@ describe('selectors', () => {
 
   describe('class InfixOperator', () => {
     const letfSelector = new selectors.all();
-    const rightSelector = new selectors.hetatm();
+    letfSelector.keyword = 'lSelector';
+    const rightSelector = new selectors.all();
+    rightSelector.keyword = 'rSelector';
     const noneSelector = new selectors.none();
     const selectorPO = new selectors.InfixOperator(letfSelector, rightSelector);
     const halfSelectorPO = new selectors.InfixOperator(letfSelector);
@@ -313,6 +332,36 @@ describe('selectors', () => {
       it('toString', () => {
         expect(selectorPO.toString()).to.equal([letfSelector.toString(), 'error', rightSelector.toString()].join(' '));
       });
+      describe('complex infix operator toString', () => {
+        const middlePriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
+        middlePriorityIO.keyword = 'middle';
+        const lowPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
+        lowPriorityIO.priority = selectors.InfixOperator.prototype.priority - 2;
+        lowPriorityIO.keyword = 'low';
+        const highPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
+        highPriorityIO.priority = selectors.InfixOperator.prototype.priority + 2;
+        highPriorityIO.keyword = 'high';
+        it('middle(low, high)', () => {
+          const complexPO = new selectors.InfixOperator(lowPriorityIO, highPriorityIO);
+          complexPO.keyword = 'middle';
+          expect(complexPO.toString()).to.equal('lSelector low rSelector middle (lSelector high rSelector)');
+        });
+        it('middle(high, low)', () => {
+          const complexPO = new selectors.InfixOperator(highPriorityIO, lowPriorityIO);
+          complexPO.keyword = 'middle';
+          expect(complexPO.toString()).to.equal('(lSelector high rSelector) middle lSelector low rSelector');
+        });
+        it('middle(high, high)', () => {
+          const complexPO = new selectors.InfixOperator(highPriorityIO, highPriorityIO);
+          complexPO.keyword = 'middle';
+          expect(complexPO.toString()).to.equal('(lSelector high rSelector) middle (lSelector high rSelector)');
+        });
+        it('middle(low, low)', () => {
+          const complexPO = new selectors.InfixOperator(lowPriorityIO, lowPriorityIO);
+          complexPO.keyword = 'middle';
+          expect(complexPO.toString()).to.equal('lSelector low rSelector middle lSelector low rSelector');
+        });
+      });
     });
     describe('toJSON', () => {
       it('toJSON', () => {
@@ -335,7 +384,6 @@ describe('selectors', () => {
         expect(() => selectors.GetSelector(key)).to.throw();
       });
     });
-
     describe('ClearContext', () => {
       it('for exists selector', () => {
         let key = 'all';
@@ -344,7 +392,6 @@ describe('selectors', () => {
         expect(selectors.Context).to.deep.equal({});
       });
     });
-
     describe('keyword', () => {
       it('for exists selector', () => {
         expect(selectors.keyword('ALL')).to.deep.equal(selectors.all);
@@ -353,7 +400,6 @@ describe('selectors', () => {
         expect(selectors.keyword('hh')).to.deep.equal(selectors.none);
       });
     });
-
     describe('parse', () => {
       it('for incorrect selector string', () => {
         expect(selectors.parse('seal 1:10').selector).to.deep.equal(selectors.none());
@@ -363,8 +409,8 @@ describe('selectors', () => {
         expect(selectors.parse('serial 1:10')).to.deep.equal({ selector: selectors.serial(new selectors.Range(1, 10)) });
       });
     });
-
   });
+
   describe('includesAtom function', () => {
     class AtomName {
       constructor(name, node) {
