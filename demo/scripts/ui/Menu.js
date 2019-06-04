@@ -969,10 +969,10 @@ Menu.prototype._init = function () {
     });
 
     const elements = $(`${self._menuId} [data-toolbar-type=${toolbar}]`);
-    elements.toggle();
-    this.classList.toggle('active');
-
     if (toolbar === 'miew-menu-toolbar-resolution') {
+      elements.toggle();
+      this.classList.toggle('active');
+
       const resSelector = $(`${self._menuId} [data-toggle="resolution-immediate"]`
           + `[data-value="${settings.now.resolution}"]`);
       if (this.classList.contains('active') === true) {
@@ -981,13 +981,21 @@ Menu.prototype._init = function () {
         resSelector.removeClass('active');
       }
     } else {
-      const type = toolbar.substr(toolbar.lastIndexOf('-') + 1, toolbar.length);
-      const selector = $(`${self._menuId} [data-toggle="${type}-immediate"]`
-          + `[data-value="${unarray(self._viewer.rep()[type])}"]`);
-      if (this.classList.contains('active') === true) {
-        selector.addClass('active');
+      const curRep = self._viewer.rep();
+      if (curRep !== null) {
+        elements.toggle();
+        this.classList.toggle('active');
+
+        const type = toolbar.substr(toolbar.lastIndexOf('-') + 1, toolbar.length);
+        const selector = $(`${self._menuId} [data-toggle="${type}-immediate"]`
+            + `[data-value="${unarray(curRep[type])}"]`);
+        if (this.classList.contains('active') === true) {
+          selector.addClass('active');
+        } else {
+          selector.removeClass('active');
+        }
       } else {
-        selector.removeClass('active');
+        self._viewer.logger.error('No representation');
       }
     }
   });
