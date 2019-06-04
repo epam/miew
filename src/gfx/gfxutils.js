@@ -11,7 +11,7 @@ const LAYERS = {
 };
 
 const SELECTION_LAYERS = [ // These layers, that are used in the selection by ray casting
-  'DEFAULT', 'TRANSPARENT',
+  LAYERS.DEFAULT, LAYERS.TRANSPARENT,
 ];
 
 THREE.Object3D.prototype.resetTransform = function () {
@@ -359,7 +359,7 @@ function destroyObject(object) {
 
 function belongToSelectLayers(object) {
   for (let i = 0; i < SELECTION_LAYERS.length; i++) {
-    if (object.layers.mask >> LAYERS[SELECTION_LAYERS[i]] === 1) {
+    if (((object.layers.mask >> SELECTION_LAYERS[i]) & 1) === 1) {
       return true;
     }
   }
