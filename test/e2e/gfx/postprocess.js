@@ -88,7 +88,7 @@ function buildParams(bitMask) {
 // Make full combination of the effects to check proper management of render targets and validity of random effects
 // composition without electron density
 function testPostProcessEffects(fxs) {
-  describe('use the Miew to display a data set width different combination of post-process effects', () => {
+  describe('use the Miew to display a data set with different combination of post-process effects', () => {
     const number = 2 ** effects.length;
     for (let i = 0; i < number; i++) {
       const combination = buildParams(i);

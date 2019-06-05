@@ -9,6 +9,7 @@ import golden from './golden';
 import goldenCfg from './golden.cfg';
 
 import testPostProcess from './gfx/postprocess';
+import testShadows from './gfx/shadows';
 
 chai.use(dirtyChai);
 
@@ -20,13 +21,23 @@ const cfg = Object.assign({}, goldenCfg, {
 let driver;
 let page;
 
-function fxs(fn, id, opts) {
+function runMiewAndCheck(fn, id, opts) {
   return function () {
     return page.reload()
       .then(() => page.waitForMiew())
       .then(() => driver.executeScript(fn, opts))
       .then(() => page.waitUntilRebuildIsDone())
       .then(() => golden.shouldMatch(id, this));
+  };
+}
+
+function getPropListFromMiew(fn, opts, propStorage, checkFn, listName, checkId) {
+  return function () {
+    propStorage[listName] = page.reload()
+      .then(() => page.waitForMiew())
+      .then(() => driver.executeScript(fn, opts))
+      .then(json => JSON.parse(json));
+    return propStorage[listName].then(list => checkFn(list, checkId));
   };
 }
 
@@ -57,5 +68,8 @@ describe('As a third-party developer, I want to', function () {
   });
 
   // test visual effect which involve complex render targets management
-  testPostProcess(fxs);
+  testPostProcess(runMiewAndCheck);
+
+  // test all combinations of modes working with shadows
+  testShadows(getPropListFromMiew, runMiewAndCheck);
 });
