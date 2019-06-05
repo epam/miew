@@ -280,17 +280,17 @@ describe('selectors', () => {
       describe('complex prefix operator toString', () => {
         const middlePriorityPO = new selectors.PrefixOperator(selector);
         middlePriorityPO.keyword = 'middle';
-        it('lower from higher priority selector', () => {
-          const lowPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
-          lowPriorityPO.priority = selectors.PrefixOperator.prototype.priority - 1;
-          lowPriorityPO.keyword = 'low';
-          expect(lowPriorityPO.toString()).to.equal('low (middle selector)');
-        });
         it('higher from lower priority selector', () => {
           const highPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
-          highPriorityPO.priority = selectors.PrefixOperator.prototype.priority + 1;
+          highPriorityPO.priority = selectors.PrefixOperator.prototype.priority - 1;
           highPriorityPO.keyword = 'high';
-          expect(highPriorityPO.toString()).to.equal('high middle selector');
+          expect(highPriorityPO.toString()).to.equal('high (middle selector)');
+        });
+        it('lower from higher priority selector', () => {
+          const lowPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
+          lowPriorityPO.priority = selectors.PrefixOperator.prototype.priority + 1;
+          lowPriorityPO.keyword = 'low';
+          expect(lowPriorityPO.toString()).to.equal('low middle selector');
         });
       });
     });
@@ -333,33 +333,31 @@ describe('selectors', () => {
         expect(selectorPO.toString()).to.equal([letfSelector.toString(), 'error', rightSelector.toString()].join(' '));
       });
       describe('complex infix operator toString', () => {
-        const middlePriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
-        middlePriorityIO.keyword = 'middle';
-        const lowPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
-        lowPriorityIO.priority = selectors.InfixOperator.prototype.priority - 2;
-        lowPriorityIO.keyword = 'low';
         const highPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
-        highPriorityIO.priority = selectors.InfixOperator.prototype.priority + 2;
+        highPriorityIO.priority = selectors.InfixOperator.prototype.priority - 2;
         highPriorityIO.keyword = 'high';
-        it('middle(low, high)', () => {
-          const complexPO = new selectors.InfixOperator(lowPriorityIO, highPriorityIO);
-          complexPO.keyword = 'middle';
-          expect(complexPO.toString()).to.equal('lSelector low rSelector middle (lSelector high rSelector)');
-        });
+        const lowPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
+        lowPriorityIO.priority = selectors.InfixOperator.prototype.priority + 2;
+        lowPriorityIO.keyword = 'low';
         it('middle(high, low)', () => {
           const complexPO = new selectors.InfixOperator(highPriorityIO, lowPriorityIO);
           complexPO.keyword = 'middle';
-          expect(complexPO.toString()).to.equal('(lSelector high rSelector) middle lSelector low rSelector');
+          expect(complexPO.toString()).to.equal('lSelector high rSelector middle (lSelector low rSelector)');
         });
-        it('middle(high, high)', () => {
-          const complexPO = new selectors.InfixOperator(highPriorityIO, highPriorityIO);
+        it('middle(low, high)', () => {
+          const complexPO = new selectors.InfixOperator(lowPriorityIO, highPriorityIO);
           complexPO.keyword = 'middle';
-          expect(complexPO.toString()).to.equal('(lSelector high rSelector) middle (lSelector high rSelector)');
+          expect(complexPO.toString()).to.equal('(lSelector low rSelector) middle lSelector high rSelector');
         });
         it('middle(low, low)', () => {
           const complexPO = new selectors.InfixOperator(lowPriorityIO, lowPriorityIO);
           complexPO.keyword = 'middle';
-          expect(complexPO.toString()).to.equal('lSelector low rSelector middle lSelector low rSelector');
+          expect(complexPO.toString()).to.equal('(lSelector low rSelector) middle (lSelector low rSelector)');
+        });
+        it('middle(high, high)', () => {
+          const complexPO = new selectors.InfixOperator(highPriorityIO, highPriorityIO);
+          complexPO.keyword = 'middle';
+          expect(complexPO.toString()).to.equal('lSelector high rSelector middle lSelector high rSelector');
         });
       });
     });
