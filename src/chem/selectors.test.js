@@ -381,7 +381,7 @@ describe('selectors', () => {
       it('for exists but empty selector', () => {
         const key = 'all';
         selectors.Context[key] = undefined;
-        expect(selectors.GetSelector(key)).to.deep.equal(selectors.none());
+        expect(new selectors.GetSelector(key)()).to.deep.equal(selectors.none());
       });
       it('for fantastic selector', () => {
         const key = 'p';
