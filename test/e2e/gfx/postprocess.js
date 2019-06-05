@@ -5,32 +5,38 @@ const protein = '1zlm';
 
 const effects = [
   { // selection
-    name: 'sel',
+    name: 'Selection',
+    id: 'sel',
     select: 'residue LYS',
   },
   { // fxaa
-    name: 'aa',
+    name: 'FXAA',
+    id: 'aa',
     settings: 'fxaa',
     values: [false, true],
   },
   { // ambient occlusion
-    name: 'ao',
+    name: 'Ambient Occlusion',
+    id: 'ao',
     settings: 'ao',
     values: [false, true],
   },
   { // outline
-    name: 'out',
+    name: 'Outline',
+    id: 'out',
     settings: 'outline.on',
     values: [false, true],
   },
   { // electron density
-    name: 'den',
+    name: 'Electron Density',
+    id: 'den',
     settings: 'use.multiFile',
     values: [false, true],
     load: `/data/${protein}.dsn6`,
   },
   { // stereo distortion
-    name: 'ste',
+    name: 'Stereo Distortion',
+    id: 'ste',
     settings: 'stereo',
     values: ['NONE', 'DISTORTED'],
   },
@@ -54,7 +60,8 @@ function loadMolWithEffects(opts) {
 }
 
 function buildParams(bitMask) {
-  let desc = '';
+  const descStrs = [];
+  const idStrs = [''];
   const settings = {};
   const selectStrs = [];
   const load = [];
@@ -68,7 +75,8 @@ function buildParams(bitMask) {
     }
     if (bit) {
       // build image notation
-      desc += `_${effect.name}`;
+      idStrs.push(effect.id);
+      descStrs.push(effect.name);
       // add selection
       if (effect.select) {
         selectStrs.push(effect.select);
@@ -80,8 +88,10 @@ function buildParams(bitMask) {
     }
   }
   const select = selectStrs.join(' AND ');
+  const id = idStrs.join('_');
+  const desc = descStrs.join(', ');
   return {
-    desc, settings, select, load,
+    desc, settings, select, load, id,
   };
 }
 
@@ -94,9 +104,9 @@ function testPostProcessEffects(fxs) {
       const combination = buildParams(i);
       // add general protein to load
       combination.load[combination.load.length] = `/data/${protein}.pdb`;
-      it('use combination of effects', fxs(
+      it(`render ${protein} with ${combination.desc}`, fxs(
         loadMolWithEffects,
-        `${protein}${combination.desc}`,
+        `${protein}${combination.id}`,
         combination,
       ));
     }
