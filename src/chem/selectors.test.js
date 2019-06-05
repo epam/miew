@@ -256,9 +256,9 @@ describe('selectors', () => {
   });
 
   describe('class PrefixOperator', () => {
-    const selector = new selectors.all();
+    const selector = selectors.all();
     selector.keyword = 'selector';
-    const noneSelector = new selectors.none();
+    const noneSelector = selectors.none();
     const selectorPO = new selectors.PrefixOperator(selector);
     const noneSelectorPO = new selectors.PrefixOperator();
 
@@ -302,11 +302,11 @@ describe('selectors', () => {
   });
 
   describe('class InfixOperator', () => {
-    const letfSelector = new selectors.all();
+    const letfSelector = selectors.all();
     letfSelector.keyword = 'lSelector';
-    const rightSelector = new selectors.all();
+    const rightSelector = selectors.all();
     rightSelector.keyword = 'rSelector';
-    const noneSelector = new selectors.none();
+    const noneSelector = selectors.none();
     const selectorPO = new selectors.InfixOperator(letfSelector, rightSelector);
     const halfSelectorPO = new selectors.InfixOperator(letfSelector);
     const noneSelectorPO = new selectors.InfixOperator();
@@ -373,26 +373,26 @@ describe('selectors', () => {
   describe('selectors functions', () => {
     describe('GetSelector', () => {
       it('for exists selector', () => {
-        let key = 'all';
-        selectors.Context['all'] = selectors.all;
+        const key = 'all';
+        selectors.Context[key] = selectors.all;
         expect(selectors.GetSelector(key)).to.not.throw();
-        expect(new selectors.GetSelector(key)()).to.deep.equal(new selectors.all());
+        expect(new selectors.GetSelector(key)()).to.deep.equal(selectors.all());
       });
       it('for exists but empty selector', () => {
-        let key = 'all';
-        selectors.Context['all'] = undefined;
-        expect(selectors.GetSelector(key)).to.deep.equal(new selectors.none());
+        const key = 'all';
+        selectors.Context[key] = undefined;
+        expect(selectors.GetSelector(key)).to.deep.equal(selectors.none());
       });
       it('for fantastic selector', () => {
-        let key = 'p';
-        selectors.Context['all'] = selectors.all;
+        const key = 'p';
+        selectors.Context.all = selectors.all;
         expect(() => selectors.GetSelector(key)).to.throw();
       });
     });
     describe('ClearContext', () => {
       it('for exists selector', () => {
-        let key = 'all';
-        selectors.Context['all'] = new selectors.all();
+        const key = 'all';
+        selectors.Context[key] = selectors.all();
         selectors.ClearContext();
         expect(selectors.Context).to.deep.equal({});
       });
@@ -418,17 +418,21 @@ describe('selectors', () => {
 
   describe('includesAtom function', () => {
     class AtomName {
-      constructor(name, node) {
+      constructor(name) {
         this._name = name || null;
       }
-      
+
       getString() {
         return this._name || 'unknown';
       }
     }
-    const residue = { _type: { _name: 'ALA', flags: 0x0000 },  _chain: { _name: 'A' }, _icode: 'A', _index: 2, _sequence: 4 }
-    const atom = { _het: false, _location: 32, _name: new AtomName('CA'), _residue: residue, _serial: 5, element: { name: 'N'}};
-    
+    const residue = {
+      _type: { _name: 'ALA', flags: 0x0000 }, _chain: { _name: 'A' }, _icode: 'A', _index: 2, _sequence: 4,
+    };
+    const atom = {
+      _het: false, _location: 32, _name: new AtomName('CA'), _residue: residue, _serial: 5, element: { name: 'N' },
+    };
+
     describe('base selectors', () => {
       const Flags = {
         HYDROGEN: 0x0008,
@@ -436,7 +440,7 @@ describe('selectors', () => {
       };
 
       it('Serial', () => {
-        atom._serial = 5
+        atom._serial = 5;
         expect(selectors.serial(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
         expect(selectors.serial([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
       });
@@ -446,39 +450,39 @@ describe('selectors', () => {
         expect(selectors.name(['N', 'CA']).includesAtom(atom)).to.equal(true);
       });
       it('AltLoc', () => {
-        atom._location = 32
+        atom._location = 32;
         expect(selectors.altloc('A').includesAtom(atom)).to.equal(false);
         expect(selectors.altloc(['A', ' ']).includesAtom(atom)).to.equal(true);
       });
       it('Elem', () => {
-        atom.element.name = 'N'
+        atom.element.name = 'N';
         expect(selectors.elem('C').includesAtom(atom)).to.equal(false);
         expect(selectors.elem(['N', 'C']).includesAtom(atom)).to.equal(true);
       });
       it('Residue', () => {
-        atom._residue._type._name = 'ALA'
+        atom._residue._type._name = 'ALA';
         expect(selectors.residue('CYS').includesAtom(atom)).to.equal(false);
-        expect(selectors.residue(['THR','ALA', 'CYS']).includesAtom(atom)).to.equal(true);
+        expect(selectors.residue(['THR', 'ALA', 'CYS']).includesAtom(atom)).to.equal(true);
       });
       it('Sequence', () => {
-        atom._residue._sequence = 4
+        atom._residue._sequence = 4;
         expect(selectors.sequence(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
         expect(selectors.sequence([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
       });
       it('ICode', () => {
-        atom._residue._icode = 'A'
+        atom._residue._icode = 'A';
         expect(selectors.icode('a').includesAtom(atom)).to.equal(false);
-        expect(selectors.icode(['A','b', 'C']).includesAtom(atom)).to.equal(true);
+        expect(selectors.icode(['A', 'b', 'C']).includesAtom(atom)).to.equal(true);
       });
       it('ResIdx', () => {
-        atom._residue._index = 2
+        atom._residue._index = 2;
         expect(selectors.residx(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
         expect(selectors.residx([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
       });
       it('Chain', () => {
-        atom._residue._chain._name = 'B'
+        atom._residue._chain._name = 'B';
         expect(selectors.chain('b').includesAtom(atom)).to.equal(false);
-        expect(selectors.chain(['A','B', 'c']).includesAtom(atom)).to.equal(true);
+        expect(selectors.chain(['A', 'B', 'c']).includesAtom(atom)).to.equal(true);
       });
       it('Hetatm', () => {
         atom._het = true;
