@@ -60,7 +60,6 @@ function testShadows(getList, runMiewAndCheckFn) {
     // test all modes
     before(() => retrieve.modes.then((modes) => {
       _.each(modes, (mode) => {
-        //     console.log(mode);
         suite.addTest(it(`set ${mode.name} mode with shadows on`, runMiewAndCheckFn(runMiewWithReps, `1crn_sha_${mode.id}`, {
           load: '/data/1crn.pdb',
           settings: { shadow: { on: true }, interpolateViews: false },
