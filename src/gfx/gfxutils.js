@@ -10,6 +10,10 @@ const LAYERS = {
   DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4, COLOR_FROM_POSITION: 5,
 };
 
+const SELECTION_LAYERS = [ // These layers, that are used in the selection by ray casting
+  LAYERS.DEFAULT, LAYERS.TRANSPARENT,
+];
+
 THREE.Object3D.prototype.resetTransform = function () {
   this.position.set(0, 0, 0);
   this.quaternion.set(0, 0, 0, 1);
@@ -353,6 +357,15 @@ function destroyObject(object) {
   }
 }
 
+function belongToSelectLayers(object) {
+  for (let i = 0; i < SELECTION_LAYERS.length; i++) {
+    if (((object.layers.mask >> SELECTION_LAYERS[i]) & 1) === 1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function _getMeshesArr(root, meshTypes) {
   const meshes = [];
   root.traverse((object) => {
@@ -523,6 +536,7 @@ export default {
   fillArray,
   clearTree,
   destroyObject,
+  belongToSelectLayers,
   applyTransformsToMeshes,
   processTransparentMaterial,
   processColFromPosMaterial,
