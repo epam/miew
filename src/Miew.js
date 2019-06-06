@@ -3440,7 +3440,18 @@ Miew.prototype._initOnSettingsChanged = function () {
   };
 
   on('modes.VD.frame', () => {
-    this._getVolumeVisual().showFrame(settings.now.modes.VD.frame);
+    const volume = this._getVolumeVisual();
+    if (volume === null) return;
+
+    volume.showFrame(settings.now.modes.VD.frame);
+    this._needRender = true;
+  });
+
+  on('modes.VD.isoMode', () => {
+    const volume = this._getVolumeVisual();
+    if (volume === null) return;
+
+    volume.getMesh().material.updateDefines();
     this._needRender = true;
   });
 

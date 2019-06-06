@@ -20,8 +20,11 @@ uniform sampler2D _WFFRight;
 
 varying vec4 screenSpacePos;
 
-vec4 sample3DTexture(vec3 texCoord)
-{
+#define STEPS_COUNT 600
+
+#define NO_COLOR vec4(0., 0., 0., 0.)
+
+vec4 sample3DTexture(vec3 texCoord) {
   // a pair of Z slices is determined by nearest slice border
   float zSliceBorder = floor(texCoord.z * volumeDim.z + 0.5);
   float zSliceNumber1 = max(zSliceBorder - 1.0, 0.0);
@@ -42,45 +45,61 @@ vec4 sample3DTexture(vec3 texCoord)
   return mix(colorSlice1, colorSlice2, weightSlice2);
 }
 
-vec4 sample3DTextureInclined(vec3 boxCoord) { //delta:{ x: XY, y : XZ, z: YZ }
+vec4 sample3DTextureInclined(vec3 boxCoord) { // delta:{ x: XY, y : XZ, z: YZ }
   vec3 textCoord = boxCoord;
   vec2 currDelta = mix(boxCoord.zz, vec2(1., 1.) - boxCoord.zz, boxAngles.yx) * delta.yz;
 
   textCoord.y = (boxCoord.y  - currDelta.y) / (1. - delta.z);
   if (textCoord.y < 0.0 || textCoord.y > 1.0)
-    return vec4(0., 0., 0., 0);
+    return NO_COLOR;
 
   currDelta.x += mix(textCoord.y, 1.0 - textCoord.y, boxAngles.z) * delta.x;
 
   textCoord.x = (boxCoord.x - currDelta.x) / (1. - delta.x - delta.y);
   if (textCoord.x < 0.0 || textCoord.x > 1.0)
-    return vec4(0., 0., 0., 0);
+    return NO_COLOR;
 
   return sample3DTexture(textCoord);
 }
 
-float CalcColor(vec3 iter, vec3 dir)
-{
-  float d = 1.0 / 128.0;
+float CalcColor(vec3 iter, vec3 dir) {
+  float d = 1. / 128.;
   vec3 dx = vec3(d, 0.0, 0.0);
   vec3 dy = vec3(0.0, d, 0.0);
   vec3 dz = vec3(0.0, 0.0, d);
-  vec3 N;
-  N.x = sample3DTextureInclined(iter + dx).r - sample3DTextureInclined(iter - dx).r;
-  N.y = sample3DTextureInclined(iter + dy).r - sample3DTextureInclined(iter - dy).r;
-  N.z = sample3DTextureInclined(iter + dz).r - sample3DTextureInclined(iter - dz).r;
-  N = normalize(N);
-  float dif = max(0.0, dot(N,dir));
+
+  // #Opt: coordInc.x:(iter + dx).x > 1. ? 0.: sample3DTextureInclined(iter + dx).x,
+  vec3 coordInc = mix(
+    vec3(
+      sample3DTextureInclined(iter + dx).x,
+      sample3DTextureInclined(iter + dy).x,
+      sample3DTextureInclined(iter + dz).x
+    ),
+    vec3(0. ,0. , 0.),
+    vec3(floor((iter + dx).x), floor((iter + dy).y), floor((iter + dz).z))
+  );
+
+  // #Opt: coordDec.x:(iter - dx).x < 0. ? 0.: sample3DTextureInclined(iter - dx).x,
+  vec3 coordDec = mix(
+    vec3(0. ,0. , 0.),
+    vec3(
+      sample3DTextureInclined(iter - dx).x,
+      sample3DTextureInclined(iter - dy).x,
+      sample3DTextureInclined(iter - dz).x
+    ),
+    vec3(ceil((iter - dx).x), ceil((iter - dy).y), ceil((iter - dz).z))
+  );
+
+  vec3 N = normalize(coordInc - coordDec);
+  float dif = max(0.0, dot(N, dir));
   return dif;
 }
 
-vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
-{
-  for (int i = 0; i < 5; i++)
-  {
-    vec3 iterator = 0.5*(left + right);
+vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold) {
+  for (int i = 0; i < 5; i++) {
+    vec3 iterator = 0.5 * (left + right);
     float vol = sample3DTextureInclined(iterator).r;
-    if ((volLeft - threshold)*(vol - threshold) < 0.)
+    if ((volLeft - threshold) * (vol - threshold) < 0.)
       right = iterator;
     else
       left = iterator;
@@ -88,38 +107,35 @@ vec3 AccuracyIso(vec3 left, vec3 right, float volLeft, float threshold)
   return 0.5 * (left + right);
 }
 
-vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count)
-{
-  float vol, stepSize = (0.5*float(count) + 1.) / 85.;
-  //    		float vol, stepSize = (0.5*count + 1.) / 64.;// 128.;
-  vec3 step = stepSize*dir, iterator = start, left, right;
-  vec4 acc = vec4(0., 0., 0., 0.);
-    for (int i=0; i < 200; i++)
-    {
-      iterator = iterator + step;
-      vol = sample3DTextureInclined(iterator).r;
-      if (length(iterator - back) < stepSize || vol > tr)
-        break;
-    }
-    if (vol > tr)
-    {
-      left = iterator - step;
+vec3 CorrectIso(vec3 left, vec3 right, float tr) {
+  for (int j = 0; j < 5; j++) {
+    vec3 iterator = 0.5 * (left + right);
+    float vol = sample3DTextureInclined(iterator).r;
+    if (vol < tr)
       right = iterator;
-      for (int j = 0; j < 5; j++)
-      {
-        iterator = 0.5 * (left + right);
-        float vol = sample3DTextureInclined(iterator).r;
-        if (vol > tr)
-          right = iterator;
-        else
-          left = iterator;
-      }
-      acc = vec4(0.5*(left + right), 1.);
-    }
+    else
+      left = iterator;
+  }
+  return 0.5 * (left + right);
+}
+
+vec4 GetIso1(vec3 start, vec3 back, float molDist, vec3 dir, float tr, int count) {
+  float vol, stepSize = (float(count) + 2.) / float(STEPS_COUNT);
+  vec3 step = stepSize * dir, iterator = start, left, right;
+  vec4 acc = NO_COLOR;
+
+  for (int i = 0; i < STEPS_COUNT; i++) {
+    iterator = iterator + step;
+    vol = sample3DTextureInclined(iterator).r;
+    if (length(iterator - back) <= stepSize || (vol > tr))
+      break;
+  }
+
+  if (vol > tr)
+    acc = vec4(CorrectIso(iterator, iterator - step, tr).xyz, 1.);
 
   return acc;
 }
-
 
 float easeOut(float x0, float x1, float x) {
   float t = clamp((x - x0) / (x1 - x0), 0.0, 1.0);
@@ -131,55 +147,34 @@ float easeIn(float x0, float x1, float x) {
   return t * t;
 }
 
-vec3 GetColSimple(float vol)
-{
+vec3 GetColSimple(float vol) {
   float t = easeOut(_isoLevel0.x, _isoLevel0.y, vol);
   float s = easeIn(_isoLevel0.y, _isoLevel0.z, vol);
   return vec3(0.5, 0.6, 0.7) * (1.0 - t) + 2.0 * vec3(s, 0, 0);
 }
 
-vec3 CorrectIso(vec3 left, vec3 right, float tr)
-{
-  for (int j = 0; j < 5; j++)
-  {
-    vec3 iterator = 0.5*(left + right);
-    float vol = sample3DTextureInclined(iterator).r;
-    if (vol < tr)
-      right = iterator;
-    else
-      left = iterator;
-  }
-  return 0.5*(left + right);
-}
-
-vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
-{
-  vec4 acc = vec4(0., 0., 0., 0.), iso;
+vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir) {
+  vec4 acc = NO_COLOR, iso;
   vec3 iterator = start, sumColor = vec3(0., 0., 0.);
-  //				float stepSize = 1. / 110., alpha, sumAlpha = 0, vol, curStepSize = stepSize, molD;
-  float stepSize = 1. / 170., alpha, sumAlpha = 0.0, vol, curStepSize = stepSize, molD;
-  vec3 step = stepSize*dir, col, colOld, right;
+  float stepSize, alpha, sumAlpha = 0.0, vol, curStepSize, molD;
+  vec3 step, col, colOld, right;
   float tr0 = _isoLevel0.x;
   float dif, r, kd, finish;
   int count = 0, stopMol = 0;
-  kd = 140. * tr0 * stepSize;
-  r = 1. - kd;
 
-  for (int k = 0; k < 3; k++)
-  {
-    stepSize = (0.5 * float(k) + 1.) / 85.;
+  for (int k = 0; k < 3; k++) {
+    stepSize = (float(k) + 2.) / float(STEPS_COUNT);
     kd = 140. * tr0 * stepSize;
     r = 1. - kd;
     step = stepSize * dir;
     iso = GetIso1(iterator, back, molDist, dir, tr0, k);
-    if (iso.a < 0.1 || length(iso.rgb - start) > molDist)
+    if (iso.a < 0.1 || length(iso.xyz - start) > molDist)
       break;
-    iterator = iso.rgb;
+    iterator = iso.xyz;
     dif = 1.;// CalcColor(iterator, dir);
     colOld = GetColSimple(tr0);
     curStepSize = stepSize;
-    for (int i = 0; i < 200; i++)
-    {
+    for (int i = 0; i < STEPS_COUNT; i++) {
       iterator = iterator + step;
       molD = length(iterator - start);
       vol = sample3DTextureInclined(iterator).r;
@@ -188,80 +183,78 @@ vec4 VolRender(vec3 start, vec3 back, float molDist, vec3 dir)
         break;
       alpha = (1. - r);
       col = GetColSimple(vol);
-      vol = sample3DTextureInclined(iterator - 0.5*step).r;
+      vol = sample3DTextureInclined(iterator - 0.5 * step).r;
       vec3 colMid = GetColSimple(vol);
-      sumColor += (1. - sumAlpha)*(colOld + 4.*colMid + col)*alpha / 6.;
-      sumAlpha += (1. - sumAlpha)*alpha;// *(1. - 1.0*dif*dif);
+      sumColor += (1. - sumAlpha) * (colOld + 4.* colMid + col) * alpha / 6.;
+      sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
       colOld = col;
     } // for i
+
     if (finish < 0.0 || sumAlpha > 0.97)
       break;
-    if (molD > molDist)
-    {
+
+    if (molD > molDist) {
       curStepSize = stepSize - (molD - molDist);
-      right = iterator - (molD - molDist)*dir;
+      right = iterator - (molD - molDist) * dir;
       vol = sample3DTextureInclined(right).r;
-    }
-    else
-    {
+    } else {
       vec3 left = iterator - step;
       right = CorrectIso(left, iterator, tr0);
       curStepSize = distance(left, right);
       vol = tr0;
     }
-    alpha = (1. - r)*curStepSize / stepSize;
+
+    alpha = (1. - r) * curStepSize / stepSize;
     dif = 1.;// CalcColor(right, dir);
     col = GetColSimple(vol);
     vol = sample3DTextureInclined(iterator - 0.5 * curStepSize / stepSize * step).r;
     vec3 colMid = GetColSimple(vol);
     sumColor += (1. - sumAlpha) * (colOld + 4. * colMid + col) * alpha / 6.;
     sumAlpha += (1. - sumAlpha) * alpha;// *(1. - 1.0*dif*dif);
+
     if (molD > molDist)
       break;
   } // for k
-  acc.rgb = 1.*sumColor / sumAlpha;
+  acc.rgb = 1. * sumColor / sumAlpha;
   acc.a = sumAlpha;
   return acc;
 }
 
-vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir)
-{
-  float stepSize = 1.0 / 200.0;
+vec4 VolRender1(vec3 start, vec3 back, float molDist, vec3 dir) {
+  float stepSize = 1.0 / float(STEPS_COUNT);
   float len = length(back - start);
   vec3 step = stepSize * dir;
   vec3 iterator = start;
   float acc = 0.0;
 
-  for (int i=0; i < 200; i++)
-  {
-    if (float(i) * stepSize > len) break;
+  for (int i = 0; i < STEPS_COUNT; i++) {
+    if (float(i) * stepSize > len)
+      break;
     iterator = iterator + step;
     if (sample3DTextureInclined(iterator).r > _isoLevel0.x)
-      acc += sample3DTextureInclined(iterator).r / 200.0;
+      acc += 10. * sample3DTextureInclined(iterator).r / float(STEPS_COUNT);
   }
 
-  return vec4(1,1,1, acc);
+  return vec4(1.,1.,1., acc);
 }
 
-vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir)
-{
-  vec4 tst = GetIso1(start, back, 2., dir, 0.28, 0);
-  vec4 col = vec4(0, 0., 0., 0.);
-  if (tst.a > 0.1)
-  {
-   float dif = CalcColor(tst.rgb, dir);
-   col = vec4(dif, 0., 0., 1.);
+vec4 IsoRender(vec3 start, vec3 back, float molDist, vec3 dir) {
+  vec4 tst = GetIso1(start, back, 2., dir, _isoLevel0.x, 0);
+  vec4 col = NO_COLOR;
+
+  if (length(tst.xyz - start) < molDist && tst.a > 0.1) {
+    float dif =  CalcColor(tst.xyz, dir);
+    dif = 0.9 * dif * dif;
+    col = vec4(dif, dif, dif, 1);
   }
   return col;
 }
 
-vec4 VolRender3(vec3 start, vec3 back, float molDist, vec3 dir)
-{
-  return sample3DTextureInclined(start);
+vec4 VolRender2(vec3 start, vec3 back, float molDist, vec3 dir) {
+  return sample3DTexture(start);
 }
 
-void main()
-{
+void main() {
   vec3 tc = screenSpacePos.xyz / screenSpacePos.w * 0.5 + 0.5;
 
   if (_flipV > 0.0) {
@@ -271,14 +264,11 @@ void main()
   vec3 start;
   vec3 back;
   vec3 molBack;
-  if (projectionMatrix[0][2] < 0.0)
-  {
+  if (projectionMatrix[0][2] < 0.0) {
     start = texture2D(_FFLeft, tc.xy).xyz;
     back = texture2D(_BFLeft, tc.xy).xyz;
     molBack = texture2D(_WFFLeft, tc.xy).xyz;
-  }
-  else
-  {
+  } else {
     start = texture2D(_FFRight, tc.xy).xyz;
     back = texture2D(_BFRight, tc.xy).xyz;
     molBack = texture2D(_WFFRight, tc.xy).xyz;
@@ -287,12 +277,13 @@ void main()
   vec3 dir = normalize(back - start);
 
   float molDist = 2.0;
-  if (length(molBack) > 0.001)
-  {
+  if (length(molBack) > 0.001) {
     molDist = distance(start, molBack);
   }
 
-  //gl_FragColor = texture2D(_WFFLeft, tc.xy);
-  //gl_FragColor = texture2D(tileTex, tc.xy);
-  gl_FragColor = VolRender(start, back, molDist, dir);
+  #ifdef ISO_MODE
+    gl_FragColor = IsoRender(start, back, molDist, dir);
+  #else
+    gl_FragColor = VolRender(start, back, molDist, dir);
+  #endif
 }

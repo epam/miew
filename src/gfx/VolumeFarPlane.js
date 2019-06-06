@@ -12,7 +12,7 @@ class VolumeFarPlane {
   constructor(volume, width, height) {
     const planeGeo = this._initPlaneGeo(width, height);
 
-    const mat = VolumeMaterial.BackFacePosMaterialFarPlane();
+    const mat = new VolumeMaterial.BackFacePosMaterialFarPlane();
     this._plane = new meshes.Mesh(planeGeo, mat);
     this._plane.frustumCulled = false;
     this._plane.doubleSided = true;

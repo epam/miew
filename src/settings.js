@@ -435,6 +435,7 @@ const defaults = {
      *
      * @property {number} kSigma - Noise threshold coefficient.
      * @property {boolean} frame - flag, that turns on box frame painting
+     * @property {boolean} isoMode - flag, that turns on IsoSurface mode instead of Volume Rendering
      *
      */
     VD: {
@@ -442,6 +443,7 @@ const defaults = {
       kSigmaMed: 2.0,
       kSigmaMax: 4.0,
       frame: true,
+      isoMode: false,
     },
   },
 
