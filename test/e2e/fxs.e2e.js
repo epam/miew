@@ -10,6 +10,7 @@ import goldenCfg from './golden.cfg';
 
 import testPostProcess from './gfx/postprocess';
 import testShadows from './gfx/shadows';
+import testStereoModes from './gfx/stereo';
 
 chai.use(dirtyChai);
 
@@ -72,4 +73,7 @@ describe('As a third-party developer, I want to', function () {
 
   // test all combinations of modes working with shadows
   testShadows(getPropListFromMiew, runMiewAndCheck);
+
+  // test several stereo modes
+  testStereoModes(runMiewAndCheck);
 });
