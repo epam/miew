@@ -6,6 +6,10 @@ const VEC_SIZE = 3;
 const TRI_SIZE = 3;
 const tmpPrev = new THREE.Vector3();
 const tmpNext = new THREE.Vector3();
+const tmpRes = new THREE.Vector3();
+const simpleNormal = new THREE.Vector3(1.0, 0.0, 0.0);
+const normalOnCut = new THREE.Vector3();
+const nearRingPt = new THREE.Vector3();
 
 function _createExtrudedChunkGeometry(shape, ringsCount) {
   const geo = new THREE.BufferGeometry();
@@ -58,88 +62,137 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
   }
 
   setItem(itemIdx, matrices, hasSlope = false, hasCut = false) {
-    const shape = this._chunkGeo._positions;
-    const ptsCount = shape.length;
-    let innerPtIdx = 0;
+    const ptsCount = this._chunkGeo._positions.length;
+    const ringsCount = this._ringsCount;
     const chunkStartIdx = ptsCount * this._ringsCount * itemIdx * VEC_SIZE;
 
-    const positions = this._positions;
-    const normals = this._normals;
-    const nPtsInRing = ptsCount * VEC_SIZE;
+    this._setPoints(matrices, ptsCount, ringsCount, chunkStartIdx);
 
+    if (hasSlope) {
+      this._setSlopeNormals(ptsCount, ringsCount, chunkStartIdx);
+    } else {
+      this._setBaseNormals(ptsCount, ringsCount, chunkStartIdx);
+    }
 
+    if (hasCut) {
+      this._addCut(ptsCount, ringsCount, chunkStartIdx);
+    }
+  }
+
+  _setPoints(matrices, ptsCount, ringsCount, chunkStartIdx) {
     const tmpShape = this._tmpShape;
-    for (let i = 0, n = matrices.length; i < n; ++i) {
+    const positions = this._positions;
+    const shape = this._chunkGeo._positions;
+
+    for (let i = 0, vtxIdx = chunkStartIdx; i < ringsCount; ++i) {
       const mtx = matrices[i];
 
-      for (let j = 0; j < ptsCount; ++j) {
-        tmpShape[j].copy(shape[j]).applyMatrix4(mtx);
-      }
-
-      for (let j = 0; j < ptsCount; ++j, innerPtIdx += VEC_SIZE) {
-        const point = tmpShape[j];
-        const nxPt = tmpShape[(j + 1) % ptsCount];
-        const prPt = tmpShape[(j + ptsCount - 1) % ptsCount];
-
-        const vtxIdx = chunkStartIdx + innerPtIdx;
-        const prRingPt = new THREE.Vector3().fromArray(positions, vtxIdx - nPtsInRing);
-        const normInPrevRingPt = new THREE.Vector3().fromArray(normals, vtxIdx - nPtsInRing);
-        const prPrRingNormal = new THREE.Vector3().fromArray(normals, vtxIdx - 2 * nPtsInRing);
-
-        point.toArray(positions, vtxIdx);
-        this._countNormals(point, nxPt, prPt, prRingPt, prPrRingNormal, (i === 1), hasSlope).toArray(normals, vtxIdx);
-
-        if (!hasCut) {
-          continue;
-        }
-
-        // zero and first sections lies in one plane and normals for all their points are orthogonal with this plane
-        // second section points are shifted into first section points for having sharp angle on the end of cut
-        switch (i) {
-          case 0:
-            tmpPrev.subVectors(point, prPt).normalize();
-            tmpNext.subVectors(point, nxPt).normalize();
-            tmpPrev.crossVectors(tmpNext, tmpPrev).normalize();
-
-            tmpPrev.toArray(normals, vtxIdx);
-            break;
-          case 1:
-            normInPrevRingPt.toArray(normals, vtxIdx);
-            break;
-          case 2:
-            prRingPt.toArray(positions, vtxIdx);
-            break;
-          default:
-            break;
-        }
+      for (let j = 0; j < ptsCount; ++j, vtxIdx += VEC_SIZE) {
+        tmpShape[j].copy(shape[j]).applyMatrix4(mtx).toArray(positions, vtxIdx);
       }
     }
   }
 
+  _setBaseNormals(ptsCount, ringsCount, chunkStartIdx) {
+    const nPtsInRing = ptsCount * VEC_SIZE;
+
+    for (let i = 0, vtxIdx = chunkStartIdx; i < ringsCount; ++i, vtxIdx += nPtsInRing) {
+      this._countNormalsInRing(ptsCount, vtxIdx, false);
+    }
+  }
+
+  _setSlopeNormals(ptsCount, ringsCount, chunkStartIdx) {
+    const normals = this._normals;
+    const nPtsInRing = ptsCount * VEC_SIZE;
+
+    let vtxIdx = chunkStartIdx;
+    // First ring
+    // In all cases, besides cut, second ring is coincident to first. So values of first ring's normals doesn't
+    // matter (In the cut case special handler will be applied later and will set them to correct values)
+    for (let j = 0; j < ptsCount; ++j, vtxIdx += VEC_SIZE) {
+      simpleNormal.toArray(normals, vtxIdx);
+    }
+    // second ring
+    // If it isn't first Item we take normals' values from the last ring of the previous item (these rings are coincident)
+    // else we count normals' values based on next ring information
+    if (vtxIdx - 2 * nPtsInRing > 0) {
+      for (let j = 0; j < ptsCount; ++j, vtxIdx += VEC_SIZE) {
+        tmpRes.fromArray(normals, vtxIdx - 2 * nPtsInRing).toArray(normals, vtxIdx);
+      }
+    } else {
+      this._countNormalsInRing(ptsCount, vtxIdx, true, +nPtsInRing);
+      vtxIdx += nPtsInRing;
+    }
+    // other rings
+    // we count normals' values based on previous ring information
+    for (let i = 2; i < ringsCount; ++i, vtxIdx += nPtsInRing) {
+      this._countNormalsInRing(ptsCount, vtxIdx, true, -nPtsInRing);
+    }
+  }
+
   // Counting normals:
-  // - No slope
-  //   Radius doesn't change throught part => normals are parallel with the plane contains section points
-  //   normal = vToPrevPointInSection + vToNextPointInSection (all vectors are scaled for being 1 in length)
   // - Slope
   //   Radius changes throught part => normals aren't parallel with the plane contains section points
   //   normal = vTangentInSectionPlane x vToSuchPointInPrevSection (all vectors are scaled for being 1 in length)
+  // - No slope
+  //   Radius doesn't change throught part => normals are parallel with the plane contains section points
+  //   normal = vToPrevPointInSection + vToNextPointInSection (all vectors are scaled for being 1 in length)
+  _countNormalsInRing(ptsCount, vtxIdx, isSlope, shiftToExtraPt) {
+    const tmpShape = this._tmpShape;
+    const normals = this._normals;
 
-  _countNormals(point, nextPt, prevPt, prevRingPt, prevPrevRingNormal, isFirstRing, hasSlope) {
-    if (hasSlope) {
-      if (isFirstRing) {
-        // first section is equal to last section of previous part so we takes normals from it
-        return prevPrevRingNormal;
+    tmpShape[0].fromArray(this._positions, vtxIdx);
+    tmpShape[ptsCount - 1].fromArray(this._positions, vtxIdx + (ptsCount - 1) * VEC_SIZE);
+
+    for (let j = 0; j < ptsCount; ++j, vtxIdx += VEC_SIZE) {
+      if (j < ptsCount - 1) {
+        tmpShape[j + 1].fromArray(this._positions, vtxIdx + VEC_SIZE);
       }
-      // zero and first sections are equal so we will have tmpNext = 0 for the first section
-      // so we count normals with another way for it
-      tmpPrev.subVectors(prevPt, nextPt).normalize();
-      tmpNext.subVectors(point, prevRingPt).normalize();
-      return new THREE.Vector3().crossVectors(tmpPrev, tmpNext).normalize();
-    }
 
-    tmpPrev.subVectors(point, prevPt).normalize();
-    tmpNext.subVectors(point, nextPt).normalize();
-    return new THREE.Vector3().addVectors(tmpPrev, tmpNext).normalize();
+      if (isSlope) {
+        nearRingPt.fromArray(this._positions, vtxIdx + shiftToExtraPt);
+
+        tmpPrev.subVectors(tmpShape[(j + ptsCount - 1) % ptsCount], tmpShape[(j + 1) % ptsCount]).normalize();
+        tmpNext.subVectors(tmpShape[j], nearRingPt).normalize();
+        tmpRes.crossVectors(tmpPrev, tmpNext).normalize().toArray(normals, vtxIdx);
+      } else {
+        tmpPrev.subVectors(tmpShape[j], tmpShape[(j + ptsCount - 1) % ptsCount]).normalize();
+        tmpNext.subVectors(tmpShape[j], tmpShape[(j + 1) % ptsCount]).normalize();
+        tmpRes.addVectors(tmpPrev, tmpNext).normalize().toArray(normals, vtxIdx);
+      }
+    }
+  }
+
+  _addCut(ptsCount, ringsCount, chunkStartIdx) {
+    // Nothing to do if item is flat or only line
+    if (ptsCount < 3 || ringsCount < 2) {
+      return;
+    }
+    const positions = this._positions;
+    const normals = this._normals;
+    const tmpShape = this._tmpShape;
+    const nPtsInRing = ptsCount * VEC_SIZE;
+
+    // Normal to the cut plane is equal to cross product of two vectors which are lying in it
+    tmpShape[0].fromArray(positions, chunkStartIdx);
+    tmpShape[1].fromArray(positions, chunkStartIdx + VEC_SIZE);
+    tmpShape[2].fromArray(positions, chunkStartIdx + 2 * VEC_SIZE);
+
+    tmpPrev.subVectors(tmpShape[1], tmpShape[0]).normalize();
+    tmpNext.subVectors(tmpShape[1], tmpShape[2]).normalize();
+    normalOnCut.crossVectors(tmpNext, tmpPrev).normalize();
+
+    let vtxIdx = chunkStartIdx;
+    // First and second rings normals' values are equal to value of normal to the cutting plane
+    for (let j = 0; j < ptsCount * 2; ++j, vtxIdx += VEC_SIZE) {
+      normalOnCut.toArray(normals, vtxIdx);
+    }
+    if (ringsCount > 2) {
+      // Third ring points are coincident to first ring points, but have different normals. It makes sharp angle near cut
+      for (let j = 0; j < ptsCount; ++j, vtxIdx += VEC_SIZE) {
+        tmpRes.fromArray(positions, vtxIdx - nPtsInRing).toArray(positions, vtxIdx);
+      }
+    }
   }
 }
 
