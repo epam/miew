@@ -6,6 +6,39 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.0] - 2019-06-07
+### Added
+- Add isosurface rendering for electron density maps. As volumetric rendering is still in its alpha, it is done through a global `modes.VD.isoMode` flag.
+
+### Changed
+- Show detailed messages for WebGL initialization errors.
+
+### Removed - BREAKING CHANGES!
+- Remove deprecated water bonding hack.
+- Remove deprecated Complex methods.
+- Remove deprecated window.MIEWS array.
+- Remove deprecated Settings#override().
+- Remove deprecated camera panning.
+- Remove deprecated coloring ids.
+- Remove deprecated themes.
+- Remove deprecated old-fashioned atom labels.
+- Remove deprecated API in modes, colorers, materials, palettes.
+- Remove deprecated API in loaders and parsers.
+- Remove deprecated presets server integration.
+
+### Fixed
+- Fix the crash on clicking mode/color panel when representation list is empty.
+- Fix DISTORTED and ANAGLYPH stereo modes.
+- Fix incorrect shadows when molecule is moved around.
+- Fix axes disappearing when fxaa is off and ao is on.
+- Fix rendering issues for fxaa + outline + stereo=DISTORTED.
+- Fix selection information update when the terminal was used to change selection.
+- Fix raycasting performance partially. Another fix is still in progress.
+
+### Internal
+- Add rendering regression tests for post-process effects, shadows and stereo modes.
+- Fix some code smells and todos found by improved SonarCloud checks, refactor es5 code.
+
 ## [0.7.24] - 2019-04-26
 ### Added
 - Add wire frames for electron density volumes.
@@ -418,7 +451,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.24...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/epam/miew/compare/v0.7.24...v0.8.0
 [0.7.24]: https://github.com/epam/miew/compare/v0.7.23...v0.7.24
 [0.7.23]: https://github.com/epam/miew/compare/v0.7.22...v0.7.23
 [0.7.22]: https://github.com/epam/miew/compare/v0.7.21...v0.7.22
