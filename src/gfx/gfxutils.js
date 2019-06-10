@@ -4,6 +4,9 @@ import _ from 'lodash';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
 import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
+import ScreenQuadFromTex from './shaders/ScreenQuadFromTex.frag';
+import ScreenQuadFromTexDepth from './shaders/ScreenQuadFromTexDepth.frag';
+import ScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTexWithDistortion.frag';
 import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {
@@ -80,15 +83,7 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
       opacity: { type: 'f', value: 1.0 },
     },
     vertexShader: vertexScreenQuadShader,
-    fragmentShader: `\
-precision highp float;
-varying vec2 vUv;
-uniform sampler2D srcTex;
-uniform float opacity;
-void main() {
-  vec4 color = texture2D(srcTex, vUv);
-  gl_FragColor = vec4(color.xyz, color.a * opacity);
-}`,
+    fragmentShader: ScreenQuadFromTex,
     transparent: true,
     depthTest: false,
     depthWrite: false,
@@ -111,22 +106,7 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
       opacity: { type: 'f', value: 1.0 },
     },
     vertexShader: vertexScreenQuadShader,
-    fragmentShader: `\
-precision highp float;
-const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1);
-const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
-const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
-float unpackRGBAToDepth( const in vec4 v ) {
-  return dot( v, UnpackFactors );
-}
-varying vec2 vUv;
-uniform sampler2D srcTex;
-uniform float opacity;
-void main() {
-  vec4 color = texture2D(srcTex, vUv);
-  float depth = unpackRGBAToDepth(color);
-  gl_FragColor = vec4(depth, depth, depth, opacity);
-}`,
+    fragmentShader: ScreenQuadFromTexDepth,
     transparent: true,
     depthTest: false,
     depthWrite: false,
@@ -147,21 +127,7 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function 
       coef: { type: 'f', value: 1.0 },
     },
     vertexShader: vertexScreenQuadShader,
-    fragmentShader: `\
-precision highp float;
-varying vec2 vUv;
-uniform sampler2D srcTex;
-uniform float coef;
-void main() {
-  vec2 uv = vUv * 2.0 - 1.0;
-  float r2 = dot(uv, uv);
-  vec2 tc = uv * (1.0 + coef * r2);
-  if (!all(lessThan(abs(tc), vec2(1.0))))
-    discard;
-  tc = 0.5 * (tc + 1.0);
-  gl_FragColor = texture2D(srcTex, tc);
-}
-`,
+    fragmentShader: ScreenQuadFromTexWithDistortion,
     transparent: false,
     depthTest: false,
     depthWrite: false,
