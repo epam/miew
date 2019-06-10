@@ -1,8 +1,8 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import volumeFrag from './Volume_frag.glsl';
-import farPlaneVert from './VolumeFarPlane_vert.glsl';
+import volumeFrag from './Volume.frag';
+import farPlaneVert from './VolumeFarPlane.vert';
 import settings from '../../settings';
 
 const volumeUniforms = THREE.UniformsUtils.merge([

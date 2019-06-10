@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import _ from 'lodash';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
-import vertexScreenQuadShader from './shaders/ScreenQuad_vert.glsl';
+import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
 import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {

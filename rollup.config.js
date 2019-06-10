@@ -31,7 +31,10 @@ export default {
       DEBUG: false,
     }),
     rollupPluginString({
-      include: '**/*.glsl',
+      include: [
+        '**/*.vert',
+        '**/*.frag',
+      ],
     }),
     rollupPluginNodeResolve(),
     rollupPluginCommonJS({

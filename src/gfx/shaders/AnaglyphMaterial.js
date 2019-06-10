@@ -1,8 +1,8 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import vertexShader from './ScreenQuad_vert.glsl';
-import fragmentShader from './Anaglyph_frag.glsl';
+import vertexShader from './ScreenQuad.vert';
+import fragmentShader from './Anaglyph.frag';
 
 class AnaglyphMaterial extends THREE.RawShaderMaterial {
   constructor() {

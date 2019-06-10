@@ -37,7 +37,7 @@ const configure = prod => ({
         'postcss-loader',
       ],
     }, {
-      test: /\.(glsl|html)$/,
+      test: /\.(vert|frag|html)$/,
       use: ['raw-loader'],
     }, {
       test: /\.(woff|woff2|eot|ttf|svg)$/,

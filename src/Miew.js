@@ -40,7 +40,7 @@ import logger from './utils/logger';
 import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
 import WebVRPoC from './gfx/vr/WebVRPoC';
-import vertexScreenQuadShader from './gfx/shaders/ScreenQuad_vert.glsl';
+import vertexScreenQuadShader from './gfx/shaders/ScreenQuad.vert';
 
 const {
   selectors,
