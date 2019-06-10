@@ -307,30 +307,30 @@ describe('selectors', () => {
     const rightSelector = selectors.all();
     rightSelector.keyword = 'rSelector';
     const noneSelector = selectors.none();
-    const selectorPO = new selectors.InfixOperator(letfSelector, rightSelector);
-    const halfSelectorPO = new selectors.InfixOperator(letfSelector);
-    const noneSelectorPO = new selectors.InfixOperator();
+    const selectorIO = new selectors.InfixOperator(letfSelector, rightSelector);
+    const halfSelectorIO = new selectors.InfixOperator(letfSelector);
+    const noneSelectorIO = new selectors.InfixOperator();
 
     describe('construcnor', () => {
       it('priority', () => {
-        expect(selectorPO.priority).to.equal(1000);
+        expect(selectorIO.priority).to.equal(1000);
       });
       it('construcnor with two arguments', () => {
-        expect(selectorPO.lhs).to.deep.equal(letfSelector);
-        expect(selectorPO.rhs).to.deep.equal(rightSelector);
+        expect(selectorIO.lhs).to.deep.equal(letfSelector);
+        expect(selectorIO.rhs).to.deep.equal(rightSelector);
       });
       it('construcnor with one argument', () => {
-        expect(halfSelectorPO.lhs).to.deep.equal(letfSelector);
-        expect(halfSelectorPO.rhs).to.deep.equal(noneSelector);
+        expect(halfSelectorIO.lhs).to.deep.equal(letfSelector);
+        expect(halfSelectorIO.rhs).to.deep.equal(noneSelector);
       });
       it('construcnor without arguments', () => {
-        expect(noneSelectorPO.lhs).to.deep.equal(noneSelector);
-        expect(noneSelectorPO.rhs).to.deep.equal(noneSelector);
+        expect(noneSelectorIO.lhs).to.deep.equal(noneSelector);
+        expect(noneSelectorIO.rhs).to.deep.equal(noneSelector);
       });
     });
     describe('toString', () => {
       it('toString', () => {
-        expect(selectorPO.toString()).to.equal([letfSelector.toString(), 'error', rightSelector.toString()].join(' '));
+        expect(selectorIO.toString()).to.equal([letfSelector.toString(), 'error', rightSelector.toString()].join(' '));
       });
       describe('complex infix operator toString', () => {
         const highPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
@@ -363,7 +363,7 @@ describe('selectors', () => {
     });
     describe('toJSON', () => {
       it('toJSON', () => {
-        expect(selectorPO.toJSON()).to.deep.equal(['Error', letfSelector.toJSON(), rightSelector.toJSON()]);
+        expect(selectorIO.toJSON()).to.deep.equal(['Error', letfSelector.toJSON(), rightSelector.toJSON()]);
       });
     });
   });
