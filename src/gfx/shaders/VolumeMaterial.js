@@ -1,8 +1,12 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import volumeFrag from './Volume.frag';
-import farPlaneVert from './VolumeFarPlane.vert';
+import vertexVolumeFacesVert from './VolumeFaces.vert';
+import fragmentVolumeFacesFrag from './VolumeFaces.frag';
+import vertexVolumeVert from './Volume.vert';
+import fragmentVolumeFrag from './Volume.frag';
+import vertexFarPlaneVert from './VolumeFarPlane.vert';
+import fragmentFarPlaneFrag from './VolumeFarPlane.frag';
 import settings from '../../settings';
 
 const volumeUniforms = THREE.UniformsUtils.merge([
@@ -39,19 +43,8 @@ function overrideUniforms(params, defUniforms) {
 function facesPosMaterialParams(params, sideType) {
   return {
     uniforms: overrideUniforms(params, {}),
-    vertexShader: `\
-varying vec3 pos;
-void main() {
-  // we're assuming local position is in [-0.5, 0.5]
-  // we need to offset it to be represented in RGB
-  pos = position.xyz + 0.5;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}`,
-    fragmentShader: `\
-varying vec3 pos;
-void main() {
-  gl_FragColor = vec4(pos, 0.5);
-}`,
+    vertexShader: vertexVolumeFacesVert,
+    fragmentShader: fragmentVolumeFacesFrag,
     transparent: false,
     depthTest: false,
     depthWrite: false,
@@ -79,12 +72,8 @@ class BackFacePosMaterialFarPlane extends THREE.ShaderMaterial {
 
     const shaderParams = {
       uniforms: overrideUniforms(params, matUniforms),
-      vertexShader: farPlaneVert,
-      fragmentShader: `\
-varying vec4 volPos;
-void main() {
-  gl_FragColor = volPos;
-}`,
+      vertexShader: vertexFarPlaneVert,
+      fragmentShader: fragmentFarPlaneFrag,
       transparent: false,
       depthTest: false,
       depthWrite: false,
@@ -105,13 +94,8 @@ class VolumeMaterial extends THREE.ShaderMaterial {
   constructor(params) {
     const shaderParams = {
       uniforms: overrideUniforms(params, volumeUniforms),
-      vertexShader: `\
-varying vec4 screenSpacePos;
-void main() {
-  screenSpacePos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  gl_Position = screenSpacePos;
-}`,
-      fragmentShader: volumeFrag,
+      vertexShader: vertexVolumeVert,
+      fragmentShader: fragmentVolumeFrag,
       transparent: true,
       depthTest: true,
       depthWrite: false,
