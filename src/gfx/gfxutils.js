@@ -4,9 +4,9 @@ import _ from 'lodash';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
 import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
-import ScreenQuadFromTex from './shaders/ScreenQuadFromTex.frag';
-import ScreenQuadFromTexDepth from './shaders/ScreenQuadFromTexDepth.frag';
-import ScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTexWithDistortion.frag';
+import fragmentScreenQuadFromTex from './shaders/ScreenQuadFromTex.frag';
+import fragmentScreenQuadFromTexDepth from './shaders/ScreenQuadFromTexDepth.frag';
+import fragmentScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTexWithDistortion.frag';
 import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {
@@ -83,7 +83,7 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
       opacity: { type: 'f', value: 1.0 },
     },
     vertexShader: vertexScreenQuadShader,
-    fragmentShader: ScreenQuadFromTex,
+    fragmentShader: fragmentScreenQuadFromTex,
     transparent: true,
     depthTest: false,
     depthWrite: false,
@@ -106,7 +106,7 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
       opacity: { type: 'f', value: 1.0 },
     },
     vertexShader: vertexScreenQuadShader,
-    fragmentShader: ScreenQuadFromTexDepth,
+    fragmentShader: fragmentScreenQuadFromTexDepth,
     transparent: true,
     depthTest: false,
     depthWrite: false,
@@ -127,7 +127,7 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function 
       coef: { type: 'f', value: 1.0 },
     },
     vertexShader: vertexScreenQuadShader,
-    fragmentShader: ScreenQuadFromTexWithDistortion,
+    fragmentShader: fragmentScreenQuadFromTexWithDistortion,
     transparent: false,
     depthTest: false,
     depthWrite: false,
