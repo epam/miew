@@ -1,5 +1,6 @@
 import webdriver from 'selenium-webdriver';
 import ieDriver from 'selenium-webdriver/ie';
+import chromeDriver from 'selenium-webdriver/chrome';
 
 import chai from 'chai';
 import dirtyChai from 'dirty-chai';
@@ -50,6 +51,7 @@ describe('As a third-party developer, I want to', function () {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
+      .setChromeOptions(new chromeDriver.Options().addArguments(['--headless', '--disable-gpu']))
       .build();
 
     return golden.startup(driver, cfg)

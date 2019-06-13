@@ -55,6 +55,7 @@ function loadMolWithEffects(opts) {
       if (opts.select) {
         miew.select(opts.select);
       }
+      miew.view('1RjanwUpsuULsscfCHTIEPcxVEj88nzZAtuW8vQ==');
     });
   }
 }
@@ -62,7 +63,7 @@ function loadMolWithEffects(opts) {
 function buildParams(bitMask) {
   const descStrs = [];
   const idStrs = [''];
-  const settings = {};
+  const settings = { interpolateViews: false };
   const selectStrs = [];
   const load = [];
   for (let n = 0; n < effects.length; n++) {
