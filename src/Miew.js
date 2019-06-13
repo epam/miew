@@ -3599,6 +3599,8 @@ Miew.prototype.select = function (expression, append) {
   }
 
   visual.select(sel, append);
+  this._lastPick = null;
+
   this._updateInfoPanel();
   this._needRender = true;
 };
