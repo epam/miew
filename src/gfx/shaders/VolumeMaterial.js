@@ -1,12 +1,12 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import vertexVolumeFacesVert from './VolumeFaces.vert';
-import fragmentVolumeFacesFrag from './VolumeFaces.frag';
-import vertexVolumeVert from './Volume.vert';
-import fragmentVolumeFrag from './Volume.frag';
-import vertexFarPlaneVert from './VolumeFarPlane.vert';
-import fragmentFarPlaneFrag from './VolumeFarPlane.frag';
+import vertexVolumeFaces from './VolumeFaces.vert';
+import fragmentVolumeFaces from './VolumeFaces.frag';
+import vertexVolume from './Volume.vert';
+import fragmentVolume from './Volume.frag';
+import vertexFarPlane from './VolumeFarPlane.vert';
+import fragmentFarPlane from './VolumeFarPlane.frag';
 import settings from '../../settings';
 
 const volumeUniforms = THREE.UniformsUtils.merge([
@@ -43,8 +43,8 @@ function overrideUniforms(params, defUniforms) {
 function facesPosMaterialParams(params, sideType) {
   return {
     uniforms: overrideUniforms(params, {}),
-    vertexShader: vertexVolumeFacesVert,
-    fragmentShader: fragmentVolumeFacesFrag,
+    vertexShader: vertexVolumeFaces,
+    fragmentShader: fragmentVolumeFaces,
     transparent: false,
     depthTest: false,
     depthWrite: false,
@@ -72,8 +72,8 @@ class BackFacePosMaterialFarPlane extends THREE.ShaderMaterial {
 
     const shaderParams = {
       uniforms: overrideUniforms(params, matUniforms),
-      vertexShader: vertexFarPlaneVert,
-      fragmentShader: fragmentFarPlaneFrag,
+      vertexShader: vertexFarPlane,
+      fragmentShader: fragmentFarPlane,
       transparent: false,
       depthTest: false,
       depthWrite: false,
@@ -94,8 +94,8 @@ class VolumeMaterial extends THREE.ShaderMaterial {
   constructor(params) {
     const shaderParams = {
       uniforms: overrideUniforms(params, volumeUniforms),
-      vertexShader: vertexVolumeVert,
-      fragmentShader: fragmentVolumeFrag,
+      vertexShader: vertexVolume,
+      fragmentShader: fragmentVolume,
       transparent: true,
       depthTest: true,
       depthWrite: false,
