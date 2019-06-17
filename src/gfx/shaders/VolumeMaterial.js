@@ -59,6 +59,18 @@ class BackFacePosMaterial extends THREE.ShaderMaterial {
   }
 }
 
+class ShaderParams {
+  constructor(params, uniforms, vertexShader, fragmentShader) {
+    this.uniforms = overrideUniforms(params, uniforms);
+    this.vertexShader = vertexShader;
+    this.fragmentShader = fragmentShader;
+    this.transparent = false;
+    this.depthTest = false;
+    this.depthWrite = false;
+    this.side = THREE.FrontSide;
+  }
+}
+
 class BackFacePosMaterialFarPlane extends THREE.ShaderMaterial {
   constructor(params) {
     const matUniforms = THREE.UniformsUtils.merge([
@@ -70,15 +82,7 @@ class BackFacePosMaterialFarPlane extends THREE.ShaderMaterial {
       },
     ]);
 
-    const shaderParams = {
-      uniforms: overrideUniforms(params, matUniforms),
-      vertexShader: vertexFarPlane,
-      fragmentShader: fragmentFarPlane,
-      transparent: false,
-      depthTest: false,
-      depthWrite: false,
-      side: THREE.FrontSide,
-    };
+    const shaderParams = new ShaderParams(params, matUniforms, vertexFarPlane, fragmentFarPlane);
     super(shaderParams);
   }
 }
@@ -92,15 +96,9 @@ class FrontFacePosMaterial extends THREE.ShaderMaterial {
 
 class VolumeMaterial extends THREE.ShaderMaterial {
   constructor(params) {
-    const shaderParams = {
-      uniforms: overrideUniforms(params, volumeUniforms),
-      vertexShader: vertexVolume,
-      fragmentShader: fragmentVolume,
-      transparent: true,
-      depthTest: true,
-      depthWrite: false,
-      side: THREE.FrontSide,
-    };
+    const shaderParams = new ShaderParams(params, volumeUniforms, vertexVolume, fragmentVolume);
+    shaderParams.transparent = true;
+    shaderParams.depthTest = true;
 
     super(shaderParams);
     this.updateDefines();
