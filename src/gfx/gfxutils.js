@@ -5,7 +5,6 @@ import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
 import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
 import fragmentScreenQuadFromTex from './shaders/ScreenQuadFromTex.frag';
-import fragmentScreenQuadFromTexDepth from './shaders/ScreenQuadFromTexDepth.frag';
 import fragmentScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTexWithDistortion.frag';
 import UberMaterial from './shaders/UberMaterial';
 
@@ -90,43 +89,18 @@ class ScreenQuadMaterial extends THREE.RawShaderMaterial {
   }
 }
 
-class OpacityScreenQuadMaterial extends ScreenQuadMaterial {
-  constructor(params) {
-    if (params.uniforms === undefined) {
-      params.uniforms = {};
-    }
-    params.uniforms.opacity = { type: 'f', value: 1.0 };
-    params.transparent = true;
-    super(params);
-  }
-
-  setRenderParams(srcTex, opacity) {
-    this.uniforms.srcTex.value = srcTex;
-    this.transparent = (opacity < 1.0);
-    this.uniforms.opacity.value = opacity;
-  }
-}
-
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
-  const _material = new OpacityScreenQuadMaterial({
+  const _material = new ScreenQuadMaterial({
+    uniforms: { opacity: { type: 'f', value: 1.0 } },
     fragmentShader: fragmentScreenQuadFromTex,
+    transparent: true,
   });
 
 
   return function (srcTex, opacity) {
-    _material.setRenderParams(srcTex, opacity);
-    this.renderScreenQuad(_material);
-  };
-}());
-
-// render texture with depth packed in RGBA (packing is from threejs)
-THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
-  const _material = new OpacityScreenQuadMaterial({
-    fragmentShader: fragmentScreenQuadFromTexDepth,
-  });
-
-  return function (srcTex, opacity) {
-    _material.setRenderParams(srcTex, opacity);
+    _material.uniforms.srcTex.value = srcTex;
+    _material.transparent = (opacity < 1.0);
+    _material.uniforms.opacity.value = opacity;
     this.renderScreenQuad(_material);
   };
 }());
