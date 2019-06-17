@@ -268,7 +268,8 @@ float unpackRGBAToDepth( const in vec4 v ) {
     float getShadow( sampler2D shadowMap, DirectionalLight dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {
    	  float shadow = 0.0;
 
-      shadowCoord.xyz += dirLight.shadowBias * vNormal; //TODO use normals as it done for G-buffer (for sprites)
+      // When shadows for sprites will appear use here for them normals as it done for G-buffer
+      shadowCoord.xyz += dirLight.shadowBias * vNormal;
       shadowCoord.xyz /= shadowCoord.w;
 
       bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
