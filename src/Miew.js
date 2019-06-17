@@ -2244,6 +2244,7 @@ Miew.prototype.changeUnit = function (unitIdx, name) {
   }
   if (visual.getComplex().setCurrentUnit(unitIdx)) {
     this._resetScene();
+    this._updateInfoPanel();
   }
   return currentUnitInfo();
 };
