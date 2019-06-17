@@ -76,61 +76,65 @@ THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
   };
 }());
 
+class ScreenQuadMaterial extends THREE.RawShaderMaterial {
+  constructor(params) {
+    if (params.uniforms === undefined) {
+      params.uniforms = {};
+    }
+    params.uniforms.srcTex = { type: 't', value: null };
+    params.vertexShader = vertexScreenQuadShader;
+    params.transparent = false;
+    params.depthTest = false;
+    params.depthWrite = false;
+    super(params);
+  }
+}
+
+class OpacityScreenQuadMaterial extends ScreenQuadMaterial {
+  constructor(params) {
+    if (params.uniforms === undefined) {
+      params.uniforms = {};
+    }
+    params.uniforms.opacity = { type: 'f', value: 1.0 };
+    params.transparent = true;
+    super(params);
+  }
+
+  setRenderParams(srcTex, opacity) {
+    this.uniforms.srcTex.value = srcTex;
+    this.transparent = (opacity < 1.0);
+    this.uniforms.opacity.value = opacity;
+  }
+}
+
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
-  const _material = new THREE.RawShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      opacity: { type: 'f', value: 1.0 },
-    },
-    vertexShader: vertexScreenQuadShader,
+  const _material = new OpacityScreenQuadMaterial({
     fragmentShader: fragmentScreenQuadFromTex,
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
   });
 
 
   return function (srcTex, opacity) {
-    _material.uniforms.srcTex.value = srcTex;
-    _material.transparent = (opacity < 1.0);
-    _material.uniforms.opacity.value = opacity;
+    _material.setRenderParams(srcTex, opacity);
     this.renderScreenQuad(_material);
   };
 }());
 
 // render texture with depth packed in RGBA (packing is from threejs)
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
-  const _material = new THREE.RawShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      opacity: { type: 'f', value: 1.0 },
-    },
-    vertexShader: vertexScreenQuadShader,
+  const _material = new OpacityScreenQuadMaterial({
     fragmentShader: fragmentScreenQuadFromTexDepth,
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
   });
 
   return function (srcTex, opacity) {
-    _material.uniforms.srcTex.value = srcTex;
-    _material.transparent = (opacity < 1.0);
-    _material.uniforms.opacity.value = opacity;
+    _material.setRenderParams(srcTex, opacity);
     this.renderScreenQuad(_material);
   };
 }());
 
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function () {
-  const _material = new THREE.RawShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      coef: { type: 'f', value: 1.0 },
-    },
-    vertexShader: vertexScreenQuadShader,
+  const _material = new ScreenQuadMaterial({
+    uniforms: { coef: { type: 'f', value: 1.0 } },
     fragmentShader: fragmentScreenQuadFromTexWithDistortion,
-    transparent: false,
-    depthTest: false,
-    depthWrite: false,
   });
 
 
