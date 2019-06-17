@@ -41,7 +41,7 @@ import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
 import WebVRPoC from './gfx/vr/WebVRPoC';
 import vertexScreenQuadShader from './gfx/shaders/ScreenQuad.vert';
-import fragmentScreenQuadFromDistTex from './gfx/shaders/ScreenQuadFromTex.frag';
+import fragmentScreenQuadFromDistTex from './gfx/shaders/ScreenQuadFromDistortionTex.frag';
 
 const {
   selectors,
