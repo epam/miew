@@ -3,7 +3,9 @@ import * as THREE from 'three';
 import _ from 'lodash';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
-import vertexScreenQuadShader from './shaders/ScreenQuad_vert.glsl';
+import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
+import fragmentScreenQuadFromTex from './shaders/ScreenQuadFromTex.frag';
+import fragmentScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTexWithDistortion.frag';
 import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {
@@ -73,64 +75,27 @@ THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
   };
 }());
 
-THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
-  const _material = new THREE.RawShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      opacity: { type: 'f', value: 1.0 },
-    },
-    vertexShader: vertexScreenQuadShader,
-    fragmentShader: `\
-precision highp float;
-varying vec2 vUv;
-uniform sampler2D srcTex;
-uniform float opacity;
-void main() {
-  vec4 color = texture2D(srcTex, vUv);
-  gl_FragColor = vec4(color.xyz, color.a * opacity);
-}`,
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
-  });
-
-
-  return function (srcTex, opacity) {
-    _material.uniforms.srcTex.value = srcTex;
-    _material.transparent = (opacity < 1.0);
-    _material.uniforms.opacity.value = opacity;
-    this.renderScreenQuad(_material);
-  };
-}());
-
-// render texture with depth packed in RGBA (packing is from threejs)
-THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
-  const _material = new THREE.RawShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      opacity: { type: 'f', value: 1.0 },
-    },
-    vertexShader: vertexScreenQuadShader,
-    fragmentShader: `\
-precision highp float;
-const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1);
-const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
-const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
-float unpackRGBAToDepth( const in vec4 v ) {
-  return dot( v, UnpackFactors );
+class ScreenQuadMaterial extends THREE.RawShaderMaterial {
+  constructor(params) {
+    if (params.uniforms === undefined) {
+      params.uniforms = {};
+    }
+    params.uniforms.srcTex = { type: 't', value: null };
+    params.vertexShader = vertexScreenQuadShader;
+    params.transparent = false;
+    params.depthTest = false;
+    params.depthWrite = false;
+    super(params);
+  }
 }
-varying vec2 vUv;
-uniform sampler2D srcTex;
-uniform float opacity;
-void main() {
-  vec4 color = texture2D(srcTex, vUv);
-  float depth = unpackRGBAToDepth(color);
-  gl_FragColor = vec4(depth, depth, depth, opacity);
-}`,
+
+THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
+  const _material = new ScreenQuadMaterial({
+    uniforms: { opacity: { type: 'f', value: 1.0 } },
+    fragmentShader: fragmentScreenQuadFromTex,
     transparent: true,
-    depthTest: false,
-    depthWrite: false,
   });
+
 
   return function (srcTex, opacity) {
     _material.uniforms.srcTex.value = srcTex;
@@ -141,30 +106,9 @@ void main() {
 }());
 
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function () {
-  const _material = new THREE.RawShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      coef: { type: 'f', value: 1.0 },
-    },
-    vertexShader: vertexScreenQuadShader,
-    fragmentShader: `\
-precision highp float;
-varying vec2 vUv;
-uniform sampler2D srcTex;
-uniform float coef;
-void main() {
-  vec2 uv = vUv * 2.0 - 1.0;
-  float r2 = dot(uv, uv);
-  vec2 tc = uv * (1.0 + coef * r2);
-  if (!all(lessThan(abs(tc), vec2(1.0))))
-    discard;
-  tc = 0.5 * (tc + 1.0);
-  gl_FragColor = texture2D(srcTex, tc);
-}
-`,
-    transparent: false,
-    depthTest: false,
-    depthWrite: false,
+  const _material = new ScreenQuadMaterial({
+    uniforms: { coef: { type: 'f', value: 1.0 } },
+    fragmentShader: fragmentScreenQuadFromTexWithDistortion,
   });
 
 

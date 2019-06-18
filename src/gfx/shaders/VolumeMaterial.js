@@ -1,8 +1,12 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import volumeFrag from './Volume_frag.glsl';
-import farPlaneVert from './VolumeFarPlane_vert.glsl';
+import vertexVolumeFaces from './VolumeFaces.vert';
+import fragmentVolumeFaces from './VolumeFaces.frag';
+import vertexVolume from './Volume.vert';
+import fragmentVolume from './Volume.frag';
+import vertexFarPlane from './VolumeFarPlane.vert';
+import fragmentFarPlane from './VolumeFarPlane.frag';
 import settings from '../../settings';
 
 const volumeUniforms = THREE.UniformsUtils.merge([
@@ -39,19 +43,8 @@ function overrideUniforms(params, defUniforms) {
 function facesPosMaterialParams(params, sideType) {
   return {
     uniforms: overrideUniforms(params, {}),
-    vertexShader: `\
-varying vec3 pos;
-void main() {
-  // we're assuming local position is in [-0.5, 0.5]
-  // we need to offset it to be represented in RGB
-  pos = position.xyz + 0.5;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}`,
-    fragmentShader: `\
-varying vec3 pos;
-void main() {
-  gl_FragColor = vec4(pos, 0.5);
-}`,
+    vertexShader: vertexVolumeFaces,
+    fragmentShader: fragmentVolumeFaces,
     transparent: false,
     depthTest: false,
     depthWrite: false,
@@ -66,6 +59,18 @@ class BackFacePosMaterial extends THREE.ShaderMaterial {
   }
 }
 
+class ShaderParams {
+  constructor(params, uniforms, vertexShader, fragmentShader) {
+    this.uniforms = overrideUniforms(params, uniforms);
+    this.vertexShader = vertexShader;
+    this.fragmentShader = fragmentShader;
+    this.transparent = false;
+    this.depthTest = false;
+    this.depthWrite = false;
+    this.side = THREE.FrontSide;
+  }
+}
+
 class BackFacePosMaterialFarPlane extends THREE.ShaderMaterial {
   constructor(params) {
     const matUniforms = THREE.UniformsUtils.merge([
@@ -77,19 +82,7 @@ class BackFacePosMaterialFarPlane extends THREE.ShaderMaterial {
       },
     ]);
 
-    const shaderParams = {
-      uniforms: overrideUniforms(params, matUniforms),
-      vertexShader: farPlaneVert,
-      fragmentShader: `\
-varying vec4 volPos;
-void main() {
-  gl_FragColor = volPos;
-}`,
-      transparent: false,
-      depthTest: false,
-      depthWrite: false,
-      side: THREE.FrontSide,
-    };
+    const shaderParams = new ShaderParams(params, matUniforms, vertexFarPlane, fragmentFarPlane);
     super(shaderParams);
   }
 }
@@ -103,20 +96,9 @@ class FrontFacePosMaterial extends THREE.ShaderMaterial {
 
 class VolumeMaterial extends THREE.ShaderMaterial {
   constructor(params) {
-    const shaderParams = {
-      uniforms: overrideUniforms(params, volumeUniforms),
-      vertexShader: `\
-varying vec4 screenSpacePos;
-void main() {
-  screenSpacePos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  gl_Position = screenSpacePos;
-}`,
-      fragmentShader: volumeFrag,
-      transparent: true,
-      depthTest: true,
-      depthWrite: false,
-      side: THREE.FrontSide,
-    };
+    const shaderParams = new ShaderParams(params, volumeUniforms, vertexVolume, fragmentVolume);
+    shaderParams.transparent = true;
+    shaderParams.depthTest = true;
 
     super(shaderParams);
     this.updateDefines();

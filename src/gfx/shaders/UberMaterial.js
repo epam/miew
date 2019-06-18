@@ -1,13 +1,13 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import vertexShader from './Uber_vert.glsl';
-import fragmentShader from './Uber_frag.glsl';
+import vertexShader from './Uber.vert';
+import fragmentShader from './Uber.frag';
 import capabilities from '../capabilities';
 import noise from '../noiseTexture';
 
-// Length of _samplesKernel is used in Uber_frag.glsl
-// If you want to change length of _samplesKernel, please, remember change it in Uber_frag.glsl too.
+// Length of _samplesKernel is used in Uber.frag
+// If you want to change length of _samplesKernel, please, remember change it in Uber.frag too.
 // You can easy find places for replace using word:_samplesKernel
 const _samplesKernel = [
   new THREE.Vector2(-0.541978, 0.840393),

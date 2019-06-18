@@ -1,10 +1,10 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import vertexScreenQuadShader from './ScreenQuad_vert.glsl';
-import fragmentSSAOShader from './AO_frag.glsl';
-import fragmentHorBilateralBlur5Shader from './AOHBlur_frag.glsl';
-import fragmentVertBilateralBlur5Shader from './AOVBlur_frag.glsl';
+import vertexScreenQuadShader from './ScreenQuad.vert';
+import fragmentSSAOShader from './AO.frag';
+import fragmentHorBilateralBlur5Shader from './AOHBlur.frag';
+import fragmentVertBilateralBlur5Shader from './AOVBlur.frag';
 
 const _samplesKernel = [
   // hemisphere samples adopted to sphere
