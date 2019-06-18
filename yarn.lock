@@ -270,7 +270,7 @@
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/plugin-syntax-json-strings" "^7.2.0"
 
-"@babel/plugin-proposal-object-rest-spread@^7.0.0", "@babel/plugin-proposal-object-rest-spread@^7.4.4":
+"@babel/plugin-proposal-object-rest-spread@^7.4.4":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-object-rest-spread/-/plugin-proposal-object-rest-spread-7.4.4.tgz#1ef173fcf24b3e2df92a678f027673b55e7e3005"
   integrity sha512-dMBG6cSPBbHeEBdFXeQ2QLc5gUpg4Vkaz8octD4aoW/ISO+jBOcsuxYL7bsb5WSu8RLP6boxrBIALEHgoHtO9g==
@@ -368,7 +368,7 @@
     "@babel/helper-plugin-utils" "^7.0.0"
     lodash "^4.17.11"
 
-"@babel/plugin-transform-classes@^7.2.0", "@babel/plugin-transform-classes@^7.4.4":
+"@babel/plugin-transform-classes@^7.4.4":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-classes/-/plugin-transform-classes-7.4.4.tgz#0ce4094cdafd709721076d3b9c38ad31ca715eb6"
   integrity sha512-/e44eFLImEGIpL9qPxSRat13I5QNRgBLu2hOQJCF7VLy/otSM/sypV1+XaIw5+502RX/+6YaSAPmldk+nhHDPw==
@@ -412,7 +412,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
 
-"@babel/plugin-transform-exponentiation-operator@^7.0.0", "@babel/plugin-transform-exponentiation-operator@^7.2.0":
+"@babel/plugin-transform-exponentiation-operator@^7.2.0":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-exponentiation-operator/-/plugin-transform-exponentiation-operator-7.2.0.tgz#a63868289e5b4007f7054d46491af51435766008"
   integrity sha512-umh4hR6N7mu4Elq9GG8TOu9M0bakvlsREEC+ialrQN6ABS4oDQ69qJv1VtR3uxlKMCQMCvzk7vr17RHKcjx68A==
@@ -435,7 +435,7 @@
     "@babel/helper-function-name" "^7.1.0"
     "@babel/helper-plugin-utils" "^7.0.0"
 
-"@babel/plugin-transform-jscript@^7.0.0":
+"@babel/plugin-transform-jscript@^7.2.0":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-jscript/-/plugin-transform-jscript-7.2.0.tgz#25d87f6a34cc602e8374bd806f2ac753ba5533a1"
   integrity sha512-7r0hfq8SWlVYdVFX5y+0N/kB0AC6u1ad+vnxvUwSDtPF4UKJ6bUSoj/SEVJkzNWFmNsy4x3nEfz4ywedgjjhsg==
@@ -449,7 +449,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
 
-"@babel/plugin-transform-member-expression-literals@^7.0.0", "@babel/plugin-transform-member-expression-literals@^7.2.0":
+"@babel/plugin-transform-member-expression-literals@^7.2.0":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-member-expression-literals/-/plugin-transform-member-expression-literals-7.2.0.tgz#fa10aa5c58a2cb6afcf2c9ffa8cb4d8b3d489a2d"
   integrity sha512-HiU3zKkSU6scTidmnFJ0bMX8hz5ixC93b4MHMiYebmk2lUVNGOboPsqQvx5LzooihijUoLR/v7Nc1rbBtnc7FA==
@@ -520,14 +520,14 @@
     "@babel/helper-get-function-arity" "^7.0.0"
     "@babel/helper-plugin-utils" "^7.0.0"
 
-"@babel/plugin-transform-property-literals@^7.0.0", "@babel/plugin-transform-property-literals@^7.2.0":
+"@babel/plugin-transform-property-literals@^7.2.0":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-property-literals/-/plugin-transform-property-literals-7.2.0.tgz#03e33f653f5b25c4eb572c98b9485055b389e905"
   integrity sha512-9q7Dbk4RhgcLp8ebduOpCbtjh7C0itoLYHXd9ueASKAG/is5PQtMR5VJGka9NKqGhYEGn5ITahd4h9QeBMylWQ==
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
 
-"@babel/plugin-transform-property-mutators@^7.0.0":
+"@babel/plugin-transform-property-mutators@^7.2.0":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-property-mutators/-/plugin-transform-property-mutators-7.2.0.tgz#c0a5768e4430fce6fe7e12766592b60e7fa3fe2e"
   integrity sha512-u72d5EOlRrggmuf71VBWanw6xgbuQBDRJr+tms0r3gj69joRU1aS3TtYElyJI/PJhFl4ENJcIVW8HVZ5ST3xfQ==
@@ -581,6 +581,16 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
 
+"@babel/plugin-transform-runtime@^7.4.4":
+  version "7.4.4"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-runtime/-/plugin-transform-runtime-7.4.4.tgz#a50f5d16e9c3a4ac18a1a9f9803c107c380bce08"
+  integrity sha512-aMVojEjPszvau3NRg+TIH14ynZLvPewH4xhlCW1w6A3rkxTS1m4uwzRclYR9oS+rl/dr+kT+pzbfHuAWP/lc7Q==
+  dependencies:
+    "@babel/helper-module-imports" "^7.0.0"
+    "@babel/helper-plugin-utils" "^7.0.0"
+    resolve "^1.8.1"
+    semver "^5.5.1"
+
 "@babel/plugin-transform-shorthand-properties@^7.2.0":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-shorthand-properties/-/plugin-transform-shorthand-properties-7.2.0.tgz#6333aee2f8d6ee7e28615457298934a3b46198f0"
@@ -603,7 +613,7 @@
     "@babel/helper-plugin-utils" "^7.0.0"
     "@babel/helper-regex" "^7.0.0"
 
-"@babel/plugin-transform-template-literals@^7.0.0", "@babel/plugin-transform-template-literals@^7.4.4":
+"@babel/plugin-transform-template-literals@^7.4.4":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-template-literals/-/plugin-transform-template-literals-7.4.4.tgz#9d28fea7bbce637fb7612a0750989d8321d4bcb0"
   integrity sha512-mQrEC4TWkhLN0z8ygIvEL9ZEToPhG5K7KDW3pzGqOfIGZ28Jb0POUkeWcoz8HnHvhFy6dwAT1j8OzqN8s804+g==
@@ -635,7 +645,7 @@
     core-js "^2.6.5"
     regenerator-runtime "^0.13.2"
 
-"@babel/preset-env@^7.0.0":
+"@babel/preset-env@^7.4.5":
   version "7.4.5"
   resolved "https://registry.yarnpkg.com/@babel/preset-env/-/preset-env-7.4.5.tgz#2fad7f62983d5af563b5f3139242755884998a58"
   integrity sha512-f2yNVXM+FsR5V8UwcFeIHzHWgnhXg3NpRmy0ADvALpnhB0SLbCvrCRr4BLOUYbQNLS+Z0Yer46x9dJXpXewI7w==
@@ -1399,28 +1409,29 @@ babel-plugin-istanbul@^5.1.4:
     istanbul-lib-instrument "^3.3.0"
     test-exclude "^5.2.3"
 
-babel-plugin-transform-react-remove-prop-types@^0.4.18:
+babel-plugin-transform-react-remove-prop-types@^0.4.24:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-react-remove-prop-types/-/babel-plugin-transform-react-remove-prop-types-0.4.24.tgz#f2edaf9b4c6a5fbe5c1d678bfb531078c1555f3a"
   integrity sha512-eqj0hVcJUR57/Ug2zE1Yswsw4LhuqqHhD+8v120T1cl3kjg76QwtyBrdIk4WVwK+lAhBJVYCd/v+4nc4y+8JsA==
 
-babel-preset-airbnb@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/babel-preset-airbnb/-/babel-preset-airbnb-3.2.1.tgz#6ce0ed936701178af63fbcd363979659398f97e7"
-  integrity sha512-TLmtPLDMUhX2PC1nNEQsJqqX36il6YH9rGN57m0l8rrFaExJZqHM6CqyL7/RLmLmDZbDcp4OPcLwHeDcCDAJCA==
+babel-preset-airbnb@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/babel-preset-airbnb/-/babel-preset-airbnb-4.0.0.tgz#5a6891967983830ce3b9d5df82017c7bde12fda5"
+  integrity sha512-Fgz2WAWdTJcOLLTP9C+zdwoO6ikX7gdJ3TdwMwIEDrETiggkDobRz6H7hxat/WASbujZtYF8URM/ldCwtKaXIw==
   dependencies:
     "@babel/helper-plugin-utils" "^7.0.0"
-    "@babel/plugin-proposal-object-rest-spread" "^7.0.0"
-    "@babel/plugin-transform-classes" "^7.2.0"
-    "@babel/plugin-transform-exponentiation-operator" "^7.0.0"
-    "@babel/plugin-transform-jscript" "^7.0.0"
-    "@babel/plugin-transform-member-expression-literals" "^7.0.0"
-    "@babel/plugin-transform-property-literals" "^7.0.0"
-    "@babel/plugin-transform-property-mutators" "^7.0.0"
-    "@babel/plugin-transform-template-literals" "^7.0.0"
-    "@babel/preset-env" "^7.0.0"
+    "@babel/plugin-proposal-object-rest-spread" "^7.4.4"
+    "@babel/plugin-transform-classes" "^7.4.4"
+    "@babel/plugin-transform-exponentiation-operator" "^7.2.0"
+    "@babel/plugin-transform-jscript" "^7.2.0"
+    "@babel/plugin-transform-member-expression-literals" "^7.2.0"
+    "@babel/plugin-transform-property-literals" "^7.2.0"
+    "@babel/plugin-transform-property-mutators" "^7.2.0"
+    "@babel/plugin-transform-runtime" "^7.4.4"
+    "@babel/plugin-transform-template-literals" "^7.4.4"
+    "@babel/preset-env" "^7.4.5"
     "@babel/preset-react" "^7.0.0"
-    babel-plugin-transform-react-remove-prop-types "^0.4.18"
+    babel-plugin-transform-react-remove-prop-types "^0.4.24"
 
 bail@^1.0.0:
   version "1.0.4"
@@ -7628,6 +7639,13 @@ resolve@^1.1.4, resolve@^1.1.7, resolve@^1.10.0, resolve@^1.10.1, resolve@^1.11.
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.11.1.tgz#ea10d8110376982fef578df8fc30b9ac30a07a3e"
   integrity sha512-vIpgF6wfuJOZI7KKKSP+HmiKggadPQAdsp5HiC1mvqnfp0gF1vdwgBWZIdrVft9pgqoMFQN+R7BSWZiBxx+BBw==
+  dependencies:
+    path-parse "^1.0.6"
+
+resolve@^1.8.1:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.11.0.tgz#4014870ba296176b86343d50b60f3b50609ce232"
+  integrity sha512-WL2pBDjqT6pGUNSUzMw00o4T7If+z4H2x3Gz893WoUQ5KW8Vr9txp00ykiP16VBaZF5+j/OcXJHZ9+PCvdiDKw==
   dependencies:
     path-parse "^1.0.6"
 
