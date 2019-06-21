@@ -436,6 +436,15 @@ function processMaterialForShadow(root, material) {
   });
 }
 
+function processGeoForSetRenderOrder(root, idMaterial) {
+  const renderOrder = +(idMaterial !== 'BA');
+  root.traverse((object) => {
+    if (object.isGroup) {
+      object.renderOrder = renderOrder;
+    }
+  });
+}
+
 /** Traverse tree and make visible only needed meshes */
 function makeVisibleMeshes(object, checker) {
   if (object && object.traverse) {
@@ -486,6 +495,7 @@ export default {
   processColFromPosMaterial,
   prepareObjMaterialForShadow,
   processMaterialForShadow,
+  processGeoForSetRenderOrder,
   makeVisibleMeshes,
   applySelectionMaterial,
   getMiddlePoint,
