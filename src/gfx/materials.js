@@ -95,7 +95,6 @@ const materialList = [
     id: 'GL',
     name: 'Glass',
     shortName: 'Glass',
-    depthWrite: true,
     uberOptions: {
       diffuse: neutralColor(0.50),
       specular: neutralColor(0.65),
@@ -114,6 +113,9 @@ const materialList = [
     name: 'Backdrop',
     shortName: 'Backdrop',
     uberOptions: {
+      diffuse: neutralColor(1.0),
+      specular: neutralColor(0.0),
+      shininess: 1,
       opacity: 1.0,
     },
     values: {
