@@ -24,7 +24,7 @@
     .white { background-color: white; }
     .fail { background-color: #B22746; color: white; font-weight: bold; }
     .skip { background-color: #CCCCCC }
-    .pass { }
+    .pass { display: none; }
   </style>
 </head>
 <body>
@@ -36,7 +36,6 @@
     <dt><b>Browser</b></dt><dd>{{browser}}</dd>
     <dt><b>Date</b></dt><dd>{{date}}</dd>
   </dl>
-
   <table>
     <thead>
     <tr>
@@ -64,5 +63,6 @@
     {{/entries}}
     </tbody>
   </table>
+  <h3>Passed tests are not displayed!</h3>
 </body>
 </html>
