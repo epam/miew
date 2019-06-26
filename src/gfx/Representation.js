@@ -75,7 +75,7 @@ class Representation {
       gfxutils.processMaterialForShadow(this.geo, this.material);
     }
 
-    gfxutils.processGeoForSetRenderOrder(this.geo, this.materialPreset.id);
+    gfxutils.processObjRenderOrder(this.geo, this.materialPreset.id);
     gfxutils.processColFromPosMaterial(this.geo, this.material);
 
     return this.geo;

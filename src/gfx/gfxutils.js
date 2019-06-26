@@ -436,7 +436,7 @@ function processMaterialForShadow(root, material) {
   });
 }
 
-function processGeoForSetRenderOrder(root, idMaterial) {
+function processObjRenderOrder(root, idMaterial) {
   // set renderOrder to 0 for Backdrop and to 1 in other cases to render Backdrop earlier all other materials
   const renderOrder = +(idMaterial !== 'BA');
   root.traverse((object) => {
@@ -496,7 +496,7 @@ export default {
   processColFromPosMaterial,
   prepareObjMaterialForShadow,
   processMaterialForShadow,
-  processGeoForSetRenderOrder,
+  processObjRenderOrder,
   makeVisibleMeshes,
   applySelectionMaterial,
   getMiddlePoint,
