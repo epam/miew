@@ -436,6 +436,16 @@ function processMaterialForShadow(root, material) {
   });
 }
 
+function processObjRenderOrder(root, idMaterial) {
+  // set renderOrder to 0 for Backdrop and to 1 in other cases to render Backdrop earlier all other materials
+  const renderOrder = +(idMaterial !== 'BA');
+  root.traverse((object) => {
+    if (object.isGroup) {
+      object.renderOrder = renderOrder;
+    }
+  });
+}
+
 /** Traverse tree and make visible only needed meshes */
 function makeVisibleMeshes(object, checker) {
   if (object && object.traverse) {
@@ -486,6 +496,7 @@ export default {
   processColFromPosMaterial,
   prepareObjMaterialForShadow,
   processMaterialForShadow,
+  processObjRenderOrder,
   makeVisibleMeshes,
   applySelectionMaterial,
   getMiddlePoint,

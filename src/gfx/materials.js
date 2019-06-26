@@ -22,7 +22,6 @@ const materialList = [
       depthWrite: true,
       transparent: false,
       toonShading: false,
-      side: THREE.DoubleSide,
     },
   }, {
     id: 'SF',
@@ -40,7 +39,6 @@ const materialList = [
       depthWrite: true,
       transparent: false,
       toonShading: false,
-      side: THREE.DoubleSide,
     },
   }, {
     id: 'PL',
@@ -58,7 +56,6 @@ const materialList = [
       depthWrite: true,
       transparent: false,
       toonShading: false,
-      side: THREE.DoubleSide,
     },
   }, {
     id: 'ME',
@@ -76,7 +73,6 @@ const materialList = [
       depthWrite: true,
       transparent: false,
       toonShading: false,
-      side: THREE.DoubleSide,
     },
   }, {
     id: 'TR',
@@ -94,13 +90,11 @@ const materialList = [
       depthWrite: true,
       transparent: true,
       toonShading: false,
-      side: THREE.DoubleSide,
     },
   }, {
     id: 'GL',
     name: 'Glass',
     shortName: 'Glass',
-    depthWrite: true,
     uberOptions: {
       diffuse: neutralColor(0.50),
       specular: neutralColor(0.65),
@@ -113,22 +107,23 @@ const materialList = [
       depthWrite: true,
       transparent: true,
       toonShading: false,
-      side: THREE.DoubleSide,
     },
   }, {
     id: 'BA',
     name: 'Backdrop',
     shortName: 'Backdrop',
     uberOptions: {
+      diffuse: neutralColor(1.0),
+      specular: neutralColor(0.0),
+      shininess: 1,
       opacity: 1.0,
     },
     values: {
       lights: false,
       fog: false,
-      depthWrite: true,
+      depthWrite: false,
       transparent: false,
       toonShading: false,
-      side: THREE.BackSide,
     },
   }, {
     id: 'TN',
@@ -146,7 +141,6 @@ const materialList = [
       depthWrite: true,
       transparent: false,
       toonShading: true,
-      side: THREE.DoubleSide,
     },
   }, {
     id: 'FL',
@@ -163,7 +157,6 @@ const materialList = [
       fog: true,
       depthWrite: true,
       transparent: false,
-      side: THREE.DoubleSide,
     },
   },
 ];
