@@ -2422,12 +2422,6 @@ Miew.prototype.repCurrent = function (index, name) {
  * @returns {?object} Representation description.
  */
 Miew.prototype.rep = function (index, rep) {
-  if (rep !== undefined && rep.material !== undefined && rep.material.toUpperCase() === 'BA') {
-    if (index !== 0) {
-      this.logger.warn('Backdrop material is expected to be used only in first representation');
-    }
-    this.logger.warn('Backdrop material is expected to be used in uniform color');
-  }
   const visual = this._getComplexVisual('');
   return visual ? visual.rep(index, rep) : null;
 };
