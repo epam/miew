@@ -49,6 +49,7 @@ export default {
       },
     }),
     rollupPluginBabel({
+      runtimeHelpers: true,
       exclude: [
         './node_modules/**',
         './vendor/js/**',
