@@ -6,9 +6,47 @@ plugins:
   fixme:
     enabled: true
   duplication:
+    enabled: true
     exclude_patterns:
     - "**/*.test.js"
     - "**/*.e2e.js"
+checks:
+  argument-count:
+    enabled: true
+    config:
+      threshold: 7
+  complex-logic:
+    enabled: true
+    config:
+      threshold: 4
+  file-lines:
+    enabled: true
+    config:
+      threshold: 500
+  method-complexity:
+    enabled: true
+    config:
+      threshold: 15
+  method-count:
+    enabled: true
+    config:
+      threshold: 20
+  method-lines:
+    enabled: true
+    config:
+      threshold: 50
+  nested-control-flow:
+    enabled: true
+    config:
+      threshold: 4
+  return-statements:
+    enabled: true
+    config:
+      threshold: 4
+  similar-code:
+    enabled: true
+  identical-code:
+    enabled: true
 exclude_patterns:
 - ".github/"
 - ".idea/"
