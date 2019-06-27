@@ -5,109 +5,142 @@ import selectors from './selectors';
 chai.use(dirtyChai);
 
 describe('selectors', () => {
-  describe('class Range', () => {
+  describe('Range', () => {
     const range2to7 = new selectors.Range(2, 7);
+    const range2to7asString = '2:7';
+    const range2to7asJSON = [2, 7];
     const rangeIs2 = new selectors.Range(2);
+    const rangeIs2asString = '2';
+    const rangeIs2asJSON = [2, 2];
 
-    describe('contructor', () => {
-      it('from two arguments', () => {
-        expect(range2to7).to.deep.equal({ min: 2, max: 7 });
-      });
-      it('from one argument', () => {
-        expect(rangeIs2).to.deep.equal({ min: 2, max: 2 });
-      });
-    });
-    describe('includes', () => {
-      it('not zero range', () => {
+    describe('#includes(value)', () => {
+      it('check range [2,7] for not including 0', () => {
         expect(range2to7.includes(0)).to.equal(false);
+      });
+      it('check range [2,7] for including 2', () => {
         expect(range2to7.includes(2)).to.equal(true);
+      });
+      it('check range [2,7] for including 4', () => {
         expect(range2to7.includes(4)).to.equal(true);
+      });
+      it('check range [2,7] for including 7', () => {
         expect(range2to7.includes(7)).to.equal(true);
+      });
+      it('check range [2,7] for not including 11', () => {
         expect(range2to7.includes(11)).to.equal(false);
       });
-      it('zero range', () => {
+      it('check range [2] for not including -1', () => {
         expect(rangeIs2.includes(-1)).to.equal(false);
+      });
+      it('check range [2] for including 2', () => {
         expect(rangeIs2.includes(2)).to.equal(true);
+      });
+      it('check range [2] for not including 7', () => {
         expect(rangeIs2.includes(7)).to.equal(false);
       });
     });
-    describe('toString', () => {
-      it('from two arguments', () => {
-        expect(range2to7.toString()).to.equal('2:7');
+    describe('#toString()', () => {
+      it('construct string for two arguments range', () => {
+        expect(range2to7.toString()).to.equal(range2to7asString);
       });
-      it('from one argument', () => {
-        expect(rangeIs2.toString()).to.equal('2');
+      it('construct string for one argument range', () => {
+        expect(rangeIs2.toString()).to.equal(rangeIs2asString);
       });
     });
-    describe('toJSON', () => {
-      it('from two arguments', () => {
-        expect(range2to7.toJSON()).to.deep.equal([2, 7]);
+    describe('#toJSON()', () => {
+      it('construct JSON for two arguments range', () => {
+        expect(range2to7.toJSON()).to.deep.equal(range2to7asJSON);
       });
-      it('from one argument', () => {
-        expect(rangeIs2.toJSON()).to.deep.equal([2, 2]);
+      it('construct JSON for one argument range', () => {
+        expect(rangeIs2.toJSON()).to.deep.equal(rangeIs2asJSON);
       });
     });
   });
 
-  describe('class RangeList', () => {
+  describe('RangeList', () => {
     const range0 = new selectors.Range(2, 8);
     const range1 = new selectors.Range(1, 14);
     const range2 = new selectors.Range(10, 12);
 
-    const emptyRL = new selectors.RangeList();
-    const oneRangeRL = new selectors.RangeList(range0);
     const twoRangesRL = new selectors.RangeList([range0, range2]);
+    const twoRangesRLAsString = [range0.toString(), range2.toString()].join(',');
+    const twoRangesRLAsJSON = [range0.toJSON(), range2.toJSON()];
     const threeRangesRL = new selectors.RangeList([range0, range1, range2]);
 
-    describe('contructor', () => {
-      it('no arguments', () => {
-        expect(emptyRL).to.deep.equal({ _values: [] });
-      });
-      it('from one range', () => {
-        expect(oneRangeRL).to.deep.equal({ _values: [range0] });
-      });
-      it('from array of ranges', () => {
-        expect(threeRangesRL).to.deep.equal({ _values: [range0, range1, range2] });
-      });
-    });
-    describe('append', () => {
-      it('append range', () => {
-        expect(oneRangeRL.append(range2)).to.deep.equal(twoRangesRL);
-      });
-    });
-    describe('remove', () => {
-      it('exist range', () => {
-        expect(threeRangesRL.remove(range1)).to.deep.equal(twoRangesRL);
-      });
-      it('fantastic range', () => {
-        expect(twoRangesRL.remove(range1)).to.deep.equal(twoRangesRL);
-      });
-    });
-    describe('toString', () => {
-      it('toString', () => {
-        expect(twoRangesRL.toString()).to.equal([range0.toString(), range2.toString()].join(','));
-      });
-    });
-    describe('toJSON', () => {
-      it('toJSON', () => {
-        expect(twoRangesRL.toJSON()).to.deep.equal([range0.toJSON(), range2.toJSON()]);
-      });
-    });
-    describe('includes', () => {
-      it('in one of ranges', () => {
+    describe('#includes(value)', () => {
+      it('check list for including value which exists in one of ranges', () => {
         expect(twoRangesRL.includes(11)).to.equal(true);
       });
-      it('in two of ranges', () => {
+      it('check list for including value which exists in more than one range', () => {
         expect(threeRangesRL.includes(11)).to.equal(true);
       });
-      it('outside of ranges', () => {
+      it('check list for not including value which is between different ranges', () => {
         expect(twoRangesRL.includes(9)).to.equal(false);
+      });
+      it('check list for not including value which is outside all ranges', () => {
         expect(twoRangesRL.includes(20)).to.equal(false);
+      });
+    });
+    describe('#toString()', () => {
+      it('construct string', () => {
+        expect(twoRangesRL.toString()).to.equal(twoRangesRLAsString);
+      });
+    });
+    describe('#toJSON()', () => {
+      it('construct JSON', () => {
+        expect(twoRangesRL.toJSON()).to.deep.equal(twoRangesRLAsJSON);
+      });
+    });
+    describe('#append(value)', () => {
+      it('list begins containing values from appending range', () => {
+        const rangeList = new selectors.RangeList();
+        expect(rangeList.includes(11)).to.equal(false);
+        rangeList.append(range2);
+        expect(rangeList.includes(11)).to.equal(true);
+      });
+      it('list does not begin containing values outside of appending range', () => {
+        const rangeList = new selectors.RangeList();
+        expect(rangeList.includes(1)).to.equal(false);
+        rangeList.append(range2);
+        expect(rangeList.includes(1)).to.equal(false);
+      });
+      it('list keeps containing values from previous ranges', () => {
+        const rangeList = new selectors.RangeList();
+        rangeList.append(range2);
+        expect(rangeList.includes(11)).to.equal(true);
+        rangeList.append(range0);
+        expect(rangeList.includes(11)).to.equal(true);
+      });
+    });
+    describe('#remove(value)', () => {
+      it('list stops containing values from removing range', () => {
+        const rangeList = new selectors.RangeList(range0);
+        expect(rangeList.includes(3)).to.equal(true);
+        rangeList.remove(range0);
+        expect(rangeList.includes(3)).to.equal(false);
+      });
+      it('list keeps containing values from remaining ranges', () => {
+        const rangeList = new selectors.RangeList([range0, range2]);
+        expect(rangeList.includes(11)).to.equal(true);
+        rangeList.remove(range0);
+        expect(rangeList.includes(11)).to.equal(true);
+      });
+      it('list keeps containing values from remaining ranges even if they also exists in removing range', () => {
+        const rangeList = new selectors.RangeList([range0, range1]);
+        expect(rangeList.includes(5)).to.equal(true);
+        rangeList.remove(range0);
+        expect(rangeList.includes(5)).to.equal(true);
+      });
+      it('list keeps containing values from all ranges when removed range was not existing in list', () => {
+        const rangeList = new selectors.RangeList(range0);
+        expect(rangeList.includes(3)).to.equal(true);
+        rangeList.remove(range1);
+        expect(rangeList.includes(3)).to.equal(true);
       });
     });
   });
 
-  describe('class ValueList', () => {
+  describe('ValueList', () => {
     const value0 = 'a';
     const value1 = 'B';
     const value2 = 12;
@@ -165,7 +198,7 @@ describe('selectors', () => {
     });
   });
 
-  describe('class Selector', () => {
+  describe('Selector', () => {
     const selector = new selectors.Selector();
 
     describe('Selector prototype', () => {
@@ -196,7 +229,7 @@ describe('selectors', () => {
     });
   });
 
-  describe('class RangeListSelector', () => {
+  describe('RangeListSelector', () => {
     const rangeList = new selectors.RangeList([new selectors.Range(2, 8), new selectors.Range(1, 14)]);
     const rangeListSelector = new selectors.RangeListSelector([new selectors.Range(2, 8), new selectors.Range(1, 14)]);
 
@@ -223,7 +256,7 @@ describe('selectors', () => {
     });
   });
 
-  describe('class ValueListSelector', () => {
+  describe('ValueListSelector', () => {
     const valueList = new selectors.ValueList(['A', 'b'], false);
     const valueListSelector = new selectors.ValueListSelector(['A', 'b'], true);
 
@@ -255,7 +288,7 @@ describe('selectors', () => {
     });
   });
 
-  describe('class PrefixOperator', () => {
+  describe('PrefixOperator', () => {
     const selector = selectors.all();
     selector.keyword = 'selector';
     const noneSelector = selectors.none();
@@ -301,7 +334,7 @@ describe('selectors', () => {
     });
   });
 
-  describe('class InfixOperator', () => {
+  describe('InfixOperator', () => {
     const letfSelector = selectors.all();
     letfSelector.keyword = 'lSelector';
     const rightSelector = selectors.all();
