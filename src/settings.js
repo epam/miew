@@ -435,6 +435,7 @@ const defaults = {
      *
      * @property {number} kSigma - Noise threshold coefficient.
      * @property {boolean} frame - flag, that turns on box frame painting
+     * @property {boolean} isoMode - flag, that turns on IsoSurface mode instead of Volume Rendering
      *
      */
     VD: {
@@ -442,6 +443,7 @@ const defaults = {
       kSigmaMed: 2.0,
       kSigmaMax: 4.0,
       frame: true,
+      isoMode: false,
     },
   },
 
@@ -577,31 +579,28 @@ const defaults = {
     },
   },
 
-  /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-  labels: 'no', // can be one of: no, obj, fg, bg.
-
   /*
-     * Use antialiasing in WebGL.
-     * @type {boolean}
-     */
+   * Use antialiasing in WebGL.
+   * @type {boolean}
+   */
   antialias: true,
 
   /*
-     * Camera field of view in degrees.
-     * @type {number}
-     */
+   * Camera field of view in degrees.
+   * @type {number}
+   */
   camFov: 45.0,
 
   /*
-     * Camera near plane distance.
-     * @type {number}
-     */
+   * Camera near plane distance.
+   * @type {number}
+   */
   camNear: 0.5,
 
   /*
-     * Camera far plane distance.
-     * @type {number}
-     */
+   * Camera far plane distance.
+   * @type {number}
+   */
   camFar: 100.0,
 
   camDistance: 2.5,
@@ -623,16 +622,16 @@ const defaults = {
   fogColor: 0x000000,
   fogColorEnable: false,
 
-  /*
-     * Palette used for molecule coloring.
-     * @type {string}
-     */
+  /**
+   * Palette used for molecule coloring.
+   * @type {string}
+   */
   palette: 'JM',
 
   /*
-     * Geometry resolution.
-     * @type {string}
-     */
+   * Geometry resolution.
+   * @type {string}
+   */
   resolution: 'medium',
 
   autoResolution: false/* true */,
@@ -692,19 +691,6 @@ const defaults = {
 
   //----------------------------------------------------------------------------
 
-  /**
-   * Theme to use, 'dark' or 'light'.
-   * @type {string}
-   * @instance
-   * @deprecated Old-fashioned theme paradigma, to be removed in the next major version.
-   */
-  theme: 'dark',
-  /** @deprecated Old-fashioned theme paradigma, to be removed in the next major version. */
-  themes: {
-    dark: 0x202020,
-    light: 0xcccccc,
-  },
-
   bg: {
     color: 0x202020,
     transparent: false,
@@ -714,7 +700,6 @@ const defaults = {
     clipPlane: false,
     clipPlaneFactor: 0.5,
     clipPlaneSpeed: 0.00003,
-    waterBondingHack: false,
   },
 
   /*
@@ -743,6 +728,11 @@ const defaults = {
    */
   fps: true,
 
+  /**
+   * Switch using of z-sprites for sphere and cylinder geometry
+   * @type {boolean}
+   * @instance
+   */
   zSprites: true,
 
   isoSurfaceFakeOpacity: true,
@@ -805,10 +795,18 @@ const defaults = {
    */
   autoRotation: 0.0,
 
-  // maximum fps for animation
+  /**
+   * Set maximum fps for animation.
+   * @type {number}
+   * @instance
+   */
   maxfps: 30,
 
-  // fbx output precision
+  /**
+   * Set fbx output precision.
+   * @type {number}
+   * @instance
+   */
   fbxprec: 4,
 
   /**
@@ -828,12 +826,6 @@ const defaults = {
    * @instance
    */
   zooming: true,
-
-  /** @deprecated  Move object instead of panning the camera */
-  panning: false,
-
-  /** @deprecated  Move object instead of panning the camera */
-  inversePanning: false,
 
   /**
    * Enable picking atoms & residues with left mouse button or touch.
@@ -863,10 +855,15 @@ const defaults = {
    */
   aromatic: false,
 
-  // load only one biological unit from all those described in PDB file
+  /**
+   * Load only one biological unit from all those described in PDB file.
+   * @type {boolean}
+   * @instance
+   */
   singleUnit: true,
 
   /**
+   * Set stereo mode ('NONE', 'SIMPLE', 'DISTORTED', 'ANAGLYPH', 'WEBVR').
    * @type {string}
    * @instance
    */
@@ -879,7 +876,11 @@ const defaults = {
    */
   interpolateViews: true,
 
-  // switch transparency mode ('standard', 'prepass')
+  /**
+   * Set transparency mode ('standard', 'prepass').
+   * @type {string}
+   * @instance
+   */
   transparency: 'prepass',
 
   /**
@@ -970,11 +971,6 @@ utils.deriveClass(Settings, EventDispatcher, {
     const { old, now } = this;
     const keys = _.filter(Object.keys(this._changed), key => _.get(old, key) !== _.get(now, key));
     return keys;
-  },
-
-  /** @deprecated Use Settings#set instead */
-  override(other) {
-    this.set(other);
   },
 
   applyDiffs(diffs) {

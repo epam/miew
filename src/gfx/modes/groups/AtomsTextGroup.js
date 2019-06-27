@@ -32,10 +32,6 @@ function getAtomText(atom) {
     return atom.getName().getNode();
   }
 
-  if (!atom.isLabelVisible()) {
-    return null;
-  }
-
   return atom.getVisualName();
 }
 

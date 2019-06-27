@@ -13,7 +13,7 @@ import Colorer from './Colorer';
  * @classdesc Coloring algorithm based on chemical element.
  */
 class ElementColorer extends Colorer {
-  static id = ['EL', 'AT']; // 'AT' is @deprecated backward compatibility after renaming [A]tom [T]ype -> [EL]ement
+  static id = 'EL';
 
   getAtomColor(atom, _complex) {
     const type = atom.element.name;
@@ -29,7 +29,6 @@ class ElementColorer extends Colorer {
 }
 
 ElementColorer.prototype.id = 'EL';
-ElementColorer.prototype.aliases = ['AT']; // @deprecated
 ElementColorer.prototype.name = 'Element';
 ElementColorer.prototype.shortName = 'Element';
 

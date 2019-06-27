@@ -63,7 +63,7 @@ If you decide to update the thumbnails, here are the instructions.
 
  1. Use the following URL Query String to see Glycine from the fixed viewpoint. 
 
-        ?l=mmtf:1CRN&p=macro&s=sequence+22:34&r=1&s=sequence+2:3&v=1bjwPwW3%2BQsFuFMbA1kUQPpO4Wj8/v1K/zsjhPg%3D%3D&theme=light&axes=false&fog=false
+        ?l=mmtf:1CRN&p=macro&s=sequence+22:34&r=1&s=sequence+2:3&v=1bjwPwW3%2BQsFuFMbA1kUQPpO4Wj8/v1K/zsjhPg%3D%3D&bg.color=0xCCCCCC&axes=false&fog=false
 
 
  2. Select the desired palette.

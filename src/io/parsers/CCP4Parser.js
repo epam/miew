@@ -136,14 +136,6 @@ class CCP4Parser extends Parser {
     this.model = new Ccp4Model();
   }
 
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    return data instanceof ArrayBuffer && Parser.checkDataTypeOptions(options, 'ccp4');
-  }
-
   static canProbablyParse(_data) {
     return false; // Autodetection is not implemented yet
   }

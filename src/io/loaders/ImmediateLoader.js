@@ -1,13 +1,13 @@
 import Loader from './Loader';
 
 export default class ImmediateLoader extends Loader {
-  loadAsync() {
-    return Promise.resolve(this._source);
-  }
-
-  /** @deprecated */
-  static canLoad(source, options) {
-    return typeof source !== 'undefined' && typeof options !== 'undefined' && options.sourceType === 'immediate';
+  load() {
+    return new Promise((resolve) => {
+      if (this._abort) {
+        throw new Error('Loading aborted');
+      }
+      resolve(this._source);
+    });
   }
 
   static canProbablyLoad(_source) {

@@ -1,13 +1,13 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
 import * as THREE from 'three';
-import vertexShader from './Uber_vert.glsl';
-import fragmentShader from './Uber_frag.glsl';
+import vertexShader from './Uber.vert';
+import fragmentShader from './Uber.frag';
 import capabilities from '../capabilities';
 import noise from '../noiseTexture';
 
-// Length of _samplesKernel is used in Uber_frag.glsl
-// If you want to change length of _samplesKernel, please, remember change it in Uber_frag.glsl too.
+// Length of _samplesKernel is used in Uber.frag
+// If you want to change length of _samplesKernel, please, remember change it in Uber.frag too.
 // You can easy find places for replace using word:_samplesKernel
 const _samplesKernel = [
   new THREE.Vector2(-0.541978, 0.840393),
@@ -16,15 +16,16 @@ const _samplesKernel = [
   new THREE.Vector2(-0.105475, 0.994422),
 ];
 
-//  var INSTANCED_SPRITE_OVERSCALE = 1.3;
-
 const defaultUniforms = THREE.UniformsUtils.merge([
 
-  THREE.UniformsLib.common, // is it needed?
   THREE.UniformsLib.fog,
   THREE.UniformsLib.lights,
 
   {
+    // are updated automatically by three.js (see THREE.ShaderLib.common)
+    diffuse: { value: new THREE.Color(0xeeeeee) },
+    opacity: { value: 1.0 },
+
     specular: { type: 'c', value: new THREE.Color(0x111111) },
     shininess: { type: 'f', value: 30 },
     fixedColor: { type: 'c', value: new THREE.Color(0xffffff) },
@@ -194,8 +195,14 @@ UberMaterial.prototype.uberOptions = {
 };
 
 UberMaterial.prototype.copy = function (source) {
-  // TODO Why not RawShaderMaterial?
-  THREE.ShaderMaterial.prototype.copy.call(this, source);
+  THREE.RawShaderMaterial.prototype.copy.call(this, source);
+
+  this.fragmentShader = source.fragmentShader;
+  this.vertexShader = source.vertexShader;
+
+  this.uniforms = THREE.UniformsUtils.clone(source.uniforms);
+  this.defines = Object.assign({}, source.defines);
+  this.extensions = source.extensions;
 
   this.fog = source.fog;
   this.instancedPos = source.instancedPos;

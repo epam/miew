@@ -1,5 +1,4 @@
 import AtomName from './AtomName';
-import Element from './Element';
 
 function getCylinderCount(bondOrder) {
   return bondOrder < 2 ? 1 : bondOrder;
@@ -113,27 +112,6 @@ class Atom {
     for (let i = 0, n = bonds.length; i < n; ++i) {
       process(bonds[i]);
     }
-  }
-
-  /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-  isLabelVisible() {
-    if (this.getName().getNode() !== null) {
-      return true;
-    }
-    if (this.element === null) {
-      return false;
-    }
-    if (this.element.number === Element.ByName.C.number) {
-      const n = this.getVisualName();
-      if (n === null) {
-        return false;
-      }
-      if (n.length === 1 && n.charCodeAt(0) === 0x43 && this.getBonds().length !== 0) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   getHydrogenCountBoron() {

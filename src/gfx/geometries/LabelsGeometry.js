@@ -23,7 +23,6 @@ function createLabel(fieldTxt, className) {
     text.appendChild(spanText);
   } else {
     text.appendChild(fieldTxt);
-    // text.style.paddingTop = '10px';
   }
   text.worldPos = new THREE.Vector3();
   return text;
@@ -68,8 +67,7 @@ class LabelsGeometry extends EventDispatcher {
 
   setItem(itemIdx, itemPos, fieldTxt) {
     const opts = this._opts;
-    const { labels } = opts;
-    const text = this.items[itemIdx] || createLabel(fieldTxt, `label label-${labels}`);
+    const text = this.items[itemIdx] || createLabel(fieldTxt, 'label');
 
     text.worldPos.copy(itemPos);
     text.style.textAlign = opts.horizontalAlign;

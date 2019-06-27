@@ -41,7 +41,6 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
   }
 
   checkIntersection(object, raycaster, ray, pA, pB, pC, point) {
-    // let intersect;
     const intersect = ray.intersectTriangle(pA, pB, pC, false, point);
 
     if (intersect === null) {

@@ -39,10 +39,8 @@
   position: relative;
 }
 
-/* FIXME: $back-gray */
-
 .miew-message {
-  /* hack for centered error-reporting*/
+  /* trick for centered error-reporting*/
   background-color: #ccc;
   display: table;
   width: 100%;
@@ -77,25 +75,3 @@
 .overlay {
   pointer-events: none;
 }
-
-.theme-dark .label-obj,
-  .theme-dark .label-fg {
-    color: #ccc;
-    background-color: #202020;
-  }
-
-.theme-dark .label-bg {
-    color: #202020;
-    background-color: #ccc;
-  }
-
-.theme-light .label-obj,
-  .theme-light .label-fg {
-    color: #202020;
-    background-color: #ccc;
-  }
-
-.theme-light .label-bg {
-    color: #ccc;
-    background-color: #202020;
-  }

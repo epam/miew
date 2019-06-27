@@ -10,18 +10,4 @@ const palettes = new EntityList([
   vmdPalette,
 ]);
 
-/** @deprecated */
-Object.defineProperty(palettes, 'list', {
-  get() {
-    return this.all;
-  },
-});
-
-/** @deprecated */
-Object.defineProperty(palettes, 'any', {
-  get() {
-    return this.first;
-  },
-});
-
 export default palettes;

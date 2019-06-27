@@ -1,4 +1,3 @@
-/* global READONLY_SERVER */
 /* eslint-disable quote-props */
 /* eslint-disable prefer-destructuring */
 import $ from 'jquery';
@@ -49,12 +48,9 @@ function getNumAtomsBySelector(viewer, selector) {
 }
 
 function Menu(/** Node */ container, /** Miew */ viewer) {
-  const themeRE = /\s*theme-\w+\b/g;
-  const { theme } = settings.now;
   // Add proper DOM elements
   _.forEach($.parseHTML(menuHtml), element => container.parentNode.appendChild(element));
 
-  container.className = `${container.className.replace(themeRE, '')} theme-${theme}`;
   // Save some objects for future reference
   this._viewer = viewer;
   this._menuId = '#miew-menu';
@@ -973,10 +969,10 @@ Menu.prototype._init = function () {
     });
 
     const elements = $(`${self._menuId} [data-toolbar-type=${toolbar}]`);
-    elements.toggle();
-    this.classList.toggle('active');
-
     if (toolbar === 'miew-menu-toolbar-resolution') {
+      elements.toggle();
+      this.classList.toggle('active');
+
       const resSelector = $(`${self._menuId} [data-toggle="resolution-immediate"]`
           + `[data-value="${settings.now.resolution}"]`);
       if (this.classList.contains('active') === true) {
@@ -985,13 +981,21 @@ Menu.prototype._init = function () {
         resSelector.removeClass('active');
       }
     } else {
-      const type = toolbar.substr(toolbar.lastIndexOf('-') + 1, toolbar.length);
-      const selector = $(`${self._menuId} [data-toggle="${type}-immediate"]`
-          + `[data-value="${unarray(self._viewer.rep()[type])}"]`);
-      if (this.classList.contains('active') === true) {
-        selector.addClass('active');
+      const curRep = self._viewer.rep();
+      if (curRep !== null) {
+        elements.toggle();
+        this.classList.toggle('active');
+
+        const type = toolbar.substr(toolbar.lastIndexOf('-') + 1, toolbar.length);
+        const selector = $(`${self._menuId} [data-toggle="${type}-immediate"]`
+            + `[data-value="${unarray(curRep[type])}"]`);
+        if (this.classList.contains('active') === true) {
+          selector.addClass('active');
+        } else {
+          selector.removeClass('active');
+        }
       } else {
-        selector.removeClass('active');
+        self._viewer.logger.error('No representation');
       }
     }
   });
@@ -1002,13 +1006,14 @@ Menu.prototype._init = function () {
     }
   });
 
-  $(`${self._menuId} input[type=checkbox][data-dir=settings]`).bootstrapSwitch();
-  $(`${self._menuId} input[type=checkbox][data-dir=settings]`).on(
+  const dataDirSettings = $(`${self._menuId} input[type=checkbox][data-dir=settings]`);
+  dataDirSettings.bootstrapSwitch();
+  dataDirSettings.on(
     'switchChange.bootstrapSwitch',
     /** @this HTMLInputElement */ function () {
       const param = this.getAttribute('data-toggle');
-      if (param === 'theme') {
-        self._viewer.set('theme', this.checked ? 'dark' : 'light');
+      if (param === 'bg.color') {
+        self._viewer.set('bg.color', this.checked ? 0x202020 : 0xCCCCCC);
       } else {
         self._viewer.set(param, this.checked);
       }
@@ -1208,38 +1213,12 @@ Menu.prototype._displayGlobalErrorDialog = function (title, message) {
 };
 
 Menu.prototype.presetsPanel = {
-  pdbList: {
-    filteredItems: [],
-    pageSize: 10,
-    currentPageIndex: 0,
-    totalPagesCount: null,
-    pagination: {
-      minimumItemsCount: 5,
-    },
-  },
-  presetsList: {
-    pdb: null,
-    items: [],
-  },
   inputs: {
     main: null,
-    sub: null,
   },
   actions: {
     pdb: {
-      list: {
-        page: null,
-        refresh: null,
-        search: null,
-        display: null,
-        select: null,
-      },
       load: null,
-      register: null,
-      remove: {
-        ask: null,
-        confirm: null,
-      },
       inputs: {
         clear: null,
         refresh: null,
@@ -1247,79 +1226,18 @@ Menu.prototype.presetsPanel = {
         text: null,
       },
     },
-    preset: {
-      list: {
-        refresh: null,
-        display: null,
-      },
-      apply: null,
-      rename: {
-        ask: null,
-        confirm: null,
-      },
-      update: null,
-      remove: {
-        ask: null,
-        confirm: null,
-      },
-      input: {
-        clear: null,
-        refresh: null,
-      },
-      create: null,
-    },
-    navigate: {
-      back: null,
-    },
   },
-};
-
-Menu.prototype._presetsPanelDisplayPdbProgress = function (display) {
-  const self = this;
-  const progress = $(`${self._menuId} .miew-presets-panel-progress`);
-  if (display) {
-    progress.removeClass('hidden');
-  } else {
-    progress.addClass('hidden');
-  }
-};
-
-Menu.prototype._presetsPanelDisplayPresetsProgress = function (display) {
-  const self = this;
-  const progress = $(`${self._menuId} .miew-presets-sub-panel-progress`);
-  const refreshBtn = $(`${self._menuId} .presets-panel-action[data-presets-panel-action=preset-list-refresh]`);
-  const subPanelAlertArea = $(`${self._menuId} .miew-menu-form-presets .alert-warning`);
-  if (display) {
-    progress.removeClass('hidden');
-    refreshBtn.addClass('hidden');
-    subPanelAlertArea.hide();
-  } else {
-    progress.addClass('hidden');
-    refreshBtn.removeClass('hidden');
-  }
 };
 
 Menu.prototype._presetsPanelActionsPdbInputsRefresh = function (self) {
   const loadPdbButton = $(`${self._menuId} .presets-panel-action[data-presets-panel-action=pdb-load]`);
   const clearInputsButton = $(`${self._menuId} .presets-panel-action[data-presets-panel-action=pdb-inputs-clear]`);
-  const registerTopologyButton = $(`${self._menuId} .presets-panel-action[data-presets-panel-action=pdb-register]`);
 
   const mainTextInput = $($('[data-form-type=miew-menu-form-load-pdb] input[type=text][data-pdb-url-type=main]')
     .get(0));
   const mainErrorAlert = $($('[data-form-type=miew-menu-form-load-pdb] .alert-danger[data-pdb-url-type=main]')
     .get(0));
   const mainWarningAlert = $($('[data-form-type=miew-menu-form-load-pdb] .alert-warning[data-pdb-url-type=main]')
-    .get(0));
-
-  const subFormTitle = $($('[data-form-type=miew-menu-form-load-pdb] .control-label[data-pdb-url-type=sub]')
-    .get(0));
-  const subTextInput = $($('[data-form-type=miew-menu-form-load-pdb] input[type=text][data-pdb-url-type=sub]')
-    .get(0));
-  const subForm = $($('[data-form-type=miew-menu-form-load-pdb] div[data-pdb-url-type=sub]')
-    .get(0));
-  const subErrorAlert = $($('[data-form-type=miew-menu-form-load-pdb] .alert-danger[data-pdb-url-type=sub]')
-    .get(0));
-  const subWarningAlert = $($('[data-form-type=miew-menu-form-load-pdb] .alert-warning[data-pdb-url-type=sub]')
     .get(0));
 
   const extractExtension = function (name) {
@@ -1335,67 +1253,25 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function (self) {
   };
 
   let mainAlertText = null;
-  let subAlertText = null;
 
-  const displaySubForm = function (visible) {
-    if (visible) {
-      subFormTitle.removeClass('hidden');
-      subForm.removeClass('hidden');
+  const displayFormError = function (error) {
+    if (error) {
+      mainErrorAlert.html(error);
+      mainErrorAlert.removeClass('hidden');
     } else {
-      subFormTitle.addClass('hidden');
-      subForm.addClass('hidden');
+      mainErrorAlert.html(error);
+      mainErrorAlert.addClass('hidden');
     }
   };
-  const displayFormError = function (form, error) {
-    if (form === 'main') {
-      if (error) {
-        mainErrorAlert.html(error);
-        mainErrorAlert.removeClass('hidden');
-      } else {
-        mainErrorAlert.html(error);
-        mainErrorAlert.addClass('hidden');
-      }
-    } else if (error) {
-      subErrorAlert.html(error);
-      subErrorAlert.removeClass('hidden');
+  const displayFormWarning = function (warning) {
+    if (warning) {
+      mainWarningAlert.html(warning);
+      mainWarningAlert.removeClass('hidden');
     } else {
-      subErrorAlert.html(error);
-      subErrorAlert.addClass('hidden');
+      mainWarningAlert.html(warning);
+      mainWarningAlert.addClass('hidden');
     }
   };
-  const displayFormWarning = function (form, warning) {
-    if (form === 'main') {
-      if (warning) {
-        mainWarningAlert.html(warning);
-        mainWarningAlert.removeClass('hidden');
-      } else {
-        mainWarningAlert.html(warning);
-        mainWarningAlert.addClass('hidden');
-      }
-    } else if (warning) {
-      subWarningAlert.html(warning);
-      subWarningAlert.removeClass('hidden');
-    } else {
-      subWarningAlert.html(warning);
-      subWarningAlert.addClass('hidden');
-    }
-  };
-
-  const topologyNotRegistered = function (name) {
-    registerTopologyButton.removeClass('disabled');
-    registerTopologyButton.html(`Add '${name}' to server`);
-  };
-
-  const topologyRegistered = function (name) {
-    registerTopologyButton.addClass('disabled');
-    if (name) {
-      registerTopologyButton.html(`${name} already registered at server`);
-    } else {
-      registerTopologyButton.html('Add current file to server');
-    }
-  };
-
-  self._viewer.srvCurrentTopologyIsRegistered(topologyRegistered, topologyNotRegistered);
 
   self.presetsPanel.inputs.isCorrect = false;
   if (!self.presetsPanel.inputs || !self.presetsPanel.inputs.main) {
@@ -1404,14 +1280,9 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function (self) {
 
     mainTextInput.val('');
     mainTextInput.removeAttr('disabled');
-    subTextInput.val('');
-    subTextInput.removeAttr('disabled');
 
-    displaySubForm(false);
-    displayFormError('main', null);
-    displayFormError('sub', null);
-    displayFormWarning('main', null);
-    displayFormWarning('sub', null);
+    displayFormError(null);
+    displayFormWarning(null);
   } else {
     if (self.presetsPanel.inputs.main) {
       let mainExtension;
@@ -1428,102 +1299,42 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function (self) {
       const extRegExp = new RegExp(`^(${extensions.map(ext => ext.substr(1)).join('|')})$`);
       const extString = extensions.join(', ');
 
-      if (mainExtension.match(/^(top|prmtop)$/)) {
-        self.presetsPanel.inputs.mainIsAMBER = true;
-        self.presetsPanel.inputs.mainIsCorrect = true;
-      } else if (self.presetsPanel.inputs.main instanceof File && !mainExtension.match(extRegExp)) {
-        self.presetsPanel.inputs.mainIsAMBER = false;
+      if (self.presetsPanel.inputs.main instanceof File && !mainExtension.match(extRegExp)) {
         self.presetsPanel.inputs.mainIsCorrect = false;
         self.presetsPanel.inputs.isCorrect = false;
-        self.presetsPanel.inputs.sub = null;
         mainAlertText = `Only the following filename extensions are supported: ${extString}`;
       } else {
-        self.presetsPanel.inputs.mainIsAMBER = false;
         self.presetsPanel.inputs.mainIsCorrect = true;
         self.presetsPanel.inputs.isCorrect = false;
-        self.presetsPanel.inputs.sub = null;
       }
     }
-    displaySubForm(self.presetsPanel.inputs.mainIsAMBER);
-    if (!self.presetsPanel.inputs.mainIsAMBER) {
-      subTextInput.val('');
-      subTextInput.removeAttr('disabled');
-      self.presetsPanel.inputs.subIsCorrect = true;
-      self.presetsPanel.inputs.isCorrect = true;
-    } else if (self.presetsPanel.inputs.sub) {
-      let subExtension;
-      if (self.presetsPanel.inputs.sub instanceof File) {
-        subTextInput.val(self.presetsPanel.inputs.sub.name);
-        subTextInput.attr('disabled', 'disabled');
-        subExtension = extractExtension(self.presetsPanel.inputs.sub.name);
-      } else {
-        subTextInput.removeAttr('disabled');
-        subExtension = extractExtension(self.presetsPanel.inputs.sub);
-      }
-
-      if (subExtension === 'nc') {
-        self.presetsPanel.inputs.subIsCorrect = true;
-        self.presetsPanel.inputs.isCorrect = true;
-      } else {
-        self.presetsPanel.inputs.subIsCorrect = false;
-        self.presetsPanel.inputs.isCorrect = false;
-        subAlertText = 'Only .nc files are supported.';
-      }
-    } else {
-      self.presetsPanel.inputs.subIsCorrect = false;
-      self.presetsPanel.inputs.isCorrect = false;
-    }
+    self.presetsPanel.inputs.isCorrect = true;
 
     if (self.presetsPanel.inputs.isCorrect) {
       loadPdbButton.removeClass('disabled');
     } else {
       loadPdbButton.addClass('disabled');
     }
-    if (self.presetsPanel.inputs.main || self.presetsPanel.inputs.sub) {
+    if (self.presetsPanel.inputs.main) {
       clearInputsButton.removeClass('hidden');
     } else {
       clearInputsButton.addClass('hidden');
     }
-    displayFormError('main', mainAlertText);
-    displayFormError('sub', subAlertText);
+    displayFormError(mainAlertText);
   }
 };
 
 Menu.prototype._presetsPanelActionsPdbInputsClear = function (self) {
   self.presetsPanel.inputs = {
     main: null,
-    sub: null,
   };
   self.presetsPanel.actions.pdb.inputs.refresh(self);
 };
 
-Menu.prototype._presetsPanelActionsPdbRegister = function (self) {
-  const completeFn = function () {
-    self._presetsPanelDisplayPdbProgress(false);
-  };
-  const doneFn = function () {
-    completeFn();
-    self._initPresetsPanel();
-  };
-  const failFn = function (message) {
-    completeFn();
-    self._displayGlobalErrorDialog('Error creating preset', message);
-  };
-  self._viewer.srvCurrentTopologyIsRegistered((name) => {
-    self._displayGlobalErrorDialog('Error registering PDB', `Cannot register ${name}`);
-  }, () => {
-    self._presetsPanelDisplayPdbProgress(true);
-    self._viewer.srvTopologyRegister(doneFn, failFn);
-    self.presetsPanel.actions.pdb.inputs.refresh(self);
-  });
-};
-
 Menu.prototype._presetsPanelActionsPdbLoad = function (self) {
   self._onMenuOff();
-  if (self.presetsPanel.inputs && !self.presetsPanel.inputs.mainIsAMBER) {
+  if (self.presetsPanel.inputs) {
     self._viewer.load(self.presetsPanel.inputs.main);
-  } else {
-    self._viewer.load(self.presetsPanel.inputs.main, { mdFile: self.presetsPanel.inputs.sub });
   }
   self.presetsPanel.actions.pdb.inputs.clear(self);
 };
@@ -1552,498 +1363,19 @@ Menu.prototype._presetsPanelActionsPdbInputsText = function (self, element, even
   }
 };
 
-Menu.prototype._presetsPanelActionsPdbRemoveAsk = function (self, element) {
-  const pdbId = element.getAttribute('data-pdb-id');
-  const pdbName = element.getAttribute('data-pdb-name');
-  const selector = $(`${self._menuId} .miew-menu-modals [data-modal-type=miew-menu-modal-remove-pdb]`);
-  const body = selector.find('.modal-body').get(0);
-  const action = selector.find('button.presets-panel-action[data-presets-panel-action="pdb-remove-confirm"]').get(0);
-  const forceDeleteCheckbox = selector.find('#pdb-force-delete').get(0);
-  forceDeleteCheckbox.checked = false;
-  $(body).html(`Are you sure you want to delete ${pdbName}?`);
-  $(action).attr('data-pdb-id', pdbId);
-  selector.modal({
-    keyboard: true,
-  }, 'show');
-};
-
-Menu.prototype._presetsPanelActionsPdbRemoveConfirm = function (self, element) {
-  const pdbId = element.getAttribute('data-pdb-id');
-  const selector = $(`${self._menuId} .miew-menu-modals [data-modal-type=miew-menu-modal-remove-pdb]`);
-  const forceDeleteCheckbox = selector.find('#pdb-force-delete').get(0);
-  self._presetsPanelDisplayPdbProgress(true);
-  self._viewer.srvTopologyDelete(
-    pdbId,
-    forceDeleteCheckbox.checked,
-    () => {
-      self._presetsPanelDisplayPdbProgress(false);
-      self.presetsPanel.actions.pdb.list.refresh(self, true);
-    },
-    (message) => {
-      self._presetsPanelDisplayPdbProgress(false);
-      self._displayGlobalErrorDialog('Error removing PDB', message);
-    },
-  );
-};
-
-Menu.prototype._presetsPanelActionsPdbListGo = function (self, element) {
-  const dataPageIndex = element.getAttribute('data-page-index');
-  let newIndex;
-  if (dataPageIndex === 'first') {
-    newIndex = 0;
-  } else if (dataPageIndex === 'last') {
-    newIndex = self.presetsPanel.pdbList.totalPagesCount - 1;
-  } else {
-    newIndex = +dataPageIndex;
-  }
-  if (newIndex !== self.presetsPanel.pdbList.currentPageIndex) {
-    self.presetsPanel.pdbList.currentPageIndex = newIndex;
-    self.presetsPanel.actions.pdb.list.display(self);
-  }
-};
-
-Menu.prototype._presetsPanelActionsPdbListDisplay = function (self) {
-  const itemsGroup = $(`${self._menuId} .miew-configured-pdb-list`).get(0);
-  $(itemsGroup).empty();
-  const frag = document.createDocumentFragment();
-  let i;
-  const { currentPageIndex, pageSize, filteredItems } = self.presetsPanel.pdbList;
-  for (i = currentPageIndex * pageSize; i < Math.min(filteredItems.length, (currentPageIndex + 1) * pageSize); i++) {
-    // var editActionElement = createElement('span',
-    //   { 'class': 'pull-right glyphicon glyphicon-pencil miew-configured-pdb-list-item-action presets-panel-action',
-    //     'data-action': 'edit',
-    //     'data-presets-panel-action': 'pdb-rename',
-    //     'data-pdb-id': filteredItems[i].id,
-    //     'data-pdb-name': filteredItems[i].name});
-    const removeActionElement = typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER ? undefined
-      : createElement(
-        'span',
-        {
-          'class': 'pull-right glyphicon glyphicon-remove miew-configured-pdb-list-item-action presets-panel-action',
-          'data-action': 'remove',
-          'data-presets-panel-action': 'pdb-remove-ask',
-          'data-pdb-id': filteredItems[i].id,
-          'data-pdb-name': filteredItems[i].name,
-        },
-      );
-    const item = createElement(
-      'a',
-      {
-        'href': '#',
-        'class': 'list-group-item miew-pdb-item presets-panel-action',
-        'data-pdb-id': filteredItems[i].id,
-        'data-pdb-name': filteredItems[i].name,
-        'data-presets-panel-action': 'pdb-list-select',
-      },
-      [createElement(
-        'span', {},
-        [filteredItems[i].name, removeActionElement],
-      )],
-    );
-    frag.appendChild(item);
-  }
-  itemsGroup.appendChild(frag);
-
-  const createPageLinkItem = function (index) {
-    let textElement;
-    if (index === 'first') {
-      textElement = createElement('span', { 'aria-hidden': true }, null);
-      $(textElement).html('&laquo;');
-    } else if (index === 'last') {
-      textElement = createElement('span', { 'aria-hidden': true }, null);
-      $(textElement).html('&raquo;');
-    } else {
-      textElement = `${index + 1}`;
-    }
-    return createElement(
-      'li',
-      { 'class': (self.presetsPanel.pdbList.currentPageIndex === index ? 'active' : '') },
-      createElement(
-        'a',
-        {
-          'data-page-index': index,
-          'href': '#',
-          'class': 'presets-panel-action',
-          'data-presets-panel-action': 'pdb-list-page',
-        },
-        textElement,
-      ),
-    );
-  };
-
-  const paginationControl = $(`${self._menuId} .miew-configured-pdb-list-pagination`).get(0);
-  $(paginationControl).empty();
-  const { totalPagesCount } = self.presetsPanel.pdbList;
-  if (!totalPagesCount || totalPagesCount <= 1) {
-    return;
-  }
-  const pages = [];
-  const paginationItemsCount = self.presetsPanel.pdbList.pagination.minimumItemsCount;
-  const onSidePaginationItemsCount = Math.floor(paginationItemsCount / 2);
-  let minIndex = Math.max(0, currentPageIndex - onSidePaginationItemsCount);
-  let maxIndex = Math.max(currentPageIndex + onSidePaginationItemsCount, minIndex + paginationItemsCount - 1);
-  maxIndex = Math.min(totalPagesCount - 1, maxIndex);
-  minIndex = Math.max(0, Math.min(minIndex, maxIndex - paginationItemsCount + 1));
-  if (minIndex > 0) {
-    if (minIndex === 1) {
-      pages.push(0);
-    } else {
-      pages.push('first');
-    }
-  }
-  for (i = minIndex; i <= maxIndex; i++) {
-    pages.push(i);
-  }
-  if (maxIndex < totalPagesCount - 1) {
-    if (maxIndex === totalPagesCount - 2) {
-      pages.push(totalPagesCount - 1);
-    } else {
-      pages.push('last');
-    }
-  }
-  const paginationFrag = document.createDocumentFragment();
-  for (i = 0; i < pages.length; i++) {
-    paginationFrag.appendChild(createPageLinkItem(pages[i]));
-  }
-  paginationControl.appendChild(paginationFrag);
-};
-
-Menu.prototype._presetsPanelActionsPdbListRefresh = function (self, forceUpdate) {
-  const searchField = $(`${self._menuId} .miew-configured-pdb-list-search-field`);
-  if (forceUpdate) {
-    self._presetsPanelDisplayPdbProgress(true);
-  }
-  const onServerResponseReceived = function (filteredList) {
-    self._presetsPanelDisplayPdbProgress(false);
-    if (filteredList) {
-      self.presetsPanel.pdbList.filteredItems = filteredList;
-    } else {
-      self.presetsPanel.pdbList.filteredItems = [];
-    }
-    self.presetsPanel.pdbList.totalPagesCount = Math.ceil(self.presetsPanel.pdbList.filteredItems.length
-          / self.presetsPanel.pdbList.pageSize);
-    self.presetsPanel.pdbList.currentPageIndex = 0;
-    self.presetsPanel.actions.pdb.list.display(self);
-  };
-  const onFail = function () {
-    self._presetsPanelDisplayPdbProgress(false);
-    self.presetsPanel.pdbList.filteredItems = [];
-    self.presetsPanel.pdbList.totalPagesCount = 0;
-    self.presetsPanel.pdbList.currentPageIndex = 0;
-    self.presetsPanel.actions.pdb.list.display(self);
-  };
-  if (forceUpdate) {
-    self._viewer.srvTopologyAll(() => {
-      self._viewer.srvTopologyFilter(searchField.val(), onServerResponseReceived, onFail);
-    }, onFail);
-  } else {
-    self._viewer.srvTopologyFilter(searchField.val(), onServerResponseReceived, onFail);
-  }
-};
-
-Menu.prototype._presetsPanelActionsPdbListSearch = function (self) {
-  self.presetsPanel.actions.pdb.list.refresh(self, false);
-};
-
-Menu.prototype._presetsPanelActionsPdbListSelect = function (self, element) {
-  const pdbId = +element.getAttribute('data-pdb-id');
-  const pdbName = element.getAttribute('data-pdb-name');
-  self.presetsPanel.presetsList.pdb = self.presetsPanel.pdbList.filteredItems.filter(item => item.id === pdbId)[0];
-  const panelTitle = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] .panel-title`);
-  const mainPanel = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] div.main`);
-  const subPanel = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] div.sub`);
-  const mainBackButton = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] button.main-back-button`);
-  const presetsBackButton = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] button.presets-back-button`);
-  const presetsListElement = $(`${self._menuId} .miew-menu-form-presets .list-group`).get(0);
-  const presetsAlertArea = $(`${self._menuId} .miew-menu-form-presets .alert-warning`);
-  $(presetsListElement).empty();
-  panelTitle.html(pdbName);
-  mainPanel.hide();
-  presetsAlertArea.hide();
-  subPanel.show();
-  mainBackButton.addClass('hidden');
-  presetsBackButton.removeClass('hidden');
-  self.presetsPanel.actions.preset.input.clear(self);
-  self.presetsPanel.actions.preset.list.refresh(self);
-};
-
-Menu.prototype._presetsPanelActionsPresetsListRefresh = function (self) {
-  if (!self.presetsPanel.presetsList.pdb) {
-    return;
-  }
-  const onServerResponseReceived = function (list) {
-    self._presetsPanelDisplayPresetsProgress(false);
-    if (list) {
-      self.presetsPanel.presetsList.items = list;
-    } else {
-      self.presetsPanel.presetsList.items = [];
-    }
-    self.presetsPanel.actions.preset.list.display(self);
-  };
-  const onServerResponseError = function () {
-    self.presetsPanel.presetsList.items = [];
-    self.presetsPanel.actions.preset.list.display(self);
-  };
-  self._presetsPanelDisplayPresetsProgress(true);
-  self._viewer.srvPresetList(self.presetsPanel.presetsList.pdb.id, onServerResponseReceived, onServerResponseError);
-};
-
-Menu.prototype._presetsPanelActionsNavigateBack = function (self) {
-  const panelTitle = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] .panel-title`);
-  const mainPanel = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] div.main`);
-  const subPanel = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] div.sub`);
-  const mainBackButton = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] button.main-back-button`);
-  const presetsBackButton = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] button.presets-back-button`);
-  panelTitle.html('Presets');
-  mainPanel.show();
-  subPanel.hide();
-  mainBackButton.removeClass('hidden');
-  presetsBackButton.addClass('hidden');
-};
-
-Menu.prototype._presetsPanelActionsPresetApply = function (self, element) {
-  self._onMenuOff();
-  self._viewer.srvPresetApply(+element.getAttribute('data-preset-id'));
-};
-
-Menu.prototype._presetsPanelActionsPresetRenameAsk = function (self, element) {
-  const presetId = element.getAttribute('data-preset-id');
-  const presetName = element.getAttribute('data-preset-name');
-  const selector = $(`${self._menuId} .miew-menu-modals [data-modal-type=miew-menu-modal-rename-preset]`);
-  const input = selector.find('.modal-body input').get(0);
-  const action = selector.find('button.presets-panel-action[data-presets-panel-action="preset-rename-confirm"]').get(0);
-  $(input).val(presetName);
-  $(action).attr('data-preset-id', presetId);
-  selector.modal({
-    keyboard: true,
-  }, 'show');
-  selector.on(
-    'shown.bs.modal',
-    function () {
-      const root = $(this).find('.modal-body input')[0];
-      root.focus();
-      root.select();
-    },
-  );
-};
-
-Menu.prototype._presetsPanelActionsPresetRenameConfirm = function (self, element) {
-  const presetId = +element.getAttribute('data-preset-id');
-  const modal = $(element).closest('[data-modal-type=miew-menu-modal-rename-preset]');
-  const input = modal.find('.modal-body input').get(0);
-  const newName = $(input).val();
-  self._presetsPanelDisplayPresetsProgress(true);
-  self._viewer.srvPresetRename(presetId, newName, () => {
-    self._presetsPanelDisplayPresetsProgress(false);
-    self.presetsPanel.actions.preset.list.refresh(self);
-  }, (error) => {
-    self._presetsPanelDisplayPresetsProgress(false);
-    self._displayGlobalErrorDialog('Error renaming preset', error);
-  });
-};
-
-Menu.prototype._presetsPanelActionsPresetUpdate = function (self, element) {
-  self._updateReprList();
-  const presetId = +element.getAttribute('data-preset-id');
-  self._presetsPanelDisplayPresetsProgress(true);
-  self._viewer.srvPresetUpdate(presetId, () => {
-    self._presetsPanelDisplayPresetsProgress(false);
-  }, (message) => {
-    self._presetsPanelDisplayPresetsProgress(false);
-    self._displayGlobalErrorDialog('Error updating preset', message);
-  });
-};
-
-Menu.prototype._presetsPanelActionsPresetRemoveAsk = function (self, element) {
-  const presetId = element.getAttribute('data-preset-id');
-  const presetName = element.getAttribute('data-preset-name');
-  const selector = $(`${self._menuId} .miew-menu-modals [data-modal-type=miew-menu-modal-remove-preset]`);
-  const body = selector.find('.modal-body').get(0);
-  const action = selector.find('button.presets-panel-action[data-presets-panel-action="preset-remove-confirm"]').get(0);
-  $(body).html(`Are you sure you want to delete '${presetName}'?`);
-  $(action).attr('data-preset-id', presetId);
-  selector.modal({
-    keyboard: true,
-  }, 'show');
-};
-
-Menu.prototype._presetsPanelActionsPresetRemoveConfirm = function (self, element) {
-  const presetId = element.getAttribute('data-preset-id');
-  self._presetsPanelDisplayPresetsProgress(true);
-
-  const onCompleteFn = function () {
-    self._presetsPanelDisplayPresetsProgress(false);
-  };
-
-  self._viewer.srvPresetDelete(presetId, () => {
-    onCompleteFn();
-    self.presetsPanel.actions.preset.list.refresh(self);
-  }, (message) => {
-    onCompleteFn();
-    self._displayGlobalErrorDialog('Error removing preset', message);
-  });
-};
-
-Menu.prototype._presetsPanelActionsPresetsListDisplay = function (self) {
-  const listElement = $(`${self._menuId} .miew-menu-form-presets .list-group`).get(0);
-  const alertArea = $(`${self._menuId} .miew-menu-form-presets .alert-warning`);
-  $(listElement).empty();
-  if (self.presetsPanel.presetsList.items.length === 0) {
-    alertArea.show();
-  } else {
-    alertArea.hide();
-  }
-
-  const frag = document.createDocumentFragment();
-  let newItem;
-  let preset;
-  for (let i = 0; i < self.presetsPanel.presetsList.items.length; i++) {
-    preset = self.presetsPanel.presetsList.items[i];
-
-    const editPresetActionElement = createElement(
-      'span',
-      {
-        'class': 'glyphicon glyphicon-pencil miew-configured-pdb-list-item-action presets-panel-action',
-        'data-presets-panel-action': 'preset-rename-ask',
-        'data-preset-id': preset.id,
-        'data-preset-name': preset.name,
-      },
-    );
-    const updatePresetActionElement = createElement(
-      'span',
-      {
-        'class': 'glyphicon glyphicon-floppy-save miew-configured-pdb-list-item-action presets-panel-action',
-        'data-presets-panel-action': 'preset-update',
-        'data-preset-id': preset.id,
-        'data-preset-name': preset.name,
-      },
-    );
-    const removePresetActionElement = createElement(
-      'span',
-      {
-        'class': 'glyphicon glyphicon-remove miew-configured-pdb-list-item-action presets-panel-action',
-        'data-presets-panel-action': 'preset-remove-ask',
-        'data-preset-id': preset.id,
-        'data-preset-name': preset.name,
-      },
-    );
-
-    const presetActionsElement = typeof READONLY_SERVER !== 'undefined' && READONLY_SERVER ? undefined
-      : createElement(
-        'div',
-        {
-          'class': 'pull-right',
-        }, [editPresetActionElement, updatePresetActionElement, removePresetActionElement],
-      );
-
-    let mdFileIcon = null;
-
-    if (preset.mdFile) {
-      mdFileIcon = createElement(
-        'span',
-        {
-          'class': 'glyphicon glyphicon-play-circle',
-          'style': 'margin-left:5px',
-        }, null,
-      );
-    }
-
-    newItem = createElement(
-      'a',
-      {
-        'class': 'list-group-item presets-panel-action',
-        'href': '#',
-        'data-preset-id': preset.id,
-        'data-presets-panel-action': 'preset-apply',
-      }, [createElement('span', {}, preset.name), mdFileIcon, presetActionsElement],
-    );
-    frag.appendChild(newItem);
-  }
-  listElement.appendChild(frag);
-};
-
-Menu.prototype._presetsPanelActionsPresetInputClear = function (self) {
-  const newPresetNameInput = $(`${self._menuId} input[data-input-type="miew-menu-input-new-preset-name"]`).get(0);
-  $(newPresetNameInput).val('');
-  self.presetsPanel.actions.preset.input.refresh(self);
-};
-
-Menu.prototype._presetsPanelActionsPresetInputRefresh = function (self) {
-  const newPresetNameInput = $(`${self._menuId} input[data-input-type="miew-menu-input-new-preset-name"]`).get(0);
-  const newPresetButton = $(`${self._menuId} .presets-panel-action[data-presets-panel-action="preset-create"]`).get(0);
-  const newPresetAlert = $(`${self._menuId} div[data-label-type="miew-label-add-new-preset-info"]`).get(0);
-  if (!self._viewer._srvTopologyFile || !self.presetsPanel.presetsList.pdb
-      || self._viewer._srvTopologyFile.id !== self.presetsPanel.presetsList.pdb.id) {
-    $(newPresetButton).addClass('disabled');
-    $(newPresetNameInput).attr('disabled', 'disabled');
-    $(newPresetAlert).show();
-  } else if ($(newPresetNameInput).val() && $(newPresetNameInput).val().length > 0) {
-    $(newPresetButton).removeClass('disabled');
-    $(newPresetNameInput).removeAttr('disabled');
-    $(newPresetAlert).hide();
-  } else {
-    $(newPresetButton).addClass('disabled');
-    $(newPresetNameInput).removeAttr('disabled');
-    $(newPresetAlert).hide();
-  }
-};
-
-Menu.prototype._presetsPanelActionsPresetCreate = function (self) {
-  const newPresetNameInput = $(`${self._menuId
-  } input.presets-panel-action[data-presets-panel-action="preset-input-refresh"]`).get(0);
-  $(newPresetNameInput).addClass('disabled');
-  self._presetsPanelDisplayPresetsProgress(true);
-
-  const onComplete = function () {
-    self._presetsPanelDisplayPresetsProgress(false);
-    self.presetsPanel.actions.preset.input.clear(self);
-    $(newPresetNameInput).removeClass('disabled');
-  };
-
-  self._viewer.srvPresetCreate($(newPresetNameInput).val(), () => {
-    onComplete();
-    self.presetsPanel.actions.preset.list.refresh(self);
-  }, (message) => {
-    onComplete();
-    self._displayGlobalErrorDialog('Error creating preset', message);
-  });
-};
-
 Menu.prototype._initPresetsPanelActions = function () {
   const self = this;
 
-  self.presetsPanel.actions.pdb.inputs.refresh = self._presetsPanelActionsPdbInputsRefresh;
-  self.presetsPanel.actions.pdb.inputs.clear = self._presetsPanelActionsPdbInputsClear;
-  self.presetsPanel.actions.pdb.inputs.file = self._presetsPanelActionsPdbInputsFile;
-  self.presetsPanel.actions.pdb.inputs.text = self._presetsPanelActionsPdbInputsText;
-  self.presetsPanel.actions.pdb.register = self._presetsPanelActionsPdbRegister;
-  self.presetsPanel.actions.pdb.load = self._presetsPanelActionsPdbLoad;
-  self.presetsPanel.actions.pdb.remove.ask = self._presetsPanelActionsPdbRemoveAsk;
-  self.presetsPanel.actions.pdb.remove.confirm = self._presetsPanelActionsPdbRemoveConfirm;
-  self.presetsPanel.actions.pdb.list.refresh = self._presetsPanelActionsPdbListRefresh;
-  self.presetsPanel.actions.pdb.list.page = self._presetsPanelActionsPdbListGo;
-  self.presetsPanel.actions.pdb.list.display = self._presetsPanelActionsPdbListDisplay;
-  self.presetsPanel.actions.pdb.list.search = self._presetsPanelActionsPdbListSearch;
-  self.presetsPanel.actions.pdb.list.select = self._presetsPanelActionsPdbListSelect;
-  self.presetsPanel.actions.navigate.back = self._presetsPanelActionsNavigateBack;
-  self.presetsPanel.actions.preset.list.refresh = self._presetsPanelActionsPresetsListRefresh;
-  self.presetsPanel.actions.preset.list.display = self._presetsPanelActionsPresetsListDisplay;
-  self.presetsPanel.actions.preset.apply = self._presetsPanelActionsPresetApply;
-  self.presetsPanel.actions.preset.rename.ask = self._presetsPanelActionsPresetRenameAsk;
-  self.presetsPanel.actions.preset.rename.confirm = self._presetsPanelActionsPresetRenameConfirm;
-  self.presetsPanel.actions.preset.update = self._presetsPanelActionsPresetUpdate;
-  self.presetsPanel.actions.preset.remove.ask = self._presetsPanelActionsPresetRemoveAsk;
-  self.presetsPanel.actions.preset.remove.confirm = self._presetsPanelActionsPresetRemoveConfirm;
-  self.presetsPanel.actions.preset.input.refresh = self._presetsPanelActionsPresetInputRefresh;
-  self.presetsPanel.actions.preset.input.clear = self._presetsPanelActionsPresetInputClear;
-  self.presetsPanel.actions.preset.create = self._presetsPanelActionsPresetCreate;
+  self.presetsPanel.actions.pdb.inputs.refresh = self._presetsPanelActionsPdbInputsRefresh; // check input box?
+  self.presetsPanel.actions.pdb.inputs.clear = self._presetsPanelActionsPdbInputsClear; // "Cancel" button
+  self.presetsPanel.actions.pdb.inputs.file = self._presetsPanelActionsPdbInputsFile; // "Open file" button
+  self.presetsPanel.actions.pdb.inputs.text = self._presetsPanelActionsPdbInputsText; // URL text input
+  self.presetsPanel.actions.pdb.load = self._presetsPanelActionsPdbLoad; // "Load" button
 
   self.presetsPanel.actions.pdb.inputs.refresh(self);
 
-  const subPanel = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] div.sub`);
   const mainBackButton = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] button.main-back-button`);
   const presetsBackButton = $(`${self._menuId} [data-panel-type=miew-menu-panel-presets] button.presets-back-button`);
-  subPanel.hide();
   mainBackButton.removeClass('hidden');
   presetsBackButton.addClass('hidden');
 
@@ -2083,11 +1415,7 @@ Menu.prototype._initPresetsPanelActions = function () {
 };
 
 Menu.prototype._initPresetsPanel = function () {
-  const self = this;
-  self.presetsPanel.actions.pdb.list.refresh(self, true);
-  self.presetsPanel.actions.pdb.inputs.refresh(self);
-  self.presetsPanel.actions.preset.list.refresh(self);
-  self.presetsPanel.actions.preset.input.refresh(self);
+  this.presetsPanel.actions.pdb.inputs.refresh(this);
 };
 
 Menu.prototype._initRenderPanel = function () {
@@ -2587,15 +1915,16 @@ Menu.prototype.show = function (panelID, menuItem) {
 
   $(`${self._menuId} input[type=checkbox][data-dir=settings]`).each((index, element) => {
     const param = element.getAttribute('data-toggle');
-    if (param === 'theme') {
-      $(`${self._menuId} [data-toggle="${param}"]`).bootstrapSwitch('state', settings.get(param) === 'dark');
+    if (param === 'bg.color') {
+      $(`${self._menuId} [data-toggle="${param}"]`).bootstrapSwitch('state', settings.get(param) === 0x202020);
     } else {
       $(`${self._menuId} [data-toggle="${param}"]`).bootstrapSwitch('state', settings.get(param));
     }
   });
 
   // renew currently opened mode-, colorer-, matpreset- combobox panel (need, when they were changed from toolbar)
-  if (self._curPanelID.indexOf('mode') !== -1
+  if (self._curPanelID.indexOf('selection') !== -1
+    || self._curPanelID.indexOf('mode') !== -1
     || self._curPanelID.indexOf('color') !== -1
     || self._curPanelID.indexOf('matpreset') !== -1) {
     const reprList = $(`${self._menuId} [data-panel-type=miew-menu-panel-representation] .miew-repr-list`);
@@ -2617,9 +1946,7 @@ Menu.prototype.showTerminal = function () {
 
 Menu.prototype._removeActiveFromCombo = function (comboName) {
   const selector = $(`${this._menuId} [data-toggle=${comboName}].active`);
-  if (selector) {
-    selector.removeClass('active');
-  }
+  selector.removeClass('active');
 };
 
 Menu.prototype.hide = function () {
@@ -2650,9 +1977,7 @@ Menu.prototype.hideTerminal = function () {
 
 Menu.prototype._hideToolbarPanel = function () {
   const toolbar = $(`${this._menuId} [data-toggle="toolbar"].active`);
-  if (toolbar) {
-    toolbar.click();
-  }
+  toolbar.trigger('click');
 };
 
 Menu.prototype._onMenuOn = function () {
@@ -2990,8 +2315,6 @@ Menu.prototype._updateReprList = function () {
         }
 
         _fillModeOptionsFromMenu();
-
-        // repr.setMode(repr.mode.id);
 
         if (repr.visible !== isVisible) {
           self._viewer.setNeedRender();

@@ -703,24 +703,6 @@ class Complex {
     return this._currentUnit;
   }
 
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#getCurrentUnit}
-   */
-  getCurrentStructure = Complex.prototype.getCurrentUnit;
-
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#resetCurrentUnit}
-   */
-  resetCurrentStructure = Complex.prototype.resetCurrentUnit;
-
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#setCurrentUnit}
-   */
-  setCurrentStructure = Complex.prototype.setCurrentUnit;
-
   getDefaultBoundaries() {
     return this.units[0].getBoundaries();
   }
@@ -867,11 +849,9 @@ class Complex {
     }
 
     if (opts.needAutoBonding) {
-      // console.time('AutoBonding');
       const autoConnector = new AutoBond(this);
       autoConnector.build();
       autoConnector.destroy();
-      // console.timeEnd('AutoBonding');
     }
 
     const chains = this._chains;

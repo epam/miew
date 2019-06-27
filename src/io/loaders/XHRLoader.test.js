@@ -143,22 +143,6 @@ describe('XHRLoader', () => {
     });
   });
 
-  describe('.canLoad()', () => {
-    it('accepts a string', () => {
-      expect(XHRLoader.canLoad(fakeSource, {})).to.equal(true);
-    });
-
-    it('rejects a non-string object', () => {
-      expect(XHRLoader.canLoad(42, {})).to.equal(false);
-      expect(XHRLoader.canLoad({ name: 'foo' }, {})).to.equal(false);
-    });
-
-    it('requires the source type to be "url"', () => {
-      expect(XHRLoader.canLoad(fakeSource, { sourceType: 'url' })).to.equal(true);
-      expect(XHRLoader.canLoad(fakeSource, { sourceType: 'file' })).to.equal(false);
-    });
-  });
-
   describe('.canProbablyLoad()', () => {
     it('rejects a non-string object', () => {
       expect(XHRLoader.canProbablyLoad(42)).to.equal(false);

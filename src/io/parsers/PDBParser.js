@@ -68,23 +68,11 @@ class PDBParser extends Parser {
     this._options.fileType = 'pdb';
   }
 
-
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    return (typeof data === 'string')
-      && (Parser.checkDataTypeOptions(options, 'pdb') || Parser.checkDataTypeOptions(options, 'pdb', '.ent'));
-  }
-
-
   static canProbablyParse(data) {
     return _.isString(data) && pdbStartRegexp.test(data);
   }
 
   _finalize() {
-    // console.time('PDBParser._finalize');
     this._fixBondsArray();
     this._fixChains();
 
@@ -330,7 +318,6 @@ class PDBParser extends Parser {
     // identify fields: debugging and stuff
     /* eslint-disable no-magic-numbers */
     const codeOfS = 0x53;
-    // var twoLinesMaxLen = 2 * 80;
     const serialNumber = stream.readInt(8, 10);
     const structureName = stream.readString(12, 14).trim(); // FIXME: LString(3) forbids trim()
     const comment = stream.readString(41, 70).trim();

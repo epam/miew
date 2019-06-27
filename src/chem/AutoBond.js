@@ -1,6 +1,5 @@
 import AtomPairs from './AtomPairs';
 import Bond from './Bond';
-import settings from '../settings';
 
 const cProfileBondBuilder = false;
 const cEstBondsMultiplier = 4;
@@ -27,36 +26,6 @@ function _getBondingRadius(atom) {
 function _isAtomEligible(atom) {
   // build for all non-hetatm and for hetatm without bonds
   return !atom.isHet() || (atom._bonds && atom._bonds.length === 0);
-}
-
-// @deprecated
-function _isAtomEligibleWithWaterBondingHack(atom) {
-  const noHack = atom._residue._type._name !== 'HOH';
-  return noHack && !atom.isHet();
-}
-
-// @deprecated remove this hack (requested by customer)
-function _waterBondingHack(complex) {
-  const t = Bond.BondType.UNKNOWN;
-  const residues = complex._residues;
-  for (let i = 0, n = residues.length; i < n; i++) {
-    const residue = residues[i];
-    if (residue._type._name === 'HOH') {
-      const atoms = residue._atoms;
-      const a0 = atoms[0];
-      const a1 = atoms[1];
-      const a2 = atoms[2];
-      if (!a1 || !a2) {
-        continue;
-      }
-      const b1 = complex.addBond(a0, a1, 0, t, true);
-      const b2 = complex.addBond(a0, a2, 0, t, true);
-      a0._bonds[0] = b1;
-      a0._bonds[1] = b2;
-      a1._bonds[0] = b1;
-      a2._bonds[0] = b2;
-    }
-  }
 }
 
 /**
@@ -110,7 +79,6 @@ class AutoBond {
 
     const atoms = this._complex._atoms;
     const atomsNum = atoms.length;
-    const { isAtomEligible } = this;
     const self = this;
 
     let rA;
@@ -148,7 +116,7 @@ class AutoBond {
 
     for (let i = 0; i < atomsNum; ++i) {
       atomA = atoms[i];
-      if (!isAtomEligible(atomA)) {
+      if (!_isAtomEligible(atomA)) {
         continue;
       }
 
@@ -194,10 +162,6 @@ class AutoBond {
     }
     this._buildInner();
 
-    if (settings.now.draft.waterBondingHack && this._complex) {
-      _waterBondingHack(this._complex);
-    }
-
     if (cProfileBondBuilder) {
       console.timeEnd('Bonds Builder');
     }
@@ -211,8 +175,6 @@ class AutoBond {
     if (atoms[0]._index < 0) {
       throw new Error('AutoBond: Atoms in complex were not indexed.');
     }
-
-    this.isAtomEligible = settings.now.draft.waterBondingHack ? _isAtomEligibleWithWaterBondingHack : _isAtomEligible;
 
     this._calcBoundingBox();
     this._pairCollection = new AtomPairs(atoms.length * cEstBondsMultiplier);

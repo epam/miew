@@ -12,8 +12,12 @@ export default class XHRLoader extends Loader {
     this._binary = (options.binary === true);
   }
 
-  loadAsync() {
+  load() {
     return new Promise((resolve, reject) => {
+      if (this._abort) {
+        throw new Error('Loading aborted');
+      }
+
       const url = this._source;
       const request = this._agent = new XMLHttpRequest();
 
@@ -42,12 +46,6 @@ export default class XHRLoader extends Loader {
       }
       request.send();
     });
-  }
-
-  /** @deprecated */
-  static canLoad(source, options) {
-    const { sourceType } = options;
-    return (typeof source === 'string') && (!sourceType || sourceType === 'url');
   }
 
   static canProbablyLoad(source) {
