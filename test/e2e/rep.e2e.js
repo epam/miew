@@ -41,8 +41,7 @@ describe('As a power user, I want to', function () {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
-      // .setChromeOptions(new chromeDriver.Options().addArguments(['--headless', '--disable-gpu']))
-      .setChromeOptions(new chromeDriver.Options().addArguments(['--headless']))
+      .setChromeOptions(new chromeDriver.Options().addArguments(['--headless', '--disable-gpu']))
       .build();
 
     return golden.startup(driver, cfg)
