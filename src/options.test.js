@@ -258,7 +258,7 @@ describe('options', () => {
   const errorArgumentRepsStr = 'r=0&m=BS&c=EL&w=w';
   const errorKeyRepsStr = 'r=0&m=BS!radus:9&c=EL';
 
-  describe('.toScript', () => {
+  describe('.toScript(opts)', () => {
     function equalCommands(original, generated) {
       if (!_.isArray(original) || original.length !== generated.length + 2) {
         return false;
@@ -292,62 +292,60 @@ describe('options', () => {
       return script.split('\n');
     }
 
-    describe('correctInput', () => {
-      it('generates proper script for simplest rep lists', () => {
-        expect(simpleRepsCommands).to.equalCommands(toCommands(options.toScript(simpleRepsOpts)));
-        expect(bigRepsCommands).to.equalCommands(toCommands(options.toScript(bigRepsOpts)));
-      });
+    it('generates proper script for simplest rep lists', () => {
+      expect(simpleRepsCommands).to.equalCommands(toCommands(options.toScript(simpleRepsOpts)));
+      expect(bigRepsCommands).to.equalCommands(toCommands(options.toScript(bigRepsOpts)));
+    });
 
-      it('restores mode/colorer options', () => {
-        expect(paramRepCommands).to.equalCommands(toCommands(options.toScript(paramRepsOpts)));
-      });
+    it('restores mode/colorer options', () => {
+      expect(paramRepCommands).to.equalCommands(toCommands(options.toScript(paramRepsOpts)));
+    });
 
-      it('restores string params', () => {
-        expect(subsetRepsSimpleCommands).to.equalCommands(toCommands(options.toScript(subsetRepsSimpleOpts)));
-      });
+    it('restores string params', () => {
+      expect(subsetRepsSimpleCommands).to.equalCommands(toCommands(options.toScript(subsetRepsSimpleOpts)));
+    });
 
-      it('restores multi rep lists', () => {
-        expect(multipleRepsCommands).to.equalCommands(toCommands(options.toScript(multipleRepsOpts)));
-      });
+    it('restores multi rep lists', () => {
+      expect(multipleRepsCommands).to.equalCommands(toCommands(options.toScript(multipleRepsOpts)));
+    });
 
-      it('restores text mode options', () => {
-        expect(textModeCommands).to.equalCommands(toCommands(options.toScript(textModeOpts)));
-      });
+    it('restores text mode options', () => {
+      expect(textModeCommands).to.equalCommands(toCommands(options.toScript(textModeOpts)));
+    });
 
-      it('restores objects', () => {
-        expect(objectsCommands).to.equalCommands(toCommands(options.toScript(objectsOpts)));
-      });
+    it('restores objects', () => {
+      expect(objectsCommands).to.equalCommands(toCommands(options.toScript(objectsOpts)));
+    });
 
-      it('restores high level properties', () => {
-        expect(miscCommands).to.equalCommands(toCommands(options.toScript(miscOpts)));
-      });
+    it('restores high level properties', () => {
+      expect(miscCommands).to.equalCommands(toCommands(options.toScript(miscOpts)));
+    });
 
-      // settings params
-      it('restores proper script for settings', () => {
-        expect(settingsCommands).to.equalCommands(toCommands(options.toScript(settingsOpts)));
-      });
+    // settings params
+    it('restores proper script for settings', () => {
+      expect(settingsCommands).to.equalCommands(toCommands(options.toScript(settingsOpts)));
+    });
 
-      // overall
-      it('restores proper scripts', () => {
-        expect(overallCommands).to.equalCommands(toCommands(options.toScript(overallOpts)));
-      });
+    // overall
+    it('restores proper scripts', () => {
+      expect(overallCommands).to.equalCommands(toCommands(options.toScript(overallOpts)));
+    });
 
-      it('restores proper script for settings with preset', () => {
-        expect(settingsWithPresetCommands).to.equalCommands(toCommands(options.toScript(settingsWithPresetOpts)));
-      });
+    it('restores proper script for settings with preset', () => {
+      expect(settingsWithPresetCommands).to.equalCommands(toCommands(options.toScript(settingsWithPresetOpts)));
+    });
 
-      // sophisticated examples
-      it('restores proper script for complex subset opts', () => {
-        expect(complexSubsetCommands).to.equalCommands(toCommands(options.toScript(complexSubsetOpts)));
-      });
+    // sophisticated examples
+    it('restores proper script for complex subset opts', () => {
+      expect(complexSubsetCommands).to.equalCommands(toCommands(options.toScript(complexSubsetOpts)));
+    });
 
-      it('restores proper script for complex text mode opts', () => {
-        expect(complexTextModeCommands).to.equalCommands(toCommands(options.toScript(complexTextModeOpts)));
-      });
+    it('restores proper script for complex text mode opts', () => {
+      expect(complexTextModeCommands).to.equalCommands(toCommands(options.toScript(complexTextModeOpts)));
     });
   });
 
-  describe('.toURL', () => {
+  describe('.toURL(opts)', () => {
     // extract only options from our URL
     function getOpts(url) {
       let dashIdx = url.lastIndexOf('#');
@@ -358,63 +356,61 @@ describe('options', () => {
       done();
     });
 
-    describe('correctInput', () => {
-      it('generates proper URL for simplest rep lists', () => {
-        expect(getOpts(options.toURL(simpleRepsOpts))).to.equal(simpleRepsStr);
-        expect(getOpts(options.toURL(bigRepsOpts))).to.equal(bigRepsStr);
-      });
+    it('generates proper URL for simplest rep lists', () => {
+      expect(getOpts(options.toURL(simpleRepsOpts))).to.equal(simpleRepsStr);
+      expect(getOpts(options.toURL(bigRepsOpts))).to.equal(bigRepsStr);
+    });
 
-      it('generates proper URL for parametrized modes and colorers', () => {
-        expect(getOpts(options.toURL(paramRepsOpts))).to.equal(paramRepStr);
-      });
+    it('generates proper URL for parametrized modes and colorers', () => {
+      expect(getOpts(options.toURL(paramRepsOpts))).to.equal(paramRepStr);
+    });
 
-      it('generates proper URL for modes with string params', () => {
-        expect(getOpts(options.toURL(subsetRepsSimpleOpts))).to.equal(subsetRepsSimpleStr);
-      });
+    it('generates proper URL for modes with string params', () => {
+      expect(getOpts(options.toURL(subsetRepsSimpleOpts))).to.equal(subsetRepsSimpleStr);
+    });
 
-      it('generates proper URL for multi mode rep lists', () => {
-        expect(getOpts(options.toURL(multipleRepsOpts))).to.equal(multipleRepsStr);
-      });
+    it('generates proper URL for multi mode rep lists', () => {
+      expect(getOpts(options.toURL(multipleRepsOpts))).to.equal(multipleRepsStr);
+    });
 
-      it('generates proper URL for text mode', () => {
-        expect(getOpts(options.toURL(textModeOpts))).to.equal(textModeStr);
-      });
+    it('generates proper URL for text mode', () => {
+      expect(getOpts(options.toURL(textModeOpts))).to.equal(textModeStr);
+    });
 
-      // objects
-      it('generates proper URL for scene objects', () => {
-        expect(getOpts(options.toURL(objectsOpts))).to.equal(objectsStr);
-      });
+    // objects
+    it('generates proper URL for scene objects', () => {
+      expect(getOpts(options.toURL(objectsOpts))).to.equal(objectsStr);
+    });
 
-      it('generates proper URL for scene objects', () => {
-        expect(getOpts(options.toURL(miscOpts))).to.equal(miscStr);
-      });
+    it('generates proper URL for scene objects', () => {
+      expect(getOpts(options.toURL(miscOpts))).to.equal(miscStr);
+    });
 
-      // settings params
-      it('generates proper URL for settings', () => {
-        expect(getOpts(options.toURL(settingsOpts))).to.equal(settingsStr);
-      });
+    // settings params
+    it('generates proper URL for settings', () => {
+      expect(getOpts(options.toURL(settingsOpts))).to.equal(settingsStr);
+    });
 
-      // overall
-      it('generates proper long URLs', () => {
-        expect(getOpts(options.toURL(overallOpts))).to.equal(overallStr);
-      });
+    // overall
+    it('generates proper long URLs', () => {
+      expect(getOpts(options.toURL(overallOpts))).to.equal(overallStr);
+    });
 
-      it('restores proper script for settings with preset', () => {
-        expect(getOpts(options.toURL(settingsWithPresetOpts))).to.equal(settingsWithPresetStr);
-      });
+    it('restores proper script for settings with preset', () => {
+      expect(getOpts(options.toURL(settingsWithPresetOpts))).to.equal(settingsWithPresetStr);
+    });
 
-      // sophisticated examples
-      it('generates proper URL for complex subset opts', () => {
-        expect(getOpts(options.toURL(complexSubsetOpts))).to.equal(complexSubsetStr);
-      });
+    // sophisticated examples
+    it('generates proper URL for complex subset opts', () => {
+      expect(getOpts(options.toURL(complexSubsetOpts))).to.equal(complexSubsetStr);
+    });
 
-      it('generates proper URL for complex text mode opts', () => {
-        expect(getOpts(options.toURL(complexTextModeOpts))).to.equal(complexTextModeStr);
-      });
+    it('generates proper URL for complex text mode opts', () => {
+      expect(getOpts(options.toURL(complexTextModeOpts))).to.equal(complexTextModeStr);
     });
   });
 
-  describe('.fromURL', () => {
+  describe('.fromURL(url)', () => {
     function equalOptions(original, generated) {
       function compareAllExceptReps(one, another) {
         const origKeys = Object.keys(one);
@@ -482,7 +478,7 @@ describe('options', () => {
       return `?${opts}`;
     }
 
-    it('error input', () => {
+    it('restores simrpe options from error input url', () => {
       expect(options.fromURL(urlize(errorArgumentRepsStr))).to.equalOptions(repsOpts);
       expect(options.fromURL(urlize(errorKeyRepsStr))).to.equalOptions(repsOpts);
     });
@@ -545,7 +541,7 @@ describe('options', () => {
   });
 
   // TODO think about making public fromArray function and tests firstly it (not fromAttr or fromURL)
-  describe('.fromAttr', () => {
+  describe('.fromAttr(attr)', () => {
     function urlize(opts) {
       return `?${opts || ''}`;
     }
