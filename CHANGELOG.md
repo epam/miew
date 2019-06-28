@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.1] - 2019-07-01
+### Fixed
+- Do not show the last pick information when selection was changed via the terminal.
+- Update the selection notification when the displayed unit changes.
+- Fix backdrop material so it works for sprite-based modes (B&S, VDW...)
+- Fix a bug in Cartoon geometry which led to bad raycasting performance.
+
+### Internal
+- Visual regression tests are now run in headless Chrome. This allows lowering error threshold and
+  comparing results obtained on different graphics hardware. It is a big step towards distributed
+  testing in cloud.
+
 ## [0.8.0] - 2019-06-07
 ### Added
 - Add isosurface rendering for electron density maps. As volumetric rendering is still in its alpha, it is done through a global `modes.VD.isoMode` flag.
@@ -451,7 +463,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/epam/miew/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/epam/miew/compare/v0.7.24...v0.8.0
 [0.7.24]: https://github.com/epam/miew/compare/v0.7.23...v0.7.24
 [0.7.23]: https://github.com/epam/miew/compare/v0.7.22...v0.7.23
