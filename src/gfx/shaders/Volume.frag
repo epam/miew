@@ -20,8 +20,6 @@ uniform sampler2D _WFFRight;
 
 varying vec4 screenSpacePos;
 
-#define STEPS_COUNT 600
-
 #define NO_COLOR vec4(0., 0., 0., 0.)
 
 vec4 sample3DTexture(vec3 texCoord) {

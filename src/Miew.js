@@ -3559,6 +3559,12 @@ Miew.prototype._initOnSettingsChanged = function () {
 
   on(['transparency', 'resolution', 'palette'], () => {
     this.rebuildAll();
+
+    const volume = this._getVolumeVisual();
+    if (volume === null) return;
+
+    volume.getMesh().material.updateDefines();
+    this._needRender = true;
   });
 
   on(['axes', 'fxaa', 'ao',

@@ -107,6 +107,7 @@ class VolumeMaterial extends THREE.ShaderMaterial {
   updateDefines() {
     this.defines = {
       ISO_MODE: settings.now.modes.VD.isoMode,
+      STEPS_COUNT: settings.now.modes.VD.polyComplexity[settings.now.resolution] * 100,
     };
     this.needsUpdate = true;
   }
