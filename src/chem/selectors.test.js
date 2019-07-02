@@ -389,47 +389,46 @@ describe('selectors', () => {
   });
 
   describe('PrefixOperator', () => {
+    const noneSelector = selectors.none();
+    const noArgumentedPO = new selectors.PrefixOperator();
+    const noArgumentedPOAsString = [noArgumentedPO.keyword, noneSelector.toString()].join(' ');
+    const noArgumentedPOAsJSON = [noArgumentedPO.name, noneSelector.toJSON()];
+
     const selector = selectors.all();
     selector.keyword = 'selector';
-    const noneSelector = selectors.none();
-    const selectorPO = new selectors.PrefixOperator(selector);
-    const noneSelectorPO = new selectors.PrefixOperator();
+    const simplePO = new selectors.PrefixOperator(selector);
+    const simplePOAsString = [simplePO.keyword, selector.toString()].join(' ');
+    const simplePOAsJSON = [simplePO.name, selector.toJSON()];
 
-    describe('construcnor', () => {
-      it('priority', () => {
-        expect(selectorPO.priority).to.equal(1);
+    const middlePriorityPO = new selectors.PrefixOperator(selector);
+    middlePriorityPO.keyword = 'middlePO';
+
+    describe('#toString()', () => {
+      it('construct string for prefix operator created with no arguments', () => {
+        expect(noArgumentedPO.toString()).to.equal(noArgumentedPOAsString);
       });
-      it('construcnor with rhs', () => {
-        expect(selectorPO.rhs).to.deep.equal(selector);
+      it('construct string for simple prefix operator', () => {
+        expect(simplePO.toString()).to.equal(simplePOAsString);
       });
-      it('construcnor without arguments', () => {
-        expect(noneSelectorPO.rhs).to.deep.equal(noneSelector);
+      it('construct string for higher priority prefix operator from lower priority...', () => {
+        const highPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
+        highPriorityPO.priority = selectors.PrefixOperator.prototype.priority - 1;
+        highPriorityPO.keyword = 'highestPO';
+        expect(highPriorityPO.toString()).to.equal('highestPO (middlePO selector)');
       });
-    });
-    describe('toString', () => {
-      it('easy prefix operator toString', () => {
-        expect(selectorPO.toString()).to.equal(['error', selector.toString()].join(' '));
-      });
-      describe('complex prefix operator toString', () => {
-        const middlePriorityPO = new selectors.PrefixOperator(selector);
-        middlePriorityPO.keyword = 'middle';
-        it('higher from lower priority selector', () => {
-          const highPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
-          highPriorityPO.priority = selectors.PrefixOperator.prototype.priority - 1;
-          highPriorityPO.keyword = 'high';
-          expect(highPriorityPO.toString()).to.equal('high (middle selector)');
-        });
-        it('lower from higher priority selector', () => {
-          const lowPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
-          lowPriorityPO.priority = selectors.PrefixOperator.prototype.priority + 1;
-          lowPriorityPO.keyword = 'low';
-          expect(lowPriorityPO.toString()).to.equal('low middle selector');
-        });
+      it('construct string for lower priority prefix operator from higher priority...', () => {
+        const lowPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
+        lowPriorityPO.priority = selectors.PrefixOperator.prototype.priority + 1;
+        lowPriorityPO.keyword = 'lowestPO';
+        expect(lowPriorityPO.toString()).to.equal('lowestPO middlePO selector');
       });
     });
-    describe('toJSON', () => {
-      it('toJSON', () => {
-        expect(selectorPO.toJSON()).to.deep.equal(['Error', selector.toJSON()]);
+    describe('#toJSON()', () => {
+      it('construct JSON for prefix operator created with no arguments', () => {
+        expect(noArgumentedPO.toJSON()).to.deep.equal(noArgumentedPOAsJSON);
+      });
+      it('construct JSON for simple prefix operator', () => {
+        expect(simplePO.toJSON()).to.deep.equal(simplePOAsJSON);
       });
     });
   });
