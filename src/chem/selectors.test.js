@@ -141,59 +141,169 @@ describe('selectors', () => {
   });
 
   describe('ValueList', () => {
-    const value0 = 'a';
-    const value1 = 'B';
-    const value2 = 12;
+    const VaLuE1 = 'VaLuE';
+    const vALue1 = 'vALue';
+    const value2 = 45;
 
-    const emptyVL = new selectors.ValueList();
-    const oneValueVL = new selectors.ValueList(value0);
-    const twoValuesVL = new selectors.ValueList([value0, value2]);
-    const threeValuesVL = new selectors.ValueList([value0, value1, value2]);
+    const VL = new selectors.ValueList([value2, VaLuE1]);
+    const VLAsString = [value2.toString(), VaLuE1.toString()].join(',');
+    const VLAsJSON = [value2, VaLuE1];
+    const onlyUpperVL = new selectors.ValueList([value2, VaLuE1], true);
+    const onlyUpperVLAsString = [value2.toString(), VaLuE1.toUpperCase().toString()].join(',');
+    const onlyUpperVLAsJSON = [value2, VaLuE1.toUpperCase()];
 
-    describe('contructor', () => {
-      it('no arguments', () => {
-        expect(emptyVL).to.deep.equal({ _values: [] });
+    describe('#includes(value)', () => {
+      it('check case sensitive list for including value which exists in it', () => {
+        expect(VL.includes(VaLuE1)).to.equal(true);
       });
-      it('from one value', () => {
-        expect(oneValueVL).to.deep.equal({ _values: [value0] });
+      it('check case sensitive list for including value which exists in it in different case', () => {
+        expect(VL.includes(vALue1)).to.equal(false);
       });
-      it('from array of values', () => {
-        expect(threeValuesVL).to.deep.equal({ _values: [value0, value1, value2] });
+      it('check case sensitive list for including value which does not exist in it', () => {
+        expect(VL.includes('anotherVal')).to.equal(false);
       });
-      it('with toUpperCase setting', () => {
-        const valList = new selectors.ValueList(['ala', 12, 'B', 'c'], true);
-        expect(valList).to.deep.equal({ _values: ['ALA', 12, 'B', 'C'] });
+      it('check only upper case list for including value which exists in it', () => {
+        expect(onlyUpperVL.includes(VaLuE1.toUpperCase())).to.equal(true);
       });
-    });
-    describe('append', () => {
-      it('append value', () => {
-        expect(oneValueVL.append(value2)).to.deep.equal(twoValuesVL);
+      it('check only upper case list list for including value which exists in it in different case', () => {
+        expect(onlyUpperVL.includes(vALue1)).to.equal(false);
       });
-    });
-    describe('remove', () => {
-      it('exist range', () => {
-        expect(threeValuesVL.remove(value1)).to.deep.equal(twoValuesVL);
-      });
-      it('fantastic range', () => {
-        expect(twoValuesVL.remove(value1)).to.deep.equal(twoValuesVL);
+      it('check only upper case  list for including value which does not exist in it', () => {
+        expect(onlyUpperVL.includes('anotherVal')).to.equal(false);
       });
     });
-    describe('toString', () => {
-      it('toString', () => {
-        expect(twoValuesVL.toString()).to.equal([value0.toString(), value2.toString()].join(','));
+    describe('#toString()', () => {
+      it('construct string for case sensitive list', () => {
+        expect(VL.toString()).to.equal(VLAsString);
+      });
+      it('construct string for only upper case  list', () => {
+        expect(onlyUpperVL.toString()).to.equal(onlyUpperVLAsString);
       });
     });
-    describe('toJSON', () => {
-      it('toJSON', () => {
-        expect(twoValuesVL.toJSON()).to.deep.equal([value0, value2]);
+    describe('#toJSON()', () => {
+      it('construct JSON for case sensitive list', () => {
+        expect(VL.toJSON()).to.deep.equal(VLAsJSON);
+      });
+      it('construct JSON for only upper case  list', () => {
+        expect(onlyUpperVL.toJSON()).to.deep.equal(onlyUpperVLAsJSON);
       });
     });
-    describe('includes', () => {
-      it('existed value', () => {
-        expect(twoValuesVL.includes(value0)).to.equal(true);
+    describe('#append(value)', () => {
+      it('case sensitive list begins containing appending value', () => {
+        const valueList = new selectors.ValueList();
+        expect(valueList.includes(VaLuE1)).to.equal(false);
+        valueList.append(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
       });
-      it('fantastic value', () => {
-        expect(twoValuesVL.includes(value1)).to.equal(false);
+      it('case sensitive list does not begin containing appending value in different case', () => {
+        const valueList = new selectors.ValueList();
+        expect(valueList.includes(vALue1)).to.equal(false);
+        valueList.append(VaLuE1);
+        expect(valueList.includes(vALue1)).to.equal(false);
+      });
+      it('case sensitive list keeps containing values from previous ranges', () => {
+        const valueList = new selectors.ValueList();
+        valueList.append(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+        valueList.append(value2);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+      });
+      it('only upper case list begins containing upper case version of appending value', () => {
+        const valueList = new selectors.ValueList(undefined, true);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(false);
+        valueList.append(VaLuE1);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+      });
+      it('only upper case list begins containing appending value even if it is not string', () => {
+        const valueList = new selectors.ValueList(undefined, true);
+        expect(valueList.includes(value2)).to.equal(false);
+        valueList.append(value2);
+        expect(valueList.includes(value2)).to.equal(true);
+      });
+      it('only upper case list does not begin containing not upper case version of appending value', () => {
+        const valueList = new selectors.ValueList(undefined, true);
+        expect(valueList.includes(VaLuE1)).to.equal(false);
+        valueList.append(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(false);
+      });
+      it('only upper case list keeps containing values from previous ranges', () => {
+        const valueList = new selectors.ValueList(undefined, true);
+        valueList.append(VaLuE1);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+        valueList.append(value2);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+      });
+    });
+    describe('#remove(value)', () => {
+      it('case sensitive list stops containing removing value', () => {
+        const valueList = new selectors.ValueList(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+        valueList.remove(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(false);
+      });
+      it('case sensitive list keeps containing remaining values', () => {
+        const valueList = new selectors.ValueList([VaLuE1, value2]);
+        expect(valueList.includes(value2)).to.equal(true);
+        valueList.remove(VaLuE1);
+        expect(valueList.includes(value2)).to.equal(true);
+      });
+      it('case sensitive list which contains two equal values keeps containing one of them after deleting another', () => {
+        const valueList = new selectors.ValueList([VaLuE1, VaLuE1]);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+        valueList.remove(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+        valueList.remove(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(false);
+      });
+      it('case sensitive list keeps containing all values when removed value was not existing in list', () => {
+        const valueList = new selectors.ValueList(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+        valueList.remove('anotherValue');
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+      });
+      it('case sensitive list keeps containing all values when removed value was not existing in list in such case', () => {
+        const valueList = new selectors.ValueList(VaLuE1);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+        valueList.remove(vALue1);
+        expect(valueList.includes(VaLuE1)).to.equal(true);
+      });
+      it('only upper case  list stops containing removing value', () => {
+        const valueList = new selectors.ValueList(VaLuE1, true);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+        valueList.remove(VaLuE1.toUpperCase());
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(false);
+      });
+      it('only upper case list stops containing removing value even if it is not string', () => {
+        const valueList = new selectors.ValueList(value2, true);
+        expect(valueList.includes(value2)).to.equal(true);
+        valueList.remove(value2);
+        expect(valueList.includes(value2)).to.equal(false);
+      });
+      it('only upper case list stops containing removing value even if it was sent not in upper case', () => {
+        const valueList = new selectors.ValueList(VaLuE1, true);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+        valueList.remove(vALue1);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(false);
+      });
+      it('only upper case keeps containing remaining values', () => {
+        const valueList = new selectors.ValueList([VaLuE1, value2], true);
+        expect(valueList.includes(value2)).to.equal(true);
+        valueList.remove(VaLuE1);
+        expect(valueList.includes(value2)).to.equal(true);
+      });
+      it('only upper case list which contains two equal values keeps containing one of them after deleting another', () => {
+        const valueList = new selectors.ValueList([VaLuE1, VaLuE1], true);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+        valueList.remove(VaLuE1);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+        valueList.remove(VaLuE1);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(false);
+      });
+      it('only upper case list keeps containing all values when removed value was not existing in list', () => {
+        const valueList = new selectors.ValueList(VaLuE1, true);
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+        valueList.remove('anotherValue');
+        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
       });
     });
   });
