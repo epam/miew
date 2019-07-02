@@ -434,68 +434,71 @@ describe('selectors', () => {
   });
 
   describe('InfixOperator', () => {
+    const noneSelector = selectors.none();
     const letfSelector = selectors.all();
     letfSelector.keyword = 'lSelector';
     const rightSelector = selectors.all();
     rightSelector.keyword = 'rSelector';
-    const noneSelector = selectors.none();
-    const selectorIO = new selectors.InfixOperator(letfSelector, rightSelector);
-    const halfSelectorIO = new selectors.InfixOperator(letfSelector);
-    const noneSelectorIO = new selectors.InfixOperator();
 
-    describe('construcnor', () => {
-      it('priority', () => {
-        expect(selectorIO.priority).to.equal(1000);
+    const noneSelectorIO = new selectors.InfixOperator();
+    const noneSelectorIOAsString = [noneSelector.toString(), noneSelectorIO.keyword, noneSelector.toString()].join(' ');
+    const noneSelectorIOAsJSON = [noneSelectorIO.name, noneSelector.toJSON(), noneSelector.toJSON()];
+
+    const halfSelectorIO = new selectors.InfixOperator(letfSelector);
+    const halfSelectorIOAsString = [letfSelector.toString(), halfSelectorIO.keyword, noneSelector.toString()].join(' ');
+    const halfSelectorIOAsJSON = [halfSelectorIO.name, letfSelector.toJSON(), noneSelector.toJSON()];
+
+    const selectorIO = new selectors.InfixOperator(letfSelector, rightSelector);
+    const selectorIOAsString = [letfSelector.toString(), selectorIO.keyword, rightSelector.toString()].join(' ');
+    const selectorIOAsJSON = [selectorIO.name, letfSelector.toJSON(), rightSelector.toJSON()];
+
+    const highPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
+    highPriorityIO.priority = selectors.InfixOperator.prototype.priority - 2;
+    highPriorityIO.keyword = '^';
+    const lowPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
+    lowPriorityIO.priority = selectors.InfixOperator.prototype.priority + 2;
+    lowPriorityIO.keyword = '+';
+
+    describe('#toString()', () => {
+      it('construct string for infix operator with no arguments', () => {
+        expect(noneSelectorIO.toString()).to.equal(noneSelectorIOAsString);
       });
-      it('construcnor with two arguments', () => {
-        expect(selectorIO.lhs).to.deep.equal(letfSelector);
-        expect(selectorIO.rhs).to.deep.equal(rightSelector);
+      it('construct string for infix operator with one argument', () => {
+        expect(halfSelectorIO.toString()).to.equal(halfSelectorIOAsString);
       });
-      it('construcnor with one argument', () => {
-        expect(halfSelectorIO.lhs).to.deep.equal(letfSelector);
-        expect(halfSelectorIO.rhs).to.deep.equal(noneSelector);
+      it('construct string for simple infix operator', () => {
+        expect(selectorIO.toString()).to.equal(selectorIOAsString);
       });
-      it('construcnor without arguments', () => {
-        expect(noneSelectorIO.lhs).to.deep.equal(noneSelector);
-        expect(noneSelectorIO.rhs).to.deep.equal(noneSelector);
+      it('construct string for complex infix operator with follow preorities: middle(high, low)', () => {
+        const complexPO = new selectors.InfixOperator(highPriorityIO, lowPriorityIO);
+        complexPO.keyword = '*';
+        expect(complexPO.toString()).to.equal('lSelector ^ rSelector * (lSelector + rSelector)');
+      });
+      it('construct string for complex infix operator with follow preorities: middle(low, high)', () => {
+        const complexPO = new selectors.InfixOperator(lowPriorityIO, highPriorityIO);
+        complexPO.keyword = '*';
+        expect(complexPO.toString()).to.equal('(lSelector + rSelector) * lSelector ^ rSelector');
+      });
+      it('construct string for complex infix operator with follow preorities: middle(low, low)', () => {
+        const complexPO = new selectors.InfixOperator(lowPriorityIO, lowPriorityIO);
+        complexPO.keyword = '*';
+        expect(complexPO.toString()).to.equal('(lSelector + rSelector) * (lSelector + rSelector)');
+      });
+      it('construct string for complex infix operator with follow preorities: middle(high, high)', () => {
+        const complexPO = new selectors.InfixOperator(highPriorityIO, highPriorityIO);
+        complexPO.keyword = '*';
+        expect(complexPO.toString()).to.equal('lSelector ^ rSelector * lSelector ^ rSelector');
       });
     });
-    describe('toString', () => {
-      it('toString', () => {
-        expect(selectorIO.toString()).to.equal([letfSelector.toString(), 'error', rightSelector.toString()].join(' '));
+    describe('#toJSON()', () => {
+      it('construct JSON for infix operator with no arguments', () => {
+        expect(noneSelectorIO.toJSON()).to.deep.equal(noneSelectorIOAsJSON);
       });
-      describe('complex infix operator toString', () => {
-        const highPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
-        highPriorityIO.priority = selectors.InfixOperator.prototype.priority - 2;
-        highPriorityIO.keyword = 'high';
-        const lowPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
-        lowPriorityIO.priority = selectors.InfixOperator.prototype.priority + 2;
-        lowPriorityIO.keyword = 'low';
-        it('middle(high, low)', () => {
-          const complexPO = new selectors.InfixOperator(highPriorityIO, lowPriorityIO);
-          complexPO.keyword = 'middle';
-          expect(complexPO.toString()).to.equal('lSelector high rSelector middle (lSelector low rSelector)');
-        });
-        it('middle(low, high)', () => {
-          const complexPO = new selectors.InfixOperator(lowPriorityIO, highPriorityIO);
-          complexPO.keyword = 'middle';
-          expect(complexPO.toString()).to.equal('(lSelector low rSelector) middle lSelector high rSelector');
-        });
-        it('middle(low, low)', () => {
-          const complexPO = new selectors.InfixOperator(lowPriorityIO, lowPriorityIO);
-          complexPO.keyword = 'middle';
-          expect(complexPO.toString()).to.equal('(lSelector low rSelector) middle (lSelector low rSelector)');
-        });
-        it('middle(high, high)', () => {
-          const complexPO = new selectors.InfixOperator(highPriorityIO, highPriorityIO);
-          complexPO.keyword = 'middle';
-          expect(complexPO.toString()).to.equal('lSelector high rSelector middle lSelector high rSelector');
-        });
+      it('construct JSON for infix operator with one argument', () => {
+        expect(halfSelectorIO.toJSON()).to.deep.equal(halfSelectorIOAsJSON);
       });
-    });
-    describe('toJSON', () => {
-      it('toJSON', () => {
-        expect(selectorIO.toJSON()).to.deep.equal(['Error', letfSelector.toJSON(), rightSelector.toJSON()]);
+      it('construct JSON for simple infix operator', () => {
+        expect(selectorIO.toJSON()).to.deep.equal(selectorIOAsJSON);
       });
     });
   });
