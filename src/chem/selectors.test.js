@@ -337,28 +337,21 @@ describe('selectors', () => {
   });
 
   describe('RangeListSelector', () => {
-    const rangeList = new selectors.RangeList([new selectors.Range(2, 8), new selectors.Range(1, 14)]);
-    const rangeListSelector = new selectors.RangeListSelector([new selectors.Range(2, 8), new selectors.Range(1, 14)]);
+    const range0 = new selectors.Range(2, 8);
+    const range1 = new selectors.Range(1, 14);
+    const rangeList = new selectors.RangeList([range0, range1]);
+    const rangeListSelector = new selectors.RangeListSelector(rangeList);
+    const rangeListSelectorAsString = [rangeListSelector.keyword, rangeList.toString()].join(' ');
+    const rangeListSelectorAsJSON = [rangeListSelector.name, rangeList.toJSON()];
 
-    describe('construcnor', () => {
-      it('keyword', () => {
-        expect(rangeListSelector.keyword).to.equal('error');
-      });
-      it('name', () => {
-        expect(rangeListSelector.name).to.equal('Error');
-      });
-      it('list', () => {
-        expect(rangeListSelector.list).to.deep.equal(rangeList);
+    describe('#toString()', () => {
+      it('construct string', () => {
+        expect(rangeListSelector.toString()).to.equal(rangeListSelectorAsString);
       });
     });
-    describe('toString', () => {
-      it('toString', () => {
-        expect(rangeListSelector.toString()).to.equal(['error', rangeList.toString()].join(' '));
-      });
-    });
-    describe('toJSON', () => {
-      it('toJSON', () => {
-        expect(rangeListSelector.toJSON()).to.deep.equal(['Error', rangeList.toJSON()]);
+    describe('#toJSON()', () => {
+      it('construct JSON', () => {
+        expect(rangeListSelector.toJSON()).to.deep.equal(rangeListSelectorAsJSON);
       });
     });
   });
