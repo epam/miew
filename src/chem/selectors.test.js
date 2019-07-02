@@ -309,32 +309,29 @@ describe('selectors', () => {
   });
 
   describe('Selector', () => {
-    const selector = new selectors.Selector();
+    const defaultSelector = new selectors.Selector();
+    const defaultSelectorAsString = 'error';
+    const defaultSelectorAsJSON = ['Error'];
+    const newSelector = new selectors.Selector();
+    newSelector.keyword = 'newSelectorKeyword';
+    newSelector.name = 'newSelectorName';
+    const newSelectorAsString = newSelector.keyword;
+    const newSelectorAsJSON = [newSelector.name];
 
-    describe('Selector prototype', () => {
-      it('keyword', () => {
-        expect(selector.keyword).to.equal('error');
+    describe('#toString()', () => {
+      it('construct string for default selector', () => {
+        expect(defaultSelector.toString()).to.equal(defaultSelectorAsString);
       });
-      it('name', () => {
-        expect(selector.name).to.equal('Error');
-      });
-    });
-    describe('toString', () => {
-      it('from prototype', () => {
-        expect(selector.toString()).to.equal('error');
-      });
-      it('from extention', () => {
-        selector.keyword = 'new keyword';
-        expect(selector.toString()).to.equal('new keyword');
+      it('construct string for selector with modified keyword', () => {
+        expect(newSelector.toString()).to.equal(newSelectorAsString);
       });
     });
-    describe('toJSON', () => {
-      it('from prototype', () => {
-        expect(selector.toJSON()).to.deep.equal(['Error']);
+    describe('#toJSON()', () => {
+      it('construct JSON for default selector', () => {
+        expect(defaultSelector.toJSON()).to.deep.equal(defaultSelectorAsJSON);
       });
-      it('from extention', () => {
-        selector.name = 'new name';
-        expect(selector.toJSON()).to.deep.equal(['new name']);
+      it('construct JSON for selector with modified name', () => {
+        expect(newSelector.toJSON()).to.deep.equal(newSelectorAsJSON);
       });
     });
   });
