@@ -1,5 +1,6 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
+import proxyquire from 'proxyquire';
 import selectors from './selectors';
 
 chai.use(dirtyChai);
@@ -546,12 +547,27 @@ describe('selectors', () => {
   });
 
   describe('#parse(str)', () => {
-    it('for incorrect selector string', () => {
-      expect(selectors.parse('seal 1:10').selector).to.deep.equal(selectors.none());
-      expect(selectors.parse('seal 1:10')).to.have.a.property('error');
+    const correctSelector = selectors.serial(new selectors.Range(1, 10));
+    const errorMessage = 'errorMessage';
+    const parser = {
+      parse: (str) => {
+        if (str === 'correctSelString') {
+          return correctSelector;
+        }
+        const exc = { message: errorMessage };
+        throw exc;
+      },
+    }
+    const modifiedSelector = proxyquire('./selectors', { '../utils/SelectionParser': { parser } });
+
+    it('returns object with correct selector in selector field if input string is correct selection string', () => {
+      expect(modifiedSelector.default.parse('correctSelString').selector).to.deep.equal(correctSelector);
     });
-    it('for correct selector string', () => {
-      expect(selectors.parse('serial 1:10')).to.deep.equal({ selector: selectors.serial(new selectors.Range(1, 10)) });
+    it('returns object with noneSelector in selector field if input string is incorrect selection string', () => {
+      expect(modifiedSelector.default.parse('incorrectSelString').selector).to.deep.equal(selectors.none());
+    });
+    it('for selector string', () => {
+      expect(modifiedSelector.default.parse('incorrectSelString').error).to.deep.equal(errorMessage);
     });
   });
 
