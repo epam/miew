@@ -501,49 +501,57 @@ describe('selectors', () => {
     });
   });
 
-  describe('selectors functions', () => {
-    describe('GetSelector', () => {
-      it('for exists selector', () => {
-        const key = 'all';
-        selectors.Context[key] = selectors.all;
-        expect(selectors.GetSelector(key)).to.not.throw();
-        expect(new selectors.GetSelector(key)()).to.deep.equal(selectors.all());
-      });
-      it('for exists but empty selector', () => {
-        const key = 'all';
-        selectors.Context[key] = undefined;
-        expect(new selectors.GetSelector(key)()).to.deep.equal(selectors.none());
-      });
-      it('for fantastic selector', () => {
-        const key = 'p';
-        selectors.Context.all = selectors.all;
-        expect(() => selectors.GetSelector(key)).to.throw();
-      });
+  describe('#GetSelector(key)', () => {
+    selectors.Context.all = selectors.all();
+    selectors.Context.noSelector = undefined;
+    selectors.Context.none = selectors.none();
+    it('throw exception for invalid keys', () => {
+      expect(() => selectors.GetSelector('strangeKey')).to.throw();
     });
-    describe('ClearContext', () => {
-      it('for exists selector', () => {
-        const key = 'all';
-        selectors.Context[key] = selectors.all();
-        selectors.ClearContext();
-        expect(selectors.Context).to.deep.equal({});
-      });
+    it('Does not throw exception for valid keys', () => {
+      expect(() => selectors.GetSelector('all')).to.not.throw();
     });
-    describe('keyword', () => {
-      it('for exists selector', () => {
-        expect(selectors.keyword('ALL')).to.deep.equal(selectors.all);
-      });
-      it('for fantastic selector', () => {
-        expect(selectors.keyword('hh')).to.deep.equal(selectors.none);
-      });
+    it('return selector which corresponds to sent key', () => {
+      expect(selectors.GetSelector('all')).to.deep.equal(selectors.all());
     });
-    describe('parse', () => {
-      it('for incorrect selector string', () => {
-        expect(selectors.parse('seal 1:10').selector).to.deep.equal(selectors.none());
-        expect(selectors.parse('seal 1:10')).to.have.a.property('error');
-      });
-      it('for correct selector string', () => {
-        expect(selectors.parse('serial 1:10')).to.deep.equal({ selector: selectors.serial(new selectors.Range(1, 10)) });
-      });
+    it('return Noneselector if key corresponds to undefined or empty value', () => {
+      expect(selectors.GetSelector('noSelector')).to.deep.equal(selectors.none());
+    });
+  });
+
+  describe('#ClearContext()', () => {
+    selectors.Context.all = selectors.all();
+    selectors.Context.noSelector = undefined;
+    selectors.Context.none = selectors.none();
+    it('make context to stop containing key which was in it before', () => {
+      expect(selectors.GetSelector('all')).to.deep.equal(selectors.all());
+      selectors.ClearContext();
+      expect(() => selectors.GetSelector('all')).to.throw();
+    });
+  });
+
+  describe('#keyword(key)', () => {
+    selectors.Context.all = selectors.all();
+    selectors.Context.noSelector = undefined;
+    selectors.Context.none = selectors.none();
+    it('return function for creating selector which corresponds to sent key', () => {
+      expect(selectors.keyword('all')).to.deep.equal(selectors.all);
+    });
+    it('return function for creating Noneselector if key corresponds to undefined or empty value', () => {
+      expect(selectors.keyword('strangeKey')).to.deep.equal(selectors.none);
+    });
+    it('return function for creating selector which corresponds to sent key in different case', () => {
+      expect(selectors.keyword('aLl')).to.deep.equal(selectors.all);
+    });
+  });
+
+  describe('#parse(str)', () => {
+    it('for incorrect selector string', () => {
+      expect(selectors.parse('seal 1:10').selector).to.deep.equal(selectors.none());
+      expect(selectors.parse('seal 1:10')).to.have.a.property('error');
+    });
+    it('for correct selector string', () => {
+      expect(selectors.parse('serial 1:10')).to.deep.equal({ selector: selectors.serial(new selectors.Range(1, 10)) });
     });
   });
 

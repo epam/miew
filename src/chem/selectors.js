@@ -402,7 +402,7 @@ selectors.GetSelector = function (key) {
     const exc = { message: `selector ${key} is not registered` };
     throw exc;
   }
-  return selectors.Context[key] || keywords.none;
+  return selectors.Context[key] || NULL_SELECTOR;
 };
 
 selectors.ClearContext = function () {
