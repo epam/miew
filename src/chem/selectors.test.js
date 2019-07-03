@@ -549,199 +549,428 @@ describe('selectors', () => {
     });
   });
 
-  describe('includesAtom function', () => {
-    class AtomName {
-      constructor(name) {
-        this._name = name || null;
-      }
-
-      getString() {
-        return this._name || 'unknown';
-      }
+  class AtomName {
+    constructor(name) {
+      this._name = name || null;
     }
-    const residue = {
-      _type: { _name: 'ALA', flags: 0x0000 }, _chain: { _name: 'A' }, _icode: 'A', _index: 2, _sequence: 4,
-    };
-    const atom = {
-      _het: false, _location: 32, _name: new AtomName('CA'), _residue: residue, _serial: 5, element: { name: 'N' },
-    };
 
-    describe('base selectors', () => {
-      const Flags = {
-        HYDROGEN: 0x0008,
-        NONPOLARH: 0x1008,
-      };
+    getString() {
+      return this._name || 'unknown';
+    }
+  }
+  const residue = {
+    _type: { _name: 'ALA', flags: 0x0000 }, _chain: { _name: 'A' }, _icode: 'A', _index: 2, _sequence: 4,
+  };
+  const atom = {
+    _het: false, _location: 32, _name: new AtomName('CA'), _residue: residue, _serial: 5, element: { name: 'N' },
+  };
 
-      it('Serial', () => {
-        atom._serial = 5;
+  const Flags = {
+    PROTEIN: 0x0001,
+    BASIC: 0x0002,
+    ACIDIC: 0x0004,
+    POLAR: 0x0008,
+    NONPOLAR: 0x0010,
+    AROMATIC: 0x0020,
+    NUCLEIC: 0x0100,
+    PURINE: 0x0200,
+    PYRIMIDINE: 0x0400,
+    DNA: 0x0800,
+    RNA: 0x1000,
+    WATER: 0x10000,
+  };
+
+  describe('SerialSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._serial = 5;
+      it('check on correct including atom', () => {
+        expect(selectors.serial(new selectors.Range(3, 8)).includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
         expect(selectors.serial(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
-        expect(selectors.serial([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
       });
-      it('Name', () => {
-        atom._name._name = 'CA';
+    });
+  });
+
+  describe('NameSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._name._name = 'CA';
+      it('check on correct including atom', () => {
+        expect(selectors.name('CA').includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
         expect(selectors.name('N').includesAtom(atom)).to.equal(false);
-        expect(selectors.name(['N', 'CA']).includesAtom(atom)).to.equal(true);
       });
-      it('AltLoc', () => {
-        atom._location = 32;
+      it('check on not being case sensitive', () => {
+        expect(selectors.name('cA').includesAtom(atom)).to.equal(true);
+      });
+    });
+  });
+
+  describe('AltLocSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._location = 32;
+      it('check on correct including atom', () => {
+        expect(selectors.altloc(' ').includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
         expect(selectors.altloc('A').includesAtom(atom)).to.equal(false);
-        expect(selectors.altloc(['A', ' ']).includesAtom(atom)).to.equal(true);
       });
-      it('Elem', () => {
-        atom.element.name = 'N';
+    });
+  });
+
+  describe('ElemSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom.element.name = 'N';
+      it('check on correct including atom', () => {
+        expect(selectors.elem('N').includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
         expect(selectors.elem('C').includesAtom(atom)).to.equal(false);
-        expect(selectors.elem(['N', 'C']).includesAtom(atom)).to.equal(true);
       });
-      it('Residue', () => {
-        atom._residue._type._name = 'ALA';
+      it('check on not being case sensitive', () => {
+        expect(selectors.elem('n').includesAtom(atom)).to.equal(true);
+      });
+    });
+  });
+
+  describe('ResidueSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._residue._type._name = 'ALA';
+      it('check on correct including atom', () => {
+        expect(selectors.residue('ALA').includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
         expect(selectors.residue('CYS').includesAtom(atom)).to.equal(false);
-        expect(selectors.residue(['THR', 'ALA', 'CYS']).includesAtom(atom)).to.equal(true);
       });
-      it('Sequence', () => {
-        atom._residue._sequence = 4;
-        expect(selectors.sequence(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
-        expect(selectors.sequence([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
+      it('check on not being case sensitive', () => {
+        expect(selectors.residue('AlA').includesAtom(atom)).to.equal(true);
       });
-      it('ICode', () => {
-        atom._residue._icode = 'A';
+    });
+  });
+
+  describe('SequenceSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._residue._sequence = 4;
+      it('check on correct including atom', () => {
+        expect(selectors.sequence(new selectors.Range(2, 18)).includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
+        expect(selectors.sequence(new selectors.Range(5, 8)).includesAtom(atom)).to.equal(false);
+      });
+    });
+  });
+
+  describe('ICodeSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._residue._icode = 'A';
+      it('check on correct including atom', () => {
+        expect(selectors.icode('A').includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
+        expect(selectors.icode('F').includesAtom(atom)).to.equal(false);
+      });
+      it('check on being case sensitive', () => {
         expect(selectors.icode('a').includesAtom(atom)).to.equal(false);
-        expect(selectors.icode(['A', 'b', 'C']).includesAtom(atom)).to.equal(true);
       });
-      it('ResIdx', () => {
-        atom._residue._index = 2;
+    });
+  });
+
+  describe('ResIdxSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._residue._index = 2;
+      it('check on correct including atom', () => {
+        expect(selectors.residx(new selectors.Range(1, 18)).includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
         expect(selectors.residx(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
-        expect(selectors.residx([new selectors.Range(2, 8), new selectors.Range(6, 18)]).includesAtom(atom)).to.equal(true);
       });
-      it('Chain', () => {
-        atom._residue._chain._name = 'B';
+    });
+  });
+
+  describe('ChainSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._residue._chain._name = 'B';
+      it('check on correct including atom', () => {
+        expect(selectors.chain('B').includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding atom', () => {
+        expect(selectors.chain('F').includesAtom(atom)).to.equal(false);
+      });
+      it('check on being case sensitive', () => {
         expect(selectors.chain('b').includesAtom(atom)).to.equal(false);
-        expect(selectors.chain(['A', 'B', 'c']).includesAtom(atom)).to.equal(true);
       });
-      it('Hetatm', () => {
+    });
+  });
+
+  describe('HetatmSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including hetatoms', () => {
         atom._het = true;
         expect(selectors.hetatm().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding hetatoms', () => {
         atom._het = false;
         expect(selectors.hetatm().includesAtom(atom)).to.equal(false);
       });
-      it('PolarH', () => {
-        atom.flags = Flags.HYDROGEN;
+    });
+  });
+
+  describe('PolarHSelector', () => {
+    const atomFlags = {
+      HYDROGEN: 0x0008,
+      NONPOLARH: 0x1008,
+    };
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including atom', () => {
+        atom.flags = atomFlags.HYDROGEN;
         expect(selectors.polarh().includesAtom(atom)).to.equal(true);
-        atom.flags = Flags.NONPOLARH;
+      });
+      it('check on correct excluding atom', () => {
+        atom.flags = atomFlags.NONPOLARH;
         expect(selectors.polarh().includesAtom(atom)).to.equal(false);
       });
-      it('NonPolarH', () => {
-        atom.flags = Flags.NONPOLARH;
+    });
+  });
+
+  describe('NonPolarHSelector', () => {
+    const atomFlags = {
+      HYDROGEN: 0x0008,
+      NONPOLARH: 0x1008,
+    };
+    describe('#includesAtom(atom)', () => {
+      atom._residue._index = 2;
+      it('check on correct including atom', () => {
+        atom.flags = atomFlags.NONPOLARH;
         expect(selectors.nonpolarh().includesAtom(atom)).to.equal(true);
-        atom.flags = Flags.HYDROGEN;
+      });
+      it('check on correct excluding atom', () => {
+        atom.flags = atomFlags.HYDROGEN;
         expect(selectors.nonpolarh().includesAtom(atom)).to.equal(false);
       });
-      it('All', () => {
+    });
+  });
+
+  describe('AllSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._residue._index = 2;
+      it('check on correct including atom', () => {
         expect(selectors.all().includesAtom(atom)).to.equal(true);
       });
-      it('None', () => {
+    });
+  });
+
+  describe('NoneSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      atom._residue._index = 2;
+      it('check on correct excluding atom', () => {
         expect(selectors.none().includesAtom(atom)).to.equal(false);
       });
     });
-    describe('flag selectors', () => {
-      const Flags = {
-        PROTEIN: 0x0001,
-        BASIC: 0x0002,
-        ACIDIC: 0x0004,
-        POLAR: 0x0008,
-        NONPOLAR: 0x0010,
-        AROMATIC: 0x0020,
-        NUCLEIC: 0x0100,
-        PURINE: 0x0200,
-        PYRIMIDINE: 0x0400,
-        DNA: 0x0800,
-        RNA: 0x1000,
-        WATER: 0x10000,
-      };
-      it('Protein', () => {
+  });
+
+  describe('Protein', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including protein atom', () => {
         atom._residue._type.flags = Flags.PROTEIN;
         expect(selectors.protein().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not protein atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.protein().includesAtom(atom)).to.equal(false);
       });
-      it('Basic', () => {
+    });
+  });
+
+  describe('Basic', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including basic atom', () => {
         atom._residue._type.flags = Flags.BASIC;
         expect(selectors.basic().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not basic atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.basic().includesAtom(atom)).to.equal(false);
       });
-      it('Acidic', () => {
+    });
+  });
+
+  describe('Acidic', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including acidic atom', () => {
         atom._residue._type.flags = Flags.ACIDIC;
         expect(selectors.acidic().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not acidic atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.acidic().includesAtom(atom)).to.equal(false);
       });
-      it('Charged', () => {
+    });
+  });
+
+  describe('Charged', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including acidic atom', () => {
         atom._residue._type.flags = Flags.ACIDIC;
         expect(selectors.charged().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct including basic atom', () => {
         atom._residue._type.flags = Flags.BASIC;
         expect(selectors.charged().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not acidic or basic atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.charged().includesAtom(atom)).to.equal(false);
       });
-      it('Polar', () => {
+    });
+  });
+
+  describe('Polar', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including polar atom', () => {
         atom._residue._type.flags = Flags.POLAR;
         expect(selectors.polar().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not polar atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.polar().includesAtom(atom)).to.equal(false);
       });
-      it('NonPolar', () => {
+    });
+  });
+
+  describe('NonPolar', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including nonPolar atom', () => {
         atom._residue._type.flags = Flags.NONPOLAR;
         expect(selectors.nonpolar().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not nonPolar atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.nonpolar().includesAtom(atom)).to.equal(false);
       });
-      it('Aromatic', () => {
+    });
+  });
+
+  describe('Aromatic', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including aromatic atom', () => {
         atom._residue._type.flags = Flags.AROMATIC;
         expect(selectors.aromatic().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not aromatic atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.aromatic().includesAtom(atom)).to.equal(false);
       });
-      it('Nucleic', () => {
+    });
+  });
+
+  describe('Nucleic', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including nucleic atom', () => {
         atom._residue._type.flags = Flags.NUCLEIC;
         expect(selectors.nucleic().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not nucleic atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.nucleic().includesAtom(atom)).to.equal(false);
       });
-      it('Purine', () => {
+    });
+  });
+
+  describe('Purine', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including purine atom', () => {
         atom._residue._type.flags = Flags.PURINE;
         expect(selectors.purine().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not purine atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.purine().includesAtom(atom)).to.equal(false);
       });
-      it('Pyrimidine', () => {
+    });
+  });
+
+  describe('Pyrimidine', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including pyrimidine atom', () => {
         atom._residue._type.flags = Flags.PYRIMIDINE;
         expect(selectors.pyrimidine().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not pyrimidine atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.pyrimidine().includesAtom(atom)).to.equal(false);
       });
-      it('Water', () => {
+    });
+  });
+
+  describe('Water', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on correct including water atom', () => {
         atom._residue._type.flags = Flags.WATER;
         expect(selectors.water().includesAtom(atom)).to.equal(true);
+      });
+      it('check on correct excluding not water atom', () => {
         atom._residue._type.flags = 0x0000;
         expect(selectors.water().includesAtom(atom)).to.equal(false);
       });
     });
-    describe('operators', () => {
-      it('Not', () => {
+  });
+
+  describe('NotSelector', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on invert selector result from false to true', () => {
+        expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.not(selectors.none()).includesAtom(atom)).to.equal(true);
+      });
+      it('check on invert selector result from false to true', () => {
+        expect(selectors.all().includesAtom(atom)).to.equal(true);
         expect(selectors.not(selectors.all()).includesAtom(atom)).to.equal(false);
       });
-      it('And', () => {
-        expect(selectors.and(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
-        expect(selectors.and(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(false);
-        expect(selectors.and(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(false);
-        expect(selectors.and(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
+    });
+  });
+
+  describe('AndOperator', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on conjunction true and true selector results', () => {
+        expect(selectors.all().includesAtom(atom)).to.equal(true);
+        expect(selectors.and(selectors.all(), selectors.all()).includesAtom(atom)).to.equal(true);
       });
-      it('Or', () => {
-        expect(selectors.and(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
+      it('check on conjunction true and false selector results', () => {
+        expect(selectors.all().includesAtom(atom)).to.equal(true);
+        expect(selectors.none().includesAtom(atom)).to.equal(false);
+        expect(selectors.and(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(false);
+      });
+      it('check on conjunction false and true selector results', () => {
+        expect(selectors.all().includesAtom(atom)).to.equal(true);
+        expect(selectors.none().includesAtom(atom)).to.equal(false);
+        expect(selectors.and(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(false);
+      });
+      it('check on conjunction false and false selector results', () => {
+        expect(selectors.none().includesAtom(atom)).to.equal(false);
+        expect(selectors.and(selectors.none(), selectors.none()).includesAtom(atom)).to.equal(false);
+      });
+    });
+  });
+
+  describe('OrOperator', () => {
+    describe('#includesAtom(atom)', () => {
+      it('check on disjunction true and true selector results', () => {
+        expect(selectors.all().includesAtom(atom)).to.equal(true);
+        expect(selectors.or(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
+      });
+      it('check on disjunction true and false selector results', () => {
+        expect(selectors.all().includesAtom(atom)).to.equal(true);
+        expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.or(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(true);
+      });
+      it('check on disjunction false and true selector results', () => {
+        expect(selectors.all().includesAtom(atom)).to.equal(true);
+        expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.or(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(true);
-        expect(selectors.and(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
+      });
+      it('check on disjunction false and false selector results', () => {
+        expect(selectors.none().includesAtom(atom)).to.equal(false);
+        expect(selectors.or(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
       });
     });
   });
