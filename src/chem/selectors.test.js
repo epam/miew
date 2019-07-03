@@ -357,33 +357,31 @@ describe('selectors', () => {
   });
 
   describe('ValueListSelector', () => {
-    const valueList = new selectors.ValueList(['A', 'b'], false);
-    const valueListSelector = new selectors.ValueListSelector(['A', 'b'], true);
+    const values = ['A', 'b'];
+    const valueList = new selectors.ValueList(values, true);
+    const valueLS = new selectors.ValueListSelector(values, false);
+    const valueLSAsString = [valueLS.keyword, valueList.toString()].join(' ');
+    const valueLSAsJSON = [valueLS.name, valueList.toJSON()];
 
-    describe('construcnor', () => {
-      it('keyword', () => {
-        expect(valueListSelector.keyword).to.equal('error');
+    const sensitiveValueList = new selectors.ValueList(values, false);
+    const sensitiveValueLS = new selectors.ValueListSelector(values, true);
+    const sensitiveValueLSAsString = [sensitiveValueLS.keyword, sensitiveValueList.toString()].join(' ');
+    const sensitiveValueLSAsJSON = [sensitiveValueLS.name, sensitiveValueList.toJSON()];
+
+    describe('#toString()', () => {
+      it('construct string for case insensitive selector', () => {
+        expect(valueLS.toString()).to.equal(valueLSAsString);
       });
-      it('name', () => {
-        expect(valueListSelector.name).to.equal('Error');
-      });
-      it('list', () => {
-        expect(valueListSelector.list).to.deep.equal(valueList);
-      });
-      it('caseSensitive list', () => {
-        const vl = new selectors.ValueList(['A', 'b'], true);
-        const vls = new selectors.ValueListSelector(['A', 'b'], false);
-        expect(vls.list).to.deep.equal(vl);
+      it('construct string for case sensitive selector', () => {
+        expect(sensitiveValueLS.toString()).to.equal(sensitiveValueLSAsString);
       });
     });
-    describe('toString', () => {
-      it('toString', () => {
-        expect(valueListSelector.toString()).to.equal(['error', valueList.toString()].join(' '));
+    describe('#toJSON()', () => {
+      it('construct JSON for case insensitive selector', () => {
+        expect(valueLS.toJSON()).to.deep.equal(valueLSAsJSON);
       });
-    });
-    describe('toJSON', () => {
-      it('toJSON', () => {
-        expect(valueListSelector.toJSON()).to.deep.equal(['Error', valueList.toJSON()]);
+      it('construct JSON for case sensitive selector', () => {
+        expect(sensitiveValueLS.toJSON()).to.deep.equal(sensitiveValueLSAsJSON);
       });
     });
   });
