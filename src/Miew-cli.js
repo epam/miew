@@ -35,6 +35,10 @@ RepresentationMap.prototype.get = function (strId) {
 };
 
 RepresentationMap.prototype.add = function (strId, index) {
+  if (strId === -1) {
+    return 'Can not create representation: there is no data';
+  }
+
   if (index !== undefined) {
     if (!this.representationMap.hasOwnProperty(strId)) {
       this.representationMap[strId.toString()] = index;

@@ -1144,6 +1144,10 @@ Menu.prototype._initReprPanel = function () {
   const reprList = $(`${self._menuId} .panel-menu[data-panel-type=miew-menu-panel-representation] .miew-repr-list`);
 
   $(`${self._menuId} .miew-repr-list-controls [data-btn-type=miew-menu-btn-add-repr]`).on('click', () => {
+    if (self._viewer.getComplexVisualsCount() === 0) {
+      return;
+    }
+
     const index = reprList.find('.panel').length;
     if (index > 0) {
       self._copyCurReprListItem(index);

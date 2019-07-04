@@ -786,6 +786,15 @@ Miew.prototype.getVisuals = function () {
 };
 
 /*
+   * Get complex visuals count
+   */
+Miew.prototype.getComplexVisualsCount = function () {
+  let count = 0;
+  this._forEachComplexVisual(() => count++);
+  return count;
+};
+
+/*
    * Get current visual
    */
 Miew.prototype.getCurrentVisual = function () {
