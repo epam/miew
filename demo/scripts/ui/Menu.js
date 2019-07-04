@@ -1086,6 +1086,12 @@ Menu.prototype._initMiewEventListeners = function () {
     self._onResize();
   });
 
+  this._viewer.addEventListener('fetchingFinished', (e) => {
+    if (e.error) {
+      self._updateInfo(e.data);
+    }
+  });
+
   this._viewer.addEventListener('parsingFinished', (e) => {
     self._updateInfo(e.data);
     self._fillSourceList();
