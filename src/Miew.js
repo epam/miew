@@ -2551,6 +2551,7 @@ Miew.prototype._discardComponentEdit = function () {
   this._setEditMode(EDIT_MODE.COMPLEX);
 
   this._needRender = true;
+  this.rebuildAll();
 };
 
 Miew.prototype._enterFragmentEditMode = function () {
