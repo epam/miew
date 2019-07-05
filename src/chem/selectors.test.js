@@ -2,71 +2,83 @@ import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import proxyquire from 'proxyquire';
 import selectors from './selectors';
+import Atom from './Atom';
+import ResidueType from './ResidueType';
 
 chai.use(dirtyChai);
 
 describe('selectors', () => {
-  describe('Range', () => {
-    const range2to7 = new selectors.Range(2, 7);
-    const range2to7asString = '2:7';
-    const range2to7asJSON = [2, 7];
-    const rangeIs2 = new selectors.Range(2);
-    const rangeIs2asString = '2';
-    const rangeIs2asJSON = [2, 2];
+  let rFrom2To8;
+  let rFrom1To14;
+  let rFrom10To12;
+  let rEqual1;
 
-    describe('#includes(value)', () => {
-      it('check range [2,7] for not including 0', () => {
-        expect(range2to7.includes(0)).to.equal(false);
-      });
-      it('check range [2,7] for including 2', () => {
-        expect(range2to7.includes(2)).to.equal(true);
-      });
-      it('check range [2,7] for including 4', () => {
-        expect(range2to7.includes(4)).to.equal(true);
-      });
-      it('check range [2,7] for including 7', () => {
-        expect(range2to7.includes(7)).to.equal(true);
-      });
-      it('check range [2,7] for not including 11', () => {
-        expect(range2to7.includes(11)).to.equal(false);
-      });
-      it('check range [2] for not including -1', () => {
-        expect(rangeIs2.includes(-1)).to.equal(false);
-      });
-      it('check range [2] for including 2', () => {
-        expect(rangeIs2.includes(2)).to.equal(true);
-      });
-      it('check range [2] for not including 7', () => {
-        expect(rangeIs2.includes(7)).to.equal(false);
-      });
-    });
+  let rangeList;
+  let valueList;
+
+  before(() => {
+    rFrom2To8 = new selectors.Range(2, 8);
+    rFrom1To14 = new selectors.Range(1, 14);
+    rFrom10To12 = new selectors.Range(10, 12);
+    rEqual1 = new selectors.Range(2);
+
+
+    rangeList = new selectors.RangeList([rFrom2To8, rFrom1To14, rFrom10To12]);
+    valueList = new selectors.ValueList(['A', 'CA', 'ALA']);
+  });
+
+  describe('Range', () => {
     describe('#toString()', () => {
       it('construct string for two arguments range', () => {
-        expect(range2to7.toString()).to.equal(range2to7asString);
+        expect(rFrom2To8.toString()).to.equal('2:7');
       });
       it('construct string for one argument range', () => {
-        expect(rangeIs2.toString()).to.equal(rangeIs2asString);
+        const rangeIs2asString = '2';
+        expect(rEqual1.toString()).to.equal(rangeIs2asString);
       });
     });
     describe('#toJSON()', () => {
       it('construct JSON for two arguments range', () => {
-        expect(range2to7.toJSON()).to.deep.equal(range2to7asJSON);
+        expect(rFrom2To8.toJSON()).to.deep.equal([2, 7]);
       });
       it('construct JSON for one argument range', () => {
-        expect(rangeIs2.toJSON()).to.deep.equal(rangeIs2asJSON);
+        const rangeIs2asJSON = [2, 2];
+        expect(rEqual1.toJSON()).to.deep.equal(rangeIs2asJSON);
+      });
+    });
+    describe('#includes(value)', () => {
+      it('check range [2,7] for not including 0', () => {
+        expect(rFrom2To8.includes(0)).to.equal(false);
+      });
+      it('check range [2,7] for including 2', () => {
+        expect(rFrom2To8.includes(2)).to.equal(true);
+      });
+      it('check range [2,7] for including 4', () => {
+        expect(rFrom2To8.includes(4)).to.equal(true);
+      });
+      it('check range [2,7] for including 7', () => {
+        expect(rFrom2To8.includes(7)).to.equal(true);
+      });
+      it('check range [2,7] for not including 11', () => {
+        expect(rFrom2To8.includes(11)).to.equal(false);
+      });
+      it('check range [2] for not including -1', () => {
+        expect(rEqual1.includes(-1)).to.equal(false);
+      });
+      it('check range [2] for including 2', () => {
+        expect(rEqual1.includes(2)).to.equal(true);
+      });
+      it('check range [2] for not including 7', () => {
+        expect(rEqual1.includes(7)).to.equal(false);
       });
     });
   });
 
   describe('RangeList', () => {
-    const range0 = new selectors.Range(2, 8);
-    const range1 = new selectors.Range(1, 14);
-    const range2 = new selectors.Range(10, 12);
-
-    const twoRangesRL = new selectors.RangeList([range0, range2]);
-    const twoRangesRLAsString = [range0.toString(), range2.toString()].join(',');
-    const twoRangesRLAsJSON = [range0.toJSON(), range2.toJSON()];
-    const threeRangesRL = new selectors.RangeList([range0, range1, range2]);
+    const twoRangesRL = new selectors.RangeList([rFrom2To8, rFrom10To12]);
+    const twoRangesRLAsString = [rFrom2To8.toString(), rFrom10To12.toString()].join(',');
+    const twoRangesRLAsJSON = [rFrom2To8.toJSON(), rFrom10To12.toJSON()];
+    const threeRangesRL = new selectors.RangeList([rFrom2To8, rFrom1To14, rFrom10To12]);
 
     describe('#includes(value)', () => {
       it('check list for including value which exists in one of ranges', () => {
@@ -96,46 +108,46 @@ describe('selectors', () => {
       it('list begins containing values from appending range', () => {
         const rangeList = new selectors.RangeList();
         expect(rangeList.includes(11)).to.equal(false);
-        rangeList.append(range2);
+        rangeList.append(rFrom10To12);
         expect(rangeList.includes(11)).to.equal(true);
       });
       it('list does not begin containing values outside of appending range', () => {
         const rangeList = new selectors.RangeList();
         expect(rangeList.includes(1)).to.equal(false);
-        rangeList.append(range2);
+        rangeList.append(rFrom10To12);
         expect(rangeList.includes(1)).to.equal(false);
       });
       it('list keeps containing values from previous ranges', () => {
         const rangeList = new selectors.RangeList();
-        rangeList.append(range2);
+        rangeList.append(rFrom10To12);
         expect(rangeList.includes(11)).to.equal(true);
-        rangeList.append(range0);
+        rangeList.append(rFrom2To8);
         expect(rangeList.includes(11)).to.equal(true);
       });
     });
     describe('#remove(value)', () => {
       it('list stops containing values from removing range', () => {
-        const rangeList = new selectors.RangeList(range0);
+        const rangeList = new selectors.RangeList(rFrom2To8);
         expect(rangeList.includes(3)).to.equal(true);
-        rangeList.remove(range0);
+        rangeList.remove(rFrom2To8);
         expect(rangeList.includes(3)).to.equal(false);
       });
       it('list keeps containing values from remaining ranges', () => {
-        const rangeList = new selectors.RangeList([range0, range2]);
+        const rangeList = new selectors.RangeList([rFrom2To8, rFrom10To12]);
         expect(rangeList.includes(11)).to.equal(true);
-        rangeList.remove(range0);
+        rangeList.remove(rFrom2To8);
         expect(rangeList.includes(11)).to.equal(true);
       });
       it('list keeps containing values from remaining ranges even if they also exists in removing range', () => {
-        const rangeList = new selectors.RangeList([range0, range1]);
+        const rangeList = new selectors.RangeList([rFrom2To8, rFrom1To14]);
         expect(rangeList.includes(5)).to.equal(true);
-        rangeList.remove(range0);
+        rangeList.remove(rFrom2To8);
         expect(rangeList.includes(5)).to.equal(true);
       });
       it('list keeps containing values from all ranges when removed range was not existing in list', () => {
-        const rangeList = new selectors.RangeList(range0);
+        const rangeList = new selectors.RangeList(rFrom2To8);
         expect(rangeList.includes(3)).to.equal(true);
-        rangeList.remove(range1);
+        rangeList.remove(rFrom1To14);
         expect(rangeList.includes(3)).to.equal(true);
       });
     });
@@ -338,9 +350,6 @@ describe('selectors', () => {
   });
 
   describe('RangeListSelector', () => {
-    const range0 = new selectors.Range(2, 8);
-    const range1 = new selectors.Range(1, 14);
-    const rangeList = new selectors.RangeList([range0, range1]);
     const rangeListSelector = new selectors.RangeListSelector(rangeList);
     const rangeListSelectorAsString = [rangeListSelector.keyword, rangeList.toString()].join(' ');
     const rangeListSelectorAsJSON = [rangeListSelector.name, rangeList.toJSON()];
@@ -557,7 +566,7 @@ describe('selectors', () => {
         const exc = { message: errorMessage };
         throw exc;
       },
-    }
+    };
     const modifiedSelector = proxyquire('./selectors', { '../utils/SelectionParser': { parser } });
 
     it('returns object with correct selector in selector field if input string is correct selection string', () => {
@@ -580,36 +589,29 @@ describe('selectors', () => {
       return this._name || 'unknown';
     }
   }
-  const residue = {
-    _type: { _name: 'ALA', flags: 0x0000 }, _chain: { _name: 'A' }, _icode: 'A', _index: 2, _sequence: 4,
-  };
-  const atom = {
-    _het: false, _location: 32, _name: new AtomName('CA'), _residue: residue, _serial: 5, element: { name: 'N' },
-  };
 
-  const Flags = {
-    PROTEIN: 0x0001,
-    BASIC: 0x0002,
-    ACIDIC: 0x0004,
-    POLAR: 0x0008,
-    NONPOLAR: 0x0010,
-    AROMATIC: 0x0020,
-    NUCLEIC: 0x0100,
-    PURINE: 0x0200,
-    PYRIMIDINE: 0x0400,
-    DNA: 0x0800,
-    RNA: 0x1000,
-    WATER: 0x10000,
+  const atom = {
+    _serial: 5,
+    _name: new AtomName('CA'),
+    _location: 32,
+    element: { name: 'N' },
+    _residue: {
+      _type: { _name: 'ALA', flags: 0x0000 },
+      _sequence: 4,
+      _icode: 'A',
+      _index: 2,
+      _chain: { _name: 'A' },
+    },
+    _het: false,
   };
 
   describe('SerialSelector', () => {
     describe('#includesAtom(atom)', () => {
-      atom._serial = 5;
       it('check on correct including atom', () => {
-        expect(selectors.serial(new selectors.Range(3, 8)).includesAtom(atom)).to.equal(true);
+        expect(selectors.serial(rFrom1To14).includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding atom', () => {
-        expect(selectors.serial(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
+        expect(selectors.serial(rFrom10To12).includesAtom(atom)).to.equal(false);
       });
     });
   });
@@ -643,7 +645,6 @@ describe('selectors', () => {
 
   describe('ElemSelector', () => {
     describe('#includesAtom(atom)', () => {
-      atom.element.name = 'N';
       it('check on correct including atom', () => {
         expect(selectors.elem('N').includesAtom(atom)).to.equal(true);
       });
@@ -675,10 +676,10 @@ describe('selectors', () => {
     describe('#includesAtom(atom)', () => {
       atom._residue._sequence = 4;
       it('check on correct including atom', () => {
-        expect(selectors.sequence(new selectors.Range(2, 18)).includesAtom(atom)).to.equal(true);
+        expect(selectors.sequence(rFrom1To14).includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding atom', () => {
-        expect(selectors.sequence(new selectors.Range(5, 8)).includesAtom(atom)).to.equal(false);
+        expect(selectors.sequence(rFrom10To12).includesAtom(atom)).to.equal(false);
       });
     });
   });
@@ -702,10 +703,10 @@ describe('selectors', () => {
     describe('#includesAtom(atom)', () => {
       atom._residue._index = 2;
       it('check on correct including atom', () => {
-        expect(selectors.residx(new selectors.Range(1, 18)).includesAtom(atom)).to.equal(true);
+        expect(selectors.residx(rFrom1To14).includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding atom', () => {
-        expect(selectors.residx(new selectors.Range(6, 18)).includesAtom(atom)).to.equal(false);
+        expect(selectors.residx(rFrom10To12).includesAtom(atom)).to.equal(false);
       });
     });
   });
@@ -739,35 +740,27 @@ describe('selectors', () => {
   });
 
   describe('PolarHSelector', () => {
-    const atomFlags = {
-      HYDROGEN: 0x0008,
-      NONPOLARH: 0x1008,
-    };
     describe('#includesAtom(atom)', () => {
       it('check on correct including atom', () => {
-        atom.flags = atomFlags.HYDROGEN;
+        atom.flags = Atom.Flags.HYDROGEN;
         expect(selectors.polarh().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding atom', () => {
-        atom.flags = atomFlags.NONPOLARH;
+        atom.flags = Atom.Flags.NONPOLARH;
         expect(selectors.polarh().includesAtom(atom)).to.equal(false);
       });
     });
   });
 
   describe('NonPolarHSelector', () => {
-    const atomFlags = {
-      HYDROGEN: 0x0008,
-      NONPOLARH: 0x1008,
-    };
     describe('#includesAtom(atom)', () => {
       atom._residue._index = 2;
       it('check on correct including atom', () => {
-        atom.flags = atomFlags.NONPOLARH;
+        atom.flags = Atom.Flags.NONPOLARH;
         expect(selectors.nonpolarh().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding atom', () => {
-        atom.flags = atomFlags.HYDROGEN;
+        atom.flags = Atom.Flags.HYDROGEN;
         expect(selectors.nonpolarh().includesAtom(atom)).to.equal(false);
       });
     });
@@ -794,7 +787,7 @@ describe('selectors', () => {
   describe('Protein', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including protein atom', () => {
-        atom._residue._type.flags = Flags.PROTEIN;
+        atom._residue._type.flags = ResidueType.Flags.PROTEIN;
         expect(selectors.protein().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not protein atom', () => {
@@ -807,7 +800,7 @@ describe('selectors', () => {
   describe('Basic', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including basic atom', () => {
-        atom._residue._type.flags = Flags.BASIC;
+        atom._residue._type.flags = ResidueType.Flags.BASIC;
         expect(selectors.basic().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not basic atom', () => {
@@ -820,7 +813,7 @@ describe('selectors', () => {
   describe('Acidic', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including acidic atom', () => {
-        atom._residue._type.flags = Flags.ACIDIC;
+        atom._residue._type.flags = ResidueType.Flags.ACIDIC;
         expect(selectors.acidic().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not acidic atom', () => {
@@ -833,11 +826,11 @@ describe('selectors', () => {
   describe('Charged', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including acidic atom', () => {
-        atom._residue._type.flags = Flags.ACIDIC;
+        atom._residue._type.flags = ResidueType.Flags.ACIDIC;
         expect(selectors.charged().includesAtom(atom)).to.equal(true);
       });
       it('check on correct including basic atom', () => {
-        atom._residue._type.flags = Flags.BASIC;
+        atom._residue._type.flags = ResidueType.Flags.BASIC;
         expect(selectors.charged().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not acidic or basic atom', () => {
@@ -850,7 +843,7 @@ describe('selectors', () => {
   describe('Polar', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including polar atom', () => {
-        atom._residue._type.flags = Flags.POLAR;
+        atom._residue._type.flags = ResidueType.Flags.POLAR;
         expect(selectors.polar().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not polar atom', () => {
@@ -863,7 +856,7 @@ describe('selectors', () => {
   describe('NonPolar', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including nonPolar atom', () => {
-        atom._residue._type.flags = Flags.NONPOLAR;
+        atom._residue._type.flags = ResidueType.Flags.NONPOLAR;
         expect(selectors.nonpolar().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not nonPolar atom', () => {
@@ -876,7 +869,7 @@ describe('selectors', () => {
   describe('Aromatic', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including aromatic atom', () => {
-        atom._residue._type.flags = Flags.AROMATIC;
+        atom._residue._type.flags = ResidueType.Flags.AROMATIC;
         expect(selectors.aromatic().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not aromatic atom', () => {
@@ -889,7 +882,7 @@ describe('selectors', () => {
   describe('Nucleic', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including nucleic atom', () => {
-        atom._residue._type.flags = Flags.NUCLEIC;
+        atom._residue._type.flags = ResidueType.Flags.NUCLEIC;
         expect(selectors.nucleic().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not nucleic atom', () => {
@@ -902,7 +895,7 @@ describe('selectors', () => {
   describe('Purine', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including purine atom', () => {
-        atom._residue._type.flags = Flags.PURINE;
+        atom._residue._type.flags = ResidueType.Flags.PURINE;
         expect(selectors.purine().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not purine atom', () => {
@@ -915,7 +908,7 @@ describe('selectors', () => {
   describe('Pyrimidine', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including pyrimidine atom', () => {
-        atom._residue._type.flags = Flags.PYRIMIDINE;
+        atom._residue._type.flags = ResidueType.Flags.PYRIMIDINE;
         expect(selectors.pyrimidine().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not pyrimidine atom', () => {
@@ -928,7 +921,7 @@ describe('selectors', () => {
   describe('Water', () => {
     describe('#includesAtom(atom)', () => {
       it('check on correct including water atom', () => {
-        atom._residue._type.flags = Flags.WATER;
+        atom._residue._type.flags = ResidueType.Flags.WATER;
         expect(selectors.water().includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding not water atom', () => {
