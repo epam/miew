@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import ParsingError from './ParsingError';
 
+// Implemented and being tested against: https://www.iucr.org/resources/cif/spec/version1.1/cifsyntax
+
 function _isWhitespace(ch) {
   return ch === 32 || ch === 10 || ch === 13 || ch === 9;
 }
