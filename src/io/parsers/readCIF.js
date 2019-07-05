@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import ParsingError from './ParsingError';
 
 function _isWhitespace(ch) {
   return ch === 32 || ch === 10 || ch === 13 || ch === 9;
@@ -26,8 +27,7 @@ export default function readCIF(source) {
   let line = 1;
   let column = 1;
   let begin;
-  let state = 0; // -1 - stop, 0 - start, 1 - block, 2 - item, 3 - loop, 4 - values, 5 - value, 666 - error
-  let err = 'unexpected character';
+  let state = 0; // 0 - start, 1 - block, 2 - item, 3 - loop, 4 - values, 5 - value
   const result = {};
   let block = {};
   let keys = [];
@@ -52,8 +52,7 @@ export default function readCIF(source) {
       do {
         j = _inlineIndexOf(10, source, j + 1); // '\n'
         if (j === -1) {
-          err = 'unterminated text block found';
-          return null;
+          throw new ParsingError('Unterminated text block found', line, column);
         }
         ++lines;
       } while ((j + 1 < n && source.charCodeAt(j + 1) !== code) || j + 1 >= n);
@@ -70,8 +69,7 @@ export default function readCIF(source) {
       do {
         j = _inlineIndexOf(code, source, j + 1);
         if (j === -1) {
-          err = 'unterminated quoted string found';
-          return null;
+          throw new ParsingError('Unterminated quoted string found', line, column);
         }
       } while (j + 1 < n && !_isWhitespace(source.charCodeAt(j + 1)));
       val = source.substring(i + 1, j);
@@ -143,16 +141,12 @@ export default function readCIF(source) {
             state = 1; // block
             continue; // don't forget to process the whitespace
           } else {
-            err = 'data block name missing';
-            state = 666; // error
-            break;
+            throw new ParsingError('Data block name missing', line, column);
           }
         } else if (Number.isNaN(code)) { // <eof> ....................................................................
           break;
         } else { // ..................................................................................................
-          err += ` in state ${state}`;
-          state = 666; // error
-          break;
+          throw new ParsingError(`Unexpected character in state ${state}`, line, column);
         }
       } else if (state === 1) { // block =============================================================================
         if ((code === 68 || code === 100) && source.substr(i + 1, 4).toLowerCase() === 'ata_') { // 'data_' ..........
@@ -172,17 +166,13 @@ export default function readCIF(source) {
             state = 2; // item
             continue; // don't forget to process the whitespace
           } else {
-            err = 'tag name missing';
-            state = 666; // error
-            break;
+            throw new ParsingError('Tag name missing', line, column);
           }
         } else if ((code === 76 || code === 108) && source.substr(i + 1, 4).toLowerCase() === 'oop_') { // 'loop_' ...
           i += 5;
           column += 5;
           if (i < n && !_isWhitespace(source.charCodeAt(i))) {
-            err += ` in state ${state}`;
-            state = 666; // error
-            break;
+            throw new ParsingError(`Unexpected character in state ${state}`, line, column);
           } else {
             // start new loop
             keys = [];
@@ -195,20 +185,16 @@ export default function readCIF(source) {
         } else if (Number.isNaN(code)) { // <eof> ....................................................................
           break;
         } else { // ..................................................................................................
-          err += ` in state ${state}`;
-          state = 666; // error
-          break;
+          throw new ParsingError(`Unexpected character in state ${state}`, line, column);
         }
       } else if (state === 2) { // item ==============================================================================
         if (Number.isNaN(code)) {
           break;
-        } else if ((value = _parseValue()) !== null) { // eslint-disable-line no-cond-assign
-          _.set(block, key, value);
-          state = 1; // block
-          continue;
         }
-        state = 666;
-        break;
+        value = _parseValue();
+        _.set(block, key, value);
+        state = 1; // block
+        continue;
       } else if (state === 3) { // loop ==============================================================================
         if (code === 95) { // '_' ....................................................................................
           j = i + 1;
@@ -223,9 +209,7 @@ export default function readCIF(source) {
             _storeKey(source.substring(begin, i));
             continue; // don't forget to process the whitespace
           } else {
-            err = 'tag name missing';
-            state = 666; // error
-            break;
+            throw new ParsingError('Tag name missing', line, column);
           }
         } else { // ..................................................................................................
           if (keysCount > 0) {
@@ -237,9 +221,7 @@ export default function readCIF(source) {
             state = 4;
             continue; // parse again in a different state
           }
-          err = 'data tags are missing inside a loop';
-          state = 666; // error
-          break;
+          throw new ParsingError('Data tags are missing inside a loop', line, column);
         }
       } else if (state === 4) { // values ============================================================================
         if ((code === 68 || code === 100) && source.substr(i + 1, 4).toLowerCase() === 'ata_') { // 'data_' ..........
@@ -251,17 +233,11 @@ export default function readCIF(source) {
         } else if (Number.isNaN(code)) { // <eof> ....................................................................
           state = 0;
         } else { // ..................................................................................................
-          if (_storeValue(_parseValue()) !== null) {
-            continue;
-          }
-          state = 666;
-          break;
+          _storeValue(_parseValue());
         }
         continue; // parse again in a different state
       } else { // ====================================================================================================
-        err = `unexpected internal state ${state}`;
-        state = 666; // error
-        break;
+        throw new ParsingError(`Unexpected internal state ${state}`, line, column);
       }
 
       newline = false;
@@ -271,21 +247,8 @@ export default function readCIF(source) {
   }
 
   if (state === 2) { // item
-    err = `unexpected end of file in state ${state}`;
-    state = 666; // error
+    throw new ParsingError(`Unexpected end of file in state ${state}`, line, column);
   }
 
-  const ret = {
-    data: result,
-  };
-
-  if (state === 666) { // error
-    ret.error = {
-      line,
-      column,
-      message: err,
-    };
-  }
-
-  return ret;
+  return result;
 }

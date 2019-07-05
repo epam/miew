@@ -159,11 +159,8 @@ class CIFParser extends Parser {
 
   parseSync() {
     this.logger.info('Parsing CIF file..');
-    const ret = readCIF(this._data);
-    if (ret.error) {
-      throw new Error(ret.error.message);
-    }
-    return this._toComplex(ret.data);
+    const data = readCIF(this._data);
+    return this._toComplex(data);
   }
 
   /**

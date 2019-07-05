@@ -6,6 +6,6 @@ chai.use(dirtyChai);
 
 describe('readCIF()', () => {
   it('accepts empty file', () => {
-    expect(readCIF('')).to.deep.equal({ data: {} });
+    expect(readCIF('')).to.deep.equal({});
   });
 });
