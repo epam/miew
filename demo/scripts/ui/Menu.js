@@ -1141,6 +1141,11 @@ Menu.prototype._initLoadPanel = function () {
     evt.preventDefault();
     return false;
   });
+  // empty input box on panel opening
+  const elem = $(`${this._menuId} .list-group-item[data-value="miew-menu-panel-presets"]`);
+  elem.on('click', () => {
+    self._presetsPanelActionsPdbInputsClear(self);
+  });
 
   this._initPresetsPanelActions();
 };
@@ -1364,7 +1369,7 @@ Menu.prototype._presetsPanelActionsPdbInputsText = function (self, element, even
   const urlType = $(element).data('pdb-url-type');
   self.presetsPanel.inputs[urlType] = $(element).val();
   self.presetsPanel.actions.pdb.inputs.refresh(self);
-  if (event && event.type === 'change' && self.presetsPanel.inputs.isCorrect) {
+  if (event && event.type === 'keyup' && event.keyCode === 13 && self.presetsPanel.inputs.isCorrect) {
     self.presetsPanel.actions.pdb.load(self);
   }
 };
@@ -1397,7 +1402,7 @@ Menu.prototype._initPresetsPanelActions = function () {
     return findAction(parent[current], path);
   };
 
-  $(document).on('click input propertychange paste change', '.presets-panel-action', function (event) {
+  $(document).on('click input propertychange paste keyup', '.presets-panel-action', function (event) {
     if ($(this).hasClass('disabled')) {
       return false;
     }
