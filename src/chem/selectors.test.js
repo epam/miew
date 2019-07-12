@@ -4,6 +4,7 @@ import proxyquire from 'proxyquire';
 import selectors from './selectors';
 import Atom from './Atom';
 import ResidueType from './ResidueType';
+import utils from '../utils';
 
 chai.use(dirtyChai);
 
@@ -66,19 +67,19 @@ describe('selectors', () => {
     rListSelectorAsString = [rListSelector.keyword, rListAsString].join(' ');
     rListSelectorAsJSON = [rListSelector.name, rListAsJSON];
 
-    VaLuE = 'VaLuE';
-    vALue = 'vALue';
+    VaLuE = 'VaLu E';
+    vALue = 'vALu e';
     value45 = 45;
     value78 = 78;
     anotherValue = 'anotherValue';
     values = [value45, VaLuE];
 
     vList = new selectors.ValueList(values);
-    vListAsString = [value45.toString(), VaLuE.toString()].join(',');
+    vListAsString = [value45.toString(), utils.correctSelectorIdentifier(VaLuE.toString())].join(',');
     vListAsJSON = values;
 
     vListOnlyUpper = new selectors.ValueList(values, true);
-    vListOnlyUpperAsString = [value45.toString(), VaLuE.toUpperCase().toString()].join(',');
+    vListOnlyUpperAsString = [value45.toString(), utils.correctSelectorIdentifier(VaLuE.toUpperCase().toString())].join(',');
     vListOnlyUpperAsJSON = [value45, VaLuE.toUpperCase()];
 
     vListSelector = new selectors.ValueListSelector(values, false);
@@ -512,9 +513,6 @@ describe('selectors', () => {
         },
       };
       modifiedSelector = proxyquire('./selectors', { '../utils/SelectionParser': { parser } });
-    });
-    after(() => {
-      '../utils/SelectionParser'.parser.restore();
     });
 
     it('returns object with correct selector in selector field if input string is correct selection string', () => {
