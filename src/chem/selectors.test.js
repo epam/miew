@@ -9,389 +9,426 @@ chai.use(dirtyChai);
 
 describe('selectors', () => {
   let rFrom2To8;
+  let rFrom2To8String;
+  let rFrom2To8JSON;
   let rFrom1To14;
-  let rFrom10To12;
-  let rEqual1;
+  let rFrom18To20;
+  let rEqual2;
+  let rEqual2AsString;
+  let rEqual2AsJSON;
 
-  let rangeList;
-  let valueList;
+  let rList;
+  let rListAsString;
+  let rListAsJSON;
+
+  let rListSelector;
+  let rListSelectorAsString;
+  let rListSelectorAsJSON;
+
+  let VaLuE;
+  let vALue;
+  let value45;
+  let value78;
+  let anotherValue;
+  let values;
+
+  let vList;
+  let vListAsString;
+  let vListAsJSON;
+
+  let vListOnlyUpper;
+  let vListOnlyUpperAsString;
+  let vListOnlyUpperAsJSON;
+
+  let vListSelector;
+  let vListSelectorAsString;
+  let vListSelectorAsJSON;
+
+  let vListSelectorSense;
+  let vListSelectorSenseAsString;
+  let vListSelectorSenseAsJSON;
 
   before(() => {
     rFrom2To8 = new selectors.Range(2, 8);
+    rFrom2To8String = '2:8';
+    rFrom2To8JSON = [2, 8];
     rFrom1To14 = new selectors.Range(1, 14);
-    rFrom10To12 = new selectors.Range(10, 12);
-    rEqual1 = new selectors.Range(2);
+    rFrom18To20 = new selectors.Range(18, 20);
+    rEqual2 = new selectors.Range(2);
+    rEqual2AsString = '2';
+    rEqual2AsJSON = [2, 2];
 
+    rList = new selectors.RangeList([rFrom2To8, rFrom1To14, rFrom18To20]);
+    rListAsString = [rFrom2To8.toString(), rFrom1To14.toString(), rFrom18To20.toString()].join(',');
+    rListAsJSON = [rFrom2To8.toJSON(), rFrom1To14.toJSON(), rFrom18To20.toJSON()];
 
-    rangeList = new selectors.RangeList([rFrom2To8, rFrom1To14, rFrom10To12]);
-    valueList = new selectors.ValueList(['A', 'CA', 'ALA']);
+    rListSelector = new selectors.RangeListSelector(rList);
+    rListSelectorAsString = [rListSelector.keyword, rListAsString].join(' ');
+    rListSelectorAsJSON = [rListSelector.name, rListAsJSON];
+
+    VaLuE = 'VaLuE';
+    vALue = 'vALue';
+    value45 = 45;
+    value78 = 78;
+    anotherValue = 'anotherValue';
+    values = [value45, VaLuE];
+
+    vList = new selectors.ValueList(values);
+    vListAsString = [value45.toString(), VaLuE.toString()].join(',');
+    vListAsJSON = values;
+
+    vListOnlyUpper = new selectors.ValueList(values, true);
+    vListOnlyUpperAsString = [value45.toString(), VaLuE.toUpperCase().toString()].join(',');
+    vListOnlyUpperAsJSON = [value45, VaLuE.toUpperCase()];
+
+    vListSelector = new selectors.ValueListSelector(values, false);
+    vListSelectorAsString = [vListSelector.keyword, vListOnlyUpper.toString()].join(' ');
+    vListSelectorAsJSON = [vListSelector.name, vListOnlyUpper.toJSON()];
+
+    vListSelectorSense = new selectors.ValueListSelector(values, true);
+    vListSelectorSenseAsString = [vListSelectorSense.keyword, vList.toString()].join(' ');
+    vListSelectorSenseAsJSON = [vListSelectorSense.name, vList.toJSON()];
   });
 
   describe('Range', () => {
     describe('#toString()', () => {
-      it('construct string for two arguments range', () => {
-        expect(rFrom2To8.toString()).to.equal('2:7');
+      it('constructs string for two arguments range', () => {
+        expect(rFrom2To8.toString()).to.equal(rFrom2To8String);
       });
-      it('construct string for one argument range', () => {
-        const rangeIs2asString = '2';
-        expect(rEqual1.toString()).to.equal(rangeIs2asString);
+      it('constructs string for one argument range', () => {
+        expect(rEqual2.toString()).to.equal(rEqual2AsString);
       });
     });
     describe('#toJSON()', () => {
-      it('construct JSON for two arguments range', () => {
-        expect(rFrom2To8.toJSON()).to.deep.equal([2, 7]);
+      it('constructs JSON for two arguments range', () => {
+        expect(rFrom2To8.toJSON()).to.deep.equal(rFrom2To8JSON);
       });
-      it('construct JSON for one argument range', () => {
-        const rangeIs2asJSON = [2, 2];
-        expect(rEqual1.toJSON()).to.deep.equal(rangeIs2asJSON);
+      it('constructs JSON for one argument range', () => {
+        expect(rEqual2.toJSON()).to.deep.equal(rEqual2AsJSON);
       });
     });
     describe('#includes(value)', () => {
-      it('check range [2,7] for not including 0', () => {
+      it('does not include value wich is smaller than bottom border', () => {
         expect(rFrom2To8.includes(0)).to.equal(false);
       });
-      it('check range [2,7] for including 2', () => {
+      it('includes value wich is equal to bottom border', () => {
         expect(rFrom2To8.includes(2)).to.equal(true);
       });
-      it('check range [2,7] for including 4', () => {
+      it('includes value wich lies between bottom and top borders', () => {
         expect(rFrom2To8.includes(4)).to.equal(true);
       });
-      it('check range [2,7] for including 7', () => {
+      it('includes value wich is equal to top border', () => {
         expect(rFrom2To8.includes(7)).to.equal(true);
       });
-      it('check range [2,7] for not including 11', () => {
+      it('does not include value wich is igger than top border', () => {
         expect(rFrom2To8.includes(11)).to.equal(false);
       });
-      it('check range [2] for not including -1', () => {
-        expect(rEqual1.includes(-1)).to.equal(false);
+      it('does not include value wich is smaller than single existed', () => {
+        expect(rEqual2.includes(-1)).to.equal(false);
       });
-      it('check range [2] for including 2', () => {
-        expect(rEqual1.includes(2)).to.equal(true);
+      it('includes value wich is equal to single existed', () => {
+        expect(rEqual2.includes(2)).to.equal(true);
       });
-      it('check range [2] for not including 7', () => {
-        expect(rEqual1.includes(7)).to.equal(false);
+      it('does not include value wich is bigger than single existed', () => {
+        expect(rEqual2.includes(7)).to.equal(false);
       });
     });
   });
 
   describe('RangeList', () => {
-    const twoRangesRL = new selectors.RangeList([rFrom2To8, rFrom10To12]);
-    const twoRangesRLAsString = [rFrom2To8.toString(), rFrom10To12.toString()].join(',');
-    const twoRangesRLAsJSON = [rFrom2To8.toJSON(), rFrom10To12.toJSON()];
-    const threeRangesRL = new selectors.RangeList([rFrom2To8, rFrom1To14, rFrom10To12]);
-
-    describe('#includes(value)', () => {
-      it('check list for including value which exists in one of ranges', () => {
-        expect(twoRangesRL.includes(11)).to.equal(true);
-      });
-      it('check list for including value which exists in more than one range', () => {
-        expect(threeRangesRL.includes(11)).to.equal(true);
-      });
-      it('check list for not including value which is between different ranges', () => {
-        expect(twoRangesRL.includes(9)).to.equal(false);
-      });
-      it('check list for not including value which is outside all ranges', () => {
-        expect(twoRangesRL.includes(20)).to.equal(false);
-      });
-    });
     describe('#toString()', () => {
-      it('construct string', () => {
-        expect(twoRangesRL.toString()).to.equal(twoRangesRLAsString);
+      it('constructs string', () => {
+        expect(rList.toString()).to.equal(rListAsString);
       });
     });
     describe('#toJSON()', () => {
-      it('construct JSON', () => {
-        expect(twoRangesRL.toJSON()).to.deep.equal(twoRangesRLAsJSON);
+      it('constructs JSON', () => {
+        expect(rList.toJSON()).to.deep.equal(rListAsJSON);
+      });
+    });
+    describe('#includes(value)', () => {
+      it('includes value which exists in one of ranges', () => {
+        expect(rList.includes(13)).to.equal(true);
+      });
+      it('includes value which exists in more than one range', () => {
+        expect(rList.includes(5)).to.equal(true);
+      });
+      it('does not include value which is between different ranges', () => {
+        expect(rList.includes(17)).to.equal(false);
+      });
+      it('does not include value which is outside all ranges', () => {
+        expect(rList.includes(22)).to.equal(false);
       });
     });
     describe('#append(value)', () => {
-      it('list begins containing values from appending range', () => {
-        const rangeList = new selectors.RangeList();
-        expect(rangeList.includes(11)).to.equal(false);
-        rangeList.append(rFrom10To12);
-        expect(rangeList.includes(11)).to.equal(true);
+      let rangeList;
+      beforeEach(() => {
+        rangeList = new selectors.RangeList();
       });
-      it('list does not begin containing values outside of appending range', () => {
-        const rangeList = new selectors.RangeList();
+
+      it('begins containing values from appending range', () => {
+        expect(rangeList.includes(19)).to.equal(false);
+        rangeList.append(rFrom18To20);
+        expect(rangeList.includes(19)).to.equal(true);
+      });
+      it('does not begin containing values outside of appending range', () => {
         expect(rangeList.includes(1)).to.equal(false);
-        rangeList.append(rFrom10To12);
+        rangeList.append(rFrom18To20);
         expect(rangeList.includes(1)).to.equal(false);
       });
-      it('list keeps containing values from previous ranges', () => {
-        const rangeList = new selectors.RangeList();
-        rangeList.append(rFrom10To12);
-        expect(rangeList.includes(11)).to.equal(true);
+      it('keeps containing values from previous ranges', () => {
+        rangeList.append(rFrom18To20);
+        expect(rangeList.includes(19)).to.equal(true);
         rangeList.append(rFrom2To8);
-        expect(rangeList.includes(11)).to.equal(true);
+        expect(rangeList.includes(19)).to.equal(true);
       });
     });
     describe('#remove(value)', () => {
-      it('list stops containing values from removing range', () => {
-        const rangeList = new selectors.RangeList(rFrom2To8);
-        expect(rangeList.includes(3)).to.equal(true);
-        rangeList.remove(rFrom2To8);
-        expect(rangeList.includes(3)).to.equal(false);
+      let rangeList;
+      beforeEach(() => {
+        rangeList = new selectors.RangeList([rFrom2To8, rFrom1To14, rFrom18To20]);
       });
-      it('list keeps containing values from remaining ranges', () => {
-        const rangeList = new selectors.RangeList([rFrom2To8, rFrom10To12]);
-        expect(rangeList.includes(11)).to.equal(true);
-        rangeList.remove(rFrom2To8);
-        expect(rangeList.includes(11)).to.equal(true);
+      it('stops containing values from removing range', () => {
+        expect(rangeList.includes(19)).to.equal(true);
+        rangeList.remove(rFrom18To20);
+        expect(rangeList.includes(19)).to.equal(false);
       });
-      it('list keeps containing values from remaining ranges even if they also exists in removing range', () => {
-        const rangeList = new selectors.RangeList([rFrom2To8, rFrom1To14]);
+      it('keeps containing values from remaining ranges', () => {
+        expect(rangeList.includes(13)).to.equal(true);
+        rangeList.remove(rFrom18To20);
+        expect(rangeList.includes(13)).to.equal(true);
+      });
+      it('keeps containing values from remaining ranges even if they also exists in removing range', () => {
         expect(rangeList.includes(5)).to.equal(true);
-        rangeList.remove(rFrom2To8);
-        expect(rangeList.includes(5)).to.equal(true);
-      });
-      it('list keeps containing values from all ranges when removed range was not existing in list', () => {
-        const rangeList = new selectors.RangeList(rFrom2To8);
-        expect(rangeList.includes(3)).to.equal(true);
         rangeList.remove(rFrom1To14);
-        expect(rangeList.includes(3)).to.equal(true);
+        expect(rangeList.includes(5)).to.equal(true);
+      });
+      it('keeps containing values from all ranges when removed range was not existing in list', () => {
+        expect(rangeList.includes(2)).to.equal(true);
+        rangeList.remove(rEqual2);
+        expect(rangeList.includes(2)).to.equal(true);
       });
     });
   });
 
   describe('ValueList', () => {
-    const VaLuE1 = 'VaLuE';
-    const vALue1 = 'vALue';
-    const value2 = 45;
-
-    const VL = new selectors.ValueList([value2, VaLuE1]);
-    const VLAsString = [value2.toString(), VaLuE1.toString()].join(',');
-    const VLAsJSON = [value2, VaLuE1];
-    const onlyUpperVL = new selectors.ValueList([value2, VaLuE1], true);
-    const onlyUpperVLAsString = [value2.toString(), VaLuE1.toUpperCase().toString()].join(',');
-    const onlyUpperVLAsJSON = [value2, VaLuE1.toUpperCase()];
-
-    describe('#includes(value)', () => {
-      it('check case sensitive list for including value which exists in it', () => {
-        expect(VL.includes(VaLuE1)).to.equal(true);
-      });
-      it('check case sensitive list for including value which exists in it in different case', () => {
-        expect(VL.includes(vALue1)).to.equal(false);
-      });
-      it('check case sensitive list for including value which does not exist in it', () => {
-        expect(VL.includes('anotherVal')).to.equal(false);
-      });
-      it('check only upper case list for including value which exists in it', () => {
-        expect(onlyUpperVL.includes(VaLuE1.toUpperCase())).to.equal(true);
-      });
-      it('check only upper case list list for including value which exists in it in different case', () => {
-        expect(onlyUpperVL.includes(vALue1)).to.equal(false);
-      });
-      it('check only upper case  list for including value which does not exist in it', () => {
-        expect(onlyUpperVL.includes('anotherVal')).to.equal(false);
-      });
-    });
     describe('#toString()', () => {
-      it('construct string for case sensitive list', () => {
-        expect(VL.toString()).to.equal(VLAsString);
+      it('constructs string for case sensitive list', () => {
+        expect(vList.toString()).to.equal(vListAsString);
       });
-      it('construct string for only upper case  list', () => {
-        expect(onlyUpperVL.toString()).to.equal(onlyUpperVLAsString);
+      it('constructs string for only upper case list', () => {
+        expect(vListOnlyUpper.toString()).to.equal(vListOnlyUpperAsString);
       });
     });
     describe('#toJSON()', () => {
-      it('construct JSON for case sensitive list', () => {
-        expect(VL.toJSON()).to.deep.equal(VLAsJSON);
+      it('constructs JSON for case sensitive list', () => {
+        expect(vList.toJSON()).to.deep.equal(vListAsJSON);
       });
-      it('construct JSON for only upper case  list', () => {
-        expect(onlyUpperVL.toJSON()).to.deep.equal(onlyUpperVLAsJSON);
+      it('constructs JSON for only upper case list', () => {
+        expect(vListOnlyUpper.toJSON()).to.deep.equal(vListOnlyUpperAsJSON);
+      });
+    });
+    describe('#includes(value)', () => {
+      it('includes value which exists in it (case sensitive list)', () => {
+        expect(vList.includes(VaLuE)).to.equal(true);
+      });
+      it('does not include value which exists in it in different case (case sensitive list)', () => {
+        expect(vList.includes(vALue)).to.equal(false);
+      });
+      it('does nit include value which does not exist in it (case sensitive list)', () => {
+        expect(vList.includes(anotherValue)).to.equal(false);
+      });
+      it('includes value which exists in it (only upper case list)', () => {
+        expect(vListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(true);
+      });
+      it('does not include value which exists in it in not upper case (only upper case list)', () => {
+        expect(vListOnlyUpper.includes(vALue)).to.equal(false);
+      });
+      it('does not include value which does not exist in it (only upper case list)', () => {
+        expect(vListOnlyUpper.includes(anotherValue)).to.equal(false);
       });
     });
     describe('#append(value)', () => {
-      it('case sensitive list begins containing appending value', () => {
-        const valueList = new selectors.ValueList();
-        expect(valueList.includes(VaLuE1)).to.equal(false);
-        valueList.append(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
+      let valueList;
+      let valueListOnlyUpper;
+      beforeEach(() => {
+        valueList = new selectors.ValueList();
+        valueListOnlyUpper = new selectors.ValueList(undefined, true);
       });
-      it('case sensitive list does not begin containing appending value in different case', () => {
-        const valueList = new selectors.ValueList();
-        expect(valueList.includes(vALue1)).to.equal(false);
-        valueList.append(VaLuE1);
-        expect(valueList.includes(vALue1)).to.equal(false);
+      it('begins containing appending value (case sensitive list)', () => {
+        expect(valueList.includes(VaLuE)).to.equal(false);
+        valueList.append(VaLuE);
+        expect(valueList.includes(VaLuE)).to.equal(true);
       });
-      it('case sensitive list keeps containing values from previous ranges', () => {
-        const valueList = new selectors.ValueList();
-        valueList.append(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
-        valueList.append(value2);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
+      it('does not begin containing appending value in different case (case sensitive list)', () => {
+        expect(valueList.includes(vALue)).to.equal(false);
+        valueList.append(VaLuE);
+        expect(valueList.includes(vALue)).to.equal(false);
       });
-      it('only upper case list begins containing upper case version of appending value', () => {
-        const valueList = new selectors.ValueList(undefined, true);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(false);
-        valueList.append(VaLuE1);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+      it('keeps containing values from previous ranges (case sensitive list)', () => {
+        valueList.append(VaLuE);
+        expect(valueList.includes(VaLuE)).to.equal(true);
+        valueList.append(value45);
+        expect(valueList.includes(VaLuE)).to.equal(true);
       });
-      it('only upper case list begins containing appending value even if it is not string', () => {
-        const valueList = new selectors.ValueList(undefined, true);
-        expect(valueList.includes(value2)).to.equal(false);
-        valueList.append(value2);
-        expect(valueList.includes(value2)).to.equal(true);
+      it('begins containing upper case version of appending value (only upper case list)', () => {
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(false);
+        valueListOnlyUpper.append(VaLuE);
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(true);
       });
-      it('only upper case list does not begin containing not upper case version of appending value', () => {
-        const valueList = new selectors.ValueList(undefined, true);
-        expect(valueList.includes(VaLuE1)).to.equal(false);
-        valueList.append(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(false);
+      it('begins containing appending value even if it is not string (only upper case list)', () => {
+        expect(valueListOnlyUpper.includes(value45)).to.equal(false);
+        valueListOnlyUpper.append(value45);
+        expect(valueListOnlyUpper.includes(value45)).to.equal(true);
       });
-      it('only upper case list keeps containing values from previous ranges', () => {
-        const valueList = new selectors.ValueList(undefined, true);
-        valueList.append(VaLuE1);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
-        valueList.append(value2);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+      it('does not begin containing not upper case version of appending value (only upper case list)', () => {
+        expect(valueListOnlyUpper.includes(VaLuE)).to.equal(false);
+        valueListOnlyUpper.append(VaLuE);
+        expect(valueListOnlyUpper.includes(VaLuE)).to.equal(false);
+      });
+      it('keeps containing values from previous ranges (only upper case list)', () => {
+        valueListOnlyUpper.append(VaLuE);
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(true);
+        valueListOnlyUpper.append(value45);
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(true);
       });
     });
     describe('#remove(value)', () => {
-      it('case sensitive list stops containing removing value', () => {
-        const valueList = new selectors.ValueList(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
-        valueList.remove(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(false);
+      let valueList;
+      let valueListOnlyUpper;
+      beforeEach(() => {
+        valueList = new selectors.ValueList([VaLuE, value45, value45]);
+        valueListOnlyUpper = new selectors.ValueList([VaLuE, value45, value45, value78], true);
       });
-      it('case sensitive list keeps containing remaining values', () => {
-        const valueList = new selectors.ValueList([VaLuE1, value2]);
-        expect(valueList.includes(value2)).to.equal(true);
-        valueList.remove(VaLuE1);
-        expect(valueList.includes(value2)).to.equal(true);
+      it('stops containing removing value (case sensitive list)', () => {
+        expect(valueList.includes(VaLuE)).to.equal(true);
+        valueList.remove(VaLuE);
+        expect(valueList.includes(VaLuE)).to.equal(false);
       });
-      it('case sensitive list which contains two equal values keeps containing one of them after deleting another', () => {
-        const valueList = new selectors.ValueList([VaLuE1, VaLuE1]);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
-        valueList.remove(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
-        valueList.remove(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(false);
+      it('keeps containing remaining values (case sensitive list)', () => {
+        expect(valueList.includes(value45)).to.equal(true);
+        valueList.remove(VaLuE);
+        expect(valueList.includes(value45)).to.equal(true);
       });
-      it('case sensitive list keeps containing all values when removed value was not existing in list', () => {
-        const valueList = new selectors.ValueList(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
-        valueList.remove('anotherValue');
-        expect(valueList.includes(VaLuE1)).to.equal(true);
+      it('keeps containing one of two equal values after deleting another (case sensitive list)', () => {
+        expect(valueList.includes(value45)).to.equal(true);
+        valueList.remove(value45);
+        expect(valueList.includes(value45)).to.equal(true);
+        valueList.remove(value45);
+        expect(valueList.includes(value45)).to.equal(false);
       });
-      it('case sensitive list keeps containing all values when removed value was not existing in list in such case', () => {
-        const valueList = new selectors.ValueList(VaLuE1);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
-        valueList.remove(vALue1);
-        expect(valueList.includes(VaLuE1)).to.equal(true);
+      it('keeps containing all values when removed value was not existing in it (case sensitive list)', () => {
+        expect(valueList.includes(VaLuE)).to.equal(true);
+        valueList.remove(anotherValue);
+        expect(valueList.includes(VaLuE)).to.equal(true);
       });
-      it('only upper case  list stops containing removing value', () => {
-        const valueList = new selectors.ValueList(VaLuE1, true);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
-        valueList.remove(VaLuE1.toUpperCase());
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(false);
+      it('keeps containing all values when removed value was not existing in list in such case (case sensitive list)', () => {
+        expect(valueList.includes(VaLuE)).to.equal(true);
+        valueList.remove(vALue);
+        expect(valueList.includes(VaLuE)).to.equal(true);
       });
-      it('only upper case list stops containing removing value even if it is not string', () => {
-        const valueList = new selectors.ValueList(value2, true);
-        expect(valueList.includes(value2)).to.equal(true);
-        valueList.remove(value2);
-        expect(valueList.includes(value2)).to.equal(false);
+      it('stops containing removing value (only upper case list)', () => {
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(true);
+        valueListOnlyUpper.remove(VaLuE.toUpperCase());
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(false);
       });
-      it('only upper case list stops containing removing value even if it was sent not in upper case', () => {
-        const valueList = new selectors.ValueList(VaLuE1, true);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
-        valueList.remove(vALue1);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(false);
+      it('stops containing removing value even if it is not string (only upper case list)', () => {
+        expect(valueListOnlyUpper.includes(value78)).to.equal(true);
+        valueListOnlyUpper.remove(value78);
+        expect(valueListOnlyUpper.includes(value78)).to.equal(false);
       });
-      it('only upper case keeps containing remaining values', () => {
-        const valueList = new selectors.ValueList([VaLuE1, value2], true);
-        expect(valueList.includes(value2)).to.equal(true);
-        valueList.remove(VaLuE1);
-        expect(valueList.includes(value2)).to.equal(true);
+      it('stops containing removing value even if it was sent not in upper case (only upper case list)', () => {
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(true);
+        valueListOnlyUpper.remove(vALue);
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(false);
       });
-      it('only upper case list which contains two equal values keeps containing one of them after deleting another', () => {
-        const valueList = new selectors.ValueList([VaLuE1, VaLuE1], true);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
-        valueList.remove(VaLuE1);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
-        valueList.remove(VaLuE1);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(false);
+      it('keeps containing remaining values', () => {
+        expect(valueListOnlyUpper.includes(value45)).to.equal(true);
+        valueListOnlyUpper.remove(VaLuE);
+        expect(valueListOnlyUpper.includes(value45)).to.equal(true);
       });
-      it('only upper case list keeps containing all values when removed value was not existing in list', () => {
-        const valueList = new selectors.ValueList(VaLuE1, true);
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
-        valueList.remove('anotherValue');
-        expect(valueList.includes(VaLuE1.toUpperCase())).to.equal(true);
+      it('keeps containing one of two equal values after deleting another (only upper case list)', () => {
+        expect(valueListOnlyUpper.includes(value45)).to.equal(true);
+        valueListOnlyUpper.remove(value45);
+        expect(valueListOnlyUpper.includes(value45)).to.equal(true);
+        valueListOnlyUpper.remove(value45);
+        expect(valueListOnlyUpper.includes(value45)).to.equal(false);
+      });
+      it('keeps containing all values when removed value was not existing in it (only upper case list)', () => {
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(true);
+        valueListOnlyUpper.remove(anotherValue);
+        expect(valueListOnlyUpper.includes(VaLuE.toUpperCase())).to.equal(true);
       });
     });
   });
 
   describe('Selector', () => {
-    const defaultSelector = new selectors.Selector();
-    const defaultSelectorAsString = 'error';
-    const defaultSelectorAsJSON = ['Error'];
-    const newSelector = new selectors.Selector();
-    newSelector.keyword = 'newSelectorKeyword';
-    newSelector.name = 'newSelectorName';
-    const newSelectorAsString = newSelector.keyword;
-    const newSelectorAsJSON = [newSelector.name];
+    let defaultSelector = new selectors.Selector();
+    let defaultSelectorAsString = 'error';
+    let defaultSelectorAsJSON = ['Error'];
+
+    let newSelector = new selectors.Selector();
+    let newSelectorAsString = newSelector.keyword;
+    let newSelectorAsJSON = [newSelector.name];
+
+    before(() => {
+      defaultSelector = new selectors.Selector();
+      defaultSelectorAsString = 'error';
+      defaultSelectorAsJSON = ['Error'];
+
+      newSelector = new selectors.Selector();
+      newSelector.keyword = 'newSelectorKeyword';
+      newSelector.name = 'newSelectorName';
+      newSelectorAsString = newSelector.keyword;
+      newSelectorAsJSON = [newSelector.name];
+    });
 
     describe('#toString()', () => {
-      it('construct string for default selector', () => {
+      it('constructs string for default selector', () => {
         expect(defaultSelector.toString()).to.equal(defaultSelectorAsString);
       });
-      it('construct string for selector with modified keyword', () => {
+      it('constructs string for selector with modified keyword', () => {
         expect(newSelector.toString()).to.equal(newSelectorAsString);
       });
     });
     describe('#toJSON()', () => {
-      it('construct JSON for default selector', () => {
+      it('constructs JSON for default selector', () => {
         expect(defaultSelector.toJSON()).to.deep.equal(defaultSelectorAsJSON);
       });
-      it('construct JSON for selector with modified name', () => {
+      it('constructs JSON for selector with modified name', () => {
         expect(newSelector.toJSON()).to.deep.equal(newSelectorAsJSON);
       });
     });
   });
 
   describe('RangeListSelector', () => {
-    const rangeListSelector = new selectors.RangeListSelector(rangeList);
-    const rangeListSelectorAsString = [rangeListSelector.keyword, rangeList.toString()].join(' ');
-    const rangeListSelectorAsJSON = [rangeListSelector.name, rangeList.toJSON()];
-
     describe('#toString()', () => {
-      it('construct string', () => {
-        expect(rangeListSelector.toString()).to.equal(rangeListSelectorAsString);
+      it('constructs string', () => {
+        expect(rListSelector.toString()).to.equal(rListSelectorAsString);
       });
     });
     describe('#toJSON()', () => {
-      it('construct JSON', () => {
-        expect(rangeListSelector.toJSON()).to.deep.equal(rangeListSelectorAsJSON);
+      it('constructs JSON', () => {
+        expect(rListSelector.toJSON()).to.deep.equal(rListSelectorAsJSON);
       });
     });
   });
 
   describe('ValueListSelector', () => {
-    const values = ['A', 'b'];
-    const valueList = new selectors.ValueList(values, true);
-    const valueLS = new selectors.ValueListSelector(values, false);
-    const valueLSAsString = [valueLS.keyword, valueList.toString()].join(' ');
-    const valueLSAsJSON = [valueLS.name, valueList.toJSON()];
-
-    const sensitiveValueList = new selectors.ValueList(values, false);
-    const sensitiveValueLS = new selectors.ValueListSelector(values, true);
-    const sensitiveValueLSAsString = [sensitiveValueLS.keyword, sensitiveValueList.toString()].join(' ');
-    const sensitiveValueLSAsJSON = [sensitiveValueLS.name, sensitiveValueList.toJSON()];
-
     describe('#toString()', () => {
-      it('construct string for case insensitive selector', () => {
-        expect(valueLS.toString()).to.equal(valueLSAsString);
+      it('constructs string for case insensitive selector', () => {
+        expect(vListSelector.toString()).to.equal(vListSelectorAsString);
       });
-      it('construct string for case sensitive selector', () => {
-        expect(sensitiveValueLS.toString()).to.equal(sensitiveValueLSAsString);
+      it('constructs string for case sensitive selector', () => {
+        expect(vListSelectorSense.toString()).to.equal(vListSelectorSenseAsString);
       });
     });
     describe('#toJSON()', () => {
-      it('construct JSON for case insensitive selector', () => {
-        expect(valueLS.toJSON()).to.deep.equal(valueLSAsJSON);
+      it('constructs JSON for case insensitive selector', () => {
+        expect(vListSelector.toJSON()).to.deep.equal(vListSelectorAsJSON);
       });
-      it('construct JSON for case sensitive selector', () => {
-        expect(sensitiveValueLS.toJSON()).to.deep.equal(sensitiveValueLSAsJSON);
+      it('constructs JSON for case sensitive selector', () => {
+        expect(vListSelectorSense.toJSON()).to.deep.equal(vListSelectorSenseAsJSON);
       });
     });
   });
@@ -611,7 +648,7 @@ describe('selectors', () => {
         expect(selectors.serial(rFrom1To14).includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding atom', () => {
-        expect(selectors.serial(rFrom10To12).includesAtom(atom)).to.equal(false);
+        expect(selectors.serial(rFrom18To20).includesAtom(atom)).to.equal(false);
       });
     });
   });
@@ -679,7 +716,7 @@ describe('selectors', () => {
         expect(selectors.sequence(rFrom1To14).includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding atom', () => {
-        expect(selectors.sequence(rFrom10To12).includesAtom(atom)).to.equal(false);
+        expect(selectors.sequence(rFrom18To20).includesAtom(atom)).to.equal(false);
       });
     });
   });
@@ -706,7 +743,7 @@ describe('selectors', () => {
         expect(selectors.residx(rFrom1To14).includesAtom(atom)).to.equal(true);
       });
       it('check on correct excluding atom', () => {
-        expect(selectors.residx(rFrom10To12).includesAtom(atom)).to.equal(false);
+        expect(selectors.residx(rFrom18To20).includesAtom(atom)).to.equal(false);
       });
     });
   });
