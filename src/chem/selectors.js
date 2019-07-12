@@ -365,7 +365,7 @@ class InfixOperator extends Selector {
 
 InfixOperator.prototype.priority = 1000;
 
-defineOperator('Not', 1, class NotSelector extends PrefixOperator {
+defineOperator('Not', 1, class NotOperator extends PrefixOperator {
   includesAtom(atom) {
     return !this.rhs.includesAtom(atom);
   }
