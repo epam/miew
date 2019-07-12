@@ -854,34 +854,49 @@ describe('selectors', () => {
   });
 
   describe('PrefixOperator', () => {
-    const noneSelector = selectors.none();
-    const noArgumentedPO = new selectors.PrefixOperator();
-    const noArgumentedPOAsString = [noArgumentedPO.keyword, noneSelector.toString()].join(' ');
-    const noArgumentedPOAsJSON = [noArgumentedPO.name, noneSelector.toJSON()];
+    let noneSelector;
+    let selector;
 
-    const selector = selectors.all();
-    selector.keyword = 'selector';
-    const simplePO = new selectors.PrefixOperator(selector);
-    const simplePOAsString = [simplePO.keyword, selector.toString()].join(' ');
-    const simplePOAsJSON = [simplePO.name, selector.toJSON()];
+    let noArgumentedPO;
+    let noArgumentedPOAsString;
+    let noArgumentedPOAsJSON;
 
-    const middlePriorityPO = new selectors.PrefixOperator(selector);
-    middlePriorityPO.keyword = 'middlePO';
+    let simplePO;
+    let simplePOAsString;
+    let simplePOAsJSON;
+
+    let middlePriorityPO;
+
+    before(() => {
+      noneSelector = selectors.none();
+      noArgumentedPO = new selectors.PrefixOperator();
+      noArgumentedPOAsString = [noArgumentedPO.keyword, noneSelector.toString()].join(' ');
+      noArgumentedPOAsJSON = [noArgumentedPO.name, noneSelector.toJSON()];
+
+      selector = selectors.all();
+      selector.keyword = 'selector';
+      simplePO = new selectors.PrefixOperator(selector);
+      simplePOAsString = [simplePO.keyword, selector.toString()].join(' ');
+      simplePOAsJSON = [simplePO.name, selector.toJSON()];
+
+      middlePriorityPO = new selectors.PrefixOperator(selector);
+      middlePriorityPO.keyword = 'middlePO';
+    });
 
     describe('#toString()', () => {
-      it('construct string for prefix operator created with no arguments', () => {
+      it('constructs string for prefix operator created with no arguments', () => {
         expect(noArgumentedPO.toString()).to.equal(noArgumentedPOAsString);
       });
-      it('construct string for simple prefix operator', () => {
+      it('constructs string for simple prefix operator', () => {
         expect(simplePO.toString()).to.equal(simplePOAsString);
       });
-      it('construct string for higher priority prefix operator from lower priority...', () => {
+      it('constructs string for higher priority prefix operator from lower priority...', () => {
         const highPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
         highPriorityPO.priority = selectors.PrefixOperator.prototype.priority - 1;
         highPriorityPO.keyword = 'highestPO';
         expect(highPriorityPO.toString()).to.equal('highestPO (middlePO selector)');
       });
-      it('construct string for lower priority prefix operator from higher priority...', () => {
+      it('constructs string for lower priority prefix operator from higher priority...', () => {
         const lowPriorityPO = new selectors.PrefixOperator(middlePriorityPO);
         lowPriorityPO.priority = selectors.PrefixOperator.prototype.priority + 1;
         lowPriorityPO.keyword = 'lowestPO';
@@ -889,92 +904,114 @@ describe('selectors', () => {
       });
     });
     describe('#toJSON()', () => {
-      it('construct JSON for prefix operator created with no arguments', () => {
+      it('constructs JSON for prefix operator created with no arguments', () => {
         expect(noArgumentedPO.toJSON()).to.deep.equal(noArgumentedPOAsJSON);
       });
-      it('construct JSON for simple prefix operator', () => {
+      it('constructs JSON for simple prefix operator', () => {
         expect(simplePO.toJSON()).to.deep.equal(simplePOAsJSON);
       });
     });
   });
 
   describe('InfixOperator', () => {
-    const noneSelector = selectors.none();
-    const letfSelector = selectors.all();
-    letfSelector.keyword = 'lSelector';
-    const rightSelector = selectors.all();
-    rightSelector.keyword = 'rSelector';
+    let noneSelector;
+    let letfSelector;
+    let rightSelector;
 
-    const noneSelectorIO = new selectors.InfixOperator();
-    const noneSelectorIOAsString = [noneSelector.toString(), noneSelectorIO.keyword, noneSelector.toString()].join(' ');
-    const noneSelectorIOAsJSON = [noneSelectorIO.name, noneSelector.toJSON(), noneSelector.toJSON()];
+    let noneSelectorIO;
+    let noneSelectorIOAsString;
+    let noneSelectorIOAsJSON;
 
-    const halfSelectorIO = new selectors.InfixOperator(letfSelector);
-    const halfSelectorIOAsString = [letfSelector.toString(), halfSelectorIO.keyword, noneSelector.toString()].join(' ');
-    const halfSelectorIOAsJSON = [halfSelectorIO.name, letfSelector.toJSON(), noneSelector.toJSON()];
+    let halfSelectorIO;
+    let halfSelectorIOAsString;
+    let halfSelectorIOAsJSON;
 
-    const selectorIO = new selectors.InfixOperator(letfSelector, rightSelector);
-    const selectorIOAsString = [letfSelector.toString(), selectorIO.keyword, rightSelector.toString()].join(' ');
-    const selectorIOAsJSON = [selectorIO.name, letfSelector.toJSON(), rightSelector.toJSON()];
+    let selectorIO;
+    let selectorIOAsString;
+    let selectorIOAsJSON;
 
-    const highPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
-    highPriorityIO.priority = selectors.InfixOperator.prototype.priority - 2;
-    highPriorityIO.keyword = '^';
-    const lowPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
-    lowPriorityIO.priority = selectors.InfixOperator.prototype.priority + 2;
-    lowPriorityIO.keyword = '+';
+    let highPriorityIO;
+    let lowPriorityIO;
+
+    before(() => {
+      noneSelector = selectors.none();
+      letfSelector = selectors.all();
+      letfSelector.keyword = 'lSelector';
+      rightSelector = selectors.all();
+      rightSelector.keyword = 'rSelector';
+
+      noneSelectorIO = new selectors.InfixOperator();
+      noneSelectorIOAsString = [noneSelector.toString(), noneSelectorIO.keyword, noneSelector.toString()].join(' ');
+      noneSelectorIOAsJSON = [noneSelectorIO.name, noneSelector.toJSON(), noneSelector.toJSON()];
+
+      halfSelectorIO = new selectors.InfixOperator(letfSelector);
+      halfSelectorIOAsString = [letfSelector.toString(), halfSelectorIO.keyword, noneSelector.toString()].join(' ');
+      halfSelectorIOAsJSON = [halfSelectorIO.name, letfSelector.toJSON(), noneSelector.toJSON()];
+
+      selectorIO = new selectors.InfixOperator(letfSelector, rightSelector);
+      selectorIOAsString = [letfSelector.toString(), selectorIO.keyword, rightSelector.toString()].join(' ');
+      selectorIOAsJSON = [selectorIO.name, letfSelector.toJSON(), rightSelector.toJSON()];
+
+      highPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
+      highPriorityIO.priority = selectors.InfixOperator.prototype.priority - 2;
+      highPriorityIO.keyword = '^';
+
+      lowPriorityIO = new selectors.InfixOperator(letfSelector, rightSelector);
+      lowPriorityIO.priority = selectors.InfixOperator.prototype.priority + 2;
+      lowPriorityIO.keyword = '+';
+    });
 
     describe('#toString()', () => {
-      it('construct string for infix operator with no arguments', () => {
+      it('constructs string for infix operator with no arguments', () => {
         expect(noneSelectorIO.toString()).to.equal(noneSelectorIOAsString);
       });
-      it('construct string for infix operator with one argument', () => {
+      it('constructs string for infix operator with one argument', () => {
         expect(halfSelectorIO.toString()).to.equal(halfSelectorIOAsString);
       });
-      it('construct string for simple infix operator', () => {
+      it('constructs string for simple infix operator', () => {
         expect(selectorIO.toString()).to.equal(selectorIOAsString);
       });
-      it('construct string for complex infix operator with follow preorities: middle(high, low)', () => {
-        const complexPO = new selectors.InfixOperator(highPriorityIO, lowPriorityIO);
-        complexPO.keyword = '*';
-        expect(complexPO.toString()).to.equal('lSelector ^ rSelector * (lSelector + rSelector)');
+      it('constructs string for complex infix operator with follow preorities: middle(high, low)', () => {
+        const complexIO = new selectors.InfixOperator(highPriorityIO, lowPriorityIO);
+        complexIO.keyword = '*';
+        expect(complexIO.toString()).to.equal('lSelector ^ rSelector * (lSelector + rSelector)');
       });
-      it('construct string for complex infix operator with follow preorities: middle(low, high)', () => {
-        const complexPO = new selectors.InfixOperator(lowPriorityIO, highPriorityIO);
-        complexPO.keyword = '*';
-        expect(complexPO.toString()).to.equal('(lSelector + rSelector) * lSelector ^ rSelector');
+      it('constructs string for complex infix operator with follow preorities: middle(low, high)', () => {
+        const complexIO = new selectors.InfixOperator(lowPriorityIO, highPriorityIO);
+        complexIO.keyword = '*';
+        expect(complexIO.toString()).to.equal('(lSelector + rSelector) * lSelector ^ rSelector');
       });
-      it('construct string for complex infix operator with follow preorities: middle(low, low)', () => {
-        const complexPO = new selectors.InfixOperator(lowPriorityIO, lowPriorityIO);
-        complexPO.keyword = '*';
-        expect(complexPO.toString()).to.equal('(lSelector + rSelector) * (lSelector + rSelector)');
+      it('constructs string for complex infix operator with follow preorities: middle(low, low)', () => {
+        const complexIO = new selectors.InfixOperator(lowPriorityIO, lowPriorityIO);
+        complexIO.keyword = '*';
+        expect(complexIO.toString()).to.equal('(lSelector + rSelector) * (lSelector + rSelector)');
       });
-      it('construct string for complex infix operator with follow preorities: middle(high, high)', () => {
-        const complexPO = new selectors.InfixOperator(highPriorityIO, highPriorityIO);
-        complexPO.keyword = '*';
-        expect(complexPO.toString()).to.equal('lSelector ^ rSelector * lSelector ^ rSelector');
+      it('constructs string for complex infix operator with follow preorities: middle(high, high)', () => {
+        const complexIO = new selectors.InfixOperator(highPriorityIO, highPriorityIO);
+        complexIO.keyword = '*';
+        expect(complexIO.toString()).to.equal('lSelector ^ rSelector * lSelector ^ rSelector');
       });
     });
     describe('#toJSON()', () => {
-      it('construct JSON for infix operator with no arguments', () => {
+      it('constructs JSON for infix operator with no arguments', () => {
         expect(noneSelectorIO.toJSON()).to.deep.equal(noneSelectorIOAsJSON);
       });
-      it('construct JSON for infix operator with one argument', () => {
+      it('constructs JSON for infix operator with one argument', () => {
         expect(halfSelectorIO.toJSON()).to.deep.equal(halfSelectorIOAsJSON);
       });
-      it('construct JSON for simple infix operator', () => {
+      it('constructs JSON for simple infix operator', () => {
         expect(selectorIO.toJSON()).to.deep.equal(selectorIOAsJSON);
       });
     });
   });
 
-  describe('NotSelector', () => {
+  describe('NotOperator', () => {
     describe('#includesAtom(atom)', () => {
-      it('check on invert selector result from false to true', () => {
+      it('inverts false to true', () => {
         expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.not(selectors.none()).includesAtom(atom)).to.equal(true);
       });
-      it('check on invert selector result from false to true', () => {
+      it('inverts true to false', () => {
         expect(selectors.all().includesAtom(atom)).to.equal(true);
         expect(selectors.not(selectors.all()).includesAtom(atom)).to.equal(false);
       });
@@ -983,21 +1020,21 @@ describe('selectors', () => {
 
   describe('AndOperator', () => {
     describe('#includesAtom(atom)', () => {
-      it('check on conjunction true and true selector results', () => {
+      it('gives true for true and true selectors results', () => {
         expect(selectors.all().includesAtom(atom)).to.equal(true);
         expect(selectors.and(selectors.all(), selectors.all()).includesAtom(atom)).to.equal(true);
       });
-      it('check on conjunction true and false selector results', () => {
+      it('gives false for true and false selectors results', () => {
         expect(selectors.all().includesAtom(atom)).to.equal(true);
         expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.and(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(false);
       });
-      it('check on conjunction false and true selector results', () => {
+      it('gives false for false and true selectors results', () => {
         expect(selectors.all().includesAtom(atom)).to.equal(true);
         expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.and(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(false);
       });
-      it('check on conjunction false and false selector results', () => {
+      it('gives false for false and false selectors results', () => {
         expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.and(selectors.none(), selectors.none()).includesAtom(atom)).to.equal(false);
       });
@@ -1006,21 +1043,21 @@ describe('selectors', () => {
 
   describe('OrOperator', () => {
     describe('#includesAtom(atom)', () => {
-      it('check on disjunction true and true selector results', () => {
+      it('gives true for true and true selector results', () => {
         expect(selectors.all().includesAtom(atom)).to.equal(true);
         expect(selectors.or(selectors.all(), selectors.not(selectors.none())).includesAtom(atom)).to.equal(true);
       });
-      it('check on disjunction true and false selector results', () => {
+      it('gives true for true and false selector results', () => {
         expect(selectors.all().includesAtom(atom)).to.equal(true);
         expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.or(selectors.all(), selectors.none()).includesAtom(atom)).to.equal(true);
       });
-      it('check on disjunction false and true selector results', () => {
+      it('gives true for false and true selector results', () => {
         expect(selectors.all().includesAtom(atom)).to.equal(true);
         expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.or(selectors.none(), selectors.all()).includesAtom(atom)).to.equal(true);
       });
-      it('check on disjunction false and false selector results', () => {
+      it('gives false for false and false selector results', () => {
         expect(selectors.none().includesAtom(atom)).to.equal(false);
         expect(selectors.or(selectors.not(selectors.all()), selectors.none()).includesAtom(atom)).to.equal(false);
       });
