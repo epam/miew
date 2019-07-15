@@ -2922,6 +2922,43 @@ Miew.prototype.setPivotAtom = function (atom) {
   this.dispatchEvent({ type: 'transform' });
 };
 
+Miew.prototype.setPivotSelString = function (selString) {
+  const selector = selectors.parse(selString);
+  if ('error' in selector) {
+    return 1;
+  }
+  const pos = this._gfx.pivot.position;
+  pos.set(0.0, 0.0, 0.0);
+  let vCount = 0;
+
+  this._forEachComplexVisual((visual) => {
+    let count = 0;
+    const center = new THREE.Vector3(0.0, 0.0, 0.0);
+    visual._complex.forEachAtom((atom) => {
+      if (selector.selector.includesAtom(atom)) {
+        center.add(atom._position);
+        count++;
+      }
+    });
+    if (count !== 0) {
+      center.divideScalar(count);
+      center.applyMatrix4(visual.matrix);
+
+      pos.add(center);
+      vCount++;
+    }
+  });
+  if (vCount === 0) {
+    this.logger.warn('selection is empty. Center operation not performed');
+    return 0;
+  }
+  pos.divideScalar(vCount);
+  pos.negate();
+
+  this.dispatchEvent({ type: 'transform' });
+  return 0;
+};
+
 Miew.prototype.benchmarkGfx = function (force) {
   const self = this;
   const prof = new GfxProfiler(this._gfx.renderer);
@@ -3742,50 +3779,20 @@ Miew.prototype.scale = function (factor) {
  * @param {subset | string} selector - translation value (Ang) along model's X axis
  */
 Miew.prototype.center = function (selector) {
-  if (selector === undefined || (selector.obj === undefined && selector !== '')) { // on current sellection
-    if (selector === undefined) {
-      return;
-    }
-    const sel = selectors.parse(selector);
-    if ('error' in sel) {
-      this.resetPivot();
-      this._needRender = true;
-      return;
-    }
-    const pos = this._gfx.pivot.position;
-    pos.set(0.0, 0.0, 0.0);
-
-    this._forEachComplexVisual((visual) => {
-      let count = 0;
-      const center = new THREE.Vector3(0.0, 0.0, 0.0);
-      visual._complex.forEachAtom((atom) => {
-        if (sel.selector.includesAtom(atom)) {
-          center.add(atom._position);
-          count++;
-        }
-      });
-      if (count !== 0) {
-        center.divideScalar(count);
-        center.applyMatrix4(visual.matrix);
-
-        pos.add(center);
-      }
-    });
-    pos.divideScalar(1.0);
-    pos.negate();
-
-    this.dispatchEvent({ type: 'transform' });
-    this._needRender = true;
+  if (selector === undefined) { // on current sellection
     return;
   }
   if (selector.obj !== undefined && ('atom' in selector.obj || 'residue' in selector.obj)) { // from event with selection
     if ('atom' in selector.obj) {
       this.setPivotAtom(selector.obj.atom);
-      this._needRender = true;
-      return;
-    }
-    if ('residue' in selector.obj) {
+    } else {
       this.setPivotResidue(selector.obj.residue);
+    }
+    this._needRender = true;
+    return;
+  }
+  if (selector.obj === undefined && selector !== '') {
+    if (this.setPivotSelString(selector) !== 1) {
       this._needRender = true;
       return;
     }
