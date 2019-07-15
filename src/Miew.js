@@ -323,7 +323,7 @@ Miew.prototype.init = function () {
       self._onPick(event);
     });
     this._picker.addEventListener('dblclick', (event) => {
-      self._onDblClick(event);
+      self.center(event);
     });
   } catch (error) {
     if (error.name === 'TypeError' && error.message === 'Cannot read property \'getExtension\' of null') {
@@ -2687,18 +2687,6 @@ Miew.prototype._onPick = function (event) {
   this.dispatchEvent(event);
 };
 
-Miew.prototype._onDblClick = function (event) {
-  if ('atom' in event.obj) {
-    this.setPivotAtom(event.obj.atom);
-  } else if ('residue' in event.obj) {
-    this.setPivotResidue(event.obj.residue);
-  } else {
-    this.resetPivot();
-  }
-
-  this._needRender = true;
-};
-
 Miew.prototype._onKeyDown = function (event) {
   if (!this._running || !this._hotKeysEnabled) {
     return;
@@ -3746,6 +3734,63 @@ Miew.prototype.scale = function (factor) {
   }
   this._objectControls.scale(factor);
   this.dispatchEvent({ type: 'transform' });
+  this._needRender = true;
+};
+
+/**
+ * Center view on selection
+ * @param {subset | string} selector - translation value (Ang) along model's X axis
+ */
+Miew.prototype.center = function (selector) {
+  if (selector === undefined || (selector.obj === undefined && selector !== '')) { // on current sellection
+    if (selector === undefined) {
+      return;
+    }
+    const sel = selectors.parse(selector);
+    if ('error' in sel) {
+      this.resetPivot();
+      this._needRender = true;
+      return;
+    }
+    const pos = this._gfx.pivot.position;
+    pos.set(0.0, 0.0, 0.0);
+
+    this._forEachComplexVisual((visual) => {
+      let count = 0;
+      const center = new THREE.Vector3(0.0, 0.0, 0.0);
+      visual._complex.forEachAtom((atom) => {
+        if (sel.selector.includesAtom(atom)) {
+          center.add(atom._position);
+          count++;
+        }
+      });
+      if (count !== 0) {
+        center.divideScalar(count);
+        center.applyMatrix4(visual.matrix);
+
+        pos.add(center);
+      }
+    });
+    pos.divideScalar(1.0);
+    pos.negate();
+
+    this.dispatchEvent({ type: 'transform' });
+    this._needRender = true;
+    return;
+  }
+  if (selector.obj !== undefined && ('atom' in selector.obj || 'residue' in selector.obj)) { // from event with selection
+    if ('atom' in selector.obj) {
+      this.setPivotAtom(selector.obj.atom);
+      this._needRender = true;
+      return;
+    }
+    if ('residue' in selector.obj) {
+      this.setPivotResidue(selector.obj.residue);
+      this._needRender = true;
+      return;
+    }
+  }
+  this.resetPivot();
   this._needRender = true;
 };
 
