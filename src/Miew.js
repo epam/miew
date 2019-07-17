@@ -3557,7 +3557,11 @@ Miew.prototype._initOnSettingsChanged = function () {
     this._needRender = true;
   });
 
-  on(['transparency', 'resolution', 'palette'], () => {
+  on(['transparency', 'palette'], () => {
+    this.rebuildAll();
+  });
+
+  on('resolution', () => {
     this.rebuildAll();
 
     const volume = this._getVolumeVisual();

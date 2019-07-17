@@ -446,8 +446,8 @@ const defaults = {
       isoMode: false,
       polyComplexity: {
         poor: 2,
-        low: 4,
-        medium: 6,
+        low: 3,
+        medium: 4,
         high: 8,
         ultra: 10,
       },
