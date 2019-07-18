@@ -558,11 +558,21 @@ void main() {
 
   #ifdef NORMALS_TO_G_BUFFER
     #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
-      vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;
+      vec3 viewNormaInColor = viewNormalSprites;
     #else
-      vec3 viewNormaInColor = 0.5*viewNormal+0.5;
+      vec3 viewNormaInColor = viewNormal;
+    #endif
+    #ifdef DOUBLE_SIDED
+      if (!gl_FrontFacing) {
+        viewNormaInColor = -viewNormaInColor;
+      }
+    #else
+      if (dot( viewNormaInColor, vViewPosition ) < 0.0) {
+        viewNormaInColor = -viewNormaInColor;
+      }
     #endif
     // [-1, 1] -> [0, 1]
+    viewNormaInColor = 0.5*viewNormaInColor+0.5;
     gl_FragData[1] = vec4(viewNormaInColor, 1.0);
   #endif
 
