@@ -2100,6 +2100,7 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     visualName = this._onLoadEd(dataSource);
   }
 
+  //gfx.camera.position.z = this._getBSphereRadius();
   gfx.camera.updateProjectionMatrix();
   this._updateFog();
 

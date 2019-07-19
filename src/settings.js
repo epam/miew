@@ -605,7 +605,7 @@ const defaults = {
 
   camDistance: 2.5,
 
-  radiusToFit: 1,
+  radiusToFit: 1.0,
 
   /**
    * @type {number}
