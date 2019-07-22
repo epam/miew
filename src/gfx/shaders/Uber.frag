@@ -567,7 +567,7 @@ void main() {
         viewNormaInColor = -viewNormaInColor;
       }
     #else
-      if (dot( viewNormaInColor, vViewPosition ) < 0.0) {
+      if (dot(normalize( viewNormaInColor), normalize( vViewPosition )) < -0.001) {
         viewNormaInColor = -viewNormaInColor;
       }
     #endif
