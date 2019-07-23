@@ -3562,13 +3562,15 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('resolution', () => {
+    // update complex visuals
     this.rebuildAll();
 
+    // update volume visual
     const volume = this._getVolumeVisual();
-    if (volume === null) return;
-
-    volume.getMesh().material.updateDefines();
-    this._needRender = true;
+    if (volume) {
+      volume.getMesh().material.updateDefines();
+      this._needRender = true;
+    }
   });
 
   on(['axes', 'fxaa', 'ao',
