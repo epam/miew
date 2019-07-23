@@ -434,9 +434,9 @@ const defaults = {
      * @typedef VolumeDensityModeOptions
      *
      * @property {number} kSigma - Noise threshold coefficient.
-     * @property {boolean} frame - flag, that turns on box frame painting
-     * @property {boolean} isoMode - flag, that turns on IsoSurface mode instead of Volume Rendering
-     *
+     * @property {boolean} frame - flag, that turns on box frame painting.
+     * @property {boolean} isoMode - flag, that turns on IsoSurface mode instead of Volume Rendering.
+     * @property {PolyComplexity} polyComplexity - Polygonal complexity settings for different resolutions.
      */
     VD: {
       kSigma: 1.0,
@@ -444,6 +444,13 @@ const defaults = {
       kSigmaMax: 4.0,
       frame: true,
       isoMode: false,
+      polyComplexity: {
+        poor: 2,
+        low: 3,
+        medium: 4,
+        high: 8,
+        ultra: 10,
+      },
     },
   },
 

@@ -3567,8 +3567,20 @@ Miew.prototype._initOnSettingsChanged = function () {
     this._needRender = true;
   });
 
-  on(['transparency', 'resolution', 'palette'], () => {
+  on(['transparency', 'palette'], () => {
     this.rebuildAll();
+  });
+
+  on('resolution', () => {
+    // update complex visuals
+    this.rebuildAll();
+
+    // update volume visual
+    const volume = this._getVolumeVisual();
+    if (volume) {
+      volume.getMesh().material.updateDefines();
+      this._needRender = true;
+    }
   });
 
   on(['axes', 'fxaa', 'ao',
