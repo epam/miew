@@ -131,6 +131,25 @@ THREE.PerspectiveCamera.prototype.setMinimalFov = function (angle) {
 };
 
 /**
+ * @param {THREE.PerspectiveCamera} camera - Base camera for this stereo camera.
+ * @param {number} angle - Field of view in degrees.
+ */
+THREE.StereoCamera.prototype.updateHalfSized = function (camera, angle) {
+  const originalAspect = camera.aspect;
+  const originalFov = camera.fov;
+
+  camera.aspect = originalAspect / 2.0;
+  camera.setMinimalFov(angle);
+  camera.updateProjectionMatrix();
+
+  this.update(camera);
+
+  camera.aspect = originalAspect;
+  camera.fov = originalFov;
+  camera.updateProjectionMatrix();
+};
+
+/**
  * @param {number} radius - Radius of bounding sphere in angstroms to fit on screen.
  * @param {number} angle - Field of view in degrees.
  */
