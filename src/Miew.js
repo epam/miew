@@ -2922,6 +2922,28 @@ Miew.prototype.setPivotAtom = function (atom) {
   this.dispatchEvent({ type: 'transform' });
 };
 
+Miew.prototype.getSelectionCenter = (function () {
+  const _centerInVisual = new THREE.Vector3(0.0, 0.0, 0.0);
+
+  return function (center, includesAtom, selector) {
+    center.set(0.0, 0.0, 0.0);
+    let count = 0;
+
+    this._forEachComplexVisual((visual) => {
+      if (visual.getSelectionCenter(_centerInVisual, includesAtom, selector || visual.getSelectionBit())) {
+        center.add(_centerInVisual);
+        count++;
+      }
+    });
+    if (count === 0) {
+      return false;
+    }
+    center.divideScalar(count);
+    center.negate();
+    return true;
+  };
+}());
+
 Miew.prototype.setPivotSubset = (function () {
   const _center = new THREE.Vector3(0.0, 0.0, 0.0);
 
@@ -2934,44 +2956,14 @@ Miew.prototype.setPivotSubset = (function () {
   }
 
   return function (selector) {
-    const pos = this._gfx.pivot.position;
-    let vCount = 0;
+    const includesAtom = (selector) ? _includesInSelector : _includesInCurSelection;
 
-    let includesAtom;
-    if (selector) {
-      includesAtom = _includesInSelector;
+    if (this.getSelectionCenter(_center, includesAtom, selector)) {
+      this._gfx.pivot.position.copy(_center);
+      this.dispatchEvent({ type: 'transform' });
     } else {
-      includesAtom = _includesInCurSelection;
-    }
-    this._forEachComplexVisual((visual) => {
-      let count = 0;
-      _center.set(0.0, 0.0, 0.0);
-      visual._complex.forEachAtom((atom) => {
-        if (includesAtom(atom, selector || visual.getSelectionBit())) {
-          _center.add(atom._position);
-          count++;
-        }
-      });
-      if (count !== 0) {
-        _center.divideScalar(count);
-        _center.applyMatrix4(visual.matrix);
-
-        if (vCount === 0) {
-          pos.set(0.0, 0.0, 0.0);
-        }
-        pos.add(_center);
-        vCount++;
-      }
-    });
-    if (vCount === 0) {
       this.logger.warn('selection is empty. Center operation not performed');
-      return 0;
     }
-    pos.divideScalar(vCount);
-    pos.negate();
-
-    this.dispatchEvent({ type: 'transform' });
-    return 0;
   };
 }());
 
@@ -3792,14 +3784,19 @@ Miew.prototype.scale = function (factor) {
 
 /**
  * Center view on selection
- * @param {subset | string} selector - translation value (Ang) along model's X axis
+ * @param {empty | subset | string} selector - defines part of molecule which must be centered (
+ * empty - center on current selection;
+ * subset - center on picked atom/residue/molecule;
+ * string - center on atoms correspond to selection string)
  */
 Miew.prototype.center = function (selector) {
-  if (selector === undefined) { // on current sellection
+  // no arguments - center on current selection;
+  if (selector === undefined) {
     this.setPivotSubset();
     this._needRender = true;
     return;
   }
+  // subset with atom or residue - center on picked atom/residue;
   if (selector.obj !== undefined && ('atom' in selector.obj || 'residue' in selector.obj)) { // from event with selection
     if ('atom' in selector.obj) {
       this.setPivotAtom(selector.obj.atom);
@@ -3809,6 +3806,7 @@ Miew.prototype.center = function (selector) {
     this._needRender = true;
     return;
   }
+  // string - center on atoms correspond to selection string
   if (selector.obj === undefined && selector !== '') {
     const sel = selectors.parse(selector);
     if (sel.error === undefined) {
@@ -3817,6 +3815,7 @@ Miew.prototype.center = function (selector) {
       return;
     }
   }
+  // empty subset or incorrect/empty string - center on all molecule;
   this.resetPivot();
   this._needRender = true;
 };

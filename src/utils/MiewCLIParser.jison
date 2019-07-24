@@ -332,7 +332,7 @@ CommandSetWoDESC_KEY
   | PRESET
   | VIEW
   | UNIT
-  | ROTATE // TOdo add TRANSLATE
+  | ROTATE
   | SCALE
   | CENTER
   | URL
