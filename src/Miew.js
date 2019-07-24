@@ -1056,16 +1056,20 @@ Miew.prototype._renderFrame = (function () {
     const gfx = this._gfx;
     const { renderer } = gfx;
 
+    renderer.getSize(_size);
+
     if (stereo !== 'NONE') {
+      gfx.camera.focus = gfx.camera.position.z; // set focus to the center of the object
+      gfx.stereoCam.aspect = 1.0;
+
       // in anaglyph mode we render full-size image for each eye
       // while in other stereo modes only half-size (two images on the screen)
-      gfx.stereoCam.aspect = (stereo === 'ANAGLYPH') ? 1.0 : 0.5;
-
-      gfx.camera.focus = gfx.camera.position.z; // set focus to the center of the object
-      gfx.stereoCam.update(gfx.camera);
+      if (stereo === 'ANAGLYPH') {
+        gfx.stereoCam.update(gfx.camera);
+      } else {
+        gfx.stereoCam.updateHalfSized(gfx.camera, settings.now.camFov);
+      }
     }
-
-    renderer.getSize(_size);
 
     // resize offscreen buffers to match the target
     this._resizeOffscreenBuffers(_size.width * window.devicePixelRatio, _size.height * window.devicePixelRatio, stereo);
