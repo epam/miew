@@ -255,6 +255,9 @@ UberMaterial.prototype.setValues = function (values) {
   if (this.fog) {
     defines.USE_FOG = 1;
   }
+  if (this.side === THREE.DoubleSide) {
+    defines.DOUBLE_SIDED = 1;
+  }
   if (this.instancedPos) {
     defines.INSTANCED_POS = 1;
   }
