@@ -7,7 +7,7 @@ function _createShape(rad, parts) {
 
   for (let i = 0; i < parts; ++i) {
     // starts from pi/2 because it's important that points are lied on the angles of arrows (visual issues if not)
-    const a = Math.PI / 2.0 + 2 * Math.PI * i / parts;
+    const a = Math.PI / 2.0 - 2 * Math.PI * i / parts;
 
     pts.push(new THREE.Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0));
   }
