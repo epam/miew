@@ -38,7 +38,6 @@ build                 return 'BUILD';
 help                  return 'HELP';
 
 load                  return 'LOAD';
-script                return 'SCRIPT';
 get                   return 'GET'
 set                   return 'SET'
 set_save              return 'SET_SAVE'
@@ -220,7 +219,6 @@ OneArgCommand
     : LOAD Url                            -> yy.utils.load(yy.miew, $2); yy.representations.clear()
     | LOAD IDENTIFIER                     -> yy.utils.load(yy.miew, $2); yy.representations.clear()
     | LOAD FILE_KEY                       -> yy.utils.load(yy.miew, $2); yy.representations.clear()
-    | SCRIPT Url                          -> yy.notimplemented()
     ;
 
 AddRepresentation
@@ -313,7 +311,6 @@ CommandSetWoDESC_KEY
   | BUILD
   | HELP
   | LOAD
-  | SCRIPT
   | GET
   | SET
   | SET_SAVE
