@@ -11,7 +11,9 @@ class VolumeBounds {
     const { delta } = volInfo; // {x: XY, y : XZ, z: YZ}
     const { obtuseAngle } = volInfo; // 1 - obtuse, 0 - acute
 
-    const bSize = bBox.getSize().multiplyScalar(0.5);
+    const bSize = new THREE.Vector3();
+    bBox.getSize(bSize);
+    bSize.multiplyScalar(0.5);
 
     const offsetVert = this._getBaseVertices(delta, obtuseAngle);
 
@@ -29,7 +31,9 @@ class VolumeBounds {
       geometry.vertices.push(geometry.vertices[i * 2].clone());
       geometry.vertices.push(geometry.vertices[i * 2 + 8].clone());
     }
-    geometry.vertices.forEach(vertex => vertex.add(bBox.getCenter())); // pivot shift
+    const center = new THREE.Vector3();
+    bBox.getCenter(center);
+    geometry.vertices.forEach(vertex => vertex.add(center)); // pivot shift
 
     this._lines = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0xFFFFFF }));
   }
