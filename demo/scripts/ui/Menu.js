@@ -1406,7 +1406,7 @@ Menu.prototype._initPresetsPanelActions = function () {
     return findAction(parent[current], path);
   };
 
-  $(document).on('click input propertychange paste keyup', '.presets-panel-action', function (event) {
+  $(document).on('click input propertychange paste keyup change', '.presets-panel-action', function (event) {
     if ($(this).hasClass('disabled')) {
       return false;
     }
