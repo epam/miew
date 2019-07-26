@@ -323,7 +323,7 @@ Miew.prototype.init = function () {
       self._onPick(event);
     });
     this._picker.addEventListener('dblclick', (event) => {
-      self._onDblClick(event);
+      self.center(event);
     });
   } catch (error) {
     if (error.name === 'TypeError' && error.message === 'Cannot read property \'getExtension\' of null') {
@@ -2691,18 +2691,6 @@ Miew.prototype._onPick = function (event) {
   this.dispatchEvent(event);
 };
 
-Miew.prototype._onDblClick = function (event) {
-  if ('atom' in event.obj) {
-    this.setPivotAtom(event.obj.atom);
-  } else if ('residue' in event.obj) {
-    this.setPivotResidue(event.obj.residue);
-  } else {
-    this.resetPivot();
-  }
-
-  this._needRender = true;
-};
-
 Miew.prototype._onKeyDown = function (event) {
   if (!this._running || !this._hotKeysEnabled) {
     return;
@@ -2937,6 +2925,51 @@ Miew.prototype.setPivotAtom = function (atom) {
   pos.negate();
   this.dispatchEvent({ type: 'transform' });
 };
+
+Miew.prototype.getSelectionCenter = (function () {
+  const _centerInVisual = new THREE.Vector3(0.0, 0.0, 0.0);
+
+  return function (center, includesAtom, selector) {
+    center.set(0.0, 0.0, 0.0);
+    let count = 0;
+
+    this._forEachComplexVisual((visual) => {
+      if (visual.getSelectionCenter(_centerInVisual, includesAtom, selector || visual.getSelectionBit())) {
+        center.add(_centerInVisual);
+        count++;
+      }
+    });
+    if (count === 0) {
+      return false;
+    }
+    center.divideScalar(count);
+    center.negate();
+    return true;
+  };
+}());
+
+Miew.prototype.setPivotSubset = (function () {
+  const _center = new THREE.Vector3(0.0, 0.0, 0.0);
+
+  function _includesInCurSelection(atom, selectionBit) {
+    return atom._mask & (1 << selectionBit);
+  }
+
+  function _includesInSelector(atom, selector) {
+    return selector.selector.includesAtom(atom);
+  }
+
+  return function (selector) {
+    const includesAtom = (selector) ? _includesInSelector : _includesInCurSelection;
+
+    if (this.getSelectionCenter(_center, includesAtom, selector)) {
+      this._gfx.pivot.position.copy(_center);
+      this.dispatchEvent({ type: 'transform' });
+    } else {
+      this.logger.warn('selection is empty. Center operation not performed');
+    }
+  };
+}());
 
 Miew.prototype.benchmarkGfx = function (force) {
   const self = this;
@@ -3762,6 +3795,44 @@ Miew.prototype.scale = function (factor) {
   }
   this._objectControls.scale(factor);
   this.dispatchEvent({ type: 'transform' });
+  this._needRender = true;
+};
+
+/**
+ * Center view on selection
+ * @param {empty | subset | string} selector - defines part of molecule which must be centered (
+ * empty - center on current selection;
+ * subset - center on picked atom/residue/molecule;
+ * string - center on atoms correspond to selection string)
+ */
+Miew.prototype.center = function (selector) {
+  // no arguments - center on current selection;
+  if (selector === undefined) {
+    this.setPivotSubset();
+    this._needRender = true;
+    return;
+  }
+  // subset with atom or residue - center on picked atom/residue;
+  if (selector.obj !== undefined && ('atom' in selector.obj || 'residue' in selector.obj)) { // from event with selection
+    if ('atom' in selector.obj) {
+      this.setPivotAtom(selector.obj.atom);
+    } else {
+      this.setPivotResidue(selector.obj.residue);
+    }
+    this._needRender = true;
+    return;
+  }
+  // string - center on atoms correspond to selection string
+  if (selector.obj === undefined && selector !== '') {
+    const sel = selectors.parse(selector);
+    if (sel.error === undefined) {
+      this.setPivotSubset(sel);
+      this._needRender = true;
+      return;
+    }
+  }
+  // empty subset or incorrect/empty string - center on all molecule;
+  this.resetPivot();
   this._needRender = true;
 };
 

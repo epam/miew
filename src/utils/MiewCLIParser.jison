@@ -71,6 +71,7 @@ removeobj             return 'REMOVEOBJ'
 rotate                return 'ROTATE'
 translate             return 'TRANSLATE'
 scale                 return 'SCALE'
+center                return 'CENTER'
 
 url                   return 'URL'
 screenshot            return 'SCREENSHOT';
@@ -188,6 +189,8 @@ Command
     | SCALE NUMBER                        -> yy.miew.scale($2)
     | ROTATE AxesList                     { for (var i = 0, n = $2.length; i < n; i++) {yy.miew.rotate($2[i]['x'] * Math.PI / 180.0, $2[i]['y'] * Math.PI / 180.0, $2[i]['z'] * Math.PI / 180.0)} }
     | TRANSLATE AxesList                  { for (var i = 0, n = $2.length; i < n; i++) {yy.miew.translate($2[i]['x'] || 0, $2[i]['y'] || 0, $2[i]['z'] || 0)} }
+    | CENTER                              -> yy.miew.center()
+    | CENTER STRING                       -> yy.miew.center($2)
     | GetURLBranch
     | Screenshot
     | LINE STRING STRING                  -> yy.miew.addObject({type: 'line', params: [$2, $3]}, true)
@@ -328,6 +331,7 @@ CommandSetWoDESC_KEY
   | UNIT
   | ROTATE
   | SCALE
+  | CENTER
   | URL
   | SCREENSHOT
   | FILE_LIST
