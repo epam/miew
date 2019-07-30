@@ -586,6 +586,24 @@ ComplexVisual.prototype.getSelectedComponent = function () {
   return multiple ? null : component;
 };
 
+ComplexVisual.prototype.getSelectionCenter = function (center, includesAtom, selRule) {
+  center.set(0.0, 0.0, 0.0);
+  let count = 0;
+
+  this._complex.forEachAtom((atom) => {
+    if (includesAtom(atom, selRule)) {
+      center.add(atom._position);
+      count++;
+    }
+  });
+  if (count === 0) {
+    return false;
+  }
+  center.divideScalar(count);
+  center.applyMatrix4(this.matrix);
+  return true;
+};
+
 ComplexVisual.prototype.needsRebuild = function () {
   if (this._reprListChanged) {
     return true;

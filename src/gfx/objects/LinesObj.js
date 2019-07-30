@@ -15,7 +15,7 @@ class LinesObj extends SceneObject {
   }
 
   _getAtomFromName(complex, atomId) {
-    const err = ' - Wrong atom format it must be \'#CHAIN_NAME.#NUMBER.#ATOM_NAME\' (e.g. \'A.38.CO1\')';
+    const err = ' - Wrong atom format it must be \'#CHAIN_NAME.#RESIDUE_NUMBER.#ATOM_NAME\' (e.g. \'A.38.CO1\')';
     const atom1 = complex.getAtomByFullname(atomId);
     if (!atom1) {
       throw new Error(atomId + err);

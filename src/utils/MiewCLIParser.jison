@@ -38,7 +38,6 @@ build                 return 'BUILD';
 help                  return 'HELP';
 
 load                  return 'LOAD';
-script                return 'SCRIPT';
 get                   return 'GET'
 set                   return 'SET'
 set_save              return 'SET_SAVE'
@@ -72,6 +71,7 @@ removeobj             return 'REMOVEOBJ'
 rotate                return 'ROTATE'
 translate             return 'TRANSLATE'
 scale                 return 'SCALE'
+center                return 'CENTER'
 
 url                   return 'URL'
 screenshot            return 'SCREENSHOT';
@@ -189,6 +189,8 @@ Command
     | SCALE NUMBER                        -> yy.miew.scale($2)
     | ROTATE AxesList                     { for (var i = 0, n = $2.length; i < n; i++) {yy.miew.rotate($2[i]['x'] * Math.PI / 180.0, $2[i]['y'] * Math.PI / 180.0, $2[i]['z'] * Math.PI / 180.0)} }
     | TRANSLATE AxesList                  { for (var i = 0, n = $2.length; i < n; i++) {yy.miew.translate($2[i]['x'] || 0, $2[i]['y'] || 0, $2[i]['z'] || 0)} }
+    | CENTER                              -> yy.miew.center()
+    | CENTER STRING                       -> yy.miew.center($2)
     | GetURLBranch
     | Screenshot
     | LINE STRING STRING                  -> yy.miew.addObject({type: 'line', params: [$2, $3]}, true)
@@ -217,7 +219,6 @@ OneArgCommand
     : LOAD Url                            -> yy.utils.load(yy.miew, $2); yy.representations.clear()
     | LOAD IDENTIFIER                     -> yy.utils.load(yy.miew, $2); yy.representations.clear()
     | LOAD FILE_KEY                       -> yy.utils.load(yy.miew, $2); yy.representations.clear()
-    | SCRIPT Url                          -> yy.notimplemented()
     ;
 
 AddRepresentation
@@ -310,7 +311,6 @@ CommandSetWoDESC_KEY
   | BUILD
   | HELP
   | LOAD
-  | SCRIPT
   | GET
   | SET
   | SET_SAVE
@@ -331,6 +331,7 @@ CommandSetWoDESC_KEY
   | UNIT
   | ROTATE
   | SCALE
+  | CENTER
   | URL
   | SCREENSHOT
   | FILE_LIST
