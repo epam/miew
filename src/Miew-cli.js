@@ -26,53 +26,58 @@ const NULL = (function () {
   };
 }());
 
-function RepresentationMap() {
-  this.representationMap = {};
-  this.representationID = {};
-}
-RepresentationMap.prototype.get = function (strId) {
-  return this.representationMap[strId] || this.representationID[strId] || '<no name>';
-};
-
-RepresentationMap.prototype.add = function (strId, index) {
-  if (strId === -1) {
-    return 'Can not create representation: there is no data';
+class RepresentationMap {
+  constructor() {
+    this.representationMap = {};
+    this.representationID = {};
   }
 
-  if (index !== undefined) {
-    if (!this.representationMap.hasOwnProperty(strId)) {
-      this.representationMap[strId.toString()] = index;
-      this.representationID[index] = strId.toString();
-    } else {
-      return 'This name has already existed, registered without name';
+  get(strId) {
+    return this.representationMap[strId] || this.representationID[strId] || '<no name>';
+  }
+
+  add(strId, index) {
+    if (strId === -1) {
+      return 'Can not create representation: there is no data';
     }
-  }
-  return `Representation ${strId} successfully added`;
-};
 
-RepresentationMap.prototype.remove = function (index) {
-  if (index && this.representationID.hasOwnProperty(index)) {
-    delete this.representationMap[this.representationID[index]];
-    delete this.representationID[index];
+    if (index !== undefined) {
+      if (!this.representationMap.hasOwnProperty(strId)) {
+        this.representationMap[strId.toString()] = index;
+        this.representationID[index] = strId.toString();
+      } else {
+        return 'This name has already existed, registered without name';
+      }
+    }
+    return `Representation ${strId} successfully added`;
   }
 
-  const sortedKeys = Object.keys(this.representationID).sort();
-  for (const i in sortedKeys) {
-    if (sortedKeys.hasOwnProperty(i)) {
-      const id = sortedKeys[i];
-      if (id > index) {
-        this.representationID[id - 1] = this.representationID[id];
-        this.representationMap[this.representationID[id]] -= 1;
-        delete this.representationID[id];
+  remove(index) {
+    if (index && this.representationID.hasOwnProperty(index)) {
+      delete this.representationMap[this.representationID[index]];
+      delete this.representationID[index];
+    }
+
+    const sortedKeys = Object.keys(this.representationID).sort();
+    for (const i in sortedKeys) {
+      if (sortedKeys.hasOwnProperty(i)) {
+        const id = sortedKeys[i];
+        if (id > index) {
+          this.representationID[id - 1] = this.representationID[id];
+          this.representationMap[this.representationID[id]] -= 1;
+          delete this.representationID[id];
+        }
       }
     }
   }
-};
 
-RepresentationMap.prototype.clear = function () {
-  this.representationMap = {};
-  this.representationID = {};
-};
+  clear() {
+    this.representationMap = {};
+    this.representationID = {};
+  }
+}
+
+
 const representationsStorage = new RepresentationMap();
 
 function CLIUtils() {

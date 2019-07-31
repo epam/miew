@@ -307,30 +307,36 @@ function _writeToFile(filename, data, isBinary, append, callback) {
   }, _errorHandler);
 }
 
-function Queue() { }
-
-Queue.prototype.queue = [];
-Queue.prototype.busy = false;
-
-Queue.prototype.add = function (filename, data, isBinary, append) {
-  this.queue.push([filename, data, isBinary, append]);
-  if (!this.busy) {
-    this.next();
+/* Temporary note: previously this variables were defined in non-standard way:
+* Queue.prototype.queue = [];
+* Queue.prototype.busy = false;
+ */
+class Queue {
+  constructor() {
+    this.queue = [];
+    this.busy = false;
   }
-};
 
-Queue.prototype.next = function () {
-  const params = this.queue.shift();
-  const self = this;
-
-  if (params && !self.busy) {
-    this.busy = true;
-    _writeToFile(params[0], params[1], params[2], params[3], () => {
-      self.busy = false;
-      self.next();
-    });
+  add(filename, data, isBinary, append) {
+    this.queue.push([filename, data, isBinary, append]);
+    if (!this.busy) {
+      this.next();
+    }
   }
-};
+
+  next() {
+    const params = this.queue.shift();
+    const self = this;
+
+    if (params && !self.busy) {
+      this.busy = true;
+      _writeToFile(params[0], params[1], params[2], params[3], () => {
+        self.busy = false;
+        self.next();
+      });
+    }
+  }
+}
 
 function _stringifyArray(arr) {
   let str = [];
