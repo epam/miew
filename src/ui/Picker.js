@@ -111,28 +111,33 @@ Picker.prototype.pickObject = function (screenPos) {
       let p = intersects[0];
       const v = new THREE.Vector3();
 
+      // find point closest to camera that doesn't get clipped by camera near plane or clipPlane (if it exists)
+      let nearPlane = this.camera.near;
       if (settings.now.draft.clipPlane && this.hasOwnProperty('clipPlaneValue')) {
-        // find point closest to camera that doesn't get clipped
-        let i;
-        for (i = 0; i < intersects.length; ++i) {
-          p = intersects[i];
-          v.copy(p.point);
-          v.applyMatrix4(this.camera.matrixWorldInverse);
-          if (v.z <= -this.clipPlaneValue) {
-            break;
-          }
-        }
-
-        if (i === intersects.length) {
-          p = null;
-        }
+        nearPlane = Math.min(nearPlane, this.clipPlaneValue);
       }
-
-      if (p != null && settings.now.fog && this.hasOwnProperty('fogFarValue')) {
-        // check that selected intersection point is not occluded by fog
+      let i;
+      for (i = 0; i < intersects.length; ++i) {
+        p = intersects[i];
         v.copy(p.point);
         v.applyMatrix4(this.camera.matrixWorldInverse);
-        if (v.z <= -this.fogFarValue) {
+        if (v.z <= -nearPlane) {
+          break;
+        }
+      }
+      if (i === intersects.length) {
+        p = null;
+      }
+
+      if (p != null) {
+        // check that selected intersection point is not clipped by camera far plane or occluded by fog (if it exists)
+        let farPlane = this.camera.far;
+        if (settings.now.fog && this.hasOwnProperty('fogFarValue')) {
+          farPlane = Math.min(farPlane, this.fogFarValue);
+        }
+        v.copy(p.point);
+        v.applyMatrix4(this.camera.matrixWorldInverse);
+        if (v.z <= -farPlane) {
           p = null;
         }
       }
