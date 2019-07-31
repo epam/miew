@@ -4,36 +4,29 @@ import logger from './utils/logger';
 //----------------------------------------------------------------------------
 // Timer
 
-function Timer() {
-  this.startTime = 0;
-  this.oldTime = 0;
-  this.elapsedTime = 0;
-  this.running = false;
-}
-
-Timer.now = (function () {
-  const p = typeof window !== 'undefined' && window.performance;
-  return (p && p.now) ? p.now.bind(p) : Date.now;
-}());
-
-Timer.prototype = {
-  constructor: Timer,
+class Timer {
+  constructor() {
+    this.startTime = 0;
+    this.oldTime = 0;
+    this.elapsedTime = 0;
+    this.running = false;
+  }
 
   start() {
     this.startTime = Timer.now();
     this.oldTime = this.startTime;
     this.running = true;
-  },
+  }
 
   stop() {
     this.getElapsedTime();
     this.running = false;
-  },
+  }
 
   getElapsedTime() {
     this.update();
     return this.elapsedTime;
-  },
+  }
 
   update() {
     let delta = 0;
@@ -45,9 +38,13 @@ Timer.prototype = {
     }
 
     return delta;
-  },
-};
+  }
+}
 
+Timer.now = (function () {
+  const p = typeof window !== 'undefined' && window.performance;
+  return (p && p.now) ? p.now.bind(p) : Date.now;
+}());
 //----------------------------------------------------------------------------
 // Query string
 
@@ -282,13 +279,13 @@ function DebugTracer(namespace) {
 
 DebugTracer.spaces = '                                                                                          ';
 
-function OutOfMemoryError(message) {
-  Error.call(this);
-  this.name = 'OutOfMemoryError';
-  this.message = message;
+class OutOfMemoryError extends Error {
+  constructor(message) {
+    super();
+    this.name = 'OutOfMemoryError';
+    this.message = message;
+  }
 }
-
-OutOfMemoryError.prototype = Object.create(Error.prototype);
 
 function allocateTyped(TypedArrayName, size) {
   let result = null;

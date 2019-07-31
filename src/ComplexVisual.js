@@ -40,6 +40,8 @@ class ComplexVisual extends Visual {
     this._selectionCount = 0;
 
     this._selectionGeometry = new THREE.Group();
+    // 32 bits = 30 bits for reps + 1 for selection + 1 for selection expansion
+    this.NUM_REPRESENTATION_BITS = 30;
   }
 
   getBoundaries() {
@@ -270,7 +272,7 @@ class ComplexVisual extends Visual {
 
   _getFreeReprIdx() {
     let bits = this._reprUsedBits;
-    for (let i = 0; i <= ComplexVisual.NUM_REPRESENTATION_BITS; ++i, bits >>= 1) {
+    for (let i = 0; i <= this.NUM_REPRESENTATION_BITS; ++i, bits >>= 1) {
       if ((bits & 1) === 0) {
         return i;
       }
@@ -284,7 +286,7 @@ class ComplexVisual extends Visual {
    * @returns {number} Index of the new representation.
    */
   repAdd(rep) {
-    if (this._reprList.length >= ComplexVisual.NUM_REPRESENTATION_BITS) {
+    if (this._reprList.length >= this.NUM_REPRESENTATION_BITS) {
       return -1;
     }
 
@@ -928,7 +930,5 @@ class ComplexVisual extends Visual {
   }
 }
 
-// 32 bits = 30 bits for reps + 1 for selection + 1 for selection expansion
-ComplexVisual.NUM_REPRESENTATION_BITS = 30;
 
 export default ComplexVisual;
