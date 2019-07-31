@@ -104,8 +104,9 @@ Picker.prototype.pickObject = function (screenPos) {
   const { gfxObj } = this;
   let intersects;
   if (gfxObj) {
-    const rayCaster = new THREE.Raycaster();
-    rayCaster.setFromCamera(screenPos, this.camera);
+    const origin = new THREE.Vector3().setFromMatrixPosition(this.camera.matrixWorld);
+    const dir = new THREE.Vector3(screenPos.x, screenPos.y, 0.5).unproject(this.camera).sub(origin).normalize();
+    const rayCaster = new THREE.Raycaster(origin, dir);
     intersects = rayCaster.intersectObject(gfxObj, false);
     if (intersects.length > 0) {
       let p = intersects[0];
