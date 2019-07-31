@@ -80,101 +80,6 @@ class RepresentationMap {
 
 const representationsStorage = new RepresentationMap();
 
-function CLIUtils() {
-}
-// repIndexOrRepMap could be RepresentationMap or index
-CLIUtils.prototype.list = function (miew, repMap, key) {
-  let ret = '';
-  if (miew && repMap !== undefined) {
-    if (key === undefined || key === '-e') {
-      const count = miew.repCount();
-
-      for (let i = 0; i < count; i++) {
-        ret += this.listRep(miew, repMap, i, key);
-      }
-    }
-  }
-  return ret;
-};
-
-CLIUtils.prototype.listRep = function (miew, repMap, repIndex, key) {
-  let ret = '';
-  const rep = miew.repGet(repIndex);
-  if (!rep) {
-    logger.warn(`Rep ${repIndex} does not exist!`);
-    return ret;
-  }
-  const index = repIndex;
-  const repName = repMap.get(index);
-
-  const { mode, colorer } = rep;
-  const selectionStr = rep.selectorString;
-  const material = rep.materialPreset;
-
-  ret += `#${index} : ${mode.name}${repName === '<no name>' ? '' : `, ${repName}`}\n`;
-
-  if (key !== undefined) {
-    ret += `    selection : "${selectionStr}"\n`;
-    ret += `    mode      : (${mode.id}), ${mode.name}\n`;
-    ret += `    colorer   : (${colorer.id}), ${colorer.name}\n`;
-    ret += `    material  : (${material.id}), ${material.name}\n`;
-  }
-
-  return ret;
-};
-
-CLIUtils.prototype.listSelector = function (miew, context) {
-  let ret = '';
-
-  for (const k in context) {
-    if (context.hasOwnProperty(k)) {
-      ret += `${k} : "${context[k]}"\n`;
-    }
-  }
-
-  return ret;
-};
-
-CLIUtils.prototype.listObjs = function (miew) {
-  const objs = miew._objects;
-
-  if (!objs || !Array.isArray(objs) || objs.length === 0) {
-    return 'There are no objects on the scene';
-  }
-
-  const strList = [];
-  for (let i = 0, n = objs.length; i < n; ++i) {
-    strList[i] = `${i}: ${objs[i].toString()}`;
-  }
-
-  return strList.join('\n');
-};
-
-CLIUtils.prototype.joinHelpStr = function (helpData) {
-  if (helpData instanceof Array) {
-    return helpData.join('\n');
-  }
-  return helpData;
-};
-
-CLIUtils.prototype.help = function (path) {
-  if (_.isUndefined(path)) {
-    return `${this.joinHelpStr(clihelp.$help)}\n${_.slice(_.sortBy(_.keys(clihelp)), 1).join(', ')}\n`;
-  }
-
-  const helpItem = _.get(clihelp, path);
-  return _.isUndefined(helpItem) ? this.help() : `${this.joinHelpStr(helpItem.$help)}\n`;
-};
-
-CLIUtils.prototype.load = function (miew, arg) {
-  if (miew === undefined || arg === undefined || arg === '-f') {
-    return;
-  }
-  miew.awaitWhileCMDisInProcess();
-  const finish = () => miew.finishAwaitingCMDInProcess();
-  miew.load(arg).then(finish, finish);
-};
-
 function keyRemap(key) {
   const keys = {
     s: 'selector',
@@ -192,84 +97,180 @@ function keyRemap(key) {
   return ans === undefined ? key : ans;
 }
 
-CLIUtils.prototype.checkArg = function (key, arg, modificate) {
-  if (key !== undefined && arg !== undefined) {
-    if (keyRemap(key) === 'selector') {
-      const res = selectors.parse(arg);
+class CLIUtils {
+  list(miew, repMap, key) {
+    let ret = '';
+    if (miew && repMap !== undefined) {
+      if (key === undefined || key === '-e') {
+        const count = miew.repCount();
 
-      if (res.error !== undefined) {
-        const selExc = { message: res.error };
-        throw selExc;
+        for (let i = 0; i < count; i++) {
+          ret += this.listRep(miew, repMap, i, key);
+        }
+      }
+    }
+    return ret;
+  }
+
+  listRep(miew, repMap, repIndex, key) {
+    let ret = '';
+    const rep = miew.repGet(repIndex);
+    if (!rep) {
+      logger.warn(`Rep ${repIndex} does not exist!`);
+      return ret;
+    }
+    const index = repIndex;
+    const repName = repMap.get(index);
+
+    const { mode, colorer } = rep;
+    const selectionStr = rep.selectorString;
+    const material = rep.materialPreset;
+
+    ret += `#${index} : ${mode.name}${repName === '<no name>' ? '' : `, ${repName}`}\n`;
+
+    if (key !== undefined) {
+      ret += `    selection : "${selectionStr}"\n`;
+      ret += `    mode      : (${mode.id}), ${mode.name}\n`;
+      ret += `    colorer   : (${colorer.id}), ${colorer.name}\n`;
+      ret += `    material  : (${material.id}), ${material.name}\n`;
+    }
+
+    return ret;
+  }
+
+  listSelector(miew, context) {
+    let ret = '';
+
+    for (const k in context) {
+      if (context.hasOwnProperty(k)) {
+        ret += `${k} : "${context[k]}"\n`;
+      }
+    }
+
+    return ret;
+  }
+
+  listObjs(miew) {
+    const objs = miew._objects;
+
+    if (!objs || !Array.isArray(objs) || objs.length === 0) {
+      return 'There are no objects on the scene';
+    }
+
+    const strList = [];
+    for (let i = 0, n = objs.length; i < n; ++i) {
+      strList[i] = `${i}: ${objs[i].toString()}`;
+    }
+
+    return strList.join('\n');
+  }
+
+  joinHelpStr(helpData) {
+    if (helpData instanceof Array) {
+      return helpData.join('\n');
+    }
+    return helpData;
+  }
+
+  help(path) {
+    if (_.isUndefined(path)) {
+      return `${this.joinHelpStr(clihelp.$help)}\n${_.slice(_.sortBy(_.keys(clihelp)), 1).join(', ')}\n`;
+    }
+
+    const helpItem = _.get(clihelp, path);
+    return _.isUndefined(helpItem) ? this.help() : `${this.joinHelpStr(helpItem.$help)}\n`;
+  }
+
+  load(miew, arg) {
+    if (miew === undefined || arg === undefined || arg === '-f') {
+      return;
+    }
+    miew.awaitWhileCMDisInProcess();
+    const finish = () => miew.finishAwaitingCMDInProcess();
+    miew.load(arg).then(finish, finish);
+  }
+
+  checkArg(key, arg, modificate) {
+    if (key !== undefined && arg !== undefined) {
+      if (keyRemap(key) === 'selector') {
+        const res = selectors.parse(arg);
+
+        if (res.error !== undefined) {
+          const selExc = { message: res.error };
+          throw selExc;
+        }
+
+        if (modificate !== undefined && modificate) {
+          return res.selector;
+        }
+        return arg;
       }
 
-      if (modificate !== undefined && modificate) {
-        return res.selector;
+      const modificators = {
+        colorers,
+        modes,
+        materials,
+      };
+
+      let modificator = key;
+      let temp;
+      while (modificator !== temp) {
+        temp = modificator;
+        modificator = keyRemap(temp);
+      }
+
+      if (modificators[modificator].get(arg) === undefined) {
+        const exc = { message: `${arg} is not existed in ${modificator}` };
+        throw exc;
       }
       return arg;
     }
+    return NULL;
+  }
 
-    const modificators = {
-      colorers,
-      modes,
-      materials,
-    };
+  propagateProp(path, arg) {
+    if (path !== undefined) {
+      let argExc = {};
+      const adapter = options.adapters[typeof _.get(settings.defaults, path)];
+      if (adapter === undefined) {
+        const pathExc = { message: `${path} is not existed` };
+        throw pathExc;
+      }
 
-    let modificator = key;
-    let temp;
-    while (modificator !== temp) {
-      temp = modificator;
-      modificator = keyRemap(temp);
-    }
+      if ((path.endsWith('.color') || path.endsWith('.baseColor')
+        || path.endsWith('.EL.carbon')) && typeof arg !== 'number') {
+        arg = palettes.get(settings.now.palette).getNamedColor(arg);
+      }
 
-    if (modificators[modificator].get(arg) === undefined) {
-      const exc = { message: `${arg} is not existed in ${modificator}` };
-      throw exc;
+      if (path.endsWith('.fg') || path.endsWith('.bg')) {
+        if (typeof arg !== 'number') {
+          const val = palettes.get(settings.now.palette).getNamedColor(arg, true);
+          if (val !== undefined) {
+            arg = `0x${val.toString(16)}`;
+          }
+        } else {
+          arg = `0x${arg.toString(16)}`;
+        }
+      }
+
+      if (path.endsWith('.template')) {
+        arg = arg.replace(/\\n/g, '\n');// NOSONAR
+      }
+
+      if (arg !== undefined && adapter(arg) !== arg && adapter(arg) !== (arg > 0)) {
+        argExc = { message: `${path} must be a "${typeof _.get(settings.defaults, path)}"` };
+        throw argExc;
+      }
     }
     return arg;
   }
-  return NULL;
-};
 
-CLIUtils.prototype.propagateProp = function (path, arg) {
-  if (path !== undefined) {
-    let argExc = {};
-    const adapter = options.adapters[typeof _.get(settings.defaults, path)];
-    if (adapter === undefined) {
-      const pathExc = { message: `${path} is not existed` };
-      throw pathExc;
-    }
-
-    if ((path.endsWith('.color') || path.endsWith('.baseColor')
-             || path.endsWith('.EL.carbon')) && typeof arg !== 'number') {
-      arg = palettes.get(settings.now.palette).getNamedColor(arg);
-    }
-
-    if (path.endsWith('.fg') || path.endsWith('.bg')) {
-      if (typeof arg !== 'number') {
-        const val = palettes.get(settings.now.palette).getNamedColor(arg, true);
-        if (val !== undefined) {
-          arg = `0x${val.toString(16)}`;
-        }
-      } else {
-        arg = `0x${arg.toString(16)}`;
-      }
-    }
-
-    if (path.endsWith('.template')) {
-      arg = arg.replace(/\\n/g, '\n');// NOSONAR
-    }
-
-    if (arg !== undefined && adapter(arg) !== arg && adapter(arg) !== (arg > 0)) {
-      argExc = { message: `${path} must be a "${typeof _.get(settings.defaults, path)}"` };
-      throw argExc;
-    }
+  unquoteString(value) {
+    return utils.unquoteString(value);
   }
-  return arg;
-};
+}
+// repIndexOrRepMap could be RepresentationMap or index
 
-CLIUtils.prototype.unquoteString = function (value) {
-  return utils.unquoteString(value);
-};
 
 const utilFunctions = new CLIUtils();
 
