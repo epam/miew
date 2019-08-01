@@ -100,65 +100,68 @@ Picker.prototype.handleResize = function () {
 };
 
 Picker.prototype.pickObject = function (screenPos) {
-  let picked = {};
+  if (!this.gfxObj) {
+    this.dispatchEvent({ type: 'newpick', obj: {} });
+    return;
+  }
+
   const { gfxObj } = this;
-  let intersects;
-  if (gfxObj) {
-    const origin = new THREE.Vector3().setFromMatrixPosition(this.camera.matrixWorld);
-    const dir = new THREE.Vector3(screenPos.x, screenPos.y, 0.5).unproject(this.camera).sub(origin).normalize();
-    const rayCaster = new THREE.Raycaster(origin, dir);
-    intersects = rayCaster.intersectObject(gfxObj, false);
-    if (intersects.length > 0) {
-      let p = intersects[0];
-      const v = new THREE.Vector3();
+  const rayCaster = new THREE.Raycaster();
+  rayCaster.ray.origin.setFromMatrixPosition(this.camera.matrixWorld);
+  rayCaster.ray.direction.set(screenPos.x, screenPos.y, 0.5).unproject(this.camera).sub(rayCaster.ray.origin).normalize();
+  const intersects = rayCaster.intersectObject(gfxObj, false);
+  if (intersects.length === 0) {
+    this.dispatchEvent({ type: 'newpick', obj: {} });
+    return;
+  }
 
-      // find point closest to camera that doesn't get clipped by camera near plane or clipPlane (if it exists)
-      let nearPlane = this.camera.near;
-      if (settings.now.draft.clipPlane && this.hasOwnProperty('clipPlaneValue')) {
-        nearPlane = Math.min(nearPlane, this.clipPlaneValue);
-      }
-      let i;
-      for (i = 0; i < intersects.length; ++i) {
-        p = intersects[i];
-        v.copy(p.point);
-        v.applyMatrix4(this.camera.matrixWorldInverse);
-        if (v.z <= -nearPlane) {
-          break;
-        }
-      }
-      if (i === intersects.length) {
-        p = null;
-      }
+  // find point closest to camera that doesn't get clipped by camera near plane or clipPlane (if it exists)
+  let nearPlane = this.camera.near;
+  if (settings.now.draft.clipPlane && this.hasOwnProperty('clipPlaneValue')) {
+    nearPlane = Math.min(nearPlane, this.clipPlaneValue);
+  }
+  let i;
+  let p = intersects[0];
+  const v = new THREE.Vector3();
+  for (i = 0; i < intersects.length; ++i) {
+    p = intersects[i];
+    v.copy(p.point);
+    v.applyMatrix4(this.camera.matrixWorldInverse);
+    if (v.z <= -nearPlane) {
+      break;
+    }
+  }
+  if (i === intersects.length) {
+    this.dispatchEvent({ type: 'newpick', obj: {} });
+    return;
+  }
 
-      if (p != null) {
-        // check that selected intersection point is not clipped by camera far plane or occluded by fog (if it exists)
-        let farPlane = this.camera.far;
-        if (settings.now.fog && this.hasOwnProperty('fogFarValue')) {
-          farPlane = Math.min(farPlane, this.fogFarValue);
-        }
-        v.copy(p.point);
-        v.applyMatrix4(this.camera.matrixWorldInverse);
-        if (v.z <= -farPlane) {
-          p = null;
-        }
-      }
+  // check that selected intersection point is not clipped by camera far plane or occluded by fog (if it exists)
+  let farPlane = this.camera.far;
+  if (settings.now.fog && this.hasOwnProperty('fogFarValue')) {
+    farPlane = Math.min(farPlane, this.fogFarValue);
+  }
+  v.copy(p.point);
+  v.applyMatrix4(this.camera.matrixWorldInverse);
+  if (v.z <= -farPlane) {
+    this.dispatchEvent({ type: 'newpick', obj: {} });
+    return;
+  }
 
-      if (p != null && (p.residue || p.atom)) {
-        const residue = p.residue || p.atom.getResidue();
-        if (settings.now.pick === 'chain') {
-          picked = { chain: residue.getChain() };
-        } else if (settings.now.pick === 'molecule') {
-          picked = { molecule: residue.getMolecule() };
-        } else if (p.residue || settings.now.pick === 'residue') {
-          picked = { residue };
-        } else if (p.atom) {
-          picked = { atom: p.atom };
-        }
-      }
+  let picked = {};
+  if (p.residue || p.atom) {
+    const residue = p.residue || p.atom.getResidue();
+    if (settings.now.pick === 'chain') {
+      picked = { chain: residue.getChain() };
+    } else if (settings.now.pick === 'molecule') {
+      picked = { molecule: residue.getMolecule() };
+    } else if (p.residue || settings.now.pick === 'residue') {
+      picked = { residue };
+    } else if (p.atom) {
+      picked = { atom: p.atom };
     }
   }
   this.picked = picked;
-
   this.dispatchEvent({ type: 'newpick', obj: picked });
 };
 
