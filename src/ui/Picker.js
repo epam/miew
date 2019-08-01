@@ -101,6 +101,7 @@ Picker.prototype.handleResize = function () {
 
 Picker.prototype.pickObject = function (screenPos) {
   if (!this.gfxObj) {
+    this.picked = {};
     this.dispatchEvent({ type: 'newpick', obj: {} });
     return;
   }
@@ -109,56 +110,27 @@ Picker.prototype.pickObject = function (screenPos) {
   const rayCaster = new THREE.Raycaster();
   rayCaster.ray.origin.setFromMatrixPosition(this.camera.matrixWorld);
   rayCaster.ray.direction.set(screenPos.x, screenPos.y, 0.5).unproject(this.camera).sub(rayCaster.ray.origin).normalize();
-  const intersects = rayCaster.intersectObject(gfxObj, false);
-  if (intersects.length === 0) {
-    this.dispatchEvent({ type: 'newpick', obj: {} });
-    return;
-  }
 
-  // find point closest to camera that doesn't get clipped by camera near plane or clipPlane (if it exists)
-  let nearPlane = this.camera.near;
-  if (settings.now.draft.clipPlane && this.hasOwnProperty('clipPlaneValue')) {
-    nearPlane = Math.min(nearPlane, this.clipPlaneValue);
-  }
-  let i;
-  let p = intersects[0];
-  const v = new THREE.Vector3();
-  for (i = 0; i < intersects.length; ++i) {
-    p = intersects[i];
-    v.copy(p.point);
-    v.applyMatrix4(this.camera.matrixWorldInverse);
-    if (v.z <= -nearPlane) {
-      break;
-    }
-  }
-  if (i === intersects.length) {
-    this.dispatchEvent({ type: 'newpick', obj: {} });
-    return;
-  }
-
-  // check that selected intersection point is not clipped by camera far plane or occluded by fog (if it exists)
-  let farPlane = this.camera.far;
-  if (settings.now.fog && this.hasOwnProperty('fogFarValue')) {
-    farPlane = Math.min(farPlane, this.fogFarValue);
-  }
-  v.copy(p.point);
-  v.applyMatrix4(this.camera.matrixWorldInverse);
-  if (v.z <= -farPlane) {
+  const clipPlane = (settings.now.draft.clipPlane && this.clipPlaneValue) ? this.clipPlaneValue : Infinity;
+  const fogFarPlane = (settings.now.fog && this.fogFarValue) ? this.fogFarValue : Infinity;
+  const point = rayCaster.intersectVisibleObject(gfxObj, this.camera, clipPlane, fogFarPlane);
+  if (!point) {
+    this.picked = {};
     this.dispatchEvent({ type: 'newpick', obj: {} });
     return;
   }
 
   let picked = {};
-  if (p.residue || p.atom) {
-    const residue = p.residue || p.atom.getResidue();
+  if (point.residue || point.atom) {
+    const residue = point.residue || point.atom.getResidue();
     if (settings.now.pick === 'chain') {
       picked = { chain: residue.getChain() };
     } else if (settings.now.pick === 'molecule') {
       picked = { molecule: residue.getMolecule() };
-    } else if (p.residue || settings.now.pick === 'residue') {
+    } else if (point.residue || settings.now.pick === 'residue') {
       picked = { residue };
-    } else if (p.atom) {
-      picked = { atom: p.atom };
+    } else if (point.atom) {
+      picked = { atom: point.atom };
     }
   }
   this.picked = picked;
