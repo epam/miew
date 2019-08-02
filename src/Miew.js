@@ -3501,7 +3501,8 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('ao', () => {
-    this._setUberMaterialValues({ normalsToGBuffer: settings.now.ao });
+    const values = { normalsToGBuffer: settings.now.ao, doubleSidedGBuffer: settings.now.ao };
+    this._setUberMaterialValues(values);
   });
 
   on('fogColor', () => {
