@@ -810,26 +810,6 @@ ComplexVisual.prototype.buildSelectorFromMask = function (mask) {
   return this._buildSelectorFromSortedLists(atoms, residues, chains);
 };
 
-ComplexVisual.prototype.getSelectedComponent = function () {
-  const selectionMask = 1 << this._selectionBit;
-
-  let component = null;
-  let multiple = false;
-
-  // find which component is selected (exclusively)
-  this._complex.forEachAtom((atom) => {
-    if (atom._mask & selectionMask) {
-      if (component === null) {
-        component = atom._residue._component;
-      } else if (component !== atom._residue._component) {
-        multiple = true;
-      }
-    }
-  });
-
-  return multiple ? null : component;
-};
-
 ComplexVisual.prototype.forSelectedResidues = function (process) {
   const selectionMask = 1 << this._selectionBit;
   this._complex.forEachResidue((residue) => {
