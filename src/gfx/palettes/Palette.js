@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 function clamp(x, a, b) {
   return x <= b ? x < 0 ? 0 : x : b;
 }
@@ -70,7 +72,7 @@ class Palette {
   }
 }
 
-Object.assign(Palette.prototype, {
+_.assign(Palette.prototype, {
   colors: [0xFFFFFF, 0xFF0000, 0x00FF00, 0x0000FF, 0x808080],
 
   minRangeColor: 0x000000,

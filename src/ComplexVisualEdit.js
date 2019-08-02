@@ -25,7 +25,7 @@ function ComplexEditor() {
 
 class ComplexComponentEditor extends ComplexEditor {
   constructor(complexVisual) {
-    super(); /* Note: There wasn't any superclass constructor invocations before! */
+    super();
     this._complexVisual = complexVisual;
     this._inProgress = false;
   }
@@ -187,7 +187,7 @@ class ComplexComponentEditor extends ComplexEditor {
 
 class ComplexFragmentEditor extends ComplexEditor {
   constructor(complexVisual) {
-    super(); /* Note: There wasn't any superclass constructor invocations before! */
+    super();
     this._complexVisual = complexVisual;
     this._inProgress = false;
   }

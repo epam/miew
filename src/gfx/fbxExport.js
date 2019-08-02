@@ -307,10 +307,6 @@ function _writeToFile(filename, data, isBinary, append, callback) {
   }, _errorHandler);
 }
 
-/* Temporary note: previously this variables were defined in non-standard way:
-* Queue.prototype.queue = [];
-* Queue.prototype.busy = false;
- */
 class Queue {
   constructor() {
     this.queue = [];
