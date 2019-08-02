@@ -9,15 +9,6 @@ const {
   Element,
 } = chem;
 
-/* Docs template */
-/**
- * Briefly abouts.
- * @param {type} name - Explanation.
- * @param {type2} name2 - Explanation2.
- * @returns {retType} Explanation
- */
-
-
 /**
  * Gromos87 file format parser.
  *
@@ -110,7 +101,13 @@ class GROParser extends Parser {
     const velocityZ = line.readFloat(62, 69); */
     /* TODO: Place for some error if something went wrong */
     /* Adding residue and atom to complex structure */
-    const type = Element.getByName(this._atomName[0]); /* MAGIC 0 */
+    const type = Element.getByName(this._atomName[0]); /* MAGIC 0. REASONS: This name is something like "CA", where
+     C - is an element an A is something else. But what about Calcium? */
+    if (type.fullName === 'Unknown') {
+      /* TODO:: THROW SOME ERROR? */
+      /* BOX VECTORS ARE HERE ALSO. INVALID LOGIC? */
+      return;
+    }
     const role = Element.Role[this._atomName]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
     /* Firstly, create a dummy chain */
     let chain = this._chain;
