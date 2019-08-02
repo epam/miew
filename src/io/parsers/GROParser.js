@@ -7,11 +7,6 @@ import GROReader from './GROReader';
 const {
   Complex,
   Element,
-  /* Helix,
-  Sheet,
-  Strand, */
-  Bond,
-  Molecule,
 } = chem;
 
 /* Docs template */
@@ -26,7 +21,6 @@ const {
 /**
  * Gromos87 file format parser.
  *
- * @param {String} title          - Complex title, free format string.
  * @param {Number} time           - Time in ps (optional).
  * @param {Number} numAtoms       - Number of atoms in complex.
  * @param {Number} residueNumber  - Number of exact residue.
@@ -38,6 +32,8 @@ const {
  *
  * @param {Complex} complex       - Complex structure for unified molecule representation.
  *
+ * @param {Molecule} molecules    - Molecules array.
+ * @param {Molecule} molecule     - Single molecule.
  * @param {String} filetype       - Extension of data file.
  *
  * @exports GROParser
@@ -47,7 +43,6 @@ class GROParser extends Parser {
   constructor(data, options) {
     super(data, options);
 
-    this._title = '';
     this._time = null;
     this._numAtoms = null;
     this._residueNumber = null;
@@ -59,8 +54,8 @@ class GROParser extends Parser {
 
     this._complex = null;
 
-    this._molecules = []; // undef
-    this._molecule = null; // undef
+    this._molecules = [];
+    this._molecule = null;
     this._options.filetype = 'gro';
   }
 
@@ -72,52 +67,27 @@ class GROParser extends Parser {
     return true;
   }
 
-  _finalizeMolecules() {
-    // get chains from complex
-    const chainDict = {};
-    let i;
-    const chains = this._complex._chains;
-    for (i = 0; i < chains.length; ++i) {
-      const chainObj = chains[i];
-      const chainName = chainObj._name;
-      chainDict[chainName] = chainObj;
-    }
-
-    // aggregate residues from chains
-    for (i = 0; i < this._molecules.length; i++) {
-      const m = this._molecules[i];
-      let residues = [];
-      for (let j = 0; j < m._chains.length; j++) {
-        const name = m._chains[j];
-        const chain = chainDict[name];
-        residues = residues.concat(chain._residues.slice());
-      }
-      const molecule = new Molecule(this._complex, m._name, i + 1);
-      molecule._residues = residues;
-      this._complex._molecules[i] = molecule;
-    }
-  }
-
   /**
-   * Parsing title and time of molecule complex.
-   * @param {String} line - Line containing title and time.
+   * Parsing title of molecule complex.
+   * NOTE: that names are ESTIMATES RIGHT NOW, NEED FURTHER DETAILED STUDY!
+   * @param {GROReader} line - Line containing title and time.
    */
   _parseTitle(line) {
     const { metadata } = this._complex;
-    const timeIsSet = line.indexOf('t= ');
-    // metadata.title = line.slice(0, timeIsSet).trim();
-
-    metadata.date = line.slice(timeIsSet, line.length).trim();
+    metadata.title = metadata.title || [];
+    metadata.title[0] = line.readLine().trim();
+    metadata.classification = metadata.title;
+    metadata.id = metadata.title;
     metadata.format = 'gro';
   }
 
   /**
    * Parsing line containing number of atoms information.
-   * @param {String} line - Line containing number of atoms.
+   * @param {GROReader} line - Line containing number of atoms.
    */
   _parseNumberOfAtoms(line) {
-    this._numAtoms = parseInt(line, 10);
-    console.log(line);
+    this._numAtoms = line.readInt(0, line.getNext());
+    console.log(this._numAtoms); /* TODO:: TESTING PURPOSES ONLY */
   }
 
   /**
@@ -128,10 +98,10 @@ class GROParser extends Parser {
    */
   _parseAtom(line) {
     /* CHECK FOR BOX VECTORS!? */
-    const residueNumber = line.readInt(1, 5);
-    const residueName = line.readString(6, 10).trim();
-    const atomName = line.readString(11, 15).trim();
-    const atomNumber = line.readInt(16, 20);
+    this._residueNumber = line.readInt(1, 5);
+    this._residueName = line.readString(6, 10).trim();
+    this._atomName = line.readString(11, 15).trim();
+    this._atomNumber = line.readInt(16, 20);
     const positionX = line.readFloat(21, 28) * 10;
     const positionY = line.readFloat(29, 36) * 10;
     const positionZ = line.readFloat(37, 45) * 10;
@@ -139,11 +109,9 @@ class GROParser extends Parser {
     const velocityY = line.readFloat(54, 61);
     const velocityZ = line.readFloat(62, 69); */
     /* TODO: Place for some error if something went wrong */
-    /* console.log(residueNumber + '___' + residueName + '___' + atomName + '___' + atomNumber
-      + '___' + positionX + '___' + positionY + '___' + positionZ + '___' + velocityX + '___' + velocityY + '___' + velocityZ); */
     /* Adding residue and atom to complex structure */
-    const type = Element.getByName(atomName);
-    const role = Element.Role[atomName]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
+    const type = Element.getByName(this._atomName[0]); /* MAGIC 0 */
+    const role = Element.Role[this._atomName]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
     /* Firstly, create a dummy chain */
     let chain = this._chain;
     if (!chain) {
@@ -151,43 +119,28 @@ class GROParser extends Parser {
     }
     /* Secondly, add residue to that chain */
     let residue = this._residue;
-    if (!residue || residue.getSequence() !== residueNumber) {
-      this._residue = residue = chain.addResidue(residueName, residueNumber, 'A');
+    if (!residue || residue.getSequence() !== this._residueNumber) {
+      this._residue = residue = chain.addResidue(this._residueName, this._residueNumber, 'A');
     }
     /* Lastly, add atom to that residue */
-    const xyz = new THREE.Vector3(positionX, positionY, positionZ);
-    residue.addAtom(atomName, type, xyz, role, null, atomNumber, null, null, null, null);
-  }
-
-
-  _fixBondsArray() {
-    const serialAtomMap = this._serialAtomMap = {};
-    const complex = this._complex;
-
-    const atoms = complex._atoms;
-    for (let i = 0, ni = atoms.length; i < ni; ++i) {
-      const atom = atoms[i];
-      serialAtomMap[atom._serial] = atom;
-    }
-
-    const bonds = complex._bonds;
-    const { logger } = this;
-    for (let j = 0, nj = bonds.length; j < nj; ++j) {
-      const bond = bonds[j];
-      if (bond._right < bond._left) {
-        logger.debug('_fixBondsArray: Logic error.');
-      }
-      bond._left = serialAtomMap[bond._left] || null;
-      bond._right = serialAtomMap[bond._right] || null;
-    }
+    this._atomPosition = new THREE.Vector3(positionX, positionY, positionZ);
+    residue.addAtom(this._atomName, type, this._atomPosition, role, null, this._atomNumber, null, null, null, null);
   }
 
   /**
    * Some finalizing procedures.
+   * NOTE: This code was created by copy-past method from PDBParser.js
    * @returns {Complex} Complex structure for visualizing.
    */
   _finalize() {
-
+    this._molecule = { _index: '', _chains: [] };
+    this._molecule._index = 1;
+    this._molecules.push(this._molecule);
+    this._complex.finalize({
+      needAutoBonding: true,
+      enableEditing: this.settings.now.editing,
+      serialAtomMap: this._serialAtomMap,
+    });
   }
 
   /**
@@ -196,46 +149,27 @@ class GROParser extends Parser {
    */
   parseSync() {
     console.log('HERE!'); /* Temp debugging purposes */
-    /* Somehow catch all data (all lines) */
     /* Create "Complex" variable */
-    const result = this._complex = new Complex();
+    this._complex = new Complex();
     /* Parse input file line-by-line */
     const reader = new GROReader(this._data);
     let counter = 0; /* Simple counter regarding to format of .gro file */
     while (!reader.end()) {
-      const line = reader.readLine();
-      /* Got line, let's parse */
       /* First two lines - technical information, other lines - Atoms */
       if (counter === 0) {
-        this._parseTitle(line);
+        this._parseTitle(reader);
       } else if (counter === 1) {
-        this._parseNumberOfAtoms(line);
+        this._parseNumberOfAtoms(reader);
       } else {
-        this._parseAtom(reader); /* BOX VECTORS PARSING IS HERE - WEIRD FLEX BUT OKAY */
+        this._parseAtom(reader); /* BOX VECTORS PARSING WILL BE HERE ASAP */
       }
       /* End of parsing, switch to next line */
       reader.next();
       counter++;
     }
-    /* TODO:: WHAT ABOUT BONDS? HOW TO CALCULATE THEM? */
-    /* SID: ADDED DUMMY BONDS AND MOLECULE */
-    // result.addBond(20, 282, 0, Bond.BondType.UNKNOWN, true);
-    // result.addBond(26, 229, 0, Bond.BondType.UNKNOWN, true);
-    // result.addBond(116, 188, 0, Bond.BondType.UNKNOWN, true);
-    this._fixBondsArray();
-    this._molecule = { _index: '', _chains: [] };
-    this._molecule._index = 1;
-    this._molecules.push(this._molecule);
-    this._finalizeMolecules();
-    // create secondary structure etc.
-    this._complex.finalize({
-      needAutoBonding: true,
-      detectAromaticLoops: this.settings.now.aromatic,
-      enableEditing: this.settings.now.editing,
-      serialAtomMap: this._serialAtomMap,
-    });
+    this._finalize();
     /* Return resulting Complex variable */
-    return result;
+    return this._complex;
   }
 }
 

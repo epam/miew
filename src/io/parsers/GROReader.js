@@ -32,6 +32,14 @@ export default class GROReader {
   }
 
   /**
+   * Getting end of string.
+   * @returns {Number} Pointer to end of string
+   */
+  getNext() {
+    return this._next;
+  }
+
+  /**
    * Reading character from position.
    * @param{Number} pos - Position in current line.
    * @returns {String} Character from position
