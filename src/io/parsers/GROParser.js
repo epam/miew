@@ -7,6 +7,7 @@ import GROReader from './GROReader';
 const {
   Complex,
   Element,
+  Molecule,
 } = chem;
 
 /**
@@ -78,7 +79,7 @@ class GROParser extends Parser {
    */
   _parseNumberOfAtoms(line) {
     this._numAtoms = line.readInt(0, line.getNext());
-    console.log(this._numAtoms); /* TODO:: TESTING PURPOSES ONLY */
+    // console.log(this._numAtoms); /* TODO:: TESTING PURPOSES ONLY */
   }
 
   /**
@@ -125,6 +126,35 @@ class GROParser extends Parser {
   }
 
   /**
+   * Needed procedure for moleculas finalization.
+   */
+  _finalizeMolecules() {
+    // get chains from complex
+    const chainDict = {};
+    let i;
+    const chains = this._complex._chains;
+    for (i = 0; i < chains.length; ++i) {
+      const chainObj = chains[i];
+      const chainName = chainObj._name;
+      chainDict[chainName] = chainObj;
+    }
+
+    // aggregate residues from chains
+    for (i = 0; i < this._molecules.length; i++) {
+      const m = this._molecules[i];
+      let residues = [];
+      for (let j = 0; j < m._chains.length; j++) {
+        const name = m._chains[j];
+        const chain = chainDict[name];
+        residues = residues.concat(chain._residues.slice());
+      }
+      const molecule = new Molecule(this._complex, m._name, i + 1);
+      molecule._residues = residues;
+      this._complex._molecules[i] = molecule;
+    }
+  }
+
+  /**
    * Some finalizing procedures.
    * NOTE: This code was created by copy-past method from PDBParser.js
    * @returns {Complex} Complex structure for visualizing.
@@ -133,6 +163,7 @@ class GROParser extends Parser {
     this._molecule = { _index: '', _chains: [] };
     this._molecule._index = 1;
     this._molecules.push(this._molecule);
+    this._finalizeMolecules();
     this._complex.finalize({
       needAutoBonding: true,
       enableEditing: this.settings.now.editing,

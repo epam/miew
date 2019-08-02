@@ -73,7 +73,7 @@ const formats = {
   gro: {
     name: 'GRO',
     extension: 'gro',
-    encoding: null,
+    encoding: 'ascii',
     Parser: GROParser,
   },
 };
