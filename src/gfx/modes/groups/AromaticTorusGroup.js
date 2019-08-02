@@ -5,7 +5,7 @@ import AromaticGroup from './AromaticGroup';
 function _createShape(rad, parts) {
   const pts = [];
   for (let i = 0; i < parts; ++i) {
-    const a = 2 * i / parts * Math.PI;
+    const a = -2 * i / parts * Math.PI;
     pts.push(new THREE.Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0));
   }
   return pts;

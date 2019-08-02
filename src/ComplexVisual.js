@@ -807,27 +807,6 @@ class ComplexVisual extends Visual {
     return this._buildSelectorFromSortedLists(atoms, residues, chains);
   }
 
-  /* DB: Repeated declaration */
-  /* getSelectedComponent() {
-    const selectionMask = 1 << this._selectionBit;
-
-    let component = null;
-    let multiple = false;
-
-    // find which component is selected (exclusively)
-    this._complex.forEachAtom((atom) => {
-      if (atom._mask & selectionMask) {
-        if (component === null) {
-          component = atom._residue._component;
-        } else if (component !== atom._residue._component) {
-          multiple = true;
-        }
-      }
-    });
-
-    return multiple ? null : component;
-  }
-
   forSelectedResidues(process) {
     const selectionMask = 1 << this._selectionBit;
     this._complex.forEachResidue((residue) => {
@@ -835,7 +814,7 @@ class ComplexVisual extends Visual {
         process(residue);
       }
     });
-  } */
+  }
 
   beginComponentEdit() {
     if (this._editor) {
