@@ -145,7 +145,7 @@ class GROParser extends Parser {
    * @returns {Complex} Complex structure for visualizing.
    */
   parseSync() {
-    console.log('HERE!'); /* Temp debugging purposes */
+    // console.log('HERE!'); /* Temp debugging purposes */
     /* Create "Complex" variable */
     this._complex = new Complex();
     /* Parse input file line-by-line */

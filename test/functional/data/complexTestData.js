@@ -1,7 +1,7 @@
 export default [{
   // just small protein loaded by default
   name: '1CRN',
-  formats: ['pdb', 'cif', 'mmtf', 'xyz'],
+  formats: ['pdb', 'cif', 'mmtf', 'xyz', 'gro'],
   num: {
     atoms: 327,
     bonds: 337,
@@ -16,7 +16,7 @@ export default [{
 }, {
   // hydrogens, waters, ligands, altloc, all aminoacids, biomolecules, symmetry, ANISOU, LINK
   name: '4NRE',
-  formats: ['pdb', 'cif', 'mmtf'],
+  formats: ['pdb', 'cif', 'mmtf', 'gro'],
   num: {
     atoms: 11306,
     bonds: { pdb: 11093, cif: 11083, mmtf: 11066 }, // = 11093 in VMD, but they are not all valid
@@ -31,7 +31,7 @@ export default [{
 }, {
   // lots of chains, models (+hydrogens)
   name: '2MPZ',
-  formats: ['pdb', 'cif', 'mmtf'],
+  formats: ['pdb', 'cif', 'mmtf', 'gro'],
   num: {
     atoms: 10422,
     bonds: { mmtf: 10395, default: 10449 },
@@ -46,7 +46,7 @@ export default [{
 }, {
   // virus = biomolecule with lots of transformations, symmetry
   name: '1MVA',
-  formats: ['pdb', 'cif', 'mmtf'],
+  formats: ['pdb', 'cif', 'mmtf', 'gro'],
   num: {
     atoms: 3112,
     bonds: 2940,
@@ -61,7 +61,7 @@ export default [{
 }, {
   // DNA, molecules
   name: '5B40',
-  formats: ['pdb', 'cif', 'mmtf'],
+  formats: ['pdb', 'cif', 'mmtf', 'gro'],
   num: {
     atoms: 11817,
     bonds: 12621,

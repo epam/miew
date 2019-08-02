@@ -10,6 +10,7 @@ import XYZParser from '../../src/io/parsers/XYZParser';
 import PubChemParser from '../../src/io/parsers/PubChemParser';
 import SDFParser from '../../src/io/parsers/SDFParser';
 import CCP4Parser from '../../src/io/parsers/CCP4Parser';
+import GROParser from '../../src/io/parsers/GROParser';
 
 
 import complexTestData from './data/complexTestData';
@@ -68,6 +69,12 @@ const formats = {
     extension: 'dsn6',
     encoding: null,
     Parser: DSN6Parser,
+  },
+  gro: {
+    name: 'GRO',
+    extension: 'gro',
+    encoding: null,
+    Parser: GROParser,
   },
 };
 
