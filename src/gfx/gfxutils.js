@@ -449,7 +449,7 @@ function processMaterialForShadow(root, material) {
   }
 
   root.traverse((object) => {
-    if (object instanceof THREE.Mesh) {
+    if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
       prepareObjMaterialForShadow(object);
     }
   });

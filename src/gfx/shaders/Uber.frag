@@ -403,6 +403,22 @@ float unpackRGBAToDepth( const in vec4 v ) {
 
     return saturate(reflectedLight.indirectDiffuse + reflectedLight.directDiffuse + reflectedLight.directSpecular);
   }
+
+  vec3 calcLineShadows(vec3 diffuseColor, vec3 vViewPosition) {
+    #ifdef SHADOWMAP
+      float shadowMask = 1.0;
+      vec3 resColor;
+      // see THREE.WebGLProgram.unrollLoops
+      #pragma unroll_loop
+      for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+        if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );
+
+        resColor = diffuseColor * (0.4 + shadowMask * 0.6);
+      }
+      return resColor;
+    #endif
+    return diffuseColor;
+  }
 #endif
 
 /////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////
@@ -568,8 +584,12 @@ void main() {
 
   #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
     GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
-    BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
-    vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);
+    #if !defined THIN_LINE && !defined THICK_LINE
+      BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
+      vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);
+    #else
+      vec3 outgoingLight = calcLineShadows(diffuseColor.rgb, vViewPosition);
+    #endif
   #else
     vec3 outgoingLight = diffuseColor.rgb;
   #endif

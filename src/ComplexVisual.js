@@ -878,7 +878,7 @@ ComplexVisual.prototype.setMaterialValues = function (values, needTraverse = fal
     rep.material.setValues(values);
     if (needTraverse) {
       rep.geo.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
+        if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
           object.material.setValues(values);
 
           if (process !== undefined) {

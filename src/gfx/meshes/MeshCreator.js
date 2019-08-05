@@ -30,12 +30,13 @@ function _createLineSegmentsGeoTriplet(geo, renderParams) {
   const lineWidth = renderParams.lineWidth || 0;
   return {
     Geometry: geo,
-    Object: thickLines ? meshes.ThickLineMesh : meshes.LineSegments,
+    Object: thickLines ? meshes.ThickLineMesh : meshes.ThinLineMesh, // LineSegments,
     initMaterial: setMatParams({
-      lights: false,
+      lights: true,
       attrColor: true,
       attrAlphaColor: true,
       thickLine: thickLines,
+      thinLine: !thickLines,
     }, {
       lineWidth,
     }),

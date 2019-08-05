@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import UberObject from './UberObject';
 
-const Mesh = UberObject(THREE.Mesh);
+const Mesh = UberObject(THREE.LineSegments);
 const _viewport = new THREE.Vector2();
 
-class ThickLineMesh extends Mesh {
+class ThinLineMesh extends Mesh {
   constructor(geometry, material) {
     super(geometry, material);
     this.castShadow = true;
@@ -23,4 +23,4 @@ class ThickLineMesh extends Mesh {
   }
 }
 
-export default ThickLineMesh;
+export default ThinLineMesh;
