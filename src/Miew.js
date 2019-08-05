@@ -2735,6 +2735,12 @@ Miew.prototype._onKeyDown = function (event) {
       settings.set('ao', !settings.now.ao);
       this._needRender = true;
       break;
+    case 'L'.charCodeAt(0):
+      event.preventDefault();
+      event.stopPropagation();
+      settings.set('shadow.on', !settings.now.shadow.on);
+      this._needRender = true;
+      break;
     case 107:
       event.preventDefault();
       event.stopPropagation();
