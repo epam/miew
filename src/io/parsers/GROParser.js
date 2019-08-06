@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import _ from 'lodash';
 import Parser from './Parser';
 import chem from '../../chem';
 import GROReader from './GROReader';
@@ -53,23 +54,20 @@ class GROParser extends Parser {
 
   /**
    * General check for possibility of parsing.
-   * @returns {boolean} TEMPORARY TRUE
+   * @returns {boolean} true if this file is in ascii, false otherwise
    */
   canProbablyParse() {
-    return true;
+    return _.isString(this._data);
   }
 
   /**
    * Parsing title of molecule complex.
-   * NOTE: that names are ESTIMATES RIGHT NOW, NEED FURTHER DETAILED STUDY!
+   * NOTE: that names are ESTIMATES, there is no strict rules in Gromos87 standard for first line in input file.
    * @param {GROReader} line - Line containing title and time.
    */
   _parseTitle(line) {
     const { metadata } = this._complex;
-    metadata.title = metadata.title || [];
-    metadata.title[0] = line.readLine().trim();
-    metadata.classification = metadata.title;
-    metadata.id = metadata.title;
+    metadata.id = line.readLine().trim();
     metadata.format = 'gro';
   }
 
@@ -79,7 +77,11 @@ class GROParser extends Parser {
    */
   _parseNumberOfAtoms(line) {
     this._numAtoms = line.readInt(0, line.getNext());
-    // console.log(this._numAtoms); /* TODO:: TESTING PURPOSES ONLY */
+    if (Number.isNaN(this._numAtoms)) {
+      this._complex.error = {
+        message: `"${line.readLine()}" is not representing atom number. Consider checking input file`,
+      };
+    }
   }
 
   /**
@@ -91,25 +93,43 @@ class GROParser extends Parser {
   _parseAtom(line) {
     /* CHECK FOR BOX VECTORS!? */
     this._residueNumber = line.readInt(1, 5);
+    if (Number.isNaN(this._residueNumber)) {
+      this._complex.error = {
+        message: `"${line.readString(1, 5)}" is not a residue number in "${line.readLine()}"`,
+      };
+      return;
+    }
     this._residueName = line.readString(6, 10).trim();
     this._atomName = line.readString(11, 15).trim();
     this._atomNumber = line.readInt(16, 20);
+    if (Number.isNaN(this._atomNumber)) {
+      this._complex.error = {
+        message: `"${line.readString(16, 20)}" is not an atom number in "${line.readLine()}"`,
+      };
+      return;
+    }
     const positionX = line.readFloat(21, 28) * 10;
     const positionY = line.readFloat(29, 36) * 10;
     const positionZ = line.readFloat(37, 45) * 10;
+    if (Number.isNaN(positionX) || Number.isNaN(positionY) || Number.isNaN(positionZ)) {
+      this._complex.error = {
+        message: `Atom position is invalid in "${line.readLine()}"`,
+      };
+      return;
+    }
     /* const velocityX = line.readFloat(46, 53);
     const velocityY = line.readFloat(54, 61);
     const velocityZ = line.readFloat(62, 69); */
-    /* TODO: Place for some error if something went wrong */
     /* Adding residue and atom to complex structure */
     const type = Element.getByName(this._atomName[0]); /* MAGIC 0. REASONS: This name is something like "CA", where
      C - is an element an A is something else. But what about Calcium? */
     if (type.fullName === 'Unknown') {
-      /* TODO:: THROW SOME ERROR? */
-      /* BOX VECTORS ARE HERE ALSO. INVALID LOGIC? */
+      this._complex.error = {
+        message: `${this._atomName[0]} hasn't been recognised as an atom name.`,
+      };
       return;
     }
-    const role = Element.Role[this._atomName]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
+    const role = Element.Role[this._atomName];
     /* Firstly, create a dummy chain */
     let chain = this._chain;
     if (!chain) {
@@ -122,41 +142,37 @@ class GROParser extends Parser {
     }
     /* Lastly, add atom to that residue */
     this._atomPosition = new THREE.Vector3(positionX, positionY, positionZ);
-    residue.addAtom(this._atomName, type, this._atomPosition, role, null, this._atomNumber, null, null, null, null);
+    /* Adding default constants to correct atom addition process */
+    const het = true;
+    const altLoc = ' ';
+    const occupancy = 1;
+    const tempFactor = 1;
+    const charge = 0;
+    residue.addAtom(this._atomName, type, this._atomPosition, role, het, this._atomNumber, altLoc, occupancy, tempFactor, charge);
   }
 
   /**
-   * Needed procedure for moleculas finalization.
+   * Needed procedure for molecules finalization. In '.gro' file format there is only 1 chain and 1 molecule.
    */
   _finalizeMolecules() {
-    // get chains from complex
+    // get chain from complex
     const chainDict = {};
-    let i;
-    const chains = this._complex._chains;
-    for (i = 0; i < chains.length; ++i) {
-      const chainObj = chains[i];
-      const chainName = chainObj._name;
-      chainDict[chainName] = chainObj;
-    }
+    const chain = this._complex._chains[0];
+    const chainName = chain._name;
+    chainDict[chainName] = chain;
 
-    // aggregate residues from chains
-    for (i = 0; i < this._molecules.length; i++) {
-      const m = this._molecules[i];
-      let residues = [];
-      for (let j = 0; j < m._chains.length; j++) {
-        const name = m._chains[j];
-        const chain = chainDict[name];
-        residues = residues.concat(chain._residues.slice());
-      }
-      const molecule = new Molecule(this._complex, m._name, i + 1);
-      molecule._residues = residues;
-      this._complex._molecules[i] = molecule;
-    }
+    // aggregate residues from chain
+    const m = this._molecules[0];
+    let residues = [];
+    residues = residues.concat(chain._residues.slice());
+
+    const molecule = new Molecule(this._complex, m._name, 1);
+    molecule._residues = residues;
+    this._complex._molecules[0] = molecule;
   }
 
   /**
    * Some finalizing procedures.
-   * NOTE: This code was created by copy-past method from PDBParser.js
    * @returns {Complex} Complex structure for visualizing.
    */
   _finalize() {
@@ -166,6 +182,7 @@ class GROParser extends Parser {
     this._finalizeMolecules();
     this._complex.finalize({
       needAutoBonding: true,
+      detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
       serialAtomMap: this._serialAtomMap,
     });
@@ -176,9 +193,8 @@ class GROParser extends Parser {
    * @returns {Complex} Complex structure for visualizing.
    */
   parseSync() {
-    // console.log('HERE!'); /* Temp debugging purposes */
     /* Create "Complex" variable */
-    this._complex = new Complex();
+    const result = this._complex = new Complex();
     /* Parse input file line-by-line */
     const reader = new GROReader(this._data);
     let counter = 0; /* Simple counter regarding to format of .gro file */
@@ -188,16 +204,30 @@ class GROParser extends Parser {
         this._parseTitle(reader);
       } else if (counter === 1) {
         this._parseNumberOfAtoms(reader);
-      } else {
-        this._parseAtom(reader); /* BOX VECTORS PARSING WILL BE HERE ASAP */
-      }
+      } else if (counter <= this._numAtoms + 1) { /* Number of atoms + 2 strings of technical information */
+        this._parseAtom(reader); /* Box Vectors are not been proceeded at all */
+      } else break;
       /* End of parsing, switch to next line */
       reader.next();
       counter++;
     }
+
+    /* Catch errors occurred in parsing process */
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    /* Finalizing data */
     this._finalize();
+
+    /* Cleaning up */
+    this._atomPosition = null;
+    this._complex = null;
+    this._molecules = null;
+    this._molecule = null;
+
     /* Return resulting Complex variable */
-    return this._complex;
+    return result;
   }
 }
 
