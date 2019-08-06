@@ -91,23 +91,10 @@ class GROParser extends Parser {
    * @param {GROReader} line - Line containing information about atom.
    */
   _parseAtom(line) {
-    /* CHECK FOR BOX VECTORS!? */
     this._residueNumber = line.readInt(1, 5);
-    if (Number.isNaN(this._residueNumber)) {
-      this._complex.error = {
-        message: `"${line.readString(1, 5)}" is not a residue number in "${line.readLine()}"`,
-      };
-      return;
-    }
     this._residueName = line.readString(6, 10).trim();
     this._atomName = line.readString(11, 15).trim();
     this._atomNumber = line.readInt(16, 20);
-    if (Number.isNaN(this._atomNumber)) {
-      this._complex.error = {
-        message: `"${line.readString(16, 20)}" is not an atom number in "${line.readLine()}"`,
-      };
-      return;
-    }
     const positionX = line.readFloat(21, 28) * 10;
     const positionY = line.readFloat(29, 36) * 10;
     const positionZ = line.readFloat(37, 45) * 10;
@@ -212,6 +199,12 @@ class GROParser extends Parser {
       counter++;
     }
 
+    /* If number of atoms in second line is less then actual atoms in file */
+    if (counter < this._numAtoms + 1) {
+      this._complex.error = {
+        message: 'File ended unexpectedly.',
+      };
+    }
     /* Catch errors occurred in parsing process */
     if (result.error) {
       throw new Error(result.error.message);
