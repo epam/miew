@@ -1194,6 +1194,10 @@ Miew.prototype._renderScene = (function () {
 
     if (ssao) {
       this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
+    } else {
+      const gl = gfx.renderer.getContext();
+      const ext = gl.getExtension('WEBGL_draw_buffers');
+      ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, null]);
     }
 
     if (settings.now.transparency === 'prepass') {
