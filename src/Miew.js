@@ -1143,11 +1143,12 @@ Miew.prototype._setUberMaterialValues = function (values) {
   });
 };
 
-Miew.prototype._setMRT = function (renderBuffer, textureBuffer) {
+Miew.prototype._enableMRT = function (ssao, renderBuffer, textureBuffer) {
   const gfx = this._gfx;
   const gl = gfx.renderer.getContext();
   const ext = gl.getExtension('WEBGL_draw_buffers');
   const { properties } = gfx.renderer;
+
 
   // take extra texture from Texture Buffer
   gfx.renderer.setRenderTarget(textureBuffer);
@@ -1167,7 +1168,12 @@ Miew.prototype._setMRT = function (renderBuffer, textureBuffer) {
   gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, tx8, 0);
 
   // mapping textures
-  ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
+  if (!ssao) {
+    ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, null]);
+  } else {
+    ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
+  }
+
 };
 
 Miew.prototype._renderScene = (function () {
@@ -1192,12 +1198,9 @@ Miew.prototype._renderScene = (function () {
     const volumeVisual = this._getVolumeVisual();
     const ssao = bHaveComplexes && settings.now.ao;
 
+
     if (ssao) {
-      this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
-    } else {
-      const gl = gfx.renderer.getContext();
-      const ext = gl.getExtension('WEBGL_draw_buffers');
-      ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, null]);
+      this._enableMRT(true, gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
     if (settings.now.transparency === 'prepass') {
@@ -1205,6 +1208,10 @@ Miew.prototype._renderScene = (function () {
     } else if (settings.now.transparency === 'standard') {
       gfx.renderer.setRenderTarget(gfx.offscreenBuf);
       gfx.renderer.render(gfx.scene, camera);
+    }
+
+    if (ssao) {
+      this._enableMRT(false, gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
