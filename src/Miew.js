@@ -1173,7 +1173,6 @@ Miew.prototype._enableMRT = function (ssao, renderBuffer, textureBuffer) {
   } else {
     ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
   }
-
 };
 
 Miew.prototype._renderScene = (function () {
