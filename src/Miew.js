@@ -1143,19 +1143,23 @@ Miew.prototype._setUberMaterialValues = function (values) {
   });
 };
 
-Miew.prototype._enableMRT = function (ssao, renderBuffer, textureBuffer) {
+Miew.prototype._enableMRT = function (on, renderBuffer, textureBuffer) {
   const gfx = this._gfx;
   const gl = gfx.renderer.getContext();
   const ext = gl.getExtension('WEBGL_draw_buffers');
   const { properties } = gfx.renderer;
 
+  if (!on) {
+    ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, null]);
+    return;
+  }
 
   // take extra texture from Texture Buffer
   gfx.renderer.setRenderTarget(textureBuffer);
   const tx8 = properties.get(textureBuffer.texture).__webglTexture;
   gl.bindTexture(gl.TEXTURE_2D, tx8);
 
-  // take texture and farmebuffer from renderbuffer
+  // take texture and framebuffer from renderbuffer
   gfx.renderer.setRenderTarget(renderBuffer);
   const fb = properties.get(renderBuffer).__webglFramebuffer;
   const tx = properties.get(renderBuffer.texture).__webglTexture;
@@ -1168,11 +1172,7 @@ Miew.prototype._enableMRT = function (ssao, renderBuffer, textureBuffer) {
   gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, tx8, 0);
 
   // mapping textures
-  if (!ssao) {
-    ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, null]);
-  } else {
-    ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
-  }
+  ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
 };
 
 Miew.prototype._renderScene = (function () {
@@ -1197,7 +1197,6 @@ Miew.prototype._renderScene = (function () {
     const volumeVisual = this._getVolumeVisual();
     const ssao = bHaveComplexes && settings.now.ao;
 
-
     if (ssao) {
       this._enableMRT(true, gfx.offscreenBuf, gfx.offscreenBuf4);
     }
@@ -1210,7 +1209,7 @@ Miew.prototype._renderScene = (function () {
     }
 
     if (ssao) {
-      this._enableMRT(false, gfx.offscreenBuf, gfx.offscreenBuf4);
+      this._enableMRT(false, null, null);
     }
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
