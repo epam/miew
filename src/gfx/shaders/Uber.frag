@@ -406,16 +406,20 @@ float unpackRGBAToDepth( const in vec4 v ) {
 
   vec3 calcLineShadows(vec3 diffuseColor, vec3 vViewPosition) {
     #ifdef SHADOWMAP
-      float shadowMask = 1.0;
-      vec3 resColor;
+      float shadowMask = 0.0;
+      float num_lights = 0.0;
       // see THREE.WebGLProgram.unrollLoops
       #pragma unroll_loop
       for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
-        if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );
-
-        resColor = diffuseColor * (0.4 + shadowMask * 0.6);
+        if ( directionalLights[ i ].shadow > 0 ) shadowMask += getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );
+        else shadowMask += 1.0;
+        num_lights += 1.0;
       }
-      return resColor;
+      float shadowFactor = 1.0;
+      if (num_lights > 0.0) {
+        shadowFactor = shadowMask / num_lights;
+      }
+      return saturate(diffuseColor * ambientLightColor * (1.0  - shadowFactor) + diffuseColor * shadowFactor);
     #endif
     return diffuseColor;
   }
