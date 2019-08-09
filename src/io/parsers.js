@@ -10,6 +10,7 @@ import PubChemParser from './parsers/PubChemParser';
 import SDFParser from './parsers/SDFParser';
 import DSN6Parser from './parsers/DSN6Parser';
 import GROParser from './parsers/GROParser';
+import MOL2Parser from './parsers/MOL2Parser';
 
 export default new ParserList([
   // note: order might be important
@@ -23,4 +24,5 @@ export default new ParserList([
   CCP4Parser,
   DSN6Parser,
   GROParser,
+  MOL2Parser,
 ]);
