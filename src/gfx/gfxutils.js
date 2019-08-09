@@ -158,7 +158,10 @@ THREE.PerspectiveCamera.prototype.setDistanceToFit = function (radius, angle) {
 };
 
 /**
- * @param {number} angle - Field of view in degrees.
+ * @param {RCGroup} gfxObj - All objects on scene.
+ * @param {THREE.PerspectiveCamera} camera - Camera used for rendering.
+ * @param {number} clipPlane - Distance to clip plane.
+ * @param {number} fogFarPlane - Distance to fog far plane.
  */
 THREE.Raycaster.prototype.intersectVisibleObject = function (gfxObj, camera, clipPlane, fogFarPlane) {
   const intersects = this.intersectObject(gfxObj, false);
