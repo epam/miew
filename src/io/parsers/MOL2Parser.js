@@ -33,22 +33,6 @@ const typeMap = {
   du: Bond.BondType.COVALENT, // dummy
 };
 
-function nameToElement(name) {
-  // http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
-  //
-  // http://www.cgl.ucsf.edu/chimera/docs/UsersGuide/tutorials/pdbintro.html#note1
-  //
-  // Atom names start with element symbols right-justified in columns 13-14
-  // as permitted by the length of the name. For example, the symbol FE for
-  // iron appears in columns 13-14, whereas the symbol C for carbon appears
-  // in column 14 (see Misaligned Atom Names). If an atom name has four
-  // characters, however, it must start in column 13 even if the element
-  // symbol is a single character (for example, see Hydrogen Atoms).
-
-  const veryLong = name.trim().length === 4;
-  return name.slice(0, veryLong ? 1 : 2).trim();
-}
-
 function buildChainID(index) {
   if (!index) {
     return 'A';
@@ -95,6 +79,8 @@ export default class MOL2Parser extends Parser {
   }
 
   _parseAtoms(stream, atomsNum) {
+    const residueRegexp = /\d+$/;
+
     let curStr = stream.getHeaderString('ATOM');
 
     const chainID = buildChainID(this._compoundIndx);
@@ -105,39 +91,25 @@ export default class MOL2Parser extends Parser {
       curStr = stream.getNextString();
       const parsedStr = curStr.trim().split(/\s+/);
       const serial = parseInt(parsedStr[0], 10); // parseInt(curStr.substr(0, 7), 10);
-      const name = parsedStr[1]; // curStr.substr(9, 3).trim();
+      const name = parsedStr[1];
 
-      const x = parseFloat(parsedStr[2]); // parseFloat(curStr.substr(13, 13));
-      const y = parseFloat(parsedStr[3]); // parseFloat(curStr.substr(26, 10));
-      const z = parseFloat(parsedStr[4]); // parseFloat(curStr.substr(36, 10));
+      const x = parseFloat(parsedStr[2]);
+      const y = parseFloat(parsedStr[3]);
+      const z = parseFloat(parsedStr[4]);
 
-      // const atomType = parsedStr[5]; // ???
-      const resSeq = parseInt(parsedStr[6], 10); // parseInt(curStr.substr(52, 4), 10);
-      const resName = parsedStr[7]; // curStr.substr(56, 5).trim();
+      const element = parsedStr[5].split('.')[0];
+      const resSeq = parseInt(parsedStr[6], 10);
+
+      const resName = parsedStr[7].replace(residueRegexp, '');
 
       const xyz = new THREE.Vector3(x, y, z);
-      const charge = chargeMap[parseFloat(parsedStr[8]) | 0]; // parseFloat(curStr.substr(69, 7));
-      const element = nameToElement(name);
+      const charge = chargeMap[parseFloat(parsedStr[8]) | 0];
+      // const element = nameToElement(name);
 
       const type = Element.getByName(element);
       const role = Element.Role[name];
 
-      if (!this._atomsIndexes[name]) {
-        this._atomsIndexes[name] = 0;
-      }
-      this._atomsIndexes[name] += 1;
-      // name += this._atomsIndexes[name]; // every atom need to have unique name.
-
-      let chain = this._chain;
-      if (!chain || chain.getName() !== chainID) {
-        this._chain = chain = this._complex.getChain(chainID) || this._complex.addChain(chainID);
-        this._residue = null;
-      }
-      let residue = this._residue;
-      if (!residue || residue.getSequence() !== resSeq || residue.getICode() !== ' ') {
-        this._residue = residue = chain.addResidue(resName, resSeq, ' ');
-      }
-      // this._residue = this._chain.addResidue(resName, resSeq, ' ');
+      this._residue = this._chain.addResidue(resName, resSeq, ' ');
       this._residue.addAtom(name, type, xyz, role, true, serial, ' ', 1.0, 0.0, charge);
     }
   }
@@ -160,8 +132,6 @@ export default class MOL2Parser extends Parser {
         (bondType in typeMap) ? orderMap[bondType] : 1,
         (bondType in typeMap) ? typeMap[bondType] : Bond.BondType.UNKNOWN,
         true);
-      console.log(orderMap[bondType]);
-      console.log(typeMap[bondType]);
     }
   }
 
@@ -245,8 +215,12 @@ export default class MOL2Parser extends Parser {
     this._buildAssemblies();
     this._complex.units = this._complex.units.concat(this._assemblies);
     this._buildMolecules();
+
     this._complex.finalize({
-      needAutoBonding: false, detectAromaticLoops: false, enableEditing: false, serialAtomMap: this._serialAtomMap,
+      needAutoBonding: false,
+      detectAromaticLoops: this.settings.now.aromatic,
+      enableEditing: this.settings.now.editing,
+      serialAtomMap: this._serialAtomMap,
     });
   }
 
@@ -256,8 +230,8 @@ export default class MOL2Parser extends Parser {
 
     const countsLine = stream.getStringFromStart(2);
     const parsedStr = countsLine.trim().split(/\s+/);
-    const atomsNum = parsedStr[0]; // parseInt(countsLine.substr(0, 3), 10);
-    const bondsNum = parsedStr[1]; // parseInt(countsLine.substr(3, 3), 10);
+    const atomsNum = parsedStr[0];
+    const bondsNum = parsedStr[1];
 
     this._parseAtoms(stream, atomsNum);
     this._parseBonds(stream, bondsNum);
@@ -272,8 +246,12 @@ export default class MOL2Parser extends Parser {
     const result = this._complex = new Complex();
     const stream = new MOL2Stream(this._data);
 
-    this._parseCompound(stream);
     result.metadata.format = this._format;
+
+    do {
+      this._parseCompound(stream);
+    } while (stream.findNextCompoundStart());
+
     this._finalize();
 
     return result;

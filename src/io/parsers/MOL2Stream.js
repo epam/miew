@@ -7,6 +7,16 @@ export default class MOL2Stream {
     this._currentStringIndx = 0;
   }
 
+  setStart(start) {
+    if (start >= this._strings.length) {
+      this._currentStart = this._strings.length - 1;
+      this._currentStringIndx = this._strings.length - 1;
+    } else {
+      this._currentStart = start;
+      this._currentStringIndx = start;
+    }
+  }
+
   getNextString() {
     return this._strings[++this._currentStringIndx];
   }
@@ -29,5 +39,18 @@ export default class MOL2Stream {
       curStr = this.getNextString();
     }
     return this._strings[this._currentStringIndx];
+  }
+
+  findNextCompoundStart() {
+    let curStr = this.getCurrentString();
+    while (!_.isUndefined(curStr) && curStr.trim() !== '@<TRIPOS>MOLECULE>') {
+      curStr = this.getNextString();
+    }
+    this.setStart(++this._currentStringIndx);
+    return this.probablyHaveDataToParse();
+  }
+
+  probablyHaveDataToParse() {
+    return this._currentStringIndx < this._strings.length - 2;
   }
 }
