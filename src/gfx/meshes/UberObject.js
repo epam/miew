@@ -5,8 +5,6 @@ export default function (SuperClass) {
     constructor(...rest) {
       super(...rest);
       this.onBeforeRender = NewObjectType.prototype.onBeforeRender;
-      this.castShadow = true;
-      this.receiveShadow = true;
     }
 
     onBeforeRender(renderer, scene, camera, geometry, material, group) {
