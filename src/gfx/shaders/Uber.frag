@@ -58,6 +58,7 @@ uniform float clipPlaneValue;
 #define PI 3.14159265359
 #define RECIPROCAL_PI 0.31830988618
 #define saturate(a) clamp( a, 0.0, 1.0 )
+#define normalSign ( float( gl_FrontFacing ) * 2.0 - 1.0 )
 
 #ifdef USE_FOG
   uniform vec3 fogColor;
@@ -541,11 +542,11 @@ void main() {
     vec4 diffuseColor = vec4(diffuse, totalOpacity);
   #endif
 
+  float flipNormal;
   #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
+    flipNormal = 1.0;
     #ifdef DOUBLE_SIDED
-      float flipNormal = ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-    #else
-      float flipNormal = 1.0;
+      flipNormal = normalSign;
     #endif
     vec3 normal = normalize( vNormal ) * flipNormal;
   #endif
@@ -558,11 +559,17 @@ void main() {
 
   #ifdef NORMALS_TO_G_BUFFER
     #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
-      vec3 viewNormaInColor = 0.5*viewNormalSprites+0.5;
+      vec3 viewNormaInColor = viewNormalSprites;
     #else
-      vec3 viewNormaInColor = 0.5*viewNormal+0.5;
+      vec3 viewNormaInColor = viewNormal;
+    #endif
+    flipNormal = 1.0;
+    // invert normals on invisible front faces to all of them been directed to the side of viewer
+    #ifdef DOUBLE_SIDED_G_BUFFER
+      flipNormal = normalSign;
     #endif
     // [-1, 1] -> [0, 1]
+    viewNormaInColor = 0.5 * viewNormaInColor * flipNormal + 0.5;
     gl_FragData[1] = vec4(viewNormaInColor, 1.0);
   #endif
 

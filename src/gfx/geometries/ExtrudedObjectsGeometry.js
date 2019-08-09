@@ -154,7 +154,7 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
 
         tmpPrev.subVectors(tmpShape[(j + ptsCount - 1) % ptsCount], tmpShape[(j + 1) % ptsCount]).normalize();
         tmpNext.subVectors(tmpShape[j], nearRingPt).normalize();
-        tmpRes.crossVectors(tmpPrev, tmpNext).normalize().toArray(normals, vtxIdx);
+        tmpRes.crossVectors(tmpNext, tmpPrev).normalize().toArray(normals, vtxIdx);
       } else {
         tmpPrev.subVectors(tmpShape[j], tmpShape[(j + ptsCount - 1) % ptsCount]).normalize();
         tmpNext.subVectors(tmpShape[j], tmpShape[(j + 1) % ptsCount]).normalize();
@@ -180,7 +180,7 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
 
     tmpPrev.subVectors(tmpShape[1], tmpShape[0]).normalize();
     tmpNext.subVectors(tmpShape[1], tmpShape[2]).normalize();
-    normalOnCut.crossVectors(tmpNext, tmpPrev).normalize();
+    normalOnCut.crossVectors(tmpPrev, tmpNext).normalize();
 
     let vtxIdx = chunkStartIdx;
     // First and second rings normals' values are equal to value of normal to the cutting plane

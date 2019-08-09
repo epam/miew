@@ -1143,18 +1143,23 @@ Miew.prototype._setUberMaterialValues = function (values) {
   });
 };
 
-Miew.prototype._setMRT = function (renderBuffer, textureBuffer) {
+Miew.prototype._enableMRT = function (on, renderBuffer, textureBuffer) {
   const gfx = this._gfx;
   const gl = gfx.renderer.getContext();
   const ext = gl.getExtension('WEBGL_draw_buffers');
   const { properties } = gfx.renderer;
+
+  if (!on) {
+    ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, null]);
+    return;
+  }
 
   // take extra texture from Texture Buffer
   gfx.renderer.setRenderTarget(textureBuffer);
   const tx8 = properties.get(textureBuffer.texture).__webglTexture;
   gl.bindTexture(gl.TEXTURE_2D, tx8);
 
-  // take texture and farmebuffer from renderbuffer
+  // take texture and framebuffer from renderbuffer
   gfx.renderer.setRenderTarget(renderBuffer);
   const fb = properties.get(renderBuffer).__webglFramebuffer;
   const tx = properties.get(renderBuffer.texture).__webglTexture;
@@ -1193,7 +1198,7 @@ Miew.prototype._renderScene = (function () {
     const ssao = bHaveComplexes && settings.now.ao;
 
     if (ssao) {
-      this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
+      this._enableMRT(true, gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
     if (settings.now.transparency === 'prepass') {
@@ -1201,6 +1206,10 @@ Miew.prototype._renderScene = (function () {
     } else if (settings.now.transparency === 'standard') {
       gfx.renderer.setRenderTarget(gfx.offscreenBuf);
       gfx.renderer.render(gfx.scene, camera);
+    }
+
+    if (ssao) {
+      this._enableMRT(false, null, null);
     }
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
@@ -1326,6 +1335,23 @@ Miew.prototype._renderOutline = (function () {
   };
 }());
 
+/**
+ * Check if there is selection which must be rendered or not.
+ * @private
+ * @returns {boolean} true on existing selection to render
+ */
+Miew.prototype._hasSelectionToRender = function () {
+  const selPivot = this._gfx.selectionPivot;
+
+  for (let i = 0; i < selPivot.children.length; i++) {
+    const selPivotChild = selPivot.children[i];
+    if (selPivotChild.children.length > 0) {
+      return true;
+    }
+  }
+  return false;
+};
+
 Miew.prototype._renderSelection = (function () {
   const _outlineMaterial = new OutlineMaterial();
 
@@ -1337,7 +1363,7 @@ Miew.prototype._renderSelection = (function () {
     gfx.renderer.setClearColor('black', 0);
 
     // render selection to offscreen buffer
-    if (gfx.selectionPivot.children.length > 0) {
+    if (self._hasSelectionToRender()) {
       gfx.renderer.setRenderTarget(srcBuffer);
       gfx.renderer.clear(true, false, false);
       gfx.selectionRoot.matrix = gfx.root.matrix;
@@ -3501,7 +3527,8 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('ao', () => {
-    this._setUberMaterialValues({ normalsToGBuffer: settings.now.ao });
+    const values = { normalsToGBuffer: settings.now.ao, doubleSidedGBuffer: settings.now.ao };
+    this._setUberMaterialValues(values);
   });
 
   on('fogColor', () => {
