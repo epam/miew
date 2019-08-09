@@ -1335,6 +1335,23 @@ Miew.prototype._renderOutline = (function () {
   };
 }());
 
+/**
+ * Check if there is selection which must be rendered or not.
+ * @private
+ * @returns {boolean} true on existing selection to render
+ */
+Miew.prototype._hasSelectionToRender = function () {
+  const selPivot = this._gfx.selectionPivot;
+
+  for (let i = 0; i < selPivot.children.length; i++) {
+    const selPivotChild = selPivot.children[i];
+    if (selPivotChild.children.length > 0) {
+      return true;
+    }
+  }
+  return false;
+};
+
 Miew.prototype._renderSelection = (function () {
   const _outlineMaterial = new OutlineMaterial();
 
@@ -1346,7 +1363,7 @@ Miew.prototype._renderSelection = (function () {
     gfx.renderer.setClearColor('black', 0);
 
     // render selection to offscreen buffer
-    if (gfx.selectionPivot.children.length > 0) {
+    if (self._hasSelectionToRender()) {
       gfx.renderer.setRenderTarget(srcBuffer);
       gfx.renderer.clear(true, false, false);
       gfx.selectionRoot.matrix = gfx.root.matrix;
