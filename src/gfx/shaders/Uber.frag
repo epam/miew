@@ -584,7 +584,7 @@ void main() {
 
   #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
     GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
-    #if !defined THIN_LINE && !defined THICK_LINE
+    #if !defined LINES
       BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
       vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);
     #else

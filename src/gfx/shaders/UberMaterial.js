@@ -111,10 +111,10 @@ function UberMaterial(params) {
   this.dashedLine = false;
   // mark as transparent
   this.transparent = true;
+  // mark as lines (thick or thin)
+  this.lines = false;
   // mark as thick lines
   this.thickLine = false;
-  // mark as thin lines
-  this.thinLine = false;
   // makes fog begin transparency (required for transparent background)
   this.fogTransparent = false;
   // used to render surface normals to G buffer for ssao effect
@@ -224,8 +224,8 @@ UberMaterial.prototype.copy = function (source) {
   this.colorFromDepth = source.colorFromDepth;
   this.prepassTransparancy = source.prepassTransparancy;
   this.dashedLine = source.dashedLine;
+  this.lines = source.lines;
   this.thickLine = source.thickLine;
-  this.thinLine = source.thinLine;
   this.fogTransparent = source.fogTransparent;
   this.normalsToGBuffer = source.normalsToGBuffer;
   this.toonShading = source.toonShading;
@@ -318,11 +318,11 @@ UberMaterial.prototype.setValues = function (values) {
   if (this.dashedLine) {
     defines.DASHED_LINE = 1;
   }
+  if (this.lines) {
+    defines.LINES = 1;
+  }
   if (this.thickLine) {
     defines.THICK_LINE = 1;
-  }
-  if (this.thinLine) {
-    defines.THIN_LINE = 1;
   }
   if (this.fogTransparent) {
     defines.FOG_TRANSPARENT = 1;
