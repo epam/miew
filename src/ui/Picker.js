@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import settings from '../settings';
-import utils from '../utils';
+import Timer from '../Timer';
 import EventDispatcher from '../utils/EventDispatcher';
 
 function Picker(gfxObj, camera, domElement) {
@@ -19,7 +19,7 @@ function Picker(gfxObj, camera, domElement) {
   this._lastClickPos = new THREE.Vector2(0, 0);
   this._clickBeginTime = 0.0;
 
-  this._clock = new utils.Timer();
+  this._clock = new Timer();
   this._clock.start();
 
   this._listeners = [
