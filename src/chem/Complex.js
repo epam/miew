@@ -1067,12 +1067,67 @@ class Complex {
     return this._voxelWorld;
   }
 
+  /**
+   * Simple function to make unified routine procedure without code duplication.
+   * @param {Array} srcArray   - Source chemical structure array (will be part of resulting chemical structure array).
+   * @param {Array} dstArray   - Resulting chemical structure array.
+   * @param {function} functor - Processor for every element in array.
+   */
+  addElement(srcArray, dstArray, functor) {
+    const { length } = srcArray;
+    for (let i = 0; i < length; ++i) {
+      const a = srcArray[i];
+      functor(a);
+      dstArray.push(a);
+    }
+  }
+
+  /**
+   * Processing complex structure (preparing to join).
+   * @param {complex} c - Complex to join.
+   * @param {number} atomBias       - Atom Bias.
+   * @param {number} bondBias       - Bond Bias.
+   * @param {number} residueBias    - Residue Bias.
+   * @param {number} chainBias      - Chain Bias.
+   * @param {number} componentBias  - Component Bias.
+   */
+  processComplex(c, atomBias, bondBias, residueBias, chainBias, componentBias) {
+    // add atoms
+    this.addElement(c._atoms, this._atoms, (elem) => {
+      elem._serial += atomBias;
+      elem._index += atomBias;
+    });
+    // add bonds
+    this.addElement(c._bonds, this._bonds, (elem) => {
+      elem._index += bondBias;
+    });
+    // add residues
+    this.addElement(c._residues, this._residues, (elem) => {
+      elem._index += residueBias;
+    });
+    // add chains
+    this.addElement(c._chains, this._chains, (elem) => {
+      elem._complex = this;
+      elem._index += chainBias;
+    });
+    // add sheets
+    this.addElement(c._sheets, this._sheets, () => { });
+    // add helices
+    this.addElement(c._helices, this._helices, () => { });
+    // add sgroups
+    this.addElement(c._sgroups, this._sgroups, () => { });
+    // add components
+    this.addElement(c._components, this._components, (elem) => {
+      elem._complex = this;
+      elem._index += componentBias;
+    });
+    // add structures
+    this.addElement(c.structures, this.structures, () => { });
+  }
+
   // this function joins multiple complexes into one (this)
   // atom, bond, ... objects are reused -- so input complexes are no longer valid
   joinComplexes(complexes) {
-    let i;
-    let j;
-
     // clear target complex
     this._chains = [];
     this._components = [];
@@ -1089,67 +1144,9 @@ class Complex {
     let residueBias = 0;
     let chainBias = 0;
     let componentBias = 0;
-    for (i = 0; i < complexes.length; ++i) {
+    for (let i = 0; i < complexes.length; ++i) {
       const c = complexes[i];
-
-      // add atoms
-      for (j = 0; j < c._atoms.length; ++j) {
-        const a = c._atoms[j];
-        a._serial += atomBias;
-        a._index += atomBias;
-        this._atoms.push(a);
-      }
-
-      // add bonds
-      for (j = 0; j < c._bonds.length; ++j) {
-        const b = c._bonds[j];
-        b._index += bondBias;
-        this._bonds.push(b);
-      }
-
-      // add residues
-      for (j = 0; j < c._residues.length; ++j) {
-        const r = c._residues[j];
-        r._index += residueBias;
-        this._residues.push(r);
-      }
-
-      // add chains
-      for (j = 0; j < c._chains.length; ++j) {
-        const chain = c._chains[j];
-        chain._complex = this;
-        chain._index += chainBias;
-        this._chains.push(chain);
-      }
-
-      // add structures
-      for (j = 0; j < c.structures.length; ++j) {
-        this.structures.push(c.structures[j]);
-      }
-
-      // add sheets
-      for (j = 0; j < c._sheets.length; ++j) {
-        this._sheets.push(c._sheets[j]);
-      }
-
-      // add helices
-      for (j = 0; j < c._helices.length; ++j) {
-        this._helices.push(c._helices[j]);
-      }
-
-      // add SGroups
-      for (j = 0; j < c._sgroups.length; ++j) {
-        this._sgroups.push(c._sgroups[j]);
-      }
-
-      // add components
-      for (j = 0; j < c._components.length; ++j) {
-        const comp = c._components[j];
-        comp._complex = this;
-        comp._index += componentBias;
-        this._components.push(comp);
-      }
-
+      this.processComplex(c, atomBias, bondBias, residueBias, chainBias, componentBias);
       // merge residue types
       for (const rt in c._residueTypes) {
         if (c._residueTypes.hasOwnProperty(rt)) {
