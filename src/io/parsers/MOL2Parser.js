@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import Parser from './Parser';
 import chem from '../../chem';
 import MOL2Stream from './MOL2Stream';
-import Assembly from '../../chem/Assembly';
 
 const {
   Complex,
@@ -54,44 +53,39 @@ function buildChainID(index) {
 export default class MOL2Parser extends Parser {
   constructor(data, options) {
     super(data, options);
-    this._format = 'mol2';
+
     this._complex = null;
     this._chain = null;
     this._residue = null;
     this._compoundIndx = -1;
+
     this._molecules = [];
-    this._metadata = {};
-    this._metadata.molecules = [];
-    this._assemblies = [];
-    this._atomsIndexes = [];
-    this._atomsParsed = 0;
+    this._molecule = null;
+
     this._options.fileType = 'mol2';
   }
 
   _parseMolecule(stream) {
     stream.getHeaderString('MOLECULE');
-    const molecule = {};
-    molecule.name = stream.getNextString();
-    molecule.title = [''];
-    molecule.format = 'mol2';
-    molecule.date = '';
-    this._metadata.molecules.push(molecule);
+
+    const { metadata } = this._complex;
+    metadata.name = stream.getNextString();
+    metadata.format = 'mol2';
+
+    this._molecule = { _index: '', _chains: [] };
+    this._molecule._index = this._compoundIndx + 1;
+    this._molecules.push(this._molecule);
   }
 
   _parseAtoms(stream, atomsNum) {
-    const residueRegexp = /\d+$/;
-
+    const resNumberRegex = /\d+$/;
     let curStr = stream.getHeaderString('ATOM');
-
-    const chainID = buildChainID(this._compoundIndx);
-
-    this._chain = this._complex.getChain(chainID) || this._complex.addChain(chainID);
 
     for (let i = 0; i < atomsNum; i++) {
       curStr = stream.getNextString();
       const parsedStr = curStr.trim().split(/\s+/);
-      const serial = parseInt(parsedStr[0], 10); // parseInt(curStr.substr(0, 7), 10);
-      const name = parsedStr[1];
+      const atomId = parseInt(parsedStr[0], 10);
+      const atomName = parsedStr[1];
 
       const x = parseFloat(parsedStr[2]);
       const y = parseFloat(parsedStr[3]);
@@ -100,17 +94,39 @@ export default class MOL2Parser extends Parser {
       const element = parsedStr[5].split('.')[0];
       const resSeq = parseInt(parsedStr[6], 10);
 
-      const resName = parsedStr[7].replace(residueRegexp, '');
+      const resName = parsedStr[7].replace(resNumberRegex, '');
+
+      /* There fields are not listed in mol2 format, set them default */
+      const het = true;
+      const altLoc = ' ';
+      const occupancy = 1.0;
+      const tempFactor = 0.0;
+
+      if (this.settings.now.nowater) {
+        if (resName === 'HOH' || resName === 'WAT') {
+          return;
+        }
+      }
+
+      const charge = parseFloat(parsedStr[8]) | 0;
+      const type = Element.getByName(element);
+      const role = Element.Role[atomName];
+
+      let chain = this._chain;
+      let resId = ' ';
+      if (!chain) {
+        const chainId = buildChainID(this._compoundIndx);
+        resId = chainId;
+        this._chain = chain = this._complex.getChain(chainId) || this._complex.addChain(chainId);
+        this._residue = null;
+      }
+      let residue = this._residue;
+      if (!residue || residue.getSequence() !== resSeq) {
+        this._residue = residue = chain.addResidue(resName, resSeq, resId);
+      }
 
       const xyz = new THREE.Vector3(x, y, z);
-      const charge = chargeMap[parseFloat(parsedStr[8]) | 0];
-      // const element = nameToElement(name);
-
-      const type = Element.getByName(element);
-      const role = Element.Role[name];
-
-      this._residue = this._chain.addResidue(resName, resSeq, ' ');
-      this._residue.addAtom(name, type, xyz, role, true, serial, ' ', 1.0, 0.0, charge);
+      this._residue.addAtom(atomName, type, xyz, role, het, atomId, altLoc, occupancy, tempFactor, charge);
     }
   }
 
@@ -121,9 +137,9 @@ export default class MOL2Parser extends Parser {
       curStr = stream.getNextString();
       const parsedStr = curStr.trim().split(/\s+/);
 
-      let atom1 = parseInt(parsedStr[1], 10) + this._atomsParsed; // parseInt(curStr.substr(6, 6), 10);
-      let atom2 = parseInt(parsedStr[2], 10) + this._atomsParsed; // parseInt(curStr.substr(12, 6), 10);
-      const bondType = parsedStr[3]; // curStr.substr(12, 6).trim();
+      let atom1 = parseInt(parsedStr[1], 10);
+      let atom2 = parseInt(parsedStr[2], 10);
+      const bondType = parsedStr[3];
 
       if (atom1 > atom2) {
         [atom1, atom2] = [atom2, atom1];
@@ -136,8 +152,14 @@ export default class MOL2Parser extends Parser {
   }
 
   _fixBondsArray() {
-    const serialAtomMap = this._serialAtomMap;
+    const serialAtomMap = this._serialAtomMap = {};
     const complex = this._complex;
+
+    const atoms = complex._atoms;
+    for (let i = 0; i < atoms.length; i++) {
+      const atom = atoms[i];
+      serialAtomMap[atom._serial] = atom;
+    }
 
     const bonds = complex._bonds;
     for (let j = 0; j < bonds.length; j++) {
@@ -150,71 +172,38 @@ export default class MOL2Parser extends Parser {
     }
   }
 
-  _buildAssemblies() {
+  _finalizeMolecules() {
+    /* Get chains from complex */
+    const chainDict = {};
     const chains = this._complex._chains;
 
-    if (chains.length === 1) {
-      return this._assemblies;
+    for (let i = 0; i < chains.length; ++i) {
+      const chain = chains[i];
+      const chainName = chain._name;
+      chainDict[chainName] = chain;
     }
 
-    for (let i = 0; i < chains.length; i++) {
-      const assembly = new Assembly(this._complex);
-      const matrix = new THREE.Matrix4();
-      assembly.addMatrix(matrix);
-      assembly.addChain(chains[i]._name);
-      this._assemblies.push(assembly);
-    }
+    /* Aggregate residues from chains */
+    for (let i = 0; i < this._molecules.length; i++) {
+      const m = this._molecules[i];
+      let residues = [];
 
-    return this._assemblies;
-  }
-
-  _finalizeMetadata() {
-    const { molecules } = this._metadata;
-    const { metadata } = this._complex;
-    const complex = this._complex;
-
-    if (molecules.length === 1) {
-      complex.name = molecules[0].name;
-      metadata.title = molecules[0].title;
-      metadata.date = molecules[0].date;
-      metadata.properties = molecules[0].props;
-    } else if (molecules.length > 1) {
-      metadata.molecules = [];
-      for (let i = 0; i < molecules.length; i++) {
-        metadata.molecules.push({
-          name: molecules[i].name, date: molecules[i].date, title: molecules[i].title, properties: molecules[i].props,
-        });
+      for (let j = 0; j < m._chains.length; j++) {
+        const name = m._chains[j];
+        const chain = chainDict[name];
+        residues = residues.concat(chain._residues.slice());
       }
-    }
-  }
-
-  _buildMolecules() {
-    this._complex._molecules = [];
-    const { molecules } = this._metadata;
-    for (let i = 0; i < molecules.length; i++) {
-      const molecule = new Molecule(this._complex, molecules[i].name, i + 1);
-      molecule._residues = molecules[i]._residues;
+      const molecule = new Molecule(this._complex, m._name, i + 1);
+      molecule._residues = residues;
       this._complex._molecules[i] = molecule;
     }
-
-    return this._complex._molecules;
   }
 
   _finalize() {
-    const serialAtomMap = this._serialAtomMap = {};
-    const atoms = this._complex._atoms;
-
-    for (let i = 0; i < atoms.length; i++) {
-      const atom = atoms[i];
-      serialAtomMap[atom._serial] = atom;
-    }
-
     this._complex._finalizeBonds();
     this._fixBondsArray();
-    this._finalizeMetadata();
-    this._buildAssemblies();
-    this._complex.units = this._complex.units.concat(this._assemblies);
-    this._buildMolecules();
+
+    this._finalizeMolecules();
 
     this._complex.finalize({
       needAutoBonding: false,
@@ -235,18 +224,11 @@ export default class MOL2Parser extends Parser {
 
     this._parseAtoms(stream, atomsNum);
     this._parseBonds(stream, bondsNum);
-
-    this._atomsParsed += atomsNum;
-
-    this._metadata.molecules[this._compoundIndx]._residues = [];
-    this._metadata.molecules[this._compoundIndx]._residues.push(this._residue);
   }
 
   parseSync() {
     const result = this._complex = new Complex();
     const stream = new MOL2Stream(this._data);
-
-    result.metadata.format = this._format;
 
     do {
       this._parseCompound(stream);
