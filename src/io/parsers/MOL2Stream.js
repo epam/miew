@@ -30,7 +30,14 @@ export default class MOL2Stream {
     return this._strings[this._currentStart + numb];
   }
 
+  getStringFromHeader(header, numb) {
+    this.getHeaderString(header);
+    this._currentStringIndx += numb;
+    return this._strings[this._currentStringIndx];
+  }
+
   getHeaderString(header) {
+    this.getStringFromStart(0);
     let curStr = this.getCurrentString();
     while (!_.isUndefined(curStr)) {
       if (curStr.match(`@<TRIPOS>${header}`)) {

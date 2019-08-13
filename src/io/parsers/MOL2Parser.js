@@ -10,7 +10,6 @@ const {
   Molecule,
 } = chem;
 
-const chargeMap = [0, 3, 2, 1, 0, -1, -2, -3];
 const orderMap = {
   un: 0,
   1: 1,
@@ -77,6 +76,12 @@ export default class MOL2Parser extends Parser {
     this._molecules.push(this._molecule);
   }
 
+  /* Atom format description:
+   * atomId atomName x y z element [resSeq [resName [charge [statusBit]]]]
+   * statusBits is the internal SYBYL status bits associated with the atom.
+   * These should never be set by the user.
+   * Source: http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf
+   */
   _parseAtoms(stream, atomsNum) {
     const resNumberRegex = /\d+$/;
     let curStr = stream.getHeaderString('ATOM');
@@ -84,6 +89,11 @@ export default class MOL2Parser extends Parser {
     for (let i = 0; i < atomsNum; i++) {
       curStr = stream.getNextString();
       const parsedStr = curStr.trim().split(/\s+/);
+      console.log(parsedStr);
+      if (parsedStr.length < 6) {
+        throw new Error('MOL2 parsing error: Not enough information to create atom!');
+      }
+
       const atomId = parseInt(parsedStr[0], 10);
       const atomName = parsedStr[1];
 
@@ -91,24 +101,32 @@ export default class MOL2Parser extends Parser {
       const y = parseFloat(parsedStr[3]);
       const z = parseFloat(parsedStr[4]);
 
-      const element = parsedStr[5].split('.')[0];
-      const resSeq = parseInt(parsedStr[6], 10);
+      const element = parsedStr[5].split('.')[0].toUpperCase();
 
-      const resName = parsedStr[7].replace(resNumberRegex, '');
+      let resSeq = 1;
+      let resName = 'UNK';
+      let charge = 0;
 
-      /* There fields are not listed in mol2 format, set them default */
-      const het = true;
-      const altLoc = ' ';
-      const occupancy = 1.0;
-      const tempFactor = 0.0;
-
+      if (parsedStr.length >= 7) {
+        resSeq = parseInt(parsedStr[6], 10);
+      }
+      if (parsedStr.length >= 8) {
+        resName = parsedStr[7].replace(resNumberRegex, '');
+      }
+      if (parsedStr.length >= 9) {
+        charge = parseFloat(parsedStr[8]) | 0;
+      }
+      // Skip waters if needed
       if (this.settings.now.nowater) {
         if (resName === 'HOH' || resName === 'WAT') {
           return;
         }
       }
-
-      const charge = parseFloat(parsedStr[8]) | 0;
+      // These fields are not listed in mol2 format. Set them default
+      const het = true;
+      const altLoc = ' ';
+      const occupancy = 1.0;
+      const tempFactor = 0.0;
       const type = Element.getByName(element);
       const role = Element.Role[atomName];
 
@@ -124,12 +142,17 @@ export default class MOL2Parser extends Parser {
       if (!residue || residue.getSequence() !== resSeq) {
         this._residue = residue = chain.addResidue(resName, resSeq, resId);
       }
-
+      if (atomId === 1563) {
+        console.log([element, atomName, type, role, resName]);
+      }
       const xyz = new THREE.Vector3(x, y, z);
       this._residue.addAtom(atomName, type, xyz, role, het, atomId, altLoc, occupancy, tempFactor, charge);
     }
   }
 
+  /* Bond format description%
+   * bondId originAtomId targetAtomId bondType [statusBits]
+   */
   _parseBonds(stream, bondsNum) {
     let curStr = stream.getHeaderString('BOND');
 
@@ -137,14 +160,14 @@ export default class MOL2Parser extends Parser {
       curStr = stream.getNextString();
       const parsedStr = curStr.trim().split(/\s+/);
 
-      let atom1 = parseInt(parsedStr[1], 10);
-      let atom2 = parseInt(parsedStr[2], 10);
+      let originAtomId = parseInt(parsedStr[1], 10);
+      let targetAtomId = parseInt(parsedStr[2], 10);
       const bondType = parsedStr[3];
 
-      if (atom1 > atom2) {
-        [atom1, atom2] = [atom2, atom1];
+      if (originAtomId > targetAtomId) {
+        [originAtomId, targetAtomId] = [targetAtomId, originAtomId];
       }
-      this._complex.addBond(atom1, atom2,
+      this._complex.addBond(originAtomId, targetAtomId,
         (bondType in typeMap) ? orderMap[bondType] : 1,
         (bondType in typeMap) ? typeMap[bondType] : Bond.BondType.UNKNOWN,
         true);
@@ -217,7 +240,8 @@ export default class MOL2Parser extends Parser {
     this._compoundIndx++;
     this._parseMolecule(stream);
 
-    const countsLine = stream.getStringFromStart(2);
+    // Ignoring comments and everything before @<TRIPOS>MOLECULE block
+    const countsLine = stream.getStringFromHeader('MOLECULE', 2);
     const parsedStr = countsLine.trim().split(/\s+/);
     const atomsNum = parsedStr[0];
     const bondsNum = parsedStr[1];
@@ -229,7 +253,6 @@ export default class MOL2Parser extends Parser {
   parseSync() {
     const result = this._complex = new Complex();
     const stream = new MOL2Stream(this._data);
-
     do {
       this._parseCompound(stream);
     } while (stream.findNextCompoundStart());
