@@ -153,7 +153,7 @@
     "postcss-nested": "^4.1.2",
     "postcss-scss": "^2.0.0",
     "raw-loader": "^3.1.0",
-    "rimraf": "^2.6.3",
+    "rimraf": "^3.0.0",
     "rollup": "^1.17.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.0.1",
