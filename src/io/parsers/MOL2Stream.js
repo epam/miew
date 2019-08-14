@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 export default class MOL2Stream {
   constructor(data) {
     this._strings = data.split(/\r?\n|\r/);
@@ -13,13 +11,9 @@ export default class MOL2Stream {
    * @param {number} start - The start position
    */
   setStart(start) {
-    if (start >= this._strings.length) {
-      this._currentStart = this._strings.length - 1;
-      this._currentStringIndx = this._strings.length - 1;
-    } else {
-      this._currentStart = start;
-      this._currentStringIndx = start;
-    }
+    const safeStart = (start < this._strings.length) ? start : this._strings.length - 1;
+    this._currentStart = safeStart;
+    this._currentStringIndx = safeStart;
   }
 
   /**
@@ -48,12 +42,13 @@ export default class MOL2Stream {
    * otherwise it returns the start string
    */
   getStringFromStart(numb) {
-    const numbStr = this._strings[this._currentStringIndx + numb];
-    if (_.isUndefined(numbStr)) {
+    const newStringIndx = this._currentStart + numb;
+
+    if (newStringIndx < this._strings.length) {
+      this._currentStringIndx = this._currentStart + numb;
+    } else {
       this._currentStringIndx = this._currentStart;
-      return this._strings[this._currentStringIndx];
     }
-    this._currentStringIndx = this._currentStart + numb;
     return this._strings[this._currentStringIndx];
   }
 
@@ -68,8 +63,9 @@ export default class MOL2Stream {
    */
   getStringFromHeader(header, numb) {
     const headerStr = this.getHeaderString(header);
-    const numbStr = this._strings[this._currentStringIndx + numb];
-    if (headerStr.match(`@<TRIPOS>${header}`) && !_.isUndefined(numbStr)) {
+    const newStringIndx = this._currentStringIndx + numb;
+
+    if (headerStr.match(`@<TRIPOS>${header}`) && newStringIndx < this._strings.length) {
       this._currentStringIndx += numb;
     }
     return this._strings[this._currentStringIndx];
@@ -85,7 +81,8 @@ export default class MOL2Stream {
   getHeaderString(header) {
     this.getStringFromStart(0);
     let curStr = this.getCurrentString();
-    while (!_.isUndefined(curStr)) {
+
+    while (this._currentStringIndx < this._strings.length) {
       if (curStr.match(`@<TRIPOS>${header}`)) {
         return this._strings[this._currentStringIndx];
       }
@@ -102,7 +99,8 @@ export default class MOL2Stream {
    */
   findNextCompoundStart() {
     let curStr = this.getCurrentString();
-    while (!_.isUndefined(curStr) && curStr.trim() !== '@<TRIPOS>MOLECULE>') {
+
+    while (this._currentStringIndx < this._strings.length && curStr.trim() !== '@<TRIPOS>MOLECULE>') {
       curStr = this.getNextString();
     }
     this.setStart(++this._currentStringIndx);
