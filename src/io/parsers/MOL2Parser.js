@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import Parser from './Parser';
 import chem from '../../chem';
 import MOL2Stream from './MOL2Stream';
-import Assembly from '../../chem/Assembly';
 
 const {
   Complex,
@@ -57,7 +56,6 @@ export default class MOL2Parser extends Parser {
     this._complex = null;
     this._chain = null;
     this._residue = null;
-    this._assemblies = [];
     this._compoundIndx = -1;
 
     this._molecules = [];
@@ -124,7 +122,7 @@ export default class MOL2Parser extends Parser {
         }
       }
       // These fields are not listed in mol2 format. Set them default
-      const het = true;
+      const het = false;
       const altLoc = ' ';
       const occupancy = 1.0;
       const tempFactor = 0.0;
@@ -149,7 +147,7 @@ export default class MOL2Parser extends Parser {
     }
   }
 
-  /* Bond format description%
+  /* Bond format description
    * bondId originAtomId targetAtomId bondType [statusBits]
    */
   _parseBonds(stream, bondsNum) {
@@ -171,24 +169,6 @@ export default class MOL2Parser extends Parser {
         (bondType in typeMap) ? typeMap[bondType] : Bond.BondType.UNKNOWN,
         true);
     }
-  }
-
-  _buildAssemblies() {
-    const chains = this._complex._chains;
-
-    if (chains.length === 1) {
-      return this._assemblies;
-    }
-
-    for (let i = 0; i < chains.length; i++) {
-      const assembly = new Assembly(this._complex);
-      const matrix = new THREE.Matrix4();
-      assembly.addMatrix(matrix);
-      assembly.addChain(chains[i]._name);
-      this._assemblies.push(assembly);
-    }
-
-    return this._assemblies;
   }
 
   _fixBondsArray() {
@@ -242,9 +222,6 @@ export default class MOL2Parser extends Parser {
   _finalize() {
     this._complex._finalizeBonds();
     this._fixBondsArray();
-
-    this._buildAssemblies();
-    this._complex.units = this._complex.units.concat(this._assemblies);
     this._finalizeMolecules();
 
     this._complex.finalize({
@@ -261,6 +238,7 @@ export default class MOL2Parser extends Parser {
 
     // Ignoring comments and everything before @<TRIPOS>MOLECULE block
     const countsLine = stream.getStringFromHeader('MOLECULE', 2);
+
     const parsedStr = countsLine.trim().split(/\s+/);
     const atomsNum = parsedStr[0];
     const bondsNum = parsedStr[1];
