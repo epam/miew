@@ -1363,16 +1363,15 @@ Miew.prototype._renderSelection = (function () {
     gfx.renderer.setClearColor('black', 0);
 
     // render selection to offscreen buffer
+    gfx.renderer.setRenderTarget(srcBuffer);
+    gfx.renderer.clear(true, false, false);
     if (self._hasSelectionToRender()) {
-      gfx.renderer.setRenderTarget(srcBuffer);
-      gfx.renderer.clear(true, false, false);
       gfx.selectionRoot.matrix = gfx.root.matrix;
       gfx.selectionPivot.matrix = gfx.pivot.matrix;
       gfx.renderer.render(gfx.selectionScene, camera);
     } else {
       // just render something to force "target clear" operation to finish
-      gfx.renderer.setRenderTarget(null);
-      gfx.renderer.renderDummyQuad(srcBuffer);
+      gfx.renderer.renderDummyQuad();
     }
 
     // overlay to screen
