@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Parser from './Parser';
 import chem from '../../chem';
 import MOL2Stream from './MOL2Stream';
+import Assembly from '../../chem/Assembly';
 
 const {
   Complex,
@@ -56,6 +57,7 @@ export default class MOL2Parser extends Parser {
     this._complex = null;
     this._chain = null;
     this._residue = null;
+    this._assemblies = [];
     this._compoundIndx = -1;
 
     this._molecules = [];
@@ -89,7 +91,6 @@ export default class MOL2Parser extends Parser {
     for (let i = 0; i < atomsNum; i++) {
       curStr = stream.getNextString();
       const parsedStr = curStr.trim().split(/\s+/);
-      console.log(parsedStr);
       if (parsedStr.length < 6) {
         throw new Error('MOL2 parsing error: Not enough information to create atom!');
       }
@@ -104,13 +105,13 @@ export default class MOL2Parser extends Parser {
       const element = parsedStr[5].split('.')[0].toUpperCase();
 
       let resSeq = 1;
-      let resName = 'UNK';
+      let resName = 'UNK'; // The same meaning has '<0>' in some mol2's
       let charge = 0;
 
       if (parsedStr.length >= 7) {
         resSeq = parseInt(parsedStr[6], 10);
       }
-      if (parsedStr.length >= 8) {
+      if (parsedStr.length >= 8 && parsedStr[7] !== '<0>') {
         resName = parsedStr[7].replace(resNumberRegex, '');
       }
       if (parsedStr.length >= 9) {
@@ -119,7 +120,7 @@ export default class MOL2Parser extends Parser {
       // Skip waters if needed
       if (this.settings.now.nowater) {
         if (resName === 'HOH' || resName === 'WAT') {
-          return;
+          continue;
         }
       }
       // These fields are not listed in mol2 format. Set them default
@@ -142,9 +143,7 @@ export default class MOL2Parser extends Parser {
       if (!residue || residue.getSequence() !== resSeq) {
         this._residue = residue = chain.addResidue(resName, resSeq, resId);
       }
-      if (atomId === 1563) {
-        console.log([element, atomName, type, role, resName]);
-      }
+
       const xyz = new THREE.Vector3(x, y, z);
       this._residue.addAtom(atomName, type, xyz, role, het, atomId, altLoc, occupancy, tempFactor, charge);
     }
@@ -172,6 +171,24 @@ export default class MOL2Parser extends Parser {
         (bondType in typeMap) ? typeMap[bondType] : Bond.BondType.UNKNOWN,
         true);
     }
+  }
+
+  _buildAssemblies() {
+    const chains = this._complex._chains;
+
+    if (chains.length === 1) {
+      return this._assemblies;
+    }
+
+    for (let i = 0; i < chains.length; i++) {
+      const assembly = new Assembly(this._complex);
+      const matrix = new THREE.Matrix4();
+      assembly.addMatrix(matrix);
+      assembly.addChain(chains[i]._name);
+      this._assemblies.push(assembly);
+    }
+
+    return this._assemblies;
   }
 
   _fixBondsArray() {
@@ -226,6 +243,8 @@ export default class MOL2Parser extends Parser {
     this._complex._finalizeBonds();
     this._fixBondsArray();
 
+    this._buildAssemblies();
+    this._complex.units = this._complex.units.concat(this._assemblies);
     this._finalizeMolecules();
 
     this._complex.finalize({

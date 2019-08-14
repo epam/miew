@@ -1,25 +1,32 @@
 export default [{
   // just small protein loaded by default
   name: '1CRN',
-  formats: ['pdb', 'cif', 'mmtf', 'xyz', 'gro'],
+  formats: ['pdb', 'cif', 'mmtf', 'xyz', 'gro', 'mol2'],
   num: {
     atoms: 327,
     bonds: 337,
     residues: { xyz: 1, default: 46 },
     chains: 1,
     molecules: 1,
-    units: { xyz: 1, gro: 1, default: 2 },
+    units: {
+      xyz: 1,
+      gro: 1,
+      mol2: 1,
+      default: 2,
+    },
     symmetries: { pdb: 2 },
     helices: {
       mmtf: 3,
       xyz: 0,
       gro: 0,
+      mol2: 0,
       default: 2,
     },
     sheets: {
       mmtf: 2,
       xyz: 0,
       gro: 0,
+      mol2: 0,
       default: 1,
     },
   },
@@ -86,7 +93,7 @@ export default [{
 }, {
   // small molecule
   name: 'serotonin',
-  formats: ['pubchem', 'sdf', 'xyz'],
+  formats: ['pubchem', 'sdf', 'xyz', 'mol2'],
   num: {
     atoms: 25,
     bonds: 26,

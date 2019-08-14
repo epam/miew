@@ -11,7 +11,7 @@ import PubChemParser from '../../src/io/parsers/PubChemParser';
 import SDFParser from '../../src/io/parsers/SDFParser';
 import CCP4Parser from '../../src/io/parsers/CCP4Parser';
 import GROParser from '../../src/io/parsers/GROParser';
-
+import MOL2Parser from '../../src/io/parsers/MOL2Parser';
 
 import complexTestData from './data/complexTestData';
 import volumeTestData from './data/volumeTestData';
@@ -75,6 +75,12 @@ const formats = {
     extension: 'gro',
     encoding: 'ascii',
     Parser: GROParser,
+  },
+  mol2: {
+    name: 'MOL2',
+    extension: 'mol2',
+    encoding: 'ascii',
+    Parser: MOL2Parser,
   },
 };
 
