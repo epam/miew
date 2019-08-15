@@ -34,7 +34,6 @@ class TransformGroup extends THREE.Object3D {
 
       child.updateMatrixWorld();
       const mtx = child.matrixWorld;
-      // TODO check near / far?
       inverseMatrix.getInverse(mtx);
       raycaster.ray.copy(ray).applyMatrix4(inverseMatrix);
       const childIntersects = [];
@@ -47,7 +46,6 @@ class TransformGroup extends THREE.Object3D {
           inters.distance = ray.origin.distanceTo(inters.point);
         }
         inters.object = child;
-        // TODO: check raycaster near/far?
         intersects[intersects.length] = inters;
       }
     }

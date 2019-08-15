@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import utils from '../utils';
+import Timer from '../Timer';
 import settings from '../settings';
 import EventDispatcher from '../utils/EventDispatcher';
 
@@ -254,7 +254,7 @@ function ObjectControls(object, objectPivot, camera, domElement, getAltObj) {
 
   this._pressedKeys = [];
 
-  this._clock = new utils.Timer();
+  this._clock = new Timer();
   this._clock.start();
   this._lastUpdateTime = this._clock.getElapsedTime();
 

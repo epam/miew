@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 function clamp(x, a, b) {
   return x <= b ? x < 0 ? 0 : x : b;
 }
@@ -16,17 +18,61 @@ function lerpColor(c1, c2, alpha) {
   return (r << 16) | (g << 8) | b;
 }
 
-function Palette(name, id) {
-  this.name = name || 'Custom';
-  this.id = id || 'CP';
+
+class Palette {
+  constructor(name, id) {
+    this.name = name || 'Custom';
+    this.id = id || 'CP';
+  }
+
+  getElementColor(name, asIs = false) {
+    const color = this.elementColors[name];
+    return color === undefined && !asIs ? this.defaultElementColor : color;
+  }
+
+  getResidueColor(name, asIs = false) {
+    const color = this.residueColors[name];
+    return color === undefined && !asIs ? this.defaultResidueColor : color;
+  }
+
+  getChainColor(name) {
+    let chain = name.charCodeAt(0);
+    chain = ((chain < 0 ? 0 : chain >= 256 ? chain - 256 : chain) & 0x1F)
+      % this.chainColors.length;
+    return this.chainColors[chain];
+  }
+
+  getSecondaryColor(type, asIs = false) {
+    const color = this.secondaryColors[type];
+    return color === undefined && !asIs ? this.defaultSecondaryColor : color;
+  }
+
+  getSequentialColor(index) {
+    const { colors } = this;
+    const len = colors.length;
+    return index < 0 ? colors[(index % len) + len] : colors[index % len];
+  }
+
+  getGradientColor(value, gradientName) {
+    const gradient = this.gradients[gradientName];
+    if (!gradient) {
+      return this.defaultNamedColor;
+    }
+    const count = gradient.length;
+    const index = value * (count - 1);
+    let left = Math.floor(index);
+    const right = clamp(left + 1, 0, count - 1);
+    left = clamp(left, 0, count - 1);
+    return lerpColor(gradient[left], gradient[right], index - left);
+  }
+
+  getNamedColor(name, asIs = false) {
+    const color = this.namedColors[name];
+    return color === undefined && !asIs ? this.defaultNamedColor : color;
+  }
 }
 
-Palette.prototype = {
-
-  constructor: Palette,
-
-  /* eslint-disable no-magic-numbers */
-
+_.assign(Palette.prototype, {
   colors: [0xFFFFFF, 0xFF0000, 0x00FF00, 0x0000FF, 0x808080],
 
   minRangeColor: 0x000000,
@@ -235,53 +281,8 @@ Palette.prototype = {
       0x0000ff, // blue
     ],
   },
+});
 
-  getElementColor(name, asIs = false) {
-    const color = this.elementColors[name];
-    return color === undefined && !asIs ? this.defaultElementColor : color;
-  },
-
-  getResidueColor(name, asIs = false) {
-    const color = this.residueColors[name];
-    return color === undefined && !asIs ? this.defaultResidueColor : color;
-  },
-
-  getChainColor(name) {
-    let chain = name.charCodeAt(0);
-    chain = ((chain < 0 ? 0 : chain >= 256 ? chain - 256 : chain) & 0x1F)
-            % this.chainColors.length;
-    return this.chainColors[chain];
-  },
-
-  getSecondaryColor(type, asIs = false) {
-    const color = this.secondaryColors[type];
-    return color === undefined && !asIs ? this.defaultSecondaryColor : color;
-  },
-
-  getSequentialColor(index) {
-    const { colors } = this;
-    const len = colors.length;
-    return index < 0 ? colors[(index % len) + len] : colors[index % len];
-  },
-
-  getGradientColor(value, gradientName) {
-    const gradient = this.gradients[gradientName];
-    if (!gradient) {
-      return this.defaultNamedColor;
-    }
-    const count = gradient.length;
-    const index = value * (count - 1);
-    let left = Math.floor(index);
-    const right = clamp(left + 1, 0, count - 1);
-    left = clamp(left, 0, count - 1);
-    return lerpColor(gradient[left], gradient[right], index - left);
-  },
-
-  getNamedColor(name, asIs = false) {
-    const color = this.namedColors[name];
-    return color === undefined && !asIs ? this.defaultNamedColor : color;
-  },
-};
 
 const { namedColorsArray, namedColors } = Palette.prototype;
 

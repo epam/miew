@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import settings from '../settings';
-import utils from '../utils';
+import Timer from '../Timer';
 import EventDispatcher from '../utils/EventDispatcher';
 
 function Picker(gfxObj, camera, domElement) {
@@ -19,7 +19,7 @@ function Picker(gfxObj, camera, domElement) {
   this._lastClickPos = new THREE.Vector2(0, 0);
   this._clickBeginTime = 0.0;
 
-  this._clock = new utils.Timer();
+  this._clock = new Timer();
   this._clock.start();
 
   this._listeners = [
@@ -100,59 +100,40 @@ Picker.prototype.handleResize = function () {
 };
 
 Picker.prototype.pickObject = function (screenPos) {
-  let picked = {};
+  if (!this.gfxObj) {
+    this.picked = {};
+    this.dispatchEvent({ type: 'newpick', obj: {} });
+    return;
+  }
+
   const { gfxObj } = this;
-  let intersects;
-  if (gfxObj) {
-    const rayCaster = new THREE.Raycaster();
-    rayCaster.setFromCamera(screenPos, this.camera);
-    intersects = rayCaster.intersectObject(gfxObj, false);
-    if (intersects.length > 0) {
-      let p = intersects[0];
-      const v = new THREE.Vector3();
+  const rayCaster = new THREE.Raycaster();
+  rayCaster.ray.origin.setFromMatrixPosition(this.camera.matrixWorld);
+  rayCaster.ray.direction.set(screenPos.x, screenPos.y, 0.5).unproject(this.camera).sub(rayCaster.ray.origin).normalize();
 
-      if (settings.now.draft.clipPlane && this.hasOwnProperty('clipPlaneValue')) {
-        // find point closest to camera that doesn't get clipped
-        let i;
-        for (i = 0; i < intersects.length; ++i) {
-          p = intersects[i];
-          v.copy(p.point);
-          v.applyMatrix4(this.camera.matrixWorldInverse);
-          if (v.z <= -this.clipPlaneValue) {
-            break;
-          }
-        }
+  const clipPlane = (settings.now.draft.clipPlane && this.clipPlaneValue) ? this.clipPlaneValue : Infinity;
+  const fogFarPlane = (settings.now.fog && this.fogFarValue) ? this.fogFarValue : Infinity;
+  const point = rayCaster.intersectVisibleObject(gfxObj, this.camera, clipPlane, fogFarPlane);
+  if (!point) {
+    this.picked = {};
+    this.dispatchEvent({ type: 'newpick', obj: {} });
+    return;
+  }
 
-        if (i === intersects.length) {
-          p = null;
-        }
-      }
-
-      if (p != null && settings.now.fog && this.hasOwnProperty('fogFarValue')) {
-        // check that selected intersection point is not occluded by fog
-        v.copy(p.point);
-        v.applyMatrix4(this.camera.matrixWorldInverse);
-        if (v.z <= -this.fogFarValue) {
-          p = null;
-        }
-      }
-
-      if (p != null && (p.residue || p.atom)) {
-        const residue = p.residue || p.atom.getResidue();
-        if (settings.now.pick === 'chain') {
-          picked = { chain: residue.getChain() };
-        } else if (settings.now.pick === 'molecule') {
-          picked = { molecule: residue.getMolecule() };
-        } else if (p.residue || settings.now.pick === 'residue') {
-          picked = { residue };
-        } else if (p.atom) {
-          picked = { atom: p.atom };
-        }
-      }
+  let picked = {};
+  if (point.residue || point.atom) {
+    const residue = point.residue || point.atom.getResidue();
+    if (settings.now.pick === 'chain') {
+      picked = { chain: residue.getChain() };
+    } else if (settings.now.pick === 'molecule') {
+      picked = { molecule: residue.getMolecule() };
+    } else if (point.residue || settings.now.pick === 'residue') {
+      picked = { residue };
+    } else if (point.atom) {
+      picked = { atom: point.atom };
     }
   }
   this.picked = picked;
-
   this.dispatchEvent({ type: 'newpick', obj: picked });
 };
 

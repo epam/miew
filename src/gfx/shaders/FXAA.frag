@@ -69,6 +69,8 @@ void main() {
     return;
   }
   float subpixRcpRange = 1.0/range;
+  // note: the sampling coordinates can be calculated in vertex shader but the approach doesn't affect performance
+  // visibly, thus we decided to leave calculation here for better readability.
   // calc other neighbours luminance
   float lumaNE = FxaaLuma(FxaaTex(srcTex, posM, vec2(  1.0, -1.0 ), srcTexelSize));
   float lumaSW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0,  1.0 ), srcTexelSize));
