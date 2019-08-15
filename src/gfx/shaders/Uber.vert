@@ -112,16 +112,16 @@ void main() {
   alphaCol = alphaColor;
 #endif
 
-  vec3 objectNormal = vec3( normal );
 #ifdef INSTANCED_MATRIX
-  vec3 transformedNormal = vec3(
-    dot(objectNormal, matVector1.xyz),
-    dot(objectNormal, matVector2.xyz),
-    dot(objectNormal, matVector3.xyz));
-  transformedNormal = normalMatrix * transformedNormal;
+  vec3 objectNormal = vec3(
+    dot(normal, matVector1.xyz),
+    dot(normal, matVector2.xyz),
+    dot(normal, matVector3.xyz));
 #else
-  vec3 transformedNormal = normalMatrix * objectNormal;
+  vec3 objectNormal = vec3( normal );
 #endif
+
+vec3 transformedNormal = normalMatrix * objectNormal;
 
 #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
   vNormal = normalize(transformedNormal);
