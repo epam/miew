@@ -7,7 +7,6 @@ import { expect } from 'chai';
 function getModes() {
   window.miew = new window.Miew({});
   const { miew } = window;
-  console.log(miew);
   return miew && JSON.stringify(miew.constructor.modes.all.map(mode => ({
     id: Array.isArray(mode.id) ? mode.id[0] : mode.id,
     name: mode.prototype ? mode.prototype.name : mode.name,

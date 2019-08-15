@@ -1,8 +1,8 @@
-import utils from './utils';
+import Timer from './Timer';
 
 function Profiler() {
   // bind method to get current time
-  this.now = utils.Timer.now;
+  this.now = Timer.now;
 
   this._startTime = 0;
   this._times = [];

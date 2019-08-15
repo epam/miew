@@ -86,7 +86,6 @@ describe('As a power user, I want to', function () {
     function getPropList(list) {
       window.miew = new window.Miew({});
       const { miew } = window;
-      console.log(miew);
       return miew && JSON.stringify(miew.constructor[list].all.map(entry => ({
         id: Array.isArray(entry.id) ? entry.id[0] : entry.id,
         name: entry.prototype ? entry.prototype.name : entry.name,

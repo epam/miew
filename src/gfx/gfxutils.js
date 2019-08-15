@@ -157,6 +157,45 @@ THREE.PerspectiveCamera.prototype.setDistanceToFit = function (radius, angle) {
   this.position.z = radius / Math.sin(0.5 * THREE.Math.degToRad(angle));
 };
 
+/**
+ * @param {RCGroup} gfxObj - All objects on scene.
+ * @param {THREE.PerspectiveCamera} camera - Camera used for rendering.
+ * @param {number} clipPlane - Distance to clip plane.
+ * @param {number} fogFarPlane - Distance to fog far plane.
+ */
+THREE.Raycaster.prototype.intersectVisibleObject = function (gfxObj, camera, clipPlane, fogFarPlane) {
+  const intersects = this.intersectObject(gfxObj, false);
+  if (intersects.length === 0) {
+    return null;
+  }
+
+  // find point closest to camera that doesn't get clipped by camera near plane or clipPlane (if it exists)
+  const nearPlane = Math.min(camera.near, clipPlane);
+  let i;
+  let p = intersects[0];
+  const v = new THREE.Vector3();
+  for (i = 0; i < intersects.length; ++i) {
+    p = intersects[i];
+    v.copy(p.point);
+    v.applyMatrix4(camera.matrixWorldInverse);
+    if (v.z <= -nearPlane) {
+      break;
+    }
+  }
+  if (i === intersects.length) {
+    return null;
+  }
+
+  // check that selected intersection point is not clipped by camera far plane or occluded by fog (if it exists)
+  const farPlane = Math.min(camera.far, fogFarPlane);
+  v.copy(p.point);
+  v.applyMatrix4(camera.matrixWorldInverse);
+  if (v.z <= -farPlane) {
+    return null;
+  }
+  return p;
+};
+
 
 function _calcCylinderMatrix(posBegin, posEnd, radius) {
   const posCenter = posBegin.clone().lerp(posEnd, 0.5);
