@@ -1493,9 +1493,9 @@ Miew.prototype._renderWithPrepassTransparency = (function () {
 
     // transparent objects z prepass
     camera.layers.set(gfxutils.LAYERS.PREPASS_TRANSPARENT);
-    gfx.renderer.context.colorMask(false, false, false, false); // don't update color buffer
+    gfx.renderer.getContext().colorMask(false, false, false, false); // don't update color buffer
     gfx.renderer.render(gfx.scene, camera);
-    gfx.renderer.context.colorMask(true, true, true, true); // update color buffer
+    gfx.renderer.getContext().colorMask(true, true, true, true); // update color buffer
 
     // transparent objects color pass
     camera.layers.set(gfxutils.LAYERS.TRANSPARENT);
