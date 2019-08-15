@@ -1071,15 +1071,15 @@ class Complex {
    * Simple function to make unified routine procedure without code duplication.
    * @param {Array} srcArray   - Source chemical structure array (will be part of resulting chemical structure array).
    * @param {Array} dstArray   - Resulting chemical structure array.
-   * @param number
+   * @param {number} number    - Parameter for processor.
    * @param {function} functor - Processor for every element in array.
    */
   addElement(srcArray, dstArray, number, functor) {
     const { length } = srcArray;
     for (let i = 0; i < length; ++i) {
-      const a = srcArray[i];
-      functor(a, number);
-      dstArray.push(a);
+      const elem = srcArray[i];
+      functor(elem, number);
+      dstArray.push(elem);
     }
   }
 
@@ -1104,27 +1104,27 @@ class Complex {
     let chainBias = 0;
     let componentBias = 0;
 
-    function processAtom(atom, _atomBias) {
-      atom._serial += atomBias;
-      atom._index += _atomBias;
+    function processAtom(atom, bias) {
+      atom._serial += bias;
+      atom._index += bias;
     }
 
-    function processBond(bond, _bondBias) {
-      bond._index += _bondBias;
+    function processBond(bond, bias) {
+      bond._index += bias;
     }
 
-    function processResidue(residue, _residueBias) {
-      residue._index += _residueBias;
+    function processResidue(residue, bias) {
+      residue._index += bias;
     }
 
-    function processChain(chain, _chainBias) {
+    function processChain(chain, bias) {
       chain._complex = self;
-      chain._index += _chainBias;
+      chain._index += bias;
     }
 
-    function processComponent(component, _componentBias) {
+    function processComponent(component, bias) {
       component._complex = self;
-      component._index += _componentBias;
+      component._index += bias;
     }
 
     /**
@@ -1135,24 +1135,15 @@ class Complex {
 
     for (let i = 0; i < complexes.length; ++i) {
       const c = complexes[i];
-      // add atoms
       this.addElement(c._atoms, this._atoms, atomBias, processAtom);
-      // add bonds
       this.addElement(c._bonds, this._bonds, bondBias, processBond);
-      // add residues
       this.addElement(c._residues, this._residues, residueBias, processResidue);
-      // add chains
       this.addElement(c._chains, this._chains, chainBias, processChain);
-      // add sheets
-      this.addElement(c._sheets, this._sheets, null, doNothing);
-      // add helices
-      this.addElement(c._helices, this._helices, null, doNothing);
-      // add sgroups
-      this.addElement(c._sgroups, this._sgroups, null, doNothing);
-      // add components
+      this.addElement(c._sheets, this._sheets, 0, doNothing);
+      this.addElement(c._helices, this._helices, 0, doNothing);
+      this.addElement(c._sgroups, this._sgroups, 0, doNothing);
       this.addElement(c._components, this._components, componentBias, processComponent);
-      // add structures
-      this.addElement(c.structures, this.structures, null, doNothing);
+      this.addElement(c.structures, this.structures, 0, doNothing);
       // merge residue types
       for (const rt in c._residueTypes) {
         if (c._residueTypes.hasOwnProperty(rt)) {
