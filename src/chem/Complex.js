@@ -1083,37 +1083,6 @@ class Complex {
     }
   }
 
-
-  /**
-   * Processing complex structure (preparing to join).
-   * @param {complex} c - Complex to join.
-   * @param {number} atomBias       - Atom Bias.
-   * @param {number} bondBias       - Bond Bias.
-   * @param {number} residueBias    - Residue Bias.
-   * @param {number} chainBias      - Chain Bias.
-   * @param {number} componentBias  - Component Bias.
-   */
-  processComplex(c, atomBias, bondBias, residueBias, chainBias, componentBias) {
-    // add atoms
-    this.addElement(c._atoms, this._atoms, atomBias, this.processAtom);
-    // add bonds
-    this.addElement(c._bonds, this._bonds, bondBias, this.processBond);
-    // add residues
-    this.addElement(c._residues, this._residues, residueBias, this.processResidue);
-    // add chains
-    this.addElement(c._chains, this._chains, chainBias, this.processChain);
-    // add sheets
-    this.addElement(c._sheets, this._sheets, null, this.doNothing);
-    // add helices
-    this.addElement(c._helices, this._helices, null, this.doNothing);
-    // add sgroups
-    this.addElement(c._sgroups, this._sgroups, null, this.doNothing);
-    // add components
-    this.addElement(c._components, this._components, componentBias, this.processComponent);
-    // add structures
-    this.addElement(c.structures, this.structures, null, this.doNothing);
-  }
-
   // this function joins multiple complexes into one (this)
   // atom, bond, ... objects are reused -- so input complexes are no longer valid
   joinComplexes(complexes) {
