@@ -127,6 +127,7 @@ export default class FBXExporter extends Exporter {
   /**
    * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
    * @param{array} array - indices buffer
+   * @returns{Int16Array} reworked array.
    */
   _reworkIndices(array) {
     const clonedArray = new Int16Array(array.length);
@@ -135,6 +136,7 @@ export default class FBXExporter extends Exporter {
       clonedArray[i] *= -1;
       clonedArray[i]--;
     }
+    return clonedArray;
   }
 
   /**
@@ -249,14 +251,30 @@ export default class FBXExporter extends Exporter {
     + `\tCulling: "${culling}"\n`
     + `\tVertices: ${this._vertices}\n`
     + `\tPolygonVertexIndex: ${this._indices}\n`
-    + `\tGeometryVersion: ${geometryVersion}`;
+    + `\tGeometryVersion: ${geometryVersion}\n`;
     /* Setting up layers */
-    const layerElementNormal = '';
+    const layerElementNormalNumber = 0; /* IDK what that is */
+    const layerElementNormalVersion = 101; /* IDK what version means */
+    const layerElementNormalName = ''; /* IDK what name means */
+    const layerElementNormal = `LayerElementNormal: ${layerElementNormalNumber} {\n`
+     + `\t\tVersion: ${layerElementNormalVersion}\n`
+     + `\t\tName: "${layerElementNormalName}"\n`
+     + '\t\tMappingInformationType: "ByVertex"\n' /* Mandatory for our Miew! Must not be changed */
+     + '\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
+     + `\t\tNormals: ${this._normals}\n`
+     + '\t}\n';
     const layerElementSmoothing = '';
     const layerElementUV = '';
     const layerElementTexture = '';
     const layerElementMaterial = '';
-    const layer = '';
+    const layer = '\t\tLayer: 0 {\n'
+    + '\t\t\tVersion: 100\n'
+    + '\t\t\tLayerElement:  {\n'
+    + '\t\t\t\tType: "LayerElementNormal"\n'
+    + '\t\t\t\tTypedIndex: 0\n'
+    + '\t\t\t}\n'
+    + '\t\t}\n'
+    + '\t}\n';
     const resultingLayer = [layerElementNormal, layerElementSmoothing, layerElementUV, layerElementTexture, layerElementMaterial, layer].join('');
     return [modelProperties, verticesIndices, resultingLayer].join('');
   }
