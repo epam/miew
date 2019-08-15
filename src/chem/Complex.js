@@ -1071,14 +1071,14 @@ class Complex {
    * Simple function to make unified routine procedure without code duplication.
    * @param {Array} srcArray   - Source chemical structure array (will be part of resulting chemical structure array).
    * @param {Array} dstArray   - Resulting chemical structure array.
-   * @param {number} number    - Parameter for processor.
+   * @param {number} param     - Parameter for processor.
    * @param {function} functor - Processor for every element in array.
    */
-  addElement(srcArray, dstArray, number, functor) {
+  addElement(srcArray, dstArray, param, functor) {
     const { length } = srcArray;
     for (let i = 0; i < length; ++i) {
       const elem = srcArray[i];
-      functor(elem, number);
+      functor(elem, param);
       dstArray.push(elem);
     }
   }
