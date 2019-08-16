@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import _ from 'lodash';
 import Exporter from './Exporter';
+import gfxutils from '../../gfx/gfxutils';
+import ZClippedMesh from '../../gfx/meshes/ZClippedMesh';
 
 /**
  * Extension to standard Float32Arrays.
@@ -150,10 +151,16 @@ export default class FBXExporter extends Exporter {
   /**
    * Reworking colors buffer + alpha, see https://raw.githubusercontent.com/wayt/Bomberman/master/Assets/fire.fbx
    * @param{array} colorArray - colors buffer
-   * @param{array} alphaArray - alpha buffer
+   * @param{Float32Array} alphaArray - alpha buffer
    * @returns{Float32Array} reworked array.
    */
   _reworkColors(colorArray, alphaArray) {
+    if (alphaArray.length === 0) {
+      alphaArray = new Float32Array(colorArray.length / 3);
+      for (let i = 0; i < alphaArray.length; ++i) {
+        alphaArray.set([1], i);
+      }
+    }
     const clonedArray = new Float32Array(colorArray.length + alphaArray.length);
     let alphaArrIdx = 0;
     let clonedArrIdx = 0;
@@ -263,12 +270,15 @@ export default class FBXExporter extends Exporter {
     });
     /* Then we need to gather only mask === 1 vertices */
     for (let i = 0; i < this._meshes.length; ++i) {
-      if (this._meshes[i].layers.mask === 1) { /* TODO: How to check? */
+     // if (this._meshes[i].layers.test(gfxutils.LAYERS.DEFAULT)) { /* It means something */
+      if (this._meshes[i].layers.mask === 1) { /* TODO: Implement what's written on top of that */
         /* Collect info about vertices + indices + material */
         this._vertices = Float32Concat(this._vertices, this._meshes[i].geometry.attributes.position.array);
         this._indices = Float32Concat(this._indices, this._reworkIndices(this._meshes[i].geometry.index.array)); /* Need to rework this into strange FBX notation */
         this._normals = Float32Concat(this._normals, this._meshes[i].geometry.attributes.normal.array);
-        this._alphas = Float32Concat(this._alphas, this._meshes[i].geometry.attributes.alphaColor.array);
+        if (!(this._meshes[i] instanceof ZClippedMesh)) {
+          this._alphas = Float32Concat(this._alphas, this._meshes[i].geometry.attributes.alphaColor.array);
+        }
         if (this._meshes[i].geometry.attributes.color.array.length >= 1) {
           this._colors = Float32Concat(this._colors, this._reworkColors(this._meshes[i].geometry.attributes.color.array, this._alphas)); /* Need to rework this into strange FBX notation */
         }
