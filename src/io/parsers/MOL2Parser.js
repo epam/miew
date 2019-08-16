@@ -34,7 +34,14 @@ const typeMap = {
 const resNumberRegex = /\d+$/;
 const spacesRegex = /\s+/;
 
-export default class MOL2Parser extends Parser {
+function splitToFields(str) {
+  return str.trim().split(spacesRegex);
+}
+/* There is no jsdoc documentation because of eslint corrections:
+ * not all Parser methods are implemented
+ */
+
+class MOL2Parser extends Parser {
   constructor(data, options) {
     super(data, options);
 
@@ -45,6 +52,8 @@ export default class MOL2Parser extends Parser {
 
     this._molecules = [];
     this._molecule = null;
+
+    this._serialAtomMap = {};
 
     this._options.fileType = 'mol2';
   }
@@ -69,9 +78,10 @@ export default class MOL2Parser extends Parser {
    */
   _parseAtoms(stream, atomsNum) {
     let curStr = stream.getHeaderString('ATOM');
+
     for (let i = 0; i < atomsNum; i++) {
       curStr = stream.getNextString();
-      const parsedStr = curStr.trim().split(spacesRegex);
+      const parsedStr = splitToFields(curStr);
 
       if (parsedStr.length < 6) {
         throw new Error('MOL2 parsing error: Not enough information to create atom!');
@@ -98,7 +108,6 @@ export default class MOL2Parser extends Parser {
       if (parsedStr.length >= 9) {
         charge = parseFloat(parsedStr[8]) | 0;
       }
-      // Skip waters if needed
       if (this.settings.now.nowater) {
         if (resName === 'HOH' || resName === 'WAT') {
           continue;
@@ -115,16 +124,15 @@ export default class MOL2Parser extends Parser {
       const role = Element.Role[atomName];
 
       let chain = this._chain;
-      const chainId = 'A';
       if (!chain) {
         // .mol2 may contain information about multiple molecules, but they can't be visualized
         // at the same time now. There is no need to create different chain IDs then.
-        this._chain = chain = this._complex.getChain(chainId) || this._complex.addChain(chainId);
+        this._chain = chain = this._complex.getChain('A') || this._complex.addChain('A');
         this._residue = null;
       }
       let residue = this._residue;
       if (!residue || residue.getSequence() !== resSeq) {
-        this._residue = residue = chain.addResidue(resName, resSeq, chainId);
+        this._residue = residue = chain.addResidue(resName, resSeq, 'A');
       }
       const xyz = new THREE.Vector3(x, y, z);
       this._residue.addAtom(atomName, type, xyz, role, het, atomId, altLoc, occupancy, tempFactor, charge);
@@ -139,7 +147,7 @@ export default class MOL2Parser extends Parser {
 
     for (let i = 0; i < bondsNum; i++) {
       curStr = stream.getNextString();
-      const parsedStr = curStr.trim().split(spacesRegex);
+      const parsedStr = splitToFields(curStr);
 
       if (parsedStr.length < 3) {
         throw new Error('MOL2 parsing error: Missing information about bonds!');
@@ -160,13 +168,10 @@ export default class MOL2Parser extends Parser {
   }
 
   _fixSerialAtoms() {
-    const serialAtomMap = this._serialAtomMap = {};
-    const complex = this._complex;
-
-    const atoms = complex._atoms;
+    const atoms = this._complex._atoms;
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
-      serialAtomMap[atom._serial] = atom;
+      this._serialAtomMap[atom._serial] = atom;
     }
   }
 
@@ -187,26 +192,15 @@ export default class MOL2Parser extends Parser {
   }
 
   _finalizeMolecules() {
-    // Get chains from complex
-    const chainDict = {};
-    const chains = this._complex._chains;
-
-    for (let i = 0; i < chains.length; i++) {
-      const chain = chains[i];
-      const chainName = chain._name;
-      chainDict[chainName] = chain;
-    }
+    // Get chain from complex
+    const chain = this._complex._chains[0];
+    this._complex._molecules = [];
 
     // Aggregate residues from chains
+    // (to be precise from the chain 'A')
     for (let i = 0; i < this._molecules.length; i++) {
       const currMolecule = this._molecules[i];
-      let molResidues = [];
-
-      for (let j = 0; j < currMolecule._chains.length; j++) {
-        const name = currMolecule._chains[j];
-        const chain = chainDict[name];
-        molResidues = molResidues.concat(chain._residues.slice());
-      }
+      const molResidues = chain._residues;
       const molecule = new Molecule(this._complex, currMolecule._name, i + 1);
       molecule._residues = molResidues;
       this._complex._molecules[i] = molecule;
@@ -257,3 +251,5 @@ export default class MOL2Parser extends Parser {
 
 MOL2Parser.formats = ['mol2'];
 MOL2Parser.extensions = ['.mol2', '.ml2', '.sy2'];
+
+export default MOL2Parser;

@@ -1,4 +1,7 @@
-export default class MOL2Stream {
+/**
+ * Class representing stream interface for MOL2 parser
+ * */
+class MOL2Stream {
   constructor(data) {
     this._strings = data.split(/\r?\n|\r/);
     this._currentStart = 0;
@@ -8,7 +11,8 @@ export default class MOL2Stream {
   /**
    * Sets the starting position taking into account possible
    * beyond the boundary position
-   * @param {number} start - The start position
+   *
+   * @param {number} start The start position
    */
   setStart(start) {
     const safeStart = (start < this._strings.length) ? start : this._strings.length - 1;
@@ -37,7 +41,7 @@ export default class MOL2Stream {
   /**
    * Returns the numb-th string from the start
    *
-   * @param {number} numb - The bias
+   * @param {number} numb The bias
    * @return {string} The numb-th string if it is not beyond the boundary,
    * otherwise it returns the start string
    */
@@ -55,8 +59,8 @@ export default class MOL2Stream {
   /**
    * Returns the numb-th string from the start
    *
-   * @param {string} header - The header to count from
-   * @param {number} numb - The bias
+   * @param {string} header The header to count from
+   * @param {number} numb The bias
    * @return {string} The numb-th string if it is not beyond the boundary and
    * the header was found,
    * otherwise it returns the start string
@@ -74,7 +78,7 @@ export default class MOL2Stream {
   /**
    * Returns the header string
    *
-   * @param {string} header - The header to look for
+   * @param {string} header The header to look for
    * @return {string} The header string if it was found,
    * otherwise it returns the start string
    */
@@ -116,3 +120,5 @@ export default class MOL2Stream {
     return this._currentStringIndx < this._strings.length - 2;
   }
 }
+
+export default MOL2Stream;
