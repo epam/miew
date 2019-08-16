@@ -6,6 +6,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.2] - 2019-08-16
+### Added
+- The parameter `resolution` now effects image quality for Electron Density.
+- Add API and terminal command to center view on selection via `miew.center`.
+- Load file in Load dialog after pressing 'Enter'.
+
+### Fixed
+- Clear info panel in demo application when data haven't been loaded.
+- Fix miew crash when adding representation if data was not loaded.
+- Fix bug with incorrect discard behavior in component mode.
+- Fix wrong scaling molecules in `DISTORTED` and `SIMPLE` stereo modes.
+- Fix 'magic' rectangular lines appearing on laptops with Intel embedded GPU board.
+- Fix disappearing of molecule after 'ao' turning off.
+
+### Known issues
+- Bounding box lines in Electron Density may disappear when `ao` is tuned on. 
+
 ## [0.8.1] - 2019-07-01
 ### Fixed
 - Do not show the last pick information when selection was changed via the terminal.
