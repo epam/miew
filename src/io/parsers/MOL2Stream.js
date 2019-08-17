@@ -1,43 +1,10 @@
+import SDFStream from './SDFStream';
+
 /**
  * Class representing stream interface for MOL2 parser
+ * @extends SDFStream
  * */
-class MOL2Stream {
-  constructor(data) {
-    this._strings = data.split(/\r?\n|\r/);
-    this._currentStart = 0;
-    this._currentStringIndx = 0;
-  }
-
-  /**
-   * Sets the starting position taking into account possible
-   * beyond the boundary position
-   *
-   * @param {number} start The start position
-   */
-  setStart(start) {
-    const safeStart = (start < this._strings.length) ? start : this._strings.length - 1;
-    this._currentStart = safeStart;
-    this._currentStringIndx = safeStart;
-  }
-
-  /**
-   * Returns the next string from the stream
-   *
-   * @return {string} The next string
-   */
-  getNextString() {
-    return this._strings[++this._currentStringIndx];
-  }
-
-  /**
-   * Returns the current string from the stream
-   *
-   * @return {string} The current string
-   */
-  getCurrentString() {
-    return this._strings[this._currentStringIndx];
-  }
-
+class MOL2Stream extends SDFStream {
   /**
    * Returns the numb-th string from the start
    *
@@ -109,15 +76,6 @@ class MOL2Stream {
     }
     this.setStart(++this._currentStringIndx);
     return this.probablyHaveDataToParse();
-  }
-
-  /**
-   * Checks if there are any data to parse
-   *
-   * @return {boolean} Whether there are any strings in the stream  or not
-   */
-  probablyHaveDataToParse() {
-    return this._currentStringIndx < this._strings.length - 2;
   }
 }
 

@@ -95,24 +95,22 @@ class MOL2Parser extends Parser {
 
       const element = parsedStr[5].split('.')[0].toUpperCase();
 
-      let resSeq = 1;
-      let resName = 'UNK'; // The same meaning has '<0>' in some mol2 files
       let charge = 0;
-
-      if (parsedStr.length >= 7) {
-        resSeq = parseInt(parsedStr[6], 10);
-      }
-      if (parsedStr.length >= 8 && parsedStr[7] !== '<0>') {
-        resName = parsedStr[7].replace(resNumberRegex, '');
-      }
       if (parsedStr.length >= 9) {
         charge = parseFloat(parsedStr[8]) | 0;
       }
-      if (this.settings.now.nowater) {
-        if (resName === 'HOH' || resName === 'WAT') {
-          continue;
-        }
+
+      let chain = this._chain;
+      if (!chain) {
+        // .mol2 may contain information about multiple molecules, but they can't be visualized
+        // at the same time now. There is no need to create different chain IDs then.
+        this._chain = chain = this._complex.getChain('A') || this._complex.addChain('A');
+        this._residue = null;
       }
+      if (!this._setResidue(parsedStr)) {
+        continue;
+      }
+
       // These fields are not listed in mol2 format. Set them default.
       // Atoms and het atoms doesn't differ in .mol2,
       // but het atoms have special residues. It can be used in next updates
@@ -123,20 +121,32 @@ class MOL2Parser extends Parser {
       const type = Element.getByName(element);
       const role = Element.Role[atomName];
 
-      let chain = this._chain;
-      if (!chain) {
-        // .mol2 may contain information about multiple molecules, but they can't be visualized
-        // at the same time now. There is no need to create different chain IDs then.
-        this._chain = chain = this._complex.getChain('A') || this._complex.addChain('A');
-        this._residue = null;
-      }
-      let residue = this._residue;
-      if (!residue || residue.getSequence() !== resSeq) {
-        this._residue = residue = chain.addResidue(resName, resSeq, 'A');
-      }
       const xyz = new THREE.Vector3(x, y, z);
       this._residue.addAtom(atomName, type, xyz, role, het, atomId, altLoc, occupancy, tempFactor, charge);
     }
+  }
+
+  _setResidue(parsedStr) {
+    let resSeq = 1;
+    let resName = 'UNK'; // The same meaning has '<0>' in some mol2 files
+
+    if (parsedStr.length >= 7) {
+      resSeq = parseInt(parsedStr[6], 10);
+    }
+    if (parsedStr.length >= 8 && parsedStr[7] !== '<0>') {
+      resName = parsedStr[7].replace(resNumberRegex, '');
+    }
+    if (this.settings.now.nowater) {
+      if (resName === 'HOH' || resName === 'WAT') {
+        return false;
+      }
+    }
+    const residue = this._residue;
+    const chain = this._chain;
+    if (!residue || residue.getSequence() !== resSeq) {
+      this._residue = chain.addResidue(resName, resSeq, 'A');
+    }
+    return true;
   }
 
   /* Bond format description
