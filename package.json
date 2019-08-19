@@ -175,6 +175,6 @@
     "webpack": "^4.39.2",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.8.0",
-    "yargs": "^13.3.0"
+    "yargs": "^14.0.0"
   }
 }
