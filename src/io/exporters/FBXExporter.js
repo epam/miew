@@ -10,15 +10,6 @@ import ZClippedMesh from '../../gfx/meshes/ZClippedMesh';
  * @returns{Float32Array} resulting concatenated array
  */
 
-function Float32Concat(first, second) {
-  const firstLength = first.length;
-  const result = new Float32Array(firstLength + second.length);
-
-  result.set(first);
-  result.set(second, firstLength);
-
-  return result;
-}
 
 /**
  * FBX file format exporter.
@@ -38,11 +29,8 @@ export default class FBXExporter extends Exporter {
     /* Exact data */
     /* Source is somewhat like ComplexVisual, but we need to catch THREE.Mesh objects */
     this._meshes = [];
-    this._vertices = [];
-    this._colors = [];
-    this._normals = [];
-    this._indices = [];
-    this._alphas = [];
+    this._materials = [];
+    this._models = [];
   }
 
   /**
@@ -135,7 +123,7 @@ export default class FBXExporter extends Exporter {
 
   /**
    * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
-   * @param{array} array - indices buffer
+   * @param{ArrayLike<number>} array - indices buffer
    * @returns{Int16Array} reworked array.
    */
   _reworkIndices(array) {
@@ -175,93 +163,187 @@ export default class FBXExporter extends Exporter {
     return clonedArray;
   }
 
+  _addModelsToResult() {
+    const allModels = [];
+    for (let i = 0; i < this._models.length; ++i) {
+      const model = this._models[i];
+      const modelName = `Model::${this._data.name}_${i}`;
+      const Version = 232; /* Mystery number */
+      /* Setting up default properties */
+      const modelProperties = `\tModel: "${modelName}", "Mesh" {\n`
+        + `\t\tVersion: ${Version}\n`
+        + '\t\tProperties60: {\n'
+        + '\t\t\tProperty: "QuaternionInterpolate", "bool", "",0\n'
+        + '\t\t\tProperty: "Visibility", "Visibility", "A",1\n'
+        + '\t\t\tProperty: "Lcl Translation", "Lcl Translation", "A",0.000000000000000,0.000000000000000,-1789.238037109375000\n'
+        + '\t\t\tProperty: "Lcl Rotation", "Lcl Rotation", "A",0.000009334667643,-0.000000000000000,0.000000000000000\n'
+        + '\t\t\tProperty: "Lcl Scaling", "Lcl Scaling", "A",1.000000000000000,1.000000000000000,1.000000000000000\n'
+        + '\t\t\tProperty: "RotationOffset", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "RotationPivot", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "ScalingOffset", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "ScalingPivot", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "TranslationActive", "bool", "",0\n'
+        + '\t\t\tProperty: "TranslationMin", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "TranslationMax", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "TranslationMinX", "bool", "",0\n'
+        + '\t\t\tProperty: "TranslationMinY", "bool", "",0\n'
+        + '\t\t\tProperty: "TranslationMinZ", "bool", "",0\n'
+        + '\t\t\tProperty: "TranslationMaxX", "bool", "",0\n'
+        + '\t\t\tProperty: "TranslationMaxY", "bool", "",0\n'
+        + '\t\t\tProperty: "TranslationMaxZ", "bool", "",0\n'
+        + '\t\t\tProperty: "RotationOrder", "enum", "",0\n'
+        + '\t\t\tProperty: "RotationSpaceForLimitOnly", "bool", "",0\n'
+        + '\t\t\tProperty: "AxisLen", "double", "",10\n'
+        + '\t\t\tProperty: "PreRotation", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "PostRotation", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "RotationActive", "bool", "",0\n'
+        + '\t\t\tProperty: "RotationMin", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "RotationMax", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "RotationMinX", "bool", "",0\n'
+        + '\t\t\tProperty: "RotationMinY", "bool", "",0\n'
+        + '\t\t\tProperty: "RotationMinZ", "bool", "",0\n'
+        + '\t\t\tProperty: "RotationMaxX", "bool", "",0\n'
+        + '\t\t\tProperty: "RotationMaxY", "bool", "",0\n'
+        + '\t\t\tProperty: "RotationMaxZ", "bool", "",0\n'
+        + '\t\t\tProperty: "RotationStiffnessX", "double", "",0\n'
+        + '\t\t\tProperty: "RotationStiffnessY", "double", "",0\n'
+        + '\t\t\tProperty: "RotationStiffnessZ", "double", "",0\n'
+        + '\t\t\tProperty: "MinDampRangeX", "double", "",0\n'
+        + '\t\t\tProperty: "MinDampRangeY", "double", "",0\n'
+        + '\t\t\tProperty: "MinDampRangeZ", "double", "",0\n'
+        + '\t\t\tProperty: "MaxDampRangeX", "double", "",0\n'
+        + '\t\t\tProperty: "MaxDampRangeY", "double", "",0\n'
+        + '\t\t\tProperty: "MaxDampRangeZ", "double", "",0\n'
+        + '\t\t\tProperty: "MinDampStrengthX", "double", "",0\n'
+        + '\t\t\tProperty: "MinDampStrengthY", "double", "",0\n'
+        + '\t\t\tProperty: "MinDampStrengthZ", "double", "",0\n'
+        + '\t\t\tProperty: "MaxDampStrengthX", "double", "",0\n'
+        + '\t\t\tProperty: "MaxDampStrengthY", "double", "",0\n'
+        + '\t\t\tProperty: "MaxDampStrengthZ", "double", "",0\n'
+        + '\t\t\tProperty: "PreferedAngleX", "double", "",0\n'
+        + '\t\t\tProperty: "PreferedAngleY", "double", "",0\n'
+        + '\t\t\tProperty: "PreferedAngleZ", "double", "",0\n'
+        + '\t\t\tProperty: "InheritType", "enum", "",0\n'
+        + '\t\t\tProperty: "ScalingActive", "bool", "",0\n'
+        + '\t\t\tProperty: "ScalingMin", "Vector3D", "",1,1,1\n'
+        + '\t\t\tProperty: "ScalingMax", "Vector3D", "",1,1,1\n'
+        + '\t\t\tProperty: "ScalingMinX", "bool", "",0\n'
+        + '\t\t\tProperty: "ScalingMinY", "bool", "",0\n'
+        + '\t\t\tProperty: "ScalingMinZ", "bool", "",0\n'
+        + '\t\t\tProperty: "ScalingMaxX", "bool", "",0\n'
+        + '\t\t\tProperty: "ScalingMaxY", "bool", "",0\n'
+        + '\t\t\tProperty: "ScalingMaxZ", "bool", "",0\n'
+        + '\t\t\tProperty: "GeometricTranslation", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "GeometricRotation", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "GeometricScaling", "Vector3D", "",1,1,1\n'
+        + '\t\t\tProperty: "LookAtProperty", "object", ""\n'
+        + '\t\t\tProperty: "UpVectorProperty", "object", ""\n'
+        + '\t\t\tProperty: "Show", "bool", "",1\n'
+        + '\t\t\tProperty: "NegativePercentShapeSupport", "bool", "",1\n'
+        + '\t\t\tProperty: "DefaultAttributeIndex", "int", "",0\n'
+        + '\t\t\tProperty: "Color", "Color", "A+",0,0,0\n'
+        + '\t\t\tProperty: "Size", "double", "",100\n'
+        + '\t\t\tProperty: "Look", "enum", "",1\n'
+        + '\t\t}\n';
+      /* Setting up vertices + indices */
+      const multiLayer = 0;
+      const multiTake = 1;
+      const shading = 'Y';
+      const culling = 'CullingOff';
+      const geometryVersion = 124;
+      const verticesIndices = `\t\tMultiLayer: ${multiLayer}\n`
+        + `\t\tMultiTake: ${multiTake}\n`
+        + `\t\tShading: ${shading}\n`
+        + `\t\tCulling: "${culling}"\n`
+        + `\t\tVertices: ${model.vertices}\n\n`
+        + `\t\tPolygonVertexIndex: ${model.indices}\n\n`
+        + `\t\tGeometryVersion: ${geometryVersion}\n`;
+      /* Setting up layers */
+      const layerElementNormalNumber = 0; /* IDK what that is */
+      const layerElementNormalVersion = 101; /* IDK what version means */
+      const layerElementNormalName = ''; /* IDK what name means */
+      const layerElementNormal = `\t\tLayerElementNormal: ${layerElementNormalNumber} {\n`
+        + `\t\t\tVersion: ${layerElementNormalVersion}\n`
+        + `\t\t\tName: "${layerElementNormalName}"\n`
+        + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
+        + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
+        + `\t\t\tNormals: ${model.normals}\n`
+        + '\t\t}\n';
+      /* next few layerElements are not in use, but we left it for maybe further compatibility */
+      const layerElementSmoothing = '';
+      const layerElementUV = '';
+      const layerElementTexture = '';
+      const layerElementMaterial = '';
+      /* but colors are actually in-use */
+      const layerElementColorNumber = 0; /* IDK what that is */
+      const layerElementColorVersion = 101; /* IDK what version means */
+      const layerElementColorName = ''; /* IDK what name means */
+      const layerElementColor = `\t\tLayerElementColor: ${layerElementColorNumber} {\n`
+        + `\t\t\tVersion: ${layerElementColorVersion}\n`
+        + `\t\t\tName: "${layerElementColorName}"\n`
+        + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
+        + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
+        + `\t\t\tColors: ${model.colors}\n`
+        + `\t\t\tColorIndex: ${[...Array(model.colors.length / 4).keys()]}\n`
+        + '\t\t}\n';
+      /* TODO: automatically check and build this info */
+      const layer = '\t\tLayer: 0 {\n'
+        + '\t\t\tVersion: 100\n'
+        + '\t\t\tLayerElement:  {\n'
+        + '\t\t\t\tType: "LayerElementNormal"\n'
+        + '\t\t\t\tTypedIndex: 0\n'
+        + '\t\t\t}\n'
+        + '\t\t\tLayerElement:  {\n'
+        + '\t\t\t\tType: "LayerElementColor"\n'
+        + '\t\t\t\tTypedIndex: 0\n'
+        + '\t\t\t}\n'
+        + '\t\t}\n'
+        + '\t}\n';
+      const resultingLayer = [layerElementNormal, layerElementSmoothing, layerElementUV, layerElementTexture, layerElementMaterial, layerElementColor, layer].join('');
+      allModels.push([modelProperties, verticesIndices, resultingLayer].join(''));
+    }
+    return allModels.join('');
+  }
+
+  /**
+   * Save geometry info from mesh to this._models.
+   */
+  _collectGeometryInfo(mesh) {
+    let lVertices = [];
+    let lIndices = [];
+    let lNormals = [];
+    let lAlphas = [];
+    let lColors = [];
+    /* Collect info about vertices + indices + material */
+    lVertices = mesh.geometry.attributes.position.array;
+    lIndices = this._reworkIndices(mesh.geometry.index.array); /* Need to rework this into strange FBX notation */
+    lNormals = mesh.geometry.attributes.normal.array;
+    if (!(mesh instanceof ZClippedMesh)) {
+      lAlphas = mesh.geometry.attributes.alphaColor.array;
+    }
+    if (mesh.geometry.attributes.color.array.length >= 1) {
+      lColors = this._reworkColors(mesh.geometry.attributes.color.array, lAlphas); /* Need to rework this into strange FBX notation */
+    }
+    if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
+      this._models.push({
+        vertices: lVertices,
+        indices: lIndices,
+        normals: lNormals,
+        colors: lColors,
+      });
+    } /* else do nothing */
+  }
+
+  /**
+   * Add Material info to this._materials.
+   */
+  _collectMaterialInfo(mesh) {
+  }
+
   /**
    * Add Models info to output file.
    */
   _addModels() {
-    const modelName = `Model::${this._data.name}`;
-    const Version = 232; /* Mystery number */
-    /* Setting up default properties */
-    const modelProperties = `Model: "${modelName}", "Mesh" {\n`
-    + `\t\tVersion: ${Version}\n`
-    + '\t\tProperties60: {\n'
-    + '\t\t\tProperty: "QuaternionInterpolate", "bool", "",0\n'
-    + '\t\t\tProperty: "Visibility", "Visibility", "A",1\n'
-    + '\t\t\tProperty: "Lcl Translation", "Lcl Translation", "A",0.000000000000000,0.000000000000000,-1789.238037109375000\n'
-    + '\t\t\tProperty: "Lcl Rotation", "Lcl Rotation", "A",0.000009334667643,-0.000000000000000,0.000000000000000\n'
-    + '\t\t\tProperty: "Lcl Scaling", "Lcl Scaling", "A",1.000000000000000,1.000000000000000,1.000000000000000\n'
-    + '\t\t\tProperty: "RotationOffset", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "RotationPivot", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "ScalingOffset", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "ScalingPivot", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "TranslationActive", "bool", "",0\n'
-    + '\t\t\tProperty: "TranslationMin", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "TranslationMax", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "TranslationMinX", "bool", "",0\n'
-    + '\t\t\tProperty: "TranslationMinY", "bool", "",0\n'
-    + '\t\t\tProperty: "TranslationMinZ", "bool", "",0\n'
-    + '\t\t\tProperty: "TranslationMaxX", "bool", "",0\n'
-    + '\t\t\tProperty: "TranslationMaxY", "bool", "",0\n'
-    + '\t\t\tProperty: "TranslationMaxZ", "bool", "",0\n'
-    + '\t\t\tProperty: "RotationOrder", "enum", "",0\n'
-    + '\t\t\tProperty: "RotationSpaceForLimitOnly", "bool", "",0\n'
-    + '\t\t\tProperty: "AxisLen", "double", "",10\n'
-    + '\t\t\tProperty: "PreRotation", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "PostRotation", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "RotationActive", "bool", "",0\n'
-    + '\t\t\tProperty: "RotationMin", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "RotationMax", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "RotationMinX", "bool", "",0\n'
-    + '\t\t\tProperty: "RotationMinY", "bool", "",0\n'
-    + '\t\t\tProperty: "RotationMinZ", "bool", "",0\n'
-    + '\t\t\tProperty: "RotationMaxX", "bool", "",0\n'
-    + '\t\t\tProperty: "RotationMaxY", "bool", "",0\n'
-    + '\t\t\tProperty: "RotationMaxZ", "bool", "",0\n'
-    + '\t\t\tProperty: "RotationStiffnessX", "double", "",0\n'
-    + '\t\t\tProperty: "RotationStiffnessY", "double", "",0\n'
-    + '\t\t\tProperty: "RotationStiffnessZ", "double", "",0\n'
-    + '\t\t\tProperty: "MinDampRangeX", "double", "",0\n'
-    + '\t\t\tProperty: "MinDampRangeY", "double", "",0\n'
-    + '\t\t\tProperty: "MinDampRangeZ", "double", "",0\n'
-    + '\t\t\tProperty: "MaxDampRangeX", "double", "",0\n'
-    + '\t\t\tProperty: "MaxDampRangeY", "double", "",0\n'
-    + '\t\t\tProperty: "MaxDampRangeZ", "double", "",0\n'
-    + '\t\t\tProperty: "MinDampStrengthX", "double", "",0\n'
-    + '\t\t\tProperty: "MinDampStrengthY", "double", "",0\n'
-    + '\t\t\tProperty: "MinDampStrengthZ", "double", "",0\n'
-    + '\t\t\tProperty: "MaxDampStrengthX", "double", "",0\n'
-    + '\t\t\tProperty: "MaxDampStrengthY", "double", "",0\n'
-    + '\t\t\tProperty: "MaxDampStrengthZ", "double", "",0\n'
-    + '\t\t\tProperty: "PreferedAngleX", "double", "",0\n'
-    + '\t\t\tProperty: "PreferedAngleY", "double", "",0\n'
-    + '\t\t\tProperty: "PreferedAngleZ", "double", "",0\n'
-    + '\t\t\tProperty: "InheritType", "enum", "",0\n'
-    + '\t\t\tProperty: "ScalingActive", "bool", "",0\n'
-    + '\t\t\tProperty: "ScalingMin", "Vector3D", "",1,1,1\n'
-    + '\t\t\tProperty: "ScalingMax", "Vector3D", "",1,1,1\n'
-    + '\t\t\tProperty: "ScalingMinX", "bool", "",0\n'
-    + '\t\t\tProperty: "ScalingMinY", "bool", "",0\n'
-    + '\t\t\tProperty: "ScalingMinZ", "bool", "",0\n'
-    + '\t\t\tProperty: "ScalingMaxX", "bool", "",0\n'
-    + '\t\t\tProperty: "ScalingMaxY", "bool", "",0\n'
-    + '\t\t\tProperty: "ScalingMaxZ", "bool", "",0\n'
-    + '\t\t\tProperty: "GeometricTranslation", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "GeometricRotation", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "GeometricScaling", "Vector3D", "",1,1,1\n'
-    + '\t\t\tProperty: "LookAtProperty", "object", ""\n'
-    + '\t\t\tProperty: "UpVectorProperty", "object", ""\n'
-    + '\t\t\tProperty: "Show", "bool", "",1\n'
-    + '\t\t\tProperty: "NegativePercentShapeSupport", "bool", "",1\n'
-    + '\t\t\tProperty: "DefaultAttributeIndex", "int", "",0\n'
-    + '\t\t\tProperty: "Color", "Color", "A+",0,0,0\n'
-    + '\t\t\tProperty: "Size", "double", "",100\n'
-    + '\t\t\tProperty: "Look", "enum", "",1\n'
-    + '\t\t}\n';
-    /* Setting up vertices + indices */
-    const multiLayer = 0;
-    const multiTake = 1;
-    const shading = 'Y';
-    const culling = 'CullingOff';
     /* To gather vertices we need to traverse this._data object */
     this._data.traverse((object) => {
       if (object instanceof THREE.Mesh) {
@@ -270,73 +352,17 @@ export default class FBXExporter extends Exporter {
     });
     /* Then we need to gather only mask === 1 vertices */
     for (let i = 0; i < this._meshes.length; ++i) {
-     // if (this._meshes[i].layers.test(gfxutils.LAYERS.DEFAULT)) { /* It means something */
-      if (this._meshes[i].layers.mask === 1) { /* TODO: Implement what's written on top of that */
-        /* Collect info about vertices + indices + material */
-        this._vertices = Float32Concat(this._vertices, this._meshes[i].geometry.attributes.position.array);
-        this._indices = Float32Concat(this._indices, this._reworkIndices(this._meshes[i].geometry.index.array)); /* Need to rework this into strange FBX notation */
-        this._normals = Float32Concat(this._normals, this._meshes[i].geometry.attributes.normal.array);
-        if (!(this._meshes[i] instanceof ZClippedMesh)) {
-          this._alphas = Float32Concat(this._alphas, this._meshes[i].geometry.attributes.alphaColor.array);
-        }
-        if (this._meshes[i].geometry.attributes.color.array.length >= 1) {
-          this._colors = Float32Concat(this._colors, this._reworkColors(this._meshes[i].geometry.attributes.color.array, this._alphas)); /* Need to rework this into strange FBX notation */
-        }
+      // if (this._meshes[i].layers.test(gfxutils.LAYERS.DEFAULT)) { /* It means something */
+      const mesh = this._meshes[i];
+      if (mesh.layers.mask === 1) { /* TODO: Implement what's written on top of that */
+        this._collectGeometryInfo(mesh);
+        this._collectMaterialInfo(mesh);
       } else {
         /* Collect info only about material */
+        this._collectMaterialInfo(mesh);
       }
     }
-    const geometryVersion = 124;
-    const verticesIndices = `\t\tMultiLayer: ${multiLayer}\n`
-    + `\t\tMultiTake: ${multiTake}\n`
-    + `\t\tShading: ${shading}\n`
-    + `\t\tCulling: "${culling}"\n`
-    + `\t\tVertices: ${this._vertices}\n\n`
-    + `\t\tPolygonVertexIndex: ${this._indices}\n\n`
-    + `\t\tGeometryVersion: ${geometryVersion}\n`;
-    /* Setting up layers */
-    const layerElementNormalNumber = 0; /* IDK what that is */
-    const layerElementNormalVersion = 101; /* IDK what version means */
-    const layerElementNormalName = ''; /* IDK what name means */
-    const layerElementNormal = `\t\tLayerElementNormal: ${layerElementNormalNumber} {\n`
-     + `\t\t\tVersion: ${layerElementNormalVersion}\n`
-     + `\t\t\tName: "${layerElementNormalName}"\n`
-     + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
-     + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
-     + `\t\t\tNormals: ${this._normals}\n`
-     + '\t\t}\n';
-    /* next few layerElements are not in use, but we left it for maybe further compatibility */
-    const layerElementSmoothing = '';
-    const layerElementUV = '';
-    const layerElementTexture = '';
-    const layerElementMaterial = '';
-    /* but colors are actually in-use */
-    const layerElementColorNumber = 0; /* IDK what that is */
-    const layerElementColorVersion = 101; /* IDK what version means */
-    const layerElementColorName = ''; /* IDK what name means */
-    const layerElementColor = `\t\tLayerElementColor: ${layerElementColorNumber} {\n`
-    + `\t\t\tVersion: ${layerElementColorVersion}\n`
-    + `\t\t\tName: "${layerElementColorName}"\n`
-    + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
-    + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
-    + `\t\t\tColors: ${this._colors}\n`
-    + `\t\t\tColorIndex: ${[...Array(this._alphas.length).keys()]}\n`
-    + '\t\t}\n';
-    /* TODO: automatically check and build this info */
-    const layer = '\t\tLayer: 0 {\n'
-    + '\t\t\tVersion: 100\n'
-    + '\t\t\tLayerElement:  {\n'
-    + '\t\t\t\tType: "LayerElementNormal"\n'
-    + '\t\t\t\tTypedIndex: 0\n'
-    + '\t\t\t}\n'
-    + '\t\t\tLayerElement:  {\n'
-    + '\t\t\t\tType: "LayerElementColor"\n'
-    + '\t\t\t\tTypedIndex: 0\n'
-    + '\t\t\t}\n'
-    + '\t\t}\n'
-    + '\t}\n';
-    const resultingLayer = [layerElementNormal, layerElementSmoothing, layerElementUV, layerElementTexture, layerElementMaterial, layerElementColor, layer].join('');
-    return [modelProperties, verticesIndices, resultingLayer].join('');
+    return this._addModelsToResult();
   }
 
   /**
@@ -360,13 +386,53 @@ export default class FBXExporter extends Exporter {
   }
 
   /**
+   * Add Material info to output file.
+   */
+
+  _addMaterial() {
+    const materialVersion = 102;
+    const ambientColor = ``;
+    const material = `"Material::${this._data.name}_default", "" {\n`
+     + `\t\tVersion: ${materialVersion}\n`
+     + '\t\tShadingModel: "lambert"\n'
+     + '\t\tMultiLayer: 0\n'
+     + '\t\tProperties60:  {\n'
+     + '\t\t\tProperty: "ShadingModel", "KString", "", "Lambert"\n'
+     + '\t\t\tProperty: "MultiLayer", "bool", "",0\n'
+     + '\t\t\tProperty: "EmissiveColor", "ColorRGB", "",0,0,0\n'
+     + '\t\t\tProperty: "EmissiveFactor", "double", "",0.0000\n'
+     + '\t\t\tProperty: "AmbientColor", "ColorRGB", "",1.0000,1.0000,1.0000\n'
+     + '\t\t\tProperty: "AmbientFactor", "double", "",1.0000\n'
+     + '\t\t\tProperty: "DiffuseColor", "ColorRGB", "",0.3051,0.2509,0.8000\n'
+     + '\t\t\tProperty: "DiffuseFactor", "double", "",0.8000\n'
+     + '\t\t\tProperty: "Bump", "Vector3D", "",0,0,0\n'
+     + '\t\t\tProperty: "TransparentColor", "ColorRGB", "",1,1,1\n'
+     + '\t\t\tProperty: "TransparencyFactor", "double", "",0.0000\n'
+     + '\t\t\tProperty: "SpecularColor", "ColorRGB", "",1.0000,1.0000,1.0000\n'
+     + '\t\t\tProperty: "SpecularFactor", "double", "",0.5000\n'
+     + '\t\t\tProperty: "ShininessExponent", "double", "",12.3\n'
+     + '\t\t\tProperty: "ReflectionColor", "ColorRGB", "",0,0,0\n'
+     + '\t\t\tProperty: "ReflectionFactor", "double", "",1\n'
+     + '\t\t\tProperty: "Emissive", "ColorRGB", "",0,0,0\n'
+     + '\t\t\tProperty: "Ambient", "ColorRGB", "",1.0,1.0,1.0\n'
+     + '\t\t\tProperty: "Diffuse", "ColorRGB", "",0.3,0.3,0.8\n'
+     + '\t\t\tProperty: "Specular", "ColorRGB", "",1.0,1.0,1.0\n'
+     + '\t\t\tProperty: "Shininess", "double", "",12.3\n'
+     + '\t\t\tProperty: "Opacity", "double", "",1.0\n'
+     + '\t\t\tProperty: "Reflectivity", "double", "",0\n'
+     + '\t\t}\n'
+     + '\t}';
+  }
+
+  /**
    * Add Objects info to output file.
    */
   createObjects() {
     const mandatoryComment = '; Object properties\n'
       + ';------------------------------------------------------------------\n\n';
     const result = 'Objects:  {\n'
-      + `\tModel: ${this._addModels()}`
+      + `${this._addModels()}`
+//      + `\tMaterial: ${this._addMaterial()}`
       + `\tGlobalSettings: ${this._addGlobalSettings()}`;
     return [mandatoryComment, result].join('');
   }
@@ -377,10 +443,13 @@ export default class FBXExporter extends Exporter {
   createRelations() {
     const mandatoryComment = '; Object relations\n'
     + ';------------------------------------------------------------------\n\n';
-    const relations = 'Relations:  {\n'
-    + `\tModel: "Model::${this._data.name}", "Mesh" {\n`
-    + '\t}\n'
-    + '\tModel: "Model::Producer Perspective", "Camera" {\n'
+    let modelsList = '';
+    for (let i = 0; i < this._models.length; ++i) {
+      modelsList += `\tModel: "Model::${this._data.name}_${i}", "Mesh" {\n`
+        + '\t}\n';
+    }
+    const relations = `Relations:  {\n${modelsList}\t`
+    + 'Model: "Model::Producer Perspective", "Camera" {\n'
     + '\t}\n'
     + '\tModel: "Model::Producer Top", "Camera" {\n'
     + '\t}\n'
@@ -405,9 +474,12 @@ export default class FBXExporter extends Exporter {
    */
   createConnections() {
     const mandatoryComment = '; Object connections\n'
-      + ';------------------------------------------------------------------\n\n'
-    const connections = 'Connections:  {\n'
-    + `\tConnect: "OO", "Model::${this._data.name}", "Model::Scene"\n`
+      + ';------------------------------------------------------------------\n\n';
+    let modelsList = '';
+    for (let i = 0; i < this._models.length; ++i) {
+      modelsList += `\tConnect: "OO", "Model::${this._data.name}_${i}", "Model::Scene"\n`;
+    }
+    const connections = `Connections:  {\n${modelsList}`
     + '}\n';
     return [mandatoryComment, connections].join('');
   }
