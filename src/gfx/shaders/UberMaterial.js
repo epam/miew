@@ -299,7 +299,7 @@ UberMaterial.prototype.setValues = function (values) {
   if (this.colorFromPos) {
     defines.COLOR_FROM_POS = 1;
   }
-  if (this.shadowmap) {
+  if (this.shadowmap && !(this.sphereSprite || this.cylinderSprite)) {
     defines.SHADOWMAP = 1;
     if (this.shadowmapType === 'pcf') {
       defines.SHADOWMAP_PCF_SHARP = 1;
