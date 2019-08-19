@@ -13,51 +13,50 @@ const {
 
 /**
  * Gromos87 file format parser.
- *
- * @param {Number} time           - Time in ps (optional).
- * @param {Number} numAtoms       - Number of atoms in complex.
- * @param {Number} residueNumber  - Number of exact residue.
- * @param {String} residueName    - Scientific name of exact residue.
- * @param {String} atomName       - Scientific name of exact atom.
- * @param {Number} atomNumber     - Sorted number of exact atom.
- * @param {Array} atomPosition    - Array which contains x, y, z position of exact atom.
- * @param {Array} atomVelocity    - Array which contains x, y, z velocity of exact atom (optional).
- *
- * @param {Complex} complex       - Complex structure for unified molecule representation.
- *
- * @param {Molecule} molecules    - Molecules array.
- * @param {Molecule} molecule     - Single molecule.
- * @param {String} filetype       - Extension of data file.
- *
- * @exports GROParser
- * @constructor
+ * @extends Parser
  */
 class GROParser extends Parser {
+  /**
+   * Create parser for .gro file format
+   *
+   * @param {String} data Input file
+   * @param {String} options Input options (optional field)
+   */
   constructor(data, options) {
     super(data, options);
-
-    this._time = null;
-    this._numAtoms = null;
-    this._residueNumber = null;
-    this._residueName = '';
-    this._atomName = '';
-    this._atomNumber = null;
-    this._atomPosition = [];
-    this._atomVelocity = [];
-
-    this._complex = null;
-
-    this._molecules = [];
-    this._molecule = null;
-    this._options.filetype = 'gro';
+    /** @type Date */
+    this._time = null; // Time in ps, optional field for animations
+    /** @type Number */
+    this._numAtoms = null; // Number of atoms in complex
+    /** @type Number */
+    this._residueNumber = null; // Number of exact residue
+    /** @type String */
+    this._residueName = ''; // Scientific name of exact residue
+    /** @type String */
+    this._atomName = ''; // Scientific name of exact atom
+    /** @type Number */
+    this._atomNumber = null; // Sorted number of exact atom
+    /** @type Array */
+    this._atomPosition = []; // Array which contains x, y, z position of exact atom
+    /** @type Array */
+    this._atomVelocity = []; // Array which contains x, y, z velocity of exact atom (optional)
+    /** @type Complex */
+    this._complex = null; // Complex structure for unified molecule representation
+    /** @type Vector3 */
+    this._molecules = []; // Molecules array
+    /** @type Molecule */
+    this._molecule = null; // Single molecule
+    /** @type String */
+    this._options.filetype = 'gro'; // Extension of data file.
   }
 
   /**
    * General check for possibility of parsing.
+   * @param {String} data - Input file
    * @returns {boolean} true if this file is in ascii, false otherwise
    */
-  canProbablyParse() {
-    return _.isString(this._data);
+  canProbablyParse(data) {
+    return _.isString(this._data) && /^\s*[^\n]*\n\s*\d+ *\n\s*\d+[^\n\d]{3}\s*\w+\s*\d+\s*-?\d/.test(data);
   }
 
   /**
@@ -78,9 +77,7 @@ class GROParser extends Parser {
   _parseNumberOfAtoms(line) {
     this._numAtoms = line.readInt(0, line.getNext());
     if (Number.isNaN(this._numAtoms)) {
-      this._complex.error = {
-        message: `"${line.readLine()}" is not representing atom number. Consider checking input file`,
-      };
+      throw new Error('Line 2 is not representing atom number. Consider checking input file');
     }
   }
 
@@ -125,7 +122,7 @@ class GROParser extends Parser {
     /* Secondly, add residue to that chain */
     let residue = this._residue;
     if (!residue || residue.getSequence() !== this._residueNumber) {
-      this._residue = residue = chain.addResidue(this._residueName, this._residueNumber, 'A');
+      this._residue = residue = chain.addResidue(this._residueName, this._residueNumber, ' ');
     }
     /* Lastly, add atom to that residue */
     this._atomPosition = new THREE.Vector3(positionX, positionY, positionZ);
@@ -163,7 +160,7 @@ class GROParser extends Parser {
    * @returns {Complex} Complex structure for visualizing.
    */
   _finalize() {
-    this._molecule = { _index: '', _chains: [] };
+    this._molecule = { _index: '', _chains: this._chain };
     this._molecule._index = 1;
     this._molecules.push(this._molecule);
     this._finalizeMolecules();
@@ -185,22 +182,19 @@ class GROParser extends Parser {
     /* Parse input file line-by-line */
     const reader = new GROReader(this._data);
     let counter = 0; /* Simple counter regarding to format of .gro file */
-    while (!reader.end()) {
-      /* First two lines - technical information, other lines - Atoms */
-      if (counter === 0) {
-        this._parseTitle(reader);
-      } else if (counter === 1) {
-        this._parseNumberOfAtoms(reader);
-      } else if (counter <= this._numAtoms + 1) { /* Number of atoms + 2 strings of technical information */
-        this._parseAtom(reader); /* Box Vectors are not been proceeded at all */
+    /* First two lines - technical information, other lines - Atoms */
+    this._parseTitle(reader);
+    reader.next();
+    this._parseNumberOfAtoms(reader);
+    reader.next();
+    for (counter = 0; counter < this._numAtoms; ++counter) {
+      if (!reader.end()) {
+        this._parseAtom(reader);
+        reader.next();
       } else break;
-      /* End of parsing, switch to next line */
-      reader.next();
-      counter++;
     }
-
     /* If number of atoms in second line is less then actual atoms in file */
-    if (counter < this._numAtoms + 1) {
+    if (counter < this._numAtoms) {
       this._complex.error = {
         message: 'File ended unexpectedly.',
       };

@@ -1,25 +1,22 @@
-/**
- * Helper class for stream-like reading input files.
- *
- * @param {String} data      - Input file.
- * @param {Number} start     - Starting position of line.
- * @param {Number} nextCR    - Position of next CR (0x0D).
- * @param {Number} nextLF    - Position of next LF (0x0A).
- * @param {Number} next      - End position of line.
- * @param {Number} end       - End of data.
- *
- * @exports PDBStream
- * @constructor
- */
-
-export default class PDBStream {
+/** Helper class for stream-like reading input files. */
+class PDBStream {
+  /**
+   * Create a stream
+   * @param {String} data Input data
+   */
   constructor(data) {
-    this._data = data;
-    this._start = 0;
-    this._nextCR = -1;
-    this._nextLF = -1;
-    this._next = -1;
-    this._end = data.length;
+    /** @type String */
+    this._data = data; // Input file
+    /** @type Number */
+    this._start = 0; // Starting position of line
+    /** @type Number */
+    this._nextCR = -1; // Position of next CR (0x0D)
+    /** @type Number */
+    this._nextLF = -1; // Position of next LF (0x0A)
+    /** @type Number */
+    this._next = -1; // End position of line
+    /** @type Number */
+    this._end = data.length; // End of data
 
     this.next();
   }
@@ -34,7 +31,7 @@ export default class PDBStream {
 
   /**
    * Reading character from position.
-   * @param{Number} pos - Position in current line.
+   * @param {Number} pos - Position in current line.
    * @returns {String} Character from position
    */
   readChar(pos) {
@@ -44,8 +41,8 @@ export default class PDBStream {
 
   /**
    * Reading character code from position.
-   * @param{Number} pos - Position in current line.
-   * @returns {String} Character code from position
+   * @param {Number} pos - Position in current line.
+   * @returns {Number} Character code from position
    */
   readCharCode(pos) {
     pos = this._start + pos - 1;
@@ -55,8 +52,8 @@ export default class PDBStream {
   /**
    * Reading string from begin to end points.
    * For a reason unknown, numbering assumed not to start from 0, but from 1.
-   * @param{Number} begin - Begin point in current line.
-   * @param{Number} end - End point in current line.
+   * @param {Number} begin - Begin point in current line.
+   * @param {Number} end - End point in current line.
    * @returns {String} String from begin to end
    */
   readString(begin, end) {
@@ -67,8 +64,8 @@ export default class PDBStream {
 
   /**
    * Reading integer from begin to end points.
-   * @param{Number} begin - Begin point in current line.
-   * @param{Number} end - End point in current line.
+   * @param {Number} begin - Begin point in current line.
+   * @param {Number} end - End point in current line.
    * @returns {Number} Integer from begin to end
    */
   readInt(begin, end) {
@@ -77,8 +74,8 @@ export default class PDBStream {
 
   /**
    * Reading float from begin to end points.
-   * @param{Number} begin - Begin point in current line.
-   * @param{Number} end - End point in current line.
+   * @param {Number} begin - Begin point in current line.
+   * @param {Number} end - End point in current line.
    * @returns {Number} Float from begin to end
    */
   readFloat(begin, end) {
@@ -112,3 +109,5 @@ export default class PDBStream {
     this._next = this._nextCR + 1 < this._nextLF ? this._nextCR : this._nextLF;
   }
 }
+
+export default PDBStream;

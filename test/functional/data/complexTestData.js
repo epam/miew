@@ -17,7 +17,10 @@ export default [{
       default: 2,
     },
     sheets: {
-      mmtf: 2, xyz: 0, gro: 0, default: 1,
+      mmtf: 2,
+      xyz: 0,
+      gro: 0,
+      default: 1,
     },
   },
 }, {

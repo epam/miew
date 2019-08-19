@@ -17,6 +17,9 @@ module.exports = {
       'src/utils/EntityList.js',
       'src/utils/EventDispatcher.js',
       'src/utils/logger.js',
+      'src/io/parsers/PDBStream.js',
+      'src/io/parsers/GROReader.js',
+      'src/io/parsers/GROParser.js',
     ],
   },
   opts: {

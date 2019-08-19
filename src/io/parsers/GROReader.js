@@ -2,17 +2,13 @@ import PDBStream from './PDBStream';
 
 /**
  * Little helper class for GRO Parser usage.
- *
- * @param {String} data      - Input file.
- * @param {Number} next      - End position of line.
- *
- * @exports GROReader
- * @constructor
+ * @extends PDBStream
  */
-export default class GROReader extends PDBStream {
+class GROReader extends PDBStream {
   constructor(data) {
     super(data);
-    this._next = -1;
+    /** @type Number */
+    this._next = -1; // End position of line
     this.next();
   }
 
@@ -24,3 +20,5 @@ export default class GROReader extends PDBStream {
     return this._next;
   }
 }
+
+export default GROReader;
