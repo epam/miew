@@ -306,6 +306,49 @@ export default class FBXExporter extends Exporter {
   }
 
   /**
+   * Add Material info to result
+   */
+  _addMaterialsToResult() {
+    const materialVersion = 102;
+    const allMaterials = [];
+    for (let i = 0; i < this._materials.length; ++i) {
+      const material = this._materials[i];
+      const stringMaterial = `\tMaterial: "Material::${this._data.name}_${i}_default", "" {\n`
+        + `\t\tVersion: ${materialVersion}\n`
+        + '\t\tShadingModel: "lambert"\n'
+        + '\t\tMultiLayer: 0\n'
+        + '\t\tProperties60:  {\n'
+        + '\t\t\tProperty: "ShadingModel", "KString", "", "Lambert"\n'
+        + '\t\t\tProperty: "MultiLayer", "bool", "",0\n'
+        + '\t\t\tProperty: "EmissiveColor", "ColorRGB", "",0,0,0\n'
+        + '\t\t\tProperty: "EmissiveFactor", "double", "",0.0000\n'
+        + `\t\t\tProperty: "AmbientColor", "ColorRGB", "",1,1,1\n`
+        + '\t\t\tProperty: "AmbientFactor", "double", "",0.0000\n'
+        + `\t\t\tProperty: "DiffuseColor", "ColorRGB", "",${material.diffuse}\n`
+        + '\t\t\tProperty: "DiffuseFactor", "double", "",1.0000\n'
+        + '\t\t\tProperty: "Bump", "Vector3D", "",0,0,0\n'
+        + '\t\t\tProperty: "TransparentColor", "ColorRGB", "",1,1,1\n'
+        + '\t\t\tProperty: "TransparencyFactor", "double", "",0.0000\n'
+        + `\t\t\tProperty: "SpecularColor", "ColorRGB", "",${material.specular}\n`
+        + '\t\t\tProperty: "SpecularFactor", "double", "",1.0000\n'
+        + `\t\t\tProperty: "ShininessExponent", "double", "",${material.shininess}\n`
+        + '\t\t\tProperty: "ReflectionColor", "ColorRGB", "",0,0,0\n'
+        + '\t\t\tProperty: "ReflectionFactor", "double", "",1\n'
+        + '\t\t\tProperty: "Emissive", "ColorRGB", "",0,0,0\n'
+        + `\t\t\tProperty: "Ambient", "ColorRGB", "",1,1,1\n`
+        + `\t\t\tProperty: "Diffuse", "ColorRGB", "",${material.diffuse}\n`
+        + `\t\t\tProperty: "Specular", "ColorRGB", "",${material.specular}\n`
+        + `\t\t\tProperty: "Shininess", "double", "",${material.shininess}\n`
+        + '\t\t\tProperty: "Opacity", "double", "",1.0\n'
+        + '\t\t\tProperty: "Reflectivity", "double", "",0\n'
+        + '\t\t}\n'
+        + '\t}\n';
+      allMaterials.push(stringMaterial);
+    }
+  return allMaterials.join('');
+  }
+
+  /**
    * Save geometry info from mesh to this._models.
    */
   _collectGeometryInfo(mesh) {
@@ -338,6 +381,16 @@ export default class FBXExporter extends Exporter {
    * Add Material info to this._materials.
    */
   _collectMaterialInfo(mesh) {
+    const lDiffuse = mesh.material.uberOptions.diffuse.toArray();
+    const lOpacity = mesh.material.uberOptions.opacity;
+    const lShininess = mesh.material.uberOptions.shininess;
+    const lSpecular = mesh.material.uberOptions.specular.toArray();
+    this._materials.push({
+      diffuse: lDiffuse,
+      opacity: lOpacity,
+      shininess: lShininess,
+      specular: lSpecular,
+    });
   }
 
   /**
@@ -362,7 +415,7 @@ export default class FBXExporter extends Exporter {
         this._collectMaterialInfo(mesh);
       }
     }
-    return this._addModelsToResult();
+    return [this._addModelsToResult(), this._addMaterialsToResult()].join('');
   }
 
   /**
@@ -385,44 +438,6 @@ export default class FBXExporter extends Exporter {
     return gSettings;
   }
 
-  /**
-   * Add Material info to output file.
-   */
-
-  _addMaterial() {
-    const materialVersion = 102;
-    const ambientColor = ``;
-    const material = `"Material::${this._data.name}_default", "" {\n`
-     + `\t\tVersion: ${materialVersion}\n`
-     + '\t\tShadingModel: "lambert"\n'
-     + '\t\tMultiLayer: 0\n'
-     + '\t\tProperties60:  {\n'
-     + '\t\t\tProperty: "ShadingModel", "KString", "", "Lambert"\n'
-     + '\t\t\tProperty: "MultiLayer", "bool", "",0\n'
-     + '\t\t\tProperty: "EmissiveColor", "ColorRGB", "",0,0,0\n'
-     + '\t\t\tProperty: "EmissiveFactor", "double", "",0.0000\n'
-     + '\t\t\tProperty: "AmbientColor", "ColorRGB", "",1.0000,1.0000,1.0000\n'
-     + '\t\t\tProperty: "AmbientFactor", "double", "",1.0000\n'
-     + '\t\t\tProperty: "DiffuseColor", "ColorRGB", "",0.3051,0.2509,0.8000\n'
-     + '\t\t\tProperty: "DiffuseFactor", "double", "",0.8000\n'
-     + '\t\t\tProperty: "Bump", "Vector3D", "",0,0,0\n'
-     + '\t\t\tProperty: "TransparentColor", "ColorRGB", "",1,1,1\n'
-     + '\t\t\tProperty: "TransparencyFactor", "double", "",0.0000\n'
-     + '\t\t\tProperty: "SpecularColor", "ColorRGB", "",1.0000,1.0000,1.0000\n'
-     + '\t\t\tProperty: "SpecularFactor", "double", "",0.5000\n'
-     + '\t\t\tProperty: "ShininessExponent", "double", "",12.3\n'
-     + '\t\t\tProperty: "ReflectionColor", "ColorRGB", "",0,0,0\n'
-     + '\t\t\tProperty: "ReflectionFactor", "double", "",1\n'
-     + '\t\t\tProperty: "Emissive", "ColorRGB", "",0,0,0\n'
-     + '\t\t\tProperty: "Ambient", "ColorRGB", "",1.0,1.0,1.0\n'
-     + '\t\t\tProperty: "Diffuse", "ColorRGB", "",0.3,0.3,0.8\n'
-     + '\t\t\tProperty: "Specular", "ColorRGB", "",1.0,1.0,1.0\n'
-     + '\t\t\tProperty: "Shininess", "double", "",12.3\n'
-     + '\t\t\tProperty: "Opacity", "double", "",1.0\n'
-     + '\t\t\tProperty: "Reflectivity", "double", "",0\n'
-     + '\t\t}\n'
-     + '\t}';
-  }
 
   /**
    * Add Objects info to output file.
@@ -448,6 +463,11 @@ export default class FBXExporter extends Exporter {
       modelsList += `\tModel: "Model::${this._data.name}_${i}", "Mesh" {\n`
         + '\t}\n';
     }
+    let materialList = '';
+    for (let i = 0; i < this._materials.length; ++i) {
+      materialList += `\tMaterial: "Material::${this._data.name}_${i}_default", "" {\n`
+        + '\t}\n';
+    }
     const relations = `Relations:  {\n${modelsList}\t`
     + 'Model: "Model::Producer Perspective", "Camera" {\n'
     + '\t}\n'
@@ -464,7 +484,7 @@ export default class FBXExporter extends Exporter {
     + '\tModel: "Model::Producer Left", "Camera" {\n'
     + '\t}\n'
     + '\tModel: "Model::Camera Switcher", "CameraSwitcher" {\n'
-    + '\t}\n'
+    + `\t}\n${materialList}`
     + '}\n\n';
     return [mandatoryComment, relations].join('');
   }
@@ -479,7 +499,11 @@ export default class FBXExporter extends Exporter {
     for (let i = 0; i < this._models.length; ++i) {
       modelsList += `\tConnect: "OO", "Model::${this._data.name}_${i}", "Model::Scene"\n`;
     }
-    const connections = `Connections:  {\n${modelsList}`
+    let materialList = '';
+    for (let i = 0; i < this._materials.length; ++i) {
+      materialList += `\tConnect: "OO", "Material::${this._data.name}_${i}_default", "Model::${this._data.name}_${i}"\n`;
+    }
+    const connections = `Connections:  {\n${modelsList}${materialList}`
     + '}\n';
     return [mandatoryComment, connections].join('');
   }
