@@ -480,7 +480,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/epam/miew/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/epam/miew/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/epam/miew/compare/v0.7.24...v0.8.0
 [0.7.24]: https://github.com/epam/miew/compare/v0.7.23...v0.7.24
