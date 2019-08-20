@@ -273,8 +273,7 @@ export default class FBXExporter extends Exporter {
       const layerElementSmoothing = '';
       const layerElementUV = '';
       const layerElementTexture = '';
-      const layerElementMaterial = '';
-      /* but colors are actually in-use */
+      /* but colors and materials are actually in-use */
       const layerElementColorNumber = 0; /* IDK what that is */
       const layerElementColorVersion = 101; /* IDK what version means */
       const layerElementColorName = ''; /* IDK what name means */
@@ -284,7 +283,7 @@ export default class FBXExporter extends Exporter {
         + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
         + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
         + `\t\t\tColors: ${model.colors}\n`
-        + `\t\t\tColorIndex: ${[...Array(model.colors.length / 4).keys()]}\n`
+        + `\t\t\tColorIndex: ${[...Array(model.vertices.length).keys()]}\n`
         + '\t\t}\n';
       /* TODO: automatically check and build this info */
       const layer = '\t\tLayer: 0 {\n'
@@ -297,9 +296,20 @@ export default class FBXExporter extends Exporter {
         + '\t\t\t\tType: "LayerElementColor"\n'
         + '\t\t\t\tTypedIndex: 0\n'
         + '\t\t\t}\n'
+        + '\t\t\tLayerElement:  {\n'
+        + '\t\t\t\tType: "LayerElementMaterial"\n'
+        + '\t\t\t\tTypedIndex: 0\n'
+        + '\t\t\t}\n'
         + '\t\t}\n'
         + '\t}\n';
-      const resultingLayer = [layerElementNormal, layerElementSmoothing, layerElementUV, layerElementTexture, layerElementMaterial, layerElementColor, layer].join('');
+      const layerElementMaterial = '\t\tLayerElementMaterial: 0 {\n'
+        + '\t\t\tVersion: 101\n'
+        + '\t\t\tName: ""\n'
+        + '\t\t\tMappingInformationType: "AllSame"\n'
+        + '\t\t\tReferenceInformationType: "Direct"\n'
+        + '\t\t\tMaterials: 0\n'
+        + '\t\t}\n';
+      const resultingLayer = [layerElementNormal, layerElementSmoothing, layerElementUV, layerElementTexture, layerElementColor, layerElementMaterial, layer].join('');
       allModels.push([modelProperties, verticesIndices, resultingLayer].join(''));
     }
     return allModels.join('');
@@ -339,7 +349,7 @@ export default class FBXExporter extends Exporter {
         + `\t\t\tProperty: "Diffuse", "ColorRGB", "",${material.diffuse}\n`
         + `\t\t\tProperty: "Specular", "ColorRGB", "",${material.specular}\n`
         + `\t\t\tProperty: "Shininess", "double", "",${material.shininess}\n`
-        + '\t\t\tProperty: "Opacity", "double", "",1.0\n'
+        + `\t\t\tProperty: "Opacity", "double", "",${material.opacity}\n`
         + '\t\t\tProperty: "Reflectivity", "double", "",0\n'
         + '\t\t}\n'
         + '\t}\n';
@@ -407,11 +417,8 @@ export default class FBXExporter extends Exporter {
     for (let i = 0; i < this._meshes.length; ++i) {
       // if (this._meshes[i].layers.test(gfxutils.LAYERS.DEFAULT)) { /* It means something */
       const mesh = this._meshes[i];
-      if (mesh.layers.mask === 1) { /* TODO: Implement what's written on top of that */
+      if (mesh.layers.mask === 1 || mesh.layers.mask === 4) { /* TODO: Implement what's written on top of that */
         this._collectGeometryInfo(mesh);
-        this._collectMaterialInfo(mesh);
-      } else {
-        /* Collect info only about material */
         this._collectMaterialInfo(mesh);
       }
     }
@@ -447,7 +454,6 @@ export default class FBXExporter extends Exporter {
       + ';------------------------------------------------------------------\n\n';
     const result = 'Objects:  {\n'
       + `${this._addModels()}`
-//      + `\tMaterial: ${this._addMaterial()}`
       + `\tGlobalSettings: ${this._addGlobalSettings()}`;
     return [mandatoryComment, result].join('');
   }
