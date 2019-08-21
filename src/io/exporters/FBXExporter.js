@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { Vector4 } from 'three';
+import _ from 'lodash';
 import Exporter from './Exporter';
 import gfxutils from '../../gfx/gfxutils';
 import ZClippedMesh from '../../gfx/meshes/ZClippedMesh';
@@ -124,10 +126,10 @@ export default class FBXExporter extends Exporter {
   /**
    * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
    * @param{ArrayLike<number>} array - indices buffer
-   * @returns{Int16Array} reworked array.
+   * @returns{Int32Array} reworked array.
    */
   _reworkIndices(array) {
-    const clonedArray = new Int16Array(array.length);
+    const clonedArray = new Int32Array(array.length);
     clonedArray.set(array);
     for (let i = 2; i < clonedArray.length; i += 3) {
       clonedArray[i] *= -1;
@@ -332,7 +334,7 @@ export default class FBXExporter extends Exporter {
         + '\t\t\tProperty: "MultiLayer", "bool", "",0\n'
         + '\t\t\tProperty: "EmissiveColor", "ColorRGB", "",0,0,0\n'
         + '\t\t\tProperty: "EmissiveFactor", "double", "",0.0000\n'
-        + `\t\t\tProperty: "AmbientColor", "ColorRGB", "",1,1,1\n`
+        + '\t\t\tProperty: "AmbientColor", "ColorRGB", "",1,1,1\n'
         + '\t\t\tProperty: "AmbientFactor", "double", "",0.0000\n'
         + `\t\t\tProperty: "DiffuseColor", "ColorRGB", "",${material.diffuse}\n`
         + '\t\t\tProperty: "DiffuseFactor", "double", "",1.0000\n'
@@ -345,7 +347,7 @@ export default class FBXExporter extends Exporter {
         + '\t\t\tProperty: "ReflectionColor", "ColorRGB", "",0,0,0\n'
         + '\t\t\tProperty: "ReflectionFactor", "double", "",1\n'
         + '\t\t\tProperty: "Emissive", "ColorRGB", "",0,0,0\n'
-        + `\t\t\tProperty: "Ambient", "ColorRGB", "",1,1,1\n`
+        + '\t\t\tProperty: "Ambient", "ColorRGB", "",1,1,1\n'
         + `\t\t\tProperty: "Diffuse", "ColorRGB", "",${material.diffuse}\n`
         + `\t\t\tProperty: "Specular", "ColorRGB", "",${material.specular}\n`
         + `\t\t\tProperty: "Shininess", "double", "",${material.shininess}\n`
@@ -355,7 +357,19 @@ export default class FBXExporter extends Exporter {
         + '\t}\n';
       allMaterials.push(stringMaterial);
     }
-  return allMaterials.join('');
+    return allMaterials.join('');
+  }
+
+  /**
+   * Rework numbes notation from scientific (exponential) to normal
+   * @returns {Array} Array of numbers in correct notation
+   */
+  _correctArrayNotation(array) {
+    const reworkedArray = [];
+    for (let i = 0; i < array.length; ++i) {
+      reworkedArray.push(array[i].toFixed(17)); /* Default, i guess? */
+    }
+    return reworkedArray;
   }
 
   /**
@@ -379,10 +393,10 @@ export default class FBXExporter extends Exporter {
     }
     if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
       this._models.push({
-        vertices: lVertices,
+        vertices: this._correctArrayNotation(lVertices),
         indices: lIndices,
-        normals: lNormals,
-        colors: lColors,
+        normals: this._correctArrayNotation(lNormals),
+        colors: this._correctArrayNotation(lColors),
       });
     } /* else do nothing */
   }
@@ -404,6 +418,60 @@ export default class FBXExporter extends Exporter {
   }
 
   /**
+   * Collect instanced models and materials.
+   */
+  _collectInstancedInfo(mesh) {
+    let lVertices = [];
+    let lIndices = [];
+    let lNormals = [];
+    let lAlphas = [];
+    let lColors = [];
+    /* Collect info about vertices + indices + material */
+
+    let idxOffset = 0;
+    let idxColors = 0;
+    for (let i = 0; i < mesh.geometry.attributes.offset.count; ++i) {
+      lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
+      lIndices = this._reworkIndices(mesh.geometry.index.array); /* Need to rework this into strange FBX notation */
+      lNormals = mesh.geometry.attributes.normal.array;
+      /* 1. Calculate vertices of every instance: */
+      const offset = new Vector4(mesh.geometry.attributes.offset.array[idxOffset], mesh.geometry.attributes.offset.array[idxOffset + 1],
+        mesh.geometry.attributes.offset.array[idxOffset + 2], mesh.geometry.attributes.offset.array[idxOffset + 3]);
+      idxOffset += 4;
+      lAlphas = [mesh.geometry.attributes.alphaColor.array[idxColors],
+        mesh.geometry.attributes.alphaColor.array[idxColors + 1],
+        mesh.geometry.attributes.alphaColor.array[idxColors + 2]];
+      lColors = this._reworkColors([mesh.geometry.attributes.color.array[idxColors],
+        mesh.geometry.attributes.color.array[idxColors + 1],
+        mesh.geometry.attributes.color.array[idxColors + 2]], lAlphas);
+      idxColors += 3;
+      for (let j = 0; j < lVertices.length; j += 3) {
+        lVertices[j] *= offset.w;
+        lVertices[j + 1] *= offset.w;
+        lVertices[j + 2] *= offset.w;
+        lNormals[j] *= offset.w;
+        lNormals[j + 1] *= offset.w;
+        lNormals[j + 2] *= offset.w;
+        lVertices[j] += offset.x;
+        lVertices[j + 1] += offset.y;
+        lVertices[j + 2] += offset.z;
+        lNormals[j] += offset.x;
+        lNormals[j + 1] += offset.y;
+        lNormals[j + 2] += offset.z;
+      }
+      if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
+        this._models.push({
+          vertices: this._correctArrayNotation(lVertices),
+          indices: lIndices,
+          normals: this._correctArrayNotation(lNormals),
+          colors: this._correctArrayNotation(lColors),
+        });
+      }
+      this._collectMaterialInfo(mesh);
+    }
+  }
+
+  /**
    * Add Models info to output file.
    */
   _addModels() {
@@ -418,8 +486,13 @@ export default class FBXExporter extends Exporter {
       // if (this._meshes[i].layers.test(gfxutils.LAYERS.DEFAULT)) { /* It means something */
       const mesh = this._meshes[i];
       if (mesh.layers.mask === 1 || mesh.layers.mask === 4) { /* TODO: Implement what's written on top of that */
-        this._collectGeometryInfo(mesh);
-        this._collectMaterialInfo(mesh);
+        if (typeof mesh.geometry.attributes.offset !== 'undefined') { /* If instancing */
+          this._collectInstancedInfo(mesh);
+        } else { /* Not instancing */
+          this._collectGeometryInfo(mesh);
+          this._collectMaterialInfo(mesh);
+        }
+
       }
     }
     return [this._addModelsToResult(), this._addMaterialsToResult()].join('');
