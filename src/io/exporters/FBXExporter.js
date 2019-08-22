@@ -6,14 +6,6 @@ import gfxutils from '../../gfx/gfxutils';
 import ZClippedMesh from '../../gfx/meshes/ZClippedMesh';
 
 /**
- * Extension to standard Float32Arrays.
- * @param{Float32Array} first  - destination array
- * @param{Float32Array} second - source array
- * @returns{Float32Array} resulting concatenated array
- */
-
-
-/**
  * FBX file format exporter.
  *
  * @param {}     -
@@ -129,13 +121,29 @@ export default class FBXExporter extends Exporter {
    * @returns{Int32Array} reworked array.
    */
   _reworkIndices(array) {
-    const clonedArray = new Int32Array(array.length);
+    const clonedArray = new Int32Array(array.length); /* TODO: revork this to bigint64 */
     clonedArray.set(array);
     for (let i = 2; i < clonedArray.length; i += 3) {
       clonedArray[i] *= -1;
       clonedArray[i]--;
     }
     return clonedArray;
+  }
+
+  /**
+   * Extension to standard Float32Arrays.
+   * @param{Float32Array} first  - destination array
+   * @param{Float32Array} second - source array
+   * @returns{Float32Array} resulting concatenated array
+   */
+  _Float32Concat(first, second) {
+    const firstLength = first.length;
+    const result = new Float32Array(firstLength + second.length);
+
+    result.set(first);
+    result.set(second, firstLength);
+
+    return result;
   }
 
   /**
@@ -162,6 +170,7 @@ export default class FBXExporter extends Exporter {
       alphaArrIdx++;
       clonedArrIdx += 4;
     }
+
     return clonedArray;
   }
 
@@ -287,7 +296,7 @@ export default class FBXExporter extends Exporter {
         + `\t\t\tColors: ${model.colors}\n`
         + `\t\t\tColorIndex: ${[...Array(model.vertices.length).keys()]}\n`
         + '\t\t}\n';
-      /* TODO: automatically check and build this info */
+      /* Do we need automatically check and build this info? In Miew we always have these layers */
       const layer = '\t\tLayer: 0 {\n'
         + '\t\t\tVersion: 100\n'
         + '\t\t\tLayerElement:  {\n'
@@ -375,7 +384,7 @@ export default class FBXExporter extends Exporter {
   /**
    * Save geometry info from mesh to this._models.
    */
-  _collectGeometryInfo(mesh) {
+  _collectStraightGeometryInfo(mesh) {
     let lVertices = [];
     let lIndices = [];
     let lNormals = [];
@@ -398,6 +407,7 @@ export default class FBXExporter extends Exporter {
         normals: this._correctArrayNotation(lNormals),
         colors: this._correctArrayNotation(lColors),
       });
+      this._collectMaterialInfo(mesh);
     } /* else do nothing */
   }
 
@@ -418,63 +428,268 @@ export default class FBXExporter extends Exporter {
   }
 
   /**
+   * Clone colors from one to number of vertices
+   */
+  _cloneColors(numVertices, color) {
+    const clonedArray = new Float32Array(numVertices * 4); /* RGBA for every vertex */
+    for (let i = 0; i < clonedArray.length; i += 4) {
+      clonedArray.set([color[0]], i); /* R */
+      clonedArray.set([color[1]], i + 1); /* G */
+      clonedArray.set([color[2]], i + 2); /* B */
+      clonedArray.set([color[3]], i + 3); /* A */
+    }
+    return clonedArray;
+  }
+
+  /**
+   * Collect instanced spheres geometry and materials.
+   */
+  _collectSpheresInfo(mesh) {
+    /* Geometry info */
+    let resVertices = new Float32Array(0);
+    let resIndices = new Float32Array(0);
+    let resNormals = new Float32Array(0);
+    let resColors = new Float32Array(0);
+    let idxOffset = 0;
+    const meshOffset = mesh.geometry.attributes.offset.array;
+    const numInstances = mesh.geometry.attributes.offset.count;
+    /* For every instanced object */
+    for (let i = 0; i < numInstances; ++i) {
+      /* Firstly, collect some basic instanced parameters */
+      const [lVertices, lNormals, lIndices, lColors] = this._collectRawInstancedGeometryParameters(mesh, i);
+      /* Extract offset for one exact object (instance) */
+      const objectOffset = new Vector4(meshOffset[idxOffset], meshOffset[idxOffset + 1],
+        meshOffset[idxOffset + 2], meshOffset[idxOffset + 3]);
+      idxOffset += 4;
+      /* For every vertex calculate it's real position (vertex.xyz * scale) + offset */
+      for (let j = 0; j < lVertices.length; j += 3) {
+        lVertices[j] *= objectOffset.w;
+        lVertices[j + 1] *= objectOffset.w;
+        lVertices[j + 2] *= objectOffset.w;
+        lVertices[j] += objectOffset.x;
+        lVertices[j + 1] += objectOffset.y;
+        lVertices[j + 2] += objectOffset.z;
+      }
+      /* Saving info from one instance to resulting model */
+      resVertices = this._Float32Concat(resVertices, lVertices);
+      resNormals = this._Float32Concat(resNormals, lNormals);
+      resColors = this._Float32Concat(resColors, lColors);
+      resIndices = this._Float32Concat(resIndices, lIndices);
+    }
+    /* For every float array we need to be sure that there are no numbers in exponential notation */
+    this._models.push({
+      vertices: this._correctArrayNotation(resVertices),
+      indices: resIndices,
+      normals: this._correctArrayNotation(resNormals),
+      colors: this._correctArrayNotation(resColors),
+    });
+    /* Material info. Material for every sphere is the same so we want to collect it only 1 time */
+    this._collectMaterialInfo(mesh);
+  }
+
+  /**
+   * Collect some basic parameters.
+   */
+  _collectRawInstancedGeometryParameters(mesh, instanceIndex) {
+    const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
+    const lNormals = _.cloneDeep(mesh.geometry.attributes.normal.array);
+    const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
+    const lColors = this._collectInstancedColors(mesh, instanceIndex);
+    return [lVertices, lNormals, lIndices, lColors];
+  }
+
+  /**
+   * Collect and rework indices in big model notation.
+   */
+  _collectInstancedIndices(mesh, index) {
+    let lIndices = _.cloneDeep(mesh.geometry.index.array);
+    /* As we making one big model we need to carefully add resVertices.length to every index in lIndices */
+    for (let k = 0; k < lIndices.length; ++k) {
+      lIndices[k] += (index * mesh.geometry.attributes.position.array.length / 3);
+    }
+    lIndices = this._reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
+    return lIndices;
+  }
+
+  /**
+   * Collect and rework colors in big model notation.
+   */
+  _collectInstancedColors(mesh, instanceIndex) {
+    const idxColors = (instanceIndex * 3); /* that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc */
+    const meshColor = mesh.geometry.attributes.color.array;
+    const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
+    const lAlphas = [meshAlphaColor[instanceIndex]];
+    const objectColor = this._reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]], lAlphas);
+    /* For FBX we need to clone color for every vertex */
+    const lColors = this._cloneColors(mesh.geometry.attributes.position.array.length / 3, objectColor);
+    return lColors;
+  }
+
+  /**
+   * Divide cylinder (add additional vertexes) for prettiness TODO::VERY COMPLICATED NEED SIMPLIFYING! NEED TRANSPOSING ALSO!
+   */
+  _divideCylinders(mesh) {
+    let resVertices = new Float32Array(0);
+    let resIndices = new Float32Array(0);
+    let resNormals = new Float32Array(0);
+    let resColors = new Float32Array(0);
+    /* Algorithm:
+    * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
+    * 2. Add additional vertices slightly under second third of vertices, copy normals and add color from color2 array
+    * 3. Triangulate added segment (dont let him be void) - add indices
+    * 4. Triangulate segment from added vertices to third third of original vertices - add indices
+    * 5. Add color to last third of vertices and we're done */
+    const meshColor1 = mesh.geometry.attributes.color.array;
+    const meshColor2 = mesh.geometry.attributes.color2.array;
+    const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
+    const numInstances = mesh.geometry.attributes.alphaColor.count;
+    for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) { /* Proceed every instance */
+      const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array); /* Grab original vertices */
+      const lNormals = _.cloneDeep(mesh.geometry.attributes.normal.array);
+      let reworkedVertices = [];
+      let reworkedNormals = [];
+      const reworkedColors = [];
+      const reworkedIndices = [];
+      const lAlphas = [meshAlphaColor[instanceIndex]];
+      const idxColors = instanceIndex * 3;
+      const objectColor1 = this._reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
+      const objectColor2 = this._reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
+      /* For FBX we need to clone color for every vertex */
+      const lColors1 = this._cloneColors(2 * mesh.geometry.attributes.position.array.length / 9, objectColor1);
+      const lColors2 = this._cloneColors(2 * mesh.geometry.attributes.position.array.length / 9, objectColor2);
+      const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
+      /* Step 1 */
+      for (let j = 0; j < lVertices.length / 3; ++j) {
+        reworkedVertices.push(lVertices[j]);
+        reworkedNormals.push(lNormals[j]);
+        reworkedColors.push(lColors1[j]);
+      }
+      for (let j = 0; j < lIndices.length; ++j) { /* Copying all indices cos they are good */
+        reworkedIndices.push(lIndices[j]);
+      }
+      /* Step 2 */
+      const additionalVertices = [];
+      const additionalNormals = [];
+      for (let j = lVertices.length / 3; j < 2 * lVertices.length / 3; ++j) {
+        reworkedVertices.push(lVertices[j]);
+        additionalVertices.push(lVertices[j]);
+        reworkedNormals.push(lNormals[j]);
+        additionalNormals.push(lNormals[j]);
+        reworkedColors.push(lColors1[j]);
+      }
+      reworkedVertices = reworkedVertices.concat(additionalVertices);
+      reworkedNormals = reworkedNormals.concat(additionalNormals);
+      let k = 1;
+      for (let j = 0; j < additionalVertices.length; ++j) {
+        reworkedColors.push(lColors2[j]);
+        reworkedVertices[k] -= 0.1; /* TODO:: 0.1 is temporary, need smth like 5% of cylinder! */
+        k += 3;
+      }
+      for (let j = 2 * lVertices.length / 3; j < lVertices.length; ++j) { /* Last third of vertices */
+        reworkedVertices.push(lVertices[j]);
+        reworkedNormals.push(lNormals[j]);
+        reworkedColors.push(lColors2[j]);
+      }
+      for (let j = 0; j < lIndices.length / 2; j += 3) {
+        reworkedIndices.push(lIndices[j]);
+        reworkedIndices.push(lIndices[j + 1]);
+        reworkedIndices.push(-1 * (lIndices[j + 2] + 1));
+      }
+      /* Ending */
+      /* Saving info from one instance to resulting model */
+      resVertices = this._Float32Concat(resVertices, reworkedVertices);
+      resNormals = this._Float32Concat(resNormals, reworkedNormals);
+      resColors = this._Float32Concat(resColors, reworkedColors);
+      resIndices = this._Float32Concat(resIndices, reworkedIndices);
+    }
+    /* For every float array we need to be sure that there are no numbers in exponential notation */
+    this._models.push({
+      vertices: this._correctArrayNotation(resVertices),
+      indices: resIndices,
+      normals: this._correctArrayNotation(resNormals),
+      colors: this._correctArrayNotation(resColors),
+    });
+    /* Material info. Material for every sphere is the same so we want to collect it only 1 time */
+    this._collectMaterialInfo(mesh);
+  }
+
+  /**
+   * Collect instanced cylinders geometry and materials.
+   */
+  _collectCylindersInfo(mesh) {
+    const testVersionDivideCylinder = true;
+    if (!testVersionDivideCylinder) { /* if we dont divide cylinders */
+      /* Geometry info */
+      let resVertices = new Float32Array(0);
+      let resIndices = new Float32Array(0);
+      let resNormals = new Float32Array(0);
+      let resColors = new Float32Array(0);
+      const matVector1 = mesh.geometry.attributes.matVector1.array;
+      const matVector2 = mesh.geometry.attributes.matVector2.array;
+      const matVector3 = mesh.geometry.attributes.matVector3.array;
+      let idxOffset = 0;
+      const numInstances = mesh.geometry.attributes.alphaColor.count;
+      for (let i = 0; i < numInstances; ++i) {
+        /* Firstly, collect some instanced parameters */
+        const [lVertices, lNormals, lIndices, lColors] = this._collectRawInstancedGeometryParameters(mesh, i);
+        /* Transformation info */
+        const transformCylinder = new THREE.Matrix4();
+        transformCylinder.set(matVector1[idxOffset], matVector2[idxOffset], matVector3[idxOffset], 0,
+          matVector1[idxOffset + 1], matVector2[idxOffset + 1], matVector3[idxOffset + 1], 0,
+          matVector1[idxOffset + 2], matVector2[idxOffset + 2], matVector3[idxOffset + 2], 0,
+          matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
+        transformCylinder.transpose();
+        idxOffset += 4;
+        /* Complex Algorithm for Cylinder slicing */
+        /* Applying offsets / transformation to every vertex */
+        /* First side - top plane */
+        for (let j = 0; j < lVertices.length; j += 3) {
+          const vertVec = new THREE.Vector4();
+          vertVec.set(lVertices[j], lVertices[j + 1], lVertices[j + 2], 1);
+          vertVec.applyMatrix4(transformCylinder);
+          const normVec = new THREE.Vector4();
+          normVec.set(lNormals[j], lNormals[j + 1], lNormals[j + 2], 0.0);
+          normVec.applyMatrix4(transformCylinder);
+
+          lVertices[j] = vertVec.x;
+          lVertices[j + 1] = vertVec.y;
+          lVertices[j + 2] = vertVec.z;
+          lNormals[j] = normVec.x;
+          lNormals[j + 1] = normVec.y;
+          lNormals[j + 2] = normVec.z;
+        }
+        /* Saving info from one instance to resulting model */
+        resVertices = this._Float32Concat(resVertices, lVertices);
+        resNormals = this._Float32Concat(resNormals, lNormals);
+        resColors = this._Float32Concat(resColors, lColors);
+        resIndices = this._Float32Concat(resIndices, lIndices);
+      }
+      /* For every float array we need to be sure that there are no numbers in exponential notation */
+      this._models.push({
+        vertices: this._correctArrayNotation(resVertices),
+        indices: resIndices,
+        normals: this._correctArrayNotation(resNormals),
+        colors: this._correctArrayNotation(resColors),
+      });
+      this._collectMaterialInfo(mesh);
+    } else this._divideCylinders(mesh);
+  }
+
+  /**
    * Collect instanced models and materials.
    */
   _collectInstancedInfo(mesh) {
-    let lVertices = [];
-    let lIndices = [];
-    let lNormals = [];
-    let lAlphas = [];
-    let lColors = [];
-    /* Collect info about vertices + indices + material */
-
-    let idxOffset = 0;
-    let idxColors = 0;
-    for (let i = 0; i < mesh.geometry.attributes.offset.count; ++i) {
-      lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
-      lIndices = this._reworkIndices(mesh.geometry.index.array); /* Need to rework this into strange FBX notation */
-      lNormals = mesh.geometry.attributes.normal.array;
-      /* 1. Calculate vertices of every instance: */
-      const offset = new Vector4(mesh.geometry.attributes.offset.array[idxOffset], mesh.geometry.attributes.offset.array[idxOffset + 1],
-        mesh.geometry.attributes.offset.array[idxOffset + 2], mesh.geometry.attributes.offset.array[idxOffset + 3]);
-      idxOffset += 4;
-      lAlphas = [mesh.geometry.attributes.alphaColor.array[idxColors],
-        mesh.geometry.attributes.alphaColor.array[idxColors + 1],
-        mesh.geometry.attributes.alphaColor.array[idxColors + 2]];
-      lColors = this._reworkColors([mesh.geometry.attributes.color.array[idxColors],
-        mesh.geometry.attributes.color.array[idxColors + 1],
-        mesh.geometry.attributes.color.array[idxColors + 2]], lAlphas);
-      idxColors += 3;
-      for (let j = 0; j < lVertices.length; j += 3) {
-        lVertices[j] *= offset.w;
-        lVertices[j + 1] *= offset.w;
-        lVertices[j + 2] *= offset.w;
-        lNormals[j] *= offset.w;
-        lNormals[j + 1] *= offset.w;
-        lNormals[j + 2] *= offset.w;
-        lVertices[j] += offset.x;
-        lVertices[j + 1] += offset.y;
-        lVertices[j + 2] += offset.z;
-        lNormals[j] += offset.x;
-        lNormals[j + 1] += offset.y;
-        lNormals[j + 2] += offset.z;
-      }
-      if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
-        this._models.push({
-          vertices: this._correctArrayNotation(lVertices),
-          indices: lIndices,
-          normals: this._correctArrayNotation(lNormals),
-          colors: this._correctArrayNotation(lColors),
-        });
-      }
-      this._collectMaterialInfo(mesh);
+    if (typeof mesh.geometry.attributes.offset !== 'undefined') { /* That's spheres */
+      this._collectSpheresInfo(mesh);
+    } else { /* Cylinders */
+      this._collectCylindersInfo(mesh);
     }
   }
 
   /**
-   * Add Models info to output file.
+   * Add Models and materials info to output file.
    */
-  _addModels() {
+  _addModelsAndMaterials() {
     /* To gather vertices we need to traverse this._data object */
     this._data.traverse((object) => {
       if (object instanceof THREE.Mesh) {
@@ -486,13 +701,11 @@ export default class FBXExporter extends Exporter {
       // if (this._meshes[i].layers.test(gfxutils.LAYERS.DEFAULT)) { /* It means something */
       const mesh = this._meshes[i];
       if (mesh.layers.mask === 1 || mesh.layers.mask === 4) { /* TODO: Implement what's written on top of that */
-        if (typeof mesh.geometry.attributes.offset !== 'undefined') { /* If instancing */
+        if (mesh.geometry.type === 'InstancedBufferGeometry') { /* If instancing */
           this._collectInstancedInfo(mesh);
         } else { /* Not instancing */
-          this._collectGeometryInfo(mesh);
-          this._collectMaterialInfo(mesh);
+          this._collectStraightGeometryInfo(mesh);
         }
-
       }
     }
     return [this._addModelsToResult(), this._addMaterialsToResult()].join('');
@@ -526,7 +739,7 @@ export default class FBXExporter extends Exporter {
     const mandatoryComment = '; Object properties\n'
       + ';------------------------------------------------------------------\n\n';
     const result = 'Objects:  {\n'
-      + `${this._addModels()}`
+      + `${this._addModelsAndMaterials()}`
       + `\tGlobalSettings: ${this._addGlobalSettings()}`;
     return [mandatoryComment, result].join('');
   }
@@ -598,8 +811,6 @@ export default class FBXExporter extends Exporter {
    * Entry point to exporter.
    */
   exportSync() {
-    /* TEMPORARY: */
-    this._outputFile = 'exportedFile.fbx';
     const header = this.createFBXHeader();
     const definitions = this.createDefinitions();
     const objects = this.createObjects();
