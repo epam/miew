@@ -21,7 +21,7 @@ describe('ExporterList', () => {
   const fmtB = ['b', 'b-format'];
   const fmtAB = ['a', 'a-format', 'b', 'b-format'];
 
-  const formats = list => list.keys('formats');
+  const formats = (list) => list.keys('formats');
 
   describe('constructor', () => {
     it('creates an empty list', () => {

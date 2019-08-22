@@ -976,7 +976,7 @@ utils.deriveClass(Settings, EventDispatcher, {
       return [];
     }
     const { old, now } = this;
-    const keys = _.filter(Object.keys(this._changed), key => _.get(old, key) !== _.get(now, key));
+    const keys = _.filter(Object.keys(this._changed), (key) => _.get(old, key) !== _.get(now, key));
     return keys;
   },
 

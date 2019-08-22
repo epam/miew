@@ -72,7 +72,7 @@ export default class MiewPage {
 var miew = window && window.miew;
 var Miew = miew && miew.constructor;
 return miew && Miew && JSON.stringify(${expression});`)
-      .then(json => JSON.parse(json));
+      .then((json) => JSON.parse(json));
   }
 
   /**

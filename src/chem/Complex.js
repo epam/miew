@@ -900,7 +900,7 @@ class Complex {
   }
 
   updateStructuresMask() {
-    const updater = structure => structure.collectMask();
+    const updater = (structure) => structure.collectMask();
     this.forEachResidue(updater);
     this.forEachChain(updater);
     this.forEachMolecule(updater);
@@ -1232,7 +1232,7 @@ class Complex {
       lastSheetIndex = curSheetIndex;
     }
 
-    this._sheets = sheets.filter(_sheet => true); // squeeze sheets array
+    this._sheets = sheets.filter((_sheet) => true); // squeeze sheets array
   }
 }
 

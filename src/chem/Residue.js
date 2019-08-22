@@ -213,7 +213,7 @@ class Residue {
 
   _finalize2(prev, next) {
     // Should be called AFTER first finalize
-    this._innerFinalize(prev, prev, next, this, atom => atom._position);
+    this._innerFinalize(prev, prev, next, this, (atom) => atom._position);
   }
 
   isConnected(anotherResidue) {

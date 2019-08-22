@@ -21,7 +21,7 @@ export default class EmptyPage {
   getValueFor(expression) {
     return this.driver.executeScript(`\
 return Miew && JSON.stringify(${expression});`)
-      .then(json => JSON.parse(json));
+      .then((json) => JSON.parse(json));
   }
 
   /**

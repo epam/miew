@@ -7,7 +7,7 @@ import { expect } from 'chai';
 function getModes() {
   window.miew = new window.Miew({});
   const { miew } = window;
-  return miew && JSON.stringify(miew.constructor.modes.all.map(mode => ({
+  return miew && JSON.stringify(miew.constructor.modes.all.map((mode) => ({
     id: Array.isArray(mode.id) ? mode.id[0] : mode.id,
     name: mode.prototype ? mode.prototype.name : mode.name,
   })));
@@ -41,7 +41,7 @@ function checkList(list, requiredId) {
   _.each(list, (entry) => {
     expect(entry).to.include.all.keys(['id', 'name']);
   });
-  expect(_.map(list, entry => entry.id)).to.include(requiredId);
+  expect(_.map(list, (entry) => entry.id)).to.include(requiredId);
 }
 
 const retrieve = {};

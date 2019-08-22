@@ -26,6 +26,16 @@ module.exports = {
       argsIgnorePattern: '^_',
       ignoreRestSiblings: true,
     }],
+    'no-mixed-operators': [
+      'error', {
+        groups: [
+          ['&', '|', '^', '~', '<<', '>>', '>>>'],
+          ['==', '!=', '===', '!==', '>', '>=', '<', '<='],
+          ['&&', '||'],
+          ['in', 'instanceof'],
+        ],
+        allowSamePrecedence: true,
+      }],
     'no-underscore-dangle': 'off',
     'no-param-reassign': 'off',
     'no-continue': 'off',
@@ -41,6 +51,7 @@ module.exports = {
     'no-restricted-syntax': 'off', // 27 problems
     'max-len': 'off', // 270 problems
     'func-names': 'off', // 562 problems
+    'max-classes-per-file': 'off',
   },
 
   overrides: [{

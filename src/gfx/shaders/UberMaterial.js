@@ -203,7 +203,7 @@ UberMaterial.prototype.copy = function (source) {
   this.vertexShader = source.vertexShader;
 
   this.uniforms = THREE.UniformsUtils.clone(source.uniforms);
-  this.defines = Object.assign({}, source.defines);
+  this.defines = { ...source.defines };
   this.extensions = source.extensions;
 
   this.fog = source.fog;

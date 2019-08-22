@@ -56,7 +56,7 @@ function getInitialString(filename) {
 function filterLines(text) {
   const lines = text
     .split(/\r?\n/)
-    .filter(line => line.search(matchLinesRE) === 0);
+    .filter((line) => line.search(matchLinesRE) === 0);
   return lines;
 }
 

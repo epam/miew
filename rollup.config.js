@@ -21,7 +21,7 @@ export default {
   input: './src/index.js',
   onwarn(warning, warn) {
     const exceptions = (warning.loc && warnExceptions[warning.code]) || [];
-    if (!exceptions.some(name => warning.loc.file.endsWith(name))) {
+    if (!exceptions.some((name) => warning.loc.file.endsWith(name))) {
       warn(warning);
     }
   },

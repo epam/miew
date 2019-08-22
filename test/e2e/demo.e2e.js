@@ -7,10 +7,11 @@ import golden from './golden';
 
 import goldenCfg from './golden.cfg';
 
-const cfg = Object.assign({}, goldenCfg, {
+const cfg = {
+  ...goldenCfg,
   title: 'Demo Tests',
   report: 'report-demo.html',
-});
+};
 
 let driver;
 let page;

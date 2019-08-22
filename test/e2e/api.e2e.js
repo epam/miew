@@ -12,10 +12,11 @@ import goldenCfg from './golden.cfg';
 
 chai.use(dirtyChai);
 
-const cfg = Object.assign({}, goldenCfg, {
+const cfg = {
+  ...goldenCfg,
   title: 'API Tests',
   report: 'report-api.html',
-});
+};
 
 let driver;
 let page;

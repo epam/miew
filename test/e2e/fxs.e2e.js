@@ -16,10 +16,11 @@ import testPlaneEffects from './gfx/planes';
 
 chai.use(dirtyChai);
 
-const cfg = Object.assign({}, goldenCfg, {
+const cfg = {
+  ...goldenCfg,
   title: 'Effects Tests',
   report: 'report-fxs.html',
-});
+};
 
 let driver;
 let page;
@@ -39,8 +40,8 @@ function getPropListFromMiew(fn, opts, propStorage, checkFn, listName, checkId) 
     propStorage[listName] = page.reload()
       .then(() => page.waitForMiew())
       .then(() => driver.executeScript(fn, opts))
-      .then(json => JSON.parse(json));
-    return propStorage[listName].then(list => checkFn(list, checkId));
+      .then((json) => JSON.parse(json));
+    return propStorage[listName].then((list) => checkFn(list, checkId));
   };
 }
 

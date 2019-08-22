@@ -140,7 +140,7 @@ class IsoSurface {
     }
 
     // check that the grid is axis-aligned
-    const notZero = axe => Math.abs(axe) > Number.EPSILON;
+    const notZero = (axe) => Math.abs(axe) > Number.EPSILON;
     return !(notZero(xAxis.y) || notZero(xAxis.z)
           || notZero(yAxis.x) || notZero(yAxis.z)
           || notZero(zAxis.x) || notZero(zAxis.y));

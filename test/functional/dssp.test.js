@@ -23,14 +23,14 @@ function load(filePath) {
 
 function extract(complex) {
   return {
-    helices: complex._helices.map(helix => ({
+    helices: complex._helices.map((helix) => ({
       init: helix.init._sequence,
       term: helix.term._sequence,
       type: helix.type,
     })),
-    sheets: complex._sheets.map(sheet => ({
+    sheets: complex._sheets.map((sheet) => ({
       width: sheet._width,
-      strands: sheet._strands.map(strand => ({
+      strands: sheet._strands.map((strand) => ({
         init: strand.init._sequence,
         term: strand.term._sequence,
         sense: strand.sense,

@@ -49,7 +49,7 @@ Logger.prototype.instantiate = function () {
 Object.defineProperty(Logger.prototype, 'level', {
   get() {
     const self = this;
-    return _.findKey(logLevels, lvl => lvl === self._level);
+    return _.findKey(logLevels, (lvl) => lvl === self._level);
   },
   set(strValue) {
     const lvlVal = logLevels[strValue];
@@ -132,7 +132,7 @@ Logger.prototype._message = function (levelVal, message) {
   if (levelVal < this._level) {
     return;
   }
-  const level = _.findKey(logLevels, lvl => lvl === levelVal);
+  const level = _.findKey(logLevels, (lvl) => lvl === levelVal);
   message = String(message);
   if (this.console) {
     const output = `miew:${level}: ${message}`;

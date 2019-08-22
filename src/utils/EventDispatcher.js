@@ -56,12 +56,12 @@ EventDispatcher.prototype.addEventListener = function (type, callback, context) 
 EventDispatcher.prototype.removeEventListener = function (type, callback, context) {
   const self = this;
   _.forEach(self._handlers, (handler, ev) => {
-    _.remove(handler, values => isUndefOrEqual(type, ev)
+    _.remove(handler, (values) => isUndefOrEqual(type, ev)
           && isUndefOrEqual(callback, values[0])
           && isUndefOrEqual(context, values[1] || self));
   });
 
-  this._handlers = _.omitBy(self._handlers, handler => handler.length === 0);
+  this._handlers = _.omitBy(self._handlers, (handler) => handler.length === 0);
 };
 
 /**

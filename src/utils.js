@@ -22,7 +22,7 @@ import logger from './utils/logger';
  * @returns {string} encoded string
  */
 function encodeQueryComponent(text, excludeExp) {
-  const encode = code => String.fromCharCode(parseInt(code.substr(1), 16));
+  const encode = (code) => String.fromCharCode(parseInt(code.substr(1), 16));
   return encodeURIComponent(text).replace(excludeExp, encode).replace(/%20/g, '+');
 }
 

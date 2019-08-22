@@ -23,7 +23,7 @@ class CollisionSphere {
   }
 }
 
-const SphereCollisionGeo = base => class extends base {
+const SphereCollisionGeo = (base) => class extends base {
   constructor(count, ...args) {
     super(...args);
     this._objects = new Array(count);

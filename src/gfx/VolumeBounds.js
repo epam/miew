@@ -33,7 +33,7 @@ class VolumeBounds {
     }
     const center = new THREE.Vector3();
     bBox.getCenter(center);
-    geometry.vertices.forEach(vertex => vertex.add(center)); // pivot shift
+    geometry.vertices.forEach((vertex) => vertex.add(center)); // pivot shift
 
     this._lines = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0xFFFFFF }));
   }

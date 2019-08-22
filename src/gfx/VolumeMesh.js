@@ -283,12 +283,12 @@ class VolumeMesh extends THREE.Mesh {
     const vert = this.vertices;
     const { size } = this;
 
-    this._collectVertices(this.faces[0], vertex => vertex.z === -size.z);
-    this._collectVertices(this.faces[1], vertex => vertex.z === size.z);
-    this._collectVertices(this.faces[2], vertex => vertex.y === -size.y);
-    this._collectVertices(this.faces[3], vertex => vertex.y === size.y);
-    this._collectVertices(this.faces[4], vertex => vertex.x === -size.x);
-    this._collectVertices(this.faces[5], vertex => vertex.x === size.x);
+    this._collectVertices(this.faces[0], (vertex) => vertex.z === -size.z);
+    this._collectVertices(this.faces[1], (vertex) => vertex.z === size.z);
+    this._collectVertices(this.faces[2], (vertex) => vertex.y === -size.y);
+    this._collectVertices(this.faces[3], (vertex) => vertex.y === size.y);
+    this._collectVertices(this.faces[4], (vertex) => vertex.x === -size.x);
+    this._collectVertices(this.faces[5], (vertex) => vertex.x === size.x);
 
     const vCenter = new THREE.Vector3();
     const vRight = new THREE.Vector3();
@@ -377,7 +377,7 @@ class VolumeMesh extends THREE.Mesh {
     const volInfo = this.volumeInfo;
     const mean = volInfo.dmean - volInfo.dmin;
     const span = volInfo.dmax - volInfo.dmin;
-    const level = k => (mean + k * volInfo.sd) / span;
+    const level = (k) => (mean + k * volInfo.sd) / span;
     this.material.uniforms._isoLevel0.value.set(level(kSigma), level(kSigmaMed), level(kSigmaMax));
   }
 

@@ -9,7 +9,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import version from './tools/version';
 
-const configure = prod => ({
+const configure = (prod) => ({
   entry: {
     demo: './demo/scripts/index.js',
   },

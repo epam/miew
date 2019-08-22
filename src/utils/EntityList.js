@@ -24,7 +24,7 @@ class EntityList {
       this._dict[index] = {};
     });
 
-    entities.forEach(entity => this.register(entity));
+    entities.forEach((entity) => this.register(entity));
   }
 
   /**

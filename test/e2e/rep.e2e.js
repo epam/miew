@@ -15,10 +15,11 @@ import goldenCfg from './golden.cfg';
 
 chai.use(dirtyChai);
 
-const cfg = Object.assign({}, goldenCfg, {
+const cfg = {
+  ...goldenCfg,
   title: 'Representations Tests',
   report: 'report-rep.html',
-});
+};
 
 let driver;
 let page;
@@ -69,8 +70,8 @@ describe('As a power user, I want to', function () {
         retrieve[listName] = page.reload()
           .then(() => page.waitForMiew())
           .then(() => driver.executeScript(fn, listName))
-          .then(json => JSON.parse(json));
-        return retrieve[listName].then(list => checkFn(list, checkId));
+          .then((json) => JSON.parse(json));
+        return retrieve[listName].then((list) => checkFn(list, checkId));
       };
     }
     // check list on having required element
@@ -80,13 +81,13 @@ describe('As a power user, I want to', function () {
       _.each(list, (entry) => {
         expect(entry).to.include.all.keys(['id', 'name']);
       });
-      expect(_.map(list, entry => entry.id)).to.include(requiredId);
+      expect(_.map(list, (entry) => entry.id)).to.include(requiredId);
     }
     // script to run on the driver
     function getPropList(list) {
       window.miew = new window.Miew({});
       const { miew } = window;
-      return miew && JSON.stringify(miew.constructor[list].all.map(entry => ({
+      return miew && JSON.stringify(miew.constructor[list].all.map((entry) => ({
         id: Array.isArray(entry.id) ? entry.id[0] : entry.id,
         name: entry.prototype ? entry.prototype.name : entry.name,
       })));

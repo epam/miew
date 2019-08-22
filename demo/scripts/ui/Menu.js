@@ -49,7 +49,7 @@ function getNumAtomsBySelector(viewer, selector) {
 
 function Menu(/** Node */ container, /** Miew */ viewer) {
   // Add proper DOM elements
-  _.forEach($.parseHTML(menuHtml), element => container.parentNode.appendChild(element));
+  _.forEach($.parseHTML(menuHtml), (element) => container.parentNode.appendChild(element));
 
   // Save some objects for future reference
   this._viewer = viewer;
@@ -1043,8 +1043,8 @@ Menu.prototype._init = function () {
       });
     }
   }
-  $(document).on('mousewheel', e => _zoomClipPlane(e)); // Chrome
-  $(document).on('DOMMouseScroll', e => _zoomClipPlane(e)); // Opera, Firefox
+  $(document).on('mousewheel', (e) => _zoomClipPlane(e)); // Chrome
+  $(document).on('DOMMouseScroll', (e) => _zoomClipPlane(e)); // Opera, Firefox
 
   this._initMiewEventListeners();
   this._initToolbar();
@@ -1311,7 +1311,7 @@ Menu.prototype._presetsPanelActionsPdbInputsRefresh = function (self) {
       }
 
       const extensions = parsers.keys('extensions').sort();
-      const extRegExp = new RegExp(`^(${extensions.map(ext => ext.substr(1)).join('|')})$`);
+      const extRegExp = new RegExp(`^(${extensions.map((ext) => ext.substr(1)).join('|')})$`);
       const extString = extensions.join(', ');
 
       if (self.presetsPanel.inputs.main instanceof File && !mainExtension.match(extRegExp)) {

@@ -115,7 +115,7 @@ class VolumeModel {
 
   _getVolumeInfo() {
     const volInfo = _.pick(this._header, ['dmean', 'dmin', 'dmax', 'sd', 'delta']);
-    volInfo.obtuseAngle = this._header.angles.map(angle => Number(angle >= (Math.PI / 2)));
+    volInfo.obtuseAngle = this._header.angles.map((angle) => Number(angle >= (Math.PI / 2)));
     return volInfo;
   }
 

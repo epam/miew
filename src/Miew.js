@@ -1647,7 +1647,7 @@ Miew.prototype._export = function (format) {
   if (this._visuals[this._curVisualName] instanceof ComplexVisual) {
     const dataSource = this._visuals[this._curVisualName]._complex;
     const exporter = new TheExporter(dataSource, { binary: true });
-    return exporter.export().then(data => data);
+    return exporter.export().then((data) => data);
   }
   if (this._visuals[this._curVisualName] instanceof VolumeVisual) {
     return Promise.reject(new Error('Sorry, exporter for volume data not implemented yet'));
@@ -1926,7 +1926,7 @@ Miew.prototype.load = function (source, opts) {
   };
 
   return _fetchData(source, opts, job)
-    .then(data => _parseData(data, opts, job))
+    .then((data) => _parseData(data, opts, job))
     .then((object) => {
       const name = this._onLoad(object, opts);
       return onLoadEnd(name);
@@ -2387,7 +2387,7 @@ Miew.prototype._extractRepresentation = function () {
  */
 Miew.prototype._setReps = function (reps) {
   reps = reps || (this._opts && this._opts.reps) || [];
-  this._forEachComplexVisual(visual => visual.resetReps(reps));
+  this._forEachComplexVisual((visual) => visual.resetReps(reps));
 };
 
 /**
@@ -3479,7 +3479,7 @@ Miew.prototype._fogFarUpdateValue = function () {
 };
 
 Miew.prototype._updateMaterials = function (values, needTraverse = false, process = undefined) {
-  this._forEachComplexVisual(visual => visual.setMaterialValues(values, needTraverse, process));
+  this._forEachComplexVisual((visual) => visual.setMaterialValues(values, needTraverse, process));
   for (let i = 0, n = this._objects.length; i < n; ++i) {
     const obj = this._objects[i];
     if (obj._line) {
