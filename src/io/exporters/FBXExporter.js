@@ -529,10 +529,16 @@ export default class FBXExporter extends Exporter {
    * Divide cylinder (add additional vertexes) for prettiness TODO::VERY COMPLICATED NEED SIMPLIFYING! NEED TRANSPOSING ALSO!
    */
   _divideCylinders(mesh) {
+    /* Resulting variables */
     let resVertices = new Float32Array(0);
     let resIndices = new Float32Array(0);
     let resNormals = new Float32Array(0);
     let resColors = new Float32Array(0);
+    /* Misc variables */
+    const matVector1 = mesh.geometry.attributes.matVector1.array;
+    const matVector2 = mesh.geometry.attributes.matVector2.array;
+    const matVector3 = mesh.geometry.attributes.matVector3.array;
+    let idxOffset = 0;
     /* Algorithm:
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
     * 2. Add additional vertices slightly under second third of vertices, copy normals and add color from color2 array
@@ -543,57 +549,81 @@ export default class FBXExporter extends Exporter {
     const meshColor2 = mesh.geometry.attributes.color2.array;
     const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
     const numInstances = mesh.geometry.attributes.alphaColor.count;
-    for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) { /* Proceed every instance */
-      const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array); /* Grab original vertices */
+    for (let instanceIndex = 0; instanceIndex < numInstances - 1; ++instanceIndex) { /* Proceed every instance TODO: -1 MAGIC */
+      /* Grab original vertices and normals */
+      const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
       const lNormals = _.cloneDeep(mesh.geometry.attributes.normal.array);
+      /* We have vertices for not transformed cylinder. Need to make it transformed */
+      const transformCylinder = new THREE.Matrix4();
+      transformCylinder.set(matVector1[idxOffset], matVector2[idxOffset], matVector3[idxOffset], 0,
+        matVector1[idxOffset + 1], matVector2[idxOffset + 1], matVector3[idxOffset + 1], 0,
+        matVector1[idxOffset + 2], matVector2[idxOffset + 2], matVector3[idxOffset + 2], 0,
+        matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
+      transformCylinder.transpose();
+      idxOffset += 4;
+      /* Applying offsets / transformation to every vertex */
+      for (let j = 0; j < lVertices.length; j += 3) {
+        const vertVec = new THREE.Vector4();
+        vertVec.set(lVertices[j], lVertices[j + 1], lVertices[j + 2], 1);
+        vertVec.applyMatrix4(transformCylinder);
+        const normVec = new THREE.Vector4();
+        normVec.set(lNormals[j], lNormals[j + 1], lNormals[j + 2], 0.0);
+        normVec.applyMatrix4(transformCylinder);
+
+        lVertices[j] = vertVec.x;
+        lVertices[j + 1] = vertVec.y;
+        lVertices[j + 2] = vertVec.z;
+        lNormals[j] = normVec.x;
+        lNormals[j + 1] = normVec.y;
+        lNormals[j + 2] = normVec.z;
+      }
+      /* Okay now vertices are reworked as we want them. Now it's time for implementing algorithm */
+      const numVertices = lVertices.length / 3;
       let reworkedVertices = [];
       let reworkedNormals = [];
       const reworkedColors = [];
       const reworkedIndices = [];
       const lAlphas = [meshAlphaColor[instanceIndex]];
       const idxColors = instanceIndex * 3;
+      /* Collect colors for each half of cylinder */
       const objectColor1 = this._reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
       const objectColor2 = this._reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
-      /* For FBX we need to clone color for every vertex */
-      const lColors1 = this._cloneColors(2 * mesh.geometry.attributes.position.array.length / 9, objectColor1);
-      const lColors2 = this._cloneColors(2 * mesh.geometry.attributes.position.array.length / 9, objectColor2);
+      /* Clone colors for one cylinder ( 2 * numVertices / 3) and for another (same number) */
+      const lColors1 = this._cloneColors(2 * numVertices / 3, objectColor1);
+      const lColors2 = this._cloneColors(2 * numVertices / 3, objectColor2);
+      /* Collect indices for given cylinder - remember: we will expand him later on */
       const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
-      /* Step 1 */
-      for (let j = 0; j < lVertices.length / 3; ++j) {
+      /* Step 1 : first third of vertices, normals and colors are copied directly */
+      for (let j = 0; j < numVertices; ++j) {
         reworkedVertices.push(lVertices[j]);
         reworkedNormals.push(lNormals[j]);
         reworkedColors.push(lColors1[j]);
       }
-      for (let j = 0; j < lIndices.length; ++j) { /* Copying all indices cos they are good */
+      /* Also copying all indices cos they will only expand later on */
+      for (let j = 0; j < lIndices.length; ++j) {
         reworkedIndices.push(lIndices[j]);
       }
-      /* Step 2 */
+      /* Step 2 : adding new vertices and normals and also copying old */
       const additionalVertices = [];
       const additionalNormals = [];
-      for (let j = lVertices.length / 3; j < 2 * lVertices.length / 3; ++j) {
+      for (let j = numVertices; j < 2 * numVertices; ++j) {
         reworkedVertices.push(lVertices[j]);
-        additionalVertices.push(lVertices[j]);
+        additionalVertices.push(lVertices[j] + 0.1);
         reworkedNormals.push(lNormals[j]);
         additionalNormals.push(lNormals[j]);
         reworkedColors.push(lColors1[j]);
       }
       reworkedVertices = reworkedVertices.concat(additionalVertices);
       reworkedNormals = reworkedNormals.concat(additionalNormals);
-      let k = 1;
-      for (let j = 0; j < additionalVertices.length; ++j) {
-        reworkedColors.push(lColors2[j]);
-        reworkedVertices[k] -= 0.1; /* TODO:: 0.1 is temporary, need smth like 5% of cylinder! */
-        k += 3;
-      }
-      for (let j = 2 * lVertices.length / 3; j < lVertices.length; ++j) { /* Last third of vertices */
+      for (let j = 2 * numVertices; j < numVertices * 3; ++j) { /* Last third of vertices */
         reworkedVertices.push(lVertices[j]);
         reworkedNormals.push(lNormals[j]);
         reworkedColors.push(lColors2[j]);
       }
       for (let j = 0; j < lIndices.length / 2; j += 3) {
-        reworkedIndices.push(lIndices[j]);
-        reworkedIndices.push(lIndices[j + 1]);
-        reworkedIndices.push(-1 * (lIndices[j + 2] + 1));
+        reworkedIndices.push(lIndices[j] + 2 * numVertices / 3);
+        reworkedIndices.push(lIndices[j + 1] + 2 * numVertices / 3);
+        reworkedIndices.push(lIndices[j + 2] - 2 * numVertices / 3 + 1);
       }
       /* Ending */
       /* Saving info from one instance to resulting model */
@@ -630,7 +660,11 @@ export default class FBXExporter extends Exporter {
       let idxOffset = 0;
       const numInstances = mesh.geometry.attributes.alphaColor.count;
       for (let i = 0; i < numInstances; ++i) {
-        /* Firstly, collect some instanced parameters */
+        /* Firstly, collect some instanced parameters
+        * vertices are copied directly
+        * normals are copied directly
+        * indices are copied and reworked to the big model notation
+        * colors are copied and cloned for each vertex */
         const [lVertices, lNormals, lIndices, lColors] = this._collectRawInstancedGeometryParameters(mesh, i);
         /* Transformation info */
         const transformCylinder = new THREE.Matrix4();
@@ -640,9 +674,7 @@ export default class FBXExporter extends Exporter {
           matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
         transformCylinder.transpose();
         idxOffset += 4;
-        /* Complex Algorithm for Cylinder slicing */
         /* Applying offsets / transformation to every vertex */
-        /* First side - top plane */
         for (let j = 0; j < lVertices.length; j += 3) {
           const vertVec = new THREE.Vector4();
           vertVec.set(lVertices[j], lVertices[j + 1], lVertices[j + 2], 1);
@@ -672,7 +704,7 @@ export default class FBXExporter extends Exporter {
         colors: this._correctArrayNotation(resColors),
       });
       this._collectMaterialInfo(mesh);
-    } else this._divideCylinders(mesh);
+    } else this._divideCylinders(mesh); /* if we want some prettiness */
   }
 
   /**
