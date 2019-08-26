@@ -116,11 +116,11 @@ export default class FBXExporter extends Exporter {
 
   /**
    * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
-   * @param{ArrayLike<number>} array - indices buffer
+   * @param{Int32Array} array - indices buffer
    * @returns{Int32Array} reworked array.
    */
   _reworkIndices(array) {
-    const clonedArray = new Int32Array(array.length); /* TODO: revork this to bigint64 */
+    const clonedArray = new Int32Array(array.length); /* TODO: rework this to bigint64 */
     clonedArray.set(array);
     for (let i = 2; i < clonedArray.length; i += 3) {
       clonedArray[i] *= -1;
@@ -138,6 +138,22 @@ export default class FBXExporter extends Exporter {
   _Float32Concat(first, second) {
     const firstLength = first.length;
     const result = new Float32Array(firstLength + second.length);
+
+    result.set(first);
+    result.set(second, firstLength);
+
+    return result;
+  }
+
+  /**
+   * Extension to standard Int32Arrays.
+   * @param{Int32Array} first  - destination array
+   * @param{Int32Array} second - source array
+   * @returns{Int32Array} resulting concatenated array
+   */
+  _Int32Concat(first, second) {
+    const firstLength = first.length;
+    const result = new Int32Array(firstLength + second.length);
 
     result.set(first);
     result.set(second, firstLength);
@@ -453,9 +469,9 @@ export default class FBXExporter extends Exporter {
     const meshOffset = mesh.geometry.attributes.offset.array;
     const numInstances = mesh.geometry.attributes.offset.count;
     /* For every instanced object */
-    for (let i = 0; i < numInstances; ++i) {
+    for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
       /* Firstly, collect some basic instanced parameters */
-      const [lVertices, lNormals, lIndices, lColors] = this._collectRawInstancedGeometryParameters(mesh, i);
+      const [lVertices, lNormals, lIndices, lColors] = this._collectRawInstancedGeometryParameters(mesh, instanceIndex);
       /* Extract offset for one exact object (instance) */
       const objectOffset = new Vector4(meshOffset[idxOffset], meshOffset[idxOffset + 1],
         meshOffset[idxOffset + 2], meshOffset[idxOffset + 3]);
@@ -473,8 +489,10 @@ export default class FBXExporter extends Exporter {
       resVertices = this._Float32Concat(resVertices, lVertices);
       resNormals = this._Float32Concat(resNormals, lNormals);
       resColors = this._Float32Concat(resColors, lColors);
-      resIndices = this._Float32Concat(resIndices, lIndices);
-      // console.log(`${i} out of ${numInstances} spheres done`);
+      resIndices = this._Int32Concat(resIndices, lIndices);
+      if (instanceIndex % 1000 === 0) {
+        console.log(`${instanceIndex} out of ${numInstances} spheres done`);
+      }
     }
     /* For every float array we need to be sure that there are no numbers in exponential notation */
     this._models.push({
@@ -501,11 +519,12 @@ export default class FBXExporter extends Exporter {
   /**
    * Collect and rework indices in big model notation.
    */
-  _collectInstancedIndices(mesh, index) {
-    let lIndices = _.cloneDeep(mesh.geometry.index.array);
+  _collectInstancedIndices(mesh, instance) {
+    let lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
     /* As we making one big model we need to carefully add resVertices.length to every index in lIndices */
+    const maxIndex = Math.max(...lIndices);
     for (let k = 0; k < lIndices.length; ++k) {
-      lIndices[k] += (index * mesh.geometry.attributes.position.array.length / 3);
+      lIndices[k] += (instance * (maxIndex + 1));
     }
     lIndices = this._reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
     return lIndices;
@@ -560,15 +579,17 @@ export default class FBXExporter extends Exporter {
     return [lVertices, lNormals];
   }
 
+  _myMemset(destArray, sourceArray, positionInDestArray) {
+    /* for (let i = 0; i < sourceArray.length; ++i) {
+      destArray[positionInDestArray + i] = sourceArray[i];
+    } */
+    destArray.set(sourceArray, positionInDestArray);
+  }
+
   /**
    * Divide cylinder (add additional vertexes) for prettiness
    */
   _divideCylinders(mesh) {
-    /* Resulting variables */
-    let resVertices = new Float32Array(0);
-    let resIndices = new Float32Array(0);
-    let resNormals = new Float32Array(0);
-    let resColors = new Float32Array(0);
     /* Algorithm:
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
     * 2. Add additional vertices slightly under second third of vertices, copy normals and add color from color2 array
@@ -579,20 +600,48 @@ export default class FBXExporter extends Exporter {
     const meshColor2 = _.cloneDeep(mesh.geometry.attributes.color2.array);
     const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
     const numInstances = mesh.geometry.attributes.alphaColor.count;
+    /* Miscellaneous variables and arrays created only for performance reasons */
+    const indicesArrayLength = mesh.geometry.index.array.length;
+    const verticesArrayLength = mesh.geometry.attributes.position.array.length;
+    const normalsArrayLength = mesh.geometry.attributes.normal.array.length;
+    const colorArray = new Array(4 * verticesArrayLength / 3);
+    const indexArray = new Array(indicesArrayLength);
+    const normalsArray = new Array(normalsArrayLength);
+    const vertexArray = new Array(verticesArrayLength);
+    const extendedColorArray = new Array(4 * (verticesArrayLength / 3 + verticesArrayLength / 9));
+    const extendedIndexArray = new Array(indicesArrayLength);
+    const extendedNormalsArray = new Array(normalsArrayLength + normalsArrayLength / 3);
+    const extendedVertexArray = new Array(verticesArrayLength + verticesArrayLength / 3);
+    /* Resulting variables. Calculating maximum length of that arrays for performance reasons */
+    /* let resVertices = new Float32Array(extendedVertexArray.length * numInstances);
+    let resIndices = new Float32Array(extendedIndexArray.length * numInstances);
+    let resNormals = new Float32Array(extendedNormalsArray.length * numInstances);
+    let resColors = new Float32Array(extendedColorArray.length * numInstances);
+    let curResVerticesIndex = 0;
+    let curResNormalsIndex = 0;
+    let curResColorsIndex = 0;
+    let curResIndicesIndex = 0; */
+    let resVertices = new Float32Array(0);
+    let resNormals = new Float32Array(0);
+    let resColors = new Float32Array(0);
+    let resIndices = new Int32Array(0);
+    /* misc */
+    let maxIndex = 0;
+    /* Main instances loop */
     for (let instanceIndex = 0; instanceIndex < numInstances - 1; ++instanceIndex) { /* Proceed every instance TODO: -1 MAGIC */
       /* Grab vertices and normals for transformed (scale, rotation, translation) cylinder */
-      let [lVertices, lNormals] = this._calculateCylinderTransform(mesh, instanceIndex);
+      const [lVertices, lNormals] = this._calculateCylinderTransform(mesh, instanceIndex);
+      const numVertices = lVertices.length / 3; /* That's the original number of vertices */
       /* Okay now vertices are reworked as we want them. Now it's time for implementing algorithm */
       /* Collect indices for given cylinder - remember: we will expand him later on */
-      let lIndices = _.cloneDeep(mesh.geometry.index.array);
+      let lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
       /* As we making one big model we need to carefully add numVertices to every index in lIndices. Remember - need to add additional vertices (numVertices / 3) as we add them!  */
       if (resIndices.length !== 0) {
         for (let k = 0; k < lIndices.length; ++k) {
-          lIndices[k] += (Math.max(...resIndices) + 1); // same as number instanceIndex * (numVertices + numVertices / 3)) but more unified
+          lIndices[k] += (maxIndex + 1); // same as number instanceIndex * (numVertices + numVertices / 3)) but more unified
         }
       }
-      lIndices =this._reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
-      const numVertices = lVertices.length / 3; /* That's the original number of vertices */
+      lIndices = this._reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
       let reworkedVertices = null;
       let reworkedNormals = null;
       let reworkedColors = null;
@@ -606,15 +655,15 @@ export default class FBXExporter extends Exporter {
       let needToDivideCylinders = true;
       if (objectColor1 === objectColor2) {
         needToDivideCylinders = false;
-        reworkedColors = new Array(numVertices * 4);
-        reworkedIndices = new Array(lIndices.length);
-        reworkedNormals = new Array(lNormals.length);
-        reworkedVertices = new Array(lVertices.length);
+        reworkedColors = colorArray;
+        reworkedIndices = indexArray;
+        reworkedNormals = normalsArray;
+        reworkedVertices = vertexArray;
       } else {
-        reworkedColors = new Array((numVertices + numVertices / 3) * 4);
-        reworkedIndices = new Array(lIndices.length).fill(0);
-        reworkedNormals = new Array(lNormals.length + lNormals.length / 3);
-        reworkedVertices = new Array(lVertices.length + lVertices.length / 3);
+        reworkedColors = extendedColorArray;
+        reworkedIndices = extendedIndexArray;
+        reworkedNormals = extendedNormalsArray;
+        reworkedVertices = extendedVertexArray;
       }
       let indexVerticesNormalsArray = 0; /* not using push */
       let indexIndicesArray = 0;
@@ -678,14 +727,36 @@ export default class FBXExporter extends Exporter {
         reworkedIndices[indexIndicesArray + 2] = (lIndices[j + 2] - offsetIndices);
         indexIndicesArray += 3;
       }
+      maxIndex = Math.max(...reworkedIndices);
       /* Ending */
       /* Saving info from one instance to resulting model */
+      /* not good perf, but better than every else  */
       resVertices = this._Float32Concat(resVertices, reworkedVertices);
       resNormals = this._Float32Concat(resNormals, reworkedNormals);
       resColors = this._Float32Concat(resColors, reworkedColors);
-      resIndices = this._Float32Concat(resIndices, reworkedIndices);
-      console.log(`${instanceIndex} out of ${numInstances} done`);
+      resIndices = this._Int32Concat(resIndices, reworkedIndices);
+      /* very bad perf */
+      /* resVertices.set(reworkedVertices, curResVerticesIndex);
+      resNormals.set(reworkedNormals, curResNormalsIndex);
+      resColors.set(reworkedColors, curResColorsIndex);
+      resIndices.set(reworkedIndices, curResIndicesIndex); */
+      /* this._myMemset(resVertices, reworkedVertices, curResVerticesIndex);
+      this._myMemset(resIndices, reworkedIndices, curResIndicesIndex);
+      this._myMemset(resColors, reworkedColors, curResColorsIndex);
+      this._myMemset(resNormals, reworkedNormals, curResNormalsIndex); */
+      /* curResVerticesIndex += reworkedVertices.length;
+      curResIndicesIndex += reworkedIndices.length;
+      curResColorsIndex += reworkedColors.length;
+      curResNormalsIndex += reworkedNormals.length; */
+      if (instanceIndex % 1000 === 0) {
+        console.log(`${instanceIndex} out of ${numInstances} cylinders done`);
+      }
     }
+    /* Need to delete all zeros from the end of resArrays */
+    /* resVertices = resVertices.subarray(0, curResVerticesIndex);
+    resIndices = resIndices.subarray(0, curResIndicesIndex);
+    resColors = resColors.subarray(0, curResColorsIndex);
+    resNormals = resNormals.subarray(0, curResNormalsIndex); */
     /* For every float array we need to be sure that there are no numbers in exponential notation */
     this._models.push({
       vertices: this._correctArrayNotation(resVertices),
