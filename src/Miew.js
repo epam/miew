@@ -391,7 +391,9 @@ Miew.prototype._initGfx = function () {
     height: this._container.clientHeight,
   };
 
-  const webGLOptions = { preserveDrawingBuffer: true, alpha: true, premultipliedAlpha: false };
+  const webGLOptions = {
+    preserveDrawingBuffer: true, alpha: true, premultipliedAlpha: false,
+  };
   if (settings.now.antialias) {
     webGLOptions.antialias = true;
   }
@@ -462,7 +464,7 @@ Miew.prototype._initGfx = function () {
   light12.shadow = new THREE.DirectionalLightShadow();
   light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
-  const shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
+  const shadowMapSize = Math.max(gfx.width, gfx.height) * gfx.renderer.getPixelRatio();
   light12.shadow.mapSize.width = shadowMapSize;
   light12.shadow.mapSize.height = shadowMapSize;
   light12.target.position.set(0.0, 0.0, 0.0);
@@ -477,8 +479,8 @@ Miew.prototype._initGfx = function () {
   gfx.axes = new Axes(gfx.root, gfx.camera);
 
   gfx.offscreenBuf = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, depthBuffer: true,
     },
@@ -490,24 +492,24 @@ Miew.prototype._initGfx = function () {
   }
 
   gfx.offscreenBuf2 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.offscreenBuf3 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.offscreenBuf4 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
@@ -520,8 +522,8 @@ Miew.prototype._initGfx = function () {
   // use float textures for volume rendering if possible
   if (gfx.renderer.getContext().getExtension('OES_texture_float')) {
     gfx.offscreenBuf5 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      gfx.width * gfx.renderer.getPixelRatio(),
+      gfx.height * gfx.renderer.getPixelRatio(),
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -532,8 +534,8 @@ Miew.prototype._initGfx = function () {
     );
 
     gfx.offscreenBuf6 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      gfx.width * gfx.renderer.getPixelRatio(),
+      gfx.height * gfx.renderer.getPixelRatio(),
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -544,8 +546,8 @@ Miew.prototype._initGfx = function () {
     );
 
     gfx.offscreenBuf7 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      gfx.width * gfx.renderer.getPixelRatio(),
+      gfx.height * gfx.renderer.getPixelRatio(),
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -563,16 +565,16 @@ Miew.prototype._initGfx = function () {
   }
 
   gfx.stereoBufL = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.stereoBufR = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
@@ -889,6 +891,7 @@ Miew.prototype._resizeOffscreenBuffers = function (width, height, stereo) {
   gfx.offscreenBuf2.setSize(multi * width, height);
   gfx.offscreenBuf3.setSize(multi * width, height);
   gfx.offscreenBuf4.setSize(multi * width, height);
+
   if (gfx.offscreenBuf5) {
     gfx.offscreenBuf5.setSize(multi * width, height);
   }
@@ -1072,7 +1075,7 @@ Miew.prototype._renderFrame = (function () {
     }
 
     // resize offscreen buffers to match the target
-    this._resizeOffscreenBuffers(_size.width * window.devicePixelRatio, _size.height * window.devicePixelRatio, stereo);
+    this._resizeOffscreenBuffers(_size.width * gfx.renderer.getPixelRatio(), _size.height * gfx.renderer.getPixelRatio(), stereo);
 
     switch (stereo) {
       case 'WEBVR':
@@ -1240,7 +1243,6 @@ Miew.prototype._renderScene = (function () {
       gfx.renderer.setRenderTarget(dstBuffer);
       gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0);
     }
-
     // outline
     if (outline) {
       srcBuffer = dstBuffer;
@@ -3023,7 +3025,17 @@ Miew.prototype.benchmarkGfx = function (force) {
     });
   }));
 };
+Miew.prototype.getCanvasSafari = function (gfx, width, height) {
+  const canvas = document.createElement('canvas');
+  const canvasContext = canvas.getContext('2d');
 
+  canvas.width = width;
+  canvas.height = height;
+
+  canvas.imageSmoothingEnabled = false;
+  canvasContext.drawImage(gfx.renderer.domElement, 0, 0, canvas.width, canvas.height);
+  return canvas;
+};
 /**
  * Makes a screenshot.
  * @param {number} [width] - Width of an image. Defaults to the canvas width.
@@ -3041,15 +3053,27 @@ Miew.prototype.screenshot = function (width, height) {
   function tan2Fov(tan) {
     return THREE.Math.radToDeg(Math.atan(tan)) * 2.0;
   }
-
   height = height || width || gfx.height;
   width = width || gfx.width;
 
+  const isSafariBrowser = navigator.vendor && navigator.vendor.indexOf('Apple') > -1
+    && navigator.userAgent
+    && navigator.userAgent.indexOf('CriOS') === -1
+    && navigator.userAgent.indexOf('FxiOS') === -1;
   let screenshotURI;
+  gfx.renderer.setPixelRatio(1);
 
   if (width === gfx.width && height === gfx.height) {
-    // copy current canvas to screenshot
-    screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
+    // Copy current canvas to screenshot
+    // Non 2d context causes flipped image from toDataUrl in Safari
+    // Also can be fixed with premultipliedAlpha: true,
+    // but it needs to be researched more
+    if (isSafariBrowser) {
+      const canvas = this.getCanvasSafari(gfx, width, height);
+      screenshotURI = canvas.toDataURL('image/png');
+    } else {
+      screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
+    }
   } else {
     const originalAspect = gfx.camera.aspect;
     const originalFov = gfx.camera.fov;
@@ -3066,17 +3090,25 @@ Miew.prototype.screenshot = function (width, height) {
     gfx.camera.updateProjectionMatrix();
 
     // resize canvas to the required size of screenshot
-    gfx.renderer.setDrawingBufferSize(width, height, 1);
+    gfx.renderer.setDrawingBufferSize(
+      width,
+      height,
+      gfx.renderer.getPixelRatio(),
+    );
 
-    // make screenshot
     this._renderFrame(settings.now.stereo);
-    screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
-
+    if (isSafariBrowser) {
+      const canvas = this.getCanvasSafari(gfx, width, height);
+      screenshotURI = canvas.toDataURL('image/png');
+    } else {
+      screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
+    }
     // restore original camera & canvas proportions
+    gfx.renderer.setPixelRatio(window.devicePixelRatio);
     gfx.camera.aspect = originalAspect;
     gfx.camera.fov = originalFov;
     gfx.camera.updateProjectionMatrix();
-    gfx.renderer.setDrawingBufferSize(gfx.width, gfx.height, window.devicePixelRatio);
+    gfx.renderer.setDrawingBufferSize(gfx.width, gfx.height, gfx.renderer.getPixelRatio());
     this._needRender = true;
   }
 
