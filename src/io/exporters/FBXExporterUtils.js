@@ -1,3 +1,6 @@
+import _ from 'lodash';
+import * as THREE from 'three';
+
 /**
  * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
  * basically, every triangle in Miew has been represented hat way (e.g.) : 0,1,7, but we must (for FBX) rework that into: 0,1,-8.
@@ -161,6 +164,150 @@ const defaultProperties = '\t\tProperties60: {\n'
   + '\t\t\tProperty: "Look", "enum", "",1\n'
   + '\t\t}\n';
 
+/**
+ * Calculate parameters for one cylinder in given mesh.
+ * @param {object} mesh - mesh with instanced objects
+ * @param {Number} instanceIndex - number of instance in mesh
+ * @returns {*[]} array of gathered transformations of vertices and normals
+ */
+function calculateCylinderTransform(mesh, instanceIndex) {
+  /* Misc variables */
+  const matVector1 = mesh.geometry.attributes.matVector1.array;
+  const matVector2 = mesh.geometry.attributes.matVector2.array;
+  const matVector3 = mesh.geometry.attributes.matVector3.array;
+  /* Grab original vertices and normals */
+  const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
+  const lNormals = _.cloneDeep(mesh.geometry.attributes.normal.array);
+  /* We have vertices for not transformed cylinder. Need to make it transformed */
+  const transformCylinder = new THREE.Matrix4();
+  const idxOffset = instanceIndex * 4;
+  transformCylinder.set(matVector1[idxOffset], matVector2[idxOffset], matVector3[idxOffset], 0,
+    matVector1[idxOffset + 1], matVector2[idxOffset + 1], matVector3[idxOffset + 1], 0,
+    matVector1[idxOffset + 2], matVector2[idxOffset + 2], matVector3[idxOffset + 2], 0,
+    matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
+  /* For a reason we must perform transpose of that matrix */
+  transformCylinder.transpose();
+  const normVec = new THREE.Vector4();
+  const vertVec = new THREE.Vector4();
+  /* Applying offsets / transformation to every vertex */
+  for (let j = 0; j < lVertices.length; j += 3) {
+    vertVec.set(lVertices[j], lVertices[j + 1], lVertices[j + 2], 1);
+    vertVec.applyMatrix4(transformCylinder);
+    normVec.set(lNormals[j], lNormals[j + 1], lNormals[j + 2], 0.0);
+    normVec.applyMatrix4(transformCylinder);
+
+    lVertices[j] = vertVec.x;
+    lVertices[j + 1] = vertVec.y;
+    lVertices[j + 2] = vertVec.z;
+    lNormals[j] = normVec.x;
+    lNormals[j + 1] = normVec.y;
+    lNormals[j + 2] = normVec.z;
+  }
+  return [lVertices, lNormals];
+}
+
+/**
+ * Collect and rework colors in big model notation.
+ * @param {object} mesh - mesh with instanced objects
+ * @param {Number} instanceIndex - number of instance in mesh
+ * @returns {Float32Array} array of gathered instanced colors
+ */
+function collectInstancedColors(mesh, instanceIndex) {
+  const idxColors = (instanceIndex * 3); /* that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc */
+  const meshColor = mesh.geometry.attributes.color.array;
+  const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
+  const lAlphas = [meshAlphaColor[instanceIndex]];
+  const objectColor = reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]], lAlphas);
+  /* For FBX we need to clone color for every vertex */
+  const lColors = cloneColors(mesh.geometry.attributes.position.array.length / 3, objectColor);
+  return lColors;
+}
+
+/**
+ * Adding color layer to resulting file
+ * @returns {string} color layer info
+ */
+function colorLayer(colorArray) {
+  const layerElementColorNumber = 0; /* IDK what that is */
+  const layerElementColorVersion = 101; /* IDK what version means */
+  const layerElementColorName = ''; /* IDK what name means */
+  return (`\t\tLayerElementColor: ${layerElementColorNumber} {\n`
+    + `\t\t\tVersion: ${layerElementColorVersion}\n`
+    + `\t\t\tName: "${layerElementColorName}"\n`
+    + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
+    + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
+    + `\t\t\tColors: ${correctArrayNotation(colorArray)}\n`
+    + `\t\t\tColorIndex: ${[...Array(colorArray.length / 4).keys()]}\n` /* As said - fastest and easiest way to produce [0, 1, .....] array */
+    + '\t\t}\n');
+}
+
+/**
+ * Adding normal layer to resulting file
+ * @returns {string} normal layer info
+ */
+function normalLayer(normalArray) {
+  const layerElementNormalNumber = 0; /* IDK what that is */
+  const layerElementNormalVersion = 101; /* IDK what version means */
+  const layerElementNormalName = ''; /* IDK what name means */
+  return (`\t\tLayerElementNormal: ${layerElementNormalNumber} {\n`
+    + `\t\t\tVersion: ${layerElementNormalVersion}\n`
+    + `\t\t\tName: "${layerElementNormalName}"\n`
+    + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
+    + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
+    + `\t\t\tNormals: ${correctArrayNotation(normalArray)}\n`
+    + '\t\t}\n');
+}
+
+
+/* Default materials layer */
+const defaultMaterialLayer = '\t\tLayerElementMaterial: 0 {\n'
+  + '\t\t\tVersion: 101\n'
+  + '\t\t\tName: ""\n'
+  + '\t\t\tMappingInformationType: "AllSame"\n'
+  + '\t\t\tReferenceInformationType: "Direct"\n'
+  + '\t\t\tMaterials: 0\n'
+  + '\t\t}\n';
+
+/* Default layers block */
+const defaultLayerBlock = '\t\tLayer: 0 {\n'
+  + '\t\t\tVersion: 100\n'
+  + '\t\t\tLayerElement:  {\n'
+  + '\t\t\t\tType: "LayerElementNormal"\n'
+  + '\t\t\t\tTypedIndex: 0\n'
+  + '\t\t\t}\n'
+  + '\t\t\tLayerElement:  {\n'
+  + '\t\t\t\tType: "LayerElementColor"\n'
+  + '\t\t\t\tTypedIndex: 0\n'
+  + '\t\t\t}\n'
+  + '\t\t\tLayerElement:  {\n'
+  + '\t\t\t\tType: "LayerElementMaterial"\n'
+  + '\t\t\t\tTypedIndex: 0\n'
+  + '\t\t\t}\n'
+  + '\t\t}\n'
+  + '\t}\n';
+
+/**
+ * Adding vertices and indices to resulting string
+ * @return {string} resulting string in FBX notation
+ */
+function addVerticesIndices(vertices, indices) {
+  const multiLayer = 0;
+  const multiTake = 1;
+  const shading = 'Y';
+  const culling = 'CullingOff';
+  const geometryVersion = 124;
+  /* About _correctArrayNotation: Float32Arrays will contains only Float32 numbers, which implies that it will be floating points with 17 numbers after point.
+  * We cannot (and it's logically incorrect) save all this information, so we convert this Float32Array into Array-like object with numbers with only 6 numbers after point
+  * Reminder - this is big memory loss (as we must save at one moment two arrays with similar information) */
+  return (`\t\tMultiLayer: ${multiLayer}\n`
+    + `\t\tMultiTake: ${multiTake}\n`
+    + `\t\tShading: ${shading}\n`
+    + `\t\tCulling: "${culling}"\n`
+    + `\t\tVertices: ${correctArrayNotation(vertices)}\n\n`
+    + `\t\tPolygonVertexIndex: ${indices}\n\n`
+    + `\t\tGeometryVersion: ${geometryVersion}\n`);
+}
+
 
 export default {
   reworkColors,
@@ -169,4 +316,11 @@ export default {
   correctArrayNotation,
   collectMaterialInfo,
   defaultProperties,
+  calculateCylinderTransform,
+  collectInstancedColors,
+  colorLayer,
+  normalLayer,
+  defaultMaterialLayer,
+  defaultLayerBlock,
+  addVerticesIndices,
 };
