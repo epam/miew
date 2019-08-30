@@ -82,34 +82,9 @@ export default class FBXExporter extends Exporter {
    * Not exactly sure if this section is template section (as it is in 7.4+) or it should every time be like this
    */
   createDefinitions() {
-    const Version = 100; /* Mystery 100, but appears that it's not checked properly */
-    const count = 3; /* Biggest mystery here. Every 6.1. file has this field = 3. Why?  I think that here must be
-    some sort of 'let count = calculateCount()' or something, cos i _think_ that it's object, geometry,material etc count */
-    /* Then we must know how many and exactly what Object Types there are */
-    /* Next variable (objectTypes) is left only because we might in some distant future automatically generate this section. */
-    // const objectTypes = []; /* Somewhat like 'let objectTypes = getObjectTypes()' or something. What about count of that objects? */
     const mandatoryComment = '; Object definitions\n'
      + ';------------------------------------------------------------------\n\n';
-    /* Seems like this numbers didn't affect anything, so this section left because everything working with it looking that way */
-    const definitions = 'Definitions:  {\n'
-      + `\tVersion: ${Version}\n`
-      + `\tCount: ${count}\n`
-      + '\tObjectType: "Model" {\n'
-      + '\t\tCount: 1\n'
-      + '\t}\n'
-      + '\tObjectType: "Geometry" {\n'
-      + '\t\tCount: 1\n'
-      + '\t}\n'
-      + '\tObjectType: "Material" {\n'
-      + '\t\tCount: 1\n'
-      + '\t}\n'
-      + '\tObjectType: "Pose" {\n'
-      + '\t\tCount: 1\n'
-      + '\t}\n'
-      + '\tObjectType: "GlobalSettings" {\n'
-      + '\t\tCount: 1\n'
-      + '\t}\n'
-      + '}\n\n';
+    const definitions = FBXUtils.defaultDefinitions();
     return mandatoryComment + definitions;
   }
 
@@ -162,32 +137,7 @@ export default class FBXExporter extends Exporter {
         + `\t\tVersion: ${materialVersion}\n`
         + '\t\tShadingModel: "lambert"\n'
         + '\t\tMultiLayer: 0\n'
-        + '\t\tProperties60:  {\n'
-        + '\t\t\tProperty: "ShadingModel", "KString", "", "Lambert"\n'
-        + '\t\t\tProperty: "MultiLayer", "bool", "",0\n'
-        + '\t\t\tProperty: "EmissiveColor", "ColorRGB", "",0,0,0\n'
-        + '\t\t\tProperty: "EmissiveFactor", "double", "",0.0000\n'
-        + '\t\t\tProperty: "AmbientColor", "ColorRGB", "",1,1,1\n'
-        + '\t\t\tProperty: "AmbientFactor", "double", "",0.0000\n'
-        + `\t\t\tProperty: "DiffuseColor", "ColorRGB", "",${material.diffuse}\n`
-        + '\t\t\tProperty: "DiffuseFactor", "double", "",1.0000\n'
-        + '\t\t\tProperty: "Bump", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "TransparentColor", "ColorRGB", "",1,1,1\n'
-        + '\t\t\tProperty: "TransparencyFactor", "double", "",0.0000\n'
-        + `\t\t\tProperty: "SpecularColor", "ColorRGB", "",${material.specular}\n`
-        + '\t\t\tProperty: "SpecularFactor", "double", "",1.0000\n'
-        + `\t\t\tProperty: "ShininessExponent", "double", "",${material.shininess}\n`
-        + '\t\t\tProperty: "ReflectionColor", "ColorRGB", "",0,0,0\n'
-        + '\t\t\tProperty: "ReflectionFactor", "double", "",1\n'
-        + '\t\t\tProperty: "Emissive", "ColorRGB", "",0,0,0\n'
-        + '\t\t\tProperty: "Ambient", "ColorRGB", "",1,1,1\n'
-        + `\t\t\tProperty: "Diffuse", "ColorRGB", "",${material.diffuse}\n`
-        + `\t\t\tProperty: "Specular", "ColorRGB", "",${material.specular}\n`
-        + `\t\t\tProperty: "Shininess", "double", "",${material.shininess}\n`
-        + `\t\t\tProperty: "Opacity", "double", "",${material.opacity}\n`
-        + '\t\t\tProperty: "Reflectivity", "double", "",0\n'
-        + '\t\t}\n'
-        + '\t}\n';
+        + `${FBXUtils.materialProperties(material)}`;
       allMaterials += stringMaterial;
     }
     return allMaterials;
@@ -318,7 +268,10 @@ export default class FBXExporter extends Exporter {
     /* For every instanced object */
     for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
       /* Firstly, collect some basic instanced parameters */
-      const [lVertices, lNormals, lIndices, lColors] = this._collectRawInstancedGeometryParameters(mesh, instanceIndex);
+      const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
+      const lNormals = _.cloneDeep(mesh.geometry.attributes.normal.array);
+      const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
+      const lColors = FBXUtils.collectInstancedColors(mesh, instanceIndex);
       /* Extract offset for one exact object (instance) */
       const objectOffset = new THREE.Vector4(meshOffset[idxOffset], meshOffset[idxOffset + 1],
         meshOffset[idxOffset + 2], meshOffset[idxOffset + 3]);
@@ -346,20 +299,6 @@ export default class FBXExporter extends Exporter {
       colors: resColors,
     };
     this._addModelToPool(modelNumber, model, material);
-  }
-
-  /**
-   * Collect some basic parameters.
-   * @param {object} mesh - mesh with instanced objects
-   * @param {Number} instanceIndex - number of instance in mesh
-   * @returns {Array} array of gathered parameters
-   */
-  _collectRawInstancedGeometryParameters(mesh, instanceIndex) {
-    const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
-    const lNormals = _.cloneDeep(mesh.geometry.attributes.normal.array);
-    const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
-    const lColors = FBXUtils.collectInstancedColors(mesh, instanceIndex);
-    return [lVertices, lNormals, lIndices, lColors];
   }
 
   /**
@@ -403,10 +342,8 @@ export default class FBXExporter extends Exporter {
     const modelNumber = this._checkExistingMaterial(material);
     /* Algorithm:
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
-    * 2. Add additional vertices slightly under second third of vertices, copy normals and add color from color2 array
-    * 3. Triangulate added segment (dont let him be void) - add indices
-    * 4. Triangulate segment from added vertices to third third of original vertices - add indices
-    * 5. Add color to last third of vertices and we're done */
+    * 2. Add additional vertices by copying second third of vertices, copy normals and add color from color2 array
+    * 3. Add color to last third of vertices and we're done */
     const meshColor1 = _.cloneDeep(mesh.geometry.attributes.color.array);
     const meshColor2 = _.cloneDeep(mesh.geometry.attributes.color2.array);
     const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
@@ -441,7 +378,7 @@ export default class FBXExporter extends Exporter {
       const [lVertices, lNormals] = FBXUtils.calculateCylinderTransform(mesh, instanceIndex);
       const numVertices = lVertices.length / 3; /* That's the original number of vertices */
       /* Okay now vertices are reworked as we want them. Now it's time for implementing algorithm */
-      /* Collect indices for given cylinder - remember: we will expand him later on */
+      /* Collect indices for given cylinder - remember: they will not change what so ever */
       let lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
       /* As we making one big model we need to carefully add numVertices to every index in lIndices. Remember - need to add additional vertices (numVertices / 3) as we add them!  */
       if (curResIndicesIndex !== 0) {
@@ -487,44 +424,34 @@ export default class FBXExporter extends Exporter {
       reworkedColors = utils.Float32Concat(lColors2, lColors1);
       /* Step 1 : first third of vertices and  normals are copied directly */
       /* we can use numVertices here, but logically speaking lVertices.length / 3 is much clearer */
-      for (let j = 0; j < lVertices.length / 3; ++j) {
-        reworkedVertices[indexVerticesNormalsArray] = (lVertices[j]);
-        reworkedNormals[indexVerticesNormalsArray] = (lNormals[j]);
-        indexVerticesNormalsArray++;
-      }
-      /* Also copying half of indices cos they will only expand later on */
-      for (let j = 0; j < lIndices.length / 2; ++j) {
-        reworkedIndices[indexIndicesArray] = (lIndices[j]);
-        indexIndicesArray++;
-      }
+      FBXUtils.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 0, lVertices.length / 3);
+      FBXUtils.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, lVertices.length / 3);
+      indexVerticesNormalsArray += lVertices.length / 3;
+      /* Also copying half of indices because other half may have offset if cylinders will be expanded */
+      FBXUtils.copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, lIndices.length / 2);
+      indexIndicesArray += lIndices.length / 2;
       /* Step 2 : adding new vertices and normals and also copying old
       * We can either full-copy middle vertices or copy them with some shift.
       * Here is first way - full copying without any shifts */
       const additionalVertices = [];
       const additionalNormals = [];
-      for (let j = lVertices.length / 3; j < 2 * lVertices.length / 3; ++j) {
-        reworkedVertices[indexVerticesNormalsArray] = (lVertices[j]);
-        reworkedNormals[indexVerticesNormalsArray] = (lNormals[j]);
-        indexVerticesNormalsArray++;
-        additionalVertices[indexAdditionalVertices] = (lVertices[j]);
-        additionalNormals[indexAdditionalVertices] = (lNormals[j]);
-        indexAdditionalVertices++;
-      }
+      FBXUtils.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, lVertices.length / 3, lVertices.length / 3);
+      FBXUtils.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, lNormals.length / 3, lNormals.length / 3);
+      indexVerticesNormalsArray += lVertices.length / 3;
+      FBXUtils.copyArrays(additionalVertices, indexAdditionalVertices, lVertices, lVertices.length / 3, lVertices.length / 3);
+      FBXUtils.copyArrays(additionalNormals, indexAdditionalVertices, lNormals, lNormals.length / 3, lNormals.length / 3);
+      indexAdditionalVertices += lVertices.length / 3;
       /* If we need to divide cylinders => we're adding additional vertices */
       if (needToDivideCylinders) {
-        for (let j = 0; j < indexAdditionalVertices; ++j) {
-          reworkedVertices[indexVerticesNormalsArray] = additionalVertices[j];
-          reworkedNormals[indexVerticesNormalsArray] = additionalNormals[j];
-          indexVerticesNormalsArray++;
-        }
+        reworkedVertices.set(additionalVertices, indexVerticesNormalsArray);
+        reworkedNormals.set(additionalNormals, indexVerticesNormalsArray);
+        indexVerticesNormalsArray += indexAdditionalVertices;
       }
       /* Last third of vertices */
-      for (let j = 2 * lVertices.length / 3; j < lVertices.length; ++j) {
-        reworkedVertices[indexVerticesNormalsArray] = (lVertices[j]);
-        reworkedNormals[indexVerticesNormalsArray] = (lNormals[j]);
-        indexVerticesNormalsArray++;
-      }
-      /* Adding last portion of indices simply as first half of indices but with 2 * number of vertices / 3 addition */
+      FBXUtils.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 2 * lVertices.length / 3, lVertices.length / 3);
+      FBXUtils.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * lNormals.length / 3, lNormals.length / 3);
+      indexVerticesNormalsArray += lVertices.length / 3;
+      /* Adding last portion of indices simply as first half of indices but with 2 * number of vertices / 3 addition if needed */
       let offsetIndices = 0;
       if (needToDivideCylinders) {
         offsetIndices = 2 * numVertices / 3;
@@ -547,9 +474,10 @@ export default class FBXExporter extends Exporter {
       curResIndicesIndex += reworkedIndices.length;
       curResColorsIndex += reworkedColors.length;
       curResNormalsIndex += reworkedNormals.length;
-      if (instanceIndex % 1000 === 0) {
+      /* IFDEF DEBUG */
+      /* if (instanceIndex % 1000 === 0) {
         console.log(`${instanceIndex} out of ${numInstances} cylinders done`);
-      }
+      } */
     }
     /* Need to delete all zeros from the end of resArrays */
     resVertices = resVertices.subarray(0, curResVerticesIndex);

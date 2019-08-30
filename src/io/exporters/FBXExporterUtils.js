@@ -308,6 +308,79 @@ function addVerticesIndices(vertices, indices) {
     + `\t\tGeometryVersion: ${geometryVersion}\n`);
 }
 
+/**
+ *
+ */
+function defaultDefinitions() {
+  const Version = 100; /* Mystery 100, but appears that it's not checked properly */
+  const count = 3; /* Biggest mystery here. Every 6.1. file has this field = 3. Why?  I think that here must be
+    some sort of 'let count = calculateCount()' or something, cos i _think_ that it's object, geometry,material etc count */
+  /* Then we must know how many and exactly what Object Types there are */
+  /* Next variable (objectTypes) is left only because we might in some distant future automatically generate this section. */
+  // const objectTypes = []; /* Somewhat like 'let objectTypes = getObjectTypes()' or something. What about count of that objects? */
+  /* Seems like this numbers didn't affect anything, so this section left because everything working with it looking that way */
+  return 'Definitions:  {\n'
+    + `\tVersion: ${Version}\n`
+    + `\tCount: ${count}\n`
+    + '\tObjectType: "Model" {\n'
+    + '\t\tCount: 1\n'
+    + '\t}\n'
+    + '\tObjectType: "Geometry" {\n'
+    + '\t\tCount: 1\n'
+    + '\t}\n'
+    + '\tObjectType: "Material" {\n'
+    + '\t\tCount: 1\n'
+    + '\t}\n'
+    + '\tObjectType: "Pose" {\n'
+    + '\t\tCount: 1\n'
+    + '\t}\n'
+    + '\tObjectType: "GlobalSettings" {\n'
+    + '\t\tCount: 1\n'
+    + '\t}\n'
+    + '}\n\n';
+}
+
+/**
+ *
+ */
+function materialProperties(material) {
+  return '\t\tProperties60:  {\n'
+    + '\t\t\tProperty: "ShadingModel", "KString", "", "Lambert"\n'
+    + '\t\t\tProperty: "MultiLayer", "bool", "",0\n'
+    + '\t\t\tProperty: "EmissiveColor", "ColorRGB", "",0,0,0\n'
+    + '\t\t\tProperty: "EmissiveFactor", "double", "",0.0000\n'
+    + '\t\t\tProperty: "AmbientColor", "ColorRGB", "",1,1,1\n'
+    + '\t\t\tProperty: "AmbientFactor", "double", "",0.0000\n'
+    + `\t\t\tProperty: "DiffuseColor", "ColorRGB", "",${material.diffuse}\n`
+    + '\t\t\tProperty: "DiffuseFactor", "double", "",1.0000\n'
+    + '\t\t\tProperty: "Bump", "Vector3D", "",0,0,0\n'
+    + '\t\t\tProperty: "TransparentColor", "ColorRGB", "",1,1,1\n'
+    + '\t\t\tProperty: "TransparencyFactor", "double", "",0.0000\n'
+    + `\t\t\tProperty: "SpecularColor", "ColorRGB", "",${material.specular}\n`
+    + '\t\t\tProperty: "SpecularFactor", "double", "",1.0000\n'
+    + `\t\t\tProperty: "ShininessExponent", "double", "",${material.shininess}\n`
+    + '\t\t\tProperty: "ReflectionColor", "ColorRGB", "",0,0,0\n'
+    + '\t\t\tProperty: "ReflectionFactor", "double", "",1\n'
+    + '\t\t\tProperty: "Emissive", "ColorRGB", "",0,0,0\n'
+    + '\t\t\tProperty: "Ambient", "ColorRGB", "",1,1,1\n'
+    + `\t\t\tProperty: "Diffuse", "ColorRGB", "",${material.diffuse}\n`
+    + `\t\t\tProperty: "Specular", "ColorRGB", "",${material.specular}\n`
+    + `\t\t\tProperty: "Shininess", "double", "",${material.shininess}\n`
+    + `\t\t\tProperty: "Opacity", "double", "",${material.opacity}\n`
+    + '\t\t\tProperty: "Reflectivity", "double", "",0\n'
+    + '\t\t}\n'
+    + '\t}\n';
+}
+
+/**
+ *
+ */
+function copyArrays(destArray, fromPositionInDestArray, sourceArray, fromPositionInSourceArray, numberOfElements) {
+  for (let j = 0; j < numberOfElements; ++j) {
+    destArray[fromPositionInDestArray] = sourceArray[j + fromPositionInSourceArray];
+    fromPositionInDestArray++;
+  }
+}
 
 export default {
   reworkColors,
@@ -323,4 +396,7 @@ export default {
   defaultMaterialLayer,
   defaultLayerBlock,
   addVerticesIndices,
+  defaultDefinitions,
+  materialProperties,
+  copyArrays,
 };
