@@ -1,8 +1,6 @@
 import * as THREE from 'three';
-import { Vector4 } from 'three';
 import _ from 'lodash';
 import Exporter from './Exporter';
-import gfxutils from '../../gfx/gfxutils';
 import ZClippedMesh from '../../gfx/meshes/ZClippedMesh';
 
 /**
@@ -19,10 +17,6 @@ export default class FBXExporter extends Exporter {
     /* Data */
     this._data = source;
     /* Misc */
-    this._outputFile = null;
-    /* Exact data */
-    /* Source is somewhat like ComplexVisual, but we need to catch THREE.Mesh objects */
-    this._meshes = [];
     this._materials = [];
     this._models = [];
   }
@@ -90,9 +84,11 @@ export default class FBXExporter extends Exporter {
     const count = 3; /* Biggest mystery here. Every 6.1. file has this field = 3. Why?  I think that here must be
     some sort of 'let count = calculateCount()' or something, cos i _think_ that it's object, geometry,material etc count */
     /* Then we must know how many and exactly what Object Types there are */
-    const objectTypes = []; /* Somewhat like 'let objectTypes = getObjectTypes()' or something. What about count of that objects? */
+    /* Next variable (objectTypes) is left only because we might in some distant future automatically generate this section. */
+    // const objectTypes = []; /* Somewhat like 'let objectTypes = getObjectTypes()' or something. What about count of that objects? */
     const mandatoryComment = '; Object definitions\n'
      + ';------------------------------------------------------------------\n\n';
+    /* Seems like this numbers didn't affect anything, so this section left because everything working with it looking that way */
     const definitions = 'Definitions:  {\n'
       + `\tVersion: ${Version}\n`
       + `\tCount: ${count}\n`
@@ -117,11 +113,12 @@ export default class FBXExporter extends Exporter {
 
   /**
    * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
+   * basically, every triangle in Miew has been represented hat way (e.g.) : 0,1,7, but we must (for FBX) rework that into: 0,1,-8.
    * @param{Int32Array} array - indices buffer
    * @returns{Int32Array} reworked array.
    */
   _reworkIndices(array) {
-    const clonedArray = new Int32Array(array.length); /* TODO: rework this to bigint64 */
+    const clonedArray = new Int32Array(array.length); /* In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers */
     clonedArray.set(array);
     for (let i = 2; i < clonedArray.length; i += 3) {
       clonedArray[i] *= -1;
@@ -132,6 +129,7 @@ export default class FBXExporter extends Exporter {
 
   /**
    * Extension to standard Float32Arrays.
+   * This is the fastest way to concat TypedArrays in js (by observations).
    * @param{Float32Array} first  - destination array
    * @param{Float32Array} second - source array
    * @returns{Float32Array} resulting concatenated array
@@ -139,15 +137,14 @@ export default class FBXExporter extends Exporter {
   _Float32Concat(first, second) {
     const firstLength = first.length;
     const result = new Float32Array(firstLength + second.length);
-
     result.set(first);
     result.set(second, firstLength);
-
     return result;
   }
 
   /**
    * Extension to standard Int32Arrays.
+   * This is the fastest way to concat TypedArrays in js (by observations).
    * @param{Int32Array} first  - destination array
    * @param{Int32Array} second - source array
    * @returns{Int32Array} resulting concatenated array
@@ -155,17 +152,16 @@ export default class FBXExporter extends Exporter {
   _Int32Concat(first, second) {
     const firstLength = first.length;
     const result = new Int32Array(firstLength + second.length);
-
     result.set(first);
     result.set(second, firstLength);
-
     return result;
   }
 
   /**
    * Reworking colors buffer + alpha, see https://raw.githubusercontent.com/wayt/Bomberman/master/Assets/fire.fbx
+   * Basically we have two arrays - color array and alpha array, and we need to put 1 alpha after 3 colors, so therefore this algorithm presents.
    * @param{array} colorArray - colors buffer
-   * @param{Float32Array} alphaArray - alpha buffer
+   * @param{[*]} alphaArray - alpha buffer
    * @returns{Float32Array} reworked array.
    */
   _reworkColors(colorArray, alphaArray) {
@@ -186,10 +182,14 @@ export default class FBXExporter extends Exporter {
       alphaArrIdx++;
       clonedArrIdx += 4;
     }
-
     return clonedArray;
   }
 
+  /**
+   * Adding gathered information about Models to resulting string.
+   * Reminder - there may be more then 1 model in scene, but we must place materials after ALL models.
+   * @returns {string} string containing all models (vertices, indices, colors, normals etc)
+   */
   _addModelsToResult() {
     let allModels = '';
     for (let i = 0; i < this._models.length; ++i) {
@@ -278,10 +278,9 @@ export default class FBXExporter extends Exporter {
       const shading = 'Y';
       const culling = 'CullingOff';
       const geometryVersion = 124;
-      /* console.log(Buffer.byteLength(`${model.vertices}`, 'utf8'));
-      console.log(Buffer.byteLength(`${model.indices}`, 'utf8'));
-      console.log(Buffer.byteLength(`${model.normals}`, 'utf8'));
-      console.log(Buffer.byteLength(`${model.colors}`, 'utf8')); */
+      /* About _correctArrayNotation: Float32Arrays will contains only Float32 numbers, which implies that it will be floating points with 17 numbers after point.
+      * We cannot (and it's logically incorrect) save all this information, so we convert this Float32Array into Array-like object with numbers with only 6 numbers after point
+      * Reminder - this is big memory loss (as we must save at one moment two arrays with similar information) */
       const verticesIndices = `\t\tMultiLayer: ${multiLayer}\n`
         + `\t\tMultiTake: ${multiTake}\n`
         + `\t\tShading: ${shading}\n`
@@ -289,7 +288,8 @@ export default class FBXExporter extends Exporter {
         + `\t\tVertices: ${this._correctArrayNotation(model.vertices)}\n\n`
         + `\t\tPolygonVertexIndex: ${model.indices}\n\n`
         + `\t\tGeometryVersion: ${geometryVersion}\n`;
-      /* Setting up layers */
+      /* Setting up layers
+      * Some positions are still not quite easy to understand, and as soon as it will not crash without them - they will be set with some default values */
       const layerElementNormalNumber = 0; /* IDK what that is */
       const layerElementNormalVersion = 101; /* IDK what version means */
       const layerElementNormalName = ''; /* IDK what name means */
@@ -314,7 +314,7 @@ export default class FBXExporter extends Exporter {
         + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
         + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
         + `\t\t\tColors: ${this._correctArrayNotation(model.colors)}\n`
-        + `\t\t\tColorIndex: ${[...Array(model.vertices.length / 3).keys()]}\n`
+        + `\t\t\tColorIndex: ${[...Array(model.vertices.length / 3).keys()]}\n` /* As said - fastest and easiest way to produce [0, 1, .....] array */
         + '\t\t}\n';
       /* Do we need automatically check and build this info? In Miew we always have these layers */
       const layer = '\t\tLayer: 0 {\n'
@@ -343,10 +343,8 @@ export default class FBXExporter extends Exporter {
       // this._models[i] = null; /* That's free i guess? */
       const resultingLayer = layerElementNormal + layerElementSmoothing + layerElementUV + layerElementTexture + layerElementColor + layerElementMaterial + layer;
       allModels += (modelProperties + verticesIndices + resultingLayer);
-
     }
-    console.log('Models done');
-    // console.log(Buffer.byteLength(allModels, 'utf8'));
+    // console.log('Models done');
     return allModels;
   }
 
@@ -399,13 +397,18 @@ export default class FBXExporter extends Exporter {
    * @returns {[]} Array of numbers in correct notation
    */
   _correctArrayNotation(array) {
-    let reworkedArray = [];
+    const reworkedArray = [];
     for (let i = 0; i < array.length; ++i) {
       reworkedArray[i] = parseFloat(array[i].toFixed(6)); /* Default, i guess? */
     }
     return reworkedArray;
   }
 
+  /**
+   * Checking if given material already was registered in materials pool (no need to create new one)
+   * @param {object} material - given material
+   * @returns {number} number of model-material pair
+   */
   _checkExistingMaterial(material) {
     for (let i = 0; i < this._materials.length; ++i) {
       if (JSON.stringify(material) === JSON.stringify(this._materials[i])) {
@@ -416,6 +419,11 @@ export default class FBXExporter extends Exporter {
     return this._models.length;
   }
 
+  /**
+   * Calculating max index in indices array of given model
+   * @param {Number} modelNumber - given model
+   * @returns {number} maximum index
+   */
   _calculateMaxIndex(modelNumber) {
     if (this._models.length === modelNumber) {
       return 0;
@@ -423,13 +431,20 @@ export default class FBXExporter extends Exporter {
     return (this._models[modelNumber].vertices.length / 3 - 1);
   }
 
+  /**
+   * Adding model to pool of models or extend existing ones
+   * @param {Number} modelNumber - number of model-material pair
+   * @param {object} model - given model
+   * @param material - material of given model
+   */
   _addModelToPool(modelNumber, model, material) {
-    /* If that's new model*/
+    /* If that's new model */
     if (this._models.length === modelNumber) {
       this._models.push(model);
       this._materials.push(material);
     } else {
-      /* Adding new vertices etc to existing model */
+      /* Adding new vertices etc to existing model
+      * Reminder - this way is better in sense of performance */
       const oldModel = this._models[modelNumber];
       const newVertices = new Float32Array(oldModel.vertices.length + model.vertices.length);
       const newNormals = new Float32Array(oldModel.normals.length + model.normals.length);
@@ -444,10 +459,6 @@ export default class FBXExporter extends Exporter {
       newIndices.set(oldModel.indices, 0);
       newIndices.set(model.indices, oldModel.indices.length);
       this._models[modelNumber] = {
-        /* vertices: [oldModel.vertices, model.vertices].join(''),
-        indices: [oldModel.indices, model.indices].join(''),
-        normals: [oldModel.normals, model.normals].join(''),
-        colors: [oldModel.colors, model.colors].join(''), */
         vertices: newVertices,
         indices: newIndices,
         normals: newNormals,
@@ -455,6 +466,7 @@ export default class FBXExporter extends Exporter {
       };
     }
   }
+
   /**
    * Save geometry info from mesh to this._models.
    */
@@ -462,24 +474,22 @@ export default class FBXExporter extends Exporter {
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
     const material = this._collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
-    let lVertices = [];
-    let lIndices = [];
-    let lNormals = [];
     let lAlphas = [];
     let lColors = [];
     /* Collect info about vertices + indices + material */
-    lVertices = mesh.geometry.attributes.position.array; /* Vertices either way are copying directly */
+    const lVertices = mesh.geometry.attributes.position.array; /* Vertices either way are copying directly */
     /* Different style with indices - if we have modelNumber => we must to add indices to existing ones */
-    /* Todo: 1 loop? */
+    /* 1 loop? */
     const maxIndex = this._calculateMaxIndex(modelNumber);
-    lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
+    let lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
     if (maxIndex !== 0) {
       for (let i = 0; i < lIndices.length; ++i) {
         lIndices[i] += maxIndex + 1;
       }
     }
     lIndices = this._reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
-    lNormals = mesh.geometry.attributes.normal.array;
+    const lNormals = mesh.geometry.attributes.normal.array;
+    /* For some surfaces which does not have alpha color arrays */
     if (!(mesh instanceof ZClippedMesh)) {
       lAlphas = mesh.geometry.attributes.alphaColor.array;
     }
@@ -488,25 +498,19 @@ export default class FBXExporter extends Exporter {
     }
     /* We have now all information about model, let's add to existing one if it's here */
     if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
-       const model = {
+      const model = {
         vertices: lVertices,
         indices: lIndices,
         normals: lNormals,
         colors: lColors,
       };
       this._addModelToPool(modelNumber, model, material);
-      /* this._models.push({
-        vertices: this._correctArrayNotation(lVertices),
-        indices: lIndices,
-        normals: this._correctArrayNotation(lNormals),
-        colors: this._correctArrayNotation(lColors),
-      });
-      this._materials.push(this._collectMaterialInfo(mesh)); */
-    } /* else do nothing */
+    } /* else do nothing. Some meshes does not have any vertices so why would we add them here? */
   }
 
   /**
-   * Add Material info to this._materials.
+   * Collect Material info from given mesh.
+   * @returns {object} gathered material
    */
   _collectMaterialInfo(mesh) {
     const lDiffuse = mesh.material.uberOptions.diffuse.toArray();
@@ -523,6 +527,7 @@ export default class FBXExporter extends Exporter {
 
   /**
    * Clone colors from one to number of vertices
+   * @returns {Float32Array} array with cloned colors
    */
   _cloneColors(numVertices, color) {
     const clonedArray = new Float32Array(numVertices * 4); /* RGBA for every vertex */
@@ -534,6 +539,7 @@ export default class FBXExporter extends Exporter {
 
   /**
    * Collect instanced spheres geometry and materials.
+   * @param {object} mesh - mesh with instanced spheres info
    */
   _collectSpheresInfo(mesh) {
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
@@ -554,7 +560,7 @@ export default class FBXExporter extends Exporter {
       /* Firstly, collect some basic instanced parameters */
       const [lVertices, lNormals, lIndices, lColors] = this._collectRawInstancedGeometryParameters(mesh, instanceIndex);
       /* Extract offset for one exact object (instance) */
-      const objectOffset = new Vector4(meshOffset[idxOffset], meshOffset[idxOffset + 1],
+      const objectOffset = new THREE.Vector4(meshOffset[idxOffset], meshOffset[idxOffset + 1],
         meshOffset[idxOffset + 2], meshOffset[idxOffset + 3]);
       idxOffset += 4;
       /* For every vertex calculate it's real position (vertex.xyz * scale) + offset */
@@ -568,13 +574,10 @@ export default class FBXExporter extends Exporter {
       resNormals.set(lNormals, instanceIndex * numVertices * 3);
       resColors.set(lColors, instanceIndex * numVertices * 4);
       resIndices.set(lIndices, instanceIndex * numIndices);
-      /* resVertices = this._Float32Concat(resVertices, lVertices);
-      resNormals = this._Float32Concat(resNormals, lNormals);
-      resColors = this._Float32Concat(resColors, lColors);
-      resIndices = this._Int32Concat(resIndices, lIndices); */
-      if (instanceIndex % 1000 === 0) {
+      /* Debug purposes */
+      /* if (instanceIndex % 1000 === 0) {
         console.log(`${instanceIndex} out of ${numInstances} spheres done`);
-      }
+      } */
     }
     const model = {
       vertices: resVertices,
@@ -583,19 +586,13 @@ export default class FBXExporter extends Exporter {
       colors: resColors,
     };
     this._addModelToPool(modelNumber, model, material);
-    /* For every float array we need to be sure that there are no numbers in exponential notation */
-    /* this._models.push({
-      vertices: this._correctArrayNotation(resVertices),
-      indices: this._correctArrayNotation(resIndices),
-      normals: resNormals,
-      colors: this._correctArrayNotation(resColors),
-    });
-
-    this._materials.push(this._collectMaterialInfo(mesh)); /* Material info. Material for every sphere is the same so we want to collect it only 1 time */
   }
 
   /**
    * Collect some basic parameters.
+   * @param {object} mesh - mesh with instanced objects
+   * @param {Number} instanceIndex - number of instance in mesh
+   * @returns {Array} array of gathered parameters
    */
   _collectRawInstancedGeometryParameters(mesh, instanceIndex) {
     const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
@@ -607,6 +604,9 @@ export default class FBXExporter extends Exporter {
 
   /**
    * Collect and rework indices in big model notation.
+   * @param {object} mesh - mesh with instanced objects
+   * @param {Number} instance - number of instance in mesh
+   * @returns {Int32Array} array of gathered indices
    */
   _collectInstancedIndices(mesh, instance) {
     const material = this._collectMaterialInfo(mesh);
@@ -614,6 +614,7 @@ export default class FBXExporter extends Exporter {
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
     const lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
     /* As we making one big model we need to carefully add resVertices.length to every index in lIndices */
+    /* Algorithm below is a bit cognitively complicated, maybe refactor here at some point? */
     const maxIndex = mesh.geometry.attributes.position.array.length / 3 - 1;
     let changeIndex = 2;
     for (let k = 0; k < lIndices.length; ++k) {
@@ -629,12 +630,14 @@ export default class FBXExporter extends Exporter {
         changeIndex += 3;
       }
     }
-    // lIndices = this._reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
     return lIndices;
   }
 
   /**
    * Collect and rework colors in big model notation.
+   * @param {object} mesh - mesh with instanced objects
+   * @param {Number} instanceIndex - number of instance in mesh
+   * @returns {Float32Array} array of gathered instanced colors
    */
   _collectInstancedColors(mesh, instanceIndex) {
     const idxColors = (instanceIndex * 3); /* that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc */
@@ -647,6 +650,12 @@ export default class FBXExporter extends Exporter {
     return lColors;
   }
 
+  /**
+   * Calculate parameters for one cylinder in given mesh.
+   * @param {object} mesh - mesh with instanced objects
+   * @param {Number} instanceIndex - number of instance in mesh
+   * @returns {*[]} array of gathered transformations of vertices and normals
+   */
   _calculateCylinderTransform(mesh, instanceIndex) {
     /* Misc variables */
     const matVector1 = mesh.geometry.attributes.matVector1.array;
@@ -662,13 +671,14 @@ export default class FBXExporter extends Exporter {
       matVector1[idxOffset + 1], matVector2[idxOffset + 1], matVector3[idxOffset + 1], 0,
       matVector1[idxOffset + 2], matVector2[idxOffset + 2], matVector3[idxOffset + 2], 0,
       matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
+    /* For a reason we must perform transpose of that matrix */
     transformCylinder.transpose();
+    const normVec = new THREE.Vector4();
+    const vertVec = new THREE.Vector4();
     /* Applying offsets / transformation to every vertex */
     for (let j = 0; j < lVertices.length; j += 3) {
-      const vertVec = new THREE.Vector4();
       vertVec.set(lVertices[j], lVertices[j + 1], lVertices[j + 2], 1);
       vertVec.applyMatrix4(transformCylinder);
-      const normVec = new THREE.Vector4();
       normVec.set(lNormals[j], lNormals[j + 1], lNormals[j + 2], 0.0);
       normVec.applyMatrix4(transformCylinder);
 
@@ -682,17 +692,12 @@ export default class FBXExporter extends Exporter {
     return [lVertices, lNormals];
   }
 
-  _myMemset(destArray, sourceArray, positionInDestArray) {
-    /* for (let i = 0; i < sourceArray.length; ++i) {
-      destArray[positionInDestArray + i] = sourceArray[i];
-    } */
-    destArray.set(sourceArray, positionInDestArray);
-  }
-
   /**
-   * Divide cylinder (add additional vertexes) for prettiness
+   * Getting all instanced cylinders from given mesh.
+   * Divide cylinder (add additional vertexes) for prettiness therefore algorithm is a bit complicated
+   * @param {object} mesh - given mesh with instanced cylinders
    */
-  _divideCylinders(mesh) {
+  _collectCylindersInfo(mesh) {
     const material = this._collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     /* Algorithm:
@@ -734,7 +739,7 @@ export default class FBXExporter extends Exporter {
     let maxIndex = 0;
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
     /* Main instances loop */
-    for (let instanceIndex = 0; instanceIndex < numInstances - 1; ++instanceIndex) { /* Proceed every instance TODO: -1 MAGIC */
+    for (let instanceIndex = 0; instanceIndex < numInstances - 1; ++instanceIndex) { /* Proceed every instance. Additional instance is strange. */
       /* Grab vertices and normals for transformed (scale, rotation, translation) cylinder */
       const [lVertices, lNormals] = this._calculateCylinderTransform(mesh, instanceIndex);
       const numVertices = lVertices.length / 3; /* That's the original number of vertices */
@@ -833,7 +838,7 @@ export default class FBXExporter extends Exporter {
         reworkedIndices[indexIndicesArray + 2] = (lIndices[j + 2] - offsetIndices);
         indexIndicesArray += 3;
       }
-      maxIndex = Math.max(...reworkedIndices); /* TODO: VERY UNSAFE! */
+      maxIndex = Math.max(...reworkedIndices); /* VERY UNSAFE! */
       /* Ending */
       /* Saving info from one instance to resulting model */
       resVertices.set(reworkedVertices, curResVerticesIndex);
@@ -854,12 +859,17 @@ export default class FBXExporter extends Exporter {
     resIndices = resIndices.subarray(0, curResIndicesIndex);
     resColors = resColors.subarray(0, curResColorsIndex);
     resNormals = resNormals.subarray(0, curResNormalsIndex);
+    /* Traverse all cells in array and add max index. For cells with negative numbers we must subtract maxIndex */
     if (maxIndexInModels !== 0) {
       for (let k = 0; k < resIndices.length; ++k) {
-        resIndices[k] > 0 ? resIndices[k] += (maxIndexInModels + 1) : resIndices[k] -= (maxIndexInModels + 1); // same as number instanceIndex * (numVertices + numVertices / 3)) but more unified
+        if (resIndices[k] > 0) {
+          resIndices[k] += (maxIndexInModels + 1);
+        } else {
+          resIndices[k] -= (maxIndexInModels + 1);
+        }
       }
     }
-    /* For every float array we need to be sure that there are no numbers in exponential notation. They already are */
+    /* For every float array we need to be sure that there are no numbers in exponential notation. */
     const model = {
       vertices: resVertices,
       indices: resIndices,
@@ -870,49 +880,11 @@ export default class FBXExporter extends Exporter {
   }
 
   /**
-   * Collect instanced cylinders geometry and materials.
-   */
-  _collectCylindersInfo(mesh) {
-    const testVersionDivideCylinder = true;
-    if (!testVersionDivideCylinder) { /* if we dont divide cylinders */
-      /* Geometry info */
-      let resVertices = new Float32Array(0);
-      let resIndices = new Float32Array(0);
-      let resNormals = new Float32Array(0);
-      let resColors = new Float32Array(0);
-      const numInstances = mesh.geometry.attributes.alphaColor.count;
-      for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
-        /* Firstly, collect some instanced parameters
-        * vertices are copied directly
-        * normals are copied directly
-        * indices are copied and reworked to the big model notation
-        * colors are copied and cloned for each vertex */
-        const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
-        const lColors = this._collectInstancedColors(mesh, instanceIndex);
-        /* Grab vertices and normals for transformed (scale, rotation, translation) cylinder */
-        const [lVertices, lNormals] = this._calculateCylinderTransform(mesh, instanceIndex);
-        /* Saving info from one instance to resulting model */
-        resVertices = this._Float32Concat(resVertices, lVertices);
-        resNormals = this._Float32Concat(resNormals, lNormals);
-        resColors = this._Float32Concat(resColors, lColors);
-        resIndices = this._Int32Concat(resIndices, lIndices);
-      }
-      /* For every float array we need to be sure that there are no numbers in exponential notation */
-      this._models.push({
-        vertices: this._correctArrayNotation(resVertices),
-        indices: resIndices,
-        normals: this._correctArrayNotation(resNormals),
-        colors: this._correctArrayNotation(resColors),
-      });
-      this._materials.push(this._collectMaterialInfo(mesh));
-    } else this._divideCylinders(mesh); /* if we want some prettiness */
-  }
-
-  /**
    * Collect instanced models and materials.
+   * @param {object} mesh - given mesh with instanced something (spheres or cylinders)
    */
   _collectInstancedInfo(mesh) {
-    if (typeof mesh.geometry.attributes.offset !== 'undefined') { /* TODO: That's spheres? What is the notation? */
+    if (mesh.geometry.constructor.name.includes('Spheres')) {
       this._collectSpheresInfo(mesh);
     } else { /* Cylinders */
       this._collectCylindersInfo(mesh);
@@ -927,14 +899,14 @@ export default class FBXExporter extends Exporter {
     this._data.traverse((object) => {
       if (object instanceof THREE.Mesh) {
         const mesh = object;
-        // if (this._meshes[i].layers.test(gfxutils.LAYERS.DEFAULT)) { /* It means something */
-        if (mesh.layers.mask === 1 || mesh.layers.mask === 4) { /* TODO: Implement what's written on top of that */
+        // if (mesh.layers.test(gfxutils.LAYERS.DEFAULT)) { /* It means something */
+        if (mesh.layers.mask === 1 || mesh.layers.mask === 4) { /* How can we use .test method from threejs layers if LAYERS isn't treejs layers? 1 is default, 4 is transparent */
           if (mesh.geometry.type === 'InstancedBufferGeometry') { /* If instancing */
             this._collectInstancedInfo(mesh);
           } else { /* Not instancing */
             this._collectStraightGeometryInfo(mesh);
           }
-          console.log('mesh is done');
+          // console.log('mesh is done');
         }
       }
     });
@@ -1041,12 +1013,13 @@ export default class FBXExporter extends Exporter {
    * Entry point to exporter.
    */
   exportSync() {
-    const header = this.createFBXHeader();
-    const definitions = this.createDefinitions();
-    const objects = this.createObjects();
-    const relations = this.createRelations();
-    const connections = this.createConnections();
-    const animation = this.createAnimation();
+    /* Creating mandatory blocks for .fbx files: */
+    const header = this.createFBXHeader(); /* FBXHeader block */
+    const definitions = this.createDefinitions(); /* Definitions block */
+    const objects = this.createObjects(); /* Objects - Models and Materials block */
+    const relations = this.createRelations(); /* Relations block */
+    const connections = this.createConnections(); /* Connections (e.g. between models and materials) */
+    const animation = this.createAnimation(); /* Animation and takes block (currently empty) */
     return header + definitions + objects + relations + connections + animation;
   }
 }

@@ -42,7 +42,6 @@ import capabilities from './gfx/capabilities';
 import WebVRPoC from './gfx/vr/WebVRPoC';
 import vertexScreenQuadShader from './gfx/shaders/ScreenQuad.vert';
 import fragmentScreenQuadFromDistTex from './gfx/shaders/ScreenQuadFromDistortionTex.frag';
-import FBXExporter from "./io/exporters/FBXExporter";
 
 const {
   selectors,
