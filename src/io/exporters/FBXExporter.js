@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import _ from 'lodash';
 import Exporter from './Exporter';
 import ZClippedMesh from '../../gfx/meshes/ZClippedMesh';
+import utils from '../../utils';
+import FBXUtils from './FBXExporterUtils';
 
 /**
  * FBX file format exporter.
@@ -112,80 +114,6 @@ export default class FBXExporter extends Exporter {
   }
 
   /**
-   * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
-   * basically, every triangle in Miew has been represented hat way (e.g.) : 0,1,7, but we must (for FBX) rework that into: 0,1,-8.
-   * @param{Int32Array} array - indices buffer
-   * @returns{Int32Array} reworked array.
-   */
-  _reworkIndices(array) {
-    const clonedArray = new Int32Array(array.length); /* In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers */
-    clonedArray.set(array);
-    for (let i = 2; i < clonedArray.length; i += 3) {
-      clonedArray[i] *= -1;
-      clonedArray[i]--;
-    }
-    return clonedArray;
-  }
-
-  /**
-   * Extension to standard Float32Arrays.
-   * This is the fastest way to concat TypedArrays in js (by observations).
-   * @param{Float32Array} first  - destination array
-   * @param{Float32Array} second - source array
-   * @returns{Float32Array} resulting concatenated array
-   */
-  _Float32Concat(first, second) {
-    const firstLength = first.length;
-    const result = new Float32Array(firstLength + second.length);
-    result.set(first);
-    result.set(second, firstLength);
-    return result;
-  }
-
-  /**
-   * Extension to standard Int32Arrays.
-   * This is the fastest way to concat TypedArrays in js (by observations).
-   * @param{Int32Array} first  - destination array
-   * @param{Int32Array} second - source array
-   * @returns{Int32Array} resulting concatenated array
-   */
-  _Int32Concat(first, second) {
-    const firstLength = first.length;
-    const result = new Int32Array(firstLength + second.length);
-    result.set(first);
-    result.set(second, firstLength);
-    return result;
-  }
-
-  /**
-   * Reworking colors buffer + alpha, see https://raw.githubusercontent.com/wayt/Bomberman/master/Assets/fire.fbx
-   * Basically we have two arrays - color array and alpha array, and we need to put 1 alpha after 3 colors, so therefore this algorithm presents.
-   * @param{array} colorArray - colors buffer
-   * @param{[*]} alphaArray - alpha buffer
-   * @returns{Float32Array} reworked array.
-   */
-  _reworkColors(colorArray, alphaArray) {
-    if (alphaArray.length === 0) {
-      alphaArray = new Float32Array(colorArray.length / 3);
-      for (let i = 0; i < alphaArray.length; ++i) {
-        alphaArray.set([1], i);
-      }
-    }
-    const clonedArray = new Float32Array(colorArray.length + alphaArray.length);
-    let alphaArrIdx = 0;
-    let clonedArrIdx = 0;
-    for (let i = 0; i < colorArray.length; i += 3) {
-      clonedArray.set([colorArray[i]], clonedArrIdx); /* R */
-      clonedArray.set([colorArray[i + 1]], clonedArrIdx + 1); /* G */
-      clonedArray.set([colorArray[i + 2]], clonedArrIdx + 2); /* B */
-      clonedArray.set([alphaArray[alphaArrIdx]], clonedArrIdx + 3); /* A */
-      alphaArrIdx++;
-      clonedArrIdx += 4;
-    }
-    return clonedArray;
-  }
-
-  /**
    * Adding gathered information about Models to resulting string.
    * Reminder - there may be more then 1 model in scene, but we must place materials after ALL models.
    * @returns {string} string containing all models (vertices, indices, colors, normals etc)
@@ -199,79 +127,7 @@ export default class FBXExporter extends Exporter {
       /* Setting up default properties */
       const modelProperties = `\tModel: "${modelName}", "Mesh" {\n`
         + `\t\tVersion: ${Version}\n`
-        + '\t\tProperties60: {\n'
-        + '\t\t\tProperty: "QuaternionInterpolate", "bool", "",0\n'
-        + '\t\t\tProperty: "Visibility", "Visibility", "A",1\n'
-        + '\t\t\tProperty: "Lcl Translation", "Lcl Translation", "A",0.000000000000000,0.000000000000000,-1789.238037109375000\n'
-        + '\t\t\tProperty: "Lcl Rotation", "Lcl Rotation", "A",0.000009334667643,-0.000000000000000,0.000000000000000\n'
-        + '\t\t\tProperty: "Lcl Scaling", "Lcl Scaling", "A",1.000000000000000,1.000000000000000,1.000000000000000\n'
-        + '\t\t\tProperty: "RotationOffset", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "RotationPivot", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "ScalingOffset", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "ScalingPivot", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "TranslationActive", "bool", "",0\n'
-        + '\t\t\tProperty: "TranslationMin", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "TranslationMax", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "TranslationMinX", "bool", "",0\n'
-        + '\t\t\tProperty: "TranslationMinY", "bool", "",0\n'
-        + '\t\t\tProperty: "TranslationMinZ", "bool", "",0\n'
-        + '\t\t\tProperty: "TranslationMaxX", "bool", "",0\n'
-        + '\t\t\tProperty: "TranslationMaxY", "bool", "",0\n'
-        + '\t\t\tProperty: "TranslationMaxZ", "bool", "",0\n'
-        + '\t\t\tProperty: "RotationOrder", "enum", "",0\n'
-        + '\t\t\tProperty: "RotationSpaceForLimitOnly", "bool", "",0\n'
-        + '\t\t\tProperty: "AxisLen", "double", "",10\n'
-        + '\t\t\tProperty: "PreRotation", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "PostRotation", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "RotationActive", "bool", "",0\n'
-        + '\t\t\tProperty: "RotationMin", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "RotationMax", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "RotationMinX", "bool", "",0\n'
-        + '\t\t\tProperty: "RotationMinY", "bool", "",0\n'
-        + '\t\t\tProperty: "RotationMinZ", "bool", "",0\n'
-        + '\t\t\tProperty: "RotationMaxX", "bool", "",0\n'
-        + '\t\t\tProperty: "RotationMaxY", "bool", "",0\n'
-        + '\t\t\tProperty: "RotationMaxZ", "bool", "",0\n'
-        + '\t\t\tProperty: "RotationStiffnessX", "double", "",0\n'
-        + '\t\t\tProperty: "RotationStiffnessY", "double", "",0\n'
-        + '\t\t\tProperty: "RotationStiffnessZ", "double", "",0\n'
-        + '\t\t\tProperty: "MinDampRangeX", "double", "",0\n'
-        + '\t\t\tProperty: "MinDampRangeY", "double", "",0\n'
-        + '\t\t\tProperty: "MinDampRangeZ", "double", "",0\n'
-        + '\t\t\tProperty: "MaxDampRangeX", "double", "",0\n'
-        + '\t\t\tProperty: "MaxDampRangeY", "double", "",0\n'
-        + '\t\t\tProperty: "MaxDampRangeZ", "double", "",0\n'
-        + '\t\t\tProperty: "MinDampStrengthX", "double", "",0\n'
-        + '\t\t\tProperty: "MinDampStrengthY", "double", "",0\n'
-        + '\t\t\tProperty: "MinDampStrengthZ", "double", "",0\n'
-        + '\t\t\tProperty: "MaxDampStrengthX", "double", "",0\n'
-        + '\t\t\tProperty: "MaxDampStrengthY", "double", "",0\n'
-        + '\t\t\tProperty: "MaxDampStrengthZ", "double", "",0\n'
-        + '\t\t\tProperty: "PreferedAngleX", "double", "",0\n'
-        + '\t\t\tProperty: "PreferedAngleY", "double", "",0\n'
-        + '\t\t\tProperty: "PreferedAngleZ", "double", "",0\n'
-        + '\t\t\tProperty: "InheritType", "enum", "",0\n'
-        + '\t\t\tProperty: "ScalingActive", "bool", "",0\n'
-        + '\t\t\tProperty: "ScalingMin", "Vector3D", "",1,1,1\n'
-        + '\t\t\tProperty: "ScalingMax", "Vector3D", "",1,1,1\n'
-        + '\t\t\tProperty: "ScalingMinX", "bool", "",0\n'
-        + '\t\t\tProperty: "ScalingMinY", "bool", "",0\n'
-        + '\t\t\tProperty: "ScalingMinZ", "bool", "",0\n'
-        + '\t\t\tProperty: "ScalingMaxX", "bool", "",0\n'
-        + '\t\t\tProperty: "ScalingMaxY", "bool", "",0\n'
-        + '\t\t\tProperty: "ScalingMaxZ", "bool", "",0\n'
-        + '\t\t\tProperty: "GeometricTranslation", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "GeometricRotation", "Vector3D", "",0,0,0\n'
-        + '\t\t\tProperty: "GeometricScaling", "Vector3D", "",1,1,1\n'
-        + '\t\t\tProperty: "LookAtProperty", "object", ""\n'
-        + '\t\t\tProperty: "UpVectorProperty", "object", ""\n'
-        + '\t\t\tProperty: "Show", "bool", "",1\n'
-        + '\t\t\tProperty: "NegativePercentShapeSupport", "bool", "",1\n'
-        + '\t\t\tProperty: "DefaultAttributeIndex", "int", "",0\n'
-        + '\t\t\tProperty: "Color", "Color", "A+",0,0,0\n'
-        + '\t\t\tProperty: "Size", "double", "",100\n'
-        + '\t\t\tProperty: "Look", "enum", "",1\n'
-        + '\t\t}\n';
+        + `${FBXUtils.defaultProperties}`;
       /* Setting up vertices + indices */
       const multiLayer = 0;
       const multiTake = 1;
@@ -285,7 +141,7 @@ export default class FBXExporter extends Exporter {
         + `\t\tMultiTake: ${multiTake}\n`
         + `\t\tShading: ${shading}\n`
         + `\t\tCulling: "${culling}"\n`
-        + `\t\tVertices: ${this._correctArrayNotation(model.vertices)}\n\n`
+        + `\t\tVertices: ${FBXUtils.correctArrayNotation(model.vertices)}\n\n`
         + `\t\tPolygonVertexIndex: ${model.indices}\n\n`
         + `\t\tGeometryVersion: ${geometryVersion}\n`;
       /* Setting up layers
@@ -298,7 +154,7 @@ export default class FBXExporter extends Exporter {
         + `\t\t\tName: "${layerElementNormalName}"\n`
         + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
         + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
-        + `\t\t\tNormals: ${this._correctArrayNotation(model.normals)}\n`
+        + `\t\t\tNormals: ${FBXUtils.correctArrayNotation(model.normals)}\n`
         + '\t\t}\n';
       /* next few layerElements are not in use, but we left it for maybe further compatibility */
       const layerElementSmoothing = '';
@@ -313,7 +169,7 @@ export default class FBXExporter extends Exporter {
         + `\t\t\tName: "${layerElementColorName}"\n`
         + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
         + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
-        + `\t\t\tColors: ${this._correctArrayNotation(model.colors)}\n`
+        + `\t\t\tColors: ${FBXUtils.correctArrayNotation(model.colors)}\n`
         + `\t\t\tColorIndex: ${[...Array(model.vertices.length / 3).keys()]}\n` /* As said - fastest and easiest way to produce [0, 1, .....] array */
         + '\t\t}\n';
       /* Do we need automatically check and build this info? In Miew we always have these layers */
@@ -392,19 +248,6 @@ export default class FBXExporter extends Exporter {
   }
 
   /**
-   * Rework numbers notation from scientific (exponential) to normal
-   * @param {Float32Array} array - array to be fixed
-   * @returns {[]} Array of numbers in correct notation
-   */
-  _correctArrayNotation(array) {
-    const reworkedArray = [];
-    for (let i = 0; i < array.length; ++i) {
-      reworkedArray[i] = parseFloat(array[i].toFixed(6)); /* Default, i guess? */
-    }
-    return reworkedArray;
-  }
-
-  /**
    * Checking if given material already was registered in materials pool (no need to create new one)
    * @param {object} material - given material
    * @returns {number} number of model-material pair
@@ -472,7 +315,7 @@ export default class FBXExporter extends Exporter {
    */
   _collectStraightGeometryInfo(mesh) {
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
-    const material = this._collectMaterialInfo(mesh);
+    const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     let lAlphas = [];
     let lColors = [];
@@ -487,14 +330,14 @@ export default class FBXExporter extends Exporter {
         lIndices[i] += maxIndex + 1;
       }
     }
-    lIndices = this._reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
+    lIndices = FBXUtils.reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
     const lNormals = mesh.geometry.attributes.normal.array;
     /* For some surfaces which does not have alpha color arrays */
     if (!(mesh instanceof ZClippedMesh)) {
       lAlphas = mesh.geometry.attributes.alphaColor.array;
     }
     if (mesh.geometry.attributes.color.array.length >= 1) {
-      lColors = this._reworkColors(mesh.geometry.attributes.color.array, lAlphas); /* Need to rework this into strange FBX notation */
+      lColors = FBXUtils.reworkColors(mesh.geometry.attributes.color.array, lAlphas); /* Need to rework this into strange FBX notation */
     }
     /* We have now all information about model, let's add to existing one if it's here */
     if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
@@ -509,41 +352,12 @@ export default class FBXExporter extends Exporter {
   }
 
   /**
-   * Collect Material info from given mesh.
-   * @returns {object} gathered material
-   */
-  _collectMaterialInfo(mesh) {
-    const lDiffuse = mesh.material.uberOptions.diffuse.toArray();
-    const lOpacity = mesh.material.uberOptions.opacity;
-    const lShininess = mesh.material.uberOptions.shininess;
-    const lSpecular = mesh.material.uberOptions.specular.toArray();
-    return ({
-      diffuse: lDiffuse,
-      opacity: lOpacity,
-      shininess: lShininess,
-      specular: lSpecular,
-    });
-  }
-
-  /**
-   * Clone colors from one to number of vertices
-   * @returns {Float32Array} array with cloned colors
-   */
-  _cloneColors(numVertices, color) {
-    const clonedArray = new Float32Array(numVertices * 4); /* RGBA for every vertex */
-    for (let i = 0; i < clonedArray.length; i += 4) {
-      clonedArray.set(color, i);
-    }
-    return clonedArray;
-  }
-
-  /**
    * Collect instanced spheres geometry and materials.
    * @param {object} mesh - mesh with instanced spheres info
    */
   _collectSpheresInfo(mesh) {
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
-    const material = this._collectMaterialInfo(mesh);
+    const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     let idxOffset = 0;
     const meshOffset = mesh.geometry.attributes.offset.array;
@@ -609,7 +423,7 @@ export default class FBXExporter extends Exporter {
    * @returns {Int32Array} array of gathered indices
    */
   _collectInstancedIndices(mesh, instance) {
-    const material = this._collectMaterialInfo(mesh);
+    const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
     const lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
@@ -644,9 +458,9 @@ export default class FBXExporter extends Exporter {
     const meshColor = mesh.geometry.attributes.color.array;
     const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
     const lAlphas = [meshAlphaColor[instanceIndex]];
-    const objectColor = this._reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]], lAlphas);
+    const objectColor = FBXUtils.reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]], lAlphas);
     /* For FBX we need to clone color for every vertex */
-    const lColors = this._cloneColors(mesh.geometry.attributes.position.array.length / 3, objectColor);
+    const lColors = FBXUtils.cloneColors(mesh.geometry.attributes.position.array.length / 3, objectColor);
     return lColors;
   }
 
@@ -698,7 +512,7 @@ export default class FBXExporter extends Exporter {
    * @param {object} mesh - given mesh with instanced cylinders
    */
   _collectCylindersInfo(mesh) {
-    const material = this._collectMaterialInfo(mesh);
+    const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     /* Algorithm:
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
@@ -731,10 +545,6 @@ export default class FBXExporter extends Exporter {
     let curResNormalsIndex = 0;
     let curResColorsIndex = 0;
     let curResIndicesIndex = 0;
-    /* let resVertices = new Float32Array(0);
-    let resNormals = new Float32Array(0);
-    let resColors = new Float32Array(0);
-    let resIndices = new Int32Array(0); */
     /* misc */
     let maxIndex = 0;
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
@@ -752,7 +562,7 @@ export default class FBXExporter extends Exporter {
           lIndices[k] += (maxIndex + 1); // same as number instanceIndex * (numVertices + numVertices / 3)) but more unified
         }
       }
-      lIndices = this._reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
+      lIndices = FBXUtils.reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
       let reworkedVertices = null;
       let reworkedNormals = null;
       let reworkedColors = null;
@@ -760,8 +570,8 @@ export default class FBXExporter extends Exporter {
       const lAlphas = [meshAlphaColor[instanceIndex]];
       const idxColors = instanceIndex * 3;
       /* Collect colors for each half of cylinder */
-      const objectColor1 = this._reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
-      const objectColor2 = this._reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
+      const objectColor1 = FBXUtils.reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
+      const objectColor2 = FBXUtils.reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
       /* Do we need to divide cylinders? */
       let needToDivideCylinders = true;
       if (objectColor1 === objectColor2) {
@@ -780,14 +590,14 @@ export default class FBXExporter extends Exporter {
       let indexIndicesArray = 0;
       let indexAdditionalVertices = 0;
       /* Clone colors for one cylinder ( 2 * numVertices / 3) and for another (same number) */
-      const lColors1 = this._cloneColors(2 * numVertices / 3, objectColor1);
+      const lColors1 = FBXUtils.cloneColors(2 * numVertices / 3, objectColor1);
       let lColors2 = null;
       if (needToDivideCylinders) {
-        lColors2 = this._cloneColors(2 * numVertices / 3, objectColor2);
+        lColors2 = FBXUtils.cloneColors(2 * numVertices / 3, objectColor2);
       } else {
-        lColors2 = this._cloneColors(numVertices / 3, objectColor2);
+        lColors2 = FBXUtils.cloneColors(numVertices / 3, objectColor2);
       }
-      reworkedColors = this._Float32Concat(lColors2, lColors1);
+      reworkedColors = utils.Float32Concat(lColors2, lColors1);
       /* Step 1 : first third of vertices and  normals are copied directly */
       /* we can use numVertices here, but logically speaking lVertices.length / 3 is much clearer */
       for (let j = 0; j < lVertices.length / 3; ++j) {
