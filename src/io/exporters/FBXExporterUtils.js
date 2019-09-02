@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import * as THREE from 'three';
+import utils from '../../utils';
 
 /**
  * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
@@ -382,11 +383,130 @@ function copyArrays(destArray, fromPositionInDestArray, sourceArray, fromPositio
   }
 }
 
+/**
+ *
+ */
+function getColorsAndDecideSeparation(mesh, instanceIndex) {
+  const meshColor1 = _.cloneDeep(mesh.geometry.attributes.color.array);
+  const meshColor2 = _.cloneDeep(mesh.geometry.attributes.color2.array);
+  const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
+  const lAlphas = [meshAlphaColor[instanceIndex]];
+  const idxColors = instanceIndex * 3;
+  const numVertices = mesh.geometry.attributes.position.length / 3; /* That's the original number of vertices */
+  /* Collect colors for each half of cylinder */
+  const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
+  const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
+  const lColors1 = cloneColors(2 * numVertices / 3, objectColor1);
+  let lColors2 = null;
+  let needToDivideCylinders = true;
+  /* Clone colors for one cylinder ( 2 * numVertices / 3) and for another (same number) */
+  if (objectColor1 !== objectColor2) {
+    lColors2 = cloneColors(2 * numVertices / 3, objectColor2);
+  } else {
+    needToDivideCylinders = false;
+    lColors2 = cloneColors(numVertices / 3, objectColor2);
+  }
+  return [utils.Float32Concat(lColors2, lColors1), needToDivideCylinders];
+}
+
+/**
+ *
+ */
+function getReworkedParameters(mesh, instanceIndex, reworkedVertices, reworkedIndices, reworkedNormals, lVertices, lIndices, lNormals, needToDivideCylinders) {
+  const numVertices = lVertices.length / 3; /* That's the original number of vertices */
+  let indexVerticesNormalsArray = 0; /* not using push */
+  let indexIndicesArray = 0;
+  let indexAdditionalVertices = 0;
+  /* Step 1 : first third of vertices and  normals are copied directly */
+  /* we can use numVertices here, but logically speaking lVertices.length / 3 is much clearer */
+  copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 0, lVertices.length / 3);
+  copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, lVertices.length / 3);
+  indexVerticesNormalsArray += lVertices.length / 3;
+  /* Also copying half of indices because other half may have offset if cylinders will be expanded */
+  copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, lIndices.length / 2);
+  indexIndicesArray += lIndices.length / 2;
+  /* Step 2 : adding new vertices and normals and also copying old
+  * We can either full-copy middle vertices or copy them with some shift.
+  * Here is first way - full copying without any shifts */
+  const additionalVertices = [];
+  const additionalNormals = [];
+  copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, lVertices.length / 3, lVertices.length / 3);
+  copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, lNormals.length / 3, lNormals.length / 3);
+  indexVerticesNormalsArray += lVertices.length / 3;
+  copyArrays(additionalVertices, indexAdditionalVertices, lVertices, lVertices.length / 3, lVertices.length / 3);
+  copyArrays(additionalNormals, indexAdditionalVertices, lNormals, lNormals.length / 3, lNormals.length / 3);
+  indexAdditionalVertices += lVertices.length / 3;
+  /* If we need to divide cylinders => we're adding additional vertices */
+  if (needToDivideCylinders) {
+    reworkedVertices.set(additionalVertices, indexVerticesNormalsArray);
+    reworkedNormals.set(additionalNormals, indexVerticesNormalsArray);
+    indexVerticesNormalsArray += indexAdditionalVertices;
+  }
+  /* Last third of vertices */
+  copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 2 * lVertices.length / 3, lVertices.length / 3);
+  copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * lNormals.length / 3, lNormals.length / 3);
+  indexVerticesNormalsArray += lVertices.length / 3;
+  /* Adding last portion of indices simply as first half of indices but with 2 * number of vertices / 3 addition if needed */
+  let offsetIndices = 0;
+  if (needToDivideCylinders) {
+    offsetIndices = 2 * numVertices / 3;
+  }
+  for (let j = 0; j < lIndices.length / 2; j += 3) {
+    reworkedIndices[indexIndicesArray] = (lIndices[j] + offsetIndices);
+    reworkedIndices[indexIndicesArray + 1] = (lIndices[j + 1] + offsetIndices);
+    reworkedIndices[indexIndicesArray + 2] = (lIndices[j + 2] - offsetIndices);
+    indexIndicesArray += 3;
+  }
+}
+
+/**
+ *
+ */
+function createRegularArrays(mesh) {
+  const indicesArrayLength = mesh.geometry.index.array.length;
+  const verticesArrayLength = mesh.geometry.attributes.position.array.length;
+  const normalsArrayLength = mesh.geometry.attributes.normal.array.length;
+  const indexArray = new Int32Array(indicesArrayLength);
+  const normalsArray = new Float32Array(normalsArrayLength);
+  const vertexArray = new Float32Array(verticesArrayLength);
+  return [indexArray, normalsArray, vertexArray];
+}
+
+/**
+ *
+ */
+function createExtendedArrays(mesh) {
+  const extendedIndicesArrayLength = mesh.geometry.index.array.length;
+  const extendedVerticesArrayLength = mesh.geometry.attributes.position.array.length + mesh.geometry.attributes.position.array.length / 3;
+  const extendedNormalsArrayLength = mesh.geometry.attributes.normal.array.length + mesh.geometry.attributes.normal.array.length / 3;
+  const extendedIndexArray = new Int32Array(extendedIndicesArrayLength);
+  const extendedNormalsArray = new Float32Array(extendedNormalsArrayLength);
+  const extendedVertexArray = new Float32Array(extendedVerticesArrayLength);
+  return [extendedIndexArray, extendedNormalsArray, extendedVertexArray];
+}
+
+/**
+ *
+ */
+function finalizeCylinderParameters(mesh, maxIndexInModels, resVertices, resIndices, resColors, resNormals, curResVerticesIndex, curResIndicesIndex, curResColorsIndex, curResNormalsIndex) {
+  resIndices = resIndices.subarray(0, curResIndicesIndex);
+  /* Traverse all cells in array and add max index. For cells with negative numbers we must subtract maxIndex */
+  if (maxIndexInModels !== 0) {
+    for (let k = 0; k < resIndices.length; ++k) {
+      if (resIndices[k] >= 0) {
+        resIndices[k] += (maxIndexInModels + 1);
+      } else {
+        resIndices[k] -= (maxIndexInModels + 1);
+      }
+    }
+  }
+  return [resVertices.subarray(0, curResVerticesIndex), resIndices, resColors.subarray(0, curResColorsIndex), resNormals.subarray(0, curResNormalsIndex)];
+}
+
+
 export default {
   reworkColors,
   reworkIndices,
-  cloneColors,
-  correctArrayNotation,
   collectMaterialInfo,
   defaultProperties,
   calculateCylinderTransform,
@@ -398,5 +518,9 @@ export default {
   addVerticesIndices,
   defaultDefinitions,
   materialProperties,
-  copyArrays,
+  getColorsAndDecideSeparation,
+  getReworkedParameters,
+  createRegularArrays,
+  createExtendedArrays,
+  finalizeCylinderParameters,
 };

@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import _ from 'lodash';
 import Exporter from './Exporter';
 import ZClippedMesh from '../../gfx/meshes/ZClippedMesh';
-import utils from '../../utils';
 import FBXUtils from './FBXExporterUtils';
 
 /**
@@ -340,128 +339,50 @@ export default class FBXExporter extends Exporter {
   _collectCylindersInfo(mesh) {
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
+    const maxIndexInModels = this._calculateMaxIndex(modelNumber);
     /* Algorithm:
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
     * 2. Add additional vertices by copying second third of vertices, copy normals and add color from color2 array
     * 3. Add color to last third of vertices and we're done */
-    const meshColor1 = _.cloneDeep(mesh.geometry.attributes.color.array);
-    const meshColor2 = _.cloneDeep(mesh.geometry.attributes.color2.array);
-    const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
     const numInstances = mesh.geometry.attributes.alphaColor.count;
     /* Miscellaneous variables and arrays created only for performance reasons */
-    const indicesArrayLength = mesh.geometry.index.array.length;
-    const verticesArrayLength = mesh.geometry.attributes.position.array.length;
-    const normalsArrayLength = mesh.geometry.attributes.normal.array.length;
-    const colorArray = new Float32Array(4 * verticesArrayLength / 3);
-    const indexArray = new Int32Array(indicesArrayLength);
-    const normalsArray = new Float32Array(normalsArrayLength);
-    const vertexArray = new Float32Array(verticesArrayLength);
-    const extendedColorArray = new Float32Array(4 * (verticesArrayLength / 3 + verticesArrayLength / 9));
-    const extendedIndexArray = new Int32Array(indicesArrayLength);
-    const extendedNormalsArray = new Float32Array(normalsArrayLength + normalsArrayLength / 3);
-    const extendedVertexArray = new Float32Array(verticesArrayLength + verticesArrayLength / 3);
+    const verticesLength = mesh.geometry.attributes.position.array.length;
+    const extendedColorsArrayLength = 4 * (verticesLength / 3 + verticesLength / 9);
+    const [indexArray, normalsArray, vertexArray] = FBXUtils.createRegularArrays(mesh);
+    const [extendedIndexArray, extendedNormalsArray, extendedVertexArray] = FBXUtils.createExtendedArrays(mesh);
     /* Resulting variables. Calculating potential maximum length of that arrays for performance reasons */
     let resVertices = new Float32Array(extendedVertexArray.length * numInstances);
     let resIndices = new Float32Array(extendedIndexArray.length * numInstances);
     let resNormals = new Float32Array(extendedNormalsArray.length * numInstances);
-    let resColors = new Float32Array(extendedColorArray.length * numInstances);
-    let curResVerticesIndex = 0;
-    let curResNormalsIndex = 0;
-    let curResColorsIndex = 0;
-    let curResIndicesIndex = 0;
-    /* misc */
-    let maxIndex = 0;
-    const maxIndexInModels = this._calculateMaxIndex(modelNumber);
+    let resColors = new Float32Array(extendedColorsArrayLength * numInstances);
+    let [curResVerticesIndex, curResNormalsIndex, curResColorsIndex, curResIndicesIndex, maxIndex] = [0, 0, 0, 0, 0];
     /* Main instances loop */
     for (let instanceIndex = 0; instanceIndex < numInstances - 1; ++instanceIndex) { /* Proceed every instance. Additional instance is strange. */
       /* Grab vertices and normals for transformed (scale, rotation, translation) cylinder */
       const [lVertices, lNormals] = FBXUtils.calculateCylinderTransform(mesh, instanceIndex);
-      const numVertices = lVertices.length / 3; /* That's the original number of vertices */
       /* Okay now vertices are reworked as we want them. Now it's time for implementing algorithm */
-      /* Collect indices for given cylinder - remember: they will not change what so ever */
+      /* Collect indices for given cylinder - remember: they may slightly change later on */
       let lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
       /* As we making one big model we need to carefully add numVertices to every index in lIndices. Remember - need to add additional vertices (numVertices / 3) as we add them!  */
       if (curResIndicesIndex !== 0) {
         for (let k = 0; k < lIndices.length; ++k) {
-          lIndices[k] += (maxIndex + 1); // same as number instanceIndex * (numVertices + numVertices / 3)) but more unified
+          lIndices[k] += (maxIndex + 1);
         }
       }
       lIndices = FBXUtils.reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
-      let reworkedVertices = null;
-      let reworkedNormals = null;
-      let reworkedColors = null;
-      let reworkedIndices = null;
-      const lAlphas = [meshAlphaColor[instanceIndex]];
-      const idxColors = instanceIndex * 3;
-      /* Collect colors for each half of cylinder */
-      const objectColor1 = FBXUtils.reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
-      const objectColor2 = FBXUtils.reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
-      /* Do we need to divide cylinders? */
-      let needToDivideCylinders = true;
-      if (objectColor1 === objectColor2) {
-        needToDivideCylinders = false;
-        reworkedColors = colorArray;
-        reworkedIndices = indexArray;
-        reworkedNormals = normalsArray;
-        reworkedVertices = vertexArray;
-      } else {
-        reworkedColors = extendedColorArray;
+      let reworkedVertices = indexArray;
+      let reworkedNormals = normalsArray;
+      let reworkedIndices = vertexArray;
+      /* Do we need to divide cylinders? It depends on colors of each half of cylinder */
+      const [reworkedColors, needToDivideCylinders] = FBXUtils.getColorsAndDecideSeparation(mesh, instanceIndex);
+      /* if we dont need to divide cylinders then we dont need extended arrays */
+      if (needToDivideCylinders) {
         reworkedIndices = extendedIndexArray;
         reworkedNormals = extendedNormalsArray;
         reworkedVertices = extendedVertexArray;
       }
-      let indexVerticesNormalsArray = 0; /* not using push */
-      let indexIndicesArray = 0;
-      let indexAdditionalVertices = 0;
-      /* Clone colors for one cylinder ( 2 * numVertices / 3) and for another (same number) */
-      const lColors1 = FBXUtils.cloneColors(2 * numVertices / 3, objectColor1);
-      let lColors2 = null;
-      if (needToDivideCylinders) {
-        lColors2 = FBXUtils.cloneColors(2 * numVertices / 3, objectColor2);
-      } else {
-        lColors2 = FBXUtils.cloneColors(numVertices / 3, objectColor2);
-      }
-      reworkedColors = utils.Float32Concat(lColors2, lColors1);
-      /* Step 1 : first third of vertices and  normals are copied directly */
-      /* we can use numVertices here, but logically speaking lVertices.length / 3 is much clearer */
-      FBXUtils.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 0, lVertices.length / 3);
-      FBXUtils.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, lVertices.length / 3);
-      indexVerticesNormalsArray += lVertices.length / 3;
-      /* Also copying half of indices because other half may have offset if cylinders will be expanded */
-      FBXUtils.copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, lIndices.length / 2);
-      indexIndicesArray += lIndices.length / 2;
-      /* Step 2 : adding new vertices and normals and also copying old
-      * We can either full-copy middle vertices or copy them with some shift.
-      * Here is first way - full copying without any shifts */
-      const additionalVertices = [];
-      const additionalNormals = [];
-      FBXUtils.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, lVertices.length / 3, lVertices.length / 3);
-      FBXUtils.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, lNormals.length / 3, lNormals.length / 3);
-      indexVerticesNormalsArray += lVertices.length / 3;
-      FBXUtils.copyArrays(additionalVertices, indexAdditionalVertices, lVertices, lVertices.length / 3, lVertices.length / 3);
-      FBXUtils.copyArrays(additionalNormals, indexAdditionalVertices, lNormals, lNormals.length / 3, lNormals.length / 3);
-      indexAdditionalVertices += lVertices.length / 3;
-      /* If we need to divide cylinders => we're adding additional vertices */
-      if (needToDivideCylinders) {
-        reworkedVertices.set(additionalVertices, indexVerticesNormalsArray);
-        reworkedNormals.set(additionalNormals, indexVerticesNormalsArray);
-        indexVerticesNormalsArray += indexAdditionalVertices;
-      }
-      /* Last third of vertices */
-      FBXUtils.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 2 * lVertices.length / 3, lVertices.length / 3);
-      FBXUtils.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * lNormals.length / 3, lNormals.length / 3);
-      indexVerticesNormalsArray += lVertices.length / 3;
-      /* Adding last portion of indices simply as first half of indices but with 2 * number of vertices / 3 addition if needed */
-      let offsetIndices = 0;
-      if (needToDivideCylinders) {
-        offsetIndices = 2 * numVertices / 3;
-      }
-      for (let j = 0; j < lIndices.length / 2; j += 3) {
-        reworkedIndices[indexIndicesArray] = (lIndices[j] + offsetIndices);
-        reworkedIndices[indexIndicesArray + 1] = (lIndices[j + 1] + offsetIndices);
-        reworkedIndices[indexIndicesArray + 2] = (lIndices[j + 2] - offsetIndices);
-        indexIndicesArray += 3;
-      }
+      /* Getting new vertices etc */
+      FBXUtils.getReworkedParameters(mesh, instanceIndex, reworkedVertices, reworkedIndices, reworkedNormals, lVertices, lIndices, lNormals, needToDivideCylinders);
       maxIndex = Math.max(...reworkedIndices); /* VERY UNSAFE! */
       /* Ending */
       /* Saving info from one instance to resulting model */
@@ -480,20 +401,7 @@ export default class FBXExporter extends Exporter {
       } */
     }
     /* Need to delete all zeros from the end of resArrays */
-    resVertices = resVertices.subarray(0, curResVerticesIndex);
-    resIndices = resIndices.subarray(0, curResIndicesIndex);
-    resColors = resColors.subarray(0, curResColorsIndex);
-    resNormals = resNormals.subarray(0, curResNormalsIndex);
-    /* Traverse all cells in array and add max index. For cells with negative numbers we must subtract maxIndex */
-    if (maxIndexInModels !== 0) {
-      for (let k = 0; k < resIndices.length; ++k) {
-        if (resIndices[k] > 0) {
-          resIndices[k] += (maxIndexInModels + 1);
-        } else {
-          resIndices[k] -= (maxIndexInModels + 1);
-        }
-      }
-    }
+    [resVertices, resIndices, resColors, resNormals] = FBXUtils.finalizeCylinderParameters(mesh, maxIndexInModels, resVertices, resIndices, resColors, resNormals, curResVerticesIndex, curResIndicesIndex, curResColorsIndex, curResNormalsIndex);
     /* For every float array we need to be sure that there are no numbers in exponential notation. */
     const model = {
       vertices: resVertices,
