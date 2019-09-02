@@ -340,22 +340,16 @@ export default class FBXExporter extends Exporter {
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
+    const regularModel = new FBXUtils.FBXGeometryModel('regular', mesh);
+    const extendedModel = new FBXUtils.FBXGeometryModel('extended', mesh);
+    const resultingModel = new FBXUtils.FBXGeometryModel('resulting', mesh);
     /* Algorithm:
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
     * 2. Add additional vertices by copying second third of vertices, copy normals and add color from color2 array
     * 3. Add color to last third of vertices and we're done */
     const numInstances = mesh.geometry.attributes.alphaColor.count;
-    /* Miscellaneous variables and arrays created only for performance reasons */
-    const verticesLength = mesh.geometry.attributes.position.array.length;
-    const extendedColorsArrayLength = 4 * (verticesLength / 3 + verticesLength / 9);
-    const [indexArray, normalsArray, vertexArray] = FBXUtils.createRegularArrays(mesh);
-    const [extendedIndexArray, extendedNormalsArray, extendedVertexArray] = FBXUtils.createExtendedArrays(mesh);
-    /* Resulting variables. Calculating potential maximum length of that arrays for performance reasons */
-    let resVertices = new Float32Array(extendedVertexArray.length * numInstances);
-    let resIndices = new Float32Array(extendedIndexArray.length * numInstances);
-    let resNormals = new Float32Array(extendedNormalsArray.length * numInstances);
-    let resColors = new Float32Array(extendedColorsArrayLength * numInstances);
-    let [curResVerticesIndex, curResNormalsIndex, curResColorsIndex, curResIndicesIndex, maxIndex] = [0, 0, 0, 0, 0];
+    let firstInstance = true;
+    let maxIndex = 0;
     /* Main instances loop */
     for (let instanceIndex = 0; instanceIndex < numInstances - 1; ++instanceIndex) { /* Proceed every instance. Additional instance is strange. */
       /* Grab vertices and normals for transformed (scale, rotation, translation) cylinder */
@@ -364,44 +358,34 @@ export default class FBXExporter extends Exporter {
       /* Collect indices for given cylinder - remember: they may slightly change later on */
       let lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
       /* As we making one big model we need to carefully add numVertices to every index in lIndices. Remember - need to add additional vertices (numVertices / 3) as we add them!  */
-      if (curResIndicesIndex !== 0) {
+      if (!firstInstance) {
         for (let k = 0; k < lIndices.length; ++k) {
           lIndices[k] += (maxIndex + 1);
         }
+      } else {
+        firstInstance = false;
       }
       lIndices = FBXUtils.reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
-      let reworkedVertices = indexArray;
-      let reworkedNormals = normalsArray;
-      let reworkedIndices = vertexArray;
       /* Do we need to divide cylinders? It depends on colors of each half of cylinder */
-      const [reworkedColors, needToDivideCylinders] = FBXUtils.getColorsAndDecideSeparation(mesh, instanceIndex);
+      const needToDivideCylinders = FBXUtils.decideSeparation(mesh, instanceIndex);
+      let reworkedModel = regularModel;
       /* if we dont need to divide cylinders then we dont need extended arrays */
       if (needToDivideCylinders) {
-        reworkedIndices = extendedIndexArray;
-        reworkedNormals = extendedNormalsArray;
-        reworkedVertices = extendedVertexArray;
+        reworkedModel = extendedModel;
       }
       /* Getting new vertices etc */
-      FBXUtils.getReworkedParameters(mesh, instanceIndex, reworkedVertices, reworkedIndices, reworkedNormals, lVertices, lIndices, lNormals, needToDivideCylinders);
-      maxIndex = Math.max(...reworkedIndices); /* VERY UNSAFE! */
+      FBXUtils.getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders);
+      maxIndex = Math.max(...reworkedModel.getArrays()[0]); /* VERY UNSAFE! */
       /* Ending */
       /* Saving info from one instance to resulting model */
-      resVertices.set(reworkedVertices, curResVerticesIndex);
-      resNormals.set(reworkedNormals, curResNormalsIndex);
-      resColors.set(reworkedColors, curResColorsIndex);
-      resIndices.set(reworkedIndices, curResIndicesIndex);
-      /* Updating current position in resulting arrays */
-      curResVerticesIndex += reworkedVertices.length;
-      curResIndicesIndex += reworkedIndices.length;
-      curResColorsIndex += reworkedColors.length;
-      curResNormalsIndex += reworkedNormals.length;
+      resultingModel.storeResults(reworkedModel);
       /* IFDEF DEBUG */
       /* if (instanceIndex % 1000 === 0) {
         console.log(`${instanceIndex} out of ${numInstances} cylinders done`);
       } */
     }
     /* Need to delete all zeros from the end of resArrays */
-    [resVertices, resIndices, resColors, resNormals] = FBXUtils.finalizeCylinderParameters(mesh, maxIndexInModels, resVertices, resIndices, resColors, resNormals, curResVerticesIndex, curResIndicesIndex, curResColorsIndex, curResNormalsIndex);
+    const [resVertices, resIndices, resColors, resNormals] = FBXUtils.finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel);
     /* For every float array we need to be sure that there are no numbers in exponential notation. */
     const model = {
       vertices: resVertices,

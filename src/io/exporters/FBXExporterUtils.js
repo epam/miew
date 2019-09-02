@@ -386,7 +386,24 @@ function copyArrays(destArray, fromPositionInDestArray, sourceArray, fromPositio
 /**
  *
  */
-function getColorsAndDecideSeparation(mesh, instanceIndex) {
+function decideSeparation(mesh, instanceIndex) {
+  const meshColor1 = _.cloneDeep(mesh.geometry.attributes.color.array);
+  const meshColor2 = _.cloneDeep(mesh.geometry.attributes.color2.array);
+  const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
+  const idxColors = instanceIndex * 3;
+  const lAlphas = [meshAlphaColor[instanceIndex]];
+  const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
+  const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
+  if (objectColor1 !== objectColor2) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ *
+ */
+function getColors(mesh, instanceIndex) {
   const meshColor1 = _.cloneDeep(mesh.geometry.attributes.color.array);
   const meshColor2 = _.cloneDeep(mesh.geometry.attributes.color2.array);
   const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
@@ -398,21 +415,22 @@ function getColorsAndDecideSeparation(mesh, instanceIndex) {
   const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
   const lColors1 = cloneColors(2 * numVertices / 3, objectColor1);
   let lColors2 = null;
-  let needToDivideCylinders = true;
   /* Clone colors for one cylinder ( 2 * numVertices / 3) and for another (same number) */
   if (objectColor1 !== objectColor2) {
     lColors2 = cloneColors(2 * numVertices / 3, objectColor2);
   } else {
-    needToDivideCylinders = false;
     lColors2 = cloneColors(numVertices / 3, objectColor2);
   }
-  return [utils.Float32Concat(lColors2, lColors1), needToDivideCylinders];
+  return utils.Float32Concat(lColors2, lColors1);
 }
 
 /**
  *
  */
-function getReworkedParameters(mesh, instanceIndex, reworkedVertices, reworkedIndices, reworkedNormals, lVertices, lIndices, lNormals, needToDivideCylinders) {
+function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders) {
+  const [reworkedIndices, reworkedNormals, reworkedVertices] = reworkedModel.getArrays();
+  const reworkedColors = getColors(mesh, instanceIndex);
+  reworkedModel.storeColors(reworkedColors);
   const numVertices = lVertices.length / 3; /* That's the original number of vertices */
   let indexVerticesNormalsArray = 0; /* not using push */
   let indexIndicesArray = 0;
@@ -465,11 +483,13 @@ function getReworkedParameters(mesh, instanceIndex, reworkedVertices, reworkedIn
 function createRegularArrays(mesh) {
   const indicesArrayLength = mesh.geometry.index.array.length;
   const verticesArrayLength = mesh.geometry.attributes.position.array.length;
+  const colorsArrayLength = 4 * mesh.geometry.attributes.position.array.length / 3;
   const normalsArrayLength = mesh.geometry.attributes.normal.array.length;
   const indexArray = new Int32Array(indicesArrayLength);
   const normalsArray = new Float32Array(normalsArrayLength);
   const vertexArray = new Float32Array(verticesArrayLength);
-  return [indexArray, normalsArray, vertexArray];
+  const colorsArray = new Float32Array(colorsArrayLength);
+  return [indexArray, normalsArray, vertexArray, colorsArray];
 }
 
 /**
@@ -479,17 +499,23 @@ function createExtendedArrays(mesh) {
   const extendedIndicesArrayLength = mesh.geometry.index.array.length;
   const extendedVerticesArrayLength = mesh.geometry.attributes.position.array.length + mesh.geometry.attributes.position.array.length / 3;
   const extendedNormalsArrayLength = mesh.geometry.attributes.normal.array.length + mesh.geometry.attributes.normal.array.length / 3;
+  const extendedColorsArrayLength = 4 * (mesh.geometry.attributes.position.array.length / 3 + mesh.geometry.attributes.position.array.length / 9);
   const extendedIndexArray = new Int32Array(extendedIndicesArrayLength);
   const extendedNormalsArray = new Float32Array(extendedNormalsArrayLength);
   const extendedVertexArray = new Float32Array(extendedVerticesArrayLength);
-  return [extendedIndexArray, extendedNormalsArray, extendedVertexArray];
+  const extendedColorsArray = new Float32Array(extendedColorsArrayLength);
+  return [extendedIndexArray, extendedNormalsArray, extendedVertexArray, extendedColorsArray];
 }
 
 /**
  *
  */
-function finalizeCylinderParameters(mesh, maxIndexInModels, resVertices, resIndices, resColors, resNormals, curResVerticesIndex, curResIndicesIndex, curResColorsIndex, curResNormalsIndex) {
-  resIndices = resIndices.subarray(0, curResIndicesIndex);
+function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
+  const resVertices = resultingModel.getArrays()[2];
+  const resNormals = resultingModel.getArrays()[1];
+  const resColors = resultingModel.getArrays()[3];
+  let resIndices = resultingModel.getArrays()[0];
+  resIndices = resIndices.subarray(0, resultingModel.curResIndicesIndex);
   /* Traverse all cells in array and add max index. For cells with negative numbers we must subtract maxIndex */
   if (maxIndexInModels !== 0) {
     for (let k = 0; k < resIndices.length; ++k) {
@@ -500,9 +526,102 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resVertices, resIndi
       }
     }
   }
-  return [resVertices.subarray(0, curResVerticesIndex), resIndices, resColors.subarray(0, curResColorsIndex), resNormals.subarray(0, curResNormalsIndex)];
+  return [resVertices.subarray(0, resultingModel.curResVerticesIndex), resIndices, resColors.subarray(0, resultingModel.curResColorsIndex), resNormals.subarray(0, resultingModel.curResNormalsIndex)];
 }
 
+/** *
+ *
+ */
+function createResultingArrays(mesh) {
+  const verticesLength = mesh.geometry.attributes.position.array.length;
+  const extendedColorsArrayLength = 4 * (verticesLength / 3 + verticesLength / 9);
+  const extendedIndexArrayLength = mesh.geometry.index.array.length;
+  const numInstances = mesh.geometry.attributes.alphaColor.count;
+  const extendedVertexArrayLength = mesh.geometry.attributes.position.array.length + mesh.geometry.attributes.position.array.length / 3;
+  const extendedNormalsArrayLength = mesh.geometry.attributes.normal.array.length + mesh.geometry.attributes.normal.array.length / 3;
+  const resVertices = new Float32Array(extendedVertexArrayLength * numInstances);
+  const resIndices = new Float32Array(extendedIndexArrayLength * numInstances);
+  const resNormals = new Float32Array(extendedNormalsArrayLength * numInstances);
+  const resColors = new Float32Array(extendedColorsArrayLength * numInstances);
+  return [resIndices, resNormals, resVertices, resColors];
+}
+
+class FBXGeometryModel {
+  constructor(modificator, mesh) {
+    this.regularIndexArray = null;
+    this.regularNormalsArray = null;
+    this.regularVertexArray = null;
+    this.regularColorsArray = null;
+    this.extendedIndexArray = null;
+    this.extendedNormalsArray = null;
+    this.extendedVertexArray = null;
+    this.extendedColorsArray = null;
+    this.modificator = modificator;
+    this.resultingVerticesArray = null;
+    this.resultingIndicesArray = null;
+    this.resultingNormalsArray = null;
+    this.resultingColorsArray = null;
+    this.curResVerticesIndex = 0;
+    this.curResNormalsIndex = 0;
+    this.curResColorsIndex = 0;
+    this.curResIndicesIndex = 0;
+    switch (modificator) {
+      case 'regular':
+        [this.regularIndexArray, this.regularNormalsArray, this.regularVertexArray, this.regularColorsArray] = createRegularArrays(mesh);
+        break;
+      case 'extended':
+        [this.extendedIndexArray, this.extendedNormalsArray, this.extendedVertexArray, this.extendedColorsArray] = createExtendedArrays(mesh);
+        break;
+      case 'resulting':
+        [this.resultingIndicesArray, this.resultingNormalsArray, this.resultingVerticesArray, this.resultingColorsArray] = createResultingArrays(mesh);
+        break;
+      default:
+        break;
+    }
+  }
+
+  getArrays() {
+    switch (this.modificator) {
+      case 'regular':
+        return [this.regularIndexArray, this.regularNormalsArray, this.regularVertexArray, this.regularColorsArray];
+      case 'extended':
+        return [this.extendedIndexArray, this.extendedNormalsArray, this.extendedVertexArray, this.extendedColorsArray];
+      case 'resulting':
+        return [this.resultingIndicesArray, this.resultingNormalsArray, this.resultingVerticesArray, this.resultingColorsArray];
+      default:
+        return null;
+    }
+  }
+
+  storeColors(color) {
+    switch (this.modificator) {
+      case 'regular':
+        this.regularColorsArray = color;
+        break;
+      case 'extended':
+        this.extendedColorsArray = color;
+        break;
+      default:
+        break;
+    }
+  }
+
+  storeResults(model) {
+    const reworkedVertices = model.getArrays()[2];
+    const reworkedNormals = model.getArrays()[1];
+    const reworkedColors = model.getArrays()[3];
+    const reworkedIndices = model.getArrays()[0];
+    this.resultingVerticesArray.set(reworkedVertices, this.curResVerticesIndex);
+    this.resultingNormalsArray.set(reworkedNormals, this.curResNormalsIndex);
+    this.resultingColorsArray.set(reworkedColors, this.curResColorsIndex);
+    this.resultingIndicesArray.set(reworkedIndices, this.curResIndicesIndex);
+    /* Updating current position in resulting arrays */
+    this.curResVerticesIndex += reworkedVertices.length;
+    this.curResIndicesIndex += reworkedIndices.length;
+    this.curResColorsIndex += reworkedColors.length;
+    this.curResNormalsIndex += reworkedNormals.length;
+  }
+}
 
 export default {
   reworkColors,
@@ -516,11 +635,12 @@ export default {
   defaultMaterialLayer,
   defaultLayerBlock,
   addVerticesIndices,
+  decideSeparation,
   defaultDefinitions,
   materialProperties,
-  getColorsAndDecideSeparation,
   getReworkedParameters,
   createRegularArrays,
   createExtendedArrays,
   finalizeCylinderParameters,
+  FBXGeometryModel,
 };
