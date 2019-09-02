@@ -477,35 +477,6 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   }
 }
 
-/**
- *
- */
-function createRegularArrays(mesh) {
-  const indicesArrayLength = mesh.geometry.index.array.length;
-  const verticesArrayLength = mesh.geometry.attributes.position.array.length;
-  const colorsArrayLength = 4 * mesh.geometry.attributes.position.array.length / 3;
-  const normalsArrayLength = mesh.geometry.attributes.normal.array.length;
-  const indexArray = new Int32Array(indicesArrayLength);
-  const normalsArray = new Float32Array(normalsArrayLength);
-  const vertexArray = new Float32Array(verticesArrayLength);
-  const colorsArray = new Float32Array(colorsArrayLength);
-  return [indexArray, normalsArray, vertexArray, colorsArray];
-}
-
-/**
- *
- */
-function createExtendedArrays(mesh) {
-  const extendedIndicesArrayLength = mesh.geometry.index.array.length;
-  const extendedVerticesArrayLength = mesh.geometry.attributes.position.array.length + mesh.geometry.attributes.position.array.length / 3;
-  const extendedNormalsArrayLength = mesh.geometry.attributes.normal.array.length + mesh.geometry.attributes.normal.array.length / 3;
-  const extendedColorsArrayLength = 4 * (mesh.geometry.attributes.position.array.length / 3 + mesh.geometry.attributes.position.array.length / 9);
-  const extendedIndexArray = new Int32Array(extendedIndicesArrayLength);
-  const extendedNormalsArray = new Float32Array(extendedNormalsArrayLength);
-  const extendedVertexArray = new Float32Array(extendedVerticesArrayLength);
-  const extendedColorsArray = new Float32Array(extendedColorsArrayLength);
-  return [extendedIndexArray, extendedNormalsArray, extendedVertexArray, extendedColorsArray];
-}
 
 /**
  *
@@ -529,22 +500,6 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
   return [resVertices.subarray(0, resultingModel.curResVerticesIndex), resIndices, resColors.subarray(0, resultingModel.curResColorsIndex), resNormals.subarray(0, resultingModel.curResNormalsIndex)];
 }
 
-/** *
- *
- */
-function createResultingArrays(mesh) {
-  const verticesLength = mesh.geometry.attributes.position.array.length;
-  const extendedColorsArrayLength = 4 * (verticesLength / 3 + verticesLength / 9);
-  const extendedIndexArrayLength = mesh.geometry.index.array.length;
-  const numInstances = mesh.geometry.attributes.alphaColor.count;
-  const extendedVertexArrayLength = mesh.geometry.attributes.position.array.length + mesh.geometry.attributes.position.array.length / 3;
-  const extendedNormalsArrayLength = mesh.geometry.attributes.normal.array.length + mesh.geometry.attributes.normal.array.length / 3;
-  const resVertices = new Float32Array(extendedVertexArrayLength * numInstances);
-  const resIndices = new Float32Array(extendedIndexArrayLength * numInstances);
-  const resNormals = new Float32Array(extendedNormalsArrayLength * numInstances);
-  const resColors = new Float32Array(extendedColorsArrayLength * numInstances);
-  return [resIndices, resNormals, resVertices, resColors];
-}
 
 class FBXGeometryModel {
   constructor(modificator, mesh) {
@@ -565,19 +520,61 @@ class FBXGeometryModel {
     this.curResNormalsIndex = 0;
     this.curResColorsIndex = 0;
     this.curResIndicesIndex = 0;
+    this.verticesArrayLength = mesh.geometry.attributes.position.array.length;
+    this.colorsArrayLength = 4 * mesh.geometry.attributes.position.array.length / 3;
+    this.normalsArrayLength = mesh.geometry.attributes.normal.array.length;
+    this.indicesArrayLength = mesh.geometry.index.array.length;
+    this.extendedIndexArrayLength = mesh.geometry.index.array.length;
+    this.extendedVertexArrayLength = mesh.geometry.attributes.position.array.length + mesh.geometry.attributes.position.array.length / 3;
+    this.extendedNormalsArrayLength = mesh.geometry.attributes.normal.array.length + mesh.geometry.attributes.normal.array.length / 3;
+    this.extendedColorsArrayLength = 4 * (mesh.geometry.attributes.position.array.length / 3 + mesh.geometry.attributes.position.array.length / 9);
     switch (modificator) {
       case 'regular':
-        [this.regularIndexArray, this.regularNormalsArray, this.regularVertexArray, this.regularColorsArray] = createRegularArrays(mesh);
+        [this.regularIndexArray, this.regularNormalsArray, this.regularVertexArray, this.regularColorsArray] = this.createRegularArrays();
         break;
       case 'extended':
-        [this.extendedIndexArray, this.extendedNormalsArray, this.extendedVertexArray, this.extendedColorsArray] = createExtendedArrays(mesh);
+        [this.extendedIndexArray, this.extendedNormalsArray, this.extendedVertexArray, this.extendedColorsArray] = this.createExtendedArrays();
         break;
       case 'resulting':
-        [this.resultingIndicesArray, this.resultingNormalsArray, this.resultingVerticesArray, this.resultingColorsArray] = createResultingArrays(mesh);
+        [this.resultingIndicesArray, this.resultingNormalsArray, this.resultingVerticesArray, this.resultingColorsArray] = this.createResultingArrays(mesh);
         break;
       default:
         break;
     }
+  }
+
+  /**
+   *
+   */
+  createRegularArrays() {
+    const indexArray = new Int32Array(this.indicesArrayLength);
+    const normalsArray = new Float32Array(this.normalsArrayLength);
+    const vertexArray = new Float32Array(this.verticesArrayLength);
+    const colorsArray = new Float32Array(this.colorsArrayLength);
+    return [indexArray, normalsArray, vertexArray, colorsArray];
+  }
+
+  /**
+   *
+   */
+  createExtendedArrays() {
+    const extendedIndexArray = new Int32Array(this.extendedIndexArrayLength);
+    const extendedNormalsArray = new Float32Array(this.extendedNormalsArrayLength);
+    const extendedVertexArray = new Float32Array(this.extendedVertexArrayLength);
+    const extendedColorsArray = new Float32Array(this.extendedColorsArrayLength);
+    return [extendedIndexArray, extendedNormalsArray, extendedVertexArray, extendedColorsArray];
+  }
+
+  /** *
+   *
+   */
+  createResultingArrays(mesh) {
+    const numInstances = mesh.geometry.attributes.alphaColor.count;
+    const resVertices = new Float32Array(this.extendedVertexArrayLength * numInstances);
+    const resIndices = new Float32Array(this.extendedIndexArrayLength * numInstances);
+    const resNormals = new Float32Array(this.extendedNormalsArrayLength * numInstances);
+    const resColors = new Float32Array(this.extendedColorsArrayLength * numInstances);
+    return [resIndices, resNormals, resVertices, resColors];
   }
 
   getArrays() {
@@ -639,8 +636,6 @@ export default {
   defaultDefinitions,
   materialProperties,
   getReworkedParameters,
-  createRegularArrays,
-  createExtendedArrays,
   finalizeCylinderParameters,
   FBXGeometryModel,
 };
