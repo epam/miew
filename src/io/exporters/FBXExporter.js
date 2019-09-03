@@ -352,7 +352,7 @@ export default class FBXExporter extends Exporter {
     let firstInstance = true;
     let maxIndex = 0;
     /* Main instances loop */
-    for (let instanceIndex = 0; instanceIndex < numInstances - 1; ++instanceIndex) { /* Proceed every instance. Additional instance is strange. */
+    for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) { /* Proceed every instance. Additional instance is strange. */
       /* Grab vertices and normals for transformed (scale, rotation, translation) cylinder */
       const [lVertices, lNormals] = FBXUtils.calculateCylinderTransform(mesh, instanceIndex);
       /* Okay now vertices are reworked as we want them. Now it's time for implementing algorithm */

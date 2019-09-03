@@ -310,7 +310,8 @@ function addVerticesIndices(vertices, indices) {
 }
 
 /**
- *
+ * Forming default definitions block.
+ * @returns {String} default definitions block
  */
 function defaultDefinitions() {
   const Version = 100; /* Mystery 100, but appears that it's not checked properly */
@@ -342,7 +343,9 @@ function defaultDefinitions() {
 }
 
 /**
- *
+ * Forming material properties block.
+ * @param {Object} material - given material of model
+ * @returns {String} material properties string
  */
 function materialProperties(material) {
   return '\t\tProperties60:  {\n'
@@ -374,7 +377,12 @@ function materialProperties(material) {
 }
 
 /**
- *
+ * Needed procedure for array copying
+ * @param {Array} destArray - array to where will be copied
+ * @param {Number} fromPositionInDestArray - position in destination array from where will be copied
+ * @param {Array} sourceArray - array from where will be copied
+ * @param {Number} fromPositionInSourceArray - position in source array from where will be copied
+ * @param {Number} numberOfElements - number of elements to copy
  */
 function copyArrays(destArray, fromPositionInDestArray, sourceArray, fromPositionInSourceArray, numberOfElements) {
   for (let j = 0; j < numberOfElements; ++j) {
@@ -383,6 +391,12 @@ function copyArrays(destArray, fromPositionInDestArray, sourceArray, fromPositio
   }
 }
 
+/**
+ * Simple check for equality of two objects by their properties
+ * @param {Object} objA - first object
+ * @param {Object} objB - second object
+ * @returns {boolean} true if object are equal, false otherwise
+ */
 function isEqual(objA, objB) {
   const aProps = Object.getOwnPropertyNames(objA);
   const bProps = Object.getOwnPropertyNames(objB);
@@ -390,7 +404,6 @@ function isEqual(objA, objB) {
     return false;
   }
   for (let i = 0; i < aProps.length; i++) {
-
     const propName = aProps[i];
     if (objA[propName] !== objB[propName]) {
       return false;
@@ -400,7 +413,11 @@ function isEqual(objA, objB) {
 }
 
 /**
- *
+ * Function to decide - do we need separate one cylinder into two or not.
+ * We do need to separate them if they have not equal colors on two sides
+ * @param {Object} mesh - given mesh
+ * @param {Number} instanceIndex - exact instance of cylinder in mesh
+ * @returns {boolean} true if need separation, false otherwise
  */
 function decideSeparation(mesh, instanceIndex) {
   /* No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies */
@@ -411,14 +428,14 @@ function decideSeparation(mesh, instanceIndex) {
   const lAlphas = [meshAlphaColor[instanceIndex]];
   const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
   const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
-  if (isEqual(objectColor1, objectColor2)) {
-    return false;
-  }
-  return true;
+  return !isEqual(objectColor1, objectColor2);
 }
 
 /**
- *
+ * Get color array in FBX notation for given cylinder.
+ * @param {Object} mesh - given mesh
+ * @param {Number} instanceIndex - exact cylinder in given mesh
+ * @returns {Float32Array} cylinder colors array (for every vertex)
  */
 function getColors(mesh, instanceIndex) {
   /* No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies */
@@ -443,7 +460,14 @@ function getColors(mesh, instanceIndex) {
 }
 
 /**
- *
+ * From raw parameters in mesh create exact cylinder parameters
+ * @param {Object} mesh - given mesh
+ * @param {Number} instanceIndex - exact cylinder number in given mesh
+ * @param {FBXCylinderGeometryModel} reworkedModel - Cylinder model where to write reworked parameters
+ * @param {Array} lVertices - raw vertices from mesh
+ * @param {Array} lIndices - raw indices from mesh
+ * @param {Array} lNormals - raw normals from mesh
+ * @param {boolean} needToDivideCylinders - flag "do we need to divide cylinders"
  */
 function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders) {
   const [reworkedIndices, reworkedNormals, reworkedVertices] = reworkedModel.getArrays();
@@ -495,9 +519,12 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   }
 }
 
-
 /**
- *
+ * Some finalization procedures
+ * @param {Object} mesh - given mesh
+ * @param {Number} maxIndexInModels - maximum index in models (to concatenate models)
+ * @param {FBXCylinderGeometryModel} resultingModel - resulting cylinder model
+ * @returns {Array} array of finalized indices, normals, vertices, colors
  */
 function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
   const resVertices = resultingModel.getArrays()[2];
@@ -518,7 +545,9 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
   return [resVertices.subarray(0, resultingModel.curResVerticesIndex), resIndices, resColors.subarray(0, resultingModel.curResColorsIndex), resNormals.subarray(0, resultingModel.curResNormalsIndex)];
 }
 
-
+/**
+ * Utils class for simplifying cylinders procedures
+ */
 class FBXCylinderGeometryModel {
   constructor(modificator, mesh) {
     this.regularIndexArray = null;
@@ -562,7 +591,8 @@ class FBXCylinderGeometryModel {
   }
 
   /**
-   *
+   * Creating not extended arrays (for not-dividable cylinders)
+   * @returns {[Int32Array, Float32Array, Float32Array, Float32Array]} not extended arrays of parameters
    */
   createRegularArrays() {
     const indexArray = new Int32Array(this.indicesArrayLength);
@@ -573,7 +603,8 @@ class FBXCylinderGeometryModel {
   }
 
   /**
-   *
+   * Creating extended arrays (for dividable cylinders)
+   * @returns {[Int32Array, Float32Array, Float32Array, Float32Array]} extended arrays of parameters
    */
   createExtendedArrays() {
     const extendedIndexArray = new Int32Array(this.extendedIndexArrayLength);
@@ -583,8 +614,10 @@ class FBXCylinderGeometryModel {
     return [extendedIndexArray, extendedNormalsArray, extendedVertexArray, extendedColorsArray];
   }
 
-  /** *
-   *
+  /**
+   * Creating resulting arrays
+   * @param {Object} mesh - given mesh
+   * @returns {[Int32Array, Float32Array, Float32Array, Float32Array]} arrays of parameters
    */
   createResultingArrays(mesh) {
     const numInstances = mesh.geometry.attributes.alphaColor.count;
@@ -595,6 +628,10 @@ class FBXCylinderGeometryModel {
     return [resIndices, resNormals, resVertices, resColors];
   }
 
+  /**
+   * Simple getter for working arrays
+   * @returns {null|*[]} working arrays
+   */
   getArrays() {
     switch (this.modificator) {
       case 'regular':
@@ -608,6 +645,10 @@ class FBXCylinderGeometryModel {
     }
   }
 
+  /**
+   * Utility for storing color arrays
+   * @param {Array} color - color array
+   */
   storeColors(color) {
     switch (this.modificator) {
       case 'regular':
@@ -621,6 +662,10 @@ class FBXCylinderGeometryModel {
     }
   }
 
+  /**
+   * Storing gathered data to model
+   * @param {FBXCylinderGeometryModel} model - cylinder model
+   */
   storeResults(model) {
     const reworkedVertices = model.getArrays()[2];
     const reworkedNormals = model.getArrays()[1];
