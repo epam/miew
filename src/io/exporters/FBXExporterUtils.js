@@ -548,8 +548,11 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
 /**
  * Utils class for simplifying cylinders procedures
  */
-class FBXCylinderGeometryModel {
+export class FBXCylinderGeometryModel {
   constructor(modificator, mesh) {
+    if (!mesh || !modificator) {
+      throw new Error('Error in cylinder dividing');
+    }
     this.regularIndexArray = null;
     this.regularNormalsArray = null;
     this.regularVertexArray = null;
