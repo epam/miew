@@ -383,40 +383,58 @@ function copyArrays(destArray, fromPositionInDestArray, sourceArray, fromPositio
   }
 }
 
+function isEqual(objA, objB) {
+  const aProps = Object.getOwnPropertyNames(objA);
+  const bProps = Object.getOwnPropertyNames(objB);
+  if (aProps.length !== bProps.length) {
+    return false;
+  }
+  for (let i = 0; i < aProps.length; i++) {
+
+    const propName = aProps[i];
+    if (objA[propName] !== objB[propName]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  *
  */
 function decideSeparation(mesh, instanceIndex) {
-  const meshColor1 = _.cloneDeep(mesh.geometry.attributes.color.array);
-  const meshColor2 = _.cloneDeep(mesh.geometry.attributes.color2.array);
+  /* No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies */
+  const meshColor1 = mesh.geometry.attributes.color.array;
+  const meshColor2 = mesh.geometry.attributes.color2.array;
   const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
   const idxColors = instanceIndex * 3;
   const lAlphas = [meshAlphaColor[instanceIndex]];
   const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
   const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
-  if (objectColor1 !== objectColor2) {
-    return true;
+  if (isEqual(objectColor1, objectColor2)) {
+    return false;
   }
-  return false;
+  return true;
 }
 
 /**
  *
  */
 function getColors(mesh, instanceIndex) {
-  const meshColor1 = _.cloneDeep(mesh.geometry.attributes.color.array);
-  const meshColor2 = _.cloneDeep(mesh.geometry.attributes.color2.array);
+  /* No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies */
+  const meshColor1 = mesh.geometry.attributes.color.array;
+  const meshColor2 = mesh.geometry.attributes.color2.array;
   const meshAlphaColor = mesh.geometry.attributes.alphaColor.array;
   const lAlphas = [meshAlphaColor[instanceIndex]];
   const idxColors = instanceIndex * 3;
-  const numVertices = mesh.geometry.attributes.position.length / 3; /* That's the original number of vertices */
+  const numVertices = mesh.geometry.attributes.position.count; /* That's the original number of vertices */
   /* Collect colors for each half of cylinder */
   const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
   const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
   const lColors1 = cloneColors(2 * numVertices / 3, objectColor1);
   let lColors2 = null;
   /* Clone colors for one cylinder ( 2 * numVertices / 3) and for another (same number) */
-  if (objectColor1 !== objectColor2) {
+  if (!isEqual(objectColor1, objectColor2)) {
     lColors2 = cloneColors(2 * numVertices / 3, objectColor2);
   } else {
     lColors2 = cloneColors(numVertices / 3, objectColor2);
@@ -465,7 +483,7 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * lNormals.length / 3, lNormals.length / 3);
   indexVerticesNormalsArray += lVertices.length / 3;
   /* Adding last portion of indices simply as first half of indices but with 2 * number of vertices / 3 addition if needed */
-  let offsetIndices = 0;
+  let offsetIndices = numVertices / 3;
   if (needToDivideCylinders) {
     offsetIndices = 2 * numVertices / 3;
   }
@@ -501,7 +519,7 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
 }
 
 
-class FBXGeometryModel {
+class FBXCylinderGeometryModel {
   constructor(modificator, mesh) {
     this.regularIndexArray = null;
     this.regularNormalsArray = null;
@@ -637,5 +655,5 @@ export default {
   materialProperties,
   getReworkedParameters,
   finalizeCylinderParameters,
-  FBXGeometryModel,
+  FBXCylinderGeometryModel,
 };

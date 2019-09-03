@@ -93,6 +93,7 @@ export default class FBXExporter extends Exporter {
    * @returns {string} string containing all models (vertices, indices, colors, normals etc)
    */
   _addModelsToResult() {
+    console.log('Models started');
     let allModels = '';
     for (let i = 0; i < this._models.length; ++i) {
       const model = this._models[i];
@@ -120,7 +121,7 @@ export default class FBXExporter extends Exporter {
       const resultingLayer = layerElementNormal + layerElementSmoothing + layerElementUV + layerElementTexture + layerElementColor + layerElementMaterial + layer;
       allModels += (modelProperties + verticesIndices + resultingLayer);
     }
-    // console.log('Models done');
+    console.log('Models done');
     return allModels;
   }
 
@@ -287,9 +288,9 @@ export default class FBXExporter extends Exporter {
       resColors.set(lColors, instanceIndex * numVertices * 4);
       resIndices.set(lIndices, instanceIndex * numIndices);
       /* Debug purposes */
-      /* if (instanceIndex % 1000 === 0) {
+      if (instanceIndex % 1000 === 0) {
         console.log(`${instanceIndex} out of ${numInstances} spheres done`);
-      } */
+      }
     }
     const model = {
       vertices: resVertices,
@@ -340,9 +341,9 @@ export default class FBXExporter extends Exporter {
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
-    const regularModel = new FBXUtils.FBXGeometryModel('regular', mesh);
-    const extendedModel = new FBXUtils.FBXGeometryModel('extended', mesh);
-    const resultingModel = new FBXUtils.FBXGeometryModel('resulting', mesh);
+    const regularModel = new FBXUtils.FBXCylinderGeometryModel('regular', mesh);
+    const extendedModel = new FBXUtils.FBXCylinderGeometryModel('extended', mesh);
+    const resultingModel = new FBXUtils.FBXCylinderGeometryModel('resulting', mesh);
     /* Algorithm:
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
     * 2. Add additional vertices by copying second third of vertices, copy normals and add color from color2 array
@@ -380,9 +381,9 @@ export default class FBXExporter extends Exporter {
       /* Saving info from one instance to resulting model */
       resultingModel.storeResults(reworkedModel);
       /* IFDEF DEBUG */
-      /* if (instanceIndex % 1000 === 0) {
+      if (instanceIndex % 1000 === 0) {
         console.log(`${instanceIndex} out of ${numInstances} cylinders done`);
-      } */
+      }
     }
     /* Need to delete all zeros from the end of resArrays */
     const [resVertices, resIndices, resColors, resNormals] = FBXUtils.finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel);
@@ -423,7 +424,7 @@ export default class FBXExporter extends Exporter {
           } else { /* Not instancing */
             this._collectStraightGeometryInfo(mesh);
           }
-          // console.log('mesh is done');
+          console.log('mesh is done');
         }
       }
     });
