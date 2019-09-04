@@ -548,7 +548,7 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
 /**
  * Utils class for simplifying cylinders procedures
  */
-export class FBXCylinderGeometryModel {
+class FBXCylinderGeometryModel {
   constructor(modificator, mesh) {
     if (!mesh || !modificator) {
       throw new Error('Error in cylinder dividing');
