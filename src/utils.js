@@ -495,24 +495,9 @@ function correctSelectorIdentifier(value) {
  * @param{Float32Array} second - source array
  * @returns{Float32Array} resulting concatenated array
  */
-function Float32Concat(first, second) {
+function TypedArrayConcat(first, second) {
   const firstLength = first.length;
-  const result = new Float32Array(firstLength + second.length);
-  result.set(first);
-  result.set(second, firstLength);
-  return result;
-}
-
-/**
- * Extension to standard Int32Arrays.
- * This is the fastest way to concat TypedArrays in js (by observations).
- * @param{Int32Array} first  - destination array
- * @param{Int32Array} second - source array
- * @returns{Int32Array} resulting concatenated array
- */
-function Int32Concat(first, second) {
-  const firstLength = first.length;
-  const result = new Int32Array(firstLength + second.length);
+  const result = new first.constructor(firstLength + second.length);
   result.set(first);
   result.set(second, firstLength);
   return result;
@@ -554,6 +539,5 @@ export default {
   getFileExtension,
   splitFileName,
   download,
-  Float32Concat,
-  Int32Concat,
+  TypedArrayConcat,
 };

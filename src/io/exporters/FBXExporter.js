@@ -210,30 +210,31 @@ export default class FBXExporter extends Exporter {
    * Save geometry info from mesh to this._models.
    */
   _collectStraightGeometryInfo(mesh) {
+    const { geometry: { attributes: { position, alphaColor, color, normal }, index } } = mesh;
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     let lAlphas = [];
     let lColors = [];
     /* Collect info about vertices + indices + material */
-    const lVertices = mesh.geometry.attributes.position.array; /* Vertices either way are copying directly */
+    const lVertices = position.array; /* Vertices either way are copying directly */
     /* Different style with indices - if we have modelNumber => we must to add indices to existing ones */
     /* 1 loop? */
     const maxIndex = this._calculateMaxIndex(modelNumber);
-    let lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
+    let lIndices = Int32Array.from(_.cloneDeep(index.array));
     if (maxIndex !== 0) {
       for (let i = 0; i < lIndices.length; ++i) {
         lIndices[i] += maxIndex + 1;
       }
     }
     lIndices = FBXUtils.reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
-    const lNormals = mesh.geometry.attributes.normal.array;
+    const lNormals = normal.array;
     /* For some surfaces which does not have alpha color arrays */
     if (!(mesh instanceof ZClippedMesh)) {
-      lAlphas = mesh.geometry.attributes.alphaColor.array;
+      lAlphas = alphaColor.array;
     }
-    if (mesh.geometry.attributes.color.array.length >= 1) {
-      lColors = FBXUtils.reworkColors(mesh.geometry.attributes.color.array, lAlphas); /* Need to rework this into strange FBX notation */
+    if (color.array.length >= 1) {
+      lColors = FBXUtils.reworkColors(color.array, lAlphas); /* Need to rework this into strange FBX notation */
     }
     /* We have now all information about model, let's add to existing one if it's here */
     if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
@@ -252,14 +253,15 @@ export default class FBXExporter extends Exporter {
    * @param {object} mesh - mesh with instanced spheres info
    */
   _collectSpheresInfo(mesh) {
+    const { geometry: { attributes: {offset, position, normal}, index } } = mesh;
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     let idxOffset = 0;
-    const meshOffset = mesh.geometry.attributes.offset.array;
-    const numInstances = mesh.geometry.attributes.offset.count;
-    const numVertices = mesh.geometry.attributes.position.array.length / 3;
-    const numIndices = mesh.geometry.index.array.length;
+    const meshOffset = offset.array;
+    const numInstances = offset.count;
+    const numVertices = position.array.length / 3;
+    const numIndices = index.array.length;
     /* Geometry info */
     const resVertices = new Float32Array(numInstances * numVertices * 3); /* XYZ for every vertex */
     const resIndices = new Float32Array(numInstances * numIndices);
@@ -268,8 +270,8 @@ export default class FBXExporter extends Exporter {
     /* For every instanced object */
     for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
       /* Firstly, collect some basic instanced parameters */
-      const lVertices = _.cloneDeep(mesh.geometry.attributes.position.array);
-      const lNormals = _.cloneDeep(mesh.geometry.attributes.normal.array);
+      const lVertices = _.cloneDeep(position.array);
+      const lNormals = _.cloneDeep(normal.array);
       const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
       const lColors = FBXUtils.collectInstancedColors(mesh, instanceIndex);
       /* Extract offset for one exact object (instance) */
@@ -308,13 +310,14 @@ export default class FBXExporter extends Exporter {
    * @returns {Int32Array} array of gathered indices
    */
   _collectInstancedIndices(mesh, instance) {
+    const { geometry: { attributes: { position }, index } } = mesh;
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
-    const lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
+    const lIndices = Int32Array.from(_.cloneDeep(index.array));
     /* As we making one big model we need to carefully add resVertices.length to every index in lIndices */
     /* Algorithm below is a bit cognitively complicated, maybe refactor here at some point? */
-    const maxIndex = mesh.geometry.attributes.position.array.length / 3 - 1;
+    const maxIndex = position.array.length / 3 - 1;
     let changeIndex = 2;
     for (let k = 0; k < lIndices.length; ++k) {
       /* If it's first model - no need to add "+ 1", if not - need that + 1 */
@@ -338,6 +341,7 @@ export default class FBXExporter extends Exporter {
    * @param {object} mesh - given mesh with instanced cylinders
    */
   _collectCylindersInfo(mesh) {
+    const { geometry: { attributes: { alphaColor }, index } } = mesh;
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
@@ -348,7 +352,7 @@ export default class FBXExporter extends Exporter {
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
     * 2. Add additional vertices by copying second third of vertices, copy normals and add color from color2 array
     * 3. Add color to last third of vertices and we're done */
-    const numInstances = mesh.geometry.attributes.alphaColor.count;
+    const numInstances = alphaColor.count;
     let firstInstance = true;
     let maxIndex = 0;
     /* Main instances loop */
@@ -357,7 +361,7 @@ export default class FBXExporter extends Exporter {
       const [lVertices, lNormals] = FBXUtils.calculateCylinderTransform(mesh, instanceIndex);
       /* Okay now vertices are reworked as we want them. Now it's time for implementing algorithm */
       /* Collect indices for given cylinder - remember: they may slightly change later on */
-      let lIndices = Int32Array.from(_.cloneDeep(mesh.geometry.index.array));
+      let lIndices = Int32Array.from(_.cloneDeep(index.array));
       /* As we making one big model we need to carefully add numVertices to every index in lIndices. Remember - need to add additional vertices (numVertices / 3) as we add them!  */
       if (!firstInstance) {
         for (let k = 0; k < lIndices.length; ++k) {
