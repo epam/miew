@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Exporter from './Exporter';
 import ZClippedMesh from '../../gfx/meshes/ZClippedMesh';
 import FBXUtils from './FBXExporterUtils';
+import FBXCylinderGeometryModel from './FBXCylinderGeometryModel';
 
 /**
  * FBX file format exporter.
@@ -378,9 +379,9 @@ export default class FBXExporter extends Exporter {
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
-    const regularModel = new FBXUtils.FBXCylinderGeometryModel('regular', mesh);
-    const extendedModel = new FBXUtils.FBXCylinderGeometryModel('extended', mesh);
-    const resultingModel = new FBXUtils.FBXCylinderGeometryModel('resulting', mesh);
+    const regularModel = new FBXCylinderGeometryModel('regular', mesh);
+    const extendedModel = new FBXCylinderGeometryModel('extended', mesh);
+    const resultingModel = new FBXCylinderGeometryModel('resulting', mesh);
     /* Algorithm:
     * 1. Let first third of vertices as they are - normals, indices, vertex colors are as they are.
     * 2. Add additional vertices by copying second third of vertices, copy normals and add color from color2 array

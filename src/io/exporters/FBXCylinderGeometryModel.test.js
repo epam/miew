@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import * as THREE from 'three';
 import dirtyChai from 'dirty-chai';
-import FBXCylinderGeometryModel from './FBXExporterUtils';
+import FBXCylinderGeometryModel from './FBXCylinderGeometryModel';
 import CylinderBufferGeometry from '../../gfx/geometries/CylinderBufferGeometry';
 import utils from '../../utils';
 
@@ -27,36 +27,36 @@ describe('FBXCylinderGeometryModel', () => {
       },
     };
 
-    regularCylinder = new FBXCylinderGeometryModel.FBXCylinderGeometryModel('regular', cylinder);
-    extendedCylinder = new FBXCylinderGeometryModel.FBXCylinderGeometryModel('extended', cylinder);
-    resultingCylinder = new FBXCylinderGeometryModel.FBXCylinderGeometryModel('resulting', cylinder);
+    regularCylinder = new FBXCylinderGeometryModel('regular', cylinder);
+    extendedCylinder = new FBXCylinderGeometryModel('extended', cylinder);
+    resultingCylinder = new FBXCylinderGeometryModel('resulting', cylinder);
   });
 
   describe('constructor', () => {
     it('throws an error if no parameters passed', () => {
-      expect(() => new FBXCylinderGeometryModel.FBXCylinderGeometryModel()).to.throw();
+      expect(() => new FBXCylinderGeometryModel()).to.throw();
     });
 
     it('throws an error if only one of parameters passed', () => {
-      expect(() => new FBXCylinderGeometryModel.FBXCylinderGeometryModel('regular', null)).to.throw();
+      expect(() => new FBXCylinderGeometryModel('regular', null)).to.throw();
     });
 
     it('throws an error if only one of parameters passed', () => {
       const mesh = new THREE.Mesh();
-      expect(() => new FBXCylinderGeometryModel.FBXCylinderGeometryModel(null, mesh)).to.throw();
+      expect(() => new FBXCylinderGeometryModel(null, mesh)).to.throw();
     });
 
 
     it('do not throws an error if all parameters passed', () => {
-      expect(() => new FBXCylinderGeometryModel.FBXCylinderGeometryModel('regular', cylinder)).to.not.throw();
+      expect(() => new FBXCylinderGeometryModel('regular', cylinder)).to.not.throw();
     });
 
     it('do not throws an error if more then one of parameters passed', () => {
-      expect(() => new FBXCylinderGeometryModel.FBXCylinderGeometryModel('regular', cylinder, '123')).to.not.throw();
+      expect(() => new FBXCylinderGeometryModel('regular', cylinder, '123')).to.not.throw();
     });
 
     it('do nothing if modificator isnt a specified one', () => {
-      const tmpCylinder = new FBXCylinderGeometryModel.FBXCylinderGeometryModel('abcd', cylinder);
+      const tmpCylinder = new FBXCylinderGeometryModel('abcd', cylinder);
       expect(tmpCylinder).to.have.property('regularIndexArray', null);
       expect(tmpCylinder).to.have.property('regularNormalsArray', null);
       expect(tmpCylinder).to.have.property('regularVertexArray', null);

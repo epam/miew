@@ -402,33 +402,16 @@ function materialProperties(material) {
  * @param {Array} sourceArray - array from where will be copied
  * @param {Number} fromPositionInSourceArray - position in source array from where will be copied
  * @param {Number} numberOfElements - number of elements to copy
+ * @returns {Number} number of copied elements
  */
-function copyArrays(destArray, fromPositionInDestArray, sourceArray, fromPositionInSourceArray, numberOfElements) {
-  for (let j = 0; j < numberOfElements; ++j) {
-    destArray[fromPositionInDestArray] = sourceArray[j + fromPositionInSourceArray];
-    fromPositionInDestArray++;
+function copyArrays(destArray, fromPositionInDestArray, sourceArray, fromPositionInSourceArray, numberOfElements, offset = 0) {
+  for (let j = 0; j < numberOfElements; j += 3) {
+    destArray[fromPositionInDestArray] = sourceArray[j + fromPositionInSourceArray] + offset;
+    destArray[fromPositionInDestArray + 1] = sourceArray[j + 1 + fromPositionInSourceArray] + offset;
+    destArray[fromPositionInDestArray + 2] = sourceArray[j + 2 + fromPositionInSourceArray] - offset;
+    fromPositionInDestArray += 3;
   }
-}
-
-/**
- * Simple check for equality of two objects by their properties
- * @param {Object} objA - first object
- * @param {Object} objB - second object
- * @returns {boolean} true if object are equal, false otherwise
- */
-function isEqual(objA, objB) {
-  const aProps = Object.getOwnPropertyNames(objA);
-  const bProps = Object.getOwnPropertyNames(objB);
-  if (aProps.length !== bProps.length) {
-    return false;
-  }
-  for (let i = 0; i < aProps.length; i++) {
-    const propName = aProps[i];
-    if (objA[propName] !== objB[propName]) {
-      return false;
-    }
-  }
-  return true;
+  return numberOfElements;
 }
 
 /**
@@ -456,7 +439,7 @@ function decideSeparation(mesh, instanceIndex) {
   const lAlphas = [meshAlphaColor[instanceIndex]];
   const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
   const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
-  return !isEqual(objectColor1, objectColor2);
+  return !utils.isEqual(objectColor1, objectColor2);
 }
 
 /**
@@ -498,7 +481,7 @@ function getColors(mesh, instanceIndex, model) {
   const lColors1 = cloneColors(numVerticesBeforeDividingLine, objectColor1);
   let lColors2 = null;
   /* Clone colors for one cylinder ( 2 * numVertices / 3) and for another (same number) */
-  if (!isEqual(objectColor1, objectColor2)) {
+  if (!utils.isEqual(objectColor1, objectColor2)) {
     lColors2 = cloneColors(numVerticesBeforeDividingLine, objectColor2);
   } else {
     lColors2 = cloneColors(numVerticesAfterDividingLine, objectColor2);
@@ -528,7 +511,6 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   const [reworkedIndices, reworkedNormals, reworkedVertices] = reworkedModel.getArrays();
   const reworkedColors = getColors(mesh, instanceIndex, reworkedModel);
   reworkedModel.storeColors(reworkedColors);
-  const numVertices = lVertices.length / 3; /* That's the original number of vertices */
   let indexVerticesNormalsArray = 0; /* not using push */
   let indexIndicesArray = 0;
   let indexAdditionalVertices = 0;
@@ -536,7 +518,7 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   let hatVertices = 0;
   let indicesBeforeDividingLine = 0;
   if (reworkedModel.closedCylinder) {
-    thirdOfTubeCylinderVertices = 3 * (numVertices - 2) / 5;
+    thirdOfTubeCylinderVertices = 3 * (lVertices.length / 3 - 2) / 5;
     hatVertices = 2 * (thirdOfTubeCylinderVertices + 3);
     indicesBeforeDividingLine = 6 * thirdOfTubeCylinderVertices / 3;
   } else {
@@ -546,22 +528,18 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   /* Step 1 : first third of vertices and  normals are copied directly */
   /* we can use numVertices here, but logically speaking lVertices.length / 3 is much clearer */
   copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 0, thirdOfTubeCylinderVertices);
-  copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, thirdOfTubeCylinderVertices);
-  indexVerticesNormalsArray += thirdOfTubeCylinderVertices;
+  indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, thirdOfTubeCylinderVertices);
   /* Also copying half of indices because other half may have offset if cylinders will be expanded */
-  copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine);
-  indexIndicesArray += indicesBeforeDividingLine;
+  indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine);
   /* Step 2 : adding new vertices and normals and also copying old
   * We can either full-copy middle vertices or copy them with some shift.
   * Here is first way - full copying without any shifts */
   const additionalVertices = [];
   const additionalNormals = [];
   copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  indexVerticesNormalsArray += thirdOfTubeCylinderVertices;
+  indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   copyArrays(additionalVertices, indexAdditionalVertices, lVertices, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  copyArrays(additionalNormals, indexAdditionalVertices, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  indexAdditionalVertices += thirdOfTubeCylinderVertices;
+  indexAdditionalVertices += copyArrays(additionalNormals, indexAdditionalVertices, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   /* If we need to divide cylinders => we're adding additional vertices */
   if (needToDivideCylinders) {
     reworkedVertices.set(additionalVertices, indexVerticesNormalsArray);
@@ -570,37 +548,25 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   }
   /* Last third of vertices */
   copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  indexVerticesNormalsArray += thirdOfTubeCylinderVertices;
+  indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   /* If we have closed cylinder => we must add last vertices */
   if (reworkedModel.closedCylinder) {
     copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 3 * thirdOfTubeCylinderVertices, hatVertices);
     copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 3 * thirdOfTubeCylinderVertices, hatVertices);
   }
   /* Adding last portion of indices simply as first half of indices but with 2 * number of vertices / 3 addition if needed */
-  /* TODO: CHECK CODE BELOW */
   let offsetIndices = thirdOfTubeCylinderVertices / 3;
   if (needToDivideCylinders) {
     offsetIndices = 2 * thirdOfTubeCylinderVertices / 3;
   }
-  for (let j = 0; j < indicesBeforeDividingLine; j += 3) {
-    reworkedIndices[indexIndicesArray] = (lIndices[j] + offsetIndices);
-    reworkedIndices[indexIndicesArray + 1] = (lIndices[j + 1] + offsetIndices);
-    reworkedIndices[indexIndicesArray + 2] = (lIndices[j + 2] - offsetIndices);
-    indexIndicesArray += 3;
-  }
+  indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine, offsetIndices);
   /* if we have closed cylinder => must add last indices with offset */
-  let closedCylinderOffset = 0;
-  if (needToDivideCylinders) {
-    closedCylinderOffset = thirdOfTubeCylinderVertices / 3;
-  }
   if (reworkedModel.closedCylinder) {
-    for (let j = 2 * indicesBeforeDividingLine; j < lIndices.length; j += 3) {
-      reworkedIndices[indexIndicesArray] = (lIndices[j] + closedCylinderOffset);
-      reworkedIndices[indexIndicesArray + 1] = (lIndices[j + 1] + closedCylinderOffset);
-      reworkedIndices[indexIndicesArray + 2] = (lIndices[j + 2] - closedCylinderOffset);
-      indexIndicesArray += 3;
+    let closedCylinderOffset = 0;
+    if (needToDivideCylinders) {
+      closedCylinderOffset = thirdOfTubeCylinderVertices / 3;
     }
+    copyArrays(reworkedIndices, indexIndicesArray, lIndices, 2 * indicesBeforeDividingLine, lIndices.length - 2 * indicesBeforeDividingLine, closedCylinderOffset);
   }
 }
 
@@ -643,186 +609,6 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
   return [resVertices.subarray(0, resultingModel.curResVerticesIndex), resIndices, resColors.subarray(0, resultingModel.curResColorsIndex), resNormals.subarray(0, resultingModel.curResNormalsIndex)];
 }
 
-/**
- * Utils class for simplifying cylinders procedures
- */
-class FBXCylinderGeometryModel {
-  constructor(modificator, mesh) {
-    if (!mesh || !modificator) {
-      throw new Error('Error in cylinder dividing');
-    }
-    this.regularIndexArray = null;
-    this.regularNormalsArray = null;
-    this.regularVertexArray = null;
-    this.regularColorsArray = null;
-    this.extendedIndexArray = null;
-    this.extendedNormalsArray = null;
-    this.extendedVertexArray = null;
-    this.extendedColorsArray = null;
-    this.modificator = modificator;
-    this.resultingVertexArray = null;
-    this.resultingIndexArray = null;
-    this.resultingNormalsArray = null;
-    this.resultingColorsArray = null;
-    this.curResVerticesIndex = 0;
-    this.curResNormalsIndex = 0;
-    this.curResColorsIndex = 0;
-    this.curResIndicesIndex = 0;
-    this.closedCylinder = false;
-    /* For some improvements in performance we make that definitions */
-    const {
-      parent: {
-        parent: {
-          constructor,
-        },
-      },
-      geometry: {
-        attributes: {
-          position,
-          normal,
-        },
-        index,
-      },
-    } = mesh;
-    const vertexArrayLength = position.array.length;
-    const normalArrayLength = normal.array.length;
-    const indexArrayLength = index.array.length;
-    /* Here we have a difference - some cylinders are closed (therefore they have additional vertices etc) and some are simple and opened */
-    /* Not extended parameters are the same for both types of cylinders */
-    this.vertexArrayLength = vertexArrayLength;
-    this.colorsArrayLength = 4 * vertexArrayLength / 3;
-    this.normalsArrayLength = normalArrayLength;
-    this.indexArrayLength = indexArrayLength;
-    if (constructor.name.includes('Trace')) {
-      /* that's closed cylinders */
-      /* All this numbers are based purely on idea of building this cylinders :
-      * Closed cylinders are built like that - bottom vertices, middle vertices, top vertices, then top and bottom hats */
-      this.closedCylinder = true;
-      this.extendedIndexArrayLength = indexArrayLength;
-      this.extendedVertexArrayLength = vertexArrayLength + (vertexArrayLength - 2) / 5;
-      this.extendedNormalsArrayLength = normalArrayLength + (normalArrayLength - 2) / 5;
-      this.extendedColorsArrayLength = 4 * (vertexArrayLength / 3 + (vertexArrayLength - 2) / 15);
-    } else {
-      this.extendedIndexArrayLength = indexArrayLength;
-      this.extendedVertexArrayLength = vertexArrayLength + vertexArrayLength / 3;
-      this.extendedNormalsArrayLength = normalArrayLength + normalArrayLength / 3;
-      this.extendedColorsArrayLength = 4 * (vertexArrayLength / 3 + vertexArrayLength / 9);
-    }
-    switch (modificator) {
-      case 'regular':
-        [this.regularIndexArray, this.regularNormalsArray, this.regularVertexArray, this.regularColorsArray] = this.createRegularArrays();
-        break;
-      case 'extended':
-        [this.extendedIndexArray, this.extendedNormalsArray, this.extendedVertexArray, this.extendedColorsArray] = this.createExtendedArrays();
-        break;
-      case 'resulting':
-        [this.resultingIndexArray, this.resultingNormalsArray, this.resultingVertexArray, this.resultingColorsArray] = this.createResultingArrays(mesh);
-        break;
-      default:
-        break;
-    }
-  }
-
-  /**
-   * Creating not extended arrays (for not-dividable cylinders)
-   * @returns {[Int32Array, Float32Array, Float32Array, Float32Array]} not extended arrays of parameters
-   */
-  createRegularArrays() {
-    const indexArray = new Int32Array(this.indexArrayLength);
-    const normalsArray = new Float32Array(this.normalsArrayLength);
-    const vertexArray = new Float32Array(this.vertexArrayLength);
-    const colorsArray = new Float32Array(this.colorsArrayLength);
-    return [indexArray, normalsArray, vertexArray, colorsArray];
-  }
-
-  /**
-   * Creating extended arrays (for dividable cylinders)
-   * @returns {[Int32Array, Float32Array, Float32Array, Float32Array]} extended arrays of parameters
-   */
-  createExtendedArrays() {
-    const extendedIndexArray = new Int32Array(this.extendedIndexArrayLength);
-    const extendedNormalsArray = new Float32Array(this.extendedNormalsArrayLength);
-    const extendedVertexArray = new Float32Array(this.extendedVertexArrayLength);
-    const extendedColorsArray = new Float32Array(this.extendedColorsArrayLength);
-    return [extendedIndexArray, extendedNormalsArray, extendedVertexArray, extendedColorsArray];
-  }
-
-  /**
-   * Creating resulting arrays
-   * @param {Object} mesh - given mesh
-   * @returns {[Int32Array, Float32Array, Float32Array, Float32Array]} arrays of parameters
-   */
-  createResultingArrays(mesh) {
-    const {
-      geometry: {
-        attributes: {
-          alphaColor,
-        },
-      },
-    } = mesh;
-    const numInstances = alphaColor.count;
-    const resVertices = new Float32Array(this.extendedVertexArrayLength * numInstances);
-    const resIndices = new Float32Array(this.extendedIndexArrayLength * numInstances);
-    const resNormals = new Float32Array(this.extendedNormalsArrayLength * numInstances);
-    const resColors = new Float32Array(this.extendedColorsArrayLength * numInstances);
-    return [resIndices, resNormals, resVertices, resColors];
-  }
-
-  /**
-   * Simple getter for working arrays
-   * @returns {null|*[]} working arrays
-   */
-  getArrays() {
-    switch (this.modificator) {
-      case 'regular':
-        return [this.regularIndexArray, this.regularNormalsArray, this.regularVertexArray, this.regularColorsArray];
-      case 'extended':
-        return [this.extendedIndexArray, this.extendedNormalsArray, this.extendedVertexArray, this.extendedColorsArray];
-      case 'resulting':
-        return [this.resultingIndexArray, this.resultingNormalsArray, this.resultingVertexArray, this.resultingColorsArray];
-      default:
-        return null;
-    }
-  }
-
-  /**
-   * Utility for storing color arrays
-   * @param {Array} color - color array
-   */
-  storeColors(color) {
-    switch (this.modificator) {
-      case 'regular':
-        this.regularColorsArray = color;
-        break;
-      case 'extended':
-        this.extendedColorsArray = color;
-        break;
-      default:
-        break;
-    }
-  }
-
-  /**
-   * Storing gathered data to model
-   * @param {FBXCylinderGeometryModel} model - cylinder model
-   */
-  storeResults(model) {
-    const reworkedVertices = model.getArrays()[2];
-    const reworkedNormals = model.getArrays()[1];
-    const reworkedColors = model.getArrays()[3];
-    const reworkedIndices = model.getArrays()[0];
-    this.resultingVertexArray.set(reworkedVertices, this.curResVerticesIndex);
-    this.resultingNormalsArray.set(reworkedNormals, this.curResNormalsIndex);
-    this.resultingColorsArray.set(reworkedColors, this.curResColorsIndex);
-    this.resultingIndexArray.set(reworkedIndices, this.curResIndicesIndex);
-    /* Updating current position in resulting arrays */
-    this.curResVerticesIndex += reworkedVertices.length;
-    this.curResIndicesIndex += reworkedIndices.length;
-    this.curResColorsIndex += reworkedColors.length;
-    this.curResNormalsIndex += reworkedNormals.length;
-  }
-}
-
 export default {
   reworkColors,
   reworkIndices,
@@ -840,6 +626,5 @@ export default {
   materialProperties,
   getReworkedParameters,
   finalizeCylinderParameters,
-  FBXCylinderGeometryModel,
   getMaxIndexInModel,
 };
