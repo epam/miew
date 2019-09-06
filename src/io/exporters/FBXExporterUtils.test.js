@@ -19,6 +19,14 @@ describe('FBXCylinderGeometryModel', () => {
     geometry.addAttribute('alphaColor', new THREE.InstancedBufferAttribute(alpha, 1, false, 1));
     const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
     cylinder = new THREE.Mesh(geometry, material);
+    cylinder.parent = {
+      parent: {
+        constructor: {
+          name: 'Cylinder',
+        },
+      },
+    };
+
     regularCylinder = new FBXCylinderGeometryModel.FBXCylinderGeometryModel('regular', cylinder);
     extendedCylinder = new FBXCylinderGeometryModel.FBXCylinderGeometryModel('extended', cylinder);
     resultingCylinder = new FBXCylinderGeometryModel.FBXCylinderGeometryModel('resulting', cylinder);
@@ -57,9 +65,9 @@ describe('FBXCylinderGeometryModel', () => {
       expect(tmpCylinder).to.have.property('extendedNormalsArray', null);
       expect(tmpCylinder).to.have.property('extendedVertexArray', null);
       expect(tmpCylinder).to.have.property('extendedColorsArray', null);
-      expect(tmpCylinder).to.have.property('resultingIndicesArray', null);
+      expect(tmpCylinder).to.have.property('resultingIndexArray', null);
       expect(tmpCylinder).to.have.property('resultingNormalsArray', null);
-      expect(tmpCylinder).to.have.property('resultingVerticesArray', null);
+      expect(tmpCylinder).to.have.property('resultingVertexArray', null);
       expect(tmpCylinder).to.have.property('resultingColorsArray', null);
     });
 
@@ -72,9 +80,9 @@ describe('FBXCylinderGeometryModel', () => {
       expect(extendedCylinder).to.not.have.property('extendedNormalsArray', null);
       expect(extendedCylinder).to.not.have.property('extendedVertexArray', null);
       expect(extendedCylinder).to.not.have.property('extendedColorsArray', null);
-      expect(resultingCylinder).to.not.have.property('resultingIndicesArray', null);
+      expect(resultingCylinder).to.not.have.property('resultingIndexArray', null);
       expect(resultingCylinder).to.not.have.property('resultingNormalsArray', null);
-      expect(resultingCylinder).to.not.have.property('resultingVerticesArray', null);
+      expect(resultingCylinder).to.not.have.property('resultingVertexArray', null);
       expect(resultingCylinder).to.not.have.property('resultingColorsArray', null);
     });
   });
@@ -103,8 +111,8 @@ describe('FBXCylinderGeometryModel', () => {
   describe('.createResultingArrays(mesh)', () => {
     it('creates 4 resulting arrays', () => {
       expect(resultingCylinder.createResultingArrays(cylinder)).to.have.lengthOf(4);
-      expect(resultingCylinder.createResultingArrays(cylinder)).to.not.have.property('resultingIndicesArray', null);
-      expect(resultingCylinder.createResultingArrays(cylinder)).to.not.have.property('resultingVerticesArray', null);
+      expect(resultingCylinder.createResultingArrays(cylinder)).to.not.have.property('resultingIndexArray', null);
+      expect(resultingCylinder.createResultingArrays(cylinder)).to.not.have.property('resultingVertexArray', null);
       expect(resultingCylinder.createResultingArrays(cylinder)).to.not.have.property('resultingNormalsArray', null);
       expect(resultingCylinder.createResultingArrays(cylinder)).to.not.have.property('resultingColorsArray', null);
     });

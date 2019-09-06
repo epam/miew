@@ -210,7 +210,17 @@ export default class FBXExporter extends Exporter {
    * Save geometry info from mesh to this._models.
    */
   _collectStraightGeometryInfo(mesh) {
-    const { geometry: { attributes: { position, alphaColor, color, normal }, index } } = mesh;
+    const {
+      geometry: {
+        attributes: {
+          position,
+          alphaColor,
+          color,
+          normal,
+        },
+        index,
+      },
+    } = mesh;
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
@@ -253,7 +263,16 @@ export default class FBXExporter extends Exporter {
    * @param {object} mesh - mesh with instanced spheres info
    */
   _collectSpheresInfo(mesh) {
-    const { geometry: { attributes: {offset, position, normal}, index } } = mesh;
+    const {
+      geometry: {
+        attributes: {
+          offset,
+          position,
+          normal,
+        },
+        index,
+      },
+    } = mesh;
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
@@ -310,7 +329,14 @@ export default class FBXExporter extends Exporter {
    * @returns {Int32Array} array of gathered indices
    */
   _collectInstancedIndices(mesh, instance) {
-    const { geometry: { attributes: { position }, index } } = mesh;
+    const {
+      geometry: {
+        attributes: {
+          position,
+        },
+        index,
+      },
+    } = mesh;
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
@@ -341,7 +367,14 @@ export default class FBXExporter extends Exporter {
    * @param {object} mesh - given mesh with instanced cylinders
    */
   _collectCylindersInfo(mesh) {
-    const { geometry: { attributes: { alphaColor }, index } } = mesh;
+    const {
+      geometry: {
+        attributes: {
+          alphaColor,
+        },
+        index,
+      },
+    } = mesh;
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     const maxIndexInModels = this._calculateMaxIndex(modelNumber);
@@ -380,7 +413,7 @@ export default class FBXExporter extends Exporter {
       }
       /* Getting new vertices etc */
       FBXUtils.getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders);
-      maxIndex = Math.max(...reworkedModel.getArrays()[0]); /* VERY UNSAFE! */
+      maxIndex = FBXUtils.getMaxIndexInModel(reworkedModel);
       /* Ending */
       /* Saving info from one instance to resulting model */
       resultingModel.storeResults(reworkedModel);

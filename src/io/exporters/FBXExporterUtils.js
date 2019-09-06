@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import * as THREE from 'three';
-import construct from '@babel/runtime/helpers/esm/construct';
 import utils from '../../utils';
 
 /**
@@ -79,7 +78,11 @@ function correctArrayNotation(array) {
  * @returns {object} gathered material
  */
 function collectMaterialInfo(mesh) {
-  const { material: { uberOptions } } = mesh;
+  const {
+    material: {
+      uberOptions,
+    },
+  } = mesh;
   const lDiffuse = uberOptions.diffuse.toArray();
   const lOpacity = uberOptions.opacity;
   const lShininess = uberOptions.shininess;
@@ -175,7 +178,11 @@ const defaultProperties = '\t\tProperties60: {\n'
  */
 function calculateCylinderTransform(mesh, instanceIndex) {
   /* Misc variables */
-  const { geometry: { attributes } } = mesh;
+  const {
+    geometry: {
+      attributes,
+    },
+  } = mesh;
   const matVector1 = attributes.matVector1.array;
   const matVector2 = attributes.matVector2.array;
   const matVector3 = attributes.matVector3.array;
@@ -217,7 +224,15 @@ function calculateCylinderTransform(mesh, instanceIndex) {
  * @returns {Float32Array} array of gathered instanced colors
  */
 function collectInstancedColors(mesh, instanceIndex) {
-  const { geometry: { attributes: { color, alphaColor, position } } } = mesh;
+  const {
+    geometry: {
+      attributes: {
+        color,
+        alphaColor,
+        position,
+      },
+    },
+  } = mesh;
   const idxColors = (instanceIndex * 3); /* that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc */
   const meshColor = color.array;
   const meshAlphaColor = alphaColor.array;
@@ -424,7 +439,15 @@ function isEqual(objA, objB) {
  * @returns {boolean} true if need separation, false otherwise
  */
 function decideSeparation(mesh, instanceIndex) {
-  const { geometry: { attributes: { color, color2, alphaColor } } } = mesh;
+  const {
+    geometry: {
+      attributes: {
+        color,
+        color2,
+        alphaColor,
+      },
+    },
+  } = mesh;
   /* No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies */
   const meshColor1 = color.array;
   const meshColor2 = color2.array;
@@ -479,6 +502,14 @@ function getColors(mesh, instanceIndex, model) {
     lColors2 = cloneColors(numVerticesBeforeDividingLine, objectColor2);
   } else {
     lColors2 = cloneColors(numVerticesAfterDividingLine, objectColor2);
+  }
+  /* Need to carefully process hats */
+  if (model.closedCylinder) {
+    const additionalColors1 = cloneColors((numVertices - 2) / 5 + 1, objectColor1);
+    const additionalColors2 = cloneColors((numVertices - 2) / 5 + 1, objectColor2);
+    const additionalLColors = utils.TypedArrayConcat(additionalColors1, additionalColors2);
+    const tubeColors = utils.TypedArrayConcat(lColors2, lColors1);
+    return utils.TypedArrayConcat(tubeColors, additionalLColors);
   }
   return utils.TypedArrayConcat(lColors2, lColors1);
 }
@@ -571,7 +602,19 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
       indexIndicesArray += 3;
     }
   }
+}
 
+/**
+ * Calculating max index in index array of given model. Behaviour is different for closed and open cylinders
+ * @param {FBXCylinderGeometryModel} model - given model
+ * @returns {number} max index in index array
+ */
+function getMaxIndexInModel(model) {
+  const maxIndex = Math.max(...model.getArrays()[0]); /* VERY UNSAFE! */
+  if (model.closedCylinder) {
+    return maxIndex + 1; /* VERY UNSAFE! */
+  }
+  return maxIndex;
 }
 
 /**
@@ -627,7 +670,20 @@ class FBXCylinderGeometryModel {
     this.curResIndicesIndex = 0;
     this.closedCylinder = false;
     /* For some improvements in performance we make that definitions */
-    const { parent: { parent: { constructor } }, geometry: { attributes: { position, normal }, index } } = mesh;
+    const {
+      parent: {
+        parent: {
+          constructor,
+        },
+      },
+      geometry: {
+        attributes: {
+          position,
+          normal,
+        },
+        index,
+      },
+    } = mesh;
     const vertexArrayLength = position.array.length;
     const normalArrayLength = normal.array.length;
     const indexArrayLength = index.array.length;
@@ -697,7 +753,13 @@ class FBXCylinderGeometryModel {
    * @returns {[Int32Array, Float32Array, Float32Array, Float32Array]} arrays of parameters
    */
   createResultingArrays(mesh) {
-    const { geometry: { attributes: { alphaColor } } } = mesh;
+    const {
+      geometry: {
+        attributes: {
+          alphaColor,
+        },
+      },
+    } = mesh;
     const numInstances = alphaColor.count;
     const resVertices = new Float32Array(this.extendedVertexArrayLength * numInstances);
     const resIndices = new Float32Array(this.extendedIndexArrayLength * numInstances);
@@ -779,4 +841,5 @@ export default {
   getReworkedParameters,
   finalizeCylinderParameters,
   FBXCylinderGeometryModel,
+  getMaxIndexInModel,
 };
