@@ -2,6 +2,10 @@ import _ from 'lodash';
 import logger from './utils/logger';
 
 
+const browserType = {
+  DEFAULT: 0,
+  SAFARI: 1,
+};
 //----------------------------------------------------------------------------
 // Query string
 
@@ -393,6 +397,16 @@ function dataUrlToBlob(url) {
   return null;
 }
 
+function getBrowser() {
+  if (navigator.vendor && navigator.vendor.indexOf('Apple') > -1
+    && navigator.userAgent
+    && navigator.userAgent.indexOf('CriOS') === -1
+    && navigator.userAgent.indexOf('FxiOS') === -1) {
+    return browserType.SAFARI;
+  }
+  return browserType.DEFAULT;
+}
+
 function shotOpen(url) {
   if (typeof window !== 'undefined') {
     window.open().document.write(`<body style="margin:0"><img src="${url}" /></body>`);
@@ -477,6 +491,7 @@ function correctSelectorIdentifier(value) {
 // Exports
 
 export default {
+  browserType,
   encodeQueryComponent,
   decodeQueryComponent,
   getUrlParameters,
@@ -499,6 +514,7 @@ export default {
   forInRecursive,
   enquoteString,
   unquoteString,
+  getBrowser,
   shotOpen,
   shotDownload,
   copySubArrays,

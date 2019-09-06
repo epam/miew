@@ -3042,37 +3042,34 @@ Miew.prototype.screenshot = function (width, height) {
     return THREE.Math.radToDeg(Math.atan(tan)) * 2.0;
   }
 
-  function getScreenshotSafari() {
-    const canvas = document.createElement('canvas');
-    const canvasContext = canvas.getContext('2d');
+  function getDataURL() {
+    let dataURL;
+    const currBrowser = utils.getBrowser();
 
-    canvas.width = width;
-    canvas.height = height;
-    canvasContext.drawImage(gfx.renderer.domElement, 0, 0, canvas.width, canvas.height);
-    const screenshot = canvas.toDataURL('image/png');
+    if (currBrowser === utils.browserType.SAFARI) {
+      const canvas = document.createElement('canvas');
+      const canvasContext = canvas.getContext('2d');
 
-    return screenshot;
+      canvas.width = width;
+      canvas.height = height;
+      canvasContext.drawImage(gfx.renderer.domElement, 0, 0, canvas.width, canvas.height);
+      dataURL = canvas.toDataURL('image/png');
+    } else {
+      // Copy current canvas to screenshot
+      dataURL = gfx.renderer.domElement.toDataURL('image/png');
+    }
+    return dataURL;
   }
   height = height || width || gfx.height;
   width = width || gfx.width;
 
-  const isSafariBrowser = navigator.vendor && navigator.vendor.indexOf('Apple') > -1
-    && navigator.userAgent
-    && navigator.userAgent.indexOf('CriOS') === -1
-    && navigator.userAgent.indexOf('FxiOS') === -1;
   let screenshotURI;
 
   if (width === gfx.width && height === gfx.height) {
     // renderer.domElement.toDataURL('image/png') returns flipped image in Safari
     // It hasn't been resolved yet, but getScreenshotSafari()
     // fixes it using an extra canvas.
-    // Also the bug can be fixed with premultipliedAlpha: true WebGL option
-    if (isSafariBrowser) {
-      screenshotURI = getScreenshotSafari();
-    } else {
-      // Copy current canvas to screenshot
-      screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
-    }
+    screenshotURI = getDataURL();
   } else {
     const originalAspect = gfx.camera.aspect;
     const originalFov = gfx.camera.fov;
@@ -3093,11 +3090,7 @@ Miew.prototype.screenshot = function (width, height) {
 
     // make screenshot
     this._renderFrame(settings.now.stereo);
-    if (isSafariBrowser) {
-      screenshotURI = getScreenshotSafari();
-    } else {
-      screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
-    }
+    screenshotURI = getDataURL();
 
     // restore original camera & canvas proportions
     gfx.camera.aspect = originalAspect;
