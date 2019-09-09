@@ -446,6 +446,7 @@ function decideSeparation(mesh, instanceIndex) {
  * Get color array in FBX notation for given cylinder.
  * @param {Object} mesh - given mesh
  * @param {Number} instanceIndex - exact cylinder in given mesh
+ * @param {FBXCylinderGeometryModel} model - given model (either closed or opened cylinder)
  * @returns {Float32Array} cylinder colors array (for every vertex)
  */
 function getColors(mesh, instanceIndex, model) {
@@ -627,4 +628,7 @@ export default {
   getReworkedParameters,
   finalizeCylinderParameters,
   getMaxIndexInModel,
+  /* Exports for testing */
+  cloneColors,
+  correctArrayNotation,
 };
