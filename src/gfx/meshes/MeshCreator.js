@@ -14,7 +14,7 @@ function _createInstancedCylinders(useZSprites, openEnded, useTraceMesh) {
     Geometry(a, b) {
       return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
     },
-    Object: useTraceMesh ? meshes.Trace : meshes.ZSprite,
+    Object: useTraceMesh ? meshes.Instanced : meshes.ZSprite,
     initMaterial: setMatParams({
       instancedMatrix: true,
       attrColor: true,

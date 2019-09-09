@@ -3,7 +3,7 @@ import UberObject from './UberObject';
 
 const Mesh = UberObject(THREE.Mesh);
 
-class TraceMesh extends Mesh {
+class InstancedMesh extends Mesh {
   constructor(...rest) {
     super(...rest);
     this.castShadow = true;
@@ -11,4 +11,4 @@ class TraceMesh extends Mesh {
   }
 }
 
-export default TraceMesh;
+export default InstancedMesh;
