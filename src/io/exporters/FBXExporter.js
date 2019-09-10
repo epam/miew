@@ -221,6 +221,7 @@ export default class FBXExporter extends Exporter {
         },
         index,
       },
+      matrix,
     } = mesh;
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
     const material = FBXUtils.collectMaterialInfo(mesh);
@@ -228,7 +229,14 @@ export default class FBXExporter extends Exporter {
     let lAlphas = [];
     let lColors = [];
     /* Collect info about vertices + indices + material */
-    const lVertices = position.array; /* Vertices either way are copying directly */
+    let lNormals = null;
+    let lVertices = null;
+    if (matrix.equals(new THREE.Matrix4().identity())) {
+      lVertices = position.array; /* Vertices either way are copying directly */
+      lNormals = normal.array;
+    } else {
+      [lVertices, lNormals] = FBXUtils.applyMatrixToVerticesNormals(matrix, _.cloneDeep(position.array), _.cloneDeep(normal.array));
+    }
     /* Different style with indices - if we have modelNumber => we must to add indices to existing ones */
     /* 1 loop? */
     const maxIndex = this._calculateMaxIndex(modelNumber);
@@ -239,7 +247,6 @@ export default class FBXExporter extends Exporter {
       }
     }
     lIndices = FBXUtils.reworkIndices(lIndices); /* Need to rework this into strange FBX notation */
-    const lNormals = normal.array;
     /* For some surfaces which does not have alpha color arrays */
     if (!(mesh instanceof ZClippedMesh)) {
       lAlphas = alphaColor.array;
@@ -273,6 +280,7 @@ export default class FBXExporter extends Exporter {
         },
         index,
       },
+      matrix,
     } = mesh;
     /* Firstly extract material information, if it's already in the base we will add to already existing model */
     const material = FBXUtils.collectMaterialInfo(mesh);
@@ -290,8 +298,8 @@ export default class FBXExporter extends Exporter {
     /* For every instanced object */
     for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
       /* Firstly, collect some basic instanced parameters */
-      const lVertices = _.cloneDeep(position.array);
-      const lNormals = _.cloneDeep(normal.array);
+      let lVertices = _.cloneDeep(position.array);
+      let lNormals = _.cloneDeep(normal.array);
       const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
       const lColors = FBXUtils.collectInstancedColors(mesh, instanceIndex);
       /* Extract offset for one exact object (instance) */
@@ -305,6 +313,9 @@ export default class FBXExporter extends Exporter {
         lVertices[j + 2] = ((lVertices[j + 2] * objectOffset.w) + objectOffset.z);
       }
       /* Saving info from one instance to resulting model */
+      if (!matrix.equals(new THREE.Matrix4().identity())) {
+        [lVertices, lNormals] = FBXUtils.applyMatrixToVerticesNormals(matrix, _.cloneDeep(lVertices), _.cloneDeep(lNormals));
+      }
       resVertices.set(lVertices, instanceIndex * numVertices * 3);
       resNormals.set(lNormals, instanceIndex * numVertices * 3);
       resColors.set(lColors, instanceIndex * numVertices * 4);
@@ -375,6 +386,7 @@ export default class FBXExporter extends Exporter {
         },
         index,
       },
+      matrix,
     } = mesh;
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
@@ -392,7 +404,10 @@ export default class FBXExporter extends Exporter {
     /* Main instances loop */
     for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) { /* Proceed every instance. Additional instance is strange. */
       /* Grab vertices and normals for transformed (scale, rotation, translation) cylinder */
-      const [lVertices, lNormals] = FBXUtils.calculateCylinderTransform(mesh, instanceIndex);
+      let [lVertices, lNormals] = FBXUtils.calculateCylinderTransform(mesh, instanceIndex);
+      if (!matrix.equals(new THREE.Matrix4().identity())) {
+        [lVertices, lNormals] = FBXUtils.applyMatrixToVerticesNormals(matrix, _.cloneDeep(lVertices), _.cloneDeep(lNormals));
+      }
       /* Okay now vertices are reworked as we want them. Now it's time for implementing algorithm */
       /* Collect indices for given cylinder - remember: they may slightly change later on */
       let lIndices = Int32Array.from(_.cloneDeep(index.array));

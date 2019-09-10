@@ -3,6 +3,33 @@ import * as THREE from 'three';
 import utils from '../../utils';
 
 /**
+ *
+ * @param matrix
+ * @param vertices
+ * @param normals
+ * @returns {[*, *]}
+ */
+function applyMatrixToVerticesNormals(matrix, vertices, normals) {
+  const normVec = new THREE.Vector4();
+  const vertVec = new THREE.Vector4();
+  /* Applying offsets / transformation to every vertex */
+  for (let j = 0; j < vertices.length; j += 3) {
+    vertVec.set(vertices[j], vertices[j + 1], vertices[j + 2], 1);
+    vertVec.applyMatrix4(matrix);
+    normVec.set(normals[j], normals[j + 1], normals[j + 2], 0.0);
+    normVec.applyMatrix4(matrix);
+
+    vertices[j] = vertVec.x;
+    vertices[j + 1] = vertVec.y;
+    vertices[j + 2] = vertVec.z;
+    normals[j] = normVec.x;
+    normals[j + 1] = normVec.y;
+    normals[j + 2] = normVec.z;
+  }
+  return [vertices, normals];
+}
+
+/**
  * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
  * basically, every triangle in Miew has been represented hat way (e.g.) : 0,1,7, but we must (for FBX) rework that into: 0,1,-8.
  * @param{Int32Array} array - indices buffer
@@ -198,23 +225,7 @@ function calculateCylinderTransform(mesh, instanceIndex) {
     matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
   /* For a reason we must perform transpose of that matrix */
   transformCylinder.transpose();
-  const normVec = new THREE.Vector4();
-  const vertVec = new THREE.Vector4();
-  /* Applying offsets / transformation to every vertex */
-  for (let j = 0; j < lVertices.length; j += 3) {
-    vertVec.set(lVertices[j], lVertices[j + 1], lVertices[j + 2], 1);
-    vertVec.applyMatrix4(transformCylinder);
-    normVec.set(lNormals[j], lNormals[j + 1], lNormals[j + 2], 0.0);
-    normVec.applyMatrix4(transformCylinder);
-
-    lVertices[j] = vertVec.x;
-    lVertices[j + 1] = vertVec.y;
-    lVertices[j + 2] = vertVec.z;
-    lNormals[j] = normVec.x;
-    lNormals[j + 1] = normVec.y;
-    lNormals[j + 2] = normVec.z;
-  }
-  return [lVertices, lNormals];
+  return applyMatrixToVerticesNormals(transformCylinder, lVertices, lNormals);
 }
 
 /**
@@ -610,6 +621,7 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
   return [resVertices.subarray(0, resultingModel.curResVerticesIndex), resIndices, resColors.subarray(0, resultingModel.curResColorsIndex), resNormals.subarray(0, resultingModel.curResNormalsIndex)];
 }
 
+
 export default {
   reworkColors,
   reworkIndices,
@@ -628,6 +640,7 @@ export default {
   getReworkedParameters,
   finalizeCylinderParameters,
   getMaxIndexInModel,
+  applyMatrixToVerticesNormals,
   /* Exports for testing */
   cloneColors,
   correctArrayNotation,
