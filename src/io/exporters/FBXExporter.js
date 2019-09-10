@@ -321,9 +321,9 @@ export default class FBXExporter extends Exporter {
       resColors.set(lColors, instanceIndex * numVertices * 4);
       resIndices.set(lIndices, instanceIndex * numIndices);
       /* Debug purposes */
-      if (instanceIndex % 1000 === 0) {
+      /* if (instanceIndex % 1000 === 0) {
         console.log(`${instanceIndex} out of ${numInstances} spheres done`);
-      }
+      } */
     }
     const model = {
       vertices: resVertices,
