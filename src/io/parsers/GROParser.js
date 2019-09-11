@@ -67,6 +67,7 @@ class GROParser extends Parser {
   _parseTitle(line) {
     const { metadata } = this._complex;
     metadata.id = line.readLine().trim();
+    metadata.name = metadata.id.slice(metadata.id.lastIndexOf('\\') + 1, metadata.id.lastIndexOf('.'));
     metadata.format = 'gro';
   }
 
@@ -136,34 +137,15 @@ class GROParser extends Parser {
   }
 
   /**
-   * Needed procedure for molecules finalization. In '.gro' file format there is only 1 chain and 1 molecule.
-   */
-  _finalizeMolecules() {
-    // get chain from complex
-    const chainDict = {};
-    const chain = this._complex._chains[0];
-    const chainName = chain._name;
-    chainDict[chainName] = chain;
-
-    // aggregate residues from chain
-    const m = this._molecules[0];
-    let residues = [];
-    residues = residues.concat(chain._residues.slice());
-
-    const molecule = new Molecule(this._complex, m._name, 1);
-    molecule._residues = residues;
-    this._complex._molecules[0] = molecule;
-  }
-
-  /**
-   * Some finalizing procedures.
-   * @returns {Complex} Complex structure for visualizing.
+   * Some finalizing procedures. In '.gro' file format there is only 1 chain and 1 molecule.
    */
   _finalize() {
-    this._molecule = { _index: '', _chains: this._chain };
-    this._molecule._index = 1;
-    this._molecules.push(this._molecule);
-    this._finalizeMolecules();
+    const molecule = new Molecule(this._complex, this._complex.metadata.name, 1);
+    // aggregate residues from chain
+    molecule._residues = this._chain._residues;
+    molecule._chains = this._chain;
+    this._complex._molecules[0] = molecule;
+    this._molecules.push(molecule);
     this._complex.finalize({
       needAutoBonding: true,
       detectAromaticLoops: this.settings.now.aromatic,
