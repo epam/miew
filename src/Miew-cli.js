@@ -2,7 +2,6 @@ import _ from 'lodash';
 import Miew from './Miew';
 import { parser as parsercli } from './utils/MiewCLIParser';
 import clihelp from './utils/MiewCLIHelp';
-import JSONConverter from './utils/JSONtoSelectorConverter';
 import logger from './utils/logger';
 import utils from './utils';
 
@@ -394,8 +393,6 @@ Miew.prototype.callNextCmd = function () {
   }
   return '';
 };
-
-Miew.JSONConverter = JSONConverter;
 
 parsercli.yy = cliutils;
 // workaround for incorrect JISON parser generator for AMD module
