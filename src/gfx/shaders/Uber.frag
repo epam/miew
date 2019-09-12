@@ -546,7 +546,7 @@ void main() {
   #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
     flipNormal = 1.0;
     #ifdef DOUBLE_SIDED
-      flipNormal = normalSign;
+      flipNormal = float( gl_FrontFacing );
     #endif
     vec3 normal = normalize( vNormal ) * flipNormal;
   #endif
@@ -560,17 +560,14 @@ void main() {
   #ifdef NORMALS_TO_G_BUFFER
     #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
       vec3 viewNormaInColor = viewNormalSprites;
+      float frontFaced = 1.0;
     #else
       vec3 viewNormaInColor = viewNormal;
-    #endif
-    flipNormal = 1.0;
-    // invert normals on invisible front faces to all of them been directed to the side of viewer
-    #ifdef DOUBLE_SIDED_G_BUFFER
-      flipNormal = normalSign;
+      float frontFaced = normalSign;
     #endif
     // [-1, 1] -> [0, 1]
-    viewNormaInColor = 0.5 * viewNormaInColor * flipNormal + 0.5;
-    gl_FragData[1] = vec4(viewNormaInColor, 1.0);
+    viewNormaInColor = 0.5 * viewNormaInColor + 0.5;
+    gl_FragData[1] = vec4(viewNormaInColor, frontFaced);
   #endif
 
   #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0

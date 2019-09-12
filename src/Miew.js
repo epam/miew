@@ -3546,7 +3546,7 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('ao', () => {
-    const values = { normalsToGBuffer: settings.now.ao, doubleSidedGBuffer: settings.now.ao };
+    const values = { normalsToGBuffer: settings.now.ao };
     this._setUberMaterialValues(values);
   });
 

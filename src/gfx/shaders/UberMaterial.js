@@ -117,8 +117,6 @@ function UberMaterial(params) {
   this.fogTransparent = false;
   // used to render surface normals to G buffer for ssao effect
   this.normalsToGBuffer = false;
-  // used to render surface normals directed to the side of viewer to G buffer for ssao effect
-  this.doubleSidedGBuffer = false;
   // used for toon material
   this.toonShading = false;
 
@@ -227,7 +225,6 @@ UberMaterial.prototype.copy = function (source) {
   this.thickLine = source.thickLine;
   this.fogTransparent = source.fogTransparent;
   this.normalsToGBuffer = source.normalsToGBuffer;
-  this.doubleSidedGBuffer = source.doubleSidedGBuffer;
   this.toonShading = source.toonShading;
 
   this.uberOptions.copy(source.uberOptions);
@@ -327,9 +324,6 @@ UberMaterial.prototype.setValues = function (values) {
   if (this.normalsToGBuffer) {
     extensions.drawBuffers = 1;
     defines.NORMALS_TO_G_BUFFER = 1;
-  }
-  if (this.doubleSidedGBuffer) {
-    defines.DOUBLE_SIDED_G_BUFFER = 1;
   }
   if (this.toonShading) {
     defines.TOON_SHADING = 1;
