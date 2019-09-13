@@ -462,7 +462,7 @@ Miew.prototype._initGfx = function () {
   light12.shadow = new THREE.DirectionalLightShadow();
   light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
-  const shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
+  const shadowMapSize = Math.max(gfx.width, gfx.height) * gfx.renderer.getPixelRatio();
   light12.shadow.mapSize.width = shadowMapSize;
   light12.shadow.mapSize.height = shadowMapSize;
   light12.target.position.set(0.0, 0.0, 0.0);
@@ -477,8 +477,8 @@ Miew.prototype._initGfx = function () {
   gfx.axes = new Axes(gfx.root, gfx.camera);
 
   gfx.offscreenBuf = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, depthBuffer: true,
     },
@@ -490,24 +490,24 @@ Miew.prototype._initGfx = function () {
   }
 
   gfx.offscreenBuf2 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.offscreenBuf3 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.offscreenBuf4 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
@@ -520,8 +520,8 @@ Miew.prototype._initGfx = function () {
   // use float textures for volume rendering if possible
   if (gfx.renderer.getContext().getExtension('OES_texture_float')) {
     gfx.offscreenBuf5 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      gfx.width * gfx.renderer.getPixelRatio(),
+      gfx.height * gfx.renderer.getPixelRatio(),
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -532,8 +532,8 @@ Miew.prototype._initGfx = function () {
     );
 
     gfx.offscreenBuf6 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      gfx.width * gfx.renderer.getPixelRatio(),
+      gfx.height * gfx.renderer.getPixelRatio(),
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -544,8 +544,8 @@ Miew.prototype._initGfx = function () {
     );
 
     gfx.offscreenBuf7 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      gfx.width * gfx.renderer.getPixelRatio(),
+      gfx.height * gfx.renderer.getPixelRatio(),
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -563,16 +563,16 @@ Miew.prototype._initGfx = function () {
   }
 
   gfx.stereoBufL = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.stereoBufR = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    gfx.width * gfx.renderer.getPixelRatio(),
+    gfx.height * gfx.renderer.getPixelRatio(),
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
@@ -1072,7 +1072,7 @@ Miew.prototype._renderFrame = (function () {
     }
 
     // resize offscreen buffers to match the target
-    this._resizeOffscreenBuffers(_size.width * window.devicePixelRatio, _size.height * window.devicePixelRatio, stereo);
+    this._resizeOffscreenBuffers(_size.width * gfx.renderer.getPixelRatio(), _size.height * gfx.renderer.getPixelRatio(), stereo);
 
     switch (stereo) {
       case 'WEBVR':
@@ -3065,7 +3065,7 @@ Miew.prototype.screenshot = function (width, height) {
 
   let screenshotURI;
 
-  if (width === gfx.width && height === gfx.height) {
+  if (window.devicePixelRatio === 1 && width === gfx.width && height === gfx.height) {
     // renderer.domElement.toDataURL('image/png') returns flipped image in Safari
     // It hasn't been resolved yet, but getScreenshotSafari()
     // fixes it using an extra canvas.
@@ -3081,6 +3081,7 @@ Miew.prototype.screenshot = function (width, height) {
 
     // set appropriate camera aspect & FOV
     const shotAspect = width / height;
+    gfx.renderer.setPixelRatio(1);
     gfx.camera.aspect = shotAspect;
     gfx.camera.fov = tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
     gfx.camera.updateProjectionMatrix();
@@ -3093,6 +3094,7 @@ Miew.prototype.screenshot = function (width, height) {
     screenshotURI = getDataURL();
 
     // restore original camera & canvas proportions
+    gfx.renderer.setPixelRatio(window.devicePixelRatio);
     gfx.camera.aspect = originalAspect;
     gfx.camera.fov = originalFov;
     gfx.camera.updateProjectionMatrix();
