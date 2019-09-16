@@ -2,6 +2,8 @@ import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
 
+const NUM_COORDS_PER_VERTEX = 3;
+const NUM_COLORS_PER_VERTEX = 4;
 /**
  *
  * @param matrix
@@ -36,7 +38,7 @@ function applyMatrixToVerticesNormals(matrix, vertices, normals) {
  * @returns{Int32Array} reworked array.
  */
 function reworkIndices(array) {
-  const clonedArray = new Int32Array(array.length); // In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers//
+  const clonedArray = new Int32Array(array.length); // In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers
   clonedArray.set(array);
   for (let i = 2; i < clonedArray.length; i += 3) {
     clonedArray[i] *= -1;
@@ -55,10 +57,10 @@ function reworkColors(colorArray) {
   const clonedArray = new Float32Array(colorArray.length + colorArray.length / 3);
   let clonedArrIdx = 0;
   for (let i = 0; i < colorArray.length; i += 3) {
-    clonedArray.set([colorArray[i]], clonedArrIdx); // R//
-    clonedArray.set([colorArray[i + 1]], clonedArrIdx + 1); // G//
-    clonedArray.set([colorArray[i + 2]], clonedArrIdx + 2); // B//
-    clonedArray.set([1], clonedArrIdx + 3); // A//
+    clonedArray.set([colorArray[i]], clonedArrIdx); // R
+    clonedArray.set([colorArray[i + 1]], clonedArrIdx + 1); // G
+    clonedArray.set([colorArray[i + 2]], clonedArrIdx + 2); // B
+    clonedArray.set([1], clonedArrIdx + 3); // A
     clonedArrIdx += 4;
   }
   return clonedArray;
@@ -70,7 +72,7 @@ function reworkColors(colorArray) {
  * @returns {Float32Array} array with cloned colors
  */
 function cloneColors(numVertices, color) {
-  const clonedArray = new Float32Array(numVertices * 4); // RGBA for every vertex//
+  const clonedArray = new Float32Array(numVertices * 4); // RGBA for every vertex
   for (let i = 0; i < clonedArray.length; i += 4) {
     clonedArray.set(color, i);
   }
@@ -85,7 +87,7 @@ function cloneColors(numVertices, color) {
 function correctArrayNotation(array) {
   const reworkedArray = [];
   for (let i = 0; i < array.length; ++i) {
-    reworkedArray[i] = parseFloat(array[i].toFixed(6)); // Default, i guess?//
+    reworkedArray[i] = parseFloat(array[i].toFixed(6)); // Default, i guess?
   }
   return reworkedArray;
 }
@@ -113,7 +115,7 @@ function collectMaterialInfo(mesh) {
   });
 }
 
-// Default model properties//
+// Default model properties
 const defaultProperties = `    Properties60: {
               Property: "QuaternionInterpolate", "bool", "",0
               Property: "Visibility", "Visibility", "A",1
@@ -196,7 +198,7 @@ const defaultProperties = `    Properties60: {
  * @returns {*[]} array of gathered transformations of vertices and normals
  */
 function calculateCylinderTransform(mesh, instanceIndex) {
-  // Misc variables//
+  // Misc variables
   const {
     geometry: {
       attributes,
@@ -205,17 +207,17 @@ function calculateCylinderTransform(mesh, instanceIndex) {
   const matVector1 = attributes.matVector1.array;
   const matVector2 = attributes.matVector2.array;
   const matVector3 = attributes.matVector3.array;
-  // Grab original vertices and normals//
+  // Grab original vertices and normals
   const lVertices = _.cloneDeep(attributes.position.array);
   const lNormals = _.cloneDeep(attributes.normal.array);
-  // We have vertices for not transformed cylinder. Need to make it transformed//
+  // We have vertices for not transformed cylinder. Need to make it transformed
   const transformCylinder = new THREE.Matrix4();
   const idxOffset = instanceIndex * 4;
   transformCylinder.set(matVector1[idxOffset], matVector2[idxOffset], matVector3[idxOffset], 0,
     matVector1[idxOffset + 1], matVector2[idxOffset + 1], matVector3[idxOffset + 1], 0,
     matVector1[idxOffset + 2], matVector2[idxOffset + 2], matVector3[idxOffset + 2], 0,
     matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
-  // For a reason we must perform transpose of that matrix//
+  // For a reason we must perform transpose of that matrix
   transformCylinder.transpose();
   return applyMatrixToVerticesNormals(transformCylinder, lVertices, lNormals);
 }
@@ -235,10 +237,10 @@ function collectInstancedColors(mesh, instanceIndex) {
       },
     },
   } = mesh;
-  const idxColors = (instanceIndex * 3); // that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc//
+  const idxColors = (instanceIndex * 3); // that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc
   const meshColor = color.array;
   const objectColor = reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]]);
-  // For FBX we need to clone color for every vertex//
+  // For FBX we need to clone color for every vertex
   const lColors = cloneColors(position.array.length / 3, objectColor);
   return lColors;
 }
@@ -248,11 +250,11 @@ function collectInstancedColors(mesh, instanceIndex) {
  * @returns {string} color layer info
  */
 function colorLayer(colorArray) {
-  const layerElementColorNumber = 0; // Currently unknown what that is//
-  const layerElementColorVersion = 101; // Currently unknown what version means//
-  const layerElementColorName = ''; // Currently unknown what name means//
-  // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed//
-  // As said [..Array(...)] - fastest and easiest way to produce [0, 1, .....] array//
+  const layerElementColorNumber = 0; // Currently unknown what that is
+  const layerElementColorVersion = 101; // Currently unknown what version means
+  const layerElementColorName = ''; // Currently unknown what name means
+  // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
+  // As said [..Array(...)] - fastest and easiest way to produce [0, 1, .....] array
   return (`    LayerElementColor: ${layerElementColorNumber} {
           Version: ${layerElementColorVersion}
           Name: "${layerElementColorName}"
@@ -269,10 +271,10 @@ function colorLayer(colorArray) {
  * @returns {string} normal layer info
  */
 function normalLayer(normalArray) {
-  const layerElementNormalNumber = 0; // Currently unknown what that is//
-  const layerElementNormalVersion = 101; // Currently unknown what version means//
-  const layerElementNormalName = ''; // Currently unknown what name means//
-  // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed//
+  const layerElementNormalNumber = 0; // Currently unknown what that is
+  const layerElementNormalVersion = 101; // Currently unknown what version means
+  const layerElementNormalName = ''; // Currently unknown what name means
+  // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
   return (`    LayerElementNormal: ${layerElementNormalNumber} {
           Version: ${layerElementNormalVersion}
           Name: "${layerElementNormalName}"
@@ -283,7 +285,7 @@ function normalLayer(normalArray) {
     `);
 }
 
-// Default materials layer//
+// Default materials layer
 const defaultMaterialLayer = `    LayerElementMaterial: 0 {
           Version: 101
           Name: ""
@@ -293,7 +295,7 @@ const defaultMaterialLayer = `    LayerElementMaterial: 0 {
         }
   `;
 
-// Default layers block//
+// Default layers block
 const defaultLayerBlock = `    Layer: 0 {
         Version: 100
         LayerElement:  {
@@ -439,7 +441,7 @@ function decideSeparation(mesh, instanceIndex) {
       },
     },
   } = mesh;
-  // No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies//
+  // No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies
   const meshColor1 = color.array;
   const meshColor2 = color2.array;
   const idxColors = instanceIndex * 3;
@@ -465,11 +467,11 @@ function getColors(mesh, instanceIndex, model) {
       },
     },
   } = mesh;
-  // No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies//
+  // No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies
   const meshColor1 = color.array;
   const meshColor2 = color2.array;
   const idxColors = instanceIndex * 3;
-  const numVertices = position.count; // That's the original number of vertices//
+  const numVertices = position.count; // That's the original number of vertices
   let numVerticesBeforeDividingLine = 0;
   let numVerticesAfterDividingLine = 0;
   if (model.closedCylinder) {
@@ -479,18 +481,18 @@ function getColors(mesh, instanceIndex, model) {
     numVerticesBeforeDividingLine = 2 * (numVertices) / 3;
     numVerticesAfterDividingLine = (numVertices) / 3;
   }
-  // Collect colors for each half of cylinder//
+  // Collect colors for each half of cylinder
   const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]]);
   const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]]);
   const lColors1 = cloneColors(numVerticesBeforeDividingLine, objectColor1);
   let lColors2 = null;
-  // Clone colors for one cylinder and for another//
+  // Clone colors for one cylinder and for another
   if (!utils.isEqual(objectColor1, objectColor2)) {
     lColors2 = cloneColors(numVerticesBeforeDividingLine, objectColor2);
   } else {
     lColors2 = cloneColors(numVerticesAfterDividingLine, objectColor2);
   }
-  // Need to carefully process hats//
+  // Need to carefully process hats
   if (model.closedCylinder) {
     const additionalColors1 = cloneColors((numVertices - 2) / 5 + 1, objectColor1);
     const additionalColors2 = cloneColors((numVertices - 2) / 5 + 1, objectColor2);
@@ -529,10 +531,10 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
     thirdOfTubeCylinderVertices = lVertices.length / 3;
     indicesBeforeDividingLine = lIndices.length / 2;
   }
-  // Step 1 : first chunk of vertices and  normals are copied directly//
+  // Step 1 : first chunk of vertices and  normals are copied directly
   copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 0, thirdOfTubeCylinderVertices);
   indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, thirdOfTubeCylinderVertices);
-  // Also copying half of tube indices because other half may have offset if cylinders will be expanded//
+  // Also copying half of tube indices because other half may have offset if cylinders will be expanded
   indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine);
   /* Step 2 : adding new vertices and normals and also copying old
   * We can either full-copy middle vertices or copy them with some shift.
@@ -543,27 +545,27 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   copyArrays(additionalVertices, indexAdditionalVertices, lVertices, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   indexAdditionalVertices += copyArrays(additionalNormals, indexAdditionalVertices, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  // If we need to divide cylinders => we're adding additional vertices//
+  // If we need to divide cylinders => we're adding additional vertices
   if (needToDivideCylinders) {
     reworkedVertices.set(additionalVertices, indexVerticesNormalsArray);
     reworkedNormals.set(additionalNormals, indexVerticesNormalsArray);
     indexVerticesNormalsArray += indexAdditionalVertices;
   }
-  // Last chunk of vertices//
+  // Last chunk of vertices
   copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  // If we have closed cylinder => we must add last vertices//
+  // If we have closed cylinder => we must add last vertices
   if (reworkedModel.closedCylinder) {
     copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 3 * thirdOfTubeCylinderVertices, hatVertices);
     copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 3 * thirdOfTubeCylinderVertices, hatVertices);
   }
-  // Adding last portion of indices simply as first chunk of indices but with some special addition if needed//
+  // Adding last portion of indices simply as first chunk of indices but with some special addition if needed
   let offsetIndices = thirdOfTubeCylinderVertices / 3;
   if (needToDivideCylinders) {
     offsetIndices = 2 * thirdOfTubeCylinderVertices / 3;
   }
   indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine, offsetIndices);
-  // if we have closed cylinder => must add last indices with offset//
+  // if we have closed cylinder => must add last indices with offset
   if (reworkedModel.closedCylinder) {
     let closedCylinderOffset = 0;
     if (needToDivideCylinders) {
@@ -579,7 +581,7 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
  * @returns {number} max index in index array
  */
 function getMaxIndexInModel(model) {
-  const maxIndex = Math.max(...model.getArrays()[0]); // VERY UNSAFE!//
+  const maxIndex = Math.max(...model.getArrays()[0]); // VERY UNSAFE!
   if (model.closedCylinder) {
     return maxIndex + 1;
   }
@@ -599,7 +601,7 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
   const resColors = resultingModel.getArrays()[3];
   let resIndices = resultingModel.getArrays()[0];
   resIndices = resIndices.subarray(0, resultingModel.curResIndicesIndex);
-  // Traverse all cells in array and add max index. For cells with negative numbers we must subtract maxIndex//
+  // Traverse all cells in array and add max index. For cells with negative numbers we must subtract maxIndex
   if (maxIndexInModels !== 0) {
     for (let k = 0; k < resIndices.length; ++k) {
       if (resIndices[k] >= 0) {
@@ -644,7 +646,7 @@ export default {
   getMaxIndexInModel,
   applyMatrixToVerticesNormals,
   createArraysForAddingModelToPool,
-  // Exports for testing//
+  // Exports for testing
   cloneColors,
   correctArrayNotation,
 };
