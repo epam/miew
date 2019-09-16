@@ -26,20 +26,6 @@ describe('FBXUtils.reworkIndices(array)', () => {
   });
 });
 
-describe('FBXUtils.reworkColors(colorArray, alphaArray)', () => {
-  const colorArray = Float32Array.from([1, 0, 0, 0, 1, 0, 0, 0, 1]);
-  const alphaArray = Float32Array.from([1, 0.5, 0.1]);
-  const expectedColors = Float32Array.from([1, 0, 0, 1, 0, 1, 0, 0.5, 0, 0, 1, 0.1]);
-  const expectedColorsWithNoAlphas = Float32Array.from([1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1]);
-  it('returns array with alphas inserted after RGB', () => {
-    expect(FBXUtils.reworkColors(colorArray, alphaArray)).to.deep.equal(expectedColors);
-  });
-
-  it('accepts no alpha array if there is no one', () => {
-    expect(FBXUtils.reworkColors(colorArray, new Float32Array(0))).to.deep.equal(expectedColorsWithNoAlphas);
-  });
-});
-
 describe('FBXUtils.cloneColors(numVertices, color)', () => {
   it('clones given color to number of vertices provided', () => {
     const color = Float32Array.from([0.5, 0.4, 0.3, 1]);

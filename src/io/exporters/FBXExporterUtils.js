@@ -12,7 +12,7 @@ import utils from '../../utils';
 function applyMatrixToVerticesNormals(matrix, vertices, normals) {
   const normVec = new THREE.Vector4();
   const vertVec = new THREE.Vector4();
-  /* Applying offsets / transformation to every vertex */
+  // Applying offsets / transformation to every vertex//
   for (let j = 0; j < vertices.length; j += 3) {
     vertVec.set(vertices[j], vertices[j + 1], vertices[j + 2], 1);
     vertVec.applyMatrix4(matrix);
@@ -36,7 +36,7 @@ function applyMatrixToVerticesNormals(matrix, vertices, normals) {
  * @returns{Int32Array} reworked array.
  */
 function reworkIndices(array) {
-  const clonedArray = new Int32Array(array.length); /* In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers */
+  const clonedArray = new Int32Array(array.length); // In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers//
   clonedArray.set(array);
   for (let i = 2; i < clonedArray.length; i += 3) {
     clonedArray[i] *= -1;
@@ -49,25 +49,16 @@ function reworkIndices(array) {
  * Reworking colors buffer + alpha, see https://raw.githubusercontent.com/wayt/Bomberman/master/Assets/fire.fbx
  * Basically we have two arrays - color array and alpha array, and we need to put 1 alpha after 3 colors, so therefore this algorithm presents.
  * @param{array} colorArray - colors buffer
- * @param{[*]} alphaArray - alpha buffer
  * @returns{Float32Array} reworked array.
  */
-function reworkColors(colorArray, alphaArray) {
-  if (alphaArray.length === 0) {
-    alphaArray = new Float32Array(colorArray.length / 3);
-    for (let i = 0; i < alphaArray.length; ++i) {
-      alphaArray.set([1], i);
-    }
-  }
-  const clonedArray = new Float32Array(colorArray.length + alphaArray.length);
-  let alphaArrIdx = 0;
+function reworkColors(colorArray) {
+  const clonedArray = new Float32Array(colorArray.length + colorArray.length / 3);
   let clonedArrIdx = 0;
   for (let i = 0; i < colorArray.length; i += 3) {
-    clonedArray.set([colorArray[i]], clonedArrIdx); /* R */
-    clonedArray.set([colorArray[i + 1]], clonedArrIdx + 1); /* G */
-    clonedArray.set([colorArray[i + 2]], clonedArrIdx + 2); /* B */
-    clonedArray.set([alphaArray[alphaArrIdx]], clonedArrIdx + 3); /* A */
-    alphaArrIdx++;
+    clonedArray.set([colorArray[i]], clonedArrIdx); // R//
+    clonedArray.set([colorArray[i + 1]], clonedArrIdx + 1); // G//
+    clonedArray.set([colorArray[i + 2]], clonedArrIdx + 2); // B//
+    clonedArray.set([1], clonedArrIdx + 3); // A//
     clonedArrIdx += 4;
   }
   return clonedArray;
@@ -79,7 +70,7 @@ function reworkColors(colorArray, alphaArray) {
  * @returns {Float32Array} array with cloned colors
  */
 function cloneColors(numVertices, color) {
-  const clonedArray = new Float32Array(numVertices * 4); /* RGBA for every vertex */
+  const clonedArray = new Float32Array(numVertices * 4); // RGBA for every vertex//
   for (let i = 0; i < clonedArray.length; i += 4) {
     clonedArray.set(color, i);
   }
@@ -94,7 +85,7 @@ function cloneColors(numVertices, color) {
 function correctArrayNotation(array) {
   const reworkedArray = [];
   for (let i = 0; i < array.length; ++i) {
-    reworkedArray[i] = parseFloat(array[i].toFixed(6)); /* Default, i guess? */
+    reworkedArray[i] = parseFloat(array[i].toFixed(6)); // Default, i guess?//
   }
   return reworkedArray;
 }
@@ -122,80 +113,81 @@ function collectMaterialInfo(mesh) {
   });
 }
 
-/* Default model properties */
-const defaultProperties = '\t\tProperties60: {\n'
-  + '\t\t\tProperty: "QuaternionInterpolate", "bool", "",0\n'
-  + '\t\t\tProperty: "Visibility", "Visibility", "A",1\n'
-  + '\t\t\tProperty: "Lcl Translation", "Lcl Translation", "A",0.000000000000000,0.000000000000000,-1789.238037109375000\n'
-  + '\t\t\tProperty: "Lcl Rotation", "Lcl Rotation", "A",0.000009334667643,-0.000000000000000,0.000000000000000\n'
-  + '\t\t\tProperty: "Lcl Scaling", "Lcl Scaling", "A",1.000000000000000,1.000000000000000,1.000000000000000\n'
-  + '\t\t\tProperty: "RotationOffset", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "RotationPivot", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "ScalingOffset", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "ScalingPivot", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "TranslationActive", "bool", "",0\n'
-  + '\t\t\tProperty: "TranslationMin", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "TranslationMax", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "TranslationMinX", "bool", "",0\n'
-  + '\t\t\tProperty: "TranslationMinY", "bool", "",0\n'
-  + '\t\t\tProperty: "TranslationMinZ", "bool", "",0\n'
-  + '\t\t\tProperty: "TranslationMaxX", "bool", "",0\n'
-  + '\t\t\tProperty: "TranslationMaxY", "bool", "",0\n'
-  + '\t\t\tProperty: "TranslationMaxZ", "bool", "",0\n'
-  + '\t\t\tProperty: "RotationOrder", "enum", "",0\n'
-  + '\t\t\tProperty: "RotationSpaceForLimitOnly", "bool", "",0\n'
-  + '\t\t\tProperty: "AxisLen", "double", "",10\n'
-  + '\t\t\tProperty: "PreRotation", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "PostRotation", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "RotationActive", "bool", "",0\n'
-  + '\t\t\tProperty: "RotationMin", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "RotationMax", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "RotationMinX", "bool", "",0\n'
-  + '\t\t\tProperty: "RotationMinY", "bool", "",0\n'
-  + '\t\t\tProperty: "RotationMinZ", "bool", "",0\n'
-  + '\t\t\tProperty: "RotationMaxX", "bool", "",0\n'
-  + '\t\t\tProperty: "RotationMaxY", "bool", "",0\n'
-  + '\t\t\tProperty: "RotationMaxZ", "bool", "",0\n'
-  + '\t\t\tProperty: "RotationStiffnessX", "double", "",0\n'
-  + '\t\t\tProperty: "RotationStiffnessY", "double", "",0\n'
-  + '\t\t\tProperty: "RotationStiffnessZ", "double", "",0\n'
-  + '\t\t\tProperty: "MinDampRangeX", "double", "",0\n'
-  + '\t\t\tProperty: "MinDampRangeY", "double", "",0\n'
-  + '\t\t\tProperty: "MinDampRangeZ", "double", "",0\n'
-  + '\t\t\tProperty: "MaxDampRangeX", "double", "",0\n'
-  + '\t\t\tProperty: "MaxDampRangeY", "double", "",0\n'
-  + '\t\t\tProperty: "MaxDampRangeZ", "double", "",0\n'
-  + '\t\t\tProperty: "MinDampStrengthX", "double", "",0\n'
-  + '\t\t\tProperty: "MinDampStrengthY", "double", "",0\n'
-  + '\t\t\tProperty: "MinDampStrengthZ", "double", "",0\n'
-  + '\t\t\tProperty: "MaxDampStrengthX", "double", "",0\n'
-  + '\t\t\tProperty: "MaxDampStrengthY", "double", "",0\n'
-  + '\t\t\tProperty: "MaxDampStrengthZ", "double", "",0\n'
-  + '\t\t\tProperty: "PreferedAngleX", "double", "",0\n'
-  + '\t\t\tProperty: "PreferedAngleY", "double", "",0\n'
-  + '\t\t\tProperty: "PreferedAngleZ", "double", "",0\n'
-  + '\t\t\tProperty: "InheritType", "enum", "",0\n'
-  + '\t\t\tProperty: "ScalingActive", "bool", "",0\n'
-  + '\t\t\tProperty: "ScalingMin", "Vector3D", "",1,1,1\n'
-  + '\t\t\tProperty: "ScalingMax", "Vector3D", "",1,1,1\n'
-  + '\t\t\tProperty: "ScalingMinX", "bool", "",0\n'
-  + '\t\t\tProperty: "ScalingMinY", "bool", "",0\n'
-  + '\t\t\tProperty: "ScalingMinZ", "bool", "",0\n'
-  + '\t\t\tProperty: "ScalingMaxX", "bool", "",0\n'
-  + '\t\t\tProperty: "ScalingMaxY", "bool", "",0\n'
-  + '\t\t\tProperty: "ScalingMaxZ", "bool", "",0\n'
-  + '\t\t\tProperty: "GeometricTranslation", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "GeometricRotation", "Vector3D", "",0,0,0\n'
-  + '\t\t\tProperty: "GeometricScaling", "Vector3D", "",1,1,1\n'
-  + '\t\t\tProperty: "LookAtProperty", "object", ""\n'
-  + '\t\t\tProperty: "UpVectorProperty", "object", ""\n'
-  + '\t\t\tProperty: "Show", "bool", "",1\n'
-  + '\t\t\tProperty: "NegativePercentShapeSupport", "bool", "",1\n'
-  + '\t\t\tProperty: "DefaultAttributeIndex", "int", "",0\n'
-  + '\t\t\tProperty: "Color", "Color", "A+",0,0,0\n'
-  + '\t\t\tProperty: "Size", "double", "",100\n'
-  + '\t\t\tProperty: "Look", "enum", "",1\n'
-  + '\t\t}\n';
+// Default model properties//
+const defaultProperties = `    Properties60: {
+              Property: "QuaternionInterpolate", "bool", "",0
+              Property: "Visibility", "Visibility", "A",1
+              Property: "Lcl Translation", "Lcl Translation", "A",0.000000000000000,0.000000000000000,-1789.238037109375000
+              Property: "Lcl Rotation", "Lcl Rotation", "A",0.000009334667643,-0.000000000000000,0.000000000000000
+              Property: "Lcl Scaling", "Lcl Scaling", "A",1.000000000000000,1.000000000000000,1.000000000000000
+              Property: "RotationOffset", "Vector3D", "",0,0,0
+              Property: "RotationPivot", "Vector3D", "",0,0,0
+              Property: "ScalingOffset", "Vector3D", "",0,0,0
+              Property: "ScalingPivot", "Vector3D", "",0,0,0
+              Property: "TranslationActive", "bool", "",0
+              Property: "TranslationMin", "Vector3D", "",0,0,0
+              Property: "TranslationMax", "Vector3D", "",0,0,0
+              Property: "TranslationMinX", "bool", "",0
+              Property: "TranslationMinY", "bool", "",0
+              Property: "TranslationMinZ", "bool", "",0
+              Property: "TranslationMaxX", "bool", "",0
+              Property: "TranslationMaxY", "bool", "",0
+              Property: "TranslationMaxZ", "bool", "",0
+              Property: "RotationOrder", "enum", "",0
+              Property: "RotationSpaceForLimitOnly", "bool", "",0
+              Property: "AxisLen", "double", "",10
+              Property: "PreRotation", "Vector3D", "",0,0,0
+              Property: "PostRotation", "Vector3D", "",0,0,0
+              Property: "RotationActive", "bool", "",0
+              Property: "RotationMin", "Vector3D", "",0,0,0
+              Property: "RotationMax", "Vector3D", "",0,0,0
+              Property: "RotationMinX", "bool", "",0
+              Property: "RotationMinY", "bool", "",0
+              Property: "RotationMinZ", "bool", "",0
+              Property: "RotationMaxX", "bool", "",0
+              Property: "RotationMaxY", "bool", "",0
+              Property: "RotationMaxZ", "bool", "",0
+              Property: "RotationStiffnessX", "double", "",0
+              Property: "RotationStiffnessY", "double", "",0
+              Property: "RotationStiffnessZ", "double", "",0
+              Property: "MinDampRangeX", "double", "",0
+              Property: "MinDampRangeY", "double", "",0
+              Property: "MinDampRangeZ", "double", "",0
+              Property: "MaxDampRangeX", "double", "",0
+              Property: "MaxDampRangeY", "double", "",0
+              Property: "MaxDampRangeZ", "double", "",0
+              Property: "MinDampStrengthX", "double", "",0
+              Property: "MinDampStrengthY", "double", "",0
+              Property: "MinDampStrengthZ", "double", "",0
+              Property: "MaxDampStrengthX", "double", "",0
+              Property: "MaxDampStrengthY", "double", "",0
+              Property: "MaxDampStrengthZ", "double", "",0
+              Property: "PreferedAngleX", "double", "",0
+              Property: "PreferedAngleY", "double", "",0
+              Property: "PreferedAngleZ", "double", "",0
+              Property: "InheritType", "enum", "",0
+              Property: "ScalingActive", "bool", "",0
+              Property: "ScalingMin", "Vector3D", "",1,1,1
+              Property: "ScalingMax", "Vector3D", "",1,1,1
+              Property: "ScalingMinX", "bool", "",0
+              Property: "ScalingMinY", "bool", "",0
+              Property: "ScalingMinZ", "bool", "",0
+              Property: "ScalingMaxX", "bool", "",0
+              Property: "ScalingMaxY", "bool", "",0
+              Property: "ScalingMaxZ", "bool", "",0
+              Property: "GeometricTranslation", "Vector3D", "",0,0,0
+              Property: "GeometricRotation", "Vector3D", "",0,0,0
+              Property: "GeometricScaling", "Vector3D", "",1,1,1
+              Property: "LookAtProperty", "object", ""
+              Property: "UpVectorProperty", "object", ""
+              Property: "Show", "bool", "",1
+              Property: "NegativePercentShapeSupport", "bool", "",1
+              Property: "DefaultAttributeIndex", "int", "",0
+              Property: "Color", "Color", "A+",0,0,0
+              Property: "Size", "double", "",100
+              Property: "Look", "enum", "",1
+      }
+  `;
 
 /**
  * Calculate parameters for one cylinder in given mesh.
@@ -204,7 +196,7 @@ const defaultProperties = '\t\tProperties60: {\n'
  * @returns {*[]} array of gathered transformations of vertices and normals
  */
 function calculateCylinderTransform(mesh, instanceIndex) {
-  /* Misc variables */
+  // Misc variables//
   const {
     geometry: {
       attributes,
@@ -213,17 +205,17 @@ function calculateCylinderTransform(mesh, instanceIndex) {
   const matVector1 = attributes.matVector1.array;
   const matVector2 = attributes.matVector2.array;
   const matVector3 = attributes.matVector3.array;
-  /* Grab original vertices and normals */
+  // Grab original vertices and normals//
   const lVertices = _.cloneDeep(attributes.position.array);
   const lNormals = _.cloneDeep(attributes.normal.array);
-  /* We have vertices for not transformed cylinder. Need to make it transformed */
+  // We have vertices for not transformed cylinder. Need to make it transformed//
   const transformCylinder = new THREE.Matrix4();
   const idxOffset = instanceIndex * 4;
   transformCylinder.set(matVector1[idxOffset], matVector2[idxOffset], matVector3[idxOffset], 0,
     matVector1[idxOffset + 1], matVector2[idxOffset + 1], matVector3[idxOffset + 1], 0,
     matVector1[idxOffset + 2], matVector2[idxOffset + 2], matVector3[idxOffset + 2], 0,
     matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
-  /* For a reason we must perform transpose of that matrix */
+  // For a reason we must perform transpose of that matrix//
   transformCylinder.transpose();
   return applyMatrixToVerticesNormals(transformCylinder, lVertices, lNormals);
 }
@@ -239,17 +231,14 @@ function collectInstancedColors(mesh, instanceIndex) {
     geometry: {
       attributes: {
         color,
-        alphaColor,
         position,
       },
     },
   } = mesh;
-  const idxColors = (instanceIndex * 3); /* that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc */
+  const idxColors = (instanceIndex * 3); // that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc//
   const meshColor = color.array;
-  const meshAlphaColor = alphaColor.array;
-  const lAlphas = [meshAlphaColor[instanceIndex]];
-  const objectColor = reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]], lAlphas);
-  /* For FBX we need to clone color for every vertex */
+  const objectColor = reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]]);
+  // For FBX we need to clone color for every vertex//
   const lColors = cloneColors(position.array.length / 3, objectColor);
   return lColors;
 }
@@ -259,17 +248,20 @@ function collectInstancedColors(mesh, instanceIndex) {
  * @returns {string} color layer info
  */
 function colorLayer(colorArray) {
-  const layerElementColorNumber = 0; /* IDK what that is */
-  const layerElementColorVersion = 101; /* IDK what version means */
-  const layerElementColorName = ''; /* IDK what name means */
-  return (`\t\tLayerElementColor: ${layerElementColorNumber} {\n`
-    + `\t\t\tVersion: ${layerElementColorVersion}\n`
-    + `\t\t\tName: "${layerElementColorName}"\n`
-    + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
-    + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
-    + `\t\t\tColors: ${correctArrayNotation(colorArray)}\n`
-    + `\t\t\tColorIndex: ${[...Array(colorArray.length / 4).keys()]}\n` /* As said - fastest and easiest way to produce [0, 1, .....] array */
-    + '\t\t}\n');
+  const layerElementColorNumber = 0; // Currently unknown what that is//
+  const layerElementColorVersion = 101; // Currently unknown what version means//
+  const layerElementColorName = ''; // Currently unknown what name means//
+  // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed//
+  // As said [..Array(...)] - fastest and easiest way to produce [0, 1, .....] array//
+  return (`    LayerElementColor: ${layerElementColorNumber} {
+          Version: ${layerElementColorVersion}
+          Name: "${layerElementColorName}"
+          MappingInformationType: "ByVertice"
+          ReferenceInformationType: "Direct"
+          Colors: ${correctArrayNotation(colorArray)}
+          ColorIndex: ${[...Array(colorArray.length / 4).keys()]}
+        }
+    `);
 }
 
 /**
@@ -277,45 +269,48 @@ function colorLayer(colorArray) {
  * @returns {string} normal layer info
  */
 function normalLayer(normalArray) {
-  const layerElementNormalNumber = 0; /* IDK what that is */
-  const layerElementNormalVersion = 101; /* IDK what version means */
-  const layerElementNormalName = ''; /* IDK what name means */
-  return (`\t\tLayerElementNormal: ${layerElementNormalNumber} {\n`
-    + `\t\t\tVersion: ${layerElementNormalVersion}\n`
-    + `\t\t\tName: "${layerElementNormalName}"\n`
-    + '\t\t\tMappingInformationType: "ByVertice"\n' /* Mandatory for our Miew! Must not be changed */
-    + '\t\t\tReferenceInformationType: "Direct"\n' /* Mandatory for our Miew! Must not be changed */
-    + `\t\t\tNormals: ${correctArrayNotation(normalArray)}\n`
-    + '\t\t}\n');
+  const layerElementNormalNumber = 0; // Currently unknown what that is//
+  const layerElementNormalVersion = 101; // Currently unknown what version means//
+  const layerElementNormalName = ''; // Currently unknown what name means//
+  // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed//
+  return (`    LayerElementNormal: ${layerElementNormalNumber} {
+          Version: ${layerElementNormalVersion}
+          Name: "${layerElementNormalName}"
+          MappingInformationType: "ByVertice"
+          ReferenceInformationType: "Direct" 
+          Normals: ${correctArrayNotation(normalArray)}
+        }
+    `);
 }
 
+// Default materials layer//
+const defaultMaterialLayer = `    LayerElementMaterial: 0 {
+          Version: 101
+          Name: ""
+          MappingInformationType: "AllSame"
+          ReferenceInformationType: "Direct"
+          Materials: 0
+        }
+  `;
 
-/* Default materials layer */
-const defaultMaterialLayer = '\t\tLayerElementMaterial: 0 {\n'
-  + '\t\t\tVersion: 101\n'
-  + '\t\t\tName: ""\n'
-  + '\t\t\tMappingInformationType: "AllSame"\n'
-  + '\t\t\tReferenceInformationType: "Direct"\n'
-  + '\t\t\tMaterials: 0\n'
-  + '\t\t}\n';
-
-/* Default layers block */
-const defaultLayerBlock = '\t\tLayer: 0 {\n'
-  + '\t\t\tVersion: 100\n'
-  + '\t\t\tLayerElement:  {\n'
-  + '\t\t\t\tType: "LayerElementNormal"\n'
-  + '\t\t\t\tTypedIndex: 0\n'
-  + '\t\t\t}\n'
-  + '\t\t\tLayerElement:  {\n'
-  + '\t\t\t\tType: "LayerElementColor"\n'
-  + '\t\t\t\tTypedIndex: 0\n'
-  + '\t\t\t}\n'
-  + '\t\t\tLayerElement:  {\n'
-  + '\t\t\t\tType: "LayerElementMaterial"\n'
-  + '\t\t\t\tTypedIndex: 0\n'
-  + '\t\t\t}\n'
-  + '\t\t}\n'
-  + '\t}\n';
+// Default layers block//
+const defaultLayerBlock = `    Layer: 0 {
+        Version: 100
+        LayerElement:  {
+          Type: "LayerElementNormal"
+          TypedIndex: 0
+        }
+        LayerElement:  {
+          Type: "LayerElementColor"
+          TypedIndex: 0
+        }
+        LayerElement:  {
+          Type: "LayerElementMaterial"
+          TypedIndex: 0
+        }
+      }
+    }
+  `;
 
 /**
  * Adding vertices and indices to resulting string
@@ -330,13 +325,14 @@ function addVerticesIndices(vertices, indices) {
   /* About _correctArrayNotation: Float32Arrays will contains only Float32 numbers, which implies that it will be floating points with 17 numbers after point.
   * We cannot (and it's logically incorrect) save all this information, so we convert this Float32Array into Array-like object with numbers with only 6 numbers after point
   * Reminder - this is big memory loss (as we must save at one moment two arrays with similar information) */
-  return (`\t\tMultiLayer: ${multiLayer}\n`
-    + `\t\tMultiTake: ${multiTake}\n`
-    + `\t\tShading: ${shading}\n`
-    + `\t\tCulling: "${culling}"\n`
-    + `\t\tVertices: ${correctArrayNotation(vertices)}\n\n`
-    + `\t\tPolygonVertexIndex: ${indices}\n\n`
-    + `\t\tGeometryVersion: ${geometryVersion}\n`);
+  return (`    MultiLayer: ${multiLayer}
+        MultiTake: ${multiTake}
+        Shading: ${shading}
+        Culling: "${culling}"
+        Vertices: ${correctArrayNotation(vertices)}
+        PolygonVertexIndex: ${indices}
+        GeometryVersion: ${geometryVersion}
+    `);
 }
 
 /**
@@ -344,32 +340,34 @@ function addVerticesIndices(vertices, indices) {
  * @returns {String} default definitions block
  */
 function defaultDefinitions() {
-  const Version = 100; /* Mystery 100, but appears that it's not checked properly */
+  const Version = 100; // Mystery 100, but appears that it's not checked properly */
   const count = 3; /* Biggest mystery here. Every 6.1. file has this field = 3. Why?  I think that here must be
     some sort of 'let count = calculateCount()' or something, cos i _think_ that it's object, geometry,material etc count */
   /* Then we must know how many and exactly what Object Types there are */
   /* Next variable (objectTypes) is left only because we might in some distant future automatically generate this section. */
   // const objectTypes = []; /* Somewhat like 'let objectTypes = getObjectTypes()' or something. What about count of that objects? */
   /* Seems like this numbers didn't affect anything, so this section left because everything working with it looking that way */
-  return 'Definitions:  {\n'
-    + `\tVersion: ${Version}\n`
-    + `\tCount: ${count}\n`
-    + '\tObjectType: "Model" {\n'
-    + '\t\tCount: 1\n'
-    + '\t}\n'
-    + '\tObjectType: "Geometry" {\n'
-    + '\t\tCount: 1\n'
-    + '\t}\n'
-    + '\tObjectType: "Material" {\n'
-    + '\t\tCount: 1\n'
-    + '\t}\n'
-    + '\tObjectType: "Pose" {\n'
-    + '\t\tCount: 1\n'
-    + '\t}\n'
-    + '\tObjectType: "GlobalSettings" {\n'
-    + '\t\tCount: 1\n'
-    + '\t}\n'
-    + '}\n\n';
+  return `Definitions:  {
+      Version: ${Version}
+      Count: ${count}
+      ObjectType: "Model" {
+        Count: 1
+      }
+      ObjectType: "Geometry" {
+        Count: 1
+      }
+      ObjectType: "Material" {
+        Count: 1
+      }
+      ObjectType: "Pose" {
+        Count: 1
+      }
+      ObjectType: "GlobalSettings" {
+        Count: 1
+      }
+}
+    
+`;
 }
 
 /**
@@ -378,32 +376,32 @@ function defaultDefinitions() {
  * @returns {String} material properties string
  */
 function materialProperties(material) {
-  return '\t\tProperties60:  {\n'
-    + '\t\t\tProperty: "ShadingModel", "KString", "", "Lambert"\n'
-    + '\t\t\tProperty: "MultiLayer", "bool", "",0\n'
-    + '\t\t\tProperty: "EmissiveColor", "ColorRGB", "",0,0,0\n'
-    + '\t\t\tProperty: "EmissiveFactor", "double", "",0.0000\n'
-    + '\t\t\tProperty: "AmbientColor", "ColorRGB", "",1,1,1\n'
-    + '\t\t\tProperty: "AmbientFactor", "double", "",0.0000\n'
-    + `\t\t\tProperty: "DiffuseColor", "ColorRGB", "",${material.diffuse}\n`
-    + '\t\t\tProperty: "DiffuseFactor", "double", "",1.0000\n'
-    + '\t\t\tProperty: "Bump", "Vector3D", "",0,0,0\n'
-    + '\t\t\tProperty: "TransparentColor", "ColorRGB", "",1,1,1\n'
-    + '\t\t\tProperty: "TransparencyFactor", "double", "",0.0000\n'
-    + `\t\t\tProperty: "SpecularColor", "ColorRGB", "",${material.specular}\n`
-    + '\t\t\tProperty: "SpecularFactor", "double", "",1.0000\n'
-    + `\t\t\tProperty: "ShininessExponent", "double", "",${material.shininess}\n`
-    + '\t\t\tProperty: "ReflectionColor", "ColorRGB", "",0,0,0\n'
-    + '\t\t\tProperty: "ReflectionFactor", "double", "",1\n'
-    + '\t\t\tProperty: "Emissive", "ColorRGB", "",0,0,0\n'
-    + '\t\t\tProperty: "Ambient", "ColorRGB", "",1,1,1\n'
-    + `\t\t\tProperty: "Diffuse", "ColorRGB", "",${material.diffuse}\n`
-    + `\t\t\tProperty: "Specular", "ColorRGB", "",${material.specular}\n`
-    + `\t\t\tProperty: "Shininess", "double", "",${material.shininess}\n`
-    + `\t\t\tProperty: "Opacity", "double", "",${material.opacity}\n`
-    + '\t\t\tProperty: "Reflectivity", "double", "",0\n'
-    + '\t\t}\n'
-    + '\t}\n';
+  return `    Properties60:  {
+            Property: "ShadingModel", "KString", "", "Lambert"
+            Property: "MultiLayer", "bool", "",0
+            Property: "EmissiveColor", "ColorRGB", "",0,0,0
+            Property: "EmissiveFactor", "double", "",0.0000
+            Property: "AmbientColor", "ColorRGB", "",1,1,1
+            Property: "AmbientFactor", "double", "",0.0000
+            Property: "DiffuseColor", "ColorRGB", "",${material.diffuse}
+            Property: "DiffuseFactor", "double", "",1.0000
+            Property: "Bump", "Vector3D", "",0,0,0
+            Property: "TransparentColor", "ColorRGB", "",1,1,1
+            Property: "TransparencyFactor", "double", "",0.0000
+            Property: "SpecularColor", "ColorRGB", "",${material.specular}
+            Property: "SpecularFactor", "double", "",1.0000
+            Property: "ShininessExponent", "double", "",${material.shininess}
+            Property: "ReflectionColor", "ColorRGB", "",0,0,0
+            Property: "ReflectionFactor", "double", "",1
+            Property: "Ambient", "ColorRGB", "",1,1,1
+            Property: "Diffuse", "ColorRGB", "",${material.diffuse}
+            Property: "Specular", "ColorRGB", "",${material.specular}
+            Property: "Shininess", "double", "",${material.shininess}
+            Property: "Opacity", "double", "",${material.opacity}
+            Property: "Reflectivity", "double", "",0
+         }
+       }
+     `;
 }
 
 /**
@@ -438,18 +436,15 @@ function decideSeparation(mesh, instanceIndex) {
       attributes: {
         color,
         color2,
-        alphaColor,
       },
     },
   } = mesh;
-  /* No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies */
+  // No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies//
   const meshColor1 = color.array;
   const meshColor2 = color2.array;
-  const meshAlphaColor = alphaColor.array;
   const idxColors = instanceIndex * 3;
-  const lAlphas = [meshAlphaColor[instanceIndex]];
-  const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
-  const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
+  const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]]);
+  const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]]);
   return !utils.isEqual(objectColor1, objectColor2);
 }
 
@@ -466,18 +461,15 @@ function getColors(mesh, instanceIndex, model) {
       attributes: {
         color,
         color2,
-        alphaColor,
         position,
       },
     },
   } = mesh;
-  /* No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies */
+  // No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies//
   const meshColor1 = color.array;
   const meshColor2 = color2.array;
-  const meshAlphaColor = alphaColor.array;
-  const lAlphas = [meshAlphaColor[instanceIndex]];
   const idxColors = instanceIndex * 3;
-  const numVertices = position.count; /* That's the original number of vertices */
+  const numVertices = position.count; // That's the original number of vertices//
   let numVerticesBeforeDividingLine = 0;
   let numVerticesAfterDividingLine = 0;
   if (model.closedCylinder) {
@@ -487,18 +479,18 @@ function getColors(mesh, instanceIndex, model) {
     numVerticesBeforeDividingLine = 2 * (numVertices) / 3;
     numVerticesAfterDividingLine = (numVertices) / 3;
   }
-  /* Collect colors for each half of cylinder */
-  const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]], lAlphas);
-  const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]], lAlphas);
+  // Collect colors for each half of cylinder//
+  const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]]);
+  const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]]);
   const lColors1 = cloneColors(numVerticesBeforeDividingLine, objectColor1);
   let lColors2 = null;
-  /* Clone colors for one cylinder ( 2 * numVertices / 3) and for another (same number) */
+  // Clone colors for one cylinder and for another//
   if (!utils.isEqual(objectColor1, objectColor2)) {
     lColors2 = cloneColors(numVerticesBeforeDividingLine, objectColor2);
   } else {
     lColors2 = cloneColors(numVerticesAfterDividingLine, objectColor2);
   }
-  /* Need to carefully process hats */
+  // Need to carefully process hats//
   if (model.closedCylinder) {
     const additionalColors1 = cloneColors((numVertices - 2) / 5 + 1, objectColor1);
     const additionalColors2 = cloneColors((numVertices - 2) / 5 + 1, objectColor2);
@@ -523,7 +515,7 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   const [reworkedIndices, reworkedNormals, reworkedVertices] = reworkedModel.getArrays();
   const reworkedColors = getColors(mesh, instanceIndex, reworkedModel);
   reworkedModel.storeColors(reworkedColors);
-  let indexVerticesNormalsArray = 0; /* not using push */
+  let indexVerticesNormalsArray = 0; // not using push//
   let indexIndicesArray = 0;
   let indexAdditionalVertices = 0;
   let thirdOfTubeCylinderVertices = 0;
@@ -537,11 +529,10 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
     thirdOfTubeCylinderVertices = lVertices.length / 3;
     indicesBeforeDividingLine = lIndices.length / 2;
   }
-  /* Step 1 : first third of vertices and  normals are copied directly */
-  /* we can use numVertices here, but logically speaking lVertices.length / 3 is much clearer */
+  // Step 1 : first chunk of vertices and  normals are copied directly//
   copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 0, thirdOfTubeCylinderVertices);
   indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, thirdOfTubeCylinderVertices);
-  /* Also copying half of indices because other half may have offset if cylinders will be expanded */
+  // Also copying half of tube indices because other half may have offset if cylinders will be expanded//
   indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine);
   /* Step 2 : adding new vertices and normals and also copying old
   * We can either full-copy middle vertices or copy them with some shift.
@@ -552,27 +543,27 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
   indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   copyArrays(additionalVertices, indexAdditionalVertices, lVertices, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   indexAdditionalVertices += copyArrays(additionalNormals, indexAdditionalVertices, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  /* If we need to divide cylinders => we're adding additional vertices */
+  // If we need to divide cylinders => we're adding additional vertices//
   if (needToDivideCylinders) {
     reworkedVertices.set(additionalVertices, indexVerticesNormalsArray);
     reworkedNormals.set(additionalNormals, indexVerticesNormalsArray);
     indexVerticesNormalsArray += indexAdditionalVertices;
   }
-  /* Last third of vertices */
+  // Last chunk of vertices//
   copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
   indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-  /* If we have closed cylinder => we must add last vertices */
+  // If we have closed cylinder => we must add last vertices//
   if (reworkedModel.closedCylinder) {
     copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 3 * thirdOfTubeCylinderVertices, hatVertices);
     copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 3 * thirdOfTubeCylinderVertices, hatVertices);
   }
-  /* Adding last portion of indices simply as first half of indices but with 2 * number of vertices / 3 addition if needed */
+  // Adding last portion of indices simply as first chunk of indices but with some special addition if needed//
   let offsetIndices = thirdOfTubeCylinderVertices / 3;
   if (needToDivideCylinders) {
     offsetIndices = 2 * thirdOfTubeCylinderVertices / 3;
   }
   indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine, offsetIndices);
-  /* if we have closed cylinder => must add last indices with offset */
+  // if we have closed cylinder => must add last indices with offset//
   if (reworkedModel.closedCylinder) {
     let closedCylinderOffset = 0;
     if (needToDivideCylinders) {
@@ -588,9 +579,9 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
  * @returns {number} max index in index array
  */
 function getMaxIndexInModel(model) {
-  const maxIndex = Math.max(...model.getArrays()[0]); /* VERY UNSAFE! */
+  const maxIndex = Math.max(...model.getArrays()[0]); // VERY UNSAFE!//
   if (model.closedCylinder) {
-    return maxIndex + 1; /* VERY UNSAFE! */
+    return maxIndex + 1;
   }
   return maxIndex;
 }
@@ -608,7 +599,7 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
   const resColors = resultingModel.getArrays()[3];
   let resIndices = resultingModel.getArrays()[0];
   resIndices = resIndices.subarray(0, resultingModel.curResIndicesIndex);
-  /* Traverse all cells in array and add max index. For cells with negative numbers we must subtract maxIndex */
+  // Traverse all cells in array and add max index. For cells with negative numbers we must subtract maxIndex//
   if (maxIndexInModels !== 0) {
     for (let k = 0; k < resIndices.length; ++k) {
       if (resIndices[k] >= 0) {
@@ -621,6 +612,17 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
   return [resVertices.subarray(0, resultingModel.curResVerticesIndex), resIndices, resColors.subarray(0, resultingModel.curResColorsIndex), resNormals.subarray(0, resultingModel.curResNormalsIndex)];
 }
 
+/**
+ *
+ * @param oldModelArray
+ * @param additionModelArray
+ */
+function createArraysForAddingModelToPool(oldModelArray, additionModelArray) {
+  const array = new Float32Array(oldModelArray.length + additionModelArray.length);
+  array.set(oldModelArray, 0);
+  array.set(additionModelArray, oldModelArray.length);
+  return array;
+}
 
 export default {
   reworkColors,
@@ -641,7 +643,8 @@ export default {
   finalizeCylinderParameters,
   getMaxIndexInModel,
   applyMatrixToVerticesNormals,
-  /* Exports for testing */
+  createArraysForAddingModelToPool,
+  // Exports for testing//
   cloneColors,
   correctArrayNotation,
 };

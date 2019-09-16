@@ -13,7 +13,7 @@ describe('FBXCylinderGeometryModel', () => {
   let resultingCylinder = null;
   let cylinder = null;
   before(() => {
-    /* Test example of cylinder geometry */
+    // Test example of cylinder geometry
     const geometry = new CylinderBufferGeometry(1, 1, 1.0, Math.max(3, 1), 2, true);
     const alpha = utils.allocateTyped(Float32Array, 1);
     geometry.addAttribute('alphaColor', new THREE.InstancedBufferAttribute(alpha, 1, false, 1));
