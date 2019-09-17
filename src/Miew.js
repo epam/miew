@@ -462,7 +462,9 @@ Miew.prototype._initGfx = function () {
   light12.shadow = new THREE.DirectionalLightShadow();
   light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
-  const shadowMapSize = Math.max(gfx.width, gfx.height) * gfx.renderer.getPixelRatio();
+
+  const pixelRatio = gfx.renderer.getPixelRatio();
+  const shadowMapSize = Math.max(gfx.width, gfx.height) * pixelRatio;
   light12.shadow.mapSize.width = shadowMapSize;
   light12.shadow.mapSize.height = shadowMapSize;
   light12.target.position.set(0.0, 0.0, 0.0);
@@ -475,10 +477,12 @@ Miew.prototype._initGfx = function () {
 
   // add axes
   gfx.axes = new Axes(gfx.root, gfx.camera);
+  const deviceWidth = gfx.width * pixelRatio;
+  const deviceHeight = gfx.height * pixelRatio;
 
   gfx.offscreenBuf = new THREE.WebGLRenderTarget(
-    gfx.width * gfx.renderer.getPixelRatio(),
-    gfx.height * gfx.renderer.getPixelRatio(),
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, depthBuffer: true,
     },
@@ -490,24 +494,24 @@ Miew.prototype._initGfx = function () {
   }
 
   gfx.offscreenBuf2 = new THREE.WebGLRenderTarget(
-    gfx.width * gfx.renderer.getPixelRatio(),
-    gfx.height * gfx.renderer.getPixelRatio(),
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.offscreenBuf3 = new THREE.WebGLRenderTarget(
-    gfx.width * gfx.renderer.getPixelRatio(),
-    gfx.height * gfx.renderer.getPixelRatio(),
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.offscreenBuf4 = new THREE.WebGLRenderTarget(
-    gfx.width * gfx.renderer.getPixelRatio(),
-    gfx.height * gfx.renderer.getPixelRatio(),
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
@@ -520,8 +524,8 @@ Miew.prototype._initGfx = function () {
   // use float textures for volume rendering if possible
   if (gfx.renderer.getContext().getExtension('OES_texture_float')) {
     gfx.offscreenBuf5 = new THREE.WebGLRenderTarget(
-      gfx.width * gfx.renderer.getPixelRatio(),
-      gfx.height * gfx.renderer.getPixelRatio(),
+      deviceWidth,
+      deviceHeight,
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -532,8 +536,8 @@ Miew.prototype._initGfx = function () {
     );
 
     gfx.offscreenBuf6 = new THREE.WebGLRenderTarget(
-      gfx.width * gfx.renderer.getPixelRatio(),
-      gfx.height * gfx.renderer.getPixelRatio(),
+      deviceWidth,
+      deviceHeight,
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -544,8 +548,8 @@ Miew.prototype._initGfx = function () {
     );
 
     gfx.offscreenBuf7 = new THREE.WebGLRenderTarget(
-      gfx.width * gfx.renderer.getPixelRatio(),
-      gfx.height * gfx.renderer.getPixelRatio(),
+      deviceWidth,
+      deviceHeight,
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -563,16 +567,16 @@ Miew.prototype._initGfx = function () {
   }
 
   gfx.stereoBufL = new THREE.WebGLRenderTarget(
-    gfx.width * gfx.renderer.getPixelRatio(),
-    gfx.height * gfx.renderer.getPixelRatio(),
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.stereoBufR = new THREE.WebGLRenderTarget(
-    gfx.width * gfx.renderer.getPixelRatio(),
-    gfx.height * gfx.renderer.getPixelRatio(),
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
@@ -1072,7 +1076,8 @@ Miew.prototype._renderFrame = (function () {
     }
 
     // resize offscreen buffers to match the target
-    this._resizeOffscreenBuffers(_size.width * gfx.renderer.getPixelRatio(), _size.height * gfx.renderer.getPixelRatio(), stereo);
+    const pixelRatio = gfx.renderer.getPixelRatio();
+    this._resizeOffscreenBuffers(_size.width * pixelRatio, _size.height * pixelRatio, stereo);
 
     switch (stereo) {
       case 'WEBVR':
