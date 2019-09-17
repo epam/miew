@@ -2,8 +2,6 @@ import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
 
-const NUM_COORDS_PER_VERTEX = 3;
-const NUM_COLORS_PER_VERTEX = 4;
 /**
  *
  * @param matrix
@@ -14,7 +12,7 @@ const NUM_COLORS_PER_VERTEX = 4;
 function applyMatrixToVerticesNormals(matrix, vertices, normals) {
   const normVec = new THREE.Vector4();
   const vertVec = new THREE.Vector4();
-  // Applying offsets / transformation to every vertex//
+  // Applying offsets / transformation to every vertex
   for (let j = 0; j < vertices.length; j += 3) {
     vertVec.set(vertices[j], vertices[j + 1], vertices[j + 2], 1);
     vertVec.applyMatrix4(matrix);
@@ -87,7 +85,7 @@ function cloneColors(numVertices, color) {
 function correctArrayNotation(array) {
   const reworkedArray = [];
   for (let i = 0; i < array.length; ++i) {
-    reworkedArray[i] = parseFloat(array[i].toFixed(6)); // Default, i guess?
+    reworkedArray[i] = parseFloat(array[i].toFixed(6)); // enough for float type precision
   }
   return reworkedArray;
 }
@@ -237,7 +235,7 @@ function collectInstancedColors(mesh, instanceIndex) {
       },
     },
   } = mesh;
-  const idxColors = (instanceIndex * 3); // that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc
+  const idxColors = instanceIndex * 3; // that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc
   const meshColor = color.array;
   const objectColor = reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]]);
   // For FBX we need to clone color for every vertex
@@ -447,7 +445,7 @@ function decideSeparation(mesh, instanceIndex) {
   const idxColors = instanceIndex * 3;
   const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]]);
   const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]]);
-  return !utils.isEqual(objectColor1, objectColor2);
+  return !_.isEqual(objectColor1, objectColor2);
 }
 
 /**
@@ -487,7 +485,7 @@ function getColors(mesh, instanceIndex, model) {
   const lColors1 = cloneColors(numVerticesBeforeDividingLine, objectColor1);
   let lColors2 = null;
   // Clone colors for one cylinder and for another
-  if (!utils.isEqual(objectColor1, objectColor2)) {
+  if (!_.isEqual(objectColor1, objectColor2)) {
     lColors2 = cloneColors(numVerticesBeforeDividingLine, objectColor2);
   } else {
     lColors2 = cloneColors(numVerticesAfterDividingLine, objectColor2);
@@ -565,7 +563,7 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
     offsetIndices = 2 * thirdOfTubeCylinderVertices / 3;
   }
   indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine, offsetIndices);
-  // if we have closed cylinder => must add last indices with offset
+  // If we have closed cylinder => must add last indices with offset
   if (reworkedModel.closedCylinder) {
     let closedCylinderOffset = 0;
     if (needToDivideCylinders) {
@@ -611,19 +609,10 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
       }
     }
   }
-  return [resVertices.subarray(0, resultingModel.curResVerticesIndex), resIndices, resColors.subarray(0, resultingModel.curResColorsIndex), resNormals.subarray(0, resultingModel.curResNormalsIndex)];
-}
-
-/**
- *
- * @param oldModelArray
- * @param additionModelArray
- */
-function createArraysForAddingModelToPool(oldModelArray, additionModelArray) {
-  const array = new Float32Array(oldModelArray.length + additionModelArray.length);
-  array.set(oldModelArray, 0);
-  array.set(additionModelArray, oldModelArray.length);
-  return array;
+  return [resVertices.subarray(0, resultingModel.curResVerticesIndex),
+    resIndices,
+    resColors.subarray(0, resultingModel.curResColorsIndex),
+    resNormals.subarray(0, resultingModel.curResNormalsIndex)];
 }
 
 export default {
@@ -645,7 +634,6 @@ export default {
   finalizeCylinderParameters,
   getMaxIndexInModel,
   applyMatrixToVerticesNormals,
-  createArraysForAddingModelToPool,
   // Exports for testing
   cloneColors,
   correctArrayNotation,

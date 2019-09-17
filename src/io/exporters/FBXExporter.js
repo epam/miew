@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Exporter from './Exporter';
 import FBXUtils from './FBXExporterUtils';
 import FBXCylinderGeometryModel from './FBXCylinderGeometryModel';
+import utils from '../../utils';
 // import gfxutils from '../../gfx/gfxutils';
 
 /**
@@ -109,7 +110,6 @@ Creator: "${CreatorTool}"
       const materialLayer = FBXUtils.defaultMaterialLayer;
       // Do we need automatically check and build this info? In Miew we always have these layers
       const layer = FBXUtils.defaultLayerBlock;
-      // this._models[i] = null; // That's free i guess?
       const resultingLayer = normalLayer + colorLayer + materialLayer + layer;
       allModels += (modelProperties + verticesIndices + resultingLayer);
     }
@@ -142,7 +142,7 @@ Creator: "${CreatorTool}"
    */
   _checkExistingMaterial(material) {
     for (let i = 0; i < this._materials.length; ++i) {
-      if (JSON.stringify(material) === JSON.stringify(this._materials[i])) {
+      if (_.isEqual(material, this._materials[i])) {
         return i;
       }
     }
@@ -177,10 +177,10 @@ Creator: "${CreatorTool}"
       // Adding new vertices etc to existing model
       // Reminder - this way is better in sense of performance
       const oldModel = this._models[modelNumber];
-      const newVertices = FBXUtils.createArraysForAddingModelToPool(oldModel.vertices, model.vertices);
-      const newNormals = FBXUtils.createArraysForAddingModelToPool(oldModel.normals, model.normals);
-      const newColors = FBXUtils.createArraysForAddingModelToPool(oldModel.colors, model.colors);
-      const newIndices = FBXUtils.createArraysForAddingModelToPool(oldModel.indices, model.indices);
+      const newVertices = utils.TypedArrayConcat(oldModel.vertices, model.vertices);
+      const newNormals = utils.TypedArrayConcat(oldModel.normals, model.normals);
+      const newColors = utils.TypedArrayConcat(oldModel.colors, model.colors);
+      const newIndices = utils.TypedArrayConcat(oldModel.indices, model.indices);
       this._models[modelNumber] = {
         vertices: newVertices,
         indices: newIndices,

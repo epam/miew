@@ -503,27 +503,6 @@ function TypedArrayConcat(first, second) {
   return result;
 }
 
-/**
- * Simple check for equality of two objects by their properties
- * @param {Object} objA - first object
- * @param {Object} objB - second object
- * @returns {boolean} true if object are equal, false otherwise
- */
-function isEqual(objA, objB) {
-  const aProps = Object.getOwnPropertyNames(objA);
-  const bProps = Object.getOwnPropertyNames(objB);
-  if (aProps.length !== bProps.length) {
-    return false;
-  }
-  for (let i = 0; i < aProps.length; i++) {
-    const propName = aProps[i];
-    if (objA[propName] !== objB[propName]) {
-      return false;
-    }
-  }
-  return true;
-}
-
 //----------------------------------------------------------------------------
 // Exports
 
@@ -561,5 +540,4 @@ export default {
   splitFileName,
   download,
   TypedArrayConcat,
-  isEqual,
 };
