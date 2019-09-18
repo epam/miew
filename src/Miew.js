@@ -3038,6 +3038,8 @@ Miew.prototype.benchmarkGfx = function (force) {
  */
 Miew.prototype.screenshot = function (width, height) {
   const gfx = this._gfx;
+  const deviceWidth = gfx.renderer.domElement.width;
+  const deviceHeight = gfx.renderer.domElement.height;
 
   function fov2Tan(fov) {
     return Math.tan(THREE.Math.degToRad(0.5 * fov));
@@ -3055,8 +3057,9 @@ Miew.prototype.screenshot = function (width, height) {
       const canvas = document.createElement('canvas');
       const canvasContext = canvas.getContext('2d');
 
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = width === undefined ? deviceWidth : width;
+      canvas.height = height === undefined ? deviceHeight : height;
+
       canvasContext.drawImage(gfx.renderer.domElement, 0, 0, canvas.width, canvas.height);
       dataURL = canvas.toDataURL('image/png');
     } else {
@@ -3065,12 +3068,11 @@ Miew.prototype.screenshot = function (width, height) {
     }
     return dataURL;
   }
-  height = height || width || gfx.height;
-  width = width || gfx.width;
+  height = height || width;
 
   let screenshotURI;
-
-  if (window.devicePixelRatio === 1 && width === gfx.width && height === gfx.height) {
+  if ((width === undefined && height === undefined)
+    || (width === deviceWidth && height === deviceHeight)) {
     // renderer.domElement.toDataURL('image/png') returns flipped image in Safari
     // It hasn't been resolved yet, but getScreenshotSafari()
     // fixes it using an extra canvas.
