@@ -1190,6 +1190,13 @@ Miew.prototype._renderScene = (function () {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
+
+    // clean buffer for normals texture
+    gfx.renderer.setClearColor(0x000000, 0.0);
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf4);
+    gfx.renderer.clearColor();
+
+    gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     gfx.renderer.setRenderTarget(gfx.offscreenBuf);
     gfx.renderer.clear();
 
