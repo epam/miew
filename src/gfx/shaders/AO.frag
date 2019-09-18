@@ -49,6 +49,12 @@ void main() {
   vec3 viewPos = ViewPosFromDepth(vUv);
   // remap coordinates to prevent noise exture rescale
   vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;
+  vec4 normalData = texture2D(normalTexture, vUv);
+  // return for background fragments (their normals are zero vectors)
+  if (length(normalData.rgb) < 0.000000001) {
+    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    return;
+  }
   //[0, 1] -> [-1, 1]
   vec3 normal = (texture2D(normalTexture, vUv).rgb * 2.0 - 1.0);
   // get random vector for sampling sphere rotation
