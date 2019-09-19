@@ -9,6 +9,7 @@ import XYZParser from './parsers/XYZParser';
 import PubChemParser from './parsers/PubChemParser';
 import SDFParser from './parsers/SDFParser';
 import DSN6Parser from './parsers/DSN6Parser';
+import GROParser from './parsers/GROParser';
 
 export default new ParserList([
   // note: order might be important
@@ -21,4 +22,5 @@ export default new ParserList([
   SDFParser,
   CCP4Parser,
   DSN6Parser,
+  GROParser,
 ]);
