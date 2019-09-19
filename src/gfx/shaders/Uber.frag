@@ -58,7 +58,6 @@ uniform float clipPlaneValue;
 #define PI 3.14159265359
 #define RECIPROCAL_PI 0.31830988618
 #define saturate(a) clamp( a, 0.0, 1.0 )
-#define normalSign ( float( gl_FrontFacing ) * 2.0 - 1.0 )
 
 #ifdef USE_FOG
   uniform vec3 fogColor;
@@ -563,7 +562,7 @@ void main() {
       float frontFaced = 1.0;
     #else
       vec3 viewNormaInColor = viewNormal;
-      float frontFaced = normalSign;
+      float frontFaced = float( gl_FrontFacing );
     #endif
     // [-1, 1] -> [0, 1]
     viewNormaInColor = 0.5 * viewNormaInColor + 0.5;
