@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import Parser from './Parser';
 import chem from '../../chem';
-import MOL2Stream from './MOL2Stream';
 
 const {
   Complex,
@@ -53,16 +52,68 @@ class MOL2Parser extends Parser {
     this._molecules = [];
     this._molecule = null;
 
+    this._currPosIdx = 0;
+    this._currStartIdx = 0;
+
     this._serialAtomMap = {};
 
     this._options.fileType = 'mol2';
   }
 
-  _parseMolecule(stream) {
-    stream.getHeaderString('MOLECULE');
+  _parseRawStrings(data) {
+    return data.split(/\r?\n|\r/);
+  }
+
+  _toStringFromStart(numb, MOL2Data) {
+    const newPosIdx = this._currStartIdx + numb;
+    this._currPosIdx = (newPosIdx < MOL2Data.length) ? newPosIdx : this._currStartIdx;
+  }
+
+  _toHeaderString(header, MOL2Data) {
+    this._toStringFromStart(0, MOL2Data);
+    while (this._currPosIdx < MOL2Data.length) {
+      if (MOL2Data[this._currPosIdx].match(`@<TRIPOS>${header}`)) {
+        return;
+      }
+      this._currPosIdx++;
+    }
+    this._toStringFromStart(0, MOL2Data);
+  }
+
+  _toStringFromHeader(header, numb, MOL2Data) {
+    this._toHeaderString(header, MOL2Data);
+    const newPosIdx = this._currPosIdx + numb;
+
+    if (MOL2Data[this._currPosIdx].match(`@<TRIPOS>${header}`) && newPosIdx < MOL2Data.length) {
+      this._currPosIdx = newPosIdx;
+    }
+  }
+
+  _setStart(startPos, MOL2Data) {
+    if (startPos >= MOL2Data.length) {
+      this._currStartIdx = this._currPosIdx = MOL2Data.length - 1;
+    } else {
+      this._currStartIdx = this._currPosIdx = startPos;
+    }
+  }
+
+  _probablyHaveDataToParse(MOL2Data) {
+    return this._currPosIdx < MOL2Data.length - 2;
+  }
+
+  _findNextCompoundStart(MOL2Data) {
+    while (this._currPosIdx < MOL2Data.length && MOL2Data[this._currPosIdx].trim() !== '@<TRIPOS>MOLECULE>') {
+      this._currPosIdx++;
+    }
+    this._setStart(++this._currPosIdx, MOL2Data);
+    return this._probablyHaveDataToParse(MOL2Data);
+  }
+
+  _parseMolecule(MOL2Data) {
+    this._toHeaderString('MOLECULE', MOL2Data);
 
     const { metadata } = this._complex;
-    metadata.name = stream.getNextString();
+    metadata.name = MOL2Data[++this._currPosIdx];
     metadata.format = 'mol2';
 
     this._molecule = { _index: '', _chains: [] };
@@ -76,12 +127,11 @@ class MOL2Parser extends Parser {
    * These should never be set by the user.
    * Source: http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf
    */
-  _parseAtoms(stream, atomsNum) {
-    let curStr = stream.getHeaderString('ATOM');
+  _parseAtoms(atomsNum, MOL2Data) {
+    this._toHeaderString('ATOM', MOL2Data);
 
     for (let i = 0; i < atomsNum; i++) {
-      curStr = stream.getNextString();
-      const parsedStr = splitToFields(curStr);
+      const parsedStr = splitToFields(MOL2Data[++this._currPosIdx]);
 
       if (parsedStr.length < 6) {
         throw new Error('MOL2 parsing error: Not enough information to create atom!');
@@ -97,7 +147,7 @@ class MOL2Parser extends Parser {
 
       let charge = 0;
       if (parsedStr.length >= 9) {
-        charge = parseFloat(parsedStr[8]) | 0;
+        charge = parseFloat(parsedStr[8]) || 0.0;
       }
 
       let chain = this._chain;
@@ -152,12 +202,11 @@ class MOL2Parser extends Parser {
   /* Bond format description
    * bondId originAtomId targetAtomId bondType [statusBits]
    */
-  _parseBonds(stream, bondsNum) {
-    let curStr = stream.getHeaderString('BOND');
+  _parseBonds(bondsNum, MOL2Data) {
+    this._toHeaderString('BOND', MOL2Data);
 
     for (let i = 0; i < bondsNum; i++) {
-      curStr = stream.getNextString();
-      const parsedStr = splitToFields(curStr);
+      const parsedStr = splitToFields(MOL2Data[++this._currPosIdx]);
 
       if (parsedStr.length < 3) {
         throw new Error('MOL2 parsing error: Missing information about bonds!');
@@ -231,27 +280,27 @@ class MOL2Parser extends Parser {
     });
   }
 
-  _parseCompound(stream) {
+  _parseCompound(MOL2Data) {
     this._compoundIndx++;
-    this._parseMolecule(stream);
+    this._parseMolecule(MOL2Data);
 
     // Ignoring comments and everything before @<TRIPOS>MOLECULE block
-    const countsLine = stream.getStringFromHeader('MOLECULE', 2);
+    this._toStringFromHeader('MOLECULE', 2, MOL2Data);
 
-    const parsedStr = countsLine.trim().split(spacesRegex);
+    const parsedStr = MOL2Data[this._currPosIdx].trim().split(spacesRegex);
     const atomsNum = parsedStr[0];
     const bondsNum = parsedStr[1];
 
-    this._parseAtoms(stream, atomsNum);
-    this._parseBonds(stream, bondsNum);
+    this._parseAtoms(atomsNum, MOL2Data);
+    this._parseBonds(bondsNum, MOL2Data);
   }
 
   parseSync() {
     const result = this._complex = new Complex();
-    const stream = new MOL2Stream(this._data);
+    const MOL2Data = this._parseRawStrings(this._data);
     do {
-      this._parseCompound(stream);
-    } while (stream.findNextCompoundStart());
+      this._parseCompound(MOL2Data);
+    } while (this._findNextCompoundStart(MOL2Data));
 
     this._finalize();
 
