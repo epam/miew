@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.3] - 2019-09-20
+### Added
+- Add parsers for GRO molecular formats
+- Support shadows effect for the Trace mode
+
+### Fixed
+- Fix screenshot orientation in Safari
+- Fix screenshot size for HiDPI displays
+- Fix disabled button of representation addition in GUI
+
 ## [0.8.2] - 2019-08-16
 ### Added
 - The parameter `resolution` now effects image quality for Electron Density.
