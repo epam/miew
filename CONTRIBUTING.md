@@ -192,6 +192,10 @@ Unfortunately, it is still a semi-manual process.
             ### Fixed
             ### Security
             ### Internal
+            
+    -   Update unreleased link in `CHANGELOG.md` file.
+    
+            [Unreleased]: https://github.com/epam/miew/compare/v0.0.1...HEAD
 
     -   Replace the automatic commit and move the tag.
 
@@ -209,6 +213,12 @@ Unfortunately, it is still a semi-manual process.
 
         git push origin master latest
         git push --tags
+
+6.  Update a release description at https://github.com/epam/miew/releases. 
+
+    *  Press button `Draft a new release`.
+    *  Select the new version tag among existing and fill in a description text box with new release link and list of changes (see `CHANGELOG.md`)
+    *  Press `Publish`.
 
 Upon commit [Travis CI][] builds `master`, `latest` branches and `v0.0.1` tag. The tag automatically initiates NPM publish process if the build is successful.
 
