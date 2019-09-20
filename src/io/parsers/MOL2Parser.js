@@ -220,8 +220,8 @@ class MOL2Parser extends Parser {
         [originAtomId, targetAtomId] = [targetAtomId, originAtomId];
       }
       this._complex.addBond(originAtomId, targetAtomId,
-        (bondType in typeMap) ? orderMap[bondType] : 1,
-        (bondType in typeMap) ? typeMap[bondType] : Bond.BondType.UNKNOWN,
+        orderMap[bondType] || 0,
+        typeMap[bondType] || Bond.BondType.UNKNOWN,
         true);
     }
   }
