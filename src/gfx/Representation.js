@@ -61,7 +61,7 @@ class Representation {
     this.needsRebuild = false;
 
     if (settings.now.ao) {
-      this.material.setValues({ normalsToGBuffer: settings.now.ao, doubleSidedGBuffer: settings.now.ao });
+      this.material.setValues({ normalsToGBuffer: settings.now.ao });
     }
 
     this.geo = this.mode.buildGeometry(complex, this.colorer, 1 << this.index, this.material);
