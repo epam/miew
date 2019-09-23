@@ -1,3 +1,5 @@
+import FBXUtils from './FBXExporterUtils';
+
 /**
  * Utils class for simplifying cylinders procedures
  */
@@ -66,7 +68,7 @@ export default class FBXCylinderGeometryModel {
     /* Here we have a difference - some cylinders are closed (therefore they have additional vertices etc) and some are simple and opened */
     /* Not extended parameters are the same for both types of cylinders */
     this.vertexArrayLength = vertexArrayLength;
-    this.colorsArrayLength = 4 * vertexArrayLength / 3;
+    this.colorsArrayLength = FBXUtils.FBX_COL_SIZE * vertexArrayLength / FBXUtils.POS_SIZE;
     this.normalsArrayLength = normalArrayLength;
     this.indexArrayLength = indexArrayLength;
     if (constructor.name.includes('Trace')) {
@@ -77,12 +79,12 @@ export default class FBXCylinderGeometryModel {
       this.extendedIndexArrayLength = indexArrayLength;
       this.extendedVertexArrayLength = vertexArrayLength + (vertexArrayLength - 2) / 5;
       this.extendedNormalsArrayLength = normalArrayLength + (normalArrayLength - 2) / 5;
-      this.extendedColorsArrayLength = 4 * (vertexArrayLength / 3 + (vertexArrayLength - 2) / 15);
+      this.extendedColorsArrayLength = FBXUtils.FBX_COL_SIZE * (vertexArrayLength / 3 + (vertexArrayLength - 2) / 15);
     } else {
       this.extendedIndexArrayLength = indexArrayLength;
       this.extendedVertexArrayLength = vertexArrayLength + vertexArrayLength / 3;
       this.extendedNormalsArrayLength = normalArrayLength + normalArrayLength / 3;
-      this.extendedColorsArrayLength = 4 * (vertexArrayLength / 3 + vertexArrayLength / 9);
+      this.extendedColorsArrayLength = FBXUtils.FBX_COL_SIZE * (vertexArrayLength / FBXUtils.POS_SIZE + vertexArrayLength / (FBXUtils.POS_SIZE * 3));
     }
   }
 

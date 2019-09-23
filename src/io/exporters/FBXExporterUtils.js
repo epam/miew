@@ -2,6 +2,11 @@ import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
 
+const POS_SIZE = 3;
+const COL_SIZE = 3;
+const FBX_POS_SIZE = 3;
+const FBX_COL_SIZE = 4;
+
 /**
  *
  * @param matrix
@@ -38,7 +43,7 @@ function applyMatrixToVerticesNormals(matrix, vertices, normals) {
 function reworkIndices(array) {
   const clonedArray = new Int32Array(array.length); // In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers
   clonedArray.set(array);
-  for (let i = 2; i < clonedArray.length; i += 3) {
+  for (let i = POS_SIZE - 1; i < clonedArray.length; i += POS_SIZE) {
     clonedArray[i] *= -1;
     clonedArray[i]--;
   }
@@ -52,14 +57,14 @@ function reworkIndices(array) {
  * @returns{Float32Array} reworked array.
  */
 function reworkColors(colorArray) {
-  const clonedArray = new Float32Array(colorArray.length + colorArray.length / 3);
+  const clonedArray = new Float32Array(colorArray.length + colorArray.length / COL_SIZE);
   let clonedArrIdx = 0;
-  for (let i = 0; i < colorArray.length; i += 3) {
+  for (let i = 0; i < colorArray.length; i += COL_SIZE) {
     clonedArray.set([colorArray[i]], clonedArrIdx); // R
     clonedArray.set([colorArray[i + 1]], clonedArrIdx + 1); // G
     clonedArray.set([colorArray[i + 2]], clonedArrIdx + 2); // B
     clonedArray.set([1], clonedArrIdx + 3); // A
-    clonedArrIdx += 4;
+    clonedArrIdx += FBX_COL_SIZE;
   }
   return clonedArray;
 }
@@ -70,8 +75,8 @@ function reworkColors(colorArray) {
  * @returns {Float32Array} array with cloned colors
  */
 function cloneColors(numVertices, color) {
-  const clonedArray = new Float32Array(numVertices * 4); // RGBA for every vertex
-  for (let i = 0; i < clonedArray.length; i += 4) {
+  const clonedArray = new Float32Array(numVertices * FBX_COL_SIZE); // RGBA for every vertex
+  for (let i = 0; i < clonedArray.length; i += FBX_COL_SIZE) {
     clonedArray.set(color, i);
   }
   return clonedArray;
@@ -210,13 +215,11 @@ function calculateCylinderTransform(mesh, instanceIndex) {
   const lNormals = _.cloneDeep(attributes.normal.array);
   // We have vertices for not transformed cylinder. Need to make it transformed
   const transformCylinder = new THREE.Matrix4();
-  const idxOffset = instanceIndex * 4;
-  transformCylinder.set(matVector1[idxOffset], matVector2[idxOffset], matVector3[idxOffset], 0,
-    matVector1[idxOffset + 1], matVector2[idxOffset + 1], matVector3[idxOffset + 1], 0,
-    matVector1[idxOffset + 2], matVector2[idxOffset + 2], matVector3[idxOffset + 2], 0,
-    matVector1[idxOffset + 3], matVector2[idxOffset + 3], matVector3[idxOffset + 3], 1);
-  // For a reason we must perform transpose of that matrix
-  transformCylinder.transpose();
+  const idxOffset = instanceIndex * 4; // used 4 because offset arrays are stored in quads
+  transformCylinder.set(matVector1[idxOffset], matVector1[idxOffset + 1], matVector1[idxOffset + 2], matVector1[idxOffset + 3],
+    matVector2[idxOffset], matVector2[idxOffset + 1], matVector2[idxOffset + 2], matVector2[idxOffset + 3],
+    matVector3[idxOffset], matVector3[idxOffset + 1], matVector3[idxOffset + 2], matVector3[idxOffset + 3],
+    0, 0, 0, 1);
   return applyMatrixToVerticesNormals(transformCylinder, lVertices, lNormals);
 }
 
@@ -235,11 +238,11 @@ function collectInstancedColors(mesh, instanceIndex) {
       },
     },
   } = mesh;
-  const idxColors = instanceIndex * 3; // that's not magic. For 1st instance we must start from 0, for 2nd - from 3, etc
+  const idxColors = instanceIndex * COL_SIZE;
   const meshColor = color.array;
   const objectColor = reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]]);
   // For FBX we need to clone color for every vertex
-  const lColors = cloneColors(position.array.length / 3, objectColor);
+  const lColors = cloneColors(position.array.length / POS_SIZE, objectColor);
   return lColors;
 }
 
@@ -259,7 +262,7 @@ function colorLayer(colorArray) {
           MappingInformationType: "ByVertice"
           ReferenceInformationType: "Direct"
           Colors: ${correctArrayNotation(colorArray)}
-          ColorIndex: ${[...Array(colorArray.length / 4).keys()]}
+          ColorIndex: ${[...Array(colorArray.length / FBX_COL_SIZE).keys()]}
         }
     `);
 }
@@ -405,7 +408,7 @@ function materialProperties(material) {
 }
 
 /**
- * Needed procedure for array copying
+ * Needed procedure for array copying by triplets
  * @param {Array} destArray - array to where will be copied
  * @param {Number} fromPositionInDestArray - position in destination array from where will be copied
  * @param {Array} sourceArray - array from where will be copied
@@ -442,7 +445,7 @@ function decideSeparation(mesh, instanceIndex) {
   // No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies
   const meshColor1 = color.array;
   const meshColor2 = color2.array;
-  const idxColors = instanceIndex * 3;
+  const idxColors = instanceIndex * COL_SIZE;
   const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]]);
   const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]]);
   return !_.isEqual(objectColor1, objectColor2);
@@ -468,10 +471,11 @@ function getColors(mesh, instanceIndex, model) {
   // No CLONE DEEP for performance reasons. We do not change that colors what so ever so we dont need deep copies
   const meshColor1 = color.array;
   const meshColor2 = color2.array;
-  const idxColors = instanceIndex * 3;
+  const idxColors = instanceIndex * COL_SIZE;
   const numVertices = position.count; // That's the original number of vertices
   let numVerticesBeforeDividingLine = 0;
   let numVerticesAfterDividingLine = 0;
+  // Special formulas that correctly calculates number of vertices for closed and opened cylinders
   if (model.closedCylinder) {
     numVerticesBeforeDividingLine = 2 * (numVertices - 2) / 5;
     numVerticesAfterDividingLine = (numVertices - 2) / 5;
@@ -511,11 +515,11 @@ function getColors(mesh, instanceIndex, model) {
  * @param {Array} lNormals - raw normals from mesh
  * @param {boolean} needToDivideCylinders - flag "do we need to divide cylinders"
  */
-function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders) {
+function getReworkedAttributes(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders) {
   const [reworkedIndices, reworkedNormals, reworkedVertices] = reworkedModel.getArrays();
   const reworkedColors = getColors(mesh, instanceIndex, reworkedModel);
   reworkedModel.storeColors(reworkedColors);
-  let indexVerticesNormalsArray = 0; // not using push//
+  let indexVerticesNormalsArray = 0; // not using push
   let indexIndicesArray = 0;
   let indexAdditionalVertices = 0;
   let thirdOfTubeCylinderVertices = 0;
@@ -579,7 +583,14 @@ function getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lI
  * @returns {number} max index in index array
  */
 function getMaxIndexInModel(model) {
-  const maxIndex = Math.max(...model.getArrays()[0]); // VERY UNSAFE!
+  const indexArray = model.getArrays()[0];
+  let maxIndex = indexArray[0];
+  const indexArrayLength = indexArray.length;
+  for (let i = 1; i < indexArrayLength; ++i) {
+    if (indexArray[i] > maxIndex) {
+      maxIndex = indexArray[i];
+    }
+  }
   if (model.closedCylinder) {
     return maxIndex + 1;
   }
@@ -593,7 +604,7 @@ function getMaxIndexInModel(model) {
  * @param {FBXCylinderGeometryModel} resultingModel - resulting cylinder model
  * @returns {Array} array of finalized indices, normals, vertices, colors
  */
-function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
+function finalizeCylinderAttributes(mesh, maxIndexInModels, resultingModel) {
   const resVertices = resultingModel.getArrays()[2];
   const resNormals = resultingModel.getArrays()[1];
   const resColors = resultingModel.getArrays()[3];
@@ -615,6 +626,34 @@ function finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel) {
     resNormals.subarray(0, resultingModel.curResNormalsIndex)];
 }
 
+/**
+ *
+ * @param mesh
+ * @param instanceIndex
+ */
+function getSpheresVertices(mesh, instanceIndex) {
+  const {
+    geometry: {
+      attributes: {
+        offset,
+        position,
+      },
+    },
+  } = mesh;
+  const idxOffset = instanceIndex * 4;
+  const meshOffset = offset.array;
+  const lVertices = _.cloneDeep(position.array);
+  const objectOffset = new THREE.Vector4(meshOffset[idxOffset], meshOffset[idxOffset + 1],
+    meshOffset[idxOffset + 2], meshOffset[idxOffset + 3]);
+  // For every vertex calculate it's real position (vertex.xyz * scale) + offset
+  for (let j = 0; j < lVertices.length; j += POS_SIZE) {
+    lVertices[j] = ((lVertices[j] * objectOffset.w) + objectOffset.x);
+    lVertices[j + 1] = ((lVertices[j + 1] * objectOffset.w) + objectOffset.y);
+    lVertices[j + 2] = ((lVertices[j + 2] * objectOffset.w) + objectOffset.z);
+  }
+  return lVertices;
+}
+
 export default {
   reworkColors,
   reworkIndices,
@@ -630,10 +669,15 @@ export default {
   decideSeparation,
   defaultDefinitions,
   materialProperties,
-  getReworkedParameters,
-  finalizeCylinderParameters,
+  getReworkedAttributes,
+  finalizeCylinderAttributes,
   getMaxIndexInModel,
   applyMatrixToVerticesNormals,
+  POS_SIZE,
+  COL_SIZE,
+  FBX_COL_SIZE,
+  FBX_POS_SIZE,
+  getSpheresVertices,
   // Exports for testing
   cloneColors,
   correctArrayNotation,

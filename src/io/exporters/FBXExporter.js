@@ -91,7 +91,6 @@ Creator: "${CreatorTool}"
    * @returns {string} string containing all models (vertices, indices, colors, normals etc)
    */
   _addModelsToResult() {
-    console.log('Models started');
     let allModels = '';
     for (let i = 0; i < this._models.length; ++i) {
       const model = this._models[i];
@@ -113,7 +112,6 @@ Creator: "${CreatorTool}"
       const resultingLayer = normalLayer + colorLayer + materialLayer + layer;
       allModels += (modelProperties + verticesIndices + resultingLayer);
     }
-    console.log('Models done');
     return allModels;
   }
 
@@ -159,7 +157,7 @@ Creator: "${CreatorTool}"
     if (this._models.length === modelNumber) {
       return 0;
     }
-    return (this._models[modelNumber].vertices.length / 3 - 1);
+    return (this._models[modelNumber].vertices.length / FBXUtils.POS_SIZE - 1);
   }
 
   /**
@@ -262,45 +260,32 @@ Creator: "${CreatorTool}"
     // Firstly extract material information, if it's already in the base we will add to already existing model
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
-    let idxOffset = 0;
-    const meshOffset = offset.array;
     const numInstances = offset.count;
-    const numVertices = position.array.length / 3;
+    const numVertices = position.count;
     const numIndices = index.array.length;
     // Geometry info
-    const resVertices = new Float32Array(numInstances * numVertices * 3); // XYZ for every vertex
+    const allVertices = numInstances * numVertices;
+    const resVertices = new Float32Array(allVertices * FBXUtils.POS_SIZE); // XYZ for every vertex
     const resIndices = new Float32Array(numInstances * numIndices);
-    const resNormals = new Float32Array(numInstances * numVertices * 3);
-    const resColors = new Float32Array(numInstances * numVertices * 4); // RGBA for every vertex
+    const resNormals = new Float32Array(allVertices * FBXUtils.POS_SIZE);
+    const resColors = new Float32Array(allVertices * FBXUtils.FBX_COL_SIZE); // RGBA for every vertex
     for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
       // Firstly, collect some basic instanced parameters */
-      let lVertices = _.cloneDeep(position.array);
       let lNormals = _.cloneDeep(normal.array);
       const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
       const lColors = FBXUtils.collectInstancedColors(mesh, instanceIndex);
       // Extract offset for one exact object (instance)
-      const objectOffset = new THREE.Vector4(meshOffset[idxOffset], meshOffset[idxOffset + 1],
-        meshOffset[idxOffset + 2], meshOffset[idxOffset + 3]);
-      idxOffset += 4;
-      // For every vertex calculate it's real position (vertex.xyz * scale) + offset
-      for (let j = 0; j < lVertices.length; j += 3) {
-        lVertices[j] = ((lVertices[j] * objectOffset.w) + objectOffset.x);
-        lVertices[j + 1] = ((lVertices[j + 1] * objectOffset.w) + objectOffset.y);
-        lVertices[j + 2] = ((lVertices[j + 2] * objectOffset.w) + objectOffset.z);
-      }
+      let lVertices = FBXUtils.getSpheresVertices(mesh, instanceIndex);
       // If not only we have instanced, but also a transformed group (e.g. viruses) then we must multiply every vertex by special matrix
       if (!matrix.equals(new THREE.Matrix4().identity())) {
         [lVertices, lNormals] = FBXUtils.applyMatrixToVerticesNormals(matrix, _.cloneDeep(lVertices), _.cloneDeep(lNormals));
       }
       // Saving info from one instance to resulting model
-      resVertices.set(lVertices, instanceIndex * numVertices * 3);
-      resNormals.set(lNormals, instanceIndex * numVertices * 3);
-      resColors.set(lColors, instanceIndex * numVertices * 4);
+      const posVertices = instanceIndex * numVertices;
+      resVertices.set(lVertices, posVertices * FBXUtils.POS_SIZE);
+      resNormals.set(lNormals, posVertices * FBXUtils.POS_SIZE);
+      resColors.set(lColors, posVertices * FBXUtils.FBX_COL_SIZE);
       resIndices.set(lIndices, instanceIndex * numIndices);
-      // Debug purposes
-      /* if (instanceIndex % 1000 === 0) {
-        console.log(`${instanceIndex} out of ${numInstances} spheres done`);
-      } */
     }
     const model = {
       vertices: resVertices,
@@ -332,7 +317,7 @@ Creator: "${CreatorTool}"
     const lIndices = Int32Array.from(_.cloneDeep(index.array));
     // As we making one big model we need to carefully add resVertices.length to every index in lIndices
     // Algorithm below is a bit cognitively complicated, maybe refactor here at some point?
-    const maxIndex = position.array.length / 3 - 1;
+    const maxIndex = position.array.length / FBXUtils.POS_SIZE - 1;
     let changeIndex = 2;
     for (let k = 0; k < lIndices.length; ++k) {
       // If it's first model - no need to add "+ 1", if not - need that + 1
@@ -344,7 +329,7 @@ Creator: "${CreatorTool}"
       if (k === changeIndex) { // Need to rework this into FBX notation
         lIndices[k] *= -1;
         lIndices[k]--;
-        changeIndex += 3;
+        changeIndex += FBXUtils.POS_SIZE;
       }
     }
     return lIndices;
@@ -400,17 +385,13 @@ Creator: "${CreatorTool}"
         reworkedModel = extendedModel;
       }
       // Getting new vertices etc
-      FBXUtils.getReworkedParameters(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders);
+      FBXUtils.getReworkedAttributes(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders);
       maxIndex = FBXUtils.getMaxIndexInModel(reworkedModel);
       // Saving info from one instance to resulting model
       resultingModel.storeResults(reworkedModel);
-      // IFDEF DEBUG
-      if (instanceIndex % 1000 === 0) {
-        console.log(`${instanceIndex} out of ${numInstances} cylinders done`);
-      }
     }
     // Need to delete all zeros from the end of resArrays
-    const [resVertices, resIndices, resColors, resNormals] = FBXUtils.finalizeCylinderParameters(mesh, maxIndexInModels, resultingModel);
+    const [resVertices, resIndices, resColors, resNormals] = FBXUtils.finalizeCylinderAttributes(mesh, maxIndexInModels, resultingModel);
     const model = {
       vertices: resVertices,
       indices: resIndices,
@@ -447,7 +428,6 @@ Creator: "${CreatorTool}"
           } else {
             this._collectStraightGeometryInfo(mesh);
           }
-          console.log('mesh is done');
         }
       }
     });
