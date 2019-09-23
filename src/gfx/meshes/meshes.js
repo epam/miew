@@ -5,7 +5,7 @@ import ZClippedMesh from './ZClippedMesh';
 import TextMesh from './TextMesh';
 import SimpleMesh from './SimpleMesh';
 import ThickLineMesh from './ThickLineMesh';
-import TraceMesh from './TraceMesh';
+import InstancedMesh from './InstancedMesh';
 
 export default {
   ZClipped: ZClippedMesh,
@@ -15,5 +15,5 @@ export default {
   LineSegments: UberObject(THREE.LineSegments),
   Mesh: SimpleMesh,
   ThickLineMesh,
-  Trace: TraceMesh,
+  Instanced: InstancedMesh,
 };

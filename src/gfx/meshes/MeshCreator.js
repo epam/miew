@@ -9,12 +9,12 @@ function setMatParams(params, uniforms) {
   };
 }
 
-function _createInstancedCylinders(useZSprites, openEnded, useTraceMesh) {
+function _createInstancedCylinders(useZSprites, openEnded) {
   return {
     Geometry(a, b) {
       return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
     },
-    Object: useTraceMesh ? meshes.Trace : meshes.ZSprite,
+    Object: useZSprites ? meshes.ZSprite : meshes.Instanced,
     initMaterial: setMatParams({
       instancedMatrix: true,
       attrColor: true,
@@ -79,7 +79,7 @@ class MeshCreator {
       Geometry(a, b) {
         return new geometries.InstancedSpheresGeometry(a, b, useZSprites);
       },
-      Object: meshes.ZSprite,
+      Object: useZSprites ? meshes.ZSprite : meshes.Instanced,
       initMaterial: setMatParams({
         instancedPos: true,
         attrColor: true,
@@ -90,11 +90,11 @@ class MeshCreator {
   }
 
   static create2CClosedCylinders(_caps, _settings) {
-    return _createInstancedCylinders(false, false, true);
+    return _createInstancedCylinders(false, false);
   }
 
   static create2CCylinders(caps, settings) {
-    return _createInstancedCylinders(settings.now.zSprites, true, false);
+    return _createInstancedCylinders(settings.now.zSprites, true);
   }
 
   static create2CLines(_caps, _settings, renderParams) {
