@@ -167,7 +167,7 @@
     "spin.js": "^4.0.0",
     "style-loader": "^1.0.0",
     "stylelint": "^11.0.0",
-    "stylelint-config-standard": "^18.2.0",
+    "stylelint-config-standard": "^19.0.0",
     "three": "=0.108.0",
     "toastr": "^2.1.4",
     "uglify-js": "^3.6.0",
