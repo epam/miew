@@ -1660,7 +1660,12 @@ Miew.prototype._export = function (format) {
   }
 
   if (this._visuals[this._curVisualName] instanceof ComplexVisual) {
-    const dataSource = this._visuals[this._curVisualName]._complex;
+    let dataSource = null;
+    if (TheExporter.name === 'FBXExporter') {
+      dataSource = this._visuals[this._curVisualName];
+    } else {
+      dataSource = this._visuals[this._curVisualName]._complex;
+    }
     const exporter = new TheExporter(dataSource, { binary: true });
     return exporter.export().then((data) => data);
   }
