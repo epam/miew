@@ -4,7 +4,7 @@ export default class EmptyPage {
   constructor(driver, url) {
     this.driver = driver;
     if (url !== null) {
-      this.driver.get(url || 'http://miew.opensource.epam.com/examples/empty.html');
+      this.driver.get(url || 'https://miew.opensource.epam.com/examples/empty.html');
     }
   }
 

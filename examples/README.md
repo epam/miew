@@ -1,3 +1,3 @@
 # Miew Examples
 
-See the live demo at http://miew.opensource.epam.com/examples/
+See the live demo at https://miew.opensource.epam.com/examples/

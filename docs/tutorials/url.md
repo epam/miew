@@ -38,7 +38,7 @@ var viewer = new Miew(_.merge({
 ));
 ```
 
-and then [pass the same values using a URL](http://miew.opensource.epam.com/?m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&bg.color=0xCCCCCC&axes=0&fps=0):
+and then [pass the same values using a URL](https://miew.opensource.epam.com/?m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&bg.color=0xCCCCCC&axes=0&fps=0):
 
 ```
 ?m=LC&m=VW&s=elem+S&mt=TR&c=UN!color:0xFFFFFF&autoRotation=-0.5&bg.color=0xCCCCCC&axes=0&fps=0
@@ -78,9 +78,9 @@ assignment. Use [`autoRotation=0.1`] to enable rotation and set the speed, or [`
 nested settings such as [`modes.CA.radius=0.05`] to change default tube radius in Cartoon Mode.
 See `Settings` object for details.
 
-[`autoRotation=0.1`]: http://miew.opensource.epam.com/?autoRotation=0.1
-[`fog=0`]: http://miew.opensource.epam.com/?fog=0
-[`modes.CA.radius=0.05`]: http://miew.opensource.epam.com/?modes.CA.radius=0.05
+[`autoRotation=0.1`]: https://miew.opensource.epam.com/?autoRotation=0.1
+[`fog=0`]: https://miew.opensource.epam.com/?fog=0
+[`modes.CA.radius=0.05`]: https://miew.opensource.epam.com/?modes.CA.radius=0.05
 
 ### Execute Commands
 
@@ -133,19 +133,19 @@ Visual representation:
     Restore the view parameters: [`v=1%2Bn4pwTVeI8Erh8LAtVogPZLruL4ZnAtAYhl/Pg%3D%3D`].  
     The encoded string is not human readable and is usually obtained via `miew.view()` API call.
 
-[`l=4xn6`]:             http://miew.opensource.epam.com/?l=4xn6
-[`l=cif:4xn6`]:         http://miew.opensource.epam.com/?l=cif:4xn6
-[`l=pubchem:serotonin`]:http://miew.opensource.epam.com/?l=pubchem:serotonin
-[`t=mmtf&l=http://mmtf.rcsb.org/v1.0/full/4xn6`]: http://miew.opensource.epam.com/?t=mmtf&l=http://mmtf.rcsb.org/v1.0/full/4xn6
-[`l=3s95&u=2`]:         http://miew.opensource.epam.com/?l=3s95&u=2
-[`p=wire`]:             http://miew.opensource.epam.com/?p=wire
-[`s=residue+ALA,CYS`]:  http://miew.opensource.epam.com/?s=residue+ALA,CYS
-[`m=VW`]:               http://miew.opensource.epam.com/?m=VW
-[`c=RT`]:               http://miew.opensource.epam.com/?c=RT
-[`mt=ME`]:              http://miew.opensource.epam.com/?mt=ME
-[`r=0&m=BS&r=1&m=TU`]:  http://miew.opensource.epam.com/?r=0&m=BS&r=1&m=TU
-[`dup&m=QS&mt=TR`]:     http://miew.opensource.epam.com/?dup&m=QS&mt=TR
-[`v=1%2Bn4pwTVeI8Erh8LAtVogPZLruL4ZnAtAYhl/Pg%3D%3D`]: http://miew.opensource.epam.com/?v=1%2Bn4pwTVeI8Erh8LAtVogPZLruL4ZnAtAYhl/Pg%3D%3D
+[`l=4xn6`]:             https://miew.opensource.epam.com/?l=4xn6
+[`l=cif:4xn6`]:         https://miew.opensource.epam.com/?l=cif:4xn6
+[`l=pubchem:serotonin`]:https://miew.opensource.epam.com/?l=pubchem:serotonin
+[`t=mmtf&l=http://mmtf.rcsb.org/v1.0/full/4xn6`]: https://miew.opensource.epam.com/?t=mmtf&l=http://mmtf.rcsb.org/v1.0/full/4xn6
+[`l=3s95&u=2`]:         https://miew.opensource.epam.com/?l=3s95&u=2
+[`p=wire`]:             https://miew.opensource.epam.com/?p=wire
+[`s=residue+ALA,CYS`]:  https://miew.opensource.epam.com/?s=residue+ALA,CYS
+[`m=VW`]:               https://miew.opensource.epam.com/?m=VW
+[`c=RT`]:               https://miew.opensource.epam.com/?c=RT
+[`mt=ME`]:              https://miew.opensource.epam.com/?mt=ME
+[`r=0&m=BS&r=1&m=TU`]:  https://miew.opensource.epam.com/?r=0&m=BS&r=1&m=TU
+[`dup&m=QS&mt=TR`]:     https://miew.opensource.epam.com/?dup&m=QS&mt=TR
+[`v=1%2Bn4pwTVeI8Erh8LAtVogPZLruL4ZnAtAYhl/Pg%3D%3D`]: https://miew.opensource.epam.com/?v=1%2Bn4pwTVeI8Erh8LAtVogPZLruL4ZnAtAYhl/Pg%3D%3D
 
 A complex example follows (whitespaces are for better readability):
 
@@ -153,7 +153,7 @@ A complex example follows (whitespaces are for better readability):
 s=not+hetatm & m=CA & c=SS &  
 s=hetatm+and+not+water & m=LC & c=EL &  
 s=sequence+6:7,17:19,43:45,62:64,77,95:99 & m=CS & mt=PL &  
-bg.color=0xCCCCCC](http://miew.opensource.epam.com/?l=mmtf:1rx1&s=not+hetatm&m=CA&c=SS&s=hetatm+and+not+water&m=LC&c=EL&s=sequence+6:7,17:19,43:45,62:64,77,95:99&m=CS&mt=PL&bg.color=0xCCCCCC)
+bg.color=0xCCCCCC](https://miew.opensource.epam.com/?l=mmtf:1rx1&s=not+hetatm&m=CA&c=SS&s=hetatm+and+not+water&m=LC&c=EL&s=sequence+6:7,17:19,43:45,62:64,77,95:99&m=CS&mt=PL&bg.color=0xCCCCCC)
 
   - load 1RX1 in mmtf format;
   - select "`not hetatm`", set Cartoon mode with Secondary Structure coloring;
@@ -177,10 +177,10 @@ is encountered. For example:
   - Selector: [`l=4xn6&s=water&c=CH&s=residue+CYS&m=VW&c=AT`],  
     means `(s=water, c=CH)` + `(s=residue CYS, m=VW, c=AT)`.
 
-[`m=BS&m=TU`]:          http://miew.opensource.epam.com?m=BS&m=TU
-[`m=BS&m=QS&mt=TR`]:    http://miew.opensource.epam.com/?m=BS&m=QS&mt=TR
-[`c=RT&c=RI&m=TU`]:     http://miew.opensource.epam.com/?c=RT&c=RI&m=TU
-[`l=4xn6&s=water&c=CH&s=residue+CYS&m=VW&c=AT`]: http://miew.opensource.epam.com/?l=4xn6&s=water&c=CH&s=residue+CYS&m=VW&c=AT
+[`m=BS&m=TU`]:          https://miew.opensource.epam.com?m=BS&m=TU
+[`m=BS&m=QS&mt=TR`]:    https://miew.opensource.epam.com/?m=BS&m=QS&mt=TR
+[`c=RT&c=RI&m=TU`]:     https://miew.opensource.epam.com/?c=RT&c=RI&m=TU
+[`l=4xn6&s=water&c=CH&s=residue+CYS&m=VW&c=AT`]: https://miew.opensource.epam.com/?l=4xn6&s=water&c=CH&s=residue+CYS&m=VW&c=AT
 
 ### Mode and Coloring Parameters
 
@@ -194,6 +194,6 @@ URL. Append an exclamation mark and a comma-separated list of `key:value` pairs 
   - [`c=UN!color:0x00FF00`]  
     set Uniform coloing using green color;
 
-[`m=BS!atom:0.1,bond:0.05,multibond:0`]: http://miew.opensource.epam.com/?m=BS!atom:0.1,bond:0.05,multibond:0
-[`c=UN!color:0x00FF00`]: http://miew.opensource.epam.com/?c=UN!color:0x00FF00
+[`m=BS!atom:0.1,bond:0.05,multibond:0`]: https://miew.opensource.epam.com/?m=BS!atom:0.1,bond:0.05,multibond:0
+[`c=UN!color:0x00FF00`]: https://miew.opensource.epam.com/?c=UN!color:0x00FF00
 

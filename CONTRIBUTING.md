@@ -25,10 +25,10 @@ own subdirectory on the server, e.g. [`master`] or [`v0.7.10`].
 
 [Semantic Versioning]: http://semver.org/
 [go against CI/CD]: https://martinfowler.com/bliki/FeatureBranch.html
-[demo application]: http://miew.opensource.epam.com/
-[a set of examples]: http://miew.opensource.epam.com/examples/
-[`master`]: http://miew.opensource.epam.com/master/
-[`v0.7.10`]: http://miew.opensource.epam.com/v0.7.10/
+[demo application]: https://miew.opensource.epam.com/
+[a set of examples]: https://miew.opensource.epam.com/examples/
+[`master`]: https://miew.opensource.epam.com/master/
+[`v0.7.10`]: https://miew.opensource.epam.com/v0.7.10/
 
 
 ## Reporting Issues

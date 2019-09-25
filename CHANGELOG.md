@@ -171,8 +171,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Migrate parts of code to ES2015 syntax (`modes/`, `colorers/`, `meshes/`, `geometries/`, `groups/`, `processors/`).
 - Update golden images for e2e regression tests.
 
-[cartoon-like rendering]: http://miew.opensource.epam.com/v0.7.20/?l=1CRN&r=0&s=not+hetatm&m=CA&c=SQ&mt=TN&r=1&s=hetatm+and+not+water&m=BS&c=EL&mt=SF&resolution=high&outline.on=true&outline.threshold=0.02
-[RCSB PDB Molecule of the Month style]: http://miew.opensource.epam.com/v0.7.20/?l=pdb:5AT1&r=0&s=not+water+and+chain+C&m=VW&c=CO!subset:elem+C,baseColor:16422548,color:16494255&mt=FL&r=1&s=not+water+and+chain+B&m=VW&c=CO!subset:elem+C,baseColor:8169212,color:9550321&mt=FL&r=2&s=not+water+and+chain+D&m=VW&c=CO!subset:elem+C,baseColor:8112632,color:9888764&mt=FL&r=3&s=not+water+and+hetatm&m=VW&c=CO!subset:elem+C,baseColor:6532453,color:8837511&mt=FL&v=1SuyCwvajDcJvkg3CdGZdPKssNrtig608h/CdPw%3D%3D&fogFarFactor=2&fogColorEnable=true&theme=light&bg.color=13421772&outline.on=true&outline.threshold=0.01
+[cartoon-like rendering]: https://miew.opensource.epam.com/v0.7.20/?l=1CRN&r=0&s=not+hetatm&m=CA&c=SQ&mt=TN&r=1&s=hetatm+and+not+water&m=BS&c=EL&mt=SF&resolution=high&outline.on=true&outline.threshold=0.02
+[RCSB PDB Molecule of the Month style]: https://miew.opensource.epam.com/v0.7.20/?l=pdb:5AT1&r=0&s=not+water+and+chain+C&m=VW&c=CO!subset:elem+C,baseColor:16422548,color:16494255&mt=FL&r=1&s=not+water+and+chain+B&m=VW&c=CO!subset:elem+C,baseColor:8169212,color:9550321&mt=FL&r=2&s=not+water+and+chain+D&m=VW&c=CO!subset:elem+C,baseColor:8112632,color:9888764&mt=FL&r=3&s=not+water+and+hetatm&m=VW&c=CO!subset:elem+C,baseColor:6532453,color:8837511&mt=FL&v=1SuyCwvajDcJvkg3CdGZdPKssNrtig608h/CdPw%3D%3D&fogFarFactor=2&fogColorEnable=true&theme=light&bg.color=13421772&outline.on=true&outline.threshold=0.01
 [David S. Goodsell]: http://pdb101.rcsb.org/motm/motm-about
  
 ## [0.7.19] - 2018-06-18

@@ -18,14 +18,14 @@ export default class MiewPage {
   /**
    * Create a Page Object.
    * @param {ThenableWebDriver} driver - a Selenium WebDriver instance.
-   * @param {?string=} url - a URL to navigate to, or http://miew.opensource.epam.com/ by default. Specify explicit
+   * @param {?string=} url - a URL to navigate to, or https://miew.opensource.epam.com/ by default. Specify explicit
    *        `null` to skip reloading and to use the current browser page.
    */
   constructor(driver, url) {
     /** @type {ThenableWebDriver} */
     this.driver = driver;
     if (url !== null) {
-      this.driver.get(url || 'http://miew.opensource.epam.com/');
+      this.driver.get(url || 'https://miew.opensource.epam.com/');
     }
   }
 
