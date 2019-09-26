@@ -351,23 +351,23 @@ function defaultDefinitions() {
   // const objectTypes = []; /* Somewhat like 'let objectTypes = getObjectTypes()' or something. What about count of that objects? */
   /* Seems like this numbers didn't affect anything, so this section left because everything working with it looking that way */
   return `Definitions:  {
-      Version: ${Version}
-      Count: ${count}
-      ObjectType: "Model" {
-        Count: 1
-      }
-      ObjectType: "Geometry" {
-        Count: 1
-      }
-      ObjectType: "Material" {
-        Count: 1
-      }
-      ObjectType: "Pose" {
-        Count: 1
-      }
-      ObjectType: "GlobalSettings" {
-        Count: 1
-      }
+  Version: ${Version}
+  Count: ${count}
+  ObjectType: "Model" {
+    Count: 1
+  }
+  ObjectType: "Geometry" {
+    Count: 1
+  }
+  ObjectType: "Material" {
+    Count: 1
+  }
+  ObjectType: "Pose" {
+    Count: 1
+  }
+  ObjectType: "GlobalSettings" {
+    Count: 1
+  }
 }
     
 `;

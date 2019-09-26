@@ -76,6 +76,13 @@ THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
   };
 }());
 
+THREE.Matrix4.prototype.isIdentity = (function () {
+  const identity = new THREE.Matrix4();
+  return function () {
+    return identity.equals(this);
+  };
+}());
+
 class ScreenQuadMaterial extends THREE.RawShaderMaterial {
   constructor(params) {
     if (params.uniforms === undefined) {

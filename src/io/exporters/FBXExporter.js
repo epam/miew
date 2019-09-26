@@ -4,7 +4,6 @@ import Exporter from './Exporter';
 import FBXUtils from './FBXExporterUtils';
 import FBXCylinderGeometryModel from './FBXCylinderGeometryModel';
 import utils from '../../utils';
-// import gfxutils from '../../gfx/gfxutils';
 
 /**
  * FBX file format exporter.
@@ -29,47 +28,41 @@ export default class FBXExporter extends Exporter {
    * Some fields are really confusing, but it seems that all listed fields are very informative
    */
   createFBXHeader() {
-    // For some reasons, without specified comment at the start of the file it wont work. Do not touch please.
-    const mandatoryComment = `; FBX 6.1.0 project file
+    const FBXHeaderVersion = 1003; // 1003 is some number which appears to present in many 6.1 ASCII files
+    const FBXVersion = 6100; // Mandatory and only supported version
+    const date = new Date();
+    const timeStampVersion = 1000;
+    const creator = 'Miew FBX Exporter v.0.1'; // Supposed to be an engine
+
+    const header = `; FBX 6.1.0 project file
 ; Created by Miew FBX Exporter
 ; For support please contact miew@epam.com
 ; ----------------------------------------------------
-`;
-    const FBXHeaderVersion = 1003; // 1003 is some number which appears to present in many 6.1 ASCII files
-    const FBXVersion = 6100; // Mandatory and only supported version
-    const currentDate = new Date();
-    const timeStampVersion = 1000;
-    const Creator = 'Miew FBX Exporter v.0.1'; // Supposed to be an engine
-    const OtherFlags = { // Really dont know what is is. Looks like it is not mandatory, but left as potential future thingy
-      FlagPLE: 0,
-    };
-    const CreatorTool = 'Miew FBX Exporter v.0.1'; // Supposed to be exact exporter tool
 
-    const extension = `
 FBXHeaderExtension:  {
   FBXHeaderVersion: ${FBXHeaderVersion}
-    FBXVersion: ${FBXVersion}
-        CreationTimeStamp:  {
-        Version: ${timeStampVersion}
-          Year: ${currentDate.getFullYear()}
-          Month: ${currentDate.getMonth()}
-          Day: ${currentDate.getDay()}
-          Hour: ${currentDate.getHours()}
-          Minute: ${currentDate.getMinutes()}
-          Second: ${currentDate.getSeconds()}
-          Millisecond: ${currentDate.getMilliseconds()}
-        }
-        Creator: "${Creator}"
-        OtherFlags:  {
-          FlagPLE: ${OtherFlags.FlagPLE}
-        }
+  FBXVersion: ${FBXVersion}
+  CreationTimeStamp:  {
+    Version: ${timeStampVersion}
+    Year: ${date.getFullYear()}
+    Month: ${date.getMonth() + 1} 
+    Day: ${date.getDate()}
+    Hour: ${date.getHours()}
+    Minute: ${date.getMinutes()}
+    Second: ${date.getSeconds()}
+    Millisecond: ${date.getMilliseconds()}
+  }
+  Creator: "${creator}"
+  OtherFlags:  {
+    FlagPLE: 0
+  }
 }
-CreationTime: "${currentDate}"
-Creator: "${CreatorTool}"
+CreationTime: "${date}"
+Creator: "${creator}"
       
 `;
 
-    return mandatoryComment + extension; // Hereby and further we're using concatenation oppose to .join. See https://jsperf.com/javascript-concat-vs-join/7
+    return header;
   }
 
   /**
@@ -81,8 +74,7 @@ Creator: "${CreatorTool}"
 ;------------------------------------------------------------------
 
 `;
-    const definitions = FBXUtils.defaultDefinitions();
-    return mandatoryComment + definitions;
+    return mandatoryComment + FBXUtils.defaultDefinitions();
   }
 
   /**
@@ -91,19 +83,18 @@ Creator: "${CreatorTool}"
    * @returns {string} string containing all models (vertices, indices, colors, normals etc)
    */
   _addModelsToResult() {
+    const modelVersion = 232;
     let allModels = '';
     for (let i = 0; i < this._models.length; ++i) {
       const model = this._models[i];
       const modelName = `Model::${this._data.name}_${i}`;
-      const Version = 232; // Mystery number, but it left like that as it all works with it
       // Setting up default properties
       const modelProperties = `  Model: "${modelName}", "Mesh" {
-          Version: ${Version}
+          Version: ${modelVersion}
       ${FBXUtils.defaultProperties}`;
       // Setting up vertices + indices
       const verticesIndices = FBXUtils.addVerticesIndices(model.vertices, model.indices);
       // Setting up layers
-      // Some positions are still not quite easy to understand, and as soon as it will not crash without them - they will be set with some default values
       const normalLayer = FBXUtils.normalLayer(model.normals);
       const colorLayer = FBXUtils.colorLayer(model.colors);
       const materialLayer = FBXUtils.defaultMaterialLayer;
@@ -153,7 +144,7 @@ Creator: "${CreatorTool}"
    * @param {Number} modelNumber - given model
    * @returns {number} maximum index
    */
-  _calculateMaxIndex(modelNumber) {
+  _calculateMaxIndex(modelNumber) { // TODO NS: why we need it in that way
     if (this._models.length === modelNumber) {
       return 0;
     }
@@ -189,7 +180,7 @@ Creator: "${CreatorTool}"
   }
 
   /**
-   * Save geometry info from mesh to this._models.
+   * Save geometry info from mesh
    */
   _collectStraightGeometryInfo(mesh) {
     const {
@@ -203,20 +194,21 @@ Creator: "${CreatorTool}"
       },
       matrix,
     } = mesh;
+
+    let lColors = [];
+    let lNormals = null;
+    let lVertices = null;
+    if (matrix.isIdentity()) {
+      lVertices = position.array;
+      lNormals = normal.array;
+    } else {
+      [lVertices, lNormals] = FBXUtils.applyMatrixToVerticesNormals(matrix,
+        _.cloneDeep(position.array),
+        _.cloneDeep(normal.array));
+    }
     // Firstly extract material information, if it's already in the base we will add to already existing model
     const material = FBXUtils.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
-    let lColors = [];
-    // Collect info about vertices + indices + material
-    let lNormals = null;
-    let lVertices = null;
-    // If we have not instanced, but transformed group (e.g. viruses) then we must multiply every vertex by special matrix
-    if (matrix.equals(new THREE.Matrix4().identity())) {
-      lVertices = position.array; // Vertices either way are copying directly
-      lNormals = normal.array;
-    } else {
-      [lVertices, lNormals] = FBXUtils.applyMatrixToVerticesNormals(matrix, _.cloneDeep(position.array), _.cloneDeep(normal.array));
-    }
     // Different style with indices - if we have modelNumber => we must to add indices to existing ones
     const maxIndex = this._calculateMaxIndex(modelNumber);
     let lIndices = Int32Array.from(_.cloneDeep(index.array));
@@ -225,11 +217,12 @@ Creator: "${CreatorTool}"
         lIndices[i] += maxIndex + 1;
       }
     }
-    lIndices = FBXUtils.reworkIndices(lIndices); // Need to rework this into FBX notation
+    // Rework this into FBX notation
+    lIndices = FBXUtils.reworkIndices(lIndices);
     if (color.array.length >= 1) {
-      lColors = FBXUtils.reworkColors(color.array); // Need to rework this into FBX notation
+      lColors = FBXUtils.reworkColors(color.array);
     }
-    // We have now all information about model, let's add to existing one if it's here
+    // Add model
     if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
       const model = {
         vertices: lVertices,
@@ -238,7 +231,7 @@ Creator: "${CreatorTool}"
         colors: lColors,
       };
       this._addModelToPool(modelNumber, model, material);
-    } // else do nothing. Some meshes does not have any vertices so why would we add them here?
+    }
   }
 
   /**
@@ -265,10 +258,10 @@ Creator: "${CreatorTool}"
     const numIndices = index.array.length;
     // Geometry info
     const allVertices = numInstances * numVertices;
-    const resVertices = new Float32Array(allVertices * FBXUtils.POS_SIZE); // XYZ for every vertex
+    const resVertices = new Float32Array(allVertices * FBXUtils.POS_SIZE);
     const resIndices = new Float32Array(numInstances * numIndices);
     const resNormals = new Float32Array(allVertices * FBXUtils.POS_SIZE);
-    const resColors = new Float32Array(allVertices * FBXUtils.FBX_COL_SIZE); // RGBA for every vertex
+    const resColors = new Float32Array(allVertices * FBXUtils.FBX_COL_SIZE);
     for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
       // Firstly, collect some basic instanced parameters */
       let lNormals = _.cloneDeep(normal.array);
@@ -439,19 +432,18 @@ Creator: "${CreatorTool}"
    */
   _addGlobalSettings() {
     const gSettings = `{
-         Version: 1000
-         Properties60:  {
-            Property: "UpAxis", "int", "",1
-            Property: "UpAxisSign", "int", "",1
-            Property: "FrontAxis", "int", "",2
-            Property: "FrontAxisSign", "int", "",1
-            Property: "CoordAxis", "int", "",0
-            Property: "CoordAxisSign", "int", "",1
-            Property: "UnitScaleFactor", "double", "",1
-         }
-      }
+    Version: 1000
+    Properties60:  {
+      Property: "UpAxis", "int", "",1
+      Property: "UpAxisSign", "int", "",1
+      Property: "FrontAxis", "int", "",2
+      Property: "FrontAxisSign", "int", "",1
+      Property: "CoordAxis", "int", "",0
+      Property: "CoordAxisSign", "int", "",1
+      Property: "UnitScaleFactor", "double", "",1
+    }
+  }
 }
-
 `;
     return gSettings;
   }
@@ -466,7 +458,8 @@ Creator: "${CreatorTool}"
 
 `;
     const result = `Objects:  {
-      ${this._addModelsAndMaterials()}  GlobalSettings: ${this._addGlobalSettings()}`;
+  ${this._addModelsAndMaterials()}  GlobalSettings: ${this._addGlobalSettings()}`;
+
     return mandatoryComment + result;
   }
 
@@ -481,8 +474,8 @@ Creator: "${CreatorTool}"
     let modelsList = '';
     for (let i = 0; i < this._models.length; ++i) {
       modelsList += `  Model: "Model::${this._data.name}_${i}", "Mesh" {
-        }
-      `;
+  }
+`;
     }
     let materialList = '';
     for (let i = 0; i < this._materials.length; ++i) {
@@ -491,22 +484,22 @@ Creator: "${CreatorTool}"
 `;
     }
     const relations = `Relations:  {\n${modelsList}  Model: "Model::Producer Perspective", "Camera" {
-      }
-      Model: "Model::Producer Top", "Camera" {
-      }
-      Model: "Model::Producer Bottom", "Camera" {
-      }
-      Model: "Model::Producer Front", "Camera" {
-      }
-      Model: "Model::Producer Back", "Camera" {
-      }
-      Model: "Model::Producer Right", "Camera" {
-      }
-      Model: "Model::Producer Left", "Camera" {
-      }
-      Model: "Model::Camera Switcher", "CameraSwitcher" {
-      }
-    ${materialList}}
+  }
+  Model: "Model::Producer Top", "Camera" {
+  }
+  Model: "Model::Producer Bottom", "Camera" {
+  }
+  Model: "Model::Producer Front", "Camera" {
+  }
+  Model: "Model::Producer Back", "Camera" {
+  }
+  Model: "Model::Producer Right", "Camera" {
+  }
+  Model: "Model::Producer Left", "Camera" {
+  }
+  Model: "Model::Camera Switcher", "CameraSwitcher" {
+  }
+${materialList}}
 
 `;
     return mandatoryComment + relations;
@@ -544,7 +537,7 @@ Creator: "${CreatorTool}"
    * Entry point to exporter.
    */
   exportSync() {
-    // Creating mandatory blocks for .fbx files:
+    // Creating mandatory blocks
     const header = this.createFBXHeader(); // FBXHeader block
     const definitions = this.createDefinitions(); // Definitions block
     const objects = this.createObjects(); // Objects - Models and Materials block
