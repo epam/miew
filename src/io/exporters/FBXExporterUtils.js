@@ -119,80 +119,79 @@ function collectMaterialInfo(mesh) {
 }
 
 // Default model properties
-const defaultProperties = `    Properties60: {
-              Property: "QuaternionInterpolate", "bool", "",0
-              Property: "Visibility", "Visibility", "A",1
-              Property: "Lcl Translation", "Lcl Translation", "A",0.000000000000000,0.000000000000000,-1789.238037109375000
-              Property: "Lcl Rotation", "Lcl Rotation", "A",0.000009334667643,-0.000000000000000,0.000000000000000
-              Property: "Lcl Scaling", "Lcl Scaling", "A",1.000000000000000,1.000000000000000,1.000000000000000
-              Property: "RotationOffset", "Vector3D", "",0,0,0
-              Property: "RotationPivot", "Vector3D", "",0,0,0
-              Property: "ScalingOffset", "Vector3D", "",0,0,0
-              Property: "ScalingPivot", "Vector3D", "",0,0,0
-              Property: "TranslationActive", "bool", "",0
-              Property: "TranslationMin", "Vector3D", "",0,0,0
-              Property: "TranslationMax", "Vector3D", "",0,0,0
-              Property: "TranslationMinX", "bool", "",0
-              Property: "TranslationMinY", "bool", "",0
-              Property: "TranslationMinZ", "bool", "",0
-              Property: "TranslationMaxX", "bool", "",0
-              Property: "TranslationMaxY", "bool", "",0
-              Property: "TranslationMaxZ", "bool", "",0
-              Property: "RotationOrder", "enum", "",0
-              Property: "RotationSpaceForLimitOnly", "bool", "",0
-              Property: "AxisLen", "double", "",10
-              Property: "PreRotation", "Vector3D", "",0,0,0
-              Property: "PostRotation", "Vector3D", "",0,0,0
-              Property: "RotationActive", "bool", "",0
-              Property: "RotationMin", "Vector3D", "",0,0,0
-              Property: "RotationMax", "Vector3D", "",0,0,0
-              Property: "RotationMinX", "bool", "",0
-              Property: "RotationMinY", "bool", "",0
-              Property: "RotationMinZ", "bool", "",0
-              Property: "RotationMaxX", "bool", "",0
-              Property: "RotationMaxY", "bool", "",0
-              Property: "RotationMaxZ", "bool", "",0
-              Property: "RotationStiffnessX", "double", "",0
-              Property: "RotationStiffnessY", "double", "",0
-              Property: "RotationStiffnessZ", "double", "",0
-              Property: "MinDampRangeX", "double", "",0
-              Property: "MinDampRangeY", "double", "",0
-              Property: "MinDampRangeZ", "double", "",0
-              Property: "MaxDampRangeX", "double", "",0
-              Property: "MaxDampRangeY", "double", "",0
-              Property: "MaxDampRangeZ", "double", "",0
-              Property: "MinDampStrengthX", "double", "",0
-              Property: "MinDampStrengthY", "double", "",0
-              Property: "MinDampStrengthZ", "double", "",0
-              Property: "MaxDampStrengthX", "double", "",0
-              Property: "MaxDampStrengthY", "double", "",0
-              Property: "MaxDampStrengthZ", "double", "",0
-              Property: "PreferedAngleX", "double", "",0
-              Property: "PreferedAngleY", "double", "",0
-              Property: "PreferedAngleZ", "double", "",0
-              Property: "InheritType", "enum", "",0
-              Property: "ScalingActive", "bool", "",0
-              Property: "ScalingMin", "Vector3D", "",1,1,1
-              Property: "ScalingMax", "Vector3D", "",1,1,1
-              Property: "ScalingMinX", "bool", "",0
-              Property: "ScalingMinY", "bool", "",0
-              Property: "ScalingMinZ", "bool", "",0
-              Property: "ScalingMaxX", "bool", "",0
-              Property: "ScalingMaxY", "bool", "",0
-              Property: "ScalingMaxZ", "bool", "",0
-              Property: "GeometricTranslation", "Vector3D", "",0,0,0
-              Property: "GeometricRotation", "Vector3D", "",0,0,0
-              Property: "GeometricScaling", "Vector3D", "",1,1,1
-              Property: "LookAtProperty", "object", ""
-              Property: "UpVectorProperty", "object", ""
-              Property: "Show", "bool", "",1
-              Property: "NegativePercentShapeSupport", "bool", "",1
-              Property: "DefaultAttributeIndex", "int", "",0
-              Property: "Color", "Color", "A+",0,0,0
-              Property: "Size", "double", "",100
-              Property: "Look", "enum", "",1
-      }
-  `;
+const defaultProperties = `Properties60: {
+      Property: "QuaternionInterpolate", "bool", "",0
+      Property: "Visibility", "Visibility", "A",1
+      Property: "Lcl Translation", "Lcl Translation", "A",0.000000000000000,0.000000000000000,-1789.238037109375000
+      Property: "Lcl Rotation", "Lcl Rotation", "A",0.000009334667643,-0.000000000000000,0.000000000000000
+      Property: "Lcl Scaling", "Lcl Scaling", "A",1.000000000000000,1.000000000000000,1.000000000000000
+      Property: "RotationOffset", "Vector3D", "",0,0,0
+      Property: "RotationPivot", "Vector3D", "",0,0,0
+      Property: "ScalingOffset", "Vector3D", "",0,0,0
+      Property: "ScalingPivot", "Vector3D", "",0,0,0
+      Property: "TranslationActive", "bool", "",0
+      Property: "TranslationMin", "Vector3D", "",0,0,0
+      Property: "TranslationMax", "Vector3D", "",0,0,0
+      Property: "TranslationMinX", "bool", "",0
+      Property: "TranslationMinY", "bool", "",0
+      Property: "TranslationMinZ", "bool", "",0
+      Property: "TranslationMaxX", "bool", "",0
+      Property: "TranslationMaxY", "bool", "",0
+      Property: "TranslationMaxZ", "bool", "",0
+      Property: "RotationOrder", "enum", "",0
+      Property: "RotationSpaceForLimitOnly", "bool", "",0
+      Property: "AxisLen", "double", "",10
+      Property: "PreRotation", "Vector3D", "",0,0,0
+      Property: "PostRotation", "Vector3D", "",0,0,0
+      Property: "RotationActive", "bool", "",0
+      Property: "RotationMin", "Vector3D", "",0,0,0
+      Property: "RotationMax", "Vector3D", "",0,0,0
+      Property: "RotationMinX", "bool", "",0
+      Property: "RotationMinY", "bool", "",0
+      Property: "RotationMinZ", "bool", "",0
+      Property: "RotationMaxX", "bool", "",0
+      Property: "RotationMaxY", "bool", "",0
+      Property: "RotationMaxZ", "bool", "",0
+      Property: "RotationStiffnessX", "double", "",0
+      Property: "RotationStiffnessY", "double", "",0
+      Property: "RotationStiffnessZ", "double", "",0
+      Property: "MinDampRangeX", "double", "",0
+      Property: "MinDampRangeY", "double", "",0
+      Property: "MinDampRangeZ", "double", "",0
+      Property: "MaxDampRangeX", "double", "",0
+      Property: "MaxDampRangeY", "double", "",0
+      Property: "MaxDampRangeZ", "double", "",0
+      Property: "MinDampStrengthX", "double", "",0
+      Property: "MinDampStrengthY", "double", "",0
+      Property: "MinDampStrengthZ", "double", "",0
+      Property: "MaxDampStrengthX", "double", "",0
+      Property: "MaxDampStrengthY", "double", "",0
+      Property: "MaxDampStrengthZ", "double", "",0
+      Property: "PreferedAngleX", "double", "",0
+      Property: "PreferedAngleY", "double", "",0
+      Property: "PreferedAngleZ", "double", "",0
+      Property: "InheritType", "enum", "",0
+      Property: "ScalingActive", "bool", "",0
+      Property: "ScalingMin", "Vector3D", "",1,1,1
+      Property: "ScalingMax", "Vector3D", "",1,1,1
+      Property: "ScalingMinX", "bool", "",0
+      Property: "ScalingMinY", "bool", "",0
+      Property: "ScalingMinZ", "bool", "",0
+      Property: "ScalingMaxX", "bool", "",0
+      Property: "ScalingMaxY", "bool", "",0
+      Property: "ScalingMaxZ", "bool", "",0
+      Property: "GeometricTranslation", "Vector3D", "",0,0,0
+      Property: "GeometricRotation", "Vector3D", "",0,0,0
+      Property: "GeometricScaling", "Vector3D", "",1,1,1
+      Property: "LookAtProperty", "object", ""
+      Property: "UpVectorProperty", "object", ""
+      Property: "Show", "bool", "",1
+      Property: "NegativePercentShapeSupport", "bool", "",1
+      Property: "DefaultAttributeIndex", "int", "",0
+      Property: "Color", "Color", "A+",0,0,0
+      Property: "Size", "double", "",100
+      Property: "Look", "enum", "",1
+    }`;
 
 /**
  * Calculate parameters for one cylinder in given mesh.
@@ -251,20 +250,20 @@ function collectInstancedColors(mesh, instanceIndex) {
  * @returns {string} color layer info
  */
 function colorLayer(colorArray) {
-  const layerElementColorNumber = 0; // Currently unknown what that is
-  const layerElementColorVersion = 101; // Currently unknown what version means
-  const layerElementColorName = ''; // Currently unknown what name means
+  const layerElementColorNumber = 0;
+  const layerElementColorVersion = 101;
+  const layerElementColorName = '';
   // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
   // As said [..Array(...)] - fastest and easiest way to produce [0, 1, .....] array
-  return (`    LayerElementColor: ${layerElementColorNumber} {
-          Version: ${layerElementColorVersion}
-          Name: "${layerElementColorName}"
-          MappingInformationType: "ByVertice"
-          ReferenceInformationType: "Direct"
-          Colors: ${correctArrayNotation(colorArray)}
-          ColorIndex: ${[...Array(colorArray.length / FBX_COL_SIZE).keys()]}
-        }
-    `);
+  return `
+    LayerElementColor: ${layerElementColorNumber} {
+      Version: ${layerElementColorVersion}
+      Name: "${layerElementColorName}"
+      MappingInformationType: "ByVertice"
+      ReferenceInformationType: "Direct"
+      Colors: ${correctArrayNotation(colorArray)}
+      ColorIndex: ${[...Array(colorArray.length / FBX_COL_SIZE).keys()]}
+    }`;
 }
 
 /**
@@ -272,48 +271,48 @@ function colorLayer(colorArray) {
  * @returns {string} normal layer info
  */
 function normalLayer(normalArray) {
-  const layerElementNormalNumber = 0; // Currently unknown what that is
-  const layerElementNormalVersion = 101; // Currently unknown what version means
-  const layerElementNormalName = ''; // Currently unknown what name means
+  const layerElementNormalNumber = 0;
+  const layerElementNormalVersion = 101;
+  const layerElementNormalName = '';
   // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
-  return (`    LayerElementNormal: ${layerElementNormalNumber} {
-          Version: ${layerElementNormalVersion}
-          Name: "${layerElementNormalName}"
-          MappingInformationType: "ByVertice"
-          ReferenceInformationType: "Direct" 
-          Normals: ${correctArrayNotation(normalArray)}
-        }
-    `);
+  return `
+    LayerElementNormal: ${layerElementNormalNumber} {
+      Version: ${layerElementNormalVersion}
+      Name: "${layerElementNormalName}"
+      MappingInformationType: "ByVertice"
+      ReferenceInformationType: "Direct" 
+      Normals: ${correctArrayNotation(normalArray)}
+    }`;
 }
 
 // Default materials layer
-const defaultMaterialLayer = `    LayerElementMaterial: 0 {
-          Version: 101
-          Name: ""
-          MappingInformationType: "AllSame"
-          ReferenceInformationType: "Direct"
-          Materials: 0
-        }
-  `;
+const defaultMaterialLayer = `
+    LayerElementMaterial: 0 {
+      Version: 101
+      Name: ""
+      MappingInformationType: "AllSame"
+      ReferenceInformationType: "Direct"
+      Materials: 0
+    }`;
 
 // Default layers block
-const defaultLayerBlock = `    Layer: 0 {
-        Version: 100
-        LayerElement:  {
-          Type: "LayerElementNormal"
-          TypedIndex: 0
-        }
-        LayerElement:  {
-          Type: "LayerElementColor"
-          TypedIndex: 0
-        }
-        LayerElement:  {
-          Type: "LayerElementMaterial"
-          TypedIndex: 0
-        }
+const defaultLayerBlock = `
+    Layer: 0 {
+      Version: 100
+      LayerElement:  {
+        Type: "LayerElementNormal"
+        TypedIndex: 0
+      }
+      LayerElement:  {
+        Type: "LayerElementColor"
+        TypedIndex: 0
+      }
+      LayerElement:  {
+        Type: "LayerElementMaterial"
+        TypedIndex: 0
       }
     }
-  `;
+  }`;
 
 /**
  * Adding vertices and indices to resulting string
@@ -328,14 +327,13 @@ function addVerticesIndices(vertices, indices) {
   /* About _correctArrayNotation: Float32Arrays will contains only Float32 numbers, which implies that it will be floating points with 17 numbers after point.
   * We cannot (and it's logically incorrect) save all this information, so we convert this Float32Array into Array-like object with numbers with only 6 numbers after point
   * Reminder - this is big memory loss (as we must save at one moment two arrays with similar information) */
-  return (`    MultiLayer: ${multiLayer}
-        MultiTake: ${multiTake}
-        Shading: ${shading}
-        Culling: "${culling}"
-        Vertices: ${correctArrayNotation(vertices)}
-        PolygonVertexIndex: ${indices}
-        GeometryVersion: ${geometryVersion}
-    `);
+  return `MultiLayer: ${multiLayer}
+    MultiTake: ${multiTake}
+    Shading: ${shading}
+    Culling: "${culling}"
+    Vertices: ${correctArrayNotation(vertices)}
+    PolygonVertexIndex: ${indices}
+    GeometryVersion: ${geometryVersion}`;
 }
 
 /**
@@ -350,7 +348,8 @@ function defaultDefinitions() {
   /* Next variable (objectTypes) is left only because we might in some distant future automatically generate this section. */
   // const objectTypes = []; /* Somewhat like 'let objectTypes = getObjectTypes()' or something. What about count of that objects? */
   /* Seems like this numbers didn't affect anything, so this section left because everything working with it looking that way */
-  return `Definitions:  {
+  return `
+Definitions:  {
   Version: ${Version}
   Count: ${count}
   ObjectType: "Model" {
@@ -368,9 +367,7 @@ function defaultDefinitions() {
   ObjectType: "GlobalSettings" {
     Count: 1
   }
-}
-    
-`;
+} `;
 }
 
 /**
@@ -379,32 +376,31 @@ function defaultDefinitions() {
  * @returns {String} material properties string
  */
 function materialProperties(material) {
-  return `    Properties60:  {
-            Property: "ShadingModel", "KString", "", "Lambert"
-            Property: "MultiLayer", "bool", "",0
-            Property: "EmissiveColor", "ColorRGB", "",0,0,0
-            Property: "EmissiveFactor", "double", "",0.0000
-            Property: "AmbientColor", "ColorRGB", "",1,1,1
-            Property: "AmbientFactor", "double", "",0.0000
-            Property: "DiffuseColor", "ColorRGB", "",${material.diffuse}
-            Property: "DiffuseFactor", "double", "",1.0000
-            Property: "Bump", "Vector3D", "",0,0,0
-            Property: "TransparentColor", "ColorRGB", "",1,1,1
-            Property: "TransparencyFactor", "double", "",0.0000
-            Property: "SpecularColor", "ColorRGB", "",${material.specular}
-            Property: "SpecularFactor", "double", "",1.0000
-            Property: "ShininessExponent", "double", "",${material.shininess}
-            Property: "ReflectionColor", "ColorRGB", "",0,0,0
-            Property: "ReflectionFactor", "double", "",1
-            Property: "Ambient", "ColorRGB", "",1,1,1
-            Property: "Diffuse", "ColorRGB", "",${material.diffuse}
-            Property: "Specular", "ColorRGB", "",${material.specular}
-            Property: "Shininess", "double", "",${material.shininess}
-            Property: "Opacity", "double", "",${material.opacity}
-            Property: "Reflectivity", "double", "",0
-         }
-       }
-     `;
+  return `  Properties60:  {
+      Property: "ShadingModel", "KString", "", "Lambert"
+      Property: "MultiLayer", "bool", "",0
+      Property: "EmissiveColor", "ColorRGB", "",0,0,0
+      Property: "EmissiveFactor", "double", "",0.0000
+      Property: "AmbientColor", "ColorRGB", "",1,1,1
+      Property: "AmbientFactor", "double", "",0.0000
+      Property: "DiffuseColor", "ColorRGB", "",${material.diffuse}
+      Property: "DiffuseFactor", "double", "",1.0000
+      Property: "Bump", "Vector3D", "",0,0,0
+      Property: "TransparentColor", "ColorRGB", "",1,1,1
+      Property: "TransparencyFactor", "double", "",0.0000
+      Property: "SpecularColor", "ColorRGB", "",${material.specular}
+      Property: "SpecularFactor", "double", "",1.0000
+      Property: "ShininessExponent", "double", "",${material.shininess}
+      Property: "ReflectionColor", "ColorRGB", "",0,0,0
+      Property: "ReflectionFactor", "double", "",1
+      Property: "Ambient", "ColorRGB", "",1,1,1
+      Property: "Diffuse", "ColorRGB", "",${material.diffuse}
+      Property: "Specular", "ColorRGB", "",${material.specular}
+      Property: "Shininess", "double", "",${material.shininess}
+      Property: "Opacity", "double", "",${material.opacity}
+      Property: "Reflectivity", "double", "",0
+    }
+  }`;
 }
 
 /**

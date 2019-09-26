@@ -34,7 +34,7 @@ export default class FBXExporter extends Exporter {
     const timeStampVersion = 1000;
     const creator = 'Miew FBX Exporter v.0.1'; // Supposed to be an engine
 
-    const header = `; FBX 6.1.0 project file
+    return `; FBX 6.1.0 project file
 ; Created by Miew FBX Exporter
 ; For support please contact miew@epam.com
 ; ----------------------------------------------------
@@ -58,11 +58,8 @@ FBXHeaderExtension:  {
   }
 }
 CreationTime: "${date}"
-Creator: "${creator}"
-      
+Creator: "${creator}"  
 `;
-
-    return header;
   }
 
   /**
@@ -70,9 +67,9 @@ Creator: "${creator}"
    * Not exactly sure if this section is template section (as it is in 7.4+) or it should every time be like this
    */
   createDefinitions() {
-    const mandatoryComment = `; Object definitions
+    const mandatoryComment = `
+; Object definitions
 ;------------------------------------------------------------------
-
 `;
     return mandatoryComment + FBXUtils.defaultDefinitions();
   }
@@ -87,21 +84,14 @@ Creator: "${creator}"
     let allModels = '';
     for (let i = 0; i < this._models.length; ++i) {
       const model = this._models[i];
-      const modelName = `Model::${this._data.name}_${i}`;
-      // Setting up default properties
-      const modelProperties = `  Model: "${modelName}", "Mesh" {
-          Version: ${modelVersion}
-      ${FBXUtils.defaultProperties}`;
-      // Setting up vertices + indices
-      const verticesIndices = FBXUtils.addVerticesIndices(model.vertices, model.indices);
-      // Setting up layers
-      const normalLayer = FBXUtils.normalLayer(model.normals);
-      const colorLayer = FBXUtils.colorLayer(model.colors);
-      const materialLayer = FBXUtils.defaultMaterialLayer;
-      // Do we need automatically check and build this info? In Miew we always have these layers
-      const layer = FBXUtils.defaultLayerBlock;
-      const resultingLayer = normalLayer + colorLayer + materialLayer + layer;
-      allModels += (modelProperties + verticesIndices + resultingLayer);
+      allModels += `Model: "Model::${this._data.name}_${i}", "Mesh" {
+    Version: ${modelVersion} 
+    ${FBXUtils.defaultProperties}
+    ${FBXUtils.addVerticesIndices(model.vertices, model.indices)}
+    ${FBXUtils.normalLayer(model.normals)} 
+    ${FBXUtils.colorLayer(model.colors)} 
+    ${FBXUtils.defaultMaterialLayer}  
+    ${FBXUtils.defaultLayerBlock}`;
     }
     return allModels;
   }
@@ -114,12 +104,12 @@ Creator: "${creator}"
     let allMaterials = '';
     for (let i = 0; i < this._materials.length; ++i) {
       const material = this._materials[i];
-      const stringMaterial = `  Material: "Material::${this._data.name}_${i}_default", "" {
-          Version: ${materialVersion}
-          ShadingModel: "lambert"
-          MultiLayer: 0
-      ${FBXUtils.materialProperties(material)}`;
-      allMaterials += stringMaterial;
+      allMaterials += `
+  Material: "Material::${this._data.name}_${i}_default", "" {
+    Version: ${materialVersion}
+    ShadingModel: "lambert"
+    MultiLayer: 0
+  ${FBXUtils.materialProperties(material)}`;
     }
     return allMaterials;
   }
@@ -453,12 +443,14 @@ Creator: "${creator}"
    * Add Objects info to output file.
    */
   createObjects() {
-    const mandatoryComment = `; Object properties
+    const mandatoryComment = `
+; Object properties
 ;------------------------------------------------------------------
 
 `;
     const result = `Objects:  {
-  ${this._addModelsAndMaterials()}  GlobalSettings: ${this._addGlobalSettings()}`;
+  ${this._addModelsAndMaterials()} 
+  GlobalSettings: ${this._addGlobalSettings()}`;
 
     return mandatoryComment + result;
   }
@@ -467,15 +459,15 @@ Creator: "${creator}"
    * Add Relations info to output file.
    */
   createRelations() {
-    const mandatoryComment = `; Object relations
+    const mandatoryComment = `
+; Object relations
 ;------------------------------------------------------------------
 
 `;
     let modelsList = '';
     for (let i = 0; i < this._models.length; ++i) {
-      modelsList += `  Model: "Model::${this._data.name}_${i}", "Mesh" {
-  }
-`;
+      modelsList += `Model: "Model::${this._data.name}_${i}", "Mesh" {
+  }`;
     }
     let materialList = '';
     for (let i = 0; i < this._materials.length; ++i) {
@@ -483,7 +475,9 @@ Creator: "${creator}"
   }
 `;
     }
-    const relations = `Relations:  {\n${modelsList}  Model: "Model::Producer Perspective", "Camera" {
+    const relations = `Relations:  {
+  ${modelsList}
+  Model: "Model::Producer Perspective", "Camera" {
   }
   Model: "Model::Producer Top", "Camera" {
   }
@@ -509,9 +503,9 @@ ${materialList}}
    * Add Connections info to output file.
    */
   createConnections() {
-    const mandatoryComment = `; Object connections
+    const mandatoryComment = `
+; Object connections
 ;------------------------------------------------------------------
-
 `;
     let modelsList = '';
     for (let i = 0; i < this._models.length; ++i) {
@@ -521,7 +515,8 @@ ${materialList}}
     for (let i = 0; i < this._materials.length; ++i) {
       materialList += `  Connect: "OO", "Material::${this._data.name}_${i}_default", "Model::${this._data.name}_${i}"\n`;
     }
-    const connections = `Connections:  {\n${modelsList}${materialList}}
+    const connections = `
+ Connections:  {\n${modelsList}${materialList}}
 `;
     return mandatoryComment + connections;
   }
