@@ -125,7 +125,6 @@ Creator: "${creator}"
         return i;
       }
     }
-    // completely new element
     return this._models.length;
   }
 
@@ -260,7 +259,7 @@ Creator: "${creator}"
       // Extract offset for one exact object (instance)
       let lVertices = FBXUtils.getSpheresVertices(mesh, instanceIndex);
       // If not only we have instanced, but also a transformed group (e.g. viruses) then we must multiply every vertex by special matrix
-      if (!matrix.equals(new THREE.Matrix4().identity())) {
+      if (!matrix.isIdentity()) {
         [lVertices, lNormals] = FBXUtils.applyMatrixToVerticesNormals(matrix, _.cloneDeep(lVertices), _.cloneDeep(lNormals));
       }
       // Saving info from one instance to resulting model
@@ -345,7 +344,7 @@ Creator: "${creator}"
     for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
       // Grab vertices and normals for transformed (scale, rotation, translation) cylinder
       let [lVertices, lNormals] = FBXUtils.calculateCylinderTransform(mesh, instanceIndex);
-      if (!matrix.equals(new THREE.Matrix4().identity())) {
+      if (!matrix.isIdentity()) {
         [lVertices, lNormals] = FBXUtils.applyMatrixToVerticesNormals(matrix, _.cloneDeep(lVertices), _.cloneDeep(lNormals));
       }
       // Okay now vertices are reworked as we want them. Now it's time for implementing algorithm
@@ -404,6 +403,7 @@ Creator: "${creator}"
     this._data.traverse((object) => {
       if (object instanceof THREE.Mesh) {
         const mesh = object;
+        // FIXME make good test
         // if (mesh.layers.test(gfxutils.LAYERS.DEFAULT) || mesh.layers.test(gfxutils.LAYERS.TRANSPARENT)) { /* It means something */
         if (mesh.layers.mask === 1 || mesh.layers.mask === 4) { /* How can we use .test method from threejs layers if LAYERS isn't treejs layers? 1 is default, 4 is transparent */
           if (mesh.geometry.type === 'InstancedBufferGeometry') {
