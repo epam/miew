@@ -143,6 +143,7 @@ class ValueList extends List {
     } else {
       super.append(value);
     }
+    return this;
   }
 
   remove(value) {
@@ -151,6 +152,7 @@ class ValueList extends List {
     } else {
       super.remove(value);
     }
+    return this;
   }
 }
 
