@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import gfxutils from './gfxutils';
 
 class VolumeBounds {
   static _projectionTable = { // corresponds between (origin axes and angles between them) and between saving vector coordinates
@@ -36,6 +37,7 @@ class VolumeBounds {
     geometry.vertices.forEach((vertex) => vertex.add(center)); // pivot shift
 
     this._lines = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0xFFFFFF }));
+    this._lines.layers.set(gfxutils.LAYERS.VOLUME);
   }
 
   // Set one edge (4 points) of frame, from which with parallel transfer  the rest of the frame points can be obtained
