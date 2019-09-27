@@ -1430,7 +1430,7 @@ Miew.prototype._renderVolume = (function () {
 
     const mesh = volumeVisual.getMesh();
 
-    mesh.rebuild(camera);
+    mesh.rebuild(gfx.camera);
 
     // use main camera to prepare special textures to be used by volumetric rendering
     // these textures have the size of the window and are stored in offscreen buffers
