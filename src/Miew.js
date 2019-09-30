@@ -1573,10 +1573,6 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
     _aoMaterial.uniforms.noiseTexture.value = noise.noiseTexture;
     _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight);
-    const { fog } = gfx.scene;
-    if (fog) {
-      _aoMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
-    }
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
     gfx.renderer.setRenderTarget(tempBuffer1);
     gfx.renderer.renderScreenQuad(_aoMaterial);
@@ -1591,6 +1587,13 @@ Miew.prototype._performAO = (function () {
     _vertBlurMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _vertBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer.width, 1.0 / tempBuffer.height);
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
+    _vertBlurMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
+    _vertBlurMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
+    _vertBlurMaterial.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
+    const { fog } = gfx.scene;
+    if (fog) {
+      _vertBlurMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
+    }
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.renderScreenQuad(_vertBlurMaterial);
   };

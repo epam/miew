@@ -60,7 +60,6 @@ function AOMaterial() {
       kernelRadius: { type: 'f', value: 1.0 },
       depthThreshold: { type: 'f', value: 1.0 },
       factor: { type: 'f', value: 1.0 },
-      fogNearFar: { type: 'v2', value: new THREE.Vector2(100.0, 100.0) },
     },
     vertexShader: vertexScreenQuadShader,
     fragmentShader: fragmentSSAOShader,
@@ -81,6 +80,7 @@ const blurUniforms5 = {
   projMatrix: { type: 'mat4', value: new THREE.Matrix4() },
   aspectRatio: { type: 'f', value: 0.0 },
   tanHalfFOV: { type: 'f', value: 0.0 },
+  fogNearFar: { type: 'v2', value: new THREE.Vector2(100.0, 100.0) },
 };
 
 function overrideUniforms(params, defUniforms) {
