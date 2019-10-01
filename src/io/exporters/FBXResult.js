@@ -1,5 +1,27 @@
 const FBX_COL_SIZE = 4; // FIXME
 
+// Forming default definitions block
+const defaultDefinitions = `
+Definitions:  {
+  Version: 100
+  Count: 3
+  ObjectType: "Model" {
+    Count: 1
+  }
+  ObjectType: "Geometry" {
+    Count: 1
+  }
+  ObjectType: "Material" {
+    Count: 1
+  }
+  ObjectType: "Pose" {
+    Count: 1
+  }
+  ObjectType: "GlobalSettings" {
+    Count: 1
+  }
+} `;
+
 // Default model properties
 const defaultProperties = `Properties60: {
       Property: "QuaternionInterpolate", "bool", "",0
@@ -128,12 +150,12 @@ export default class FBXResult {
 
   getResult(info) {
     this._info = info;
-    this._resultArray.push(this.writeHeader());
-    this._resultArray.push(this.createDefinitions());
-    this._resultArray.push(this.createObjects(info.models, info.materials));
-    this._resultArray.push(this.createRelations());
-    this._resultArray.push(this.createConnections()); // connections between models and materials)
-    this._resultArray.push(this.createAnimation()); // Animation and takes block (currently empty)
+    this._resultArray.push(this._writeHeader());
+    this._resultArray.push(this._writeDefinitions());
+    this._resultArray.push(this._writeObjects(info.models, info.materials));
+    this._resultArray.push(this._writeRelations());
+    this._resultArray.push(this._writeConnections()); // connections between models and materials)
+    this._info = null;
     return this._resultArray.join('');
   }
 
@@ -141,7 +163,7 @@ export default class FBXResult {
    * Add FBXHeader info to output file.
    * Some fields are really confusing, but it seems that all listed fields are very informative
    */
-  writeHeader() {
+  _writeHeader() {
     const FBXHeaderVersion = 1003; // 1003 is some number which appears to present in many 6.1 ASCII files
     const FBXVersion = 6100; // Mandatory and only supported version
     const date = new Date();
@@ -180,12 +202,13 @@ Creator: "${creator}"
    * Add Definitions info to output file.
    * Not exactly sure if this section is template section (as it is in 7.4+) or it should every time be like this
    */
-  createDefinitions() {
-    const mandatoryComment = `
+  _writeDefinitions() {
+    return `
 ; Object definitions
 ;------------------------------------------------------------------
+
+${defaultDefinitions}
 `;
-    return mandatoryComment + this.defaultDefinitions();
   }
 
   /**
@@ -193,7 +216,7 @@ Creator: "${creator}"
    * Reminder - there may be more then 1 model in scene, but we must place materials after ALL models.
    * @returns {string} string containing all models (vertices, indices, colors, normals etc)
    */
-  _addModelsToResult() {
+  _models() {
     const modelVersion = 232;
     let allModels = '';
     const { models } = this._info;
@@ -203,9 +226,9 @@ Creator: "${creator}"
   Model: "Model::${this._info.name}_${i}", "Mesh" {
     Version: ${modelVersion} 
     ${defaultProperties}
-    ${this.addVerticesIndices(model.vertices, model.indices)}
-    ${this.normalLayer(model.normals)} 
-    ${this.colorLayer(model.colors)} 
+    ${this._verticesIndices(model.vertices, model.indices)}
+    ${this._normalLayer(model.normals)} 
+    ${this._colorLayer(model.colors)} 
     ${defaultMaterialLayer}  
     ${defaultLayerBlock}
   }`;
@@ -216,7 +239,7 @@ Creator: "${creator}"
   /**
    * Add Material info to result
    */
-  _addMaterialsToResult() {
+  _materials() {
     const materialVersion = 102;
     let allMaterials = '';
     const { materials } = this._info;
@@ -227,7 +250,7 @@ Creator: "${creator}"
     Version: ${materialVersion}
     ShadingModel: "lambert"
     MultiLayer: 0
-    ${this.materialProperties(material)}
+    ${this._materialProperties(material)}
   }`;
     }
     return allMaterials;
@@ -236,14 +259,14 @@ Creator: "${creator}"
   /**
    * Add Objects info to output file.
    */
-  createObjects() {
+  _writeObjects() {
     return `
 ; Object properties
 ;------------------------------------------------------------------
 
 Objects:  {
-  ${this._addModelsToResult()}
-  ${this._addMaterialsToResult()}
+  ${this._models()}
+  ${this._materials()}
   ${globalSettings}
 }
 `;
@@ -252,7 +275,7 @@ Objects:  {
   /**
    * Add Relations info to output file.
    */
-  createRelations() {
+  _writeRelations() {
     let modelsList = '';
     for (let i = 0; i < this._info.models.length; ++i) {
       modelsList += `
@@ -295,7 +318,7 @@ Relations:  {
   /**
    * Add Connections info to output file.
    */
-  createConnections() {
+  _writeConnections() {
     let modelsList = '';
     const { name } = this._info;
     for (let i = 0; i < this._info.models.length; ++i) {
@@ -320,18 +343,11 @@ Connections:  {
   }
 
   /**
-   * Add Animation info to output file.
-   */
-  createAnimation() {
-    return '';
-  }
-
-  /**
    * Rework numbers notation from scientific (exponential) to normal
    * @param {Float32Array} array - array to be fixed
    * @returns {[]} Array of numbers in correct notation
    */
-  correctArrayNotation(array) { // FIXME should do during writring to string
+  _correctArrayNotation(array) { // FIXME should do during writring to string
     const reworkedArray = [];
     for (let i = 0; i < array.length; ++i) {
       reworkedArray[i] = parseFloat(array[i].toFixed(6)); // enough for float type precision
@@ -343,7 +359,7 @@ Connections:  {
    * Adding color layer to resulting file
    * @returns {string} color layer info
    */
-  colorLayer(colorArray) {
+  _colorLayer(colorArray) {
     const layerElementColorNumber = 0;
     const layerElementColorVersion = 101;
     const layerElementColorName = '';
@@ -355,7 +371,7 @@ Connections:  {
       Name: "${layerElementColorName}"
       MappingInformationType: "ByVertice"
       ReferenceInformationType: "Direct"
-      Colors: ${this.correctArrayNotation(colorArray)}
+      Colors: ${this._correctArrayNotation(colorArray)}
       ColorIndex: ${[...Array(colorArray.length / FBX_COL_SIZE).keys()]}
     }`;
   }
@@ -364,7 +380,7 @@ Connections:  {
    * Adding normal layer to resulting file
    * @returns {string} normal layer info
    */
-  normalLayer(normalArray) {
+  _normalLayer(normalArray) {
     const layerElementNormalNumber = 0;
     const layerElementNormalVersion = 101;
     const layerElementNormalName = '';
@@ -375,7 +391,7 @@ Connections:  {
       Name: "${layerElementNormalName}"
       MappingInformationType: "ByVertice"
       ReferenceInformationType: "Direct" 
-      Normals: ${this.correctArrayNotation(normalArray)}
+      Normals: ${this._correctArrayNotation(normalArray)}
     }`;
   }
 
@@ -384,7 +400,7 @@ Connections:  {
    * Adding vertices and indices to resulting string
    * @return {string} resulting string in FBX notation
    */
-  addVerticesIndices(vertices, indices) {
+  _verticesIndices(vertices, indices) {
     const multiLayer = 0;
     const multiTake = 1;
     const shading = 'Y';
@@ -397,43 +413,9 @@ Connections:  {
     MultiTake: ${multiTake}
     Shading: ${shading}
     Culling: "${culling}"
-    Vertices: ${this.correctArrayNotation(vertices)}
+    Vertices: ${this._correctArrayNotation(vertices)}
     PolygonVertexIndex: ${indices}
     GeometryVersion: ${geometryVersion}`;
-  }
-
-  /**
-   * Forming default definitions block.
-   * @returns {String} default definitions block
-   */
-  defaultDefinitions() {
-    const Version = 100; // Mystery 100, but appears that it's not checked properly */
-    const count = 3; /* Biggest mystery here. Every 6.1. file has this field = 3. Why?  I think that here must be
-    some sort of 'let count = calculateCount()' or something, cos i _think_ that it's object, geometry,material etc count */
-    /* Then we must know how many and exactly what Object Types there are */
-    /* Next variable (objectTypes) is left only because we might in some distant future automatically generate this section. */
-    // const objectTypes = []; /* Somewhat like 'let objectTypes = getObjectTypes()' or something. What about count of that objects? */
-    /* Seems like this numbers didn't affect anything, so this section left because everything working with it looking that way */
-    return `
-Definitions:  {
-  Version: ${Version}
-  Count: ${count}
-  ObjectType: "Model" {
-    Count: 1
-  }
-  ObjectType: "Geometry" {
-    Count: 1
-  }
-  ObjectType: "Material" {
-    Count: 1
-  }
-  ObjectType: "Pose" {
-    Count: 1
-  }
-  ObjectType: "GlobalSettings" {
-    Count: 1
-  }
-} `;
   }
 
   /**
@@ -441,7 +423,7 @@ Definitions:  {
    * @param {Object} material - given material of model
    * @returns {String} material properties string
    */
-  materialProperties(material) {
+  _materialProperties(material) {
     return `Properties60:  {
       Property: "ShadingModel", "KString", "", "Lambert"
       Property: "MultiLayer", "bool", "",0
