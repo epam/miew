@@ -1,5 +1,3 @@
-const FBX_COL_SIZE = 4; // FIXME
-
 // Forming default definitions block
 const defaultDefinitions = `
 Definitions:  {
@@ -144,7 +142,6 @@ const globalSettings = `GlobalSettings: {
 export default class FBXResult {
   constructor() {
     this._resultArray = [];
-    this._currentStr = -1; // FIXME check in string length
     this._info = null;
   }
 
@@ -373,7 +370,7 @@ Connections:  {
       MappingInformationType: "ByVertice"
       ReferenceInformationType: "Direct"
       Colors: ${colorsStr}
-      ColorIndex: ${[...Array(colorArray.length / FBX_COL_SIZE).keys()]}
+      ColorIndex: ${[...Array(colorArray.length / this._info.colSize).keys()]}
     }`;
   }
 

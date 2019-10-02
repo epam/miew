@@ -21,6 +21,8 @@ export default class FBXInfoExtractor {
       name: data.name,
       models: this._models,
       materials: this._materials,
+      posSize: FBX_POS_SIZE,
+      colSize: FBX_COL_SIZE,
     };
   }
 
