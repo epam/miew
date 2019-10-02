@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
+import gfxutils from '../../gfx/gfxutils'
 import FBXCylinderGeometryModel from './FBXCylinderGeometryModel';
 
 const POS_SIZE = 3; // FIXME make it only one
@@ -306,23 +307,22 @@ export default class FBXInfoExtractor {
       this._collectCylindersInfo(mesh);
     }
   }
+// FIXME reorganize methods order inside the module
 
   /**
-   * Add Models and materials info to output file.
+   * Extract fbx object information from ComplexVisual
    */
   _extractModelsAndMaterials(data) {
+    const layersOfInterest = new THREE.Layers();
+    layersOfInterest.set(gfxutils.LAYERS.DEFAULT);
+    layersOfInterest.enable(gfxutils.LAYERS.TRANSPARENT);
     // To gather all mesh attributes (vertices, indices, etc) we need to traverse this._data object
     data.traverse((object) => {
-      if (object instanceof THREE.Mesh) {
-        const mesh = object;
-        // FIXME make good test
-        // if (mesh.layers.test(gfxutils.LAYERS.DEFAULT) || mesh.layers.test(gfxutils.LAYERS.TRANSPARENT)) { /* It means something */
-        if (mesh.layers.mask === 1 || mesh.layers.mask === 4) { /* How can we use .test method from threejs layers if LAYERS isn't treejs layers? 1 is default, 4 is transparent */
-          if (mesh.geometry.type === 'InstancedBufferGeometry') {
-            this._collectInstancedInfo(mesh);
-          } else {
-            this._collectStraightGeometryInfo(mesh);
-          }
+      if (object instanceof THREE.Mesh && object.layers.test(layersOfInterest)) {
+        if (object.geometry.type === 'InstancedBufferGeometry') {
+          this._collectInstancedInfo(object);
+        } else {
+          this._collectStraightGeometryInfo(object);
         }
       }
     });
