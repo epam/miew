@@ -80,7 +80,6 @@ const blurUniforms5 = {
   projMatrix: { type: 'mat4', value: new THREE.Matrix4() },
   aspectRatio: { type: 'f', value: 0.0 },
   tanHalfFOV: { type: 'f', value: 0.0 },
-  fogNearFar: { type: 'v2', value: new THREE.Vector2(100.0, 100.0) },
 };
 
 function overrideUniforms(params, defUniforms) {
@@ -114,6 +113,12 @@ function VertBilateralBlurMaterial5(params) {
     depthTest: false,
     depthWrite: false,
   };
+  settings.uniforms = THREE.UniformsUtils.merge([
+    settings.uniforms,
+    {
+      fogNearFar: { type: 'v2', value: new THREE.Vector2(100.0, 100.0) },
+      fogColor: { type: 'v4', value: new THREE.Vector4(0.0, 0.5, 0.0, 1.0) },
+    }]);
   return new THREE.RawShaderMaterial(settings);
 }
 

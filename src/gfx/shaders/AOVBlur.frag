@@ -12,6 +12,7 @@ uniform float aspectRatio;
 uniform float tanHalfFOV;
 
 uniform vec2 fogNearFar;
+uniform vec4 fogColor;
 varying vec2 vUv;
 
 float CalcViewZ(vec2 screenPos)
@@ -64,8 +65,8 @@ void main() {
   res.rgb /= weightSum;
 
   // add fog to the AO value
-  vec3 aoColor = vec3(1.0, 1.0, 1.0) - res.rgb;
-  res.rgb = vec3(1.0, 1.0, 1.0) - aoColor * (1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z));
+  float fogFactor = smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z) * fogColor.a;
 
-  gl_FragColor = vec4(res.rgb * color.rgb, color.a);
+  gl_FragColor.rgb = color.rgb * res.rgb + fogColor.rgb * fogFactor *(vec3(1.0, 1.0, 1.0) - res.rgb);
+  gl_FragColor.a = color.a;
 }

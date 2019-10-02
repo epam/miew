@@ -1593,6 +1593,7 @@ Miew.prototype._performAO = (function () {
     const { fog } = gfx.scene;
     if (fog) {
       _vertBlurMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
+      _vertBlurMaterial.uniforms.fogColor.value.set(fog.color.r, fog.color.g, fog.color.b, settings.now.fogAlpha);
     }
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.renderScreenQuad(_vertBlurMaterial);
