@@ -45,6 +45,7 @@ void main() {
   vec4 color = texture2D(diffuseTexture, vec2(x, y));
   vec4 res = vec4(0.0);
   res.a = texture2D(aoMap, vec2(x, y )).a;
+  // return for background fragments (0.0 in alpha component means that it is background fragment)
   if (res.a < 0.000000001) {
     gl_FragColor = color;
     return;
@@ -65,8 +66,16 @@ void main() {
   res.rgb /= weightSum;
 
   // add fog to the AO value
+  // goal:    gl_FragColor = fragColor*AO*(1-fogFactor) + fogColor*fogFactor
+  // exists:  AO, fogFactor, fogColor,
+  //          color = fragColor*(1-fogFactor) + fogColor*fogFactor
+  // simplify:
+  //          fragColor*AO*(1-fogFactor) + fogColor*fogFactor =
+  //        = [fragColor*(1-fogFactor) = color - fogColor*fogFactor] =
+  //        = (color - fogColor*fogFactor)*AO + fogColor*fogFactor =
+  //        = color*AO + fogColor*fogFactor*(1 - AO)
+  // result:  gl_FragColor = color*AO + fogColor*fogFactor*(1 - AO)
   float fogFactor = smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z) * fogColor.a;
-
   gl_FragColor.rgb = color.rgb * res.rgb + fogColor.rgb * fogFactor *(vec3(1.0, 1.0, 1.0) - res.rgb);
   gl_FragColor.a = color.a;
 }

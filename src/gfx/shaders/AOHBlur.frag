@@ -13,6 +13,7 @@ void main() {
   float y = vUv.y;
   vec4 res = vec4(0.0);
   res.a = texture2D(aoMap, vec2(x, y )).a;
+  // return for background fragments (0.0 in alpha component means that it is background fragment)
   if (res.a < 0.000000001) {
     gl_FragColor = res;
     return;
