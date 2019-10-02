@@ -343,16 +343,16 @@ Connections:  {
   }
 
   /**
-   * Rework numbers notation from scientific (exponential) to normal
+   * Write float array to string with limited precision
    * @param {Float32Array} array - array to be fixed
-   * @returns {[]} Array of numbers in correct notation
+   * @returns {String} String with fixed floats
    */
-  _correctArrayNotation(array) { // FIXME should do during writring to string
-    const reworkedArray = [];
+  _floatArrayToString(array) {
+    const str = [];
     for (let i = 0; i < array.length; ++i) {
-      reworkedArray[i] = parseFloat(array[i].toFixed(6)); // enough for float type precision
+      str[i] = array[i].toFixed(6);
     }
-    return reworkedArray;
+    return str.join(',');
   }
 
   /**
@@ -363,6 +363,7 @@ Connections:  {
     const layerElementColorNumber = 0;
     const layerElementColorVersion = 101;
     const layerElementColorName = '';
+    const colorsStr = this._floatArrayToString(colorArray);
     // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
     // As said [..Array(...)] - fastest and easiest way to produce [0, 1, .....] array
     return `
@@ -371,7 +372,7 @@ Connections:  {
       Name: "${layerElementColorName}"
       MappingInformationType: "ByVertice"
       ReferenceInformationType: "Direct"
-      Colors: ${this._correctArrayNotation(colorArray)}
+      Colors: ${colorsStr}
       ColorIndex: ${[...Array(colorArray.length / FBX_COL_SIZE).keys()]}
     }`;
   }
@@ -384,6 +385,7 @@ Connections:  {
     const layerElementNormalNumber = 0;
     const layerElementNormalVersion = 101;
     const layerElementNormalName = '';
+    const normalsStr = this._floatArrayToString(normalArray);
     // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
     return `
     LayerElementNormal: ${layerElementNormalNumber} {
@@ -391,10 +393,9 @@ Connections:  {
       Name: "${layerElementNormalName}"
       MappingInformationType: "ByVertice"
       ReferenceInformationType: "Direct" 
-      Normals: ${this._correctArrayNotation(normalArray)}
+      Normals: ${normalsStr}
     }`;
   }
-
 
   /**
    * Adding vertices and indices to resulting string
@@ -406,6 +407,7 @@ Connections:  {
     const shading = 'Y';
     const culling = 'CullingOff';
     const geometryVersion = 124;
+    const vertStr = this._floatArrayToString(vertices);
     /* About _correctArrayNotation: Float32Arrays will contains only Float32 numbers, which implies that it will be floating points with 17 numbers after point.
     * We cannot (and it's logically incorrect) save all this information, so we convert this Float32Array into Array-like object with numbers with only 6 numbers after point
     * Reminder - this is big memory loss (as we must save at one moment two arrays with similar information) */
@@ -413,7 +415,7 @@ Connections:  {
     MultiTake: ${multiTake}
     Shading: ${shading}
     Culling: "${culling}"
-    Vertices: ${this._correctArrayNotation(vertices)}
+    Vertices: ${vertStr}
     PolygonVertexIndex: ${indices}
     GeometryVersion: ${geometryVersion}`;
   }
