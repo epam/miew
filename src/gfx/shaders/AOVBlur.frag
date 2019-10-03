@@ -11,8 +11,10 @@ uniform mat4  projMatrix;
 uniform float aspectRatio;
 uniform float tanHalfFOV;
 
-uniform vec2 fogNearFar;
-uniform vec4 fogColor;
+#ifdef USE_FOG
+  uniform vec2 fogNearFar;
+  uniform vec4 fogColor;
+#endif
 varying vec2 vUv;
 
 float CalcViewZ(vec2 screenPos)
@@ -65,17 +67,21 @@ void main() {
   }
   res.rgb /= weightSum;
 
-  // add fog to the AO value
-  // goal:    gl_FragColor = fragColor*AO*(1-fogFactor) + fogColor*fogFactor
-  // exists:  AO, fogFactor, fogColor,
-  //          color = fragColor*(1-fogFactor) + fogColor*fogFactor
-  // simplify:
-  //          fragColor*AO*(1-fogFactor) + fogColor*fogFactor =
-  //        = [fragColor*(1-fogFactor) = color - fogColor*fogFactor] =
-  //        = (color - fogColor*fogFactor)*AO + fogColor*fogFactor =
-  //        = color*AO + fogColor*fogFactor*(1 - AO)
-  // result:  gl_FragColor = color*AO + fogColor*fogFactor*(1 - AO)
-  float fogFactor = smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z) * fogColor.a;
-  gl_FragColor.rgb = color.rgb * res.rgb + fogColor.rgb * fogFactor *(vec3(1.0, 1.0, 1.0) - res.rgb);
+  #if defined(USE_FOG) && !defined(FOG_TRANSPARENT)
+    // add fog to the result value
+    // goal:    gl_FragColor = fragColor*AO*(1-fogFactor) + fogColor*fogFactor
+    // exists:  AO, fogFactor, fogColor,
+    //          color = fragColor*(1-fogFactor) + fogColor*fogFactor
+    // simplify:
+    //          fragColor*AO*(1-fogFactor) + fogColor*fogFactor =
+    //        = [fragColor*(1-fogFactor) = color - fogColor*fogFactor] =
+    //        = (color - fogColor*fogFactor)*AO + fogColor*fogFactor =
+    //        = color*AO + fogColor*fogFactor*(1 - AO)
+    // result:  gl_FragColor = color*AO + fogColor*fogFactor*(1 - AO)
+    float fogFactor = smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z) * fogColor.a;
+    gl_FragColor.rgb = color.rgb * res.rgb + fogColor.rgb * fogFactor *(vec3(1.0, 1.0, 1.0) - res.rgb);
+  #else
+    gl_FragColor.rgb = color.rgb * res.rgb;
+  #endif
   gl_FragColor.a = color.a;
 }

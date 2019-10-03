@@ -1595,6 +1595,19 @@ Miew.prototype._performAO = (function () {
       _vertBlurMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
       _vertBlurMaterial.uniforms.fogColor.value.set(fog.color.r, fog.color.g, fog.color.b, settings.now.fogAlpha);
     }
+    if ((fog && _vertBlurMaterial.defines.USE_FOG === undefined)
+      || (!fog && _vertBlurMaterial.defines.USE_FOG)
+      || (settings.now.bg.transparent && _vertBlurMaterial.defines.FOG_TRANSPARENT === undefined)
+      || (!settings.now.bg.transparent && _vertBlurMaterial.defines.FOG_TRANSPARENT)) {
+      _vertBlurMaterial.defines = {};
+      if (fog) {
+        _vertBlurMaterial.defines.USE_FOG = 1;
+      }
+      if (settings.now.bg.transparent) {
+        _vertBlurMaterial.defines.FOG_TRANSPARENT = 1;
+      }
+      _vertBlurMaterial.needsUpdate = true;
+    }
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.renderScreenQuad(_vertBlurMaterial);
   };
