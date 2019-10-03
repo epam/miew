@@ -83,6 +83,26 @@ THREE.Matrix4.prototype.isIdentity = (function () {
   };
 }());
 
+THREE.Matrix4.prototype.applyToArray = function (array, elemSize, w) {
+  if (!array || !elemSize || elemSize < 3) {
+    return array;
+  }
+  const e = this.elements;
+  for (let i = 0; i < array.length; i += elemSize) {
+    const x = array[i];
+    const y = array[i + 1];
+    const z = array[i + 2];
+    const usedW = w || 0;
+
+    const persp = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
+
+    array[i] = (e[0] * x + e[4] * y + e[8] * z + e[12] * usedW) * persp;
+    array[i + 1] = (e[1] * x + e[5] * y + e[9] * z + e[13] * usedW) * persp;
+    array[i + 2] = (e[2] * x + e[6] * y + e[10] * z + e[14] * usedW) * persp;
+  }
+  return array;
+}
+
 class ScreenQuadMaterial extends THREE.RawShaderMaterial {
   constructor(params) {
     if (params.uniforms === undefined) {

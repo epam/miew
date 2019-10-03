@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
-import gfxutils from '../../gfx/gfxutils'
+import gfxutils from '../../gfx/gfxutils';
 import FBXCylinderGeometryModel from './FBXCylinderGeometryModel';
 
 const POS_SIZE = 3; // FIXME make it only one
@@ -84,7 +84,7 @@ export default class FBXInfoExtractor {
   /**
    * Save geometry info from mesh
    */
-  _collectStraightGeometryInfo(mesh) {
+  _collectGeoInfo(mesh) {
     const {
       geometry: {
         attributes: {
@@ -104,9 +104,8 @@ export default class FBXInfoExtractor {
       lVertices = position.array;
       lNormals = normal.array;
     } else {
-      [lVertices, lNormals] = this.applyMatrixToVerticesNormals(matrix,
-        _.cloneDeep(position.array),
-        _.cloneDeep(normal.array));
+      lVertices = matrix.applyToArray(_.cloneDeep(position.array), POS_SIZE, 1);
+      lNormals = matrix.applyToArray(_.cloneDeep(normal.array), POS_SIZE, 0);
     }
     // Firstly extract material information, if it's already in the base we will add to already existing model
     const material = this.collectMaterialInfo(mesh);
@@ -121,9 +120,7 @@ export default class FBXInfoExtractor {
     }
     // Rework this into FBX notation
     lIndices = this.reworkIndices(lIndices);
-    if (color.array.length >= 1) {
-      lColors = this.reworkColors(color.array);
-    }
+    lColors = this.reworkColors(color.array);
     // Add model
     if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
       const model = {
@@ -173,7 +170,8 @@ export default class FBXInfoExtractor {
       let lVertices = this.getSpheresVertices(mesh, instanceIndex);
       // If not only we have instanced, but also a transformed group (e.g. viruses) then we must multiply every vertex by special matrix
       if (!matrix.isIdentity()) {
-        [lVertices, lNormals] = this.applyMatrixToVerticesNormals(matrix, _.cloneDeep(lVertices), _.cloneDeep(lNormals));
+        lVertices = matrix.applyToArray(lVertices, POS_SIZE, 1);
+        lNormals = matrix.applyToArray(lNormals, POS_SIZE, 0);
       }
       // Saving info from one instance to resulting model
       const posVertices = instanceIndex * numVertices;
@@ -258,7 +256,8 @@ export default class FBXInfoExtractor {
       // Grab vertices and normals for transformed (scale, rotation, translation) cylinder
       let [lVertices, lNormals] = this.calculateCylinderTransform(mesh, instanceIndex);
       if (!matrix.isIdentity()) {
-        [lVertices, lNormals] = this.applyMatrixToVerticesNormals(matrix, _.cloneDeep(lVertices), _.cloneDeep(lNormals));
+        lVertices = matrix.applyToArray(lVertices, POS_SIZE, 1);
+        lNormals = matrix.applyToArray(lNormals, POS_SIZE, 0);
       }
       // Okay now vertices are reworked as we want them. Now it's time for implementing algorithm
       // Collect indices for given cylinder - remember: they may slightly change later on
@@ -300,52 +299,32 @@ export default class FBXInfoExtractor {
    * Collect instanced models and materials.
    * @param {object} mesh - given mesh with instanced something (spheres or cylinders)
    */
-  _collectInstancedInfo(mesh) {
+  _collectInstancedGeoInfo(mesh) {
     if (mesh.geometry.constructor.name.includes('Spheres')) {
       this._collectSpheresInfo(mesh);
     } else if (mesh.geometry.constructor.name.includes('Cylinder')) {
       this._collectCylindersInfo(mesh);
     }
   }
-// FIXME reorganize methods order inside the module
+  // FIXME reorganize methods order inside the module
 
   /**
    * Extract fbx object information from ComplexVisual
+   * @param {object} data - complexVisual to get geometry info from
    */
   _extractModelsAndMaterials(data) {
     const layersOfInterest = new THREE.Layers();
     layersOfInterest.set(gfxutils.LAYERS.DEFAULT);
     layersOfInterest.enable(gfxutils.LAYERS.TRANSPARENT);
-    // To gather all mesh attributes (vertices, indices, etc) we need to traverse this._data object
     data.traverse((object) => {
       if (object instanceof THREE.Mesh && object.layers.test(layersOfInterest)) {
         if (object.geometry.type === 'InstancedBufferGeometry') {
-          this._collectInstancedInfo(object);
+          this._collectInstancedGeoInfo(object);
         } else {
-          this._collectStraightGeometryInfo(object);
+          this._collectGeoInfo(object);
         }
       }
     });
-  }
-
-  applyMatrixToVerticesNormals(matrix, vertices, normals) {
-    const normVec = new THREE.Vector4();
-    const vertVec = new THREE.Vector4();
-    // Applying offsets / transformation to every vertex
-    for (let j = 0; j < vertices.length; j += 3) {
-      vertVec.set(vertices[j], vertices[j + 1], vertices[j + 2], 1);
-      vertVec.applyMatrix4(matrix);
-      normVec.set(normals[j], normals[j + 1], normals[j + 2], 0.0);
-      normVec.applyMatrix4(matrix);
-
-      vertices[j] = vertVec.x;
-      vertices[j + 1] = vertVec.y;
-      vertices[j + 2] = vertVec.z;
-      normals[j] = normVec.x;
-      normals[j + 1] = normVec.y;
-      normals[j + 2] = normVec.z;
-    }
-    return [vertices, normals];
   }
 
   /**
@@ -371,6 +350,9 @@ export default class FBXInfoExtractor {
    * @returns{Float32Array} reworked array.
    */
   reworkColors(colorArray) {
+    if (!colorArray || colorArray.length === 0) {
+      return [];
+    }
     const clonedArray = new Float32Array(colorArray.length + colorArray.length / COL_SIZE);
     let clonedArrIdx = 0;
     for (let i = 0; i < colorArray.length; i += COL_SIZE) {
@@ -382,7 +364,6 @@ export default class FBXInfoExtractor {
     }
     return clonedArray;
   }
-
 
   /**
    * Clone colors from one to number of vertices
@@ -432,16 +413,18 @@ export default class FBXInfoExtractor {
     const matVector2 = attributes.matVector2.array;
     const matVector3 = attributes.matVector3.array;
     // Grab original vertices and normals
-    const lVertices = _.cloneDeep(attributes.position.array);
-    const lNormals = _.cloneDeep(attributes.normal.array);
+    let lVertices = _.cloneDeep(attributes.position.array);
+    let lNormals = _.cloneDeep(attributes.normal.array);
     // We have vertices for not transformed cylinder. Need to make it transformed
-    const transformCylinder = new THREE.Matrix4();
+    const transformCylinder = new THREE.Matrix4(); // FIXME don't create new matrix for every cylinder
     const idxOffset = instanceIndex * 4; // used 4 because offset arrays are stored in quads
     transformCylinder.set(matVector1[idxOffset], matVector1[idxOffset + 1], matVector1[idxOffset + 2], matVector1[idxOffset + 3],
       matVector2[idxOffset], matVector2[idxOffset + 1], matVector2[idxOffset + 2], matVector2[idxOffset + 3],
       matVector3[idxOffset], matVector3[idxOffset + 1], matVector3[idxOffset + 2], matVector3[idxOffset + 3],
       0, 0, 0, 1);
-    return this.applyMatrixToVerticesNormals(transformCylinder, lVertices, lNormals);
+    lVertices = transformCylinder.applyToArray(lVertices, POS_SIZE, 1);
+    lNormals = transformCylinder.applyToArray(lNormals, POS_SIZE, 0);
+    return [lVertices, lNormals];
   }
 
   /**
@@ -506,8 +489,8 @@ export default class FBXInfoExtractor {
     const meshColor1 = color.array;
     const meshColor2 = color2.array;
     const idxColors = instanceIndex * COL_SIZE;
-    const objectColor1 = reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]]);
-    const objectColor2 = reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]]);
+    const objectColor1 = this.reworkColors([meshColor1[idxColors], meshColor1[idxColors + 1], meshColor1[idxColors + 2]]);
+    const objectColor2 = this.reworkColors([meshColor2[idxColors], meshColor2[idxColors + 1], meshColor2[idxColors + 2]]);
     return !_.isEqual(objectColor1, objectColor2);
   }
 
@@ -577,7 +560,7 @@ export default class FBXInfoExtractor {
    */
   getReworkedAttributes(mesh, instanceIndex, reworkedModel, lVertices, lIndices, lNormals, needToDivideCylinders) {
     const [reworkedIndices, reworkedNormals, reworkedVertices] = reworkedModel.getArrays();
-    const reworkedColors = getColors(mesh, instanceIndex, reworkedModel);
+    const reworkedColors = this.getColors(mesh, instanceIndex, reworkedModel);
     reworkedModel.storeColors(reworkedColors);
     let indexVerticesNormalsArray = 0; // not using push
     let indexIndicesArray = 0;
@@ -594,19 +577,19 @@ export default class FBXInfoExtractor {
       indicesBeforeDividingLine = lIndices.length / 2;
     }
     // Step 1 : first chunk of vertices and  normals are copied directly
-    copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 0, thirdOfTubeCylinderVertices);
-    indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, thirdOfTubeCylinderVertices);
+    this.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 0, thirdOfTubeCylinderVertices);
+    indexVerticesNormalsArray += this.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 0, thirdOfTubeCylinderVertices);
     // Also copying half of tube indices because other half may have offset if cylinders will be expanded
-    indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine);
+    indexIndicesArray += this.copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine);
     /* Step 2 : adding new vertices and normals and also copying old
     * We can either full-copy middle vertices or copy them with some shift.
     * Here is first way - full copying without any shifts */
     const additionalVertices = [];
     const additionalNormals = [];
-    copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-    indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-    copyArrays(additionalVertices, indexAdditionalVertices, lVertices, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-    indexAdditionalVertices += copyArrays(additionalNormals, indexAdditionalVertices, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
+    this.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
+    indexVerticesNormalsArray += this.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
+    this.copyArrays(additionalVertices, indexAdditionalVertices, lVertices, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
+    indexAdditionalVertices += this.copyArrays(additionalNormals, indexAdditionalVertices, lNormals, thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
     // If we need to divide cylinders => we're adding additional vertices
     if (needToDivideCylinders) {
       reworkedVertices.set(additionalVertices, indexVerticesNormalsArray);
@@ -614,26 +597,26 @@ export default class FBXInfoExtractor {
       indexVerticesNormalsArray += indexAdditionalVertices;
     }
     // Last chunk of vertices
-    copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
-    indexVerticesNormalsArray += copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
+    this.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
+    indexVerticesNormalsArray += this.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 2 * thirdOfTubeCylinderVertices, thirdOfTubeCylinderVertices);
     // If we have closed cylinder => we must add last vertices
     if (reworkedModel.closedCylinder) {
-      copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 3 * thirdOfTubeCylinderVertices, hatVertices);
-      copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 3 * thirdOfTubeCylinderVertices, hatVertices);
+      this.copyArrays(reworkedVertices, indexVerticesNormalsArray, lVertices, 3 * thirdOfTubeCylinderVertices, hatVertices);
+      this.copyArrays(reworkedNormals, indexVerticesNormalsArray, lNormals, 3 * thirdOfTubeCylinderVertices, hatVertices);
     }
     // Adding last portion of indices simply as first chunk of indices but with some special addition if needed
     let offsetIndices = thirdOfTubeCylinderVertices / 3;
     if (needToDivideCylinders) {
       offsetIndices = 2 * thirdOfTubeCylinderVertices / 3;
     }
-    indexIndicesArray += copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine, offsetIndices);
+    indexIndicesArray += this.copyArrays(reworkedIndices, indexIndicesArray, lIndices, 0, indicesBeforeDividingLine, offsetIndices);
     // If we have closed cylinder => must add last indices with offset
     if (reworkedModel.closedCylinder) {
       let closedCylinderOffset = 0;
       if (needToDivideCylinders) {
         closedCylinderOffset = thirdOfTubeCylinderVertices / 3;
       }
-      copyArrays(reworkedIndices, indexIndicesArray, lIndices, 2 * indicesBeforeDividingLine, lIndices.length - 2 * indicesBeforeDividingLine, closedCylinderOffset);
+      this.copyArrays(reworkedIndices, indexIndicesArray, lIndices, 2 * indicesBeforeDividingLine, lIndices.length - 2 * indicesBeforeDividingLine, closedCylinderOffset);
     }
   }
 
