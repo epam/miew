@@ -398,7 +398,7 @@ Connections:  {
    * Adding vertices and indices to resulting string
    * @return {string} resulting string in FBX notation
    */
-  _verticesIndices(vertices, indices) {
+  _verticesIndices(vertices, indices) { // FIXME rewrite
     const multiLayer = 0;
     const multiTake = 1;
     const shading = 'Y';

@@ -1,8 +1,7 @@
-//import FBXUtils from './FBXExporterUtils';
 
 const POS_SIZE = 3; // FIXME make it only one
-const COL_SIZE = 3;
-const FBX_POS_SIZE = 3;
+// const COL_SIZE = 3; // FIXME they should be used
+// const FBX_POS_SIZE = 3; // FIXME they should be used
 const FBX_COL_SIZE = 4;
 
 /**
