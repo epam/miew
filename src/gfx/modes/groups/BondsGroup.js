@@ -11,7 +11,7 @@ class BondsGroup extends ChemGroup {
     const showAromatic = this._mode.showAromaticLoops();
     const bondsIdc = this._selection.chunks;
     const { bonds } = this._selection;
-    let bondsCount = 1;
+    let bondsCount = 0;
     for (let i = 0, n = bondsIdc.length; i < n; ++i) {
       bondsCount += this.getBondOrder(bonds[bondsIdc[i]], drawMultiple, showAromatic);
     }
