@@ -29,7 +29,8 @@ export default class FBXCylinderGeometryModel {
     this.curResNormalsIndex = 0;
     this.curResColorsIndex = 0;
     this.curResIndicesIndex = 0;
-    this.closedCylinder = false;
+    const geoParams = mesh.geometry.getGeoParams();
+    this.closedCylinder = !geoParams.openEnded;
     this._init(mesh);
     switch (modificator) {
       case 'regular':
@@ -53,11 +54,6 @@ export default class FBXCylinderGeometryModel {
   _init(mesh) {
     /* For some improvements in performance we make that definitions */
     const {
-      parent: {
-        parent: {
-          constructor,
-        },
-      },
       geometry: {
         attributes: {
           position,
@@ -75,11 +71,10 @@ export default class FBXCylinderGeometryModel {
     this.colorsArrayLength = FBX_COL_SIZE * vertexArrayLength / POS_SIZE;
     this.normalsArrayLength = normalArrayLength;
     this.indexArrayLength = indexArrayLength;
-    if (constructor.name.includes('Trace')) {
+    if (this.closedCylinder) {
       /* that's closed cylinders */
       /* All this numbers are based purely on idea of building this cylinders :
       * Closed cylinders are built like that - bottom vertices, middle vertices, top vertices, then top and bottom hats */
-      this.closedCylinder = true;
       this.extendedIndexArrayLength = indexArrayLength;
       this.extendedVertexArrayLength = vertexArrayLength + (vertexArrayLength - 2) / 5;
       this.extendedNormalsArrayLength = normalArrayLength + (normalArrayLength - 2) / 5;
