@@ -3,6 +3,15 @@ import Residue from './Residue';
 import ResidueType from './ResidueType';
 
 /**
+ * Residues in chain are either amino acid either nucleic acid (and water)
+ * There might be some modified/mutated residues, which could not be definite by their name (nucleic or amino); In this
+ * case firstly program definites the chain type (by well-known residues) and then definites modified/mutated residues
+ */
+const CHAIN_TYPE = {
+  INDEFINITE: 0, NUCLEIC: 1, AMINO: 2,
+};
+
+/**
  * Residue chain.
  *
  * @param {Complex} complex - Molecular complex this chain belongs to.
@@ -17,6 +26,7 @@ class Chain {
     this._name = name;
     this._mask = 1 | 0;
     this._index = -1;
+    this._type = CHAIN_TYPE.INDEFINITE;
 
     this._residues = [];
 
@@ -34,6 +44,38 @@ class Chain {
 
   getResidues() {
     return this._residues;
+  }
+
+  getType() {
+    return this._type;
+  }
+
+  _determineType() {
+    const residues = this._residues;
+
+    for (let i = 0, n = residues.length; i < n; ++i) {
+      if ((residues[i]._type.flags & ResidueType.Flags.NUCLEIC) !== 0) {
+        this._type = CHAIN_TYPE.NUCLEIC;
+        break;
+      } else if ((residues[i]._type.flags & ResidueType.Flags.PROTEIN) !== 0) {
+        this._type = CHAIN_TYPE.AMINO;
+        break;
+      }
+    }
+
+    for (let i = 0, n = residues.length; i < n; ++i) {
+      if (residues[i]._type.flags === ResidueType.Flags.UNDEFINED) {
+        switch (this._type) {
+          case CHAIN_TYPE.NUCLEIC:
+            residues[i]._type.flags = ResidueType.Flags.NUCLEIC;
+            break;
+          case CHAIN_TYPE.AMINO:
+            residues[i]._type.flags = ResidueType.Flags.PROTEIN;
+            break;
+          default:
+        }
+      }
+    }
   }
 
   /**
@@ -56,6 +98,8 @@ class Chain {
   }
 
   _finalize() {
+    this._determineType();
+
     const residues = this._residues;
 
     let prev = null;
@@ -70,7 +114,7 @@ class Chain {
     }
 
     // fix very first wing
-    if (residues.length > 1) {
+    if (residues.length > 1 && residues[1]._wingVector) {
       const p = residues[1]._wingVector;
       residues[0]._wingVector = new THREE.Vector3(p.x, p.y, p.z);
     } else if (residues.length > 0) {

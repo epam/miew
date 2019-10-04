@@ -197,7 +197,8 @@ class Residue {
 
     const lp = getAtomPosition(this._leadAtom);
     const currLeadPos = new THREE.Vector3(lp.x, lp.y, lp.z);
-    if ((this._type.flags & ResidueType.Flags.NUCLEIC) !== 0) {
+    if (((this._type.flags & ResidueType.Flags.NUCLEIC) !== 0
+    || (this._type.flags & ResidueType.Flags.WATER) !== 0)) {
       this._detectLeadWing(dst, nextRes, getAtomPosition);
       return;
     }
