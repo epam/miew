@@ -104,8 +104,8 @@ export default class FBXInfoExtractor {
       lVertices = position.array;
       lNormals = normal.array;
     } else {
-      lVertices = matrix.applyToArray(_.cloneDeep(position.array), POS_SIZE, 1);
-      lNormals = matrix.applyToArray(_.cloneDeep(normal.array), POS_SIZE, 0);
+      lVertices = matrix.applyToPointsArray(_.cloneDeep(position.array), POS_SIZE, 1);
+      lNormals = matrix.applyToPointsArray(_.cloneDeep(normal.array), POS_SIZE, 0);
     }
     // Firstly extract material information, if it's already in the base we will add to already existing model
     const material = this.collectMaterialInfo(mesh);
@@ -256,8 +256,8 @@ export default class FBXInfoExtractor {
       // Grab vertices and normals for transformed (scale, rotation, translation) cylinder
       let [lVertices, lNormals] = this.calculateCylinderTransform(mesh, instanceIndex);
       if (!matrix.isIdentity()) {
-        lVertices = matrix.applyToArray(lVertices, POS_SIZE, 1);
-        lNormals = matrix.applyToArray(lNormals, POS_SIZE, 0);
+        lVertices = matrix.applyToPointsArray(lVertices, POS_SIZE, 1);
+        lNormals = matrix.applyToPointsArray(lNormals, POS_SIZE, 0);
       }
       // Okay now vertices are reworked as we want them. Now it's time for implementing algorithm
       // Collect indices for given cylinder - remember: they may slightly change later on
@@ -422,8 +422,8 @@ export default class FBXInfoExtractor {
       matVector2[idxOffset], matVector2[idxOffset + 1], matVector2[idxOffset + 2], matVector2[idxOffset + 3],
       matVector3[idxOffset], matVector3[idxOffset + 1], matVector3[idxOffset + 2], matVector3[idxOffset + 3],
       0, 0, 0, 1);
-    lVertices = transformCylinder.applyToArray(lVertices, POS_SIZE, 1);
-    lNormals = transformCylinder.applyToArray(lNormals, POS_SIZE, 0);
+    lVertices = transformCylinder.applyToPointsArray(lVertices, POS_SIZE, 1);
+    lNormals = transformCylinder.applyToPointsArray(lNormals, POS_SIZE, 0);
     return [lVertices, lNormals];
   }
 
