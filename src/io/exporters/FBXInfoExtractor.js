@@ -261,7 +261,7 @@ export default class FBXInfoExtractor {
       }
       // Okay now vertices are reworked as we want them. Now it's time for implementing algorithm
       // Collect indices for given cylinder - remember: they may slightly change later on
-      let lIndices = Int32Array.from(_.cloneDeep(index.array));
+      let lIndices = Int32Array.from(_.cloneDeep(index.array)); // FIXME be careful with clone deep, strides in fbx and Miew can differ
       // As we making one big model we need to carefully add numVertices to every index in lIndices. Remember - need to add additional vertices as we add them!
       if (!firstInstance) {
         for (let k = 0; k < lIndices.length; ++k) {

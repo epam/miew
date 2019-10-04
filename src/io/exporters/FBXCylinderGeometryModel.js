@@ -1,7 +1,8 @@
 
 const POS_SIZE = 3; // FIXME make it only one
 // const COL_SIZE = 3; // FIXME they should be used
-// const FBX_POS_SIZE = 3; // FIXME they should be used
+const FBX_POS_SIZE = 3;
+const FBX_NORM_SIZE = 3;
 const FBX_COL_SIZE = 4;
 
 /**
@@ -52,39 +53,23 @@ export default class FBXCylinderGeometryModel {
    * @param {object} mesh - given mesh
    */
   _init(mesh) {
-    /* For some improvements in performance we make that definitions */
-    const {
-      geometry: {
-        attributes: {
-          position,
-          normal,
-        },
-        index,
-      },
-    } = mesh;
-    const vertexArrayLength = position.array.length;
-    const normalArrayLength = normal.array.length;
+    const { position } = mesh.geometry.attributes;
+    const { index } = mesh.geometry;
+    const geoParams = mesh.geometry.getGeoParams();
+
+    const vertexCount = position.array.length / POS_SIZE;
     const indexArrayLength = index.array.length;
-    /* Here we have a difference - some cylinders are closed (therefore they have additional vertices etc) and some are simple and opened */
-    /* Not extended parameters are the same for both types of cylinders */
-    this.vertexArrayLength = vertexArrayLength;
-    this.colorsArrayLength = FBX_COL_SIZE * vertexArrayLength / POS_SIZE;
-    this.normalsArrayLength = normalArrayLength;
-    this.indexArrayLength = indexArrayLength;
-    if (this.closedCylinder) {
-      /* that's closed cylinders */
-      /* All this numbers are based purely on idea of building this cylinders :
-      * Closed cylinders are built like that - bottom vertices, middle vertices, top vertices, then top and bottom hats */
-      this.extendedIndexArrayLength = indexArrayLength;
-      this.extendedVertexArrayLength = vertexArrayLength + (vertexArrayLength - 2) / 5;
-      this.extendedNormalsArrayLength = normalArrayLength + (normalArrayLength - 2) / 5;
-      this.extendedColorsArrayLength = FBX_COL_SIZE * (vertexArrayLength / 3 + (vertexArrayLength - 2) / 15);
-    } else {
-      this.extendedIndexArrayLength = indexArrayLength;
-      this.extendedVertexArrayLength = vertexArrayLength + vertexArrayLength / 3;
-      this.extendedNormalsArrayLength = normalArrayLength + normalArrayLength / 3;
-      this.extendedColorsArrayLength = FBX_COL_SIZE * (vertexArrayLength / POS_SIZE + vertexArrayLength / (POS_SIZE * 3));
-    }
+
+    this.vertexArrayLength = vertexCount * FBX_POS_SIZE;
+    this.normalsArrayLength = vertexCount * FBX_NORM_SIZE;
+    this.colorsArrayLength = vertexCount * FBX_COL_SIZE;
+
+    const extendedVertexCount = vertexCount + geoParams.radialSegments;
+    this.extendedVertexArrayLength = extendedVertexCount * FBX_POS_SIZE;
+    this.extendedNormalsArrayLength = extendedVertexCount * FBX_NORM_SIZE;
+    this.extendedColorsArrayLength = extendedVertexCount * FBX_COL_SIZE;
+
+    this.indexArrayLength = this.extendedIndexArrayLength = indexArrayLength; // number if triangles remains the same
   }
 
   /**
