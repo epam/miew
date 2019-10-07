@@ -1556,6 +1556,7 @@ Miew.prototype._performAO = (function () {
       return;
     }
     const gfx = this._gfx;
+    const tanHalfFOV = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
 
     // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
@@ -1565,7 +1566,7 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.camNearFar.value.set(gfx.camera.near, gfx.camera.far);
     _aoMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
     _aoMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
-    _aoMaterial.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
+    _aoMaterial.uniforms.tanHalfFOV.value = tanHalfFOV;
     gfx.root.matrix.decompose(_translation, _quaternion, _scale);
     _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * _scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
@@ -1586,7 +1587,7 @@ Miew.prototype._performAO = (function () {
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _vertBlurMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
     _vertBlurMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
-    _vertBlurMaterial.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
+    _vertBlurMaterial.uniforms.tanHalfFOV.value = tanHalfFOV;
     const { fog } = gfx.scene;
     if (fog) {
       _vertBlurMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);

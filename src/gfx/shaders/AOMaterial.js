@@ -42,8 +42,8 @@ const _samplesKernel = [
 ];
 
 class AOMaterial extends THREE.RawShaderMaterial {
-  constructor(params) {
-    super(params);
+  constructor() {
+    super();
 
     // set default values
     this.setValues.call(this, {
@@ -69,20 +69,6 @@ class AOMaterial extends THREE.RawShaderMaterial {
       depthTest: false,
       depthWrite: false,
     });
-
-    this.setValues(params);
-  }
-
-  setValues(values) {
-    if (typeof values === 'undefined') {
-      return;
-    }
-
-    // set direct values
-    super.setValues(values);
-
-    // set dependent values
-    this.defines = {};
   }
 }
 
