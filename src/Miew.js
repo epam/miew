@@ -23,14 +23,15 @@ import ObjectControls from './ui/ObjectControls';
 import Picker from './ui/Picker';
 import Axes from './gfx/Axes';
 import gfxutils from './gfx/gfxutils';
-import noise from './gfx/noiseTexture';
 import FrameInfo from './gfx/FrameInfo';
 import meshes from './gfx/meshes/meshes';
 import LinesObject from './gfx/objects/LinesObj';
 import UberMaterial from './gfx/shaders/UberMaterial';
 import OutlineMaterial from './gfx/shaders/OutlineMaterial';
 import FXAAMaterial from './gfx/shaders/FXAAMaterial';
-import ao from './gfx/shaders/AO';
+import AOMaterial from './gfx/shaders/AOMaterial';
+import AOHorBlurMaterial from './gfx/shaders/AOHorBlurMaterial';
+import AOVertBlurWithBlendMaterial from './gfx/shaders/AOVertBlurWithBlendMaterial';
 import AnaglyphMaterial from './gfx/shaders/AnaglyphMaterial';
 import VolumeMaterial from './gfx/shaders/VolumeMaterial';
 import viewInterpolator from './gfx/ViewInterpolator';
@@ -1542,9 +1543,9 @@ Miew.prototype._performFXAA = (function () {
 }());
 
 Miew.prototype._performAO = (function () {
-  const _aoMaterial = new ao.AOMaterial();
-  const _horBlurMaterial = new ao.HorBilateralBlurMaterial();
-  const _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
+  const _aoMaterial = new AOMaterial();
+  const _horBlurMaterial = new AOHorBlurMaterial();
+  const _vertBlurMaterial = new AOVertBlurWithBlendMaterial();
 
   const _translation = new THREE.Vector3();
   const _quaternion = new THREE.Quaternion();
@@ -1554,9 +1555,7 @@ Miew.prototype._performAO = (function () {
     if (!srcColorBuffer || !normalBuffer || !srcDepthTexture || !targetBuffer || !tempBuffer || !tempBuffer1) {
       return;
     }
-
-    const self = this;
-    const gfx = self._gfx;
+    const gfx = this._gfx;
 
     // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
@@ -1571,8 +1570,6 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * _scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
-    _aoMaterial.uniforms.noiseTexture.value = noise.noiseTexture;
-    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight);
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
     gfx.renderer.setRenderTarget(tempBuffer1);
     gfx.renderer.renderScreenQuad(_aoMaterial);
@@ -1595,17 +1592,9 @@ Miew.prototype._performAO = (function () {
       _vertBlurMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
       _vertBlurMaterial.uniforms.fogColor.value.set(fog.color.r, fog.color.g, fog.color.b, settings.now.fogAlpha);
     }
-    if ((fog && _vertBlurMaterial.defines.USE_FOG === undefined)
-      || (!fog && _vertBlurMaterial.defines.USE_FOG)
-      || (settings.now.bg.transparent && _vertBlurMaterial.defines.FOG_TRANSPARENT === undefined)
-      || (!settings.now.bg.transparent && _vertBlurMaterial.defines.FOG_TRANSPARENT)) {
-      _vertBlurMaterial.defines = {};
-      if (fog) {
-        _vertBlurMaterial.defines.USE_FOG = 1;
-      }
-      if (settings.now.bg.transparent) {
-        _vertBlurMaterial.defines.FOG_TRANSPARENT = 1;
-      }
+    if ((_vertBlurMaterial.useFog !== settings.now.fog)
+      || (_vertBlurMaterial.fogTransparent !== settings.now.bg.transparent)) {
+      _vertBlurMaterial.setValues({ useFog: settings.now.fog, fogTransparent: settings.now.bg.transparent });
       _vertBlurMaterial.needsUpdate = true;
     }
     gfx.renderer.setRenderTarget(targetBuffer);
