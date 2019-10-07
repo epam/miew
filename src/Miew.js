@@ -1558,7 +1558,6 @@ Miew.prototype._performAO = (function () {
     const gfx = this._gfx;
     const tanHalfFOV = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
 
-    // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _aoMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _aoMaterial.uniforms.normalTexture.value = normalBuffer.texture;
