@@ -186,8 +186,11 @@ class Residue {
     const vectorB = prevLeadPos.clone().sub(prevWingPos);
     vectorB.crossVectors(vectorA, vectorB);
     vectorB.crossVectors(vectorA, vectorB).normalize();
-    if (prevWing !== null && Math.abs(prevWing.angleTo(vectorB)) > Math.PI / 2) {
-      vectorB.negate();
+    if (prevWing !== null && prevWing.length() > 0.0001) {
+      const needToNegate = vectorB.length() > 0.0001 && Math.abs(prevWing.angleTo(vectorB)) > Math.PI / 2;
+      if (needToNegate) {
+        vectorB.negate();
+      }
     }
     return vectorB;
   }
