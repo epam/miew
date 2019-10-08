@@ -18,7 +18,6 @@ class AOVertBlurWithBlendMaterial extends THREE.RawShaderMaterial {
         srcTexelSize: { type: 'v2', value: new THREE.Vector2(1.0 / 512.0, 1.0 / 512.0) },
         aoMap: { type: 't', value: null },
         samplesOffsets: { type: 'fv1', value: _kernelOffsets },
-        camNearFar: { type: 'v2', value: new THREE.Vector2(1.0, 10.0) },
         projMatrix: { type: 'mat4', value: new THREE.Matrix4() },
         aspectRatio: { type: 'f', value: 0.0 },
         tanHalfFOV: { type: 'f', value: 0.0 },

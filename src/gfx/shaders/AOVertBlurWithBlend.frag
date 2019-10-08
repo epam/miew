@@ -69,16 +69,19 @@ void main() {
   res.rgb /= weightSum;
 
   #if defined(USE_FOG) && !defined(FOG_TRANSPARENT)
-    // add fog to the result value
-    // goal:    gl_FragColor = fragColor*AO*(1-fogFactor) + fogColor*fogFactor
-    // exists:  AO, fogFactor, fogColor,
-    //          color = fragColor*(1-fogFactor) + fogColor*fogFactor
-    // simplify:
+    // Add fog to the result value
+    // Proper way to get an image with fog and ao requires formula:
+    //          gl_FragColor = fragColor*AO*(1-fogFactor) + fogColor*fogFactor
+    // But we have already fogged molecule to add AO too. Let's split the straight formula into our real steps!
+    // We have:  AO, fogFactor, fogColor,
+    //          color = fragColor*(1-fogFactor) + fogColor*fogFactor (it comes from diffuseTexture,
+    //                                                                where molecule has been already drawn with fog)
+    // Transform:
     //          fragColor*AO*(1-fogFactor) + fogColor*fogFactor =
     //        = [fragColor*(1-fogFactor) = color - fogColor*fogFactor] =
     //        = (color - fogColor*fogFactor)*AO + fogColor*fogFactor =
     //        = color*AO + fogColor*fogFactor*(1 - AO)
-    // result:  gl_FragColor = color*AO + fogColor*fogFactor*(1 - AO)
+    // Result:  gl_FragColor = color*AO + fogColor*fogFactor*(1 - AO)
     float fogFactor = smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z) * fogColor.a;
     gl_FragColor.rgb = color.rgb * res.rgb + fogColor.rgb * fogFactor *(vec3(1.0, 1.0, 1.0) - res.rgb);
   #else
