@@ -1547,6 +1547,7 @@ Miew.prototype._performAO = (function () {
   const _horBlurMaterial = new AOHorBlurMaterial();
   const _vertBlurMaterial = new AOVertBlurWithBlendMaterial();
 
+  const _scale = new THREE.Vector3();
   return function (srcColorBuffer, normalBuffer, srcDepthTexture, targetBuffer, tempBuffer, tempBuffer1) {
     if (!srcColorBuffer || !normalBuffer || !srcDepthTexture || !targetBuffer || !tempBuffer || !tempBuffer1) {
       return;
@@ -1562,7 +1563,8 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
     _aoMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
     _aoMaterial.uniforms.tanHalfFOV.value = tanHalfFOV;
-    _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * gfx.root.matrix.extractScale().x;
+    gfx.root.matrix.extractScale(_scale);
+    _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * _scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)

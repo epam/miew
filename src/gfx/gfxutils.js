@@ -1,6 +1,7 @@
 /* eslint-disable no-magic-numbers */
 import * as THREE from 'three';
 import _ from 'lodash';
+import logger from '../utils/logger';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
 import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
@@ -200,7 +201,10 @@ THREE.Matrix4.prototype.extractScale = (function () {
   const _v = new THREE.Vector3();
 
   return function (scale) {
-    if (scale === undefined) scale = _v.clone();
+    if (scale === undefined) {
+      logger.debug('extractScale(): new is too expensive operation to do it on-the-fly');
+      scale = _v.clone();
+    }
 
     const te = this.elements;
     scale.x = _v.set(te[0], te[1], te[2]).length();
