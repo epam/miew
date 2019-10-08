@@ -1,7 +1,7 @@
 precision highp float;
+#define EPSILON 0.0000001
 
 #define MAX_SAMPLES_COUNT 32
-
 uniform vec3 samplesKernel[MAX_SAMPLES_COUNT];
 uniform sampler2D noiseTexture;
 uniform vec2      noiseTexelSize;
@@ -50,7 +50,7 @@ void main() {
   vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;
   vec4 normalData = texture2D(normalTexture, vUv);
   // return for background fragments (their normals are zero vectors)
-  if (length(normalData.rgb) < 0.000000001) {
+  if (length(normalData.rgb) < EPSILON) {
     // 0.0 in alpha component means that it is background fragment
     gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
     return;

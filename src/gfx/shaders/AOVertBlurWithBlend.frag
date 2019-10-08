@@ -1,4 +1,5 @@
 precision highp float;
+#define EPSILON 0.0000001
 
 #define MAX_SAMPLES_COUNT 5
 uniform float samplesOffsets[MAX_SAMPLES_COUNT];
@@ -48,7 +49,7 @@ void main() {
   vec4 res = vec4(0.0);
   res.a = texture2D(aoMap, vec2(x, y )).a;
   // return for background fragments (0.0 in alpha component means that it is background fragment)
-  if (res.a < 0.000000001) {
+  if (res.a < EPSILON) {
     gl_FragColor = color;
     return;
   }
