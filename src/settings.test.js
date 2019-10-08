@@ -29,7 +29,7 @@ describe('/settings', () => {
   describe('.get()', () => {
     it('gets current parameter', () => {
       const testSettings = _.cloneDeep(settings);
-      testSettings.now.modes.VD.kSigma = 1;    
+      testSettings.now.modes.VD.kSigma = 1;
       expect(settings.get('modes.VD.kSigma')).to.be.equal(1);
     });
   });
