@@ -23,6 +23,13 @@ function copyFbxPoint4(src, srcIdx, dst, dstIdx, value) {
   dst[dstIdx + 3] = value;
 }
 
+function copyFbxXYZW(dst, dstIdx, x, y, z, w) {
+  dst[dstIdx] = x;
+  dst[dstIdx + 1] = y;
+  dst[dstIdx + 2] = z;
+  dst[dstIdx + 3] = w;
+}
+
 class FBXGeo {
   constructor() {
     this.positions = null;
@@ -44,18 +51,29 @@ class FBXGeo {
 
   setPositions(array, start, count, stride) {
     this._setSubArray(array, start, stride, count, this.positions, this.lastPos, FBX_POS_SIZE, copyFbxPoint3);
+    this.lastPos += count * FBX_POS_SIZE;
   }
 
   setNormals(array, start, count, stride) {
     this._setSubArray(array, start, stride, count, this.normals, this.lastNorm, FBX_NORM_SIZE, copyFbxPoint3);
+    this.lastNorm += count * FBX_NORM_SIZE;
   }
 
   setColors(array, start, count, stride) {
     this._setSubArray(array, start, stride, count, this.colors, this.lastCol, FBX_COL_SIZE, copyFbxPoint4, 1);
+    this.lastCol += count * FBX_COL_SIZE;
+  }
+
+  setColor(count, r, g, b) {
+    for (let i = 0, colIdx = this.lastCol; i < count; i++, colIdx += FBX_COL_SIZE) {
+      copyFbxXYZW(this.colors, colIdx, r, g, b, 1);
+    }
+    this.lastCol += count * FBX_COL_SIZE;
   }
 
   setIndices(array, start, count) {
     this._setSubArray(array, start, 1, count, this.indices, this.lastIdx, 1);
+    this.lastIdx += count;
   }
 
   _setSubArray(srcArray, srcStart, srcStride, count, dstArray, dstStart, dstStride, copyFunctor, opts) {
@@ -72,7 +90,6 @@ class FBXGeo {
         copyFunctor(srcArray, arridx, dstArray, idx, opts);
       }
     }
-    // FIXME what about last pos??
   }
 }
 
@@ -113,11 +130,11 @@ export default class FBXInfoExtractor {
    * @param {Number} modelNumber - given model
    * @returns {number} maximum index
    */
-  _calculateMaxIndex(modelNumber) { // TODO NS: why we need it in that way
+  _calculateMaxIndex(modelNumber) {
     if (this._models.length === modelNumber) {
       return 0;
     }
-    return (this._models[modelNumber].vertices.length / POS_SIZE - 1);
+    return (this._models[modelNumber].vertices.length / POS_SIZE - 1); // FIXME remove decreasing
   }
 
   /**
@@ -129,18 +146,18 @@ export default class FBXInfoExtractor {
   _addToPool(model, material) {
     const materialIdx = this._checkExistingMaterial(material);
     if (materialIdx === this._models.length) { // new model-material pair
-      this.reworkIndices(model.indices); // FIXME move reworking into setIndices
+      this.reworkIndices(model.indices);
       this._models.push(model);
       this._materials.push(material);
     } else { // add model to existing model-material pair
+      // shift indices due to already existed verts model
+      const maxIndex = this._calculateMaxIndex(materialIdx);
       const oldModel = this._models[materialIdx];
       oldModel.vertices = utils.ConcatTypedArraysUnsafe(oldModel.vertices, model.vertices);
       oldModel.normals = utils.ConcatTypedArraysUnsafe(oldModel.normals, model.normals);
       oldModel.colors = utils.ConcatTypedArraysUnsafe(oldModel.colors, model.colors);
-      // shift indices due to already existed verts model
-      const maxIndex = this._calculateMaxIndex(materialIdx);
-      model.indices = model.indices.map((x) => x + (maxIndex + 1));
-      this.reworkIndices(model.indices); // FIXME move reworking into setIndices
+      model.indices = model.indices.map((x) => x + (maxIndex + 1)); // FIXME think about reworking
+      this.reworkIndices(model.indices);
       oldModel.indices = utils.ConcatTypedArraysUnsafe(oldModel.indices, model.indices);
     }
   }
@@ -162,8 +179,8 @@ export default class FBXInfoExtractor {
     } = mesh;
 
     const model = new FBXGeo();
-    const vertCount = position.array.length / POS_SIZE;
-    model.init(vertCount, index.array.length); // FIXME use attribute.count instead of array.length
+    const vertCount = position.count;
+    model.init(vertCount, index.count); // FIXME use attribute.count instead of array.length
 
     model.setPositions(position.array, 0, vertCount, POS_SIZE);
     model.setNormals(normal.array, 0, vertCount, POS_SIZE);
@@ -172,7 +189,7 @@ export default class FBXInfoExtractor {
       matrix.applyToPointsArray(model.normals, FBX_NORM_SIZE, 0);
     }
     model.setColors(color.array, 0, vertCount, COL_SIZE);
-    model.setIndices(index.array, 0, index.array.length); // FIXME move to setIndices
+    model.setIndices(index.array, 0, index.count);
     const material = this.collectMaterialInfo(mesh);
     const modelNew = {
       vertices: model.positions, // FIXME rename vertices to positions
@@ -194,88 +211,50 @@ export default class FBXInfoExtractor {
           offset,
           position,
           normal,
+          color,
         },
         index,
       },
       matrix,
     } = mesh;
-    // Firstly extract material information, if it's already in the base we will add to already existing model
-    const material = this.collectMaterialInfo(mesh);
-    const modelNumber = this._checkExistingMaterial(material);
-    const numInstances = offset.count;
-    const numVertices = position.count;
-    const numIndices = index.array.length;
-    // Geometry info
-    const allVertices = numInstances * numVertices;
-    const resVertices = new Float32Array(allVertices * POS_SIZE);
-    const resIndices = new Float32Array(numInstances * numIndices);
-    const resNormals = new Float32Array(allVertices * POS_SIZE);
-    const resColors = new Float32Array(allVertices * FBX_COL_SIZE);
-    for (let instanceIndex = 0; instanceIndex < numInstances; ++instanceIndex) {
+
+    const model = new FBXGeo();
+    const instCount = offset.count;
+    const vertCount = position.count;
+    const indsCount = index.count;
+    model.init(instCount * vertCount, instCount * indsCount);
+    const instMatrix = new THREE.Matrix4();
+    const objMatrix = new THREE.Matrix4();
+    for (let instanceIndex = 0; instanceIndex < instCount; ++instanceIndex) {
       // Firstly, collect some basic instanced parameters */
       let lNormals = _.cloneDeep(normal.array);
-      const lIndices = this._collectInstancedIndices(mesh, instanceIndex);
-      const lColors = this.collectInstancedColors(mesh, instanceIndex);
-      // Extract offset for one exact object (instance)
-      let lVertices = this.getSpheresVertices(mesh, instanceIndex);
-      // If not only we have instanced, but also a transformed group (e.g. viruses) then we must multiply every vertex by special matrix
-      if (!matrix.isIdentity()) {
-        lVertices = matrix.applyToArray(lVertices, POS_SIZE, 1);
-        lNormals = matrix.applyToArray(lNormals, POS_SIZE, 0);
+      let lIndices = _.cloneDeep(index.array); // FIXME don't clone them
+      let lVertices = _.cloneDeep(position.array);
+      const indexShift = vertCount * instanceIndex;
+      lIndices = lIndices.map((x) => x + indexShift); // FIXME think about reworking
+      this.getSphereInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
+      objMatrix.multiplyMatrices(matrix, instMatrix);
+      if (!objMatrix.isIdentity()) {
+        lVertices = objMatrix.applyToPointsArray(lVertices, FBX_POS_SIZE, 1);
+        lNormals = objMatrix.applyToPointsArray(lNormals, FBX_NORM_SIZE, 0);
       }
-      // Saving info from one instance to resulting model
-      const posVertices = instanceIndex * numVertices;
-      resVertices.set(lVertices, posVertices * POS_SIZE);
-      resNormals.set(lNormals, posVertices * POS_SIZE);
-      resColors.set(lColors, posVertices * FBX_COL_SIZE);
-      resIndices.set(lIndices, instanceIndex * numIndices);
+      model.setPositions(lVertices, 0, vertCount, POS_SIZE);
+      model.setNormals(lNormals, 0, vertCount, POS_SIZE);
+      const colorIdx = instanceIndex * color.itemSize;
+      model.setColor(vertCount,
+        color.array[colorIdx],
+        color.array[colorIdx + 1],
+        color.array[colorIdx + 2]);
+      model.setIndices(lIndices, 0, indsCount);
     }
-    const model = {
-      vertices: resVertices,
-      indices: resIndices,
-      normals: resNormals,
-      colors: resColors,
+    const newModel = {
+      vertices: model.positions, // FIXME rename vertices to positions
+      indices: model.indices,
+      normals: model.normals,
+      colors: model.colors,
     };
-    this._addToPool(modelNumber, model, material);
-  }
-
-  /**
-   * Collect and rework indices in big model notation.
-   * @param {object} mesh - mesh with instanced objects
-   * @param {Number} instance - number of instance in mesh
-   * @returns {Int32Array} array of gathered indices
-   */
-  _collectInstancedIndices(mesh, instance) {
-    const {
-      geometry: {
-        attributes: {
-          position,
-        },
-        index,
-      },
-    } = mesh;
     const material = this.collectMaterialInfo(mesh);
-    const modelNumber = this._checkExistingMaterial(material);
-    const maxIndexInModels = this._calculateMaxIndex(modelNumber);
-    const lIndices = Int32Array.from(_.cloneDeep(index.array));
-    // As we making one big model we need to carefully add resVertices.length to every index in lIndices
-    // Algorithm below is a bit cognitively complicated, maybe refactor here at some point?
-    const maxIndex = position.array.length / POS_SIZE - 1;
-    let changeIndex = 2;
-    for (let k = 0; k < lIndices.length; ++k) {
-      // If it's first model - no need to add "+ 1", if not - need that + 1
-      if (maxIndexInModels !== 0) {
-        lIndices[k] += (instance * (maxIndex + 1) + maxIndexInModels + 1);
-      } else {
-        lIndices[k] += (instance * (maxIndex + 1));
-      }
-      if (k === changeIndex) { // Need to rework this into FBX notation
-        lIndices[k] *= -1;
-        lIndices[k]--;
-        changeIndex += POS_SIZE;
-      }
-    }
-    return lIndices;
+    this._addToPool(newModel, material);
   }
 
   /**
@@ -483,29 +462,6 @@ export default class FBXInfoExtractor {
   }
 
   /**
-   * Collect and rework colors in big model notation.
-   * @param {object} mesh - mesh with instanced objects
-   * @param {Number} instanceIndex - number of instance in mesh
-   * @returns {Float32Array} array of gathered instanced colors
-   */
-  collectInstancedColors(mesh, instanceIndex) {
-    const {
-      geometry: {
-        attributes: {
-          color,
-          position,
-        },
-      },
-    } = mesh;
-    const idxColors = instanceIndex * COL_SIZE;
-    const meshColor = color.array;
-    const objectColor = this.reworkColors([meshColor[idxColors], meshColor[idxColors + 1], meshColor[idxColors + 2]]);
-    // For FBX we need to clone color for every vertex
-    const lColors = this.cloneColors(position.array.length / POS_SIZE, objectColor);
-    return lColors;
-  }
-
-  /**
    * Needed procedure for array copying by triplets
    * @param {Array} destArray - array to where will be copied
    * @param {Number} fromPositionInDestArray - position in destination array from where will be copied
@@ -680,7 +636,7 @@ export default class FBXInfoExtractor {
    * @param {FBXCylinderGeometryModel} model - given model
    * @returns {number} max index in index array
    */
-  getMaxIndexInModel(model) {
+  getMaxIndexInModel(model) { // FIXME remove
     const indexArray = model.getArrays()[0];
     let maxIndex = indexArray[0];
     const indexArrayLength = indexArray.length;
@@ -724,31 +680,18 @@ export default class FBXInfoExtractor {
       resNormals.subarray(0, resultingModel.curResNormalsIndex)];
   }
 
-  /**
-   *
-   * @param mesh
-   * @param instanceIndex
-   */
-  getSpheresVertices(mesh, instanceIndex) {
-    const {
-      geometry: {
-        attributes: {
-          offset,
-          position,
-        },
-      },
-    } = mesh;
-    const idxOffset = instanceIndex * 4;
-    const meshOffset = offset.array;
-    const lVertices = _.cloneDeep(position.array);
-    const objectOffset = new THREE.Vector4(meshOffset[idxOffset], meshOffset[idxOffset + 1],
-      meshOffset[idxOffset + 2], meshOffset[idxOffset + 3]);
-    // For every vertex calculate it's real position (vertex.xyz * scale) + offset
-    for (let j = 0; j < lVertices.length; j += POS_SIZE) {
-      lVertices[j] = ((lVertices[j] * objectOffset.w) + objectOffset.x);
-      lVertices[j + 1] = ((lVertices[j + 1] * objectOffset.w) + objectOffset.y);
-      lVertices[j + 2] = ((lVertices[j + 2] * objectOffset.w) + objectOffset.z);
-    }
-    return lVertices;
+  getSphereInstanceMatrix(geo, instIdx, matrix) {
+    const { offset } = geo.attributes;
+    const idx = instIdx * offset.itemSize;
+    const x = offset.array[idx];
+    const y = offset.array[idx + 1];
+    const z = offset.array[idx + 2];
+    const scale = offset.array[idx + 3];
+    matrix.set(
+      scale, 0, 0, x,
+      0, scale, 0, y,
+      0, 0, scale, z,
+      0, 0, 0, 1,
+    );
   }
 }
