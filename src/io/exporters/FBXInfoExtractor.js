@@ -134,10 +134,10 @@ export default class FBXInfoExtractor {
       // Adding new vertices etc to existing model
       // Reminder - this way is better in sense of performance
       const oldModel = this._models[modelNumber];
-      const newVertices = utils.TypedArrayConcat(oldModel.vertices, model.vertices);
-      const newNormals = utils.TypedArrayConcat(oldModel.normals, model.normals);
-      const newColors = utils.TypedArrayConcat(oldModel.colors, model.colors);
-      const newIndices = utils.TypedArrayConcat(oldModel.indices, model.indices);
+      const newVertices = utils.ConcatTypedArraysUnsafe(oldModel.vertices, model.vertices);
+      const newNormals = utils.ConcatTypedArraysUnsafe(oldModel.normals, model.normals);
+      const newColors = utils.ConcatTypedArraysUnsafe(oldModel.colors, model.colors);
+      const newIndices = utils.ConcatTypedArraysUnsafe(oldModel.indices, model.indices);
       this._models[modelNumber] = {
         vertices: newVertices,
         indices: newIndices,
@@ -609,11 +609,11 @@ export default class FBXInfoExtractor {
     if (model.closedCylinder) {
       const additionalColors1 = this.cloneColors((numVertices - 2) / 5 + 1, objectColor1);
       const additionalColors2 = this.cloneColors((numVertices - 2) / 5 + 1, objectColor2);
-      const additionalLColors = utils.TypedArrayConcat(additionalColors1, additionalColors2);
-      const tubeColors = utils.TypedArrayConcat(lColors2, lColors1);
-      return utils.TypedArrayConcat(tubeColors, additionalLColors);
+      const additionalLColors = utils.ConcatTypedArraysUnsafe(additionalColors1, additionalColors2);
+      const tubeColors = utils.ConcatTypedArraysUnsafe(lColors2, lColors1);
+      return utils.ConcatTypedArraysUnsafe(tubeColors, additionalLColors);
     }
-    return utils.TypedArrayConcat(lColors2, lColors1);
+    return utils.ConcatTypedArraysUnsafe(lColors2, lColors1);
   }
 
   /**

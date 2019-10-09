@@ -487,19 +487,16 @@ function correctSelectorIdentifier(value) {
   return enquoteHelper.join('');
 }
 
-/* FBX Exporter stuff */
 /**
- * Extension to standard Float32Arrays.
- * This is the fastest way to concat TypedArrays in js (by observations).
- * @param{Float32Array} first  - destination array
- * @param{Float32Array} second - source array
- * @returns{Float32Array} resulting concatenated array
+ * Concatenates two TypedArray. Doesn't check null refs o type equality
+ * @param{TypedArray} first  - destination array
+ * @param{TypedArray} second - source array
+ * @returns{TypedArray} resulting concatenated array
  */
-function TypedArrayConcat(first, second) {
-  const firstLength = first.length;
-  const result = new first.constructor(firstLength + second.length);
+function ConcatTypedArraysUnsafe(first, second) {
+  const result = new first.constructor(first.length + second.length);
   result.set(first);
-  result.set(second, firstLength);
+  result.set(second, first.length);
   return result;
 }
 
@@ -539,5 +536,5 @@ export default {
   getFileExtension,
   splitFileName,
   download,
-  TypedArrayConcat,
+  ConcatTypedArraysUnsafe,
 };
