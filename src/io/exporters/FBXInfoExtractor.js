@@ -7,7 +7,73 @@ import FBXCylinderGeometryModel from './FBXCylinderGeometryModel';
 const POS_SIZE = 3; // FIXME make it only one
 const COL_SIZE = 3;
 const FBX_POS_SIZE = 3;
+const FBX_NORM_SIZE = 3;
 const FBX_COL_SIZE = 4;
+
+function copyFbxPoint3(src, srcIdx, dst, dstIdx) {
+  dst[dstIdx] = src[srcIdx];
+  dst[dstIdx + 1] = src[srcIdx + 1];
+  dst[dstIdx + 2] = src[srcIdx + 2];
+}
+
+function copyFbxPoint4(src, srcIdx, dst, dstIdx, value) {
+  dst[dstIdx] = src[srcIdx];
+  dst[dstIdx + 1] = src[srcIdx + 1];
+  dst[dstIdx + 2] = src[srcIdx + 2];
+  dst[dstIdx + 3] = value;
+}
+
+class FBXGeo {
+  constructor() {
+    this.positions = null;
+    this.normals = null;
+    this.colors = null;
+    this.indices = null;
+    this.lastPos = 0;
+    this.lastNorm = 0;
+    this.lastCol = 0;
+    this.lastIdx = 0;
+  }
+
+  init(vertsCount, indsCount) {
+    this.positions = new Float32Array(vertsCount * FBX_POS_SIZE);
+    this.normals = new Float32Array(vertsCount * FBX_NORM_SIZE);
+    this.colors = new Float32Array(vertsCount * FBX_COL_SIZE);
+    this.indices = new Int32Array(indsCount);
+  }
+
+  setPositions(array, start, count, stride) {
+    this._setSubArray(array, start, stride, count, this.positions, this.lastPos, FBX_POS_SIZE, copyFbxPoint3);
+  }
+
+  setNormals(array, start, count, stride) {
+    this._setSubArray(array, start, stride, count, this.normals, this.lastNorm, FBX_NORM_SIZE, copyFbxPoint3);
+  }
+
+  setColors(array, start, count, stride) {
+    this._setSubArray(array, start, stride, count, this.colors, this.lastCol, FBX_COL_SIZE, copyFbxPoint4, 1);
+  }
+
+  setIndices(array, start, count) {
+    this._setSubArray(array, start, 1, count, this.indices, this.lastIdx, 1);
+  }
+
+  _setSubArray(srcArray, srcStart, srcStride, count, dstArray, dstStart, dstStride, copyFunctor, opts) {
+    if ((dstArray.length - dstStart) / dstStride < count
+    || (srcArray.length - srcStart) / srcStride < count) {
+      return; // we've got no space
+    }
+    if (srcStride === dstStride) { // stride is the same
+      dstArray.set(srcArray, dstStart);
+    } else {
+      let idx = dstStart;
+      let arridx = srcStart;
+      for (let i = 0; i < count; ++i, idx += dstStride, arridx += srcStride) {
+        copyFunctor(srcArray, arridx, dstArray, idx, opts);
+      }
+    }
+  }
+}
 
 export default class FBXInfoExtractor {
   constructor() {
@@ -97,40 +163,37 @@ export default class FBXInfoExtractor {
       matrix,
     } = mesh;
 
-    let lColors = [];
-    let lNormals = null;
-    let lVertices = null;
-    if (matrix.isIdentity()) {
-      lVertices = position.array;
-      lNormals = normal.array;
-    } else {
-      lVertices = matrix.applyToPointsArray(_.cloneDeep(position.array), POS_SIZE, 1);
-      lNormals = matrix.applyToPointsArray(_.cloneDeep(normal.array), POS_SIZE, 0);
+    const model = new FBXGeo();
+    const vertCount = position.array.length / POS_SIZE;
+    model.init(vertCount, index.array.length); // FIXME use attribute.count instead of array.length
+
+    model.setPositions(position.array, 0, vertCount, POS_SIZE);
+    model.setNormals(normal.array, 0, vertCount, POS_SIZE);
+    if (!matrix.isIdentity()) {
+      matrix.applyToPointsArray(model.positions, FBX_POS_SIZE, 1);
+      matrix.applyToPointsArray(model.normals, FBX_NORM_SIZE, 0);
     }
     // Firstly extract material information, if it's already in the base we will add to already existing model
     const material = this.collectMaterialInfo(mesh);
     const modelNumber = this._checkExistingMaterial(material);
     // Different style with indices - if we have modelNumber => we must to add indices to existing ones
-    const maxIndex = this._calculateMaxIndex(modelNumber);
-    let lIndices = Int32Array.from(_.cloneDeep(index.array));
-    if (maxIndex !== 0) {
-      for (let i = 0; i < lIndices.length; ++i) {
-        lIndices[i] += maxIndex + 1;
-      }
-    }
+    // const maxIndex = this._calculateMaxIndex(modelNumber);
+    model.setIndices(index.array, 0, index.array.length); // FIXME move to setIndices
+    // if (maxIndex !== 0) {
+    //   for (let i = 0; i < lIndices.length; ++i) {
+    //     lIndices[i] += maxIndex + 1;
+    //   }
+    // }
     // Rework this into FBX notation
-    lIndices = this.reworkIndices(lIndices);
-    lColors = this.reworkColors(color.array);
-    // Add model
-    if (lVertices.length > 0 && lIndices.length > 0 && lNormals.length > 0 && lColors.length > 0) {
-      const model = {
-        vertices: lVertices,
-        indices: lIndices,
-        normals: lNormals,
-        colors: lColors,
-      };
-      this._addModelToPool(modelNumber, model, material);
-    }
+    this.reworkIndices(model.indices); // FIXME move reworking into setIndices
+    model.setColors(color.array, 0, vertCount, COL_SIZE);
+    const modelNew = {
+      vertices: model.positions,
+      indices: model.indices,
+      normals: model.normals,
+      colors: model.colors,
+    };
+    this._addModelToPool(modelNumber, modelNew, material);
   }
 
   /**
@@ -334,13 +397,18 @@ export default class FBXInfoExtractor {
    * @returns{Int32Array} reworked array.
    */
   reworkIndices(array) {
-    const clonedArray = new Int32Array(array.length); // In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers
-    clonedArray.set(array);
-    for (let i = POS_SIZE - 1; i < clonedArray.length; i += POS_SIZE) {
-      clonedArray[i] *= -1;
-      clonedArray[i]--;
+    // const clonedArray = new Int32Array(array.length); // In some future we might want to rework this to bigint64, but currently it haven't been supported in many browsers
+    // clonedArray.set(array);
+    // for (let i = POS_SIZE - 1; i < clonedArray.length; i += POS_SIZE) {
+    //   clonedArray[i] *= -1;
+    //   clonedArray[i]--;
+    // }
+    // return clonedArray;
+    const faceSize = 3;
+    for (let i = faceSize - 1; i < array.length; i += faceSize) {
+      array[i] *= -1;
+      array[i]--;
     }
-    return clonedArray;
   }
 
   /**
