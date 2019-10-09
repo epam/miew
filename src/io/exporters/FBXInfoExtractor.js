@@ -72,6 +72,7 @@ class FBXGeo {
         copyFunctor(srcArray, arridx, dstArray, idx, opts);
       }
     }
+    // FIXME what about last pos??
   }
 }
 
@@ -125,25 +126,22 @@ export default class FBXInfoExtractor {
    * @param {object} model - given model
    * @param material - material of given model
    */
-  _addModelToPool(modelNumber, model, material) {
-    // If that's new model
-    if (this._models.length === modelNumber) {
+  _addToPool(model, material) {
+    const materialIdx = this._checkExistingMaterial(material);
+    if (materialIdx === this._models.length) { // new model-material pair
+      this.reworkIndices(model.indices); // FIXME move reworking into setIndices
       this._models.push(model);
       this._materials.push(material);
-    } else {
-      // Adding new vertices etc to existing model
-      // Reminder - this way is better in sense of performance
-      const oldModel = this._models[modelNumber];
-      const newVertices = utils.ConcatTypedArraysUnsafe(oldModel.vertices, model.vertices);
-      const newNormals = utils.ConcatTypedArraysUnsafe(oldModel.normals, model.normals);
-      const newColors = utils.ConcatTypedArraysUnsafe(oldModel.colors, model.colors);
-      const newIndices = utils.ConcatTypedArraysUnsafe(oldModel.indices, model.indices);
-      this._models[modelNumber] = {
-        vertices: newVertices,
-        indices: newIndices,
-        normals: newNormals,
-        colors: newColors,
-      };
+    } else { // add model to existing model-material pair
+      const oldModel = this._models[materialIdx];
+      oldModel.vertices = utils.ConcatTypedArraysUnsafe(oldModel.vertices, model.vertices);
+      oldModel.normals = utils.ConcatTypedArraysUnsafe(oldModel.normals, model.normals);
+      oldModel.colors = utils.ConcatTypedArraysUnsafe(oldModel.colors, model.colors);
+      // shift indices due to already existed verts model
+      const maxIndex = this._calculateMaxIndex(materialIdx);
+      model.indices = model.indices.map((x) => x + (maxIndex + 1));
+      this.reworkIndices(model.indices); // FIXME move reworking into setIndices
+      oldModel.indices = utils.ConcatTypedArraysUnsafe(oldModel.indices, model.indices);
     }
   }
 
@@ -173,27 +171,16 @@ export default class FBXInfoExtractor {
       matrix.applyToPointsArray(model.positions, FBX_POS_SIZE, 1);
       matrix.applyToPointsArray(model.normals, FBX_NORM_SIZE, 0);
     }
-    // Firstly extract material information, if it's already in the base we will add to already existing model
-    const material = this.collectMaterialInfo(mesh);
-    const modelNumber = this._checkExistingMaterial(material);
-    // Different style with indices - if we have modelNumber => we must to add indices to existing ones
-    // const maxIndex = this._calculateMaxIndex(modelNumber);
-    model.setIndices(index.array, 0, index.array.length); // FIXME move to setIndices
-    // if (maxIndex !== 0) {
-    //   for (let i = 0; i < lIndices.length; ++i) {
-    //     lIndices[i] += maxIndex + 1;
-    //   }
-    // }
-    // Rework this into FBX notation
-    this.reworkIndices(model.indices); // FIXME move reworking into setIndices
     model.setColors(color.array, 0, vertCount, COL_SIZE);
+    model.setIndices(index.array, 0, index.array.length); // FIXME move to setIndices
+    const material = this.collectMaterialInfo(mesh);
     const modelNew = {
-      vertices: model.positions,
+      vertices: model.positions, // FIXME rename vertices to positions
       indices: model.indices,
       normals: model.normals,
       colors: model.colors,
     };
-    this._addModelToPool(modelNumber, modelNew, material);
+    this._addToPool(modelNew, material);
   }
 
   /**
@@ -249,7 +236,7 @@ export default class FBXInfoExtractor {
       normals: resNormals,
       colors: resColors,
     };
-    this._addModelToPool(modelNumber, model, material);
+    this._addToPool(modelNumber, model, material);
   }
 
   /**
@@ -355,7 +342,7 @@ export default class FBXInfoExtractor {
       normals: resNormals,
       colors: resColors,
     };
-    this._addModelToPool(modelNumber, model, material);
+    this._addToPool(modelNumber, model, material);
   }
 
   /**
