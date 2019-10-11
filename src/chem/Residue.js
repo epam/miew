@@ -192,16 +192,16 @@ class Residue {
     return vectorB;
   }
 
-  _innerFinalize(prevRes, prev, nextRes, dst, getAtomPosition) {
+  _innerFinalize(prevRes, prev, nextRes, dst, chainAsNucleic, getAtomPosition) {
     const bFirstInChain = prev === null;
 
     const lp = getAtomPosition(this._leadAtom);
     const currLeadPos = new THREE.Vector3(lp.x, lp.y, lp.z);
-    if (((this._type.flags & ResidueType.Flags.NUCLEIC) !== 0
-    || (this._type.flags & ResidueType.Flags.WATER) !== 0)) {
+    if (chainAsNucleic) {
       this._detectLeadWing(dst, nextRes, getAtomPosition);
       return;
     }
+
     if (bFirstInChain) { // for first one in chain
       dst._midPoint = getAtomPosition(this._firstAtom).clone();
     } else {
@@ -212,9 +212,9 @@ class Residue {
     dst._controlPoint = currLeadPos;
   }
 
-  _finalize2(prev, next) {
+  _finalize2(prev, next, chainAsNucleic) {
     // Should be called AFTER first finalize
-    this._innerFinalize(prev, prev, next, this, (atom) => atom._position);
+    this._innerFinalize(prev, prev, next, this, chainAsNucleic, (atom) => atom._position);
   }
 
   isConnected(anotherResidue) {

@@ -4,11 +4,11 @@ import ResidueType from './ResidueType';
 
 /**
  * Residues in chain are either amino acid either nucleic acid (and water)
- * There might be some modified/mutated residues, which could not be definite by their name (nucleic or amino); In this
+ * There might be some modified/mutated residues, which type could not be determined by their name (nucleic or amino); In this
  * case firstly program definites the chain type (by well-known residues) and then definites modified/mutated residues
  */
-const CHAIN_TYPE = {
-  INDEFINITE: 0, NUCLEIC: 1, AMINO: 2,
+const ChainType = {
+  UNKNOWN: 0, NUCLEIC: 1, AMINO: 2,
 };
 
 /**
@@ -26,8 +26,6 @@ class Chain {
     this._name = name;
     this._mask = 1 | 0;
     this._index = -1;
-    this._type = CHAIN_TYPE.INDEFINITE;
-
     this._residues = [];
 
     this.minSequence = Number.POSITIVE_INFINITY;
@@ -46,34 +44,23 @@ class Chain {
     return this._residues;
   }
 
-  getType() {
-    return this._type;
-  }
-
   _determineType() {
     const residues = this._residues;
 
-    for (let i = 0, n = residues.length; i < n; ++i) {
-      if ((residues[i]._type.flags & ResidueType.Flags.NUCLEIC) !== 0) {
-        this._type = CHAIN_TYPE.NUCLEIC;
-        break;
-      } else if ((residues[i]._type.flags & ResidueType.Flags.PROTEIN) !== 0) {
-        this._type = CHAIN_TYPE.AMINO;
-        break;
-      }
-    }
+    const flagNucleic = ResidueType.Flags.NUCLEIC;
+    const flagProtein = ResidueType.Flags.PROTEIN;
+
+    this.type = ChainType.UNKNOWN;
 
     for (let i = 0, n = residues.length; i < n; ++i) {
-      if (residues[i]._type.flags === ResidueType.Flags.UNDEFINED) {
-        switch (this._type) {
-          case CHAIN_TYPE.NUCLEIC:
-            residues[i]._type.flags = ResidueType.Flags.NUCLEIC;
-            break;
-          case CHAIN_TYPE.AMINO:
-            residues[i]._type.flags = ResidueType.Flags.PROTEIN;
-            break;
-          default:
-        }
+      const residueTypeFlag = residues[i]._type.flags;
+
+      if ((residueTypeFlag & flagNucleic) !== 0) {
+        this.type = ChainType.NUCLEIC;
+        break;
+      } else if ((residueTypeFlag & flagProtein) !== 0) {
+        this.type = ChainType.AMINO;
+        break;
       }
     }
   }
@@ -108,7 +95,7 @@ class Chain {
       const curr = residues[i];
       // TODO: skip invalid residues
       if (1 /* curr._isValid */) { // eslint-disable-line no-constant-condition
-        curr._finalize2(prev, next);
+        curr._finalize2(prev, next, this.type === ChainType.NUCLEIC);
         prev = curr;
       }
     }
@@ -136,7 +123,7 @@ class Chain {
       const curr = residues[i];
       const currData = frameRes[curr._index];
       const nextRes = (i + 1 < n) ? residues[i + 1] : null;
-      curr._innerFinalize(prev, prevData, nextRes, currData, getAtomPos);
+      curr._innerFinalize(prev, prevData, nextRes, currData, this.type === ChainType.NUCLEIC, getAtomPos);
       prev = curr;
       prevData = currData;
     }
