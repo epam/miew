@@ -229,13 +229,13 @@ export default class FBXInfoExtractor {
     const vertCount = position.count;
     model.init(vertCount, index.count);
     if (matrix.isIdentity()) {
-      model.setPositions(position.array, 0, vertCount, POS_SIZE);
-      model.setNormals(normal.array, 0, vertCount, POS_SIZE);
+      model.setPositions(position.array, 0, vertCount, position.itemSize);
+      model.setNormals(normal.array, 0, vertCount, normal.itemSize);
     } else {
-      model.setTransformedPositions(position.array, 0, vertCount, POS_SIZE, matrix);
-      model.setTransformedNormals(normal.array, 0, vertCount, POS_SIZE, matrix);
+      model.setTransformedPositions(position.array, 0, vertCount, position.itemSize, matrix);
+      model.setTransformedNormals(normal.array, 0, vertCount, normal.itemSize, matrix);
     }
-    model.setColors(color.array, 0, vertCount, COL_SIZE);
+    model.setColors(color.array, 0, vertCount, color.itemSize);
     model.setIndices(index.array, 0, index.count);
     const material = this.collectMaterialInfo(mesh);
     const modelNew = {
@@ -276,8 +276,8 @@ export default class FBXInfoExtractor {
       // pos + normals
       this.getSphereInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
       objMatrix.multiplyMatrices(matrix, instMatrix);
-      model.setTransformedPositions(position.array, 0, vertCount, POS_SIZE, objMatrix);
-      model.setTransformedNormals(normal.array, 0, vertCount, POS_SIZE, objMatrix);
+      model.setTransformedPositions(position.array, 0, vertCount, position.itemSize, objMatrix);
+      model.setTransformedNormals(normal.array, 0, vertCount, normal.itemSize, objMatrix);
       // colors
       const colorIdx = instanceIndex * color.itemSize;
       model.setColor(vertCount,
