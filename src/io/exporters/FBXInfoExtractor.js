@@ -10,7 +10,7 @@ const FBX_POS_SIZE = 3;
 const FBX_NORM_SIZE = 3;
 const FBX_COL_SIZE = 4;
 
-function copyFbxPoint3(src, srcIdx, dst, dstIdx) {
+function copyFbxPoint3(src, srcIdx, dst, dstIdx) { // FIXME make param order unified
   dst[dstIdx] = src[srcIdx];
   dst[dstIdx + 1] = src[srcIdx + 1];
   dst[dstIdx + 2] = src[srcIdx + 2];
@@ -28,6 +28,16 @@ function copyFbxXYZW(dst, dstIdx, x, y, z, w) {
   dst[dstIdx + 1] = y;
   dst[dstIdx + 2] = z;
   dst[dstIdx + 3] = w;
+}
+const vector4 = new THREE.Vector4();
+function copyTransformedPoint3(src, srcIdx, dst, dstIdx, opts) {
+  const { matrix } = opts;
+  const { w } = opts;
+  vector4.set(src[srcIdx], src[srcIdx + 1], src[srcIdx + 2], w);
+  vector4.applyMatrix4(matrix);
+  dst[dstIdx] = vector4.x;
+  dst[dstIdx + 1] = vector4.y;
+  dst[dstIdx + 2] = vector4.z;
 }
 
 class FBXGeo {
@@ -54,8 +64,28 @@ class FBXGeo {
     this.lastPos += count * FBX_POS_SIZE;
   }
 
+  setTransformedPositions(array, start, count, stride, matrix) {
+    let idx = this.lastPos;
+    let arrIdx = start;
+    const opts = { matrix, w: 1 };
+    for (let i = 0; i < count; ++i, arrIdx += stride, idx += FBX_POS_SIZE) {
+      copyTransformedPoint3(array, arrIdx, this.positions, idx, opts);
+    }
+    this.lastPos += count * FBX_POS_SIZE;
+  }
+
   setNormals(array, start, count, stride) {
     this._setSubArray(array, start, stride, count, this.normals, this.lastNorm, FBX_NORM_SIZE, copyFbxPoint3);
+    this.lastNorm += count * FBX_NORM_SIZE;
+  }
+
+  setTransformedNormals(array, start, count, stride, matrix) {
+    let idx = this.lastNorm;
+    let arrIdx = start;
+    const opts = { matrix, w: 0 };
+    for (let i = 0; i < count; ++i, arrIdx += stride, idx += FBX_NORM_SIZE) {
+      copyTransformedPoint3(array, arrIdx, this.normals, idx, opts);
+    }
     this.lastNorm += count * FBX_NORM_SIZE;
   }
 
@@ -72,8 +102,13 @@ class FBXGeo {
   }
 
   setIndices(array, start, count) {
-    this._setSubArray(array, start, 1, count, this.indices, this.lastIdx, 1);
+    this.indices.set(array, this.lastIdx);
     this.lastIdx += count;
+  }
+
+  pushIndices(array, count, shift) {
+    const shifted = array.map((x) => x + shift);
+    this.setIndices(shifted, 0, count);
   }
 
   _setSubArray(srcArray, srcStart, srcStride, count, dstArray, dstStart, dstStride, copyFunctor, opts) {
@@ -91,6 +126,18 @@ class FBXGeo {
       }
     }
   }
+
+  // _setWithTransform(srcArray, srcStart, srcStride, count, dstArray, dstStart, dstStride, copyFunctor, matrix) {
+  //   let idx = dstStart;
+  //   let arridx = srcStart;
+  //   for (let i = 0, colIdx = this.lastCol; i < count; i++, colIdx += FBX_COL_SIZE) {
+  //     copyFbxXYZW(this.colors, colIdx, r, g, b, 1);
+  //   }
+  //   this.lastCol += count * FBX_COL_SIZE;
+  //   for (let i = 0; i < count; ++i, idx += dstStride, arridx += srcStride) {
+  //     copyFunctor(srcArray, arridx, dstArray, idx, opts);
+  //   }
+  // }
 }
 
 export default class FBXInfoExtractor {
@@ -156,7 +203,7 @@ export default class FBXInfoExtractor {
       oldModel.vertices = utils.ConcatTypedArraysUnsafe(oldModel.vertices, model.vertices);
       oldModel.normals = utils.ConcatTypedArraysUnsafe(oldModel.normals, model.normals);
       oldModel.colors = utils.ConcatTypedArraysUnsafe(oldModel.colors, model.colors);
-      model.indices = model.indices.map((x) => x + (maxIndex + 1)); // FIXME think about reworking
+      model.indices = model.indices.map((x) => x + (maxIndex + 1));
       this.reworkIndices(model.indices);
       oldModel.indices = utils.ConcatTypedArraysUnsafe(oldModel.indices, model.indices);
     }
@@ -180,13 +227,13 @@ export default class FBXInfoExtractor {
 
     const model = new FBXGeo();
     const vertCount = position.count;
-    model.init(vertCount, index.count); // FIXME use attribute.count instead of array.length
-
-    model.setPositions(position.array, 0, vertCount, POS_SIZE);
-    model.setNormals(normal.array, 0, vertCount, POS_SIZE);
-    if (!matrix.isIdentity()) {
-      matrix.applyToPointsArray(model.positions, FBX_POS_SIZE, 1);
-      matrix.applyToPointsArray(model.normals, FBX_NORM_SIZE, 0);
+    model.init(vertCount, index.count);
+    if (matrix.isIdentity()) {
+      model.setPositions(position.array, 0, vertCount, POS_SIZE);
+      model.setNormals(normal.array, 0, vertCount, POS_SIZE);
+    } else {
+      model.setTransformedPositions(position.array, 0, vertCount, POS_SIZE, matrix);
+      model.setTransformedNormals(normal.array, 0, vertCount, POS_SIZE, matrix);
     }
     model.setColors(color.array, 0, vertCount, COL_SIZE);
     model.setIndices(index.array, 0, index.count);
@@ -226,26 +273,20 @@ export default class FBXInfoExtractor {
     const instMatrix = new THREE.Matrix4();
     const objMatrix = new THREE.Matrix4();
     for (let instanceIndex = 0; instanceIndex < instCount; ++instanceIndex) {
-      // Firstly, collect some basic instanced parameters */
-      let lNormals = _.cloneDeep(normal.array);
-      let lIndices = _.cloneDeep(index.array); // FIXME don't clone them
-      let lVertices = _.cloneDeep(position.array);
-      const indexShift = vertCount * instanceIndex;
-      lIndices = lIndices.map((x) => x + indexShift); // FIXME think about reworking
+      // pos + normals
       this.getSphereInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
       objMatrix.multiplyMatrices(matrix, instMatrix);
-      if (!objMatrix.isIdentity()) {
-        lVertices = objMatrix.applyToPointsArray(lVertices, FBX_POS_SIZE, 1);
-        lNormals = objMatrix.applyToPointsArray(lNormals, FBX_NORM_SIZE, 0);
-      }
-      model.setPositions(lVertices, 0, vertCount, POS_SIZE);
-      model.setNormals(lNormals, 0, vertCount, POS_SIZE);
+      model.setTransformedPositions(position.array, 0, vertCount, POS_SIZE, objMatrix);
+      model.setTransformedNormals(normal.array, 0, vertCount, POS_SIZE, objMatrix);
+      // colors
       const colorIdx = instanceIndex * color.itemSize;
       model.setColor(vertCount,
         color.array[colorIdx],
         color.array[colorIdx + 1],
         color.array[colorIdx + 2]);
-      model.setIndices(lIndices, 0, indsCount);
+      // indices
+      const indexShift = vertCount * instanceIndex;
+      model.pushIndices(index.array, indsCount, indexShift);
     }
     const newModel = {
       vertices: model.positions, // FIXME rename vertices to positions
