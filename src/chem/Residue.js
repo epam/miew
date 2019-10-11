@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import Atom from './Atom';
 import Element from './Element';
-import ResidueType from './ResidueType';
 
 const cNucleicControlNames = ['C3\'', 'C3*', 'P', 'H5T', 'H3T'];
 const cNucleicWing1Names = ['OP1', 'O1P'];
