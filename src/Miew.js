@@ -23,14 +23,15 @@ import ObjectControls from './ui/ObjectControls';
 import Picker from './ui/Picker';
 import Axes from './gfx/Axes';
 import gfxutils from './gfx/gfxutils';
-import noise from './gfx/noiseTexture';
 import FrameInfo from './gfx/FrameInfo';
 import meshes from './gfx/meshes/meshes';
 import LinesObject from './gfx/objects/LinesObj';
 import UberMaterial from './gfx/shaders/UberMaterial';
 import OutlineMaterial from './gfx/shaders/OutlineMaterial';
 import FXAAMaterial from './gfx/shaders/FXAAMaterial';
-import ao from './gfx/shaders/AO';
+import AOMaterial from './gfx/shaders/AOMaterial';
+import AOHorBlurMaterial from './gfx/shaders/AOHorBlurMaterial';
+import AOVertBlurWithBlendMaterial from './gfx/shaders/AOVertBlurWithBlendMaterial';
 import AnaglyphMaterial from './gfx/shaders/AnaglyphMaterial';
 import VolumeMaterial from './gfx/shaders/VolumeMaterial';
 import viewInterpolator from './gfx/ViewInterpolator';
@@ -1195,6 +1196,13 @@ Miew.prototype._renderScene = (function () {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
+
+    // clean buffer for normals texture
+    gfx.renderer.setClearColor(0x000000, 0.0);
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf4);
+    gfx.renderer.clearColor();
+
+    gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     gfx.renderer.setRenderTarget(gfx.offscreenBuf);
     gfx.renderer.clear();
 
@@ -1540,23 +1548,18 @@ Miew.prototype._performFXAA = (function () {
 }());
 
 Miew.prototype._performAO = (function () {
-  const _aoMaterial = new ao.AOMaterial();
-  const _horBlurMaterial = new ao.HorBilateralBlurMaterial();
-  const _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
+  const _aoMaterial = new AOMaterial();
+  const _horBlurMaterial = new AOHorBlurMaterial();
+  const _vertBlurMaterial = new AOVertBlurWithBlendMaterial();
 
-  const _translation = new THREE.Vector3();
-  const _quaternion = new THREE.Quaternion();
   const _scale = new THREE.Vector3();
-
   return function (srcColorBuffer, normalBuffer, srcDepthTexture, targetBuffer, tempBuffer, tempBuffer1) {
     if (!srcColorBuffer || !normalBuffer || !srcDepthTexture || !targetBuffer || !tempBuffer || !tempBuffer1) {
       return;
     }
+    const gfx = this._gfx;
+    const tanHalfFOV = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
 
-    const self = this;
-    const gfx = self._gfx;
-
-    // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _aoMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _aoMaterial.uniforms.normalTexture.value = normalBuffer.texture;
@@ -1564,17 +1567,11 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.camNearFar.value.set(gfx.camera.near, gfx.camera.far);
     _aoMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
     _aoMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
-    _aoMaterial.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
-    gfx.root.matrix.decompose(_translation, _quaternion, _scale);
+    _aoMaterial.uniforms.tanHalfFOV.value = tanHalfFOV;
+    gfx.root.matrix.extractScale(_scale);
     _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * _scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
-    _aoMaterial.uniforms.noiseTexture.value = noise.noiseTexture;
-    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight);
-    const { fog } = gfx.scene;
-    if (fog) {
-      _aoMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
-    }
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
     gfx.renderer.setRenderTarget(tempBuffer1);
     gfx.renderer.renderScreenQuad(_aoMaterial);
@@ -1589,6 +1586,19 @@ Miew.prototype._performAO = (function () {
     _vertBlurMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _vertBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer.width, 1.0 / tempBuffer.height);
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
+    _vertBlurMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
+    _vertBlurMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
+    _vertBlurMaterial.uniforms.tanHalfFOV.value = tanHalfFOV;
+    const { fog } = gfx.scene;
+    if (fog) {
+      _vertBlurMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
+      _vertBlurMaterial.uniforms.fogColor.value.set(fog.color.r, fog.color.g, fog.color.b, settings.now.fogAlpha);
+    }
+    if ((_vertBlurMaterial.useFog !== settings.now.fog)
+      || (_vertBlurMaterial.fogTransparent !== settings.now.bg.transparent)) {
+      _vertBlurMaterial.setValues({ useFog: settings.now.fog, fogTransparent: settings.now.bg.transparent });
+      _vertBlurMaterial.needsUpdate = true;
+    }
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.renderScreenQuad(_vertBlurMaterial);
   };

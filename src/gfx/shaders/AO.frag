@@ -1,7 +1,7 @@
 precision highp float;
+#define EPSILON 0.0000001
 
 #define MAX_SAMPLES_COUNT 32
-
 uniform vec3 samplesKernel[MAX_SAMPLES_COUNT];
 uniform sampler2D noiseTexture;
 uniform vec2      noiseTexelSize;
@@ -19,7 +19,6 @@ uniform float kernelRadius;
 uniform float depthThreshold;
 uniform float factor;
 
-uniform vec2 fogNearFar;
 varying vec2 vUv;
 
 float CalcViewZ(vec2 screenPos)
@@ -49,6 +48,13 @@ void main() {
   vec3 viewPos = ViewPosFromDepth(vUv);
   // remap coordinates to prevent noise exture rescale
   vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;
+  vec4 normalData = texture2D(normalTexture, vUv);
+  // return for background fragments (their normals are zero vectors)
+  if (length(normalData.rgb) < EPSILON) {
+    // 0.0 in alpha component means that it is background fragment
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+    return;
+  }
   //[0, 1] -> [-1, 1]
   vec4 normalData = texture2D(normalTexture, vUv);
   vec3 normal = (normalData.rgb * 2.0 - 1.0);
@@ -86,8 +92,6 @@ void main() {
     // calc occlusion made by object surface at the sample
     AO += step(samplePos.z, sampleDepth);
   }
-  // add fog to the AO value
-  AO *= 1.0 - smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z);
   // calc result AO-map color
   AO = 1.0 - max(0.0, AO / float(MAX_SAMPLES_COUNT) * factor);
   // write value to AO-map

@@ -1,6 +1,7 @@
 /* eslint-disable no-magic-numbers */
 import * as THREE from 'three';
 import _ from 'lodash';
+import logger from '../utils/logger';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
 import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
@@ -196,6 +197,28 @@ THREE.Raycaster.prototype.intersectVisibleObject = function (gfxObj, camera, cli
   return p;
 };
 
+THREE.Matrix4.prototype.extractScale = (function () {
+  const _v = new THREE.Vector3();
+
+  return function (scale) {
+    if (scale === undefined) {
+      logger.debug('extractScale(): new is too expensive operation to do it on-the-fly');
+      scale = _v.clone();
+    }
+
+    const te = this.elements;
+    scale.x = _v.set(te[0], te[1], te[2]).length();
+    scale.y = _v.set(te[4], te[5], te[6]).length();
+    scale.z = _v.set(te[8], te[9], te[10]).length();
+
+    // if determine is negative, we need to invert one scale
+    const det = this.determinant();
+    if (det < 0) {
+      scale.x = -scale.x;
+    }
+    return scale;
+  };
+}());
 
 function _calcCylinderMatrix(posBegin, posEnd, radius) {
   const posCenter = posBegin.clone().lerp(posEnd, 0.5);
