@@ -3,6 +3,17 @@ import Residue from './Residue';
 import ResidueType from './ResidueType';
 
 /**
+ * Residues in chain are either amino acid either nucleic acid (and water)
+ * There might be some modified/mutated residues, which type could not be determined by their name (nucleic or amino); In this
+ * case firstly program definites the chain type (by well-known residues) and then definites modified/mutated residues
+ */
+const ChainType = {
+  UNKNOWN: 0,
+  PROTEIN: 1,
+  NUCLEIC: 2,
+};
+
+/**
  * Residue chain.
  *
  * @param {Complex} complex - Molecular complex this chain belongs to.
@@ -17,7 +28,6 @@ class Chain {
     this._name = name;
     this._mask = 1 | 0;
     this._index = -1;
-
     this._residues = [];
 
     this.minSequence = Number.POSITIVE_INFINITY;
@@ -34,6 +44,26 @@ class Chain {
 
   getResidues() {
     return this._residues;
+  }
+
+  _determineType() {
+    const residues = this._residues;
+
+    const { PROTEIN, NUCLEIC } = ResidueType.Flags;
+
+    this.type = ChainType.UNKNOWN;
+
+    for (let i = 0, n = residues.length; i < n; ++i) {
+      const { flags } = residues[i]._type;
+
+      if ((flags & NUCLEIC) !== 0) {
+        this.type = ChainType.NUCLEIC;
+        break;
+      } else if ((flags & PROTEIN) !== 0) {
+        this.type = ChainType.PROTEIN;
+        break;
+      }
+    }
   }
 
   /**
@@ -56,6 +86,8 @@ class Chain {
   }
 
   _finalize() {
+    this._determineType();
+
     const residues = this._residues;
 
     let prev = null;
@@ -64,13 +96,13 @@ class Chain {
       const curr = residues[i];
       // TODO: skip invalid residues
       if (1 /* curr._isValid */) { // eslint-disable-line no-constant-condition
-        curr._finalize2(prev, next);
+        curr._finalize2(prev, next, this.type === ChainType.NUCLEIC);
         prev = curr;
       }
     }
 
     // fix very first wing
-    if (residues.length > 1) {
+    if (residues.length > 1 && residues[1]._wingVector) {
       const p = residues[1]._wingVector;
       residues[0]._wingVector = new THREE.Vector3(p.x, p.y, p.z);
     } else if (residues.length > 0) {
@@ -92,7 +124,7 @@ class Chain {
       const curr = residues[i];
       const currData = frameRes[curr._index];
       const nextRes = (i + 1 < n) ? residues[i + 1] : null;
-      curr._innerFinalize(prev, prevData, nextRes, currData, getAtomPos);
+      curr._innerFinalize(prev, prevData, nextRes, currData, this.type === ChainType.NUCLEIC, getAtomPos);
       prev = curr;
       prevData = currData;
     }
