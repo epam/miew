@@ -8,7 +8,9 @@ import ResidueType from './ResidueType';
  * case firstly program definites the chain type (by well-known residues) and then definites modified/mutated residues
  */
 const ChainType = {
-  UNKNOWN: 0, NUCLEIC: 1, AMINO: 2,
+  UNKNOWN: 0,
+  PROTEIN: 1,
+  NUCLEIC: 2,
 };
 
 /**
@@ -47,19 +49,18 @@ class Chain {
   _determineType() {
     const residues = this._residues;
 
-    const flagNucleic = ResidueType.Flags.NUCLEIC;
-    const flagProtein = ResidueType.Flags.PROTEIN;
+    const { PROTEIN, NUCLEIC } = ResidueType.Flags;
 
     this.type = ChainType.UNKNOWN;
 
     for (let i = 0, n = residues.length; i < n; ++i) {
-      const residueTypeFlag = residues[i]._type.flags;
+      const { flags } = residues[i]._type;
 
-      if ((residueTypeFlag & flagNucleic) !== 0) {
+      if ((flags & NUCLEIC) !== 0) {
         this.type = ChainType.NUCLEIC;
         break;
-      } else if ((residueTypeFlag & flagProtein) !== 0) {
-        this.type = ChainType.AMINO;
+      } else if ((flags & PROTEIN) !== 0) {
+        this.type = ChainType.PROTEIN;
         break;
       }
     }

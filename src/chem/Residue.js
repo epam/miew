@@ -211,9 +211,9 @@ class Residue {
     dst._controlPoint = currLeadPos;
   }
 
-  _finalize2(prev, next, chainAsNucleic) {
+  _finalize2(prev, next, asNucleic) {
     // Should be called AFTER first finalize
-    this._innerFinalize(prev, prev, next, this, chainAsNucleic, (atom) => atom._position);
+    this._innerFinalize(prev, prev, next, this, asNucleic, (atom) => atom._position);
   }
 
   isConnected(anotherResidue) {
