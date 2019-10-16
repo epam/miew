@@ -165,7 +165,7 @@ export default class FBXInfoExtractor {
     if (this._models.length <= modelIdx) {
       return 0;
     }
-    return (this._models[modelIdx].vertices.length / FBX_POS_SIZE);
+    return (this._models[modelIdx].positions.length / FBX_POS_SIZE);
   }
 
   /**
@@ -185,7 +185,7 @@ export default class FBXInfoExtractor {
       const currentCount = this._countVertices(materialIdx);
       // add new verts
       const oldModel = this._models[materialIdx];
-      oldModel.vertices = utils.ConcatTypedArraysUnsafe(oldModel.vertices, model.vertices);
+      oldModel.positions = utils.ConcatTypedArraysUnsafe(oldModel.positions, model.positions);
       oldModel.normals = utils.ConcatTypedArraysUnsafe(oldModel.normals, model.normals);
       oldModel.colors = utils.ConcatTypedArraysUnsafe(oldModel.colors, model.colors);
       // shift indices due to already existed verts in model and add them
@@ -224,13 +224,7 @@ export default class FBXInfoExtractor {
     model.setColors(color.array, 0, vertCount, color.itemSize);
     model.setIndices(index.array, 0, index.count);
     const material = this.collectMaterialInfo(mesh);
-    const modelNew = {
-      vertices: model.positions, // FIXME rename vertices to positions
-      indices: model.indices,
-      normals: model.normals,
-      colors: model.colors,
-    };
-    this._addToPool(modelNew, material);
+    this._addToPool(model, material);
   }
 
   /**
@@ -273,14 +267,8 @@ export default class FBXInfoExtractor {
       const indexShift = vertCount * instanceIndex;
       model.setShiftedIndices(index.array, indsCount, indexShift);
     }
-    const newModel = {
-      vertices: model.positions, // FIXME rename vertices to positions
-      indices: model.indices,
-      normals: model.normals,
-      colors: model.colors,
-    };
     const material = this.collectMaterialInfo(mesh);
-    this._addToPool(newModel, material);
+    this._addToPool(model, material);
   }
   // FIXME test diff materials
 
@@ -343,14 +331,8 @@ export default class FBXInfoExtractor {
       // const indexShift = geo.vertsCount * instanceIndex;
       model.setShiftedIndices(geo.indices, indsCount, prevModelVerts);
     }
-    const newModel = {
-      vertices: model.positions, // FIXME rename vertices to positions
-      indices: model.indices,
-      normals: model.normals,
-      colors: model.colors,
-    };
     const material = this.collectMaterialInfo(mesh);
-    this._addToPool(newModel, material);
+    this._addToPool(model, material);
   }
 
   // FIXME write description

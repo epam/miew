@@ -223,7 +223,7 @@ ${defaultDefinitions}
   Model: "Model::${this._info.name}_${i}", "Mesh" {
     Version: ${modelVersion} 
     ${defaultProperties}
-    ${this._verticesIndices(model.vertices, model.indices)}
+    ${this._verticesIndices(model.positions, model.indices)}
     ${this._normalLayer(model.normals)} 
     ${this._colorLayer(model.colors)} 
     ${defaultMaterialLayer}  
@@ -398,13 +398,13 @@ Connections:  {
    * Adding vertices and indices to resulting string
    * @return {string} resulting string in FBX notation
    */
-  _verticesIndices(vertices, indices) { // FIXME rewrite
+  _verticesIndices(positions, indices) { // FIXME rewrite
     const multiLayer = 0;
     const multiTake = 1;
     const shading = 'Y';
     const culling = 'CullingOff';
     const geometryVersion = 124;
-    const vertStr = this._floatArrayToString(vertices);
+    const vertStr = this._floatArrayToString(positions);
     /* About _correctArrayNotation: Float32Arrays will contains only Float32 numbers, which implies that it will be floating points with 17 numbers after point.
     * We cannot (and it's logically incorrect) save all this information, so we convert this Float32Array into Array-like object with numbers with only 6 numbers after point
     * Reminder - this is big memory loss (as we must save at one moment two arrays with similar information) */
