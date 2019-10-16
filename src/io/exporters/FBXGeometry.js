@@ -1,5 +1,5 @@
 
-class OneColorGeo {
+class OneColorGeo { // FIXME do base class
   constructor() {
     this.positions = null;
     this.normals = null;
@@ -34,18 +34,7 @@ class OneColorGeo {
     };
   }
 
-  getGeo(color) {
-    this._fillColors(color);
-    return {
-      positions: this.positions,
-      normals: this.normals,
-      colors: this.colors,
-      indices: this.indices,
-      vertsCount: this.vertsCount,
-    };
-  }
-
-  _fillColors(color) {
+  setColors(color) {
     let offset = 0;
     for (let i = 0, l = this.colors.length, cl = this.itemSize.color; i < l; i += cl) {
       this.colors[offset++] = color.r;
@@ -62,9 +51,10 @@ class TwoColoredCylinder {
     this.colors = null;
     this.indices = null;
     this.vertsCount = 0;
-    this.cutRawStart = 0;
-    this.cutRawEnd = 0;
-    this.facesPerSlice = 0;
+    this.itemSize = null;
+    this._cutRawStart = 0;
+    this._cutRawEnd = 0;
+    this._facesPerSlice = 0;
   }
 
   // we know that cylinder consists of 2 height segments and stored:
@@ -80,7 +70,7 @@ class TwoColoredCylinder {
     } = geo;
     // extend vertices arrays
     this.vertsCount = position.count + info.addPerCylinder;
-    this.facesPerSlice = info.addPerCylinder;
+    this._facesPerSlice = info.addPerCylinder;
     this.positions = new Float32Array(this.vertsCount * position.itemSize);
     this.normals = new Float32Array(this.vertsCount * normal.itemSize);
     this.colors = new Float32Array(this.vertsCount * color.itemSize);
@@ -96,36 +86,25 @@ class TwoColoredCylinder {
     this._extendIndices(geo, info);
   }
 
-  getGeo(color1, color2) {
-    this._fillColors(color1, color2);
-    return { // don't return the structure
-      positions: this.positions,
-      normals: this.normals,
-      colors: this.colors,
-      indices: this.indices,
-      vertsCount: this.vertsCount,
-    };
-  }
-
   // FIXME add description
   _extendVertices(geo, info) {
     const { position } = geo.attributes;
     const { normal } = geo.attributes;
     const geoParams = geo.getGeoParams();
     const cutRaw = 1; // we expect cylinders of 2 segments in height => so half segment = 1
-    this.cutRawStart = cutRaw * geoParams.radialSegments;
-    this.cutRawEnd = this.cutRawStart + info.addPerCylinder;
+    this._cutRawStart = cutRaw * geoParams.radialSegments;
+    this._cutRawEnd = this._cutRawStart + info.addPerCylinder;
     { // write first half of cylinder
-      let temp1 = position.array.slice(0, this.cutRawEnd * position.itemSize);
+      let temp1 = position.array.slice(0, this._cutRawEnd * position.itemSize);
       this.positions.set(temp1, 0);
-      temp1 = normal.array.slice(0, this.cutRawEnd * normal.itemSize);
+      temp1 = normal.array.slice(0, this._cutRawEnd * normal.itemSize);
       this.normals.set(temp1, 0);
     }
     { // write second part of cylinder
-      let temp2 = position.array.slice(this.cutRawStart * position.itemSize, position.array.length);
-      this.positions.set(temp2, this.cutRawEnd * position.itemSize);
-      temp2 = normal.array.slice(this.cutRawStart * normal.itemSize, normal.array.length);
-      this.normals.set(temp2, this.cutRawEnd * normal.itemSize);
+      let temp2 = position.array.slice(this._cutRawStart * position.itemSize, position.array.length);
+      this.positions.set(temp2, this._cutRawEnd * position.itemSize);
+      temp2 = normal.array.slice(this._cutRawStart * normal.itemSize, normal.array.length);
+      this.normals.set(temp2, this._cutRawEnd * normal.itemSize);
     }
   }
 
@@ -141,11 +120,11 @@ class TwoColoredCylinder {
     this.indices.set(shifted, startToShift);
   }
 
-  _fillColors(color1, color2) {
+  setColors(color1, color2) {
     const colorSize = this.itemSize.color;
-    const part1End = this.cutRawEnd * colorSize;
+    const part1End = this._cutRawEnd * colorSize;
     const part2End = part1End * 2;
-    const capSize = (this.facesPerSlice + 1) * colorSize;
+    const capSize = (this._facesPerSlice + 1) * colorSize;
     let color = null;
     let offset = 0;
     for (let i = 0, l = this.colors.length; i < l; i += colorSize) {

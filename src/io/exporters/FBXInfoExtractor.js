@@ -36,7 +36,8 @@ function copyTransformedPoint3(src, srcIdx, dst, dstIdx, opts) {
   dst[dstIdx + 2] = vector4.z;
 }
 
-class FBXGeo {
+class FBXGeo { // FIXME rename to FBXModel
+  // FIXME add concatenation method
   constructor() {
     this.positions = null;
     this.normals = null;
@@ -121,6 +122,21 @@ class FBXGeo {
         copyFunctor(srcArray, arridx, dstArray, idx, opts);
       }
     }
+  }
+
+  getVertsNumber() {
+    return this.lastPos / FBX_POS_SIZE;
+  }
+
+  addInstance(matrix, geo) {
+    // add indices at first to take old number of vertices for shift
+    const prevModelVerts = this.getVertsNumber();
+    this.setShiftedIndices(geo.indices, geo.indices.length, prevModelVerts);
+    // add vertices
+    const size = geo.itemSize;
+    this.setTransformedPositions(geo.positions, 0, geo.vertsCount, size.position, matrix);
+    this.setTransformedNormals(geo.normals, 0, geo.vertsCount, size.normal, matrix);
+    this.setColors(geo.colors, 0, geo.vertsCount, size.color);
   }
 }
 
@@ -236,7 +252,6 @@ export default class FBXInfoExtractor {
       geometry: {
         attributes: {
           position,
-          normal,
           color,
         },
         index,
@@ -249,23 +264,20 @@ export default class FBXInfoExtractor {
     const vertCount = position.count;
     const indsCount = index.count;
     model.init(instCount * vertCount, instCount * indsCount);
+    const geo = new FBXGeometry.OneColorGeo();
+    geo.init(mesh.geometry);
     const instMatrix = new THREE.Matrix4();
     const objMatrix = new THREE.Matrix4();
+    const sphereColor = new THREE.Color();
     for (let instanceIndex = 0; instanceIndex < instCount; ++instanceIndex) {
-      // pos + normals
+      // update colors in geometry
+      const colorIdx = instanceIndex * color.itemSize;
+      sphereColor.fromArray(color.array, colorIdx);
+      geo.setColors(sphereColor);
+      // add instance to the model
       this.getSphereInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
       objMatrix.multiplyMatrices(matrix, instMatrix);
-      model.setTransformedPositions(position.array, 0, vertCount, position.itemSize, objMatrix);
-      model.setTransformedNormals(normal.array, 0, vertCount, normal.itemSize, objMatrix);
-      // colors
-      const colorIdx = instanceIndex * color.itemSize;
-      model.setColor(vertCount,
-        color.array[colorIdx],
-        color.array[colorIdx + 1],
-        color.array[colorIdx + 2]);
-      // indices
-      const indexShift = vertCount * instanceIndex;
-      model.setShiftedIndices(index.array, indsCount, indexShift);
+      model.addInstance(objMatrix, geo);
     }
     const material = this.collectMaterialInfo(mesh);
     this._addToPool(model, material);
@@ -282,7 +294,6 @@ export default class FBXInfoExtractor {
       geometry: {
         attributes: {
           position,
-          normal,
           color,
           color2,
         },
@@ -296,8 +307,9 @@ export default class FBXInfoExtractor {
     const oneCCylinder = new FBXGeometry.OneColorGeo();
     oneCCylinder.init(mesh.geometry);
     const splittingInfo = this._gatherCylindersColoringInfo(mesh.geometry);
-    const twoCCylinder = new FBXGeometry.TwoColoredCylinder();
+    let twoCCylinder = null;
     if (splittingInfo.needToSplit > 0) {
+      twoCCylinder = new FBXGeometry.TwoColoredCylinder();
       twoCCylinder.init(mesh.geometry, splittingInfo);
     }
     const additionalVertsCount = splittingInfo.addPerCylinder * splittingInfo.needToSplit;
@@ -314,22 +326,20 @@ export default class FBXInfoExtractor {
       const colorIdx = instanceIndex * color.itemSize;
       if (splittingInfo.is2Colored[instanceIndex]) {
         // .color2 contains starting color, and .color contains starting color (see uber.frag ATTR_COLOR2)
-        geo = twoCCylinder.getGeo(colorStart.fromArray(color2.array, colorIdx),
-          colorEnd.fromArray(color.array, colorIdx));
+        colorStart.fromArray(color2.array, colorIdx);
+        colorEnd.fromArray(color.array, colorIdx);
+        twoCCylinder.setColors(colorStart, colorEnd);
+        geo = twoCCylinder;
       } else {
-        geo = oneCCylinder.getGeo(colorStart.fromArray(color.array, colorIdx));
+        // has one color per cylinder
+        colorStart.fromArray(color.array, colorIdx);
+        oneCCylinder.setColors(colorStart);
+        geo = oneCCylinder;
       }
-      // add instance to model // FIXME move to separate function?
-      // pos + normals
+      // add instance to the model
       this.getCylinderInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
       objMatrix.multiplyMatrices(matrix, instMatrix);
-      const prevModelVerts = model.lastPos / 3; // FIXME
-      model.setTransformedPositions(geo.positions, 0, geo.vertsCount, position.itemSize, objMatrix);
-      model.setTransformedNormals(geo.normals, 0, geo.vertsCount, normal.itemSize, objMatrix);
-      model.setColors(geo.colors, 0, geo.vertsCount, color.itemSize);
-      // indices
-      // const indexShift = geo.vertsCount * instanceIndex;
-      model.setShiftedIndices(geo.indices, indsCount, prevModelVerts);
+      model.addInstance(objMatrix, geo);
     }
     const material = this.collectMaterialInfo(mesh);
     this._addToPool(model, material);
