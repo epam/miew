@@ -6,6 +6,7 @@ class OneColorGeo {
     this.colors = null;
     this.indices = null;
     this.vertsCount = 0;
+    this.itemSize = null;
   }
 
   init(geo) {
@@ -23,9 +24,14 @@ class OneColorGeo {
     this.normals = normal.array;
     // create color array
     this.colors = new Float32Array(this.vertsCount * color.itemSize);
-    this.colorItemSize = color.itemSize;
     // indices
     this.indices = index.array;
+    // save item size
+    this.itemSize = {
+      position: position.itemSize,
+      normal: normal.itemSize,
+      color: color.itemSize,
+    };
   }
 
   getGeo(color) {
@@ -41,7 +47,7 @@ class OneColorGeo {
 
   _fillColors(color) {
     let offset = 0;
-    for (let i = 0, l = this.colors.length, cl = this.colorItemSize; i < l; i += cl) {
+    for (let i = 0, l = this.colors.length, cl = this.itemSize.color; i < l; i += cl) {
       this.colors[offset++] = color.r;
       this.colors[offset++] = color.g;
       this.colors[offset++] = color.b;
@@ -78,7 +84,12 @@ class TwoColoredCylinder {
     this.positions = new Float32Array(this.vertsCount * position.itemSize);
     this.normals = new Float32Array(this.vertsCount * normal.itemSize);
     this.colors = new Float32Array(this.vertsCount * color.itemSize);
-    this.colorItemSize = color.itemSize;
+    // save item size
+    this.itemSize = {
+      position: position.itemSize,
+      normal: normal.itemSize,
+      color: color.itemSize,
+    };
     this._extendVertices(geo, info);
     // number of indices stays the same
     this.indices = new Uint32Array(index.count);
@@ -131,12 +142,13 @@ class TwoColoredCylinder {
   }
 
   _fillColors(color1, color2) {
-    const part1End = this.cutRawEnd * this.colorItemSize;
+    const colorSize = this.itemSize.color;
+    const part1End = this.cutRawEnd * colorSize;
     const part2End = part1End * 2;
-    const capSize = (this.facesPerSlice + 1) * this.colorItemSize;
+    const capSize = (this.facesPerSlice + 1) * colorSize;
     let color = null;
     let offset = 0;
-    for (let i = 0, l = this.colors.length, cl = this.colorItemSize; i < l; i += cl) {
+    for (let i = 0, l = this.colors.length; i < l; i += colorSize) {
       if (i < part1End) { // first part
         color = color1;
       } else if (i < part2End + capSize) { // second part + top cap
