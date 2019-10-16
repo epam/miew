@@ -30,10 +30,8 @@ function copyFbxXYZW(dst, dstIdx, x, y, z, w) {
 }
 const vector4 = new THREE.Vector4();
 function copyTransformedPoint3(src, srcIdx, dst, dstIdx, opts) {
-  const { matrix } = opts; // FIXME  simplify the code
-  const { w } = opts;
-  vector4.set(src[srcIdx], src[srcIdx + 1], src[srcIdx + 2], w);
-  vector4.applyMatrix4(matrix);
+  vector4.set(src[srcIdx], src[srcIdx + 1], src[srcIdx + 2], opts.w);
+  vector4.applyMatrix4(opts.matrix);
   dst[dstIdx] = vector4.x;
   dst[dstIdx + 1] = vector4.y;
   dst[dstIdx + 2] = vector4.z;
