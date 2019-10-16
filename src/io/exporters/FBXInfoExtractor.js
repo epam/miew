@@ -5,7 +5,6 @@ import gfxutils from '../../gfx/gfxutils';
 import FBXGeometry from './FBXGeometry';
 
 const POS_SIZE = 3; // FIXME make it only one
-const COL_SIZE = 3;
 const FBX_POS_SIZE = 3;
 const FBX_NORM_SIZE = 3;
 const FBX_COL_SIZE = 4;
@@ -343,7 +342,7 @@ export default class FBXInfoExtractor {
       model.setTransformedNormals(geo.normals, 0, geo.vertsCount, normal.itemSize, objMatrix);
       model.setColors(geo.colors, 0, geo.vertsCount, color.itemSize);
       // indices
-    //  const indexShift = geo.vertsCount * instanceIndex;
+      // const indexShift = geo.vertsCount * instanceIndex;
       model.setShiftedIndices(geo.indices, indsCount, prevModelVerts);
     }
     const newModel = {
