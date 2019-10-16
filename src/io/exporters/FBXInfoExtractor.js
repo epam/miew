@@ -241,7 +241,6 @@ export default class FBXInfoExtractor {
     const {
       geometry: {
         attributes: {
-          offset, // FIXME remove
           position,
           normal,
           color,
@@ -252,7 +251,7 @@ export default class FBXInfoExtractor {
     } = mesh;
 
     const model = new FBXGeo();
-    const instCount = offset.count; // FIXME get from geometry info, exists for InstancedGeometry
+    const instCount = mesh.geometry.maxInstancedCount;
     const vertCount = position.count;
     const indsCount = index.count;
     model.init(instCount * vertCount, instCount * indsCount);
@@ -305,7 +304,7 @@ export default class FBXInfoExtractor {
     } = mesh;
 
     const model = new FBXGeo();
-    const instCount = mesh.geometry.maxInstancedCount; // FIXME use for spheres
+    const instCount = mesh.geometry.maxInstancedCount;
     const oneCCylinder = new FBXGeometry.OneColorGeo();
     oneCCylinder.init(mesh.geometry);
     const splittingInfo = this._gatherCylindersColoringInfo(mesh.geometry);
