@@ -4,7 +4,6 @@ import utils from '../../utils';
 import gfxutils from '../../gfx/gfxutils';
 import FBXGeometry from './FBXGeometry';
 
-const POS_SIZE = 3; // FIXME make it only one
 const FBX_POS_SIZE = 3;
 const FBX_NORM_SIZE = 3;
 const FBX_COL_SIZE = 4;
@@ -158,15 +157,15 @@ export default class FBXInfoExtractor {
   }
 
   /**
-   * Calculating max index in indices array of given model
-   * @param {Number} modelNumber - given model
-   * @returns {number} maximum index
+   * Counts number of vertices already written to the model
+   * @param {Number} modelIdx - given model
+   * @returns {number} number of vertices
    */
-  _calculateMaxIndex(modelNumber) {
-    if (this._models.length === modelNumber) {
+  _countVertices(modelIdx) {
+    if (this._models.length <= modelIdx) {
       return 0;
     }
-    return (this._models[modelNumber].vertices.length / POS_SIZE - 1); // FIXME remove decreasing
+    return (this._models[modelIdx].vertices.length / FBX_POS_SIZE);
   }
 
   /**
@@ -182,13 +181,15 @@ export default class FBXInfoExtractor {
       this._models.push(model);
       this._materials.push(material);
     } else { // add model to existing model-material pair
-      // shift indices due to already existed verts model
-      const maxIndex = this._calculateMaxIndex(materialIdx);
+      // store number of vertices before addition
+      const currentCount = this._countVertices(materialIdx);
+      // add new verts
       const oldModel = this._models[materialIdx];
       oldModel.vertices = utils.ConcatTypedArraysUnsafe(oldModel.vertices, model.vertices);
       oldModel.normals = utils.ConcatTypedArraysUnsafe(oldModel.normals, model.normals);
       oldModel.colors = utils.ConcatTypedArraysUnsafe(oldModel.colors, model.colors);
-      model.indices = model.indices.map((x) => x + (maxIndex + 1));
+      // shift indices due to already existed verts in model and add them
+      model.indices = model.indices.map((x) => x + currentCount);
       this.reworkIndices(model.indices);
       oldModel.indices = utils.ConcatTypedArraysUnsafe(oldModel.indices, model.indices);
     }
