@@ -1,8 +1,13 @@
 import _ from 'lodash';
 import * as THREE from 'three';
+
 import gfxutils from '../../gfx/gfxutils';
+import settings from '../../settings';
+import logger from '../../utils/logger';
+
 import FBXGeometry from './FBXGeometry';
 import FBXModel from './FBXModel';
+import ThickLineMesh from '../../gfx/meshes/ThickLineMesh';
 
 export default class FBXInfoExtractor {
   constructor() {
@@ -123,7 +128,6 @@ export default class FBXInfoExtractor {
     const material = this.collectMaterialInfo(mesh);
     this._addToPool(model, material);
   }
-  // FIXME test diff materials
 
   /**
    * Getting all instanced cylinders from given mesh.
@@ -231,7 +235,7 @@ export default class FBXInfoExtractor {
     layersOfInterest.set(gfxutils.LAYERS.DEFAULT);
     layersOfInterest.enable(gfxutils.LAYERS.TRANSPARENT);
     data.traverse((object) => {
-      if (object instanceof THREE.Mesh && object.layers.test(layersOfInterest)) { // FIXME add check on empty geometry
+      if (object instanceof THREE.Mesh && object.layers.test(layersOfInterest) && this.checkExportAbility(object)) {
         if (object.geometry.type === 'InstancedBufferGeometry') {
           this._collectInstancedGeoInfo(object);
         } else {
@@ -239,6 +243,28 @@ export default class FBXInfoExtractor {
         }
       }
     });
+  }
+
+  /**
+   * Check ability to export the kind of mesh.
+   * @param {object} mesh - given mesh to check
+   * @returns {boolean} result of check
+   */
+  checkExportAbility(mesh) {
+    // check mesh on not being empty
+    if (mesh.geometry.attributes.position.count === 0) {
+      return false;
+    }
+    // check type of mesh
+    if (mesh.geometry.isInstancedBufferGeometry && settings.now.zSprites) {
+      logger.warn('Currently we cannot export \'sprites\' modes, like BS, WV, LC. Please turn of settings \'zSprites\' and try again');
+      return false;
+    }
+    if (mesh instanceof ThickLineMesh) {
+      logger.warn('Currently we cannot export Lines mode');
+      return false;
+    }
+    return true;
   }
 
   /**
