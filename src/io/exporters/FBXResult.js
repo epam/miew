@@ -361,6 +361,8 @@ Connections:  {
     const layerElementColorVersion = 101;
     const layerElementColorName = '';
     const colorsStr = this._floatArrayToString(colorArray);
+    const colorSize = this._info.models[0].itemSize.color;
+    const colorIndices = [...Array(colorArray.length / colorSize).keys()]; // FIXME use another way?
     // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
     // As said [..Array(...)] - fastest and easiest way to produce [0, 1, .....] array
     return `
@@ -370,7 +372,7 @@ Connections:  {
       MappingInformationType: "ByVertice"
       ReferenceInformationType: "Direct"
       Colors: ${colorsStr}
-      ColorIndex: ${[...Array(colorArray.length / this._info.colSize).keys()]}
+      ColorIndex: ${colorIndices}
     }`;
   }
 
