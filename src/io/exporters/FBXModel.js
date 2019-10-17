@@ -5,7 +5,7 @@ const FBX_POS_SIZE = 3;
 const FBX_NORM_SIZE = 3;
 const FBX_COL_SIZE = 4;
 
-function copyFbxPoint3(src, srcIdx, dst, dstIdx) { // FIXME make param order unified
+function copyFbxPoint3(src, srcIdx, dst, dstIdx) {
   dst[dstIdx] = src[srcIdx];
   dst[dstIdx + 1] = src[srcIdx + 1];
   dst[dstIdx + 2] = src[srcIdx + 2];
@@ -18,12 +18,6 @@ function copyFbxPoint4(src, srcIdx, dst, dstIdx, value) {
   dst[dstIdx + 3] = value;
 }
 
-function copyFbxXYZW(dst, dstIdx, x, y, z, w) {
-  dst[dstIdx] = x;
-  dst[dstIdx + 1] = y;
-  dst[dstIdx + 2] = z;
-  dst[dstIdx + 3] = w;
-}
 const vector4 = new THREE.Vector4();
 function copyTransformedPoint3(src, srcIdx, dst, dstIdx, opts) {
   vector4.set(src[srcIdx], src[srcIdx + 1], src[srcIdx + 2], opts.w);
@@ -31,6 +25,22 @@ function copyTransformedPoint3(src, srcIdx, dst, dstIdx, opts) {
   dst[dstIdx] = vector4.x;
   dst[dstIdx + 1] = vector4.y;
   dst[dstIdx + 2] = vector4.z;
+}
+
+function setSubArray(srcArray, srcStart, srcStride, count, dstArray, dstStart, dstStride, copyFunctor, opts) {
+  if ((dstArray.length - dstStart) / dstStride < count
+    || (srcArray.length - srcStart) / srcStride < count) {
+    return; // we've got no space
+  }
+  if (srcStride === dstStride) { // stride is the same
+    dstArray.set(srcArray, dstStart);
+  } else {
+    let idx = dstStart;
+    let arridx = srcStart;
+    for (let i = 0; i < count; ++i, idx += dstStride, arridx += srcStride) {
+      copyFunctor(srcArray, arridx, dstArray, idx, opts);
+    }
+  }
 }
 
 export default class FBXModel {
@@ -58,7 +68,7 @@ export default class FBXModel {
   }
 
   setPositions(array, start, count, stride) {
-    this._setSubArray(array, start, stride, count, this.positions, this.lastPos, FBX_POS_SIZE, copyFbxPoint3);
+    setSubArray(array, start, stride, count, this.positions, this.lastPos, FBX_POS_SIZE, copyFbxPoint3);
     this.lastPos += count * FBX_POS_SIZE;
   }
 
@@ -73,7 +83,7 @@ export default class FBXModel {
   }
 
   setNormals(array, start, count, stride) {
-    this._setSubArray(array, start, stride, count, this.normals, this.lastNorm, FBX_NORM_SIZE, copyFbxPoint3);
+    setSubArray(array, start, stride, count, this.normals, this.lastNorm, FBX_NORM_SIZE, copyFbxPoint3);
     this.lastNorm += count * FBX_NORM_SIZE;
   }
 
@@ -88,14 +98,7 @@ export default class FBXModel {
   }
 
   setColors(array, start, count, stride) {
-    this._setSubArray(array, start, stride, count, this.colors, this.lastCol, FBX_COL_SIZE, copyFbxPoint4, 1);
-    this.lastCol += count * FBX_COL_SIZE;
-  }
-
-  setColor(count, r, g, b) {
-    for (let i = 0, colIdx = this.lastCol; i < count; i++, colIdx += FBX_COL_SIZE) {
-      copyFbxXYZW(this.colors, colIdx, r, g, b, 1);
-    }
+    setSubArray(array, start, stride, count, this.colors, this.lastCol, FBX_COL_SIZE, copyFbxPoint4, 1);
     this.lastCol += count * FBX_COL_SIZE;
   }
 
@@ -107,22 +110,6 @@ export default class FBXModel {
   setShiftedIndices(array, count, shift) {
     const shifted = array.map((x) => x + shift);
     this.setIndices(shifted, 0, count);
-  }
-
-  _setSubArray(srcArray, srcStart, srcStride, count, dstArray, dstStart, dstStride, copyFunctor, opts) {
-    if ((dstArray.length - dstStart) / dstStride < count
-      || (srcArray.length - srcStart) / srcStride < count) {
-      return; // we've got no space
-    }
-    if (srcStride === dstStride) { // stride is the same
-      dstArray.set(srcArray, dstStart);
-    } else {
-      let idx = dstStart;
-      let arridx = srcStart;
-      for (let i = 0; i < count; ++i, idx += dstStride, arridx += srcStride) {
-        copyFunctor(srcArray, arridx, dstArray, idx, opts);
-      }
-    }
   }
 
   getVerticesNumber() {
