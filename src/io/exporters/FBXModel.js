@@ -125,13 +125,13 @@ export default class FBXModel {
     }
   }
 
-  getVertsNumber() {
+  getVerticesNumber() {
     return this.lastPos / FBX_POS_SIZE;
   }
 
   addInstance(matrix, geo) {
     // add indices at first to take old number of vertices for shift
-    const currentCount = this.getVertsNumber();
+    const currentCount = this.getVerticesNumber();
     this.setShiftedIndices(geo.indices, geo.indices.length, currentCount);
     // simply write vertices at empty space
     const size = geo.itemSize;
@@ -142,7 +142,7 @@ export default class FBXModel {
 
   concatenate(model) {
     // store number of vertices before addition
-    const currentCount = this.getVertsNumber();
+    const currentCount = this.getVerticesNumber();
     // add vertices by extending existed arrays
     this.positions = utils.ConcatTypedArraysUnsafe(this.positions, model.positions);
     this.normals = utils.ConcatTypedArraysUnsafe(this.normals, model.normals);
