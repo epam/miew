@@ -26,34 +26,44 @@ export default class FBXInfoExtractor {
   }
 
   /**
-   * Checking if given material already was registered in materials pool (no need to create new one)
-   * @param {object} material - given material
-   * @returns {number} number of model-material pair
+   * Extract fbx object information from ComplexVisual
+   * @param {object} data - complexVisual to get geometry info from
    */
-  _checkExistingMaterial(material) {
-    for (let i = 0; i < this._materials.length; ++i) {
-      if (_.isEqual(material, this._materials[i])) {
-        return i;
+  _extractModelsAndMaterials(data) {
+    const layersOfInterest = new THREE.Layers();
+    layersOfInterest.set(gfxutils.LAYERS.DEFAULT);
+    layersOfInterest.enable(gfxutils.LAYERS.TRANSPARENT);
+    data.traverse((object) => {
+      if (object instanceof THREE.Mesh && object.layers.test(layersOfInterest) && this.checkExportAbility(object)) {
+        if (object.geometry.type === 'InstancedBufferGeometry') {
+          this._collectInstancedGeoInfo(object);
+        } else {
+          this._collectGeoInfo(object);
+        }
       }
-    }
-    return this._models.length;
+    });
   }
 
   /**
-   * Adding model to pool of models or extend existing ones
-   * @param {object} model - model to add
-   * @param {object} material - material to add
+   * Check ability to export the kind of mesh.
+   * @param {object} mesh - given mesh to check
+   * @returns {boolean} result of check
    */
-  _addToPool(model, material) {
-    const materialIdx = this._checkExistingMaterial(material);
-    if (materialIdx === this._models.length) { // new model-material pair
-      model.reworkIndices();
-      this._models.push(model);
-      this._materials.push(material);
-    } else { // add model to existing model-material pair
-      const oldModel = this._models[materialIdx];
-      oldModel.concatenate(model);
+  checkExportAbility(mesh) {
+    // check mesh on not being empty
+    if (mesh.geometry.attributes.position.count === 0) {
+      return false;
     }
+    // check type of mesh
+    if (mesh.geometry.isInstancedBufferGeometry && settings.now.zSprites) {
+      logger.warn('Currently we cannot export \'sprites\' modes, like BS, WV, LC. Please turn of settings \'zSprites\' and try again');
+      return false;
+    }
+    if (mesh instanceof ThickLineMesh) {
+      logger.warn('Currently we cannot export Lines mode');
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -84,7 +94,7 @@ export default class FBXInfoExtractor {
     }
     model.setColors(color.array, 0, vertCount, color.itemSize);
     model.setIndices(index.array, 0, index.count);
-    const material = this.collectMaterialInfo(mesh);
+    const material = this._collectMaterialInfo(mesh);
     this._addToPool(model, material);
   }
 
@@ -120,11 +130,11 @@ export default class FBXInfoExtractor {
       sphereColor.fromArray(color.array, colorIdx);
       geo.setColors(sphereColor);
       // add instance to the model
-      this.getSphereInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
+      this._getSphereInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
       objMatrix.multiplyMatrices(matrix, instMatrix);
       model.addInstance(objMatrix, geo);
     }
-    const material = this.collectMaterialInfo(mesh);
+    const material = this._collectMaterialInfo(mesh);
     this._addToPool(model, material);
   }
 
@@ -181,15 +191,45 @@ export default class FBXInfoExtractor {
         geo = oneCCylinder;
       }
       // add instance to the model
-      this.getCylinderInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
+      this._getCylinderInstanceMatrix(mesh.geometry, instanceIndex, instMatrix);
       objMatrix.multiplyMatrices(matrix, instMatrix);
       model.addInstance(objMatrix, geo);
     }
-    const material = this.collectMaterialInfo(mesh);
+    const material = this._collectMaterialInfo(mesh);
     this._addToPool(model, material);
   }
 
-  // FIXME write description
+  /**
+   * Adding model to pool of models or extend existing ones
+   * @param {object} model - model to add
+   * @param {object} material - material to add
+   */
+  _addToPool(model, material) {
+    const materialIdx = this._checkExistingMaterial(material);
+    if (materialIdx === this._models.length) { // new model-material pair
+      model.reworkIndices();
+      this._models.push(model);
+      this._materials.push(material);
+    } else { // add model to existing model-material pair
+      const oldModel = this._models[materialIdx];
+      oldModel.concatenate(model);
+    }
+  }
+
+  /**
+   * Checking if given material already was registered in materials pool (no need to create new one)
+   * @param {object} material - given material
+   * @returns {number} number of model-material pair
+   */
+  _checkExistingMaterial(material) {
+    for (let i = 0; i < this._materials.length; ++i) {
+      if (_.isEqual(material, this._materials[i])) {
+        return i;
+      }
+    }
+    return this._models.length;
+  }
+
   _gatherCylindersColoringInfo(geo) {
     const instCount = geo.maxInstancedCount;
     const color1 = geo.attributes.color.array;
@@ -223,55 +263,13 @@ export default class FBXInfoExtractor {
       this._collectCylindersInfo(mesh);
     }
   }
-  // FIXME reorganize methods order inside the module
-
-  /**
-   * Extract fbx object information from ComplexVisual
-   * @param {object} data - complexVisual to get geometry info from
-   */
-  _extractModelsAndMaterials(data) {
-    const layersOfInterest = new THREE.Layers();
-    layersOfInterest.set(gfxutils.LAYERS.DEFAULT);
-    layersOfInterest.enable(gfxutils.LAYERS.TRANSPARENT);
-    data.traverse((object) => {
-      if (object instanceof THREE.Mesh && object.layers.test(layersOfInterest) && this.checkExportAbility(object)) {
-        if (object.geometry.type === 'InstancedBufferGeometry') {
-          this._collectInstancedGeoInfo(object);
-        } else {
-          this._collectGeoInfo(object);
-        }
-      }
-    });
-  }
-
-  /**
-   * Check ability to export the kind of mesh.
-   * @param {object} mesh - given mesh to check
-   * @returns {boolean} result of check
-   */
-  checkExportAbility(mesh) {
-    // check mesh on not being empty
-    if (mesh.geometry.attributes.position.count === 0) {
-      return false;
-    }
-    // check type of mesh
-    if (mesh.geometry.isInstancedBufferGeometry && settings.now.zSprites) {
-      logger.warn('Currently we cannot export \'sprites\' modes, like BS, WV, LC. Please turn of settings \'zSprites\' and try again');
-      return false;
-    }
-    if (mesh instanceof ThickLineMesh) {
-      logger.warn('Currently we cannot export Lines mode');
-      return false;
-    }
-    return true;
-  }
 
   /**
    * Collect Material info from given mesh.
    * @param {object} mesh - given mesh with material info
    * @returns {object} gathered material
    */
-  collectMaterialInfo(mesh) {
+  _collectMaterialInfo(mesh) {
     const { uberOptions } = mesh.material;
     const lDiffuse = uberOptions.diffuse.toArray();
     const lOpacity = uberOptions.opacity;
@@ -285,7 +283,7 @@ export default class FBXInfoExtractor {
     });
   }
 
-  getCylinderInstanceMatrix(geo, instIdx, matrix) {
+  _getCylinderInstanceMatrix(geo, instIdx, matrix) {
     const matVector1 = geo.attributes.matVector1.array;
     const matVector2 = geo.attributes.matVector2.array;
     const matVector3 = geo.attributes.matVector3.array;
@@ -296,7 +294,7 @@ export default class FBXInfoExtractor {
       0, 0, 0, 1);
   }
 
-  getSphereInstanceMatrix(geo, instIdx, matrix) {
+  _getSphereInstanceMatrix(geo, instIdx, matrix) {
     const { offset } = geo.attributes;
     const idx = instIdx * offset.itemSize;
     const x = offset.array[idx];
