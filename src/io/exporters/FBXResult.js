@@ -219,13 +219,14 @@ ${defaultDefinitions}
     const { models } = this._info;
     for (let i = 0; i < models.length; ++i) {
       const model = models[i];
+      const vertCount = model.getVerticesNumber();
       allModels += `
   Model: "Model::${this._info.name}_${i}", "Mesh" {
     Version: ${modelVersion} 
     ${defaultProperties}
     ${this._verticesIndices(model.positions, model.indices)}
     ${this._normalLayer(model.normals)} 
-    ${this._colorLayer(model.colors)} 
+    ${this._colorLayer(model.colors, vertCount)} 
     ${defaultMaterialLayer}  
     ${defaultLayerBlock}
   }`;
@@ -354,17 +355,18 @@ Connections:  {
 
   /**
    * Adding color layer to resulting file
+   * @param {Float32Array} colorArray attribute
+   * @param {number} vertCount - number of vertices in the model
    * @returns {string} color layer info
    */
-  _colorLayer(colorArray) {
+  _colorLayer(colorArray, vertCount) {
     const layerElementColorNumber = 0;
     const layerElementColorVersion = 101;
     const layerElementColorName = '';
     const colorsStr = this._floatArrayToString(colorArray);
-    const colorSize = this._info.models[0].itemSize.color;
-    const colorIndices = [...Array(colorArray.length / colorSize).keys()]; // FIXME use another way?
     // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
     // As said [..Array(...)] - fastest and easiest way to produce [0, 1, .....] array
+    const colorIndices = [...Array(vertCount).keys()];
     return `
     LayerElementColor: ${layerElementColorNumber} {
       Version: ${layerElementColorVersion}
@@ -378,6 +380,7 @@ Connections:  {
 
   /**
    * Adding normal layer to resulting file
+   * @param {Float32Array} normalArray attribute
    * @returns {string} normal layer info
    */
   _normalLayer(normalArray) {
@@ -400,7 +403,7 @@ Connections:  {
    * Adding vertices and indices to resulting string
    * @return {string} resulting string in FBX notation
    */
-  _verticesIndices(positions, indices) { // FIXME rewrite
+  _verticesIndices(positions, indices) {
     const multiLayer = 0;
     const multiTake = 1;
     const shading = 'Y';

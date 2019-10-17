@@ -53,11 +53,6 @@ export default class FBXModel {
     this.lastNorm = 0;
     this.lastCol = 0;
     this.lastIdx = 0;
-    this.itemSize = {
-      position: FBX_POS_SIZE,
-      normal: FBX_NORM_SIZE,
-      color: FBX_COL_SIZE,
-    };
   }
 
   init(vertsCount, indsCount) {
