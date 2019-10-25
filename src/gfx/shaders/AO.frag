@@ -56,11 +56,10 @@ void main() {
     return;
   }
   //[0, 1] -> [-1, 1]
-  vec4 normalData = texture2D(normalTexture, vUv);
   vec3 normal = (normalData.rgb * 2.0 - 1.0);
   // normalData.a store 1.0 if normal was build for frontfaced surface
   // and 0.0 in other case
-  if (normalData.a < 0.00001) {
+  if (normalData.a < EPSILON) {
     normal *= -1.0;
   }
   // get random vector for sampling sphere rotation

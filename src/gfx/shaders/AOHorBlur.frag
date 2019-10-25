@@ -23,7 +23,7 @@ void main() {
   float pixelDepth = texture2D(depthTexture, vec2(x, y)).x;
   float weightSum = 0.0;
   for (int i = 0; i < MAX_SAMPLES_COUNT; ++i) {
-    if (texture2D(aoMap, vec2(x + samplesOffsets[i] * srcTexelSize.x, y )).a < 0.000000001) {
+    if (texture2D(aoMap, vec2(x + samplesOffsets[i] * srcTexelSize.x, y )).a < EPSILON) {
       continue;
     }
     vec2 samplePos = vec2(x + samplesOffsets[i] * srcTexelSize.x, y);
