@@ -6,6 +6,7 @@ import rollupPluginReplace from 'rollup-plugin-replace';
 import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
 import rollupPluginString from 'rollup-plugin-string';
 
+import path from 'path';
 import version from './tools/version';
 import packageJson from './package.json';
 
@@ -51,11 +52,12 @@ export default {
     rollupPluginBabel({
       runtimeHelpers: true,
       exclude: [
-        './node_modules/**',
+        /node_modules[\\/](?!three)/,
         './vendor/js/**',
         './src/utils/SelectionParser',
         './src/utils/MiewCLIParser.js',
       ],
+      extends: path.join(__dirname, '/.babelrc'),
     }),
 
   ],
