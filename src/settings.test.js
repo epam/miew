@@ -32,7 +32,7 @@ describe('settings', () => {
   describe('.get()', () => {
     it('gets current parameter', () => {
       const testSettings = _.cloneDeep(settings);
-      testSettings.now.modes.VD.kSigma = 1;
+      testSettings.set('modes.VD.kSigma', 1);
       expect(settings.get('modes.VD.kSigma')).to.be.equal(1);
     });
   });
@@ -51,7 +51,7 @@ describe('settings', () => {
   describe('.checkpoint()', () => {
     it('preserves current state', () => {
       const testSettings = _.cloneDeep(settings);
-      testSettings.now.modes.VD.kSigma = 3;
+      testSettings.set('modes.VD.kSigma', 3);
       testSettings.checkpoint();
       expect(testSettings.now.modes.VD.kSigma).to.be.equal(testSettings.old.modes.VD.kSigma);
     });
@@ -60,7 +60,7 @@ describe('settings', () => {
   describe('.changed()', () => {
     it('returns empty list when checkpoint hasn\'t been used', () => {
       const testSettings = _.cloneDeep(settings);
-      testSettings.now.modes.VD.kSigma = 3;
+      testSettings.set('modes.VD.kSigma', 3);
       expect(testSettings.changed().length).to.be.equal(0);
     });
 
@@ -71,8 +71,6 @@ describe('settings', () => {
       testSettings.checkpoint();
       testSettings.set('modes.VD.kSigma', 5);
 
-      const changeParams = {};
-      changeParams.kSigma = testSettings.now.modes.VD.kSigma;
       expect(testSettings.changed()[0]).to.equal('modes.VD.kSigma');
     });
   });
