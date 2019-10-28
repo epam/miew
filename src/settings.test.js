@@ -4,7 +4,7 @@ import settings from './settings';
 import utils from './utils';
 
 
-describe('/settings', () => {
+describe('settings', () => {
   describe('.set()', () => {
     describe('path is a string', () => {
       it('sets chosen parameters with current values', () => {
