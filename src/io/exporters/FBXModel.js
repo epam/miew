@@ -27,18 +27,18 @@ function copyTransformedPoint3(src, srcIdx, dst, dstIdx, opts) {
   dst[dstIdx + 2] = vector4.z;
 }
 
-function setSubArray(srcArray, srcStart, srcStride, count, dstArray, dstStart, dstStride, copyFunctor, opts) {
-  if ((dstArray.length - dstStart) / dstStride < count
-    || (srcArray.length - srcStart) / srcStride < count) {
+function setSubArray(src, dst, count, copyFunctor, functorOpts) {
+  if ((dst.array.length - dst.start) / dst.stride < count
+    || (src.array.length - src.start) / src.stride < count) {
     return; // we've got no space
   }
-  if (srcStride === dstStride) { // stride is the same
-    dstArray.set(srcArray, dstStart);
+  if (src.stride === dst.stride) { // stride is the same
+    dst.array.set(src.array, dst.start);
   } else {
-    let idx = dstStart;
-    let arridx = srcStart;
-    for (let i = 0; i < count; ++i, idx += dstStride, arridx += srcStride) {
-      copyFunctor(srcArray, arridx, dstArray, idx, opts);
+    let idx = dst.start;
+    let arridx = src.start;
+    for (let i = 0; i < count; ++i, idx += dst.stride, arridx += src.stride) {
+      copyFunctor(src.array, arridx, dst.array, idx, functorOpts);
     }
   }
 }
@@ -63,7 +63,17 @@ export default class FBXModel {
   }
 
   setPositions(array, start, count, stride) {
-    setSubArray(array, start, stride, count, this.positions, this.lastPos, FBX_POS_SIZE, copyFbxPoint3);
+    const src = {
+      array,
+      start,
+      stride,
+    };
+    const dst = {
+      array: this.positions,
+      start: this.lastPos,
+      stride: FBX_POS_SIZE,
+    };
+    setSubArray(src, dst, count, copyFbxPoint3);
     this.lastPos += count * FBX_POS_SIZE;
   }
 
@@ -78,7 +88,17 @@ export default class FBXModel {
   }
 
   setNormals(array, start, count, stride) {
-    setSubArray(array, start, stride, count, this.normals, this.lastNorm, FBX_NORM_SIZE, copyFbxPoint3);
+    const src = {
+      array,
+      start,
+      stride,
+    };
+    const dst = {
+      array: this.normals,
+      start: this.lastNorm,
+      stride: FBX_NORM_SIZE,
+    };
+    setSubArray(src, dst, count, copyFbxPoint3);
     this.lastNorm += count * FBX_NORM_SIZE;
   }
 
@@ -93,7 +113,17 @@ export default class FBXModel {
   }
 
   setColors(array, start, count, stride) {
-    setSubArray(array, start, stride, count, this.colors, this.lastCol, FBX_COL_SIZE, copyFbxPoint4, 1);
+    const src = {
+      array,
+      start,
+      stride,
+    };
+    const dst = {
+      array: this.colors,
+      start: this.lastCol,
+      stride: FBX_COL_SIZE,
+    };
+    setSubArray(src, dst, count, copyFbxPoint4, 1);
     this.lastCol += count * FBX_COL_SIZE;
   }
 

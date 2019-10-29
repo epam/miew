@@ -2,7 +2,6 @@ import _ from 'lodash';
 import * as THREE from 'three';
 
 import gfxutils from '../../gfx/gfxutils';
-import settings from '../../settings';
 import logger from '../../utils/logger';
 
 import fbxgeo from './FBXGeometry';
