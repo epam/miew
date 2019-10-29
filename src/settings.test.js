@@ -13,12 +13,15 @@ describe('settings', () => {
   describe('.set()', () => {
     it('accepts a string path', () => {
       const s = new Settings();
+
       s.set('modes.VD.kSigma', 3);
+
       expect(s.now.modes.VD.kSigma).to.be.equal(3);
     });
 
     it('accepts an object', () => {
       const s = new Settings();
+
       s.set({
         modes: {
           VD: {
@@ -26,13 +29,16 @@ describe('settings', () => {
           },
         },
       });
+
       expect(s.now.modes.VD.kSigma).to.be.equal(3);
     });
 
     it('ignores incorrect path', () => {
       const s = new Settings();
       const prop = 'super.duper';
+
       s.set(prop, 1);
+
       expect(s.now).to.not.have.property(prop);
     });
 
@@ -40,8 +46,10 @@ describe('settings', () => {
       const prop = 'modes.VD.kSigma';
       const callback = sinon.spy();
       const s = new Settings();
+
       s.addEventListener(`change:${prop}`, callback);
       s.set(prop, 3);
+
       expect(callback).to.be.called();
     });
   });
@@ -49,7 +57,9 @@ describe('settings', () => {
   describe('.get()', () => {
     it('gets current parameter', () => {
       const s = new Settings();
+
       s.set('modes.VD.kSigma', 1);
+
       expect(settings.get('modes.VD.kSigma')).to.be.equal(1);
     });
   });
@@ -57,8 +67,10 @@ describe('settings', () => {
   describe('.reset()', () => {
     it('resets all parameters to default values', () => {
       const s = new Settings();
+
       s.set('modes.VD.kSigma', 3);
       s.reset();
+
       expect(s.now).to.be.eql(s.defaults);
     });
   });
@@ -66,8 +78,10 @@ describe('settings', () => {
   describe('.checkpoint()', () => {
     it('preserves current state in settings.old', () => {
       const s = new Settings();
+
       s.set('modes.VD.kSigma', 3);
       s.checkpoint();
+
       expect(s.now).to.be.eql(s.old);
     });
   });
@@ -75,15 +89,19 @@ describe('settings', () => {
   describe('.changed()', () => {
     it('returns empty changed list when checkpoint hasn\'t been used', () => {
       const s = new Settings();
+
       s.set('modes.VD.kSigma', 3);
+
       expect(s.changed()).to.be.empty();
     });
 
     it('returns list of changed parameters since last checkpoint', () => {
       const s = new Settings();
+
       s.set('modes.VD.kSigma', 3);
       s.checkpoint();
       s.set('modes.VD.kSigma', 5);
+
       expect(s.changed()[0]).to.equal('modes.VD.kSigma');
     });
   });
@@ -98,7 +116,9 @@ describe('settings', () => {
         },
       };
       const s = new Settings();
+
       s.applyDiffs(diffs);
+
       expect(s.now.modes.VD.kSigma).to.equal(diffs.modes.VD.kSigma);
     });
 
@@ -112,6 +132,7 @@ describe('settings', () => {
         VERSION: -1,
       };
       const s = new Settings();
+
       expect(() => {
         s.applyDiffs(diffs);
       }).to.throw('Settings version does not match!');
@@ -128,7 +149,9 @@ describe('settings', () => {
           },
         },
       };
+
       s.set(diffs);
+
       expect(s.getDiffs(false)).to.eql(diffs);
     });
   });
@@ -143,9 +166,10 @@ describe('settings', () => {
         },
       };
       const pluginName = 'testPlugin';
-
       const s = new Settings();
+
       s.setPluginOpts(pluginName, testPlugin);
+
       expect(s.now.plugins[pluginName]).to.eql(testPlugin);
     });
   });
