@@ -8,6 +8,7 @@ import logger from '../../utils/logger';
 import fbxgeo from './FBXGeometry';
 import FBXModel from './FBXModel';
 import ThickLineMesh from '../../gfx/meshes/ThickLineMesh';
+import ZSpriteMesh from '../../gfx/meshes/ZSpriteMesh';
 
 export default class FBXInfoExtractor {
   constructor() {
@@ -55,7 +56,8 @@ export default class FBXInfoExtractor {
       return false;
     }
     // check type of mesh
-    if (mesh.geometry.isInstancedBufferGeometry && settings.now.zSprites) {
+    // if (mesh.geometry.isInstancedBufferGeometry && settings.now.zSprites) {
+    if (mesh instanceof ZSpriteMesh) {
       logger.warn('Currently we cannot export \'sprites\' modes, like BS, WV, LC. Please turn of settings \'zSprites\' and try again');
       return false;
     }
