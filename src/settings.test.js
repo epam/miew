@@ -1,27 +1,36 @@
-import { expect } from 'chai';
-import _ from 'lodash';
+import chai, { expect } from 'chai';
+import dirtyChai from 'dirty-chai';
 import settings from './settings';
-import utils from './utils';
 
+chai.use(dirtyChai);
+
+const Settings = settings.constructor;
 
 describe('settings', () => {
   describe('.set()', () => {
     it('accepts a string path', () => {
-      const testSettings = _.cloneDeep(settings);
-      testSettings.set('modes.VD.kSigma', 3);
-      expect(testSettings.now.modes.VD.kSigma).to.be.equal(3);
+      const s = new Settings();
+      s.set('modes.VD.kSigma', 3);
+      expect(s.now.modes.VD.kSigma).to.be.equal(3);
     });
 
     it('accepts an object', () => {
-      const testSettings = _.cloneDeep(settings);
-      const testDiffs = _.cloneDeep(settings);
-      testDiffs.set('modes.VD.kSigma', 3);
-      testSettings.set(testDiffs.now);
-      expect(testSettings.now.modes.VD.kSigma).to.be.equal(3);
+      const s = new Settings();
+      s.set({
+        modes: {
+          VD: {
+            kSigma: 3,
+          },
+        },
+      });
+      expect(s.now.modes.VD.kSigma).to.be.equal(3);
     });
 
     it('ignores incorrect path', () => {
-      // TODO
+      const s = new Settings();
+      const prop = 'super.duper';
+      s.set(prop, 1);
+      expect(s.now).to.not.have.property(prop);
     });
 
     it('notifies about changes', () => {
@@ -31,81 +40,89 @@ describe('settings', () => {
 
   describe('.get()', () => {
     it('gets current parameter', () => {
-      const testSettings = _.cloneDeep(settings);
-      testSettings.set('modes.VD.kSigma', 1);
+      const s = new Settings();
+      s.set('modes.VD.kSigma', 1);
       expect(settings.get('modes.VD.kSigma')).to.be.equal(1);
     });
   });
 
   describe('.reset()', () => {
     it('resets all parameters to default values', () => {
-      const testSettings = _.cloneDeep(settings);
-
-      testSettings.set('modes.VD.kSigma', 3);
-
-      testSettings.reset();
-      expect(testSettings).to.be.eql(settings);
+      const s = new Settings();
+      const sDefault = new Settings();
+      s.set('modes.VD.kSigma', 3);
+      s.reset();
+      expect(s).to.be.eql(sDefault);
     });
   });
 
   describe('.checkpoint()', () => {
-    it('preserves current state', () => {
-      const testSettings = _.cloneDeep(settings);
-      testSettings.set('modes.VD.kSigma', 3);
-      testSettings.checkpoint();
-      expect(testSettings.now.modes.VD.kSigma).to.be.equal(testSettings.old.modes.VD.kSigma);
+    it('preserves current state in settings.old', () => {
+      const s = new Settings();
+      s.set('modes.VD.kSigma', 3);
+      s.checkpoint();
+      expect(s.now).to.be.eql(s.old);
     });
   });
 
   describe('.changed()', () => {
-    it('returns empty list when checkpoint hasn\'t been used', () => {
-      const testSettings = _.cloneDeep(settings);
-      testSettings.set('modes.VD.kSigma', 3);
-      expect(testSettings.changed().length).to.be.equal(0);
+    it('returns empty changed list when checkpoint hasn\'t been used', () => {
+      const s = new Settings();
+      s.set('modes.VD.kSigma', 3);
+      expect(s.changed()).to.be.empty();
     });
 
     it('returns list of changed parameters since last checkpoint', () => {
-      const testSettings = _.cloneDeep(settings);
-
-      testSettings.set('modes.VD.kSigma', 3);
-      testSettings.checkpoint();
-      testSettings.set('modes.VD.kSigma', 5);
-
-      expect(testSettings.changed()[0]).to.equal('modes.VD.kSigma');
+      const s = new Settings();
+      s.set('modes.VD.kSigma', 3);
+      s.checkpoint();
+      s.set('modes.VD.kSigma', 5);
+      expect(s.changed()[0]).to.equal('modes.VD.kSigma');
     });
   });
 
   describe('.applyDiffs()', () => {
     it('overwrites settings with the diffs', () => {
-      const testDiffs = _.cloneDeep(settings);
-      testDiffs.set('modes.VD.kSigma', 3);
-
-      const testSettings = _.cloneDeep(settings);
-
-      testSettings.applyDiffs(testDiffs.now);
-      expect(testSettings.now.modes.VD.kSigma).to.equal(testDiffs.now.modes.VD.kSigma);
+      const diffs = {
+        modes: {
+          VD: {
+            kSigma: 3,
+          },
+        },
+      };
+      const s = new Settings();
+      s.applyDiffs(diffs);
+      expect(s.now.modes.VD.kSigma).to.equal(diffs.modes.VD.kSigma);
     });
 
     it('throws an error if versions do not match', () => {
-      const testSettings = _.cloneDeep(settings);
-      testSettings.set('modes.VD.kSigma', 3);
-      testSettings.now.VERSION = -1;
-
+      const diffs = {
+        modes: {
+          VD: {
+            kSigma: 3,
+          },
+        },
+        VERSION: -1,
+      };
+      const s = new Settings();
       expect(() => {
-        testSettings.applyDiffs(testSettings.now);
+        s.applyDiffs(diffs);
       }).to.throw('Settings version does not match!');
     });
   });
 
   describe('.getDiffs()', () => {
     it('returns a difference between current and default settings', () => {
-      const testSettings = _.cloneDeep(settings);
-      testSettings.set('modes.VD.kSigma', 3);
-      testSettings.VERSION = 0;
-
-      const diffs = utils.objectsDiff(testSettings.now, testSettings.defaults);
-      diffs.VERSION = testSettings.VERSION;
-      expect(testSettings.getDiffs(true)).to.eql(diffs);
+      const s = new Settings();
+      const diffs = {
+        modes: {
+          VD: {
+            kSigma: 3,
+          },
+        },
+      };
+      s.set(diffs);
+      expect(s.getDiffs(false)).to.eql(diffs);
     });
   });
 
@@ -120,9 +137,9 @@ describe('settings', () => {
       };
       const pluginName = 'testPlugin';
 
-      const testSettings = _.cloneDeep(settings);
-      testSettings.setPluginOpts(pluginName, testPlugin);
-      expect(testSettings.now.plugins[pluginName]).to.eql(testPlugin);
+      const s = new Settings();
+      s.setPluginOpts(pluginName, testPlugin);
+      expect(s.now.plugins[pluginName]).to.eql(testPlugin);
     });
   });
 });
