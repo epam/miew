@@ -1,8 +1,11 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
+import sinon from 'sinon';
+import sinonChai from 'sinon-chai';
 import settings from './settings';
 
 chai.use(dirtyChai);
+chai.use(sinonChai);
 
 const Settings = settings.constructor;
 
@@ -34,7 +37,12 @@ describe('settings', () => {
     });
 
     it('notifies about changes', () => {
-      // TODO
+      const prop = 'modes.VD.kSigma';
+      const callback = sinon.spy();
+      const s = new Settings();
+      s.addEventListener(`change:${prop}`, callback);
+      s.set(prop, 3);
+      expect(callback).to.be.called();
     });
   });
 
@@ -49,10 +57,9 @@ describe('settings', () => {
   describe('.reset()', () => {
     it('resets all parameters to default values', () => {
       const s = new Settings();
-      const sDefault = new Settings();
       s.set('modes.VD.kSigma', 3);
       s.reset();
-      expect(s).to.be.eql(sDefault);
+      expect(s.now).to.be.eql(s.defaults);
     });
   });
 
