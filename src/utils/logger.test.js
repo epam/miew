@@ -10,7 +10,7 @@ chai.use(sinonChai);
 describe('utils/logger', () => {
   describe('.instantiate()', () => {
     it('creates different instance', () => {
-      expect(logger.instantiate()).to.not.be.equal(logger);
+      expect(logger.instantiate()).to.not.equal(logger);
     });
   });
 
@@ -40,7 +40,7 @@ describe('utils/logger', () => {
 
       for (let i = 0, n = levels.length; i < n; ++i) {
         log.level = levels[i];
-        expect(log.level).to.be.equal(levels[i]);
+        expect(log.level).to.equal(levels[i]);
       }
     });
   });

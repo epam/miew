@@ -16,7 +16,7 @@ describe('settings', () => {
 
       s.set('modes.VD.kSigma', 3);
 
-      expect(s.now.modes.VD.kSigma).to.be.equal(3);
+      expect(s.now.modes.VD.kSigma).to.equal(3);
     });
 
     it('accepts an object', () => {
@@ -30,7 +30,7 @@ describe('settings', () => {
         },
       });
 
-      expect(s.now.modes.VD.kSigma).to.be.equal(3);
+      expect(s.now.modes.VD.kSigma).to.equal(3);
     });
 
     it('ignores incorrect path', () => {
@@ -60,7 +60,7 @@ describe('settings', () => {
 
       s.set('modes.VD.kSigma', 1);
 
-      expect(settings.get('modes.VD.kSigma')).to.be.equal(1);
+      expect(settings.get('modes.VD.kSigma')).to.equal(1);
     });
   });
 
@@ -71,7 +71,7 @@ describe('settings', () => {
       s.set('modes.VD.kSigma', 3);
       s.reset();
 
-      expect(s.now).to.be.eql(s.defaults);
+      expect(s.now).to.deep.equal(s.defaults);
     });
   });
 
@@ -80,9 +80,9 @@ describe('settings', () => {
       const s = new Settings();
 
       s.set('modes.VD.kSigma', 3);
+      expect(s.now).to.not.deep.equal(s.old);
       s.checkpoint();
-
-      expect(s.now).to.be.eql(s.old);
+      expect(s.now).to.deep.equal(s.old);
     });
   });
 
@@ -102,7 +102,7 @@ describe('settings', () => {
       s.checkpoint();
       s.set('modes.VD.kSigma', 5);
 
-      expect(s.changed()[0]).to.equal('modes.VD.kSigma');
+      expect(s.changed()).to.deep.equal(['modes.VD.kSigma']);
     });
   });
 
@@ -152,7 +152,7 @@ describe('settings', () => {
 
       s.set(diffs);
 
-      expect(s.getDiffs(false)).to.eql(diffs);
+      expect(s.getDiffs(false)).to.deep.equal(diffs);
     });
   });
 
@@ -170,7 +170,7 @@ describe('settings', () => {
 
       s.setPluginOpts(pluginName, testPlugin);
 
-      expect(s.now.plugins[pluginName]).to.eql(testPlugin);
+      expect(s.now.plugins[pluginName]).to.deep.equal(testPlugin);
     });
   });
 });
