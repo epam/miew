@@ -15,7 +15,7 @@ describe('utils/logger', () => {
   });
 
   describe('.level', () => {
-    it('does not throw error when correct level is passed', () => {
+    it('accepts valid level from Logger.levels()', () => {
       const log = logger.instantiate();
       const levels = log.levels();
 
@@ -26,7 +26,7 @@ describe('utils/logger', () => {
       }).to.not.throw(Error);
     });
 
-    it('throws error when incorrect level name is assigned', () => {
+    it('throws an error when incorrect level name is assigned', () => {
       const log = logger.instantiate();
 
       expect(() => {
@@ -69,7 +69,7 @@ describe('utils/logger', () => {
       }
     });
 
-    for (let i = 0; i < logger.levels().length; i++) {
+    for (let i = 0, n = logger.levels().length; i < n; i++) {
       it(`passes message as an event field in ${logger.levels()[i]} mode`, () => {
         const log = logger.instantiate();
         const levels = log.levels();

@@ -42,7 +42,7 @@ Logger.prototype.instantiate = function () {
   return new Logger();
 };
 
-function isNumber(variable) {
+function verify(variable) {
   if (!_.isNumber(variable)) {
     throw new Error('Wrong log level specified!');
   }
@@ -59,7 +59,7 @@ Object.defineProperty(Logger.prototype, 'level', {
   },
   set(strValue) {
     const lvlVal = logLevels[strValue];
-    isNumber(lvlVal);
+    verify(lvlVal);
     this._level = lvlVal;
   },
 });
@@ -80,7 +80,7 @@ Logger.prototype.levels = function () {
  */
 Logger.prototype.message = function (level, message) {
   const lvlVal = logLevels[level];
-  isNumber(lvlVal);
+  verify(lvlVal);
   this._message(lvlVal, message);
 };
 
