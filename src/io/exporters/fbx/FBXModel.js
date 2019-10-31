@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import utils from '../../utils';
+import utils from '../../../utils';
 
 const FBX_POS_SIZE = 3;
 const FBX_NORM_SIZE = 3;

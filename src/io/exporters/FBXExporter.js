@@ -1,6 +1,6 @@
 import Exporter from './Exporter';
-import FBXInfoExtractor from './FBXInfoExtractor';
-import FBXResult from './FBXResult';
+import FBXInfoExtractor from './fbx/FBXInfoExtractor';
+import FBXResult from './fbx/FBXResult';
 import ComplexVisual from '../../ComplexVisual';
 
 export default class FBXExporter extends Exporter {

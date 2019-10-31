@@ -1,15 +1,15 @@
 import _ from 'lodash';
 import * as THREE from 'three';
 
-import gfxutils from '../../gfx/gfxutils';
-import logger from '../../utils/logger';
+import gfxutils from '../../../gfx/gfxutils';
+import logger from '../../../utils/logger';
 
 import fbxgeo from './FBXGeometry';
 import FBXModel from './FBXModel';
-import ThickLineMesh from '../../gfx/meshes/ThickLineMesh';
-import ZSpriteMesh from '../../gfx/meshes/ZSpriteMesh';
-import InstancedSpheresGeometry from '../../gfx/geometries/InstancedSpheresGeometry';
-import Instanced2CCylindersGeometry from '../../gfx/geometries/Instanced2CCylindersGeometry';
+import ThickLineMesh from '../../../gfx/meshes/ThickLineMesh';
+import ZSpriteMesh from '../../../gfx/meshes/ZSpriteMesh';
+import InstancedSpheresGeometry from '../../../gfx/geometries/InstancedSpheresGeometry';
+import Instanced2CCylindersGeometry from '../../../gfx/geometries/Instanced2CCylindersGeometry';
 
 export default class FBXInfoExtractor {
   constructor() {
