@@ -1,6 +1,7 @@
 import Exporter from './Exporter';
 import FBXInfoExtractor from './FBXInfoExtractor';
 import FBXResult from './FBXResult';
+import ComplexVisual from '../../ComplexVisual';
 
 /**
  * FBX file format exporter.
@@ -35,3 +36,4 @@ export default class FBXExporter extends Exporter {
 }
 
 FBXExporter.formats = ['fbx'];
+FBXExporter.SourceClass = ComplexVisual;

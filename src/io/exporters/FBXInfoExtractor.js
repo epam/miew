@@ -8,6 +8,8 @@ import fbxgeo from './FBXGeometry';
 import FBXModel from './FBXModel';
 import ThickLineMesh from '../../gfx/meshes/ThickLineMesh';
 import ZSpriteMesh from '../../gfx/meshes/ZSpriteMesh';
+import InstancedSpheresGeometry from '../../gfx/geometries/InstancedSpheresGeometry';
+import Instanced2CCylindersGeometry from '../../gfx/geometries/Instanced2CCylindersGeometry';
 
 export default class FBXInfoExtractor {
   constructor() {
@@ -258,9 +260,9 @@ export default class FBXInfoExtractor {
    * @param {object} mesh - given mesh with instanced something (spheres or cylinders)
    */
   _collectInstancedGeoInfo(mesh) {
-    if (mesh.geometry.constructor.name.includes('Spheres')) {
+    if (mesh.geometry instanceof InstancedSpheresGeometry) {
       this._collectSpheresInfo(mesh);
-    } else if (mesh.geometry.constructor.name.includes('Cylinder')) {
+    } else if (mesh.geometry instanceof Instanced2CCylindersGeometry) {
       this._collectCylindersInfo(mesh);
     }
   }

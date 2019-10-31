@@ -10,6 +10,7 @@ import settings from './settings';
 import chem from './chem';
 import Visual from './Visual';
 import ComplexVisual from './ComplexVisual';
+import Complex from './chem/Complex';
 import VolumeVisual from './VolumeVisual';
 import GfxProfiler from './gfx/GfxProfiler';
 import io from './io/io';
@@ -1661,9 +1662,9 @@ Miew.prototype._export = function (format) {
 
   if (this._visuals[this._curVisualName] instanceof ComplexVisual) {
     let dataSource = null;
-    if (TheExporter.name === 'FBXExporter') {
+    if (TheExporter.SourceClass === ComplexVisual) {
       dataSource = this._visuals[this._curVisualName];
-    } else {
+    } else if (TheExporter.SourceClass === Complex) {
       dataSource = this._visuals[this._curVisualName]._complex;
     }
     const exporter = new TheExporter(dataSource, { binary: true });
