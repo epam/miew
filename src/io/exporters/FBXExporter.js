@@ -3,14 +3,6 @@ import FBXInfoExtractor from './FBXInfoExtractor';
 import FBXResult from './FBXResult';
 import ComplexVisual from '../../ComplexVisual';
 
-/**
- * FBX file format exporter.
- *
- * @param {}     -
- *
- * @exports FBXExporter
- * @constructor
- */
 export default class FBXExporter extends Exporter {
   constructor(source, options) {
     super(source, options);
