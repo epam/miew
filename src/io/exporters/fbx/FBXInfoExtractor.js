@@ -4,12 +4,13 @@ import * as THREE from 'three';
 import gfxutils from '../../../gfx/gfxutils';
 import logger from '../../../utils/logger';
 
-import fbxgeo from './FBXGeometry';
 import FBXModel from './FBXModel';
 import ThickLineMesh from '../../../gfx/meshes/ThickLineMesh';
 import ZSpriteMesh from '../../../gfx/meshes/ZSpriteMesh';
 import InstancedSpheresGeometry from '../../../gfx/geometries/InstancedSpheresGeometry';
 import Instanced2CCylindersGeometry from '../../../gfx/geometries/Instanced2CCylindersGeometry';
+import FBX1CGeometry from './FBX1CGeometry';
+import FBX2CCylinder from './FBX2CCylinder';
 
 export default class FBXInfoExtractor {
   constructor() {
@@ -122,7 +123,7 @@ export default class FBXInfoExtractor {
     const vertCount = position.count;
     const indsCount = index.count;
     model.init(instCount * vertCount, instCount * indsCount);
-    const geo = new fbxgeo.OneColorGeo();
+    const geo = new FBX1CGeometry();
     geo.init(mesh.geometry);
     const instMatrix = new THREE.Matrix4();
     const objMatrix = new THREE.Matrix4();
@@ -161,12 +162,12 @@ export default class FBXInfoExtractor {
 
     const model = new FBXModel();
     const instCount = mesh.geometry.maxInstancedCount;
-    const oneCCylinder = new fbxgeo.OneColorGeo();
+    const oneCCylinder = new FBX1CGeometry();
     oneCCylinder.init(mesh.geometry);
     const splittingInfo = this._gatherCylindersColoringInfo(mesh.geometry);
     let twoCCylinder = null;
     if (splittingInfo.needToSplit > 0) {
-      twoCCylinder = new fbxgeo.TwoColoredCylinder();
+      twoCCylinder = new FBX2CCylinder();
       twoCCylinder.init(mesh.geometry, splittingInfo);
     }
     const additionalVertsCount = splittingInfo.addPerCylinder * splittingInfo.needToSplit;
