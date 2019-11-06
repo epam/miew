@@ -219,7 +219,7 @@ ${defaultDefinitions}
     const { models } = this._info;
     for (let i = 0; i < models.length; ++i) {
       const model = models[i];
-      const vertCount = model.getVerticesNumber();
+      const vertCount = model.verticesCount;
       allModels += `
   Model: "Model::${this._info.name}_${i}", "Mesh" {
     Version: ${modelVersion} 

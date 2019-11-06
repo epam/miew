@@ -489,14 +489,37 @@ function correctSelectorIdentifier(value) {
 
 /**
  * Concatenates two TypedArray. Doesn't check null refs o type equality
+ * Attention! It must be use very rarely because requires memory reallocation every time. Use MergeTypedArraysUnsafe to
+ * unite array of subarrays.
  * @param{TypedArray} first  - destination array
  * @param{TypedArray} second - source array
  * @returns{TypedArray} resulting concatenated array
  */
-function ConcatTypedArraysUnsafe(first, second) {
+function concatTypedArraysUnsafe(first, second) {
   const result = new first.constructor(first.length + second.length);
   result.set(first);
   result.set(second, first.length);
+  return result;
+}
+
+/**
+ * Merges array of TypedArray into TypedArray. Doesn't check null refs o type equality
+ * @param{array} array  - source array of subarrays
+ * @returns{TypedArray} resulting merged array
+ */
+function mergeTypedArraysUnsafe(array) {
+  if (array.length <= 0) {
+    return null;
+  }
+  // count the size
+  const size = array.reduce((acc, cur) => acc + cur.length, 0);
+  // create combined array
+  const result = new array[0].constructor(size);
+  for (let i = 0, start = 0; i < array.length; i++) {
+    const count = array[i].length;
+    result.set(array[i], start);
+    start += count;
+  }
   return result;
 }
 
@@ -536,5 +559,6 @@ export default {
   getFileExtension,
   splitFileName,
   download,
-  ConcatTypedArraysUnsafe,
+  concatTypedArraysUnsafe,
+  mergeTypedArraysUnsafe,
 };

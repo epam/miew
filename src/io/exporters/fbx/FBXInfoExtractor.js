@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import * as THREE from 'three';
 
+import utils from '../../../utils';
 import gfxutils from '../../../gfx/gfxutils';
 import logger from '../../../utils/logger';
 
@@ -21,9 +22,12 @@ export default class FBXInfoExtractor {
   process(data) {
     this._extractModelsAndMaterials(data);
 
+
+    const models = this._flattenModels();
+
     return {
       name: data.name,
-      models: this._models,
+      models,
       materials: this._materials,
     };
   }
@@ -45,6 +49,64 @@ export default class FBXInfoExtractor {
         }
       }
     });
+  }
+
+  /**
+   * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
+   * basically, every triangle in Miew has been represented hat way (e.g.) : 0,1,7, but we must (for FBX) rework that
+   * into: 0,1,-8.
+   * @param {array} indices - belongs to [0, maxVertIndex]
+   */
+  _reworkIndices(indices) {
+    const faceSize = 3;
+    for (let i = faceSize - 1; i < indices.length; i += faceSize) {
+      indices[i] *= -1;
+      indices[i]--;
+    }
+  }
+
+  /**
+   * Combine geometry from several models having the same material into one Model and finally prepare indices
+    * @returns {array} models, combined by material id
+   */
+  _flattenModels() {
+    let overallVertsCount = 0;
+    function shift(x) {
+      return x + overallVertsCount;
+    }
+    const combined = [];
+    // flatten models geometry
+    for (let i = 0, n = this._models.length; i < n; i++) {
+      const models = this._models[i];
+      let indices = [];
+      let positions = [];
+      let normals = [];
+      let colors = [];
+      // reorganize every attributes as array of arrays
+      overallVertsCount = 0;
+      for (let j = 0; j < models.length; j++) {
+        const m = models[j];
+        indices.push(m.indices.map(shift));
+        overallVertsCount += m.getVerticesNumber();
+        positions.push(m.positions);
+        normals.push(m.normals);
+        colors.push(m.colors);
+      }
+      // join all subarrays into one
+      indices = utils.mergeTypedArraysUnsafe(indices);
+      this._reworkIndices(indices);
+      positions = utils.mergeTypedArraysUnsafe(positions);
+      normals = utils.mergeTypedArraysUnsafe(normals);
+      colors = utils.mergeTypedArraysUnsafe(colors);
+      combined.push({
+        indices,
+        positions,
+        normals,
+        colors,
+        verticesCount: overallVertsCount,
+      });
+    }
+    return combined;
   }
 
   /**
@@ -71,7 +133,7 @@ export default class FBXInfoExtractor {
   }
 
   /**
-   * Save geometry info from mesh
+   * Save geometry info from common mesh, like Surface or Cartoon
    */
   _collectGeoInfo(mesh) {
     const {
@@ -210,13 +272,12 @@ export default class FBXInfoExtractor {
    */
   _addToPool(model, material) {
     const materialIdx = this._checkExistingMaterial(material);
-    if (materialIdx === this._models.length) { // new model-material pair
-      model.reworkIndices();
-      this._models.push(model);
+    if (materialIdx < 0) { // new model-material pair
+      this._models.push([model]);
       this._materials.push(material);
     } else { // add model to existing model-material pair
-      const oldModel = this._models[materialIdx];
-      oldModel.concatenate(model);
+      const models = this._models[materialIdx];
+      models.push(model);
     }
   }
 
@@ -226,12 +287,7 @@ export default class FBXInfoExtractor {
    * @returns {number} number of model-material pair
    */
   _checkExistingMaterial(material) {
-    for (let i = 0; i < this._materials.length; ++i) {
-      if (_.isEqual(material, this._materials[i])) {
-        return i;
-      }
-    }
-    return this._models.length;
+    return _.findIndex(this._materials, (m) => _.isEqual(m, material));
   }
 
   _gatherCylindersColoringInfo(geo) {

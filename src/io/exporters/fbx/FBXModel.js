@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import utils from '../../../utils';
 
 const FBX_POS_SIZE = 3;
 const FBX_NORM_SIZE = 3;
@@ -150,36 +149,5 @@ export default class FBXModel {
     this.setTransformedPositions(geo.positions, 0, geo.vertsCount, size.position, matrix);
     this.setTransformedNormals(geo.normals, 0, geo.vertsCount, size.normal, matrix);
     this.setColors(geo.colors, 0, geo.vertsCount, size.color);
-  }
-
-  concatenate(model) {
-    // store number of vertices before addition
-    const currentCount = this.getVerticesNumber();
-    // add vertices by extending existed arrays
-    this.positions = utils.ConcatTypedArraysUnsafe(this.positions, model.positions);
-    this.normals = utils.ConcatTypedArraysUnsafe(this.normals, model.normals);
-    this.colors = utils.ConcatTypedArraysUnsafe(this.colors, model.colors);
-    // shift indices due to already existed verts in model and add them
-    model.indices = model.indices.map((x) => x + currentCount);
-    model.reworkIndices();
-    this.indices = utils.ConcatTypedArraysUnsafe(this.indices, model.indices);
-    // update lasts
-    this.lastPos = this.positions.length;
-    this.lastNorm = this.normals.length;
-    this.lastCol = this.colors.length;
-    this.lastIdx = this.indices.length;
-  }
-
-  /**
-   * Reworking indices buffer, see https://banexdevblog.wordpress.com/2014/06/23/a-quick-tutorial-about-the-fbx-ascii-format/
-   * basically, every triangle in Miew has been represented hat way (e.g.) : 0,1,7, but we must (for FBX) rework that
-   * into: 0,1,-8.
-   */
-  reworkIndices() {
-    const faceSize = 3;
-    for (let i = faceSize - 1; i < this.indices.length; i += faceSize) {
-      this.indices[i] *= -1;
-      this.indices[i]--;
-    }
   }
 }
