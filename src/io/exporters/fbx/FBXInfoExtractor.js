@@ -327,19 +327,15 @@ export default class FBXInfoExtractor {
   /**
    * Collect Material info from given mesh.
    * @param {object} mesh - given mesh with material info
-   * @returns {object} gathered material
+   * @returns {object} material
    */
   _collectMaterialInfo(mesh) {
     const { uberOptions } = mesh.material;
-    const lDiffuse = uberOptions.diffuse.toArray();
-    const lOpacity = uberOptions.opacity;
-    const lShininess = uberOptions.shininess;
-    const lSpecular = uberOptions.specular.toArray();
     return ({
-      diffuse: lDiffuse,
-      opacity: lOpacity,
-      shininess: lShininess,
-      specular: lSpecular,
+      diffuse: uberOptions.diffuse.toArray(),
+      opacity: uberOptions.opacity,
+      shininess: uberOptions.shininess,
+      specular: uberOptions.specular.toArray(),
     });
   }
 
