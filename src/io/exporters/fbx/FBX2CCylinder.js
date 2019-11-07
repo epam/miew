@@ -77,6 +77,20 @@ export default class FBX2CCylinder extends FBXGeometry {
 
   /**
    * Set defined colors: (first part + bottom cap), (second part + top cap)
+   * @param {number} start - start color index
+   * @param {number} end - start color index
+   * @param {array} array - array of colors
+   * @param {array} color - color value components
+   */
+  _setColorRange(start, end, array, color) {
+    const colorSize = color.length;
+    for (let i = start; i < end; i += colorSize) {
+      array.set(color, i);
+    }
+  }
+
+  /**
+   * Set defined colors: (first part + bottom cap), (second part + top cap)
    * @param {Object} color1 - THREE.Color.
    * @param {Object} color2 - THREE.Color.
    */
@@ -84,20 +98,14 @@ export default class FBX2CCylinder extends FBXGeometry {
     const colorSize = this.itemSize.color;
     const part1End = this._cutRawEnd * colorSize;
     const part2End = part1End * 2;
-    const capSize = (this._facesPerSlice + 1) * colorSize;
-    let color = null;
-    let offset = 0;
-    for (let i = 0, l = this.colors.length; i < l; i += colorSize) {
-      if (i < part1End) { // first part
-        color = color1;
-      } else if (i < part2End + capSize) { // second part + top cap
-        color = color2;
-      } else { // bottom cap
-        color = color1;
-      }
-      this.colors[offset++] = color.r;
-      this.colors[offset++] = color.g;
-      this.colors[offset++] = color.b;
+    this._setColorRange(0, part1End, this.colors, color1.toArray());
+    this._setColorRange(part1End, part2End, this.colors, color2.toArray());
+    if (part2End < this.colors.length) { // cylinder has caps, lets paint them
+      const capSize = (this._facesPerSlice + 1) * colorSize;
+      const cap1End = part2End + capSize;
+      this._setColorRange(part2End, cap1End, this.colors, color2.toArray());
+      const cap2End = cap1End + capSize; // should be equal to this.colors.length;
+      this._setColorRange(cap1End, cap2End, this.colors, color1.toArray());
     }
   }
 }
