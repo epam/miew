@@ -11,7 +11,7 @@ import 'jquery.terminal';
 const {
   chem: { selectors },
   io: { parsers },
-  gfx: { Representation, fbxExport },
+  gfx: { Representation },
   modes,
   colorers,
   palettes,
@@ -1492,7 +1492,6 @@ Menu.prototype._initToolsPanel = function () {
 
   $(`${self._menuId} [data-toggle=miew-menu-tools]`).on('click', function () {
     const type = this.getAttribute('data-value');
-    let visual;
     switch (type) {
       case 'dssp':
         self._viewer.dssp();
@@ -1524,8 +1523,7 @@ Menu.prototype._initToolsPanel = function () {
         break;
       }
       case 'fbx-export':
-        visual = self._viewer._getComplexVisual();
-        fbxExport(visual._complex, visual._reprList, false);
+        self._viewer.save({ fileType: 'fbx' });
         self._onMenuOff();
         break;
       case 'save-settings':

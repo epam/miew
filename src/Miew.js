@@ -36,7 +36,6 @@ import AOVertBlurWithBlendMaterial from './gfx/shaders/AOVertBlurWithBlendMateri
 import AnaglyphMaterial from './gfx/shaders/AnaglyphMaterial';
 import VolumeMaterial from './gfx/shaders/VolumeMaterial';
 import viewInterpolator from './gfx/ViewInterpolator';
-import fbxExport from './gfx/fbxExport';
 import EventDispatcher from './utils/EventDispatcher';
 import logger from './utils/logger';
 import Cookies from './utils/Cookies';
@@ -4115,7 +4114,6 @@ _.assign(Miew, /** @lends Miew */ {
   utils,
   gfx: {
     Representation,
-    fbxExport,
   },
 
   /**
