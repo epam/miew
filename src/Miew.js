@@ -1667,7 +1667,7 @@ Miew.prototype._export = function (format) {
     } else if (TheExporter.SourceClass === Complex) {
       dataSource = this._visuals[this._curVisualName]._complex;
     }
-    const exporter = new TheExporter(dataSource, { binary: true });
+    const exporter = new TheExporter(dataSource, { binary: true, miewVersion: Miew.VERSION });
     return exporter.export().then((data) => data);
   }
   if (this._visuals[this._curVisualName] instanceof VolumeVisual) {

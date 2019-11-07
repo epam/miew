@@ -165,10 +165,10 @@ export default class FBXResult {
     const FBXVersion = 6100; // Mandatory and only supported version
     const date = new Date();
     const timeStampVersion = 1000;
-    const creator = 'Miew FBX Exporter v.0.1'; // Supposed to be an engine
+    const creator = `Miew FBX Exporter v${this._info.version}`; // Supposed to be an engine
 
     return `; FBX 6.1.0 project file
-; Created by Miew FBX Exporter
+; Created by Miew FBX Exporter v${this._info.version} Copyright (c) 2015-2019 EPAM Systems, Inc.
 ; For support please contact miew@epam.com
 ; ----------------------------------------------------
 
