@@ -10,6 +10,7 @@ import settings from './settings';
 import chem from './chem';
 import Visual from './Visual';
 import ComplexVisual from './ComplexVisual';
+import Complex from './chem/Complex';
 import VolumeVisual from './VolumeVisual';
 import GfxProfiler from './gfx/GfxProfiler';
 import io from './io/io';
@@ -35,7 +36,6 @@ import AOVertBlurWithBlendMaterial from './gfx/shaders/AOVertBlurWithBlendMateri
 import AnaglyphMaterial from './gfx/shaders/AnaglyphMaterial';
 import VolumeMaterial from './gfx/shaders/VolumeMaterial';
 import viewInterpolator from './gfx/ViewInterpolator';
-import fbxExport from './gfx/fbxExport';
 import EventDispatcher from './utils/EventDispatcher';
 import logger from './utils/logger';
 import Cookies from './utils/Cookies';
@@ -1660,8 +1660,13 @@ Miew.prototype._export = function (format) {
   }
 
   if (this._visuals[this._curVisualName] instanceof ComplexVisual) {
-    const dataSource = this._visuals[this._curVisualName]._complex;
-    const exporter = new TheExporter(dataSource, { binary: true });
+    let dataSource = null;
+    if (TheExporter.SourceClass === ComplexVisual) {
+      dataSource = this._visuals[this._curVisualName];
+    } else if (TheExporter.SourceClass === Complex) {
+      dataSource = this._visuals[this._curVisualName]._complex;
+    }
+    const exporter = new TheExporter(dataSource, { miewVersion: Miew.VERSION });
     return exporter.export().then((data) => data);
   }
   if (this._visuals[this._curVisualName] instanceof VolumeVisual) {
@@ -4109,7 +4114,6 @@ _.assign(Miew, /** @lends Miew */ {
   utils,
   gfx: {
     Representation,
-    fbxExport,
   },
 
   /**

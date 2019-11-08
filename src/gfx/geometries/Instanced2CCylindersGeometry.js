@@ -176,6 +176,10 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
     return [geom];
   }
 
+  getGeoParams() {
+    return this._cylGeometry.parameters;
+  }
+
   _init(instanceCount, cylinderGeo, useZSprites) {
     this.copy(cylinderGeo);
     this._matVector1 = utils.allocateTyped(Float32Array, instanceCount * OFFSET_SIZE);
