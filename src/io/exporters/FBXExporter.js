@@ -8,7 +8,7 @@ export default class FBXExporter extends Exporter {
     super(source, options);
     // Data
     this._data = source;
-    this._version = options.miewVersion || 'v1.0';
+    this._version = options.miewVersion || '0.0-UNSPECIFIED';
     this._extractor = new FBXInfoExtractor();
   }
 
