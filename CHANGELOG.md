@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.4] - 2019-11-11
+### Added
+- Add parser for MOL2 molecular format
+- Add exporter for geometry information into FBX unicode format
+- Add button 'Export FBX' in Demo application menu 'Tools'
+- Add example of using ImmediateLoader
+
+### Changed
+- Change all Miew links to https://miew... instead of http://miew...
+- Refactor unit tests for settings.js and logger.js
+
+### Fixed
+- Fix rendering of electron density in stereo mode
+- Fix rendering of electron density bbox with visual effects 
+- Fix a crash in modified DNA processing (e.g. 1K1R)
+
+### Internal
+- Rafactor normal storage in G-buffer
+- Generalize TraceMesh into InstancedMesh
+- Refactor the algorithm of simultaneously applying fog and ambient occlusion effects
+
 ## [0.8.3] - 2019-09-20
 ### Added
 - Add parsers for GRO molecular formats
@@ -490,7 +511,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.8.3...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.8.4...HEAD
+[0.8.4]: https://github.com/epam/miew/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/epam/miew/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/epam/miew/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/epam/miew/compare/v0.8.0...v0.8.1
