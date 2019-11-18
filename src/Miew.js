@@ -1342,6 +1342,10 @@ Miew.prototype._renderOutline = (function () {
     _outlineMaterial.uniforms.srcTexSize.value.set(srcDepthBuffer.width, srcDepthBuffer.height);
     _outlineMaterial.uniforms.color.value = new THREE.Color(settings.now.outline.color);
     _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold;
+    _outlineMaterial.uniforms.thickness.value = new THREE.Vector2(
+      settings.now.outline.thickness,
+      settings.now.outline.thickness
+    );
 
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.renderScreenQuad(_outlineMaterial);
@@ -3691,7 +3695,7 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on(['axes', 'fxaa', 'ao',
-    'outline.on', 'outline.color', 'outline.threshold'], () => {
+    'outline.on', 'outline.color', 'outline.threshold', 'outline.thickness'], () => {
     this._needRender = true;
   });
 };
