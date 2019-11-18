@@ -1344,7 +1344,7 @@ Miew.prototype._renderOutline = (function () {
     _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold;
     _outlineMaterial.uniforms.thickness.value = new THREE.Vector2(
       settings.now.outline.thickness,
-      settings.now.outline.thickness
+      settings.now.outline.thickness,
     );
 
     gfx.renderer.setRenderTarget(targetBuffer);
