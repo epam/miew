@@ -2,6 +2,7 @@ precision highp float;
 
 uniform sampler2D srcTex;
 uniform vec2 srcTexSize;
+uniform vec2 thickness;
 varying vec2 vUv;
 
 #ifdef DEPTH_OUTLINE
@@ -12,7 +13,7 @@ varying vec2 vUv;
 
 void main() {
 
-  vec2 pixelSize = vec2(1, 1) / srcTexSize;
+  vec2 pixelSize = thickness / srcTexSize;
 
   #ifdef DEPTH_OUTLINE
     float c00 = texture2D(srcDepthTex, vUv + vec2(-pixelSize.x,-pixelSize.y)).x;

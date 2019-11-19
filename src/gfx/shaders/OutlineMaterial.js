@@ -17,6 +17,7 @@ class OutlineMaterial extends THREE.RawShaderMaterial {
         color: { type: 'v3', value: null },
         threshold: { type: 'f', value: null },
         opacity: { type: 'f', value: 1.0 },
+        thickness: { type: 'v2', value: new THREE.Vector2(1, 1) },
       },
       vertexShader,
       fragmentShader,
