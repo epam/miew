@@ -160,10 +160,10 @@ class ThickLinesGeometry extends THREE.BufferGeometry {
     }
     this.setIndex(new THREE.BufferAttribute(this._index, 1));
 
-    this.addAttribute('position', new THREE.BufferAttribute(this._positions, POS_SIZE));
-    this.addAttribute('color', new THREE.BufferAttribute(this._colors, COL_SIZE));
-    this.addAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1));
-    this.addAttribute('direction', new THREE.BufferAttribute(this._directions, DIR_SIZE));
+    this.setAttribute('position', new THREE.BufferAttribute(this._positions, POS_SIZE));
+    this.setAttribute('color', new THREE.BufferAttribute(this._colors, COL_SIZE));
+    this.setAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1));
+    this.setAttribute('direction', new THREE.BufferAttribute(this._directions, DIR_SIZE));
   }
 }
 

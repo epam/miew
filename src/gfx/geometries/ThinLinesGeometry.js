@@ -103,9 +103,9 @@ class ThinLinesGeometry extends THREE.BufferGeometry {
     this._colors = utils.allocateTyped(Float32Array, pointsCount * COL_SIZE);
     const alpha = this._alpha = utils.allocateTyped(Float32Array, pointsCount);
     _.fill(alpha, 1.0);
-    this.addAttribute('position', new THREE.BufferAttribute(this._positions, POS_SIZE));
-    this.addAttribute('color', new THREE.BufferAttribute(this._colors, COL_SIZE));
-    this.addAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1));
+    this.setAttribute('position', new THREE.BufferAttribute(this._positions, POS_SIZE));
+    this.setAttribute('color', new THREE.BufferAttribute(this._colors, COL_SIZE));
+    this.setAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1));
   }
 }
 

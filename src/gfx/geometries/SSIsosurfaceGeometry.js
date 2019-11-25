@@ -59,9 +59,9 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     }
 
     this.setIndex(new THREE.BufferAttribute(indices, 1));
-    this.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-    this.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-    this.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+    this.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    this.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+    this.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     this.computeBoundingBox();
     this.computeBoundingSphere();
 

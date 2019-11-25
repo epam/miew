@@ -42,7 +42,7 @@ function _createExtrudedChunkGeometry(shape, ringsCount) {
 
   geo.setIndex(indices);
   const pos = utils.allocateTyped(Float32Array, totalPts * VEC_SIZE);
-  geo.addAttribute('position', new THREE.BufferAttribute(pos, VEC_SIZE));
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, VEC_SIZE));
 
   geo._positions = shape;
 
