@@ -248,8 +248,10 @@ export default class FBXInfoExtractor {
         // .color2 contains starting color, and .color contains starting color (see uber.frag ATTR_COLOR2)
         colorStart.fromArray(color2.array, colorIdx);
         colorEnd.fromArray(color.array, colorIdx);
-        twoCCylinder.setColors(colorStart, colorEnd);
-        geo = twoCCylinder;
+        if (twoCCylinder) {
+          twoCCylinder.setColors(colorStart, colorEnd);
+          geo = twoCCylinder;
+        }
       } else {
         // has one color per cylinder
         colorStart.fromArray(color.array, colorIdx);
