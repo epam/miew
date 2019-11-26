@@ -612,9 +612,9 @@ class IsoSurface {
   toMesh() {
     const geo = new THREE.BufferGeometry();
     geo.setIndex(new THREE.BufferAttribute(this._indices, 1));
-    geo.addAttribute('position', new THREE.BufferAttribute(this._position, 3));
-    geo.addAttribute('normal', new THREE.BufferAttribute(this._normals, 3));
-    geo.addAttribute('color', new THREE.BufferAttribute(this._colors, 3));
+    geo.setAttribute('position', new THREE.BufferAttribute(this._position, 3));
+    geo.setAttribute('normal', new THREE.BufferAttribute(this._normals, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(this._colors, 3));
     geo.computeBoundingSphere();
     return geo;
   }

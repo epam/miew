@@ -81,9 +81,9 @@ class InstancedSpheresGeometry extends SphereCollisionGeo(THREE.InstancedBufferG
     const alpha = this._alpha = utils.allocateTyped(Float32Array, spheresCount);
     _.fill(alpha, 1.0);
 
-    this.addAttribute('offset', new THREE.InstancedBufferAttribute(this._offsets, OFFSET_SIZE, false, 1));
-    this.addAttribute('color', new THREE.InstancedBufferAttribute(this._colors, COLOR_SIZE, false, 1));
-    this.addAttribute('alphaColor', new THREE.InstancedBufferAttribute(alpha, 1, false, 1));
+    this.setAttribute('offset', new THREE.InstancedBufferAttribute(this._offsets, OFFSET_SIZE, false, 1));
+    this.setAttribute('color', new THREE.InstancedBufferAttribute(this._colors, COLOR_SIZE, false, 1));
+    this.setAttribute('alphaColor', new THREE.InstancedBufferAttribute(alpha, 1, false, 1));
   }
 }
 export default InstancedSpheresGeometry;

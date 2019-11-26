@@ -83,11 +83,11 @@ class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
     if (isoSurf._numTriangles > 0) {
       isoSurf.setColorVolTex(surface.volTexMap, surface.atomMap, surface.atomWeightMap, this._visibilitySelector);
       this.setIndex(new THREE.BufferAttribute(isoSurf._indices, 1));
-      this.addAttribute('position', new THREE.BufferAttribute(isoSurf._position, 3));
-      this.addAttribute('normal', new THREE.BufferAttribute(isoSurf._normals, 3));
-      this.addAttribute('color', new THREE.BufferAttribute(isoSurf._colors, 3));
+      this.setAttribute('position', new THREE.BufferAttribute(isoSurf._position, 3));
+      this.setAttribute('normal', new THREE.BufferAttribute(isoSurf._normals, 3));
+      this.setAttribute('color', new THREE.BufferAttribute(isoSurf._colors, 3));
     } else { // geometry should have at least empty position attributes to be processed in wireframe mode by three.js
-      this.addAttribute('position', new THREE.BufferAttribute(utils.allocateTyped(Float32Array, 0), 3));
+      this.setAttribute('position', new THREE.BufferAttribute(utils.allocateTyped(Float32Array, 0), 3));
     }
   }
 

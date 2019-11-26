@@ -147,9 +147,9 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
     }
 
     this.setIndex(indices);
-    this.addAttribute('position', positions);
-    this.addAttribute('normal', normals);
-    this.addAttribute('uv', uvs);
+    this.setAttribute('position', positions);
+    this.setAttribute('normal', normals);
+    this.setAttribute('uv', uvs);
   }
 
   clone() {
