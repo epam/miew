@@ -99,7 +99,7 @@ class VoxelWorld {
     let idx = this._atoms.length;
 
     // resize array of atoms
-    this._atoms.length = this._atoms.length + 2 * complex.getAtomCount();
+    this._atoms.length += 2 * complex.getAtomCount();
 
     complex.forEachAtom((atom) => {
       // find which voxel contains this atom
