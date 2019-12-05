@@ -260,7 +260,7 @@ function _fromArray(entries) {
 }
 
 function fromAttr(attr) {
-  return _fromArray(utils.getUrlParameters(`?${attr || ''}`)); // TODO: We need different processing for attrs.
+  return _fromArray(utils.getUrlParameters(`?${attr || ''}`));
 }
 
 function fromURL(url) {

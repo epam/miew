@@ -419,16 +419,16 @@ describe('options', () => {
     });
   });
 
-  // TODO think about making public fromArray function and tests firstly it (not fromAttr or fromURL)
-  /* describe('.fromAttr()', () => {
+  describe('.fromAttr()', () => {
     function urlize(opts) {
       return `?${opts || ''}`;
     }
 
+    const set = testSets[0];
     it('restores high level mode properties', () => {
-      const tmp = options.fromURL(urlize(mBScELrepStr));
-      const tmp1 = options.fromAttr(mBScELrepStr);
-      expect(options.toURL(tmp)).to.equal(options.toURL(tmp1));
+      const optURL = options.fromURL(urlize(set.string));
+      const optAttr = options.fromAttr(set.string);
+      expect(options.toURL(optURL)).to.equal(options.toURL(optAttr));
     });
-  }); */
+  });
 });
