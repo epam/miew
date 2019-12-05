@@ -148,8 +148,8 @@ describe('options', () => {
       options: { _objects: objectsList },
       string: 'o=line,A.38.CO1,A.38.CO2&o=line,A.38.CO1,A.38.CO2!color:4291624959,dashSize:0.5',
       commands: [
-        ' line "A.38.CO1" "A.38.CO2"',
-        ' line "A.38.CO1" "A.38.CO2" color=4291624959 dashSize=0.5',
+        'line "A.38.CO1" "A.38.CO2"',
+        'line "A.38.CO1" "A.38.CO2" color=4291624959 dashSize=0.5',
       ],
     },
     { // miscOpts
@@ -201,8 +201,8 @@ describe('options', () => {
         'rep 1 s="sequence 85, 175, 256 and name CB and sequence 1:286" m=TX c=EL mt=SF',
         'rep 2 m=TR radius=0.5 c=EL carbon=0',
         'rep 3 m=CS subset="chain A and sequence 29 or serial 196"',
-        ' line "A.38.CO1" "A.38.CO2"',
-        ' line "A.38.CO1" "A.38.CO2" color=4291624959 dashSize=0.5',
+        'line "A.38.CO1" "A.38.CO2"',
+        'line "A.38.CO1" "A.38.CO2" color=4291624959 dashSize=0.5',
         'set colorers.EL.carbon -3',
         'set colorers.UN.color 16711680',
         'set camFov 45',

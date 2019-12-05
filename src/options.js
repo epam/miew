@@ -423,7 +423,7 @@ function toScript(opts) {
   function checkAndAdd(command, value, saveQuotes) {
     if (value !== null && value !== undefined) {
       const quote = (typeof value === 'string' && saveQuotes) ? '"' : '';
-      commandsList[idx++] = `${command} ${quote}${value}${quote}`;
+      commandsList[idx++] = `${command} ${quote}${value}${quote}`.trim();
     }
   }
 
