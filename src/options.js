@@ -283,7 +283,7 @@ function _processArgsForURL(args) {
   if (args.length < 2) {
     return args[0];
   }
-  return args[0] + cOptsSep + _processOptsForURL(args[1]);
+  return `${args[0]}${cOptsSep}${_processOptsForURL(args[1])}`;
 }
 
 function _processObjForURL(objOpts) {

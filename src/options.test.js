@@ -7,12 +7,12 @@ chai.use(dirtyChai);
 
 describe('options', () => {
   /** ******** REP LIST *********** */
-  const simplestRep = {
+  const mBScELrep = {
     mode: 'BS',
     colorer: 'EL',
   };
 
-  const simplestRep1 = {
+  const mQSmtTRrep = {
     mode: 'QS',
     material: 'TR',
   };
@@ -45,11 +45,11 @@ describe('options', () => {
   };
 
   /** ******** REP TEST SETS *********** */
-  const simpleRepsOpts = {
-    reps: [simplestRep],
+  const mBScELrepOpts = {
+    reps: [mBScELrep],
   };
-  const simpleRepsStr = 'r=0&m=BS&c=EL';
-  const simpleRepsCommands = ['rep 0 m=BS c=EL'];
+  const mBScELrepStr = 'r=0&m=BS&c=EL';
+  const mBScELrepCommands = ['rep 0 m=BS c=EL'];
 
   const bigRepsOpts = {
     reps: [bigRep],
@@ -93,7 +93,7 @@ describe('options', () => {
 
   const multipleRepsOpts = {
     preset: 'default',
-    reps: [simplestRep, parameterRep],
+    reps: [mBScELrep, parameterRep],
   };
   const multipleRepsStr = 'p=default&r=0&m=BS&c=EL&r=1&m=TR!radius:0.5&c=EL!carbon:0';
   const multipleRepsCommands = [
@@ -104,7 +104,7 @@ describe('options', () => {
 
   const duplicatedRepsOpts = {
     preset: 'default',
-    reps: [simplestRep, parameterRep, simplestRep1],
+    reps: [mBScELrep, parameterRep, mQSmtTRrep],
   };
   const duplicatedRepsStr = 'p=default&r=0&c=EL&r=1&m=TR!radius:0.5&c=EL!carbon:0&rep=0&dup&m=QS&mt=TR&r=0&m=BS';
   const doubleModeRepsStr = 'p=default&r=0&m=BS&c=EL&r=1&m=TR!radius:0.5&c=EL!carbon:0&rep=0&m=QS&mt=TR';
@@ -180,7 +180,7 @@ describe('options', () => {
   const overallOpts = {
     preset: 'default',
     reps: [
-      simplestRep, bigRep, parameterRep, subsetRepSimple,
+      mBScELrep, bigRep, parameterRep, subsetRepSimple,
     ],
     _objects: objectsList,
     settings,
@@ -253,12 +253,12 @@ describe('options', () => {
   /** ******** ERROR INPUT TEST SETS *********** */
 
   const repsOpts = {
-    reps: [simplestRep],
+    reps: [mBScELrep],
   };
   const errorArgumentRepsStr = 'r=0&m=BS&c=EL&w=w';
   const errorKeyRepsStr = 'r=0&m=BS!radus:9&c=EL';
 
-  describe('.toScript(opts)', () => {
+  describe('.toScript()', () => {
     function equalCommands(original, generated) {
       if (!_.isArray(original) || original.length !== generated.length + 2) {
         return false;
@@ -293,7 +293,7 @@ describe('options', () => {
     }
 
     it('generates proper script for simplest rep lists', () => {
-      expect(simpleRepsCommands).to.equalCommands(toCommands(options.toScript(simpleRepsOpts)));
+      expect(mBScELrepCommands).to.equalCommands(toCommands(options.toScript(mBScELrepOpts)));
       expect(bigRepsCommands).to.equalCommands(toCommands(options.toScript(bigRepsOpts)));
     });
 
@@ -345,7 +345,7 @@ describe('options', () => {
     });
   });
 
-  describe('.toURL(opts)', () => {
+  describe('.toURL()', () => {
     // extract only options from our URL
     function getOpts(url) {
       let dashIdx = url.lastIndexOf('#');
@@ -357,7 +357,7 @@ describe('options', () => {
     });
 
     it('generates proper URL for simplest rep lists', () => {
-      expect(getOpts(options.toURL(simpleRepsOpts))).to.equal(simpleRepsStr);
+      expect(getOpts(options.toURL(mBScELrepOpts))).to.equal(mBScELrepStr);
       expect(getOpts(options.toURL(bigRepsOpts))).to.equal(bigRepsStr);
     });
 
@@ -410,7 +410,7 @@ describe('options', () => {
     });
   });
 
-  describe('.fromURL(url)', () => {
+  describe('.fromURL()', () => {
     function equalOptions(original, generated) {
       function compareAllExceptReps(one, another) {
         const origKeys = Object.keys(one);
@@ -484,7 +484,7 @@ describe('options', () => {
     });
 
     it('restores high level mode properties', () => {
-      expect(options.fromURL(urlize(simpleRepsStr))).to.equalOptions(simpleRepsOpts);
+      expect(options.fromURL(urlize(mBScELrepStr))).to.equalOptions(mBScELrepOpts);
       expect(options.fromURL(urlize(bigRepsStr))).to.equalOptions(bigRepsOpts);
     });
 
@@ -541,14 +541,14 @@ describe('options', () => {
   });
 
   // TODO think about making public fromArray function and tests firstly it (not fromAttr or fromURL)
-  describe('.fromAttr(attr)', () => {
+  describe('.fromAttr()', () => {
     function urlize(opts) {
       return `?${opts || ''}`;
     }
 
     it('restores high level mode properties', () => {
-      const tmp = options.fromURL(urlize(simpleRepsStr));
-      const tmp1 = options.fromAttr(simpleRepsStr);
+      const tmp = options.fromURL(urlize(mBScELrepStr));
+      const tmp1 = options.fromAttr(mBScELrepStr);
       expect(options.toURL(tmp)).to.equal(options.toURL(tmp1));
     });
   });
