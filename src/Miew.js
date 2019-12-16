@@ -3607,13 +3607,13 @@ Miew.prototype._initOnSettingsChanged = function () {
     const values = { shadowmap: evt.value, shadowmapType: settings.now.shadow.type };
     const gfx = this._gfx;
     if (gfx) {
-      gfx.renderer.shadowMap.enabled = values.shadowmap;
+      gfx.renderer.shadowMap.enabled = Boolean(values.shadowmap);
     }
-    if (values.shadowmap === true) {
+    if (values.shadowmap) {
       this._updateShadowCamera();
     }
     this._updateMaterials(values, true, (object) => {
-      if (values.shadowmap === true) {
+      if (values.shadowmap) {
         gfxutils.prepareObjMaterialForShadow(object);
       } else {
         object.customDepthMaterial = null;
