@@ -8,6 +8,6 @@ export default class ChangeRepOptButton extends React.Component {
   }
 
   render() {
-    return <button onClick={ (e) => this.onChange(e) }> {`Set rep ${this.props.rep} to ${this.props.mode}`}</button>;
+    return <button onClick={ e => this.onChange(e) }> {`Set rep ${this.props.rep} to ${this.props.mode}`}</button>;
   }
 }
