@@ -5,6 +5,7 @@ import Checkbox from './controls/Checkbox';
 import SpeedButton from './controls/SpeedButton';
 import InfoPanel from './controls/InfoPanel';
 import LoadButton from './controls/LoadButton';
+import ChangeRepOptButton from './controls/ChangeRepOptButton';
 
 class App extends React.Component {
   constructor() {
@@ -26,6 +27,7 @@ class App extends React.Component {
       <ViewerContainer onChange={ this._onViewerChange } />
       <div style={ { 'padding-top': '0.5em' } }>
         <LoadButton viewer={ this._viewer } file = '1zlm' />&nbsp;
+        <ChangeRepOptButton viewer={ this._viewer } rep = '0' mode = 'BS' />&nbsp;
         Axes =  <Checkbox viewer={ this._viewer } prefName='axes' prefType={Boolean}/>&nbsp;
         Rotation = &nbsp;
         <SpeedButton viewer={ this._viewer } prefName='autoRotation' delta = {0.1} prefType={Number}/>&nbsp;
