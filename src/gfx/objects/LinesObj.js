@@ -15,7 +15,7 @@ class LinesObj extends SceneObject {
   }
 
   _getAtomFromName(complex, atomId) {
-    const err = ' - Wrong atom format it must be \'#CHAIN_NAME.#NUMBER.#ATOM_NAME\' (e.g. \'A.38.CO1\')';
+    const err = ' - Wrong atom format it must be \'#CHAIN_NAME.#RESIDUE_NUMBER.#ATOM_NAME\' (e.g. \'A.38.CO1\')';
     const atom1 = complex.getAtomByFullname(atomId);
     if (!atom1) {
       throw new Error(atomId + err);
@@ -66,7 +66,6 @@ class LinesObj extends SceneObject {
     geo.vertices[0].copy(frameData.getAtomPos(this._atom1._index));
     geo.vertices[1].copy(frameData.getAtomPos(this._atom2._index));
     this._line.computeLineDistances();
-    // geo.computeBoundingBox();
     geo.computeBoundingSphere();
 
     geo.verticesNeedUpdate = true;

@@ -6,6 +6,7 @@ import rollupPluginReplace from 'rollup-plugin-replace';
 import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
 import rollupPluginString from 'rollup-plugin-string';
 
+import path from 'path';
 import version from './tools/version';
 import packageJson from './package.json';
 
@@ -21,7 +22,7 @@ export default {
   input: './src/index.js',
   onwarn(warning, warn) {
     const exceptions = (warning.loc && warnExceptions[warning.code]) || [];
-    if (!exceptions.some(name => warning.loc.file.endsWith(name))) {
+    if (!exceptions.some((name) => warning.loc.file.endsWith(name))) {
       warn(warning);
     }
   },
@@ -31,7 +32,10 @@ export default {
       DEBUG: false,
     }),
     rollupPluginString({
-      include: '**/*.glsl',
+      include: [
+        '**/*.vert',
+        '**/*.frag',
+      ],
     }),
     rollupPluginNodeResolve(),
     rollupPluginCommonJS({
@@ -46,12 +50,14 @@ export default {
       },
     }),
     rollupPluginBabel({
+      runtimeHelpers: true,
       exclude: [
-        './node_modules/**',
+        /node_modules[\\/](?!three)/,
         './vendor/js/**',
         './src/utils/SelectionParser',
         './src/utils/MiewCLIParser.js',
       ],
+      extends: path.join(__dirname, '/.babelrc'),
     }),
 
   ],

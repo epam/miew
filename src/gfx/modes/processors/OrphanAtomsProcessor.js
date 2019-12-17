@@ -6,10 +6,6 @@ class OrphanAtomsProcessor extends AtomsProcessor {
       return false;
     }
 
-    /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-    if (this._mode.settings.now.labels !== 'no' && atom.isLabelVisible()) {
-      return false;
-    }
     const bonds = atom._bonds;
     for (let i = 0, n = bonds.length; i < n; ++i) {
       if ((bonds[i]._left._mask & mask) && (bonds[i]._right._mask & mask)) {

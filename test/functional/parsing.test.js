@@ -10,7 +10,8 @@ import XYZParser from '../../src/io/parsers/XYZParser';
 import PubChemParser from '../../src/io/parsers/PubChemParser';
 import SDFParser from '../../src/io/parsers/SDFParser';
 import CCP4Parser from '../../src/io/parsers/CCP4Parser';
-
+import GROParser from '../../src/io/parsers/GROParser';
+import MOL2Parser from '../../src/io/parsers/MOL2Parser';
 
 import complexTestData from './data/complexTestData';
 import volumeTestData from './data/volumeTestData';
@@ -68,6 +69,18 @@ const formats = {
     extension: 'dsn6',
     encoding: null,
     Parser: DSN6Parser,
+  },
+  gro: {
+    name: 'GRO',
+    extension: 'gro',
+    encoding: 'ascii',
+    Parser: GROParser,
+  },
+  mol2: {
+    name: 'MOL2',
+    extension: 'mol2',
+    encoding: 'ascii',
+    Parser: MOL2Parser,
   },
 };
 
@@ -207,9 +220,9 @@ describe('Model Volume data', () => {
               lookFor('_header.cellDims.y', entry.cellDims.y, entry.cellDims.precision);
               lookFor('_header.cellDims.z', entry.cellDims.z, entry.cellDims.precision);
 
-              lookFor('_header.angles.x', entry.angles.x, entry.angles.precision);
-              lookFor('_header.angles.y', entry.angles.y, entry.angles.precision);
-              lookFor('_header.angles.z', entry.angles.z, entry.angles.precision);
+              lookFor('_header.angles[0]', entry.angles.x, entry.angles.precision);
+              lookFor('_header.angles[1]', entry.angles.y, entry.angles.precision);
+              lookFor('_header.angles[2]', entry.angles.z, entry.angles.precision);
 
               lookFor('_header.grid[0]', entry.grid.x);
               lookFor('_header.grid[1]', entry.grid.y);

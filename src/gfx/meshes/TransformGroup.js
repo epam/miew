@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import gfxutils from '../gfxutils';
 
 class TransformGroup extends THREE.Object3D {
   static _inverseMatrix = new THREE.Matrix4();
@@ -26,9 +27,13 @@ class TransformGroup extends THREE.Object3D {
     ray.copy(raycaster.ray);
     for (let i = 0, n = children.length; i < n; ++i) {
       const child = children[i];
+
+      if (!gfxutils.belongToSelectLayers(child)) {
+        continue;
+      }
+
       child.updateMatrixWorld();
       const mtx = child.matrixWorld;
-      // TODO check near / far?
       inverseMatrix.getInverse(mtx);
       raycaster.ray.copy(ray).applyMatrix4(inverseMatrix);
       const childIntersects = [];
@@ -41,7 +46,6 @@ class TransformGroup extends THREE.Object3D {
           inters.distance = ray.origin.distanceTo(inters.point);
         }
         inters.object = child;
-        // TODO: check raycaster near/far?
         intersects[intersects.length] = inters;
       }
     }

@@ -147,16 +147,15 @@
       <div class="col-xs-12 col-sm-9 panel panel-default panel-menu" data-panel-type="miew-menu-panel-presets" style="display: none">
         <div class="panel-heading">
           <button class="btn btn-default btn-titlebar pull-left main-back-button visible-xs" data-toggle="main-panel" data-value="miew-menu-panel-main"><span class="glyphicon glyphicon-menu-left"></span></button>
-          <button class="btn btn-default btn-titlebar pull-left presets-back-button hidden presets-panel-action" data-presets-panel-action="navigate-back"><span class="glyphicon glyphicon-menu-left"></span></button>
           <h3 class="panel-title">Load</h3>
         </div>
         <div class="panel-body">
           <div class="main">
-            <form data-form-type="miew-menu-form-load-pdb" style="margin-bottom:20px; ">
+            <form data-form-type="miew-menu-form-load-pdb" style="margin-bottom:20px; " onsubmit="return false;">
               <div class="form-group">
-                <label class="control-label">PDB or AMBER prmtop (PDB ID, URL or local file)</label>
+                <label class="control-label">Data to load</label>
                 <div class="input-group" style="margin-bottom: 10px;">
-                  <input type="text" class="form-control presets-panel-action" placeholder="PDB ID or URL..." data-pdb-url-type="main" data-presets-panel-action="pdb-inputs-text" data-presets-panel-events="input,propertychange,paste,change">
+                  <input type="text" class="form-control presets-panel-action" placeholder="PDB ID or URL..." data-pdb-url-type="main" data-presets-panel-action="pdb-inputs-text" data-presets-panel-events="input,propertychange,paste,keyup">
                   <span class="input-group-btn">
                     <span class="btn btn-primary miew-panel-btn-tooltip"><span class="glyphicon glyphicon-folder-open"></span><input type="file" class="form-control presets-panel-action" data-pdb-url-type="main" data-presets-panel-action="pdb-inputs-file"  data-presets-panel-events="change"></span>
                     <span data-btn-type="miew-menu-btn-browse-file" style="visibility:hidden;"><input type="file"></span>
@@ -164,27 +163,9 @@
                 </div>
                 <div class="alert alert-warning" role="alert" data-pdb-url-type="main"></div>
                 <div class="alert alert-danger" role="alert" data-pdb-url-type="main"></div>
-                <label class="control-label" data-pdb-url-type="sub">AMBER coordinate/restart file (URL)</label>
-
-                <!-- -->
-                <div style="margin-bottom: 10px;" data-pdb-url-type="sub">
-                  <input type="text" class="form-control presets-panel-action" placeholder="URL..." data-pdb-url-type="sub" data-presets-panel-action="pdb-inputs-text" data-presets-panel-events="input,propertychange,paste,change">
-                </div>
-                <!-- -->
-                <!--<div class="input-group" style="margin-bottom: 10px;" data-pdb-url-type="sub">-->
-                  <!--<input type="text" class="form-control presets-panel-action" placeholder="URL..." data-pdb-url-type="sub" data-presets-panel-action="pdb-inputs-text" data-presets-panel-events="input,propertychange,paste">-->
-                  <!--<span class="input-group-btn">-->
-                    <!--<span class="btn btn-primary miew-panel-btn-tooltip disabled"><span class="glyphicon glyphicon-folder-open disabled"></span>-->
-                      <!--&lt;!&ndash;<input type="file" class="form-control presets-panel-action" data-pdb-url-type="sub" data-presets-panel-action="pdb-inputs-file" data-presets-panel-events="change">&ndash;&gt;-->
-                    <!--</span>-->
-                  <!--</span>-->
-                <!--</div>-->
-                <div class="alert alert-warning" role="alert" data-pdb-url-type="sub"></div>
-                <div class="alert alert-danger" role="alert" data-pdb-url-type="sub"></div>
               </div>
               <div class="row">
                 <div class="col-sm-6 col-xs-6" style="padding:0px">
-                  <!-- block:READONLY_SERVER-1 --><span class="pull-left btn btn-primary presets-panel-action" data-presets-panel-action="pdb-register">Add current file to server</span><!-- endblock:READONLY_SERVER-1 -->
                 </div>
                 <div class="col-sm-6 col-xs-6" style="padding:0px">
                   <span class="pull-right btn btn-danger presets-panel-action" data-tooltip="tooltip" data-presets-panel-action="pdb-inputs-clear" style="min-width: 150px; margin-left: 10px;">Cancel</span>
@@ -198,65 +179,8 @@
                 <li class="list-group-item"><label>Automatic preset on load</label> <div class="pull-right">
                   <input type="checkbox" data-dir="settings" data-toggle="autoPreset" data-size="mini" title="Automatic preset">
                 </div></li>
-                <li class="list-group-item"><label>Skip water</label> <div class="pull-right">
-                  <input type="checkbox" data-dir="settings" data-toggle="nowater" data-size="mini" title="Skip water">
-                </div></li>
               </ul>
             </form>
-
-            <div class="progress miew-presets-panel-progress hidden">
-              <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-              </div>
-            </div>
-
-            <div data-form-type="miew-menu-form-configured-pdb-files">
-              <div class="form-group">
-                <div class="row">
-                  <div class="col-xs-10 col-sm-9" style="padding:0px">
-                    <label class="control-label">Configured PDB files</label>
-                  </div>
-                  <div class="col-xs-2 col-sm-3" style="text-align: right">
-                      <span class="glyphicon glyphicon-refresh miew-configured-pdb-list-action miew-configured-pdb-list-action-refresh presets-panel-action" data-presets-panel-action="pdb-list-refresh"></span>
-                  </div>
-                </div>
-                <input type="text" class="form-control miew-configured-pdb-list-search-field presets-panel-action" placeholder="Search name..." data-presets-panel-action="pdb-list-search" data-presets-panel-events="input,propertychange,paste">
-              </div>
-              <div class="list-group miew-configured-pdb-list">
-              </div>
-              <nav aria-label="Page navigation" style="text-align: center">
-                <ul class="pagination miew-configured-pdb-list-pagination" style="margin:0px;"></ul>
-              </nav>
-            </div>
-          </div>
-
-          <div class="sub">
-            <div class="progress miew-presets-sub-panel-progress hidden">
-              <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-              </div>
-            </div>
-            <div style="text-align: right;">
-              <a class="btn presets-panel-action" data-btn-type="miew-menu-btn-refresh-presets" data-presets-panel-action="preset-list-refresh">
-                <span class="glyphicon glyphicon-refresh" style="color: #337ab7;"></span>
-              </a>
-            </div>
-            <div class="miew-menu-form-presets">
-              <div class="alert alert-warning" role="alert" data-label-type="miew-label-empty-preset-list" style="text-align: center;">There are no presets for this molecule.<!-- block:READONLY_SERVER-2 --> Add new preset or try to reload the list.<!-- endblock:READONLY_SERVER-2 --></div>
-              <div class="list-group"></div>
-            </div>
-            <!-- block:READONLY_SERVER-3 -->
-            <div class="input-group">
-              <input type="text" class="form-control presets-panel-action" data-presets-panel-action="preset-input-refresh" data-presets-panel-events="input,propertychange,paste" placeholder="New preset name" data-input-type="miew-menu-input-new-preset-name">
-              <span class="input-group-btn">
-                <a class="btn btn-primary presets-panel-action" data-presets-panel-action="preset-create" type="button" data-btn-type="miew-menu-btn-add-preset">
-                  <span class="glyphicon glyphicon-plus"></span>
-                  Add new preset
-                </a>
-              </span>
-            </div>
-            <div>
-              <div class="alert alert-info" role="alert" data-label-type="miew-label-add-new-preset-info" style="margin-top: 10px; text-align: center;">Load pdb file first to create new preset.</div>
-            </div>
-            <!-- endblock:READONLY_SERVER-3 -->
           </div>
         </div>
       </div>
@@ -390,7 +314,7 @@
               </li>
               <!-- Background color -->
               <li class="list-group-item"><label>Background color</label> <div class="checkbox-background pull-right">
-                <input type="checkbox" data-dir="settings" data-toggle="theme" data-size="mini" data-on-text="Dark" data-off-text="Light" data-handle-width="46" data-label-width="0"  title="Background color">
+                <input type="checkbox" data-dir="settings" data-toggle="bg.color" data-size="mini" data-on-text="Dark" data-off-text="Light" data-handle-width="46" data-label-width="0"  title="Background color">
               </div></li>
               <!-- FXAA -->
               <li class="list-group-item"><label>FXAA</label> <span class="pull-right">
@@ -453,7 +377,7 @@
             <a href="#" class="list-group-item" data-toggle="miew-menu-tools" data-value="reset-settings"><span class="glyphicon glyphicon-refresh"></span>&nbsp;
               Reset settings
             </a>
-            <a href="#" class="list-group-item" data-toggle="miew-menu-tools" data-value="fbx-export" style="display: none"><span class="glyphicon glyphicon-floppy-save"></span>&nbsp;
+            <a href="#" class="list-group-item" data-toggle="miew-menu-tools" data-value="fbx-export" style="display: block"><span class="glyphicon glyphicon-floppy-save"></span>&nbsp;
               Export FBX
             </a>
           </div>
@@ -725,59 +649,6 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Rename preset -->
-    <div class="modal fade" data-modal-type="miew-menu-modal-rename-preset" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Rename preset</h4>
-          </div>
-          <div class="modal-body">
-            <input type="text" data-preset-id="">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary presets-panel-action" data-presets-panel-action="preset-rename-confirm" data-dismiss="modal" data-btn-type="miew-menu-btn-modal-rename">Rename</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" data-modal-type="miew-menu-modal-remove-pdb" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Removing PDB</h4>
-          </div>
-          <div class="modal-body">
-
-          </div>
-          <div class="modal-footer">
-            <div class="pull-left"><input type="checkbox" id="pdb-force-delete"><span style="margin-left: 10px;">Force delete</span></div>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger presets-panel-action" data-dismiss="modal" data-btn-type="miew-menu-btn-modal-remove-pdb" data-presets-panel-action="pdb-remove-confirm">Remove</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" data-modal-type="miew-menu-modal-remove-preset" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Removing preset</h4>
-          </div>
-          <div class="modal-body">
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger presets-panel-action" data-dismiss="modal" data-btn-type="miew-menu-btn-modal-remove-preset" data-presets-panel-action="preset-remove-confirm">Remove</button>
           </div>
         </div>
       </div>

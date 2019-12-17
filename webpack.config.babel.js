@@ -7,20 +7,9 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ScriptExtHtmlWebpackPlugin from 'script-ext-html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import StringReplaceWebpackPlugin from 'string-replace-webpack-plugin';
 import version from './tools/version';
-import config from './tools/config';
 
-const roServerReplacer = {
-  loader: StringReplaceWebpackPlugin.replace({
-    replacements: [{
-      pattern: /<!-- block:READONLY_SERVER-(\d) -->([\s\S]*)<!-- endblock:READONLY_SERVER-\1 -->/g,
-      replacement: () => '',
-    }],
-  }),
-};
-
-const configure = prod => ({
+const configure = (prod) => ({
   entry: {
     demo: './demo/scripts/index.js',
   },
@@ -33,8 +22,13 @@ const configure = prod => ({
   module: {
     rules: [{
       test: /\.js$/,
-      exclude: /(node_modules|vendor)/,
-      use: ['babel-loader'],
+      exclude: /(node_modules[\\/](?!three))|vendor/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          extends: path.join(__dirname, '/.babelrc'),
+        },
+      },
     }, {
       test: /\.[sp]?css$/,
       use: [
@@ -43,20 +37,12 @@ const configure = prod => ({
           loader: 'css-loader',
           options: {
             importLoaders: 1,
-            minimize: prod,
           },
         },
         'postcss-loader',
       ],
     }, {
-      test: /\.glsl$/,
-      use: ['raw-loader'],
-    }, {
-      test: /menu.html$/,
-      use: config.roServer ? ['raw-loader', roServerReplacer] : ['raw-loader'],
-    }, {
-      test: /\.html$/,
-      exclude: /menu.html$/,
+      test: /\.(vert|frag|html)$/,
       use: ['raw-loader'],
     }, {
       test: /\.(woff|woff2|eot|ttf|svg)$/,
@@ -77,8 +63,6 @@ const configure = prod => ({
   plugins: [
     new webpack.DefinePlugin({
       PACKAGE_VERSION: JSON.stringify(version.combined),
-      READONLY_SERVER: config.roServer,
-      PRESET_SERVER: JSON.stringify(yargs.argv.service),
       COOKIE_PATH: JSON.stringify(yargs.argv.cookiePath),
       DEBUG: !prod,
     }),
@@ -102,7 +86,6 @@ const configure = prod => ({
       { from: 'demo/data', to: 'data' },
       { from: 'demo/images', to: 'images' },
     ]),
-    new StringReplaceWebpackPlugin(),
     new webpack.HashedModuleIdsPlugin(),
   ],
   optimization: {

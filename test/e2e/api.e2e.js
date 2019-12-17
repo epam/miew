@@ -1,15 +1,22 @@
 /* global miew */
 import webdriver from 'selenium-webdriver';
 import ieDriver from 'selenium-webdriver/ie';
+import chromeDriver from 'selenium-webdriver/chrome';
+
+import chai from 'chai';
+import dirtyChai from 'dirty-chai';
 
 import EmptyPage from './pages/empty.page';
 import golden from './golden';
 import goldenCfg from './golden.cfg';
 
-const cfg = Object.assign({}, goldenCfg, {
+chai.use(dirtyChai);
+
+const cfg = {
+  ...goldenCfg,
   title: 'API Tests',
   report: 'report-api.html',
-});
+};
 
 let driver;
 let page;
@@ -43,6 +50,7 @@ describe('As a third-party developer, I want to', function () {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
+      .setChromeOptions(new chromeDriver.Options().addArguments(['--headless', '--disable-gpu']))
       .build();
 
     return golden.startup(driver, cfg)
@@ -85,9 +93,11 @@ describe('As a third-party developer, I want to', function () {
           reps: [{
             mode: 'TU',
             colorer: 'SQ',
+            material: 'SF',
           }, {
             mode: 'LN',
             colorer: ['UN', { color: 0xFFFFFF }],
+            material: 'SF',
           }],
         });
         if (miew.init()) {
@@ -111,8 +121,8 @@ describe('As a third-party developer, I want to', function () {
         if (miew.init()) {
           miew.run();
           miew.load('../data/1CRN.pdb').then((name) => {
-            miew.rep({ mode: 'TU', colorer: 'SQ' });
-            miew.repAdd({ mode: 'LN', colorer: ['UN', { color: 0xFFFFFF }] }, name);
+            miew.rep({ mode: 'TU', colorer: 'SQ', material: 'SF' });
+            miew.repAdd({ mode: 'LN', colorer: ['UN', { color: 0xFFFFFF }], material: 'SF' }, name);
           });
         }
       }, '1crn_TU_SQ_LN_UN'));

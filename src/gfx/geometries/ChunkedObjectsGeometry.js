@@ -51,7 +51,6 @@ class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
 
   finalize() {
     this.finishUpdate();
-    // TODO compute bounding box?
     this.computeBoundingSphere();
   }
 
@@ -68,7 +67,6 @@ class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
   raycast(raycaster, intersects) {
     const inters = [];
     super.raycast(raycaster, inters);
-    // TODO faceIdx to chunkIdx
     const facesPerChunk = this._chunkGeo.index.count / 3;
     for (let i = 0, n = inters.length; i < n; ++i) {
       if (!inters[i].hasOwnProperty('faceIndex')) {
@@ -132,10 +130,10 @@ class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
     }
 
     this.setIndex(new THREE.BufferAttribute(this._index, 1));
-    this.addAttribute('position', new THREE.BufferAttribute(this._positions, VEC_SIZE));
-    this.addAttribute('normal', new THREE.BufferAttribute(this._normals, VEC_SIZE));
-    this.addAttribute('color', new THREE.BufferAttribute(this._colors, VEC_SIZE));
-    this.addAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1));
+    this.setAttribute('position', new THREE.BufferAttribute(this._positions, VEC_SIZE));
+    this.setAttribute('normal', new THREE.BufferAttribute(this._normals, VEC_SIZE));
+    this.setAttribute('color', new THREE.BufferAttribute(this._colors, VEC_SIZE));
+    this.setAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1));
   }
 }
 export default ChunkedObjectsGeometry;

@@ -54,7 +54,7 @@ There is also a [demo application] available in the git repository.
 
 [tutorials]: docs/tutorials/embed.md
 [examples]: examples/
-[demo application]: http://miew.opensource.epam.com/
+[demo application]: https://miew.opensource.epam.com/
 
 [Require.js]: http://requirejs.org/
 [Webpack]: https://webpack.js.org/

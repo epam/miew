@@ -10,6 +10,7 @@ import settings from './settings';
 import chem from './chem';
 import Visual from './Visual';
 import ComplexVisual from './ComplexVisual';
+import Complex from './chem/Complex';
 import VolumeVisual from './VolumeVisual';
 import GfxProfiler from './gfx/GfxProfiler';
 import io from './io/io';
@@ -29,16 +30,19 @@ import LinesObject from './gfx/objects/LinesObj';
 import UberMaterial from './gfx/shaders/UberMaterial';
 import OutlineMaterial from './gfx/shaders/OutlineMaterial';
 import FXAAMaterial from './gfx/shaders/FXAAMaterial';
-import ao from './gfx/shaders/AO';
+import AOMaterial from './gfx/shaders/AOMaterial';
+import AOHorBlurMaterial from './gfx/shaders/AOHorBlurMaterial';
+import AOVertBlurWithBlendMaterial from './gfx/shaders/AOVertBlurWithBlendMaterial';
 import AnaglyphMaterial from './gfx/shaders/AnaglyphMaterial';
 import VolumeMaterial from './gfx/shaders/VolumeMaterial';
 import viewInterpolator from './gfx/ViewInterpolator';
-import fbxExport from './gfx/fbxExport';
 import EventDispatcher from './utils/EventDispatcher';
 import logger from './utils/logger';
 import Cookies from './utils/Cookies';
 import capabilities from './gfx/capabilities';
 import WebVRPoC from './gfx/vr/WebVRPoC';
+import vertexScreenQuadShader from './gfx/shaders/ScreenQuad.vert';
+import fragmentScreenQuadFromDistTex from './gfx/shaders/ScreenQuadFromDistortionTex.frag';
 
 const {
   selectors,
@@ -49,6 +53,9 @@ const {
 } = chem;
 
 const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
+
+const LOADER_NOT_FOUND = 'Could not find suitable loader for this source';
+const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
 
 const { createElement } = utils;
 
@@ -133,7 +140,7 @@ function Miew(opts) {
 
   /** @type {Settings} */
   this.settings = settings;
-  const log = logger; // TODO: add .instantiate() when migration to the "context" paradigm is finished
+  const log = logger;
   log.console = DEBUG;
   log.level = DEBUG ? 'debug' : 'info';
   /**
@@ -169,11 +176,6 @@ function Miew(opts) {
   /** @type {object} */
   this._sourceWindow = null;
 
-  // TODO make this being not so ugly
-
-  this._srvTopoSource = null;
-  this._srvAnimSource = null;
-
   this.reset();
 
   if (this._repr) {
@@ -208,6 +210,41 @@ function _setContainerContents(container, element) {
   }
   parent.appendChild(element);
 }
+
+/**
+ * Update Shadow Camera target position and frustum.
+ * @private
+ */
+Miew.prototype._updateShadowCamera = (function () {
+  const shadowMatrix = new THREE.Matrix4();
+  const direction = new THREE.Vector3();
+  const OBB = { center: new THREE.Vector3(), halfSize: new THREE.Vector3() };
+
+  return function () {
+    this._gfx.scene.updateMatrixWorld();
+    for (let i = 0; i < this._gfx.scene.children.length; i++) {
+      if (this._gfx.scene.children[i].type === 'DirectionalLight') {
+        const light = this._gfx.scene.children[i];
+        shadowMatrix.copy(light.shadow.camera.matrixWorldInverse);
+        this.getOBB(shadowMatrix, OBB);
+
+        direction.subVectors(light.target.position, light.position);
+        light.position.subVectors(OBB.center, direction);
+        light.target.position.copy(OBB.center);
+
+        light.shadow.bias = 0.09;
+        light.shadow.camera.bottom = -OBB.halfSize.y;
+        light.shadow.camera.top = OBB.halfSize.y;
+        light.shadow.camera.right = OBB.halfSize.x;
+        light.shadow.camera.left = -OBB.halfSize.x;
+        light.shadow.camera.near = direction.length() - OBB.halfSize.z;
+        light.shadow.camera.far = direction.length() + OBB.halfSize.z;
+
+        light.shadow.camera.updateProjectionMatrix();
+      }
+    }
+  };
+}());
 
 /**
  * Initialize the viewer.
@@ -264,6 +301,9 @@ Miew.prototype.init = function () {
       this._gfx.camera, this._gfx.renderer.domElement, (() => self._getAltObj()),
     );
     this._objectControls.addEventListener('change', (e) => {
+      if (settings.now.shadow.on) {
+        self._updateShadowCamera();
+      }
       // route rotate and zoom events to the external API
       switch (e.action) {
         case 'rotate':
@@ -284,16 +324,13 @@ Miew.prototype.init = function () {
       self._onPick(event);
     });
     this._picker.addEventListener('dblclick', (event) => {
-      self._onDblClick(event);
+      self.center(event);
     });
-
-    if (!settings._changed['bg.color']) {
-      settings.set('bg.color', settings.now.themes[settings.now.theme]);
-    }
   } catch (error) {
-    // FIXME: THREE.WebGLRenderer throws error AND catches it, so we receive different one. Some random crash.
     if (error.name === 'TypeError' && error.message === 'Cannot read property \'getExtension\' of null') {
       this._showMessage('Could not create WebGL context.');
+    } else if (error.message.search(/webgl/i) > 1) {
+      this._showMessage(error.message);
     } else {
       this._showMessage('Viewer initialization failed.');
       throw error;
@@ -363,7 +400,7 @@ Miew.prototype._initGfx = function () {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
-  gfx.renderer.shadowMap.enabled = false;
+  gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
   gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
   capabilities.init(gfx.renderer);
 
@@ -419,18 +456,21 @@ Miew.prototype._initGfx = function () {
   gfx.selectionPivot.matrixAutoUpdate = false;
   gfx.selectionRoot.add(gfx.selectionPivot);
 
-  // TODO: Either stay with a single light or revert this commit
   const light12 = new THREE.DirectionalLight(0xffffff, 0.45);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light12.castShadow = true;
   light12.shadow = new THREE.DirectionalLightShadow();
-  light12.shadow.bias = -0.0005;
+  light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
-  const shadowMapSize = Math.max(gfx.width, gfx.height) * window.devicePixelRatio;
+
+  const pixelRatio = gfx.renderer.getPixelRatio();
+  const shadowMapSize = Math.max(gfx.width, gfx.height) * pixelRatio;
   light12.shadow.mapSize.width = shadowMapSize;
   light12.shadow.mapSize.height = shadowMapSize;
+  light12.target.position.set(0.0, 0.0, 0.0);
   gfx.scene.add(light12);
+  gfx.scene.add(light12.target);
 
   const light3 = new THREE.AmbientLight(0x666666);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
@@ -438,10 +478,12 @@ Miew.prototype._initGfx = function () {
 
   // add axes
   gfx.axes = new Axes(gfx.root, gfx.camera);
+  const deviceWidth = gfx.width * pixelRatio;
+  const deviceHeight = gfx.height * pixelRatio;
 
   gfx.offscreenBuf = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, depthBuffer: true,
     },
@@ -453,24 +495,24 @@ Miew.prototype._initGfx = function () {
   }
 
   gfx.offscreenBuf2 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.offscreenBuf3 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.offscreenBuf4 = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
@@ -483,8 +525,8 @@ Miew.prototype._initGfx = function () {
   // use float textures for volume rendering if possible
   if (gfx.renderer.getContext().getExtension('OES_texture_float')) {
     gfx.offscreenBuf5 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      deviceWidth,
+      deviceHeight,
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -495,8 +537,8 @@ Miew.prototype._initGfx = function () {
     );
 
     gfx.offscreenBuf6 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      deviceWidth,
+      deviceHeight,
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -507,8 +549,8 @@ Miew.prototype._initGfx = function () {
     );
 
     gfx.offscreenBuf7 = new THREE.WebGLRenderTarget(
-      gfx.width * window.devicePixelRatio,
-      gfx.height * window.devicePixelRatio,
+      deviceWidth,
+      deviceHeight,
       {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
@@ -526,16 +568,16 @@ Miew.prototype._initGfx = function () {
   }
 
   gfx.stereoBufL = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
   );
 
   gfx.stereoBufR = new THREE.WebGLRenderTarget(
-    gfx.width * window.devicePixelRatio,
-    gfx.height * window.devicePixelRatio,
+    deviceWidth,
+    deviceHeight,
     {
       minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false,
     },
@@ -636,7 +678,7 @@ Miew.prototype._removeVisual = function (visual) {
   }
 
   if (name === this._curVisualName) {
-    this._curVisualName = undefined; // TODO: implement a proper way of handling visuals
+    this._curVisualName = undefined;
   }
 
   delete this._visuals[name];
@@ -749,6 +791,15 @@ Miew.prototype.getVisuals = function () {
 };
 
 /*
+   * Get complex visuals count
+   */
+Miew.prototype.getComplexVisualsCount = function () {
+  let count = 0;
+  this._forEachComplexVisual(() => count++);
+  return count;
+};
+
+/*
    * Get current visual
    */
 Miew.prototype.getCurrentVisual = function () {
@@ -781,6 +832,7 @@ Miew.prototype.run = function () {
     }
 
     this._objectControls.enable(true);
+    viewInterpolator.resume();
 
     const device = this.webVR ? this.webVR.getDevice() : null;
     (device || window).requestAnimationFrame(() => this._onTick());
@@ -797,6 +849,7 @@ Miew.prototype.halt = function () {
     this._discardComponentEdit();
     this._discardFragmentEdit();
     this._objectControls.enable(false);
+    viewInterpolator.pause();
     this._halting = true;
   }
 };
@@ -888,6 +941,60 @@ Miew.prototype._getBSphereRadius = function () {
   return radius * this._objectControls.getScale();
 };
 
+/**
+ * Calculate bounding box that would include all visuals and being axis aligned in world defined by
+ * transformation matrix: matrix
+ * @param {Matrix4} matrix - transformation matrix.
+ * @param {object}  OBB           - calculating bounding box.
+ * @param {Vector3} OBB.center    - OBB center.
+ * @param {Vector3} OBB.halfSize  - half magnitude of OBB sizes.
+ */
+Miew.prototype.getOBB = (function () {
+  const _bSphereForOneVisual = new THREE.Sphere();
+  const _bBoxForOneVisual = new THREE.Box3();
+  const _bBox = new THREE.Box3();
+
+  const _invMatrix = new THREE.Matrix4();
+
+  const _points = [
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+    new THREE.Vector3(),
+  ];
+
+  return function (matrix, OBB) {
+    _bBox.makeEmpty();
+
+    this._forEachVisual((visual) => {
+      _bSphereForOneVisual.copy(visual.getBoundaries().boundingSphere);
+      _bSphereForOneVisual.applyMatrix4(visual.matrixWorld).applyMatrix4(matrix);
+      _bSphereForOneVisual.getBoundingBox(_bBoxForOneVisual);
+      _bBox.union(_bBoxForOneVisual);
+    });
+    _bBox.getCenter(OBB.center);
+
+    _invMatrix.getInverse(matrix);
+    OBB.center.applyMatrix4(_invMatrix);
+
+    const { min } = _bBox;
+    const { max } = _bBox;
+    _points[0].set(min.x, min.y, min.z); // 000
+    _points[1].set(max.x, min.y, min.z); // 100
+    _points[2].set(min.x, max.y, min.z); // 010
+    _points[3].set(min.x, min.y, max.z); // 001
+    for (let i = 0, l = _points.length; i < l; i++) {
+      _points[i].applyMatrix4(_invMatrix);
+    }
+
+    OBB.halfSize.set(
+      Math.abs(_points[0].x - _points[1].x),
+      Math.abs(_points[0].y - _points[2].y),
+      Math.abs(_points[0].z - _points[3].z),
+    ).multiplyScalar(0.5);
+  };
+}());
+
 Miew.prototype._updateFog = function () {
   const gfx = this._gfx;
 
@@ -902,7 +1009,6 @@ Miew.prototype._updateFog = function () {
     gfx.scene.fog = undefined;
     this._setUberMaterialValues({ fog: settings.now.fog });
   }
-  this._needRender = true;
 };
 
 Miew.prototype._onUpdate = function () {
@@ -939,7 +1045,6 @@ Miew.prototype._onRender = function () {
   gfx.camera.updateMatrixWorld();
 
   this._clipPlaneUpdateValue(this._getBSphereRadius());
-  this._updateShadow(this._getBSphereRadius());
   this._fogFarUpdateValue();
 
   gfx.renderer.setRenderTarget(null);
@@ -950,24 +1055,30 @@ Miew.prototype._onRender = function () {
 
 Miew.prototype._renderFrame = (function () {
   const _anaglyphMat = new AnaglyphMaterial();
+  const _size = new THREE.Vector2();
 
   return function (stereo) {
     const gfx = this._gfx;
     const { renderer } = gfx;
 
+    renderer.getSize(_size);
+
     if (stereo !== 'NONE') {
+      gfx.camera.focus = gfx.camera.position.z; // set focus to the center of the object
+      gfx.stereoCam.aspect = 1.0;
+
       // in anaglyph mode we render full-size image for each eye
       // while in other stereo modes only half-size (two images on the screen)
-      gfx.stereoCam.aspect = (stereo === 'ANAGLYPH') ? 1.0 : 0.5;
-
-      gfx.camera.focus = gfx.camera.position.z; // set focus to the center of the object
-      gfx.stereoCam.update(gfx.camera);
+      if (stereo === 'ANAGLYPH') {
+        gfx.stereoCam.update(gfx.camera);
+      } else {
+        gfx.stereoCam.updateHalfSized(gfx.camera, settings.now.camFov);
+      }
     }
 
-    const size = renderer.getSize();
-
     // resize offscreen buffers to match the target
-    this._resizeOffscreenBuffers(size.width * window.devicePixelRatio, size.height * window.devicePixelRatio, stereo);
+    const pixelRatio = gfx.renderer.getPixelRatio();
+    this._resizeOffscreenBuffers(_size.width * pixelRatio, _size.height * pixelRatio, stereo);
 
     switch (stereo) {
       case 'WEBVR':
@@ -978,12 +1089,12 @@ Miew.prototype._renderFrame = (function () {
       case 'DISTORTED':
         renderer.setScissorTest(true);
 
-        renderer.setScissor(0, 0, size.width / 2, size.height);
-        renderer.setViewport(0, 0, size.width / 2, size.height);
+        renderer.setScissor(0, 0, _size.width / 2, _size.height);
+        renderer.setViewport(0, 0, _size.width / 2, _size.height);
         this._renderScene(this._gfx.stereoCam.cameraL, stereo === 'DISTORTED');
 
-        renderer.setScissor(size.width / 2, 0, size.width / 2, size.height);
-        renderer.setViewport(size.width / 2, 0, size.width / 2, size.height);
+        renderer.setScissor(_size.width / 2, 0, _size.width / 2, _size.height);
+        renderer.setViewport(_size.width / 2, 0, _size.width / 2, _size.height);
         this._renderScene(this._gfx.stereoCam.cameraR, stereo === 'DISTORTED');
 
         renderer.setScissorTest(false);
@@ -991,8 +1102,9 @@ Miew.prototype._renderFrame = (function () {
       case 'ANAGLYPH':
         this._renderScene(this._gfx.stereoCam.cameraL, false, gfx.stereoBufL);
         this._renderScene(this._gfx.stereoCam.cameraR, false, gfx.stereoBufR);
-        _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL;
-        _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR;
+        renderer.setRenderTarget(null);
+        _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL.texture;
+        _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR.texture;
         gfx.renderer.renderScreenQuad(_anaglyphMat);
         break;
       default:
@@ -1003,18 +1115,6 @@ Miew.prototype._renderFrame = (function () {
     if (settings.now.axes && gfx.axes && !gfx.renderer.vr.enabled) {
       gfx.axes.render(renderer);
     }
-  };
-}());
-/** @deprecated - use _onBgColorChanged */
-Miew.prototype._onThemeChanged = (function () {
-  const themeRE = /\s*theme-\w+\b/g;
-  return function () {
-    const { theme } = settings.now;
-    const div = this._containerRoot;
-    div.className = `${div.className.replace(themeRE, '')} theme-${theme}`;
-
-    settings.set('bg.color', settings.now.themes[theme]);
-    this._needRender = true;
   };
 }());
 
@@ -1049,18 +1149,23 @@ Miew.prototype._setUberMaterialValues = function (values) {
   });
 };
 
-Miew.prototype._setMRT = function (renderBuffer, textureBuffer) {
+Miew.prototype._enableMRT = function (on, renderBuffer, textureBuffer) {
   const gfx = this._gfx;
   const gl = gfx.renderer.getContext();
   const ext = gl.getExtension('WEBGL_draw_buffers');
   const { properties } = gfx.renderer;
+
+  if (!on) {
+    ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, null]);
+    return;
+  }
 
   // take extra texture from Texture Buffer
   gfx.renderer.setRenderTarget(textureBuffer);
   const tx8 = properties.get(textureBuffer.texture).__webglTexture;
   gl.bindTexture(gl.TEXTURE_2D, tx8);
 
-  // take texture and farmebuffer from renderbuffer
+  // take texture and framebuffer from renderbuffer
   gfx.renderer.setRenderTarget(renderBuffer);
   const fb = properties.get(renderBuffer).__webglFramebuffer;
   const tx = properties.get(renderBuffer.texture).__webglTexture;
@@ -1091,20 +1196,33 @@ Miew.prototype._renderScene = (function () {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
-    gfx.renderer.setRenderTarget(gfx.offscreenBuf); // FIXME clean up targets in render selection
+
+    // clean buffer for normals texture
+    gfx.renderer.setClearColor(0x000000, 0.0);
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf4);
+    gfx.renderer.clearColor();
+
+    gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
+    gfx.renderer.setRenderTarget(gfx.offscreenBuf);
     gfx.renderer.clear();
 
     const bHaveComplexes = (this._getComplexVisual() !== null);
     const volumeVisual = this._getVolumeVisual();
+    const ssao = bHaveComplexes && settings.now.ao;
 
-    if (bHaveComplexes && settings.now.ao) {
-      this._setMRT(gfx.offscreenBuf, gfx.offscreenBuf4);
+    if (ssao) {
+      this._enableMRT(true, gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
     if (settings.now.transparency === 'prepass') {
       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
-      gfx.renderer.render(gfx.scene, camera, gfx.offscreenBuf);
+      gfx.renderer.setRenderTarget(gfx.offscreenBuf);
+      gfx.renderer.render(gfx.scene, camera);
+    }
+
+    if (ssao) {
+      this._enableMRT(false, null, null);
     }
 
     // when fxaa we should get resulting image in temp off-screen buff2 for further postprocessing with fxaa filter
@@ -1112,10 +1230,10 @@ Miew.prototype._renderScene = (function () {
     const outline = bHaveComplexes && settings.now.outline.on;
     const fxaa = bHaveComplexes && settings.now.fxaa;
     const volume = (volumeVisual !== null) && (volumeVisual.getMesh().material != null);
-    let dstBuffer = (outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
+    let dstBuffer = (ssao || outline || volume || fxaa || distortion) ? gfx.offscreenBuf2 : target;
     let srcBuffer = gfx.offscreenBuf;
 
-    if (bHaveComplexes && settings.now.ao) {
+    if (ssao) {
       this._performAO(
         srcBuffer,
         gfx.offscreenBuf4,
@@ -1124,9 +1242,16 @@ Miew.prototype._renderScene = (function () {
         gfx.offscreenBuf3,
         gfx.offscreenBuf2,
       );
+      if (!fxaa && !distortion && !volume && !outline) {
+        srcBuffer = dstBuffer;
+        dstBuffer = target;
+        gfx.renderer.setRenderTarget(dstBuffer);
+        gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0);
+      }
     } else {
       // just copy color buffer to dst buffer
-      gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0, dstBuffer);
+      gfx.renderer.setRenderTarget(dstBuffer);
+      gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 1.0);
     }
 
     // outline
@@ -1144,20 +1269,22 @@ Miew.prototype._renderScene = (function () {
     if (volume) {
       // copy current picture to the buffer that retains depth-data of the original molecule render
       // so that volume renderer could use depth-test
-      gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, gfx.offscreenBuf);
+      gfx.renderer.setRenderTarget(gfx.offscreenBuf);
+      gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0);
       dstBuffer = gfx.offscreenBuf;
       this._renderVolume(volumeVisual, camera, dstBuffer, gfx.volBFTex, gfx.volFFTex, gfx.volWFFTex);
 
       // if this is the last stage -- copy image to target
       if (!fxaa && !distortion) {
-        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0, target);
+        gfx.renderer.setRenderTarget(target);
+        gfx.renderer.renderScreenQuadFromTex(dstBuffer.texture, 1.0);
       }
     }
 
     srcBuffer = dstBuffer;
 
     if (fxaa) {
-      dstBuffer = distortion ? gfx.offscreenBuf2 : target;
+      dstBuffer = distortion ? gfx.offscreenBuf4 : target;
       this._performFXAA(srcBuffer, dstBuffer);
       srcBuffer = dstBuffer;
     }
@@ -1173,21 +1300,13 @@ Miew.prototype._performDistortion = (function () {
   const _scene = new THREE.Scene();
   const _camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000);
 
-  const _material = new THREE.ShaderMaterial({
+  const _material = new THREE.RawShaderMaterial({
     uniforms: {
       srcTex: { type: 't', value: null },
       aberration: { type: 'fv3', value: new THREE.Vector3(1.0) },
     },
-    vertexShader: 'varying vec2 vUv; '
-      + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform vec3 aberration;'
-      + 'void main() {'
-      + 'vec2 uv = vUv * 2.0 - 1.0;'
-      + 'gl_FragColor.r = texture2D(srcTex, 0.5 * (uv * aberration[0] + 1.0)).r;'
-      + 'gl_FragColor.g = texture2D(srcTex, 0.5 * (uv * aberration[1] + 1.0)).g;'
-      + 'gl_FragColor.b = texture2D(srcTex, 0.5 * (uv * aberration[2] + 1.0)).b;'
-      + 'gl_FragColor.a = 1.0;'
-      + '}',
+    vertexShader: vertexScreenQuadShader,
+    fragmentShader: fragmentScreenQuadFromDistTex,
     transparent: false,
     depthTest: false,
     depthWrite: false,
@@ -1203,12 +1322,9 @@ Miew.prototype._performDistortion = (function () {
     if (mesh) {
       _material.uniforms.srcTex.value = srcBuffer.texture;
       _material.uniforms.aberration.value.set(0.995, 1.0, 1.01);
-      this._gfx.renderer.render(_scene, _camera, targetBuffer);
+      this._gfx.renderer.render(_scene, _camera);
     } else {
-      this._gfx.renderer.renderScreenQuadFromTexWithDistortion(
-        srcBuffer,
-        settings.now.debug.stereoBarrel, targetBuffer,
-      );
+      this._gfx.renderer.renderScreenQuadFromTexWithDistortion(srcBuffer, settings.now.debug.stereoBarrel);
     }
   };
 }());
@@ -1226,10 +1342,32 @@ Miew.prototype._renderOutline = (function () {
     _outlineMaterial.uniforms.srcTexSize.value.set(srcDepthBuffer.width, srcDepthBuffer.height);
     _outlineMaterial.uniforms.color.value = new THREE.Color(settings.now.outline.color);
     _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold;
+    _outlineMaterial.uniforms.thickness.value = new THREE.Vector2(
+      settings.now.outline.thickness,
+      settings.now.outline.thickness,
+    );
 
-    gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.renderScreenQuad(_outlineMaterial);
   };
 }());
+
+/**
+ * Check if there is selection which must be rendered or not.
+ * @private
+ * @returns {boolean} true on existing selection to render
+ */
+Miew.prototype._hasSelectionToRender = function () {
+  const selPivot = this._gfx.selectionPivot;
+
+  for (let i = 0; i < selPivot.children.length; i++) {
+    const selPivotChild = selPivot.children[i];
+    if (selPivotChild.children.length > 0) {
+      return true;
+    }
+  }
+  return false;
+};
 
 Miew.prototype._renderSelection = (function () {
   const _outlineMaterial = new OutlineMaterial();
@@ -1240,26 +1378,27 @@ Miew.prototype._renderSelection = (function () {
 
     // clear offscreen buffer (leave z-buffer intact)
     gfx.renderer.setClearColor('black', 0);
-    gfx.renderer.setRenderTarget(srcBuffer);
-    gfx.renderer.clear(true, false, false);
 
     // render selection to offscreen buffer
-    if (gfx.selectionPivot.children.length > 0) {
+    gfx.renderer.setRenderTarget(srcBuffer);
+    gfx.renderer.clear(true, false, false);
+    if (self._hasSelectionToRender()) {
       gfx.selectionRoot.matrix = gfx.root.matrix;
       gfx.selectionPivot.matrix = gfx.pivot.matrix;
-      gfx.renderer.render(gfx.selectionScene, camera, srcBuffer);
+      gfx.renderer.render(gfx.selectionScene, camera);
     } else {
       // just render something to force "target clear" operation to finish
-      gfx.renderer.renderDummyQuad(srcBuffer);
+      gfx.renderer.renderDummyQuad();
     }
 
     // overlay to screen
-    gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 0.6, targetBuffer);
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.renderScreenQuadFromTex(srcBuffer.texture, 0.6);
 
     // apply Sobel filter -- draw outline
     _outlineMaterial.uniforms.srcTex.value = srcBuffer.texture;
     _outlineMaterial.uniforms.srcTexSize.value.set(srcBuffer.width, srcBuffer.height);
-    gfx.renderer.renderScreenQuad(_outlineMaterial, targetBuffer);
+    gfx.renderer.renderScreenQuad(_outlineMaterial);
   };
 }());
 
@@ -1303,7 +1442,7 @@ Miew.prototype._renderVolume = (function () {
 
     const mesh = volumeVisual.getMesh();
 
-    mesh.rebuild(camera);
+    mesh.rebuild(gfx.camera);
 
     // use main camera to prepare special textures to be used by volumetric rendering
     // these textures have the size of the window and are stored in offscreen buffers
@@ -1315,17 +1454,19 @@ Miew.prototype._renderVolume = (function () {
     gfx.renderer.setRenderTarget(tmpBuf3);
     gfx.renderer.clear();
 
+    gfx.renderer.setRenderTarget(tmpBuf1);
     // draw plane with its own material, because it differs slightly from volumeBFMat
     camera.layers.set(gfxutils.LAYERS.VOLUME_BFPLANE);
-    gfx.renderer.render(gfx.scene, camera, tmpBuf1);
+    gfx.renderer.render(gfx.scene, camera);
 
     camera.layers.set(gfxutils.LAYERS.VOLUME);
     gfx.scene.overrideMaterial = volumeBFMat;
-    gfx.renderer.render(gfx.scene, camera, tmpBuf1);
+    gfx.renderer.render(gfx.scene, camera);
 
+    gfx.renderer.setRenderTarget(tmpBuf2);
     camera.layers.set(gfxutils.LAYERS.VOLUME);
     gfx.scene.overrideMaterial = volumeFFMat;
-    gfx.renderer.render(gfx.scene, camera, tmpBuf2);
+    gfx.renderer.render(gfx.scene, camera);
 
     gfx.scene.overrideMaterial = null;
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
@@ -1333,9 +1474,9 @@ Miew.prototype._renderVolume = (function () {
     // prepare texture that contains molecule positions
     world2colorMat.getInverse(mesh.matrixWorld);
     UberMaterial.prototype.uberOptions.world2colorMatrix.multiplyMatrices(cubeOffsetMat, world2colorMat);
-    this._setUberMaterialValues({ colorFromPos: true });
-    gfx.renderer.render(gfx.scene, camera, tmpBuf3);
-    this._setUberMaterialValues({ colorFromPos: false });
+    camera.layers.set(gfxutils.LAYERS.COLOR_FROM_POSITION);
+    gfx.renderer.setRenderTarget(tmpBuf3);
+    gfx.renderer.render(gfx.scene, camera);
 
     // render volume
     const vm = mesh.material;
@@ -1343,7 +1484,8 @@ Miew.prototype._renderVolume = (function () {
     vm.uniforms._FFRight.value = tmpBuf2.texture;
     vm.uniforms._WFFRight.value = tmpBuf3.texture;
     camera.layers.set(gfxutils.LAYERS.VOLUME);
-    gfx.renderer.render(gfx.scene, camera, dstBuf);
+    gfx.renderer.setRenderTarget(dstBuf);
+    gfx.renderer.render(gfx.scene, camera);
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
   };
 }());
@@ -1360,20 +1502,21 @@ Miew.prototype._renderVolume = (function () {
 Miew.prototype._renderWithPrepassTransparency = (function () {
   return function (camera, targetBuffer) {
     const gfx = this._gfx;
+    gfx.renderer.setRenderTarget(targetBuffer);
 
     // opaque objects
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
-    gfx.renderer.render(gfx.scene, camera, targetBuffer);
+    gfx.renderer.render(gfx.scene, camera);
 
     // transparent objects z prepass
     camera.layers.set(gfxutils.LAYERS.PREPASS_TRANSPARENT);
-    gfx.renderer.context.colorMask(false, false, false, false); // don't update color buffer
-    gfx.renderer.render(gfx.scene, camera, targetBuffer);
-    gfx.renderer.context.colorMask(true, true, true, true); // update color buffer
+    gfx.renderer.getContext().colorMask(false, false, false, false); // don't update color buffer
+    gfx.renderer.render(gfx.scene, camera);
+    gfx.renderer.getContext().colorMask(true, true, true, true); // update color buffer
 
     // transparent objects color pass
     camera.layers.set(gfxutils.LAYERS.TRANSPARENT);
-    gfx.renderer.render(gfx.scene, camera, targetBuffer);
+    gfx.renderer.render(gfx.scene, camera);
 
     // restore default layer
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
@@ -1404,86 +1547,23 @@ Miew.prototype._performFXAA = (function () {
       _fxaaMaterial.setValues({ bgTransparent: settings.now.bg.transparent });
       _fxaaMaterial.needsUpdate = true;
     }
-    gfx.renderer.renderScreenQuad(_fxaaMaterial, targetBuffer);
+    gfx.renderer.renderScreenQuad(_fxaaMaterial);
   };
 }());
 
 Miew.prototype._performAO = (function () {
-  const _aoMaterial = new ao.AOMaterial();
-  const _horBlurMaterial = new ao.HorBilateralBlurMaterial();
-  const _vertBlurMaterial = new ao.VertBilateralBlurMaterial();
+  const _aoMaterial = new AOMaterial();
+  const _horBlurMaterial = new AOHorBlurMaterial();
+  const _vertBlurMaterial = new AOVertBlurWithBlendMaterial();
 
-  const _noiseWidth = 4;
-  const _noiseHeight = 4;
-  const _noiseData = new Uint8Array([
-    0, 0, 0, 66, 0, 0, 77, 0, 0, 155, 62, 0,
-    0, 247, 0, 33, 0, 0, 0, 0, 0, 235, 0, 0,
-    0, 0, 0, 176, 44, 0, 232, 46, 0, 0, 29, 0,
-    0, 0, 0, 78, 197, 0, 93, 0, 0, 0, 0, 0,
-  ]);
-  const _noiseWrapS = THREE.RepeatWrapping;
-  const _noiseWrapT = THREE.RepeatWrapping;
-  const _noiseMinFilter = THREE.NearestFilter;
-  const _noiseMagFilter = THREE.NearestFilter;
-  const _noiseMapping = THREE.UVMapping;
-  const _noiseTexture = new THREE.DataTexture(
-    _noiseData, _noiseWidth, _noiseHeight, THREE.RGBFormat,
-    THREE.UnsignedByteType, _noiseMapping, _noiseWrapS, _noiseWrapT, _noiseMagFilter, _noiseMinFilter, 1,
-  );
-  _noiseTexture.needsUpdate = true;
-
-  const _samplesKernel = [
-    // hemisphere samples adopted to sphere (FIXME remove minus from Z)
-    new THREE.Vector3(0.295184, 0.077723, 0.068429),
-    new THREE.Vector3(-0.271976, -0.365221, 0.838363),
-    new THREE.Vector3(0.547713, 0.467576, 0.488515),
-    new THREE.Vector3(0.662808, -0.031733, 0.584758),
-    new THREE.Vector3(-0.025717, 0.218955, 0.657094),
-    new THREE.Vector3(-0.310153, -0.365223, 0.370701),
-    new THREE.Vector3(-0.101407, -0.006313, 0.747665),
-    new THREE.Vector3(-0.769138, 0.360399, 0.086847),
-    new THREE.Vector3(-0.271988, -0.275140, 0.905353),
-    new THREE.Vector3(0.096740, -0.566901, 0.700151),
-    new THREE.Vector3(0.562872, -0.735136, 0.094647),
-    new THREE.Vector3(0.379877, 0.359278, 0.190061),
-    new THREE.Vector3(0.519064, -0.023055, 0.405068),
-    new THREE.Vector3(-0.301036, 0.114696, 0.088885),
-    new THREE.Vector3(-0.282922, 0.598305, 0.487214),
-    new THREE.Vector3(-0.181859, 0.251670, 0.679702),
-    new THREE.Vector3(-0.191463, -0.635818, 0.512919),
-    new THREE.Vector3(-0.293655, 0.427423, 0.078921),
-    new THREE.Vector3(-0.267983, 0.680534, 0.132880),
-    new THREE.Vector3(0.139611, 0.319637, 0.477439),
-    new THREE.Vector3(-0.352086, 0.311040, 0.653913),
-    new THREE.Vector3(0.321032, 0.805279, 0.487345),
-    new THREE.Vector3(0.073516, 0.820734, 0.414183),
-    new THREE.Vector3(-0.155324, 0.589983, 0.411460),
-    new THREE.Vector3(0.335976, 0.170782, 0.527627),
-    new THREE.Vector3(0.463460, -0.355658, 0.167689),
-    new THREE.Vector3(0.222654, 0.596550, 0.769406),
-    new THREE.Vector3(0.922138, -0.042070, 0.147555),
-    new THREE.Vector3(-0.727050, -0.329192, 0.369826),
-    new THREE.Vector3(-0.090731, 0.533820, 0.463767),
-    new THREE.Vector3(-0.323457, -0.876559, 0.238524),
-    new THREE.Vector3(-0.663277, -0.372384, 0.342856),
-  ];
-  // var _kernelOffsets = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0];
-  const _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
-
+  const _scale = new THREE.Vector3();
   return function (srcColorBuffer, normalBuffer, srcDepthTexture, targetBuffer, tempBuffer, tempBuffer1) {
     if (!srcColorBuffer || !normalBuffer || !srcDepthTexture || !targetBuffer || !tempBuffer || !tempBuffer1) {
       return;
     }
+    const gfx = this._gfx;
+    const tanHalfFOV = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
 
-    const self = this;
-    const gfx = self._gfx;
-
-    // clear canvasFMatrix4
-    // gfx.renderer.setClearColor(THREE.aliceblue, 1);
-    // gfx.renderer.setRenderTarget(targetBuffer);
-    // gfx.renderer.clear(true, false);
-
-    // do fxaa processing of offscreen buff2
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _aoMaterial.uniforms.depthTexture.value = srcDepthTexture;
     _aoMaterial.uniforms.normalTexture.value = normalBuffer.texture;
@@ -1491,37 +1571,40 @@ Miew.prototype._performAO = (function () {
     _aoMaterial.uniforms.camNearFar.value.set(gfx.camera.near, gfx.camera.far);
     _aoMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
     _aoMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
-    _aoMaterial.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
-    _aoMaterial.uniforms.samplesKernel.value = _samplesKernel;
-    const translation = new THREE.Vector3();
-    const quaternion = new THREE.Quaternion();
-    const scale = new THREE.Vector3();
-    gfx.root.matrix.decompose(translation, quaternion, scale);
-    _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * scale.x;
+    _aoMaterial.uniforms.tanHalfFOV.value = tanHalfFOV;
+    gfx.root.matrix.extractScale(_scale);
+    _aoMaterial.uniforms.kernelRadius.value = settings.now.debug.ssaoKernelRadius * _scale.x;
     _aoMaterial.uniforms.depthThreshold.value = 2.0 * this._getBSphereRadius(); // diameter
     _aoMaterial.uniforms.factor.value = settings.now.debug.ssaoFactor;
-    _aoMaterial.uniforms.noiseTexture.value = _noiseTexture;
-    _aoMaterial.uniforms.noiseTexelSize.value.set(1.0 / _noiseWidth, 1.0 / _noiseHeight);
-    const { fog } = gfx.scene;
-    if (fog) {
-      _aoMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
-    }
-    _aoMaterial.transparent = false;
     // N: should be tempBuffer1 for proper use of buffers (see buffers using outside the function)
-    gfx.renderer.renderScreenQuad(_aoMaterial, tempBuffer1);
+    gfx.renderer.setRenderTarget(tempBuffer1);
+    gfx.renderer.renderScreenQuad(_aoMaterial);
 
     _horBlurMaterial.uniforms.aoMap.value = tempBuffer1.texture;
     _horBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer1.width, 1.0 / tempBuffer1.height);
     _horBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
-    _horBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
-    gfx.renderer.renderScreenQuad(_horBlurMaterial, tempBuffer);
+    gfx.renderer.setRenderTarget(tempBuffer);
+    gfx.renderer.renderScreenQuad(_horBlurMaterial);
 
     _vertBlurMaterial.uniforms.aoMap.value = tempBuffer.texture;
     _vertBlurMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _vertBlurMaterial.uniforms.srcTexelSize.value.set(1.0 / tempBuffer.width, 1.0 / tempBuffer.height);
     _vertBlurMaterial.uniforms.depthTexture.value = srcDepthTexture;
-    _vertBlurMaterial.uniforms.samplesOffsets.value = _kernelOffsets;
-    gfx.renderer.renderScreenQuad(_vertBlurMaterial, targetBuffer);
+    _vertBlurMaterial.uniforms.projMatrix.value = gfx.camera.projectionMatrix;
+    _vertBlurMaterial.uniforms.aspectRatio.value = gfx.camera.aspect;
+    _vertBlurMaterial.uniforms.tanHalfFOV.value = tanHalfFOV;
+    const { fog } = gfx.scene;
+    if (fog) {
+      _vertBlurMaterial.uniforms.fogNearFar.value.set(fog.near, fog.far);
+      _vertBlurMaterial.uniforms.fogColor.value.set(fog.color.r, fog.color.g, fog.color.b, settings.now.fogAlpha);
+    }
+    if ((_vertBlurMaterial.useFog !== settings.now.fog)
+      || (_vertBlurMaterial.fogTransparent !== settings.now.bg.transparent)) {
+      _vertBlurMaterial.setValues({ useFog: settings.now.fog, fogTransparent: settings.now.bg.transparent });
+      _vertBlurMaterial.needsUpdate = true;
+    }
+    gfx.renderer.setRenderTarget(targetBuffer);
+    gfx.renderer.renderScreenQuad(_vertBlurMaterial);
   };
 }());
 
@@ -1575,16 +1658,20 @@ Miew.prototype.resetView = function () {
 
 Miew.prototype._export = function (format) {
   const TheExporter = _.head(io.exporters.find({ format }));
-  // let result;
   if (!TheExporter) {
     this.logger.error('Could not find suitable exporter for this source');
     return Promise.reject(new Error('Could not find suitable exporter for this source'));
   }
 
   if (this._visuals[this._curVisualName] instanceof ComplexVisual) {
-    const dataSource = this._visuals[this._curVisualName]._complex;
-    const exporter = new TheExporter(dataSource, { binary: true });
-    return exporter.export().then(data => data);
+    let dataSource = null;
+    if (TheExporter.SourceClass === ComplexVisual) {
+      dataSource = this._visuals[this._curVisualName];
+    } else if (TheExporter.SourceClass === Complex) {
+      dataSource = this._visuals[this._curVisualName]._complex;
+    }
+    const exporter = new TheExporter(dataSource, { miewVersion: Miew.VERSION });
+    return exporter.export().then((data) => data);
   }
   if (this._visuals[this._curVisualName] instanceof VolumeVisual) {
     return Promise.reject(new Error('Sorry, exporter for volume data not implemented yet'));
@@ -1592,7 +1679,7 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
-const rePdbId = /^(?:(pdb|cif|mmtf|ccp4):\s*)?(\d[a-z\d]{3})$/i;
+const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
 const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
 
@@ -1611,16 +1698,19 @@ function resolveSourceShortcut(source, opts) {
 
     switch (format) {
       case 'pdb':
-        source = `http://files.rcsb.org/download/${id}.pdb`;
+        source = `https://files.rcsb.org/download/${id}.pdb`;
         break;
       case 'cif':
-        source = `http://files.rcsb.org/download/${id}.cif`;
+        source = `https://files.rcsb.org/download/${id}.cif`;
         break;
       case 'mmtf':
-        source = `http://mmtf.rcsb.org/v1.0/full/${id}`;
+        source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
         break;
       case 'ccp4':
         source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
+        break;
+      case 'dsn6':
+        source = `https://edmaps.rcsb.org/maps/${id.toLowerCase()}_2fofc.dsn6`;
         break;
       default:
         throw new Error('Unexpected data format shortcut');
@@ -1705,7 +1795,7 @@ function _fetchData(source, opts, job) {
     // detect a proper loader
     const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
     if (!TheLoader) {
-      throw new Error('Could not find suitable loader for this source');
+      throw new Error(LOADER_NOT_FOUND);
     }
 
     // split file name
@@ -1725,7 +1815,7 @@ function _fetchData(source, opts, job) {
     if (!_.isUndefined(newOptions)) {
       newOptions = JSON.parse(newOptions);
       if (newOptions && newOptions.settings) {
-        const keys = ['singleUnit', 'draft.waterBondingHack'];
+        const keys = ['singleUnit'];
         for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
           const key = keys[keyIndex];
           const value = _.get(newOptions.settings, key);
@@ -1768,46 +1858,6 @@ function _fetchData(source, opts, job) {
         throw error;
       });
     resolve(promise);
-  }));
-}
-
-function _convertData(data, opts, job) {
-  return new Promise(((resolve, reject) => {
-    if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
-    }
-    job.notify({ type: 'convert' });
-
-    if (opts.mdFile) {
-      const byteNumbers = new Array(data.length);
-      for (let i = 0; i < data.length; i++) {
-        byteNumbers[i] = data.charCodeAt(i);
-      }
-      const bytes = new Uint8Array(byteNumbers);
-      const blob = new File([bytes], opts.fileName);
-      console.time('convert');
-      Miew.prototype.srvTopologyConvert(blob, opts.mdFile, (success, newData, message) => {
-        console.timeEnd('convert');
-        if (success) {
-          opts.converted = true;
-          opts.amberFileName = opts.fileName;
-          opts.convertedFile = new File([bytes], opts.fileName);
-          opts.fileName = null;
-          opts.fileType = 'pdb';
-          job.notify({ type: 'convertingFinished' });
-          resolve(newData);
-        } else {
-          opts.converted = false;
-          logger.error(message);
-          opts.error = message;
-          job.notify({ type: 'convertingFinished', error: message });
-          reject(new Error(message));
-        }
-      });
-    } else {
-      opts.converted = true;
-      resolve(data);
-    }
   }));
 }
 
@@ -1877,6 +1927,8 @@ Miew.prototype.load = function (source, opts) {
     }
   }
 
+  viewInterpolator.reset();
+
   this.dispatchEvent({ type: 'load', options: opts, source });
 
   const job = new JobHandle();
@@ -1898,8 +1950,7 @@ Miew.prototype.load = function (source, opts) {
   };
 
   return _fetchData(source, opts, job)
-    .then(data => _convertData(data, opts, job))
-    .then(data => _parseData(data, opts, job))
+    .then((data) => _parseData(data, opts, job))
     .then((object) => {
       const name = this._onLoad(object, opts);
       return onLoadEnd(name);
@@ -1918,6 +1969,9 @@ Miew.prototype.load = function (source, opts) {
 Miew.prototype.unload = function (name) {
   this._removeVisual(name || this.getCurrentVisual());
   this.resetPivot();
+  if (settings.now.shadow.on) {
+    this._updateShadowCamera();
+  }
 };
 
 Miew.prototype._startAnimation = function (fileData) {
@@ -1931,40 +1985,6 @@ Miew.prototype._startAnimation = function (fileData) {
   try {
     this._frameInfo = new FrameInfo(
       visual.getComplex(), fileData,
-      {
-        onLoadStatusChanged() {
-          self.dispatchEvent({
-            type: 'mdPlayerStateChanged',
-            state: {
-              isPlaying: self._isAnimating,
-              isLoading: self._frameInfo ? self._frameInfo.isLoading : true,
-            },
-          });
-        },
-        onError(message) {
-          self._stopAnimation();
-          self.logger.error(message);
-        },
-      },
-    );
-  } catch (e) {
-    this.logger.error('Animation file does not fit to current complex!');
-    return;
-  }
-  this._continueAnimation();
-};
-
-Miew.prototype._startMdAnimation = function (mdFile, pdbFile) {
-  this._stopAnimation();
-  const self = this;
-  const visual = this._getComplexVisual();
-  if (visual === null) {
-    this.logger.error('Unable to start animation - no molecule is loaded.');
-    return;
-  }
-  try {
-    this._frameInfo = new FrameInfo(
-      visual.getComplex(), this.srvStreamMdFn(mdFile, pdbFile),
       {
         onLoadStatusChanged() {
           self.dispatchEvent({
@@ -2012,7 +2032,6 @@ Miew.prototype._continueAnimation = function () {
   minFrameTime = Number.isNaN(minFrameTime) ? 0 : minFrameTime;
   const self = this;
   const { pivot } = self._gfx;
-  // TODO take care of all complex visuals ?
   const visual = this._getComplexVisual();
   if (visual) {
     visual.resetSelectionMask();
@@ -2052,7 +2071,6 @@ Miew.prototype._stopAnimation = function () {
   this._frameInfo.disableEvents();
   this._frameInfo = null;
   this._animInterval = null;
-  this._srvAnimSource = null;
   this.dispatchEvent({
     type: 'mdPlayerStateChanged',
     state: null,
@@ -2062,7 +2080,7 @@ Miew.prototype._stopAnimation = function () {
 /**
  * Invoked upon successful loading of some data source
  * @param {DataSource} dataSource - Data source for visualization (molecular complex or other)
- * @param {object} opts - TODO: Options.
+ * @param {object} opts - Options.
  * @private
  */
 Miew.prototype._onLoad = function (dataSource, opts) {
@@ -2108,7 +2126,7 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     }
 
     if (opts.preset) {
-      this.srvPresetApply(opts.preset);
+      // ...removed server access...
     } else if (settings.now.autoPreset) {
       switch (opts.fileType) {
         case 'cml':
@@ -2138,10 +2156,9 @@ Miew.prototype._onLoad = function (dataSource, opts) {
   gfx.camera.updateProjectionMatrix();
   this._updateFog();
 
-  // reset global transform & camera pan
+  // reset global transform
   gfx.root.resetTransform();
   this.resetPivot();
-  this.resetPan();
 
   // set scale to fit everything on the screen
   this._objectControls.setScale(settings.now.radiusToFit / this._getBSphereRadius());
@@ -2150,6 +2167,10 @@ Miew.prototype._onLoad = function (dataSource, opts) {
 
   if (settings.now.autoResolution) {
     this._tweakResolution();
+  }
+
+  if (settings.now.shadow.on) {
+    this._updateShadowCamera();
   }
 
   if (this._opts.view) {
@@ -2164,10 +2185,6 @@ Miew.prototype._onLoad = function (dataSource, opts) {
   }
 
   this._refreshTitle();
-
-  if (opts.convertedFile && opts.mdFile) {
-    this._startMdAnimation(opts.mdFile, opts.convertedFile);
-  }
 
   return visualName;
 };
@@ -2189,8 +2206,8 @@ Miew.prototype.loadEd = function (source) {
 
   const TheLoader = _.head(io.loaders.find({ source }));
   if (!TheLoader) {
-    this.logger.error('Could not find suitable loader for this source');
-    return Promise.reject(new Error('Could not find suitable loader for this source'));
+    this.logger.error(LOADER_NOT_FOUND);
+    return Promise.reject(new Error(LOADER_NOT_FOUND));
   }
 
   const loader = this._edLoader = new TheLoader(source, { binary: true });
@@ -2198,7 +2215,7 @@ Miew.prototype.loadEd = function (source) {
   return loader.load().then((data) => {
     const TheParser = _.head(io.parsers.find({ format: 'ccp4' }));
     if (!TheParser) {
-      throw new Error('Could not find suitable parser for this source');
+      throw new Error(PARSER_NOT_FOUND);
     }
     const parser = new TheParser(data);
     parser.context = this;
@@ -2282,6 +2299,7 @@ Miew.prototype.changeUnit = function (unitIdx, name) {
   }
   if (visual.getComplex().setCurrentUnit(unitIdx)) {
     this._resetScene();
+    this._updateInfoPanel();
   }
   return currentUnitInfo();
 };
@@ -2321,7 +2339,6 @@ Miew.prototype.rebuild = function () {
 
     self._needRender = true;
 
-    // TODO: Gather geometry stats?
     self._refreshTitle();
     self._building = false;
   });
@@ -2332,7 +2349,6 @@ Miew.prototype.rebuildAll = function () {
   this._forEachComplexVisual((visual) => {
     visual.setNeedsRebuild();
   });
-  // this.rebuild(); // TODO: isn't implicit rebuild enough?
 };
 
 Miew.prototype._refreshTitle = function (appendix) {
@@ -2395,7 +2411,7 @@ Miew.prototype._extractRepresentation = function () {
  */
 Miew.prototype._setReps = function (reps) {
   reps = reps || (this._opts && this._opts.reps) || [];
-  this._forEachComplexVisual(visual => visual.resetReps(reps));
+  this._forEachComplexVisual((visual) => visual.resetReps(reps));
 };
 
 /**
@@ -2468,7 +2484,6 @@ Miew.prototype.repCurrent = function (index, name) {
  * @returns {?object} Representation description.
  */
 Miew.prototype.rep = function (index, rep) {
-  // FIXME support targeting visual by name
   const visual = this._getComplexVisual('');
   return visual ? visual.rep(index, rep) : null;
 };
@@ -2589,6 +2604,7 @@ Miew.prototype._discardComponentEdit = function () {
   this._setEditMode(EDIT_MODE.COMPLEX);
 
   this._needRender = true;
+  this.rebuildAll();
 };
 
 Miew.prototype._enterFragmentEditMode = function () {
@@ -2664,13 +2680,6 @@ Miew.prototype._discardFragmentEdit = function () {
   this._needRender = true;
 };
 
-/** @deprecated  Move object instead of panning the camera */
-Miew.prototype.resetPan = function () {
-  this._gfx.camera.position.x = 0.0;
-  this._gfx.camera.position.y = 0.0;
-  this.dispatchEvent({ type: 'transform' });
-};
-
 Miew.prototype._onPick = function (event) {
   if (!settings.now.picking) {
     // picking is disabled
@@ -2728,19 +2737,7 @@ Miew.prototype._onPick = function (event) {
   }
 
   this._updateInfoPanel();
-};
-
-Miew.prototype._onDblClick = function (event) {
-  if ('atom' in event.obj) {
-    this.setPivotAtom(event.obj.atom);
-  } else if ('residue' in event.obj) {
-    this.setPivotResidue(event.obj.residue);
-  } else {
-    this.resetPivot();
-  }
-
-  this.resetPan();
-  this._needRender = true;
+  this.dispatchEvent(event);
 };
 
 Miew.prototype._onKeyDown = function (event) {
@@ -2761,15 +2758,23 @@ Miew.prototype._onKeyDown = function (event) {
       break;
     case 'A'.charCodeAt(0):
       switch (this._editMode) {
-        case EDIT_MODE.COMPONENT: this._applyComponentEdit(); break;
-        case EDIT_MODE.FRAGMENT: this._applyFragmentEdit(); break;
+        case EDIT_MODE.COMPONENT:
+          this._applyComponentEdit();
+          break;
+        case EDIT_MODE.FRAGMENT:
+          this._applyFragmentEdit();
+          break;
         default: break;
       }
       break;
     case 'D'.charCodeAt(0):
       switch (this._editMode) {
-        case EDIT_MODE.COMPONENT: this._discardComponentEdit(); break;
-        case EDIT_MODE.FRAGMENT: this._discardFragmentEdit(); break;
+        case EDIT_MODE.COMPONENT:
+          this._discardComponentEdit();
+          break;
+        case EDIT_MODE.FRAGMENT:
+          this._discardFragmentEdit();
+          break;
         default: break;
       }
       break;
@@ -2970,6 +2975,51 @@ Miew.prototype.setPivotAtom = function (atom) {
   this.dispatchEvent({ type: 'transform' });
 };
 
+Miew.prototype.getSelectionCenter = (function () {
+  const _centerInVisual = new THREE.Vector3(0.0, 0.0, 0.0);
+
+  return function (center, includesAtom, selector) {
+    center.set(0.0, 0.0, 0.0);
+    let count = 0;
+
+    this._forEachComplexVisual((visual) => {
+      if (visual.getSelectionCenter(_centerInVisual, includesAtom, selector || visual.getSelectionBit())) {
+        center.add(_centerInVisual);
+        count++;
+      }
+    });
+    if (count === 0) {
+      return false;
+    }
+    center.divideScalar(count);
+    center.negate();
+    return true;
+  };
+}());
+
+Miew.prototype.setPivotSubset = (function () {
+  const _center = new THREE.Vector3(0.0, 0.0, 0.0);
+
+  function _includesInCurSelection(atom, selectionBit) {
+    return atom._mask & (1 << selectionBit);
+  }
+
+  function _includesInSelector(atom, selector) {
+    return selector.selector.includesAtom(atom);
+  }
+
+  return function (selector) {
+    const includesAtom = (selector) ? _includesInSelector : _includesInCurSelection;
+
+    if (this.getSelectionCenter(_center, includesAtom, selector)) {
+      this._gfx.pivot.position.copy(_center);
+      this.dispatchEvent({ type: 'transform' });
+    } else {
+      this.logger.warn('selection is empty. Center operation not performed');
+    }
+  };
+}());
+
 Miew.prototype.benchmarkGfx = function (force) {
   const self = this;
   const prof = new GfxProfiler(this._gfx.renderer);
@@ -2991,7 +3041,6 @@ Miew.prototype.benchmarkGfx = function (force) {
       if (numResults > 0) {
         self._gfxScore = 0.5 * numResults;
       }
-      // document.getElementById('atom-info').innerHTML = 'GFX score: ' + self._gfxScore.toPrecision(2);
 
       self._spinner.stop();
       resolve();
@@ -3008,6 +3057,8 @@ Miew.prototype.benchmarkGfx = function (force) {
  */
 Miew.prototype.screenshot = function (width, height) {
   const gfx = this._gfx;
+  const deviceWidth = gfx.renderer.domElement.width;
+  const deviceHeight = gfx.renderer.domElement.height;
 
   function fov2Tan(fov) {
     return Math.tan(THREE.Math.degToRad(0.5 * fov));
@@ -3017,14 +3068,34 @@ Miew.prototype.screenshot = function (width, height) {
     return THREE.Math.radToDeg(Math.atan(tan)) * 2.0;
   }
 
-  height = height || width || gfx.height;
-  width = width || gfx.width;
+  function getDataURL() {
+    let dataURL;
+    const currBrowser = utils.getBrowser();
+
+    if (currBrowser === utils.browserType.SAFARI) {
+      const canvas = document.createElement('canvas');
+      const canvasContext = canvas.getContext('2d');
+
+      canvas.width = width === undefined ? deviceWidth : width;
+      canvas.height = height === undefined ? deviceHeight : height;
+
+      canvasContext.drawImage(gfx.renderer.domElement, 0, 0, canvas.width, canvas.height);
+      dataURL = canvas.toDataURL('image/png');
+    } else {
+      // Copy current canvas to screenshot
+      dataURL = gfx.renderer.domElement.toDataURL('image/png');
+    }
+    return dataURL;
+  }
+  height = height || width;
 
   let screenshotURI;
-
-  if (width === gfx.width && height === gfx.height) {
-    // copy current canvas to screenshot
-    screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
+  if ((width === undefined && height === undefined)
+    || (width === deviceWidth && height === deviceHeight)) {
+    // renderer.domElement.toDataURL('image/png') returns flipped image in Safari
+    // It hasn't been resolved yet, but getScreenshotSafari()
+    // fixes it using an extra canvas.
+    screenshotURI = getDataURL();
   } else {
     const originalAspect = gfx.camera.aspect;
     const originalFov = gfx.camera.fov;
@@ -3036,6 +3107,7 @@ Miew.prototype.screenshot = function (width, height) {
 
     // set appropriate camera aspect & FOV
     const shotAspect = width / height;
+    gfx.renderer.setPixelRatio(1);
     gfx.camera.aspect = shotAspect;
     gfx.camera.fov = tan2Fov(areaOfInterestTanFov2 / Math.min(shotAspect, 1.0));
     gfx.camera.updateProjectionMatrix();
@@ -3045,9 +3117,10 @@ Miew.prototype.screenshot = function (width, height) {
 
     // make screenshot
     this._renderFrame(settings.now.stereo);
-    screenshotURI = gfx.renderer.domElement.toDataURL('image/png');
+    screenshotURI = getDataURL();
 
     // restore original camera & canvas proportions
+    gfx.renderer.setPixelRatio(window.devicePixelRatio);
     gfx.camera.aspect = originalAspect;
     gfx.camera.fov = originalFov;
     gfx.camera.updateProjectionMatrix();
@@ -3178,7 +3251,6 @@ Miew.prototype.setOptions = function (opts) {
     delete this._opts.view;
   }
 
-  // FIXME we need a way to associate "unit" option with particular complex
   const visual = this._getComplexVisual();
   if (visual) {
     visual.getComplex().resetCurrentUnit();
@@ -3214,7 +3286,6 @@ Miew.prototype.info = function (name) {
 Miew.prototype.addObject = function (objData, bThrow) {
   let Ctor = null;
 
-  // TODO change this to factory when better times come.
   if (objData.type === LinesObject.prototype.type) {
     Ctor = LinesObject;
   }
@@ -3363,12 +3434,9 @@ Miew.prototype.getState = function (opts) {
     view: false,
   });
 
-  // FIXME state should include all complexes (not only current)
-
   // load
   const visual = this._getComplexVisual();
   if (visual !== null) {
-    // TODO type?
     const complex = visual.getComplex();
     const { metadata } = complex;
     if (metadata.id) {
@@ -3427,29 +3495,6 @@ Miew.prototype.get = function (param, value) {
   return settings.get(param, value);
 };
 
-Miew.prototype._updateShadow = function (radius) {
-  for (let i = 0; i < this._gfx.scene.children.length; i++) {
-    if (this._gfx.scene.children[i].shadow !== undefined) {
-      const light = this._gfx.scene.children[i];
-
-      light.shadow.bias = -0.0005 * radius;
-
-      light.shadow.camera.bottom = -radius;
-      light.shadow.camera.top = radius;
-      light.shadow.camera.left = -radius;
-      light.shadow.camera.right = radius;
-
-      const distToOrigin = light.position.length();
-      const extraShift = 10; // if it's smaller there are artefacts in shadow
-      light.shadow.camera.far = distToOrigin + radius + extraShift;
-      light.shadow.camera.near = distToOrigin - radius - extraShift;
-      light.shadow.camera.near = light.shadow.camera.near > 0.1 ? light.shadow.camera.near : 0.1;
-
-      light.shadow.camera.updateProjectionMatrix();
-    }
-  }
-};
-
 Miew.prototype._clipPlaneUpdateValue = function (radius) {
   const clipPlaneValue = Math.max(
     this._gfx.camera.position.z - radius * settings.now.draft.clipPlaneFactor,
@@ -3481,8 +3526,8 @@ Miew.prototype._fogFarUpdateValue = function () {
   }
 };
 
-Miew.prototype._updateMaterials = function (values) {
-  this._forEachComplexVisual(visual => visual.setMaterialValues(values));
+Miew.prototype._updateMaterials = function (values, needTraverse = false, process = undefined) {
+  this._forEachComplexVisual((visual) => visual.setMaterialValues(values, needTraverse, process));
   for (let i = 0, n = this._objects.length; i < n; ++i) {
     const obj = this._objects[i];
     if (obj._line) {
@@ -3508,9 +3553,20 @@ Miew.prototype._initOnSettingsChanged = function () {
     });
   };
 
-  on('theme', () => {
-    // TODO add warning
-    this._onThemeChanged();
+  on('modes.VD.frame', () => {
+    const volume = this._getVolumeVisual();
+    if (volume === null) return;
+
+    volume.showFrame(settings.now.modes.VD.frame);
+    this._needRender = true;
+  });
+
+  on('modes.VD.isoMode', () => {
+    const volume = this._getVolumeVisual();
+    if (volume === null) return;
+
+    volume.getMesh().material.updateDefines();
+    this._needRender = true;
   });
 
   on('bg.color', () => {
@@ -3518,7 +3574,8 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('ao', () => {
-    this._setUberMaterialValues({ normalsToGBuffer: settings.now.ao });
+    const values = { normalsToGBuffer: settings.now.ao };
+    this._setUberMaterialValues(values);
   });
 
   on('fogColor', () => {
@@ -3546,21 +3603,30 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('shadow.on', (evt) => {
-    // update materials and rebuild all
+    // update materials
     const values = { shadowmap: evt.value, shadowmapType: settings.now.shadow.type };
     const gfx = this._gfx;
     if (gfx) {
-      gfx.renderer.shadowMap.enabled = values.shadowmap;
+      gfx.renderer.shadowMap.enabled = Boolean(values.shadowmap);
     }
-    this._updateMaterials(values);
-    this.rebuildAll();
+    if (values.shadowmap) {
+      this._updateShadowCamera();
+    }
+    this._updateMaterials(values, true, (object) => {
+      if (values.shadowmap) {
+        gfxutils.prepareObjMaterialForShadow(object);
+      } else {
+        object.customDepthMaterial = null;
+      }
+    });
+    this._needRender = true;
   });
 
   on('shadow.type', (evt) => {
-    // update materials and rebuild all if shadowmap are enable
+    // update materials if shadowmap is enable
     if (settings.now.shadow.on) {
-      this._updateMaterials({ shadowmapType: evt.value });
-      this.rebuildAll();
+      this._updateMaterials({ shadowmapType: evt.value }, true);
+      this._needRender = true;
     }
   });
 
@@ -3569,6 +3635,7 @@ Miew.prototype._initOnSettingsChanged = function () {
       if (this._gfx.scene.children[i].shadow !== undefined) {
         const light = this._gfx.scene.children[i];
         light.shadow.radius = evt.value;
+        this._needRender = true;
       }
     }
   });
@@ -3579,10 +3646,16 @@ Miew.prototype._initOnSettingsChanged = function () {
 
   on(['fog', 'fogNearFactor', 'fogFarFactor'], () => {
     this._updateFog();
+    this._needRender = true;
   });
 
   on('fogAlpha', () => {
+    const { fogAlpha } = settings.now;
+    if (fogAlpha < 0 || fogAlpha > 1) {
+      this.logger.warn('fogAlpha must belong range [0,1]');
+    }
     this._fogAlphaChanged();
+    this._needRender = true;
   });
 
   on('autoResolution', (evt) => {
@@ -3602,13 +3675,27 @@ Miew.prototype._initOnSettingsChanged = function () {
     if (this.webVR) {
       this.webVR.toggle(settings.now.stereo === 'WEBVR', this._gfx);
     }
+    this._needRender = true;
   });
 
-  on(['transparency', 'resolution', 'palette'], () => {
+  on(['transparency', 'palette'], () => {
     this.rebuildAll();
   });
 
-  on(['axes', 'fxaa', 'ao'], () => {
+  on('resolution', () => {
+    // update complex visuals
+    this.rebuildAll();
+
+    // update volume visual
+    const volume = this._getVolumeVisual();
+    if (volume) {
+      volume.getMesh().material.updateDefines();
+      this._needRender = true;
+    }
+  });
+
+  on(['axes', 'fxaa', 'ao',
+    'outline.on', 'outline.color', 'outline.threshold', 'outline.thickness'], () => {
     this._needRender = true;
   });
 };
@@ -3639,6 +3726,8 @@ Miew.prototype.select = function (expression, append) {
   }
 
   visual.select(sel, append);
+  this._lastPick = null;
+
   this._updateInfoPanel();
   this._needRender = true;
 };
@@ -3672,8 +3761,8 @@ Miew.prototype.view = function (expression) {
   }
 
   function decode() {
-    // HACK: old non-versioned view is the 0th version
-    if (expression.length === 40) { // TODO: remove when db migration is finished
+    // backwards compatible: old non-versioned view is the 0th version
+    if (expression.length === 40) {
       expression = `0${expression}`;
     }
 
@@ -3735,7 +3824,6 @@ Miew.prototype._updateView = function () {
     return;
   }
 
-  // var curr = viewInterpolator.createView();
   const res = viewInterpolator.getCurrentView();
   if (res.success) {
     const curr = res.view;
@@ -3784,15 +3872,41 @@ Miew.prototype.scale = function (factor) {
   this._needRender = true;
 };
 
-/*
-   * Pan camera
-   * @param {number} x - horizontal panning
-   * @param {number} y - vertical panning
-   * @deprecated  Move object instead of panning the camera
-   */
-Miew.prototype.pan = function (x, y) {
-  this._gfx.camera.translateX(x);
-  this._gfx.camera.translateY(y);
+/**
+ * Center view on selection
+ * @param {empty | subset | string} selector - defines part of molecule which must be centered (
+ * empty - center on current selection;
+ * subset - center on picked atom/residue/molecule;
+ * string - center on atoms correspond to selection string)
+ */
+Miew.prototype.center = function (selector) {
+  // no arguments - center on current selection;
+  if (selector === undefined) {
+    this.setPivotSubset();
+    this._needRender = true;
+    return;
+  }
+  // subset with atom or residue - center on picked atom/residue;
+  if (selector.obj !== undefined && ('atom' in selector.obj || 'residue' in selector.obj)) { // from event with selection
+    if ('atom' in selector.obj) {
+      this.setPivotAtom(selector.obj.atom);
+    } else {
+      this.setPivotResidue(selector.obj.residue);
+    }
+    this._needRender = true;
+    return;
+  }
+  // string - center on atoms correspond to selection string
+  if (selector.obj === undefined && selector !== '') {
+    const sel = selectors.parse(selector);
+    if (sel.error === undefined) {
+      this.setPivotSubset(sel);
+      this._needRender = true;
+      return;
+    }
+  }
+  // empty subset or incorrect/empty string - center on all molecule;
+  this.resetPivot();
   this._needRender = true;
 };
 
@@ -3938,7 +4052,6 @@ Miew.prototype.exportCML = function () {
     });
   }
 
-  // FIXME save data for all complexes (not only current)
   const visual = self._getComplexVisual();
   const complex = visual ? visual.getComplex() : null;
   if (complex && complex.originalCML) {
@@ -3958,7 +4071,6 @@ Miew.prototype.exportCML = function () {
  * @see http://pdb101.rcsb.org/motm/motm-about
  */
 Miew.prototype.motm = function () {
-  settings.set('theme', 'light');
   settings.set({
     fogColorEnable: true,
     fogColor: 0x000000,
@@ -3985,6 +4097,8 @@ Miew.prototype.motm = function () {
 };
 
 Miew.prototype.VERSION = (typeof PACKAGE_VERSION !== 'undefined' && PACKAGE_VERSION) || '0.0.0-dev';
+
+// Uncomment this to get debug trace:
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
 _.assign(Miew, /** @lends Miew */ {
@@ -4004,7 +4118,6 @@ _.assign(Miew, /** @lends Miew */ {
   utils,
   gfx: {
     Representation,
-    fbxExport,
   },
 
   /**

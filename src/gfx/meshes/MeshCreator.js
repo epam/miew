@@ -14,7 +14,7 @@ function _createInstancedCylinders(useZSprites, openEnded) {
     Geometry(a, b) {
       return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
     },
-    Object: meshes.ZSprite,
+    Object: useZSprites ? meshes.ZSprite : meshes.Instanced,
     initMaterial: setMatParams({
       instancedMatrix: true,
       attrColor: true,
@@ -79,7 +79,7 @@ class MeshCreator {
       Geometry(a, b) {
         return new geometries.InstancedSpheresGeometry(a, b, useZSprites);
       },
-      Object: meshes.ZSprite,
+      Object: useZSprites ? meshes.ZSprite : meshes.Instanced,
       initMaterial: setMatParams({
         instancedPos: true,
         attrColor: true,
@@ -89,7 +89,6 @@ class MeshCreator {
     };
   }
 
-  // TODO thisnk about interface and responsibilities
   static create2CClosedCylinders(_caps, _settings) {
     return _createInstancedCylinders(false, false);
   }

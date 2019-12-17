@@ -52,9 +52,9 @@ class Complex {
     this.structures = [];
 
     this._residueTypes = Object.create(ResidueType.StandardTypes);
-    this._atoms = []; // TODO: preallocate
-    this._residues = []; // TODO: preallocate
-    this._bonds = []; // TODO: preallocate
+    this._atoms = [];
+    this._residues = [];
+    this._bonds = [];
     this._sgroups = [];
     this._molecules = [];
     this._maskNeedsUpdate = false;
@@ -180,7 +180,7 @@ class Complex {
    */
   addChain(name) {
     const result = new Chain(this, name);
-    this._chains.push(result); // TODO: keep chains in dictionary with an (ordered?) array of keys
+    this._chains.push(result);
     return result;
   }
 
@@ -703,24 +703,6 @@ class Complex {
     return this._currentUnit;
   }
 
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#getCurrentUnit}
-   */
-  getCurrentStructure = Complex.prototype.getCurrentUnit;
-
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#resetCurrentUnit}
-   */
-  resetCurrentStructure = Complex.prototype.resetCurrentUnit;
-
-  /**
-   * @function
-   * @deprecated Renamed to {@link Complex#setCurrentUnit}
-   */
-  setCurrentStructure = Complex.prototype.setCurrentUnit;
-
   getDefaultBoundaries() {
     return this.units[0].getBoundaries();
   }
@@ -867,11 +849,9 @@ class Complex {
     }
 
     if (opts.needAutoBonding) {
-      // console.time('AutoBonding');
       const autoConnector = new AutoBond(this);
       autoConnector.build();
       autoConnector.destroy();
-      // console.timeEnd('AutoBonding');
     }
 
     const chains = this._chains;
@@ -920,7 +900,7 @@ class Complex {
   }
 
   updateStructuresMask() {
-    const updater = structure => structure.collectMask();
+    const updater = (structure) => structure.collectMask();
     this.forEachResidue(updater);
     this.forEachChain(updater);
     this.forEachMolecule(updater);
@@ -1087,12 +1067,25 @@ class Complex {
     return this._voxelWorld;
   }
 
+  /**
+   * Simple function to make unified routine procedure without code duplication.
+   * @param {Array} srcArray   - Source chemical structure array (will be part of resulting chemical structure array).
+   * @param {Array} dstArray   - Resulting chemical structure array.
+   * @param {number} param     - Parameter for processor.
+   * @param {function} functor - Processor for every element in array.
+   */
+  addElement(srcArray, dstArray, param, functor) {
+    const { length } = srcArray;
+    for (let i = 0; i < length; ++i) {
+      const elem = srcArray[i];
+      functor(elem, param);
+      dstArray.push(elem);
+    }
+  }
+
   // this function joins multiple complexes into one (this)
   // atom, bond, ... objects are reused -- so input complexes are no longer valid
   joinComplexes(complexes) {
-    let i;
-    let j;
-
     // clear target complex
     this._chains = [];
     this._components = [];
@@ -1104,72 +1097,53 @@ class Complex {
     this._bonds = [];
     this._sgroups = [];
 
+    const self = this;
     let atomBias = 0;
     let bondBias = 0;
     let residueBias = 0;
     let chainBias = 0;
     let componentBias = 0;
-    for (i = 0; i < complexes.length; ++i) {
+
+    function processAtom(atom, bias) {
+      atom._serial += bias;
+      atom._index += bias;
+    }
+
+    function processBond(bond, bias) {
+      bond._index += bias;
+    }
+
+    function processResidue(residue, bias) {
+      residue._index += bias;
+    }
+
+    function processChain(chain, bias) {
+      chain._complex = self;
+      chain._index += bias;
+    }
+
+    function processComponent(component, bias) {
+      component._complex = self;
+      component._index += bias;
+    }
+
+    /**
+     * Simple function to do nothing.
+     */
+    function doNothing() {
+    }
+
+    for (let i = 0; i < complexes.length; ++i) {
       const c = complexes[i];
-
-      // add atoms
-      for (j = 0; j < c._atoms.length; ++j) {
-        const a = c._atoms[j];
-        a._serial += atomBias;
-        a._index += atomBias;
-        this._atoms.push(a);
-      }
-
-      // add bonds
-      for (j = 0; j < c._bonds.length; ++j) {
-        const b = c._bonds[j];
-        b._index += bondBias;
-        this._bonds.push(b);
-      }
-
-      // add residues
-      for (j = 0; j < c._residues.length; ++j) {
-        const r = c._residues[j];
-        r._index += residueBias;
-        this._residues.push(r);
-      }
-
-      // add chains
-      for (j = 0; j < c._chains.length; ++j) {
-        const chain = c._chains[j];
-        chain._complex = this;
-        chain._index += chainBias;
-        this._chains.push(chain);
-      }
-
-      // add structures
-      for (j = 0; j < c.structures.length; ++j) {
-        this.structures.push(c.structures[j]);
-      }
-
-      // add sheets
-      for (j = 0; j < c._sheets.length; ++j) {
-        this._sheets.push(c._sheets[j]);
-      }
-
-      // add helices
-      for (j = 0; j < c._helices.length; ++j) {
-        this._helices.push(c._helices[j]);
-      }
-
-      // add SGroups
-      for (j = 0; j < c._sgroups.length; ++j) {
-        this._sgroups.push(c._sgroups[j]);
-      }
-
-      // add components
-      for (j = 0; j < c._components.length; ++j) {
-        const comp = c._components[j];
-        comp._complex = this;
-        comp._index += componentBias;
-        this._components.push(comp);
-      }
-
+      this.addElement(c._atoms, this._atoms, atomBias, processAtom);
+      this.addElement(c._bonds, this._bonds, bondBias, processBond);
+      this.addElement(c._residues, this._residues, residueBias, processResidue);
+      this.addElement(c._chains, this._chains, chainBias, processChain);
+      this.addElement(c._sheets, this._sheets, 0, doNothing);
+      this.addElement(c._helices, this._helices, 0, doNothing);
+      this.addElement(c._sgroups, this._sgroups, 0, doNothing);
+      this.addElement(c._components, this._components, componentBias, processComponent);
+      this.addElement(c.structures, this.structures, 0, doNothing);
       // merge residue types
       for (const rt in c._residueTypes) {
         if (c._residueTypes.hasOwnProperty(rt)) {
@@ -1258,7 +1232,7 @@ class Complex {
       lastSheetIndex = curSheetIndex;
     }
 
-    this._sheets = sheets.filter(_sheet => true); // squeeze sheets array
+    this._sheets = sheets.filter((_sheet) => true); // squeeze sheets array
   }
 }
 

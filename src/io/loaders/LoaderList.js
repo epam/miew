@@ -31,7 +31,7 @@ class LoaderList extends EntityList {
     if (specs.type) {
       list = this._dict.types[specs.type.toLowerCase()] || [];
     } else if (specs.source) {
-      return this._list.filter(SomeLoader => SomeLoader.canProbablyLoad && SomeLoader.canProbablyLoad(specs.source));
+      return this._list.filter((SomeLoader) => SomeLoader.canProbablyLoad && SomeLoader.canProbablyLoad(specs.source));
     }
     return [...list];
   }

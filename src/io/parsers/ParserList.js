@@ -36,7 +36,7 @@ class ParserList extends EntityList {
     }
     // autodetect only if no format is forced
     if (list.length === 0 && !specs.format && specs.data) {
-      return this._list.filter(SomeParser => SomeParser.canProbablyParse && SomeParser.canProbablyParse(specs.data));
+      return this._list.filter((SomeParser) => SomeParser.canProbablyParse && SomeParser.canProbablyParse(specs.data));
     }
     return [...list];
   }

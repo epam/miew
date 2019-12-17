@@ -140,7 +140,6 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
 
   finalize() {
     this.finishUpdate();
-    // TODO compute bounding box?
     this.computeBoundingSphere();
   }
 
@@ -177,6 +176,10 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
     return [geom];
   }
 
+  getGeoParams() {
+    return this._cylGeometry.parameters;
+  }
+
   _init(instanceCount, cylinderGeo, useZSprites) {
     this.copy(cylinderGeo);
     this._matVector1 = utils.allocateTyped(Float32Array, instanceCount * OFFSET_SIZE);
@@ -187,28 +190,28 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
     const alpha = this._alpha = utils.allocateTyped(Float32Array, instanceCount);
     _.fill(alpha, 1.0);
 
-    this.addAttribute('matVector1', new THREE.InstancedBufferAttribute(this._matVector1, OFFSET_SIZE, false, 1));
-    this.addAttribute('matVector2', new THREE.InstancedBufferAttribute(this._matVector2, OFFSET_SIZE, false, 1));
-    this.addAttribute('matVector3', new THREE.InstancedBufferAttribute(this._matVector3, OFFSET_SIZE, false, 1));
-    this.addAttribute('color', new THREE.InstancedBufferAttribute(this._color1, COLOR_SIZE, false, 1));
-    this.addAttribute('color2', new THREE.InstancedBufferAttribute(this._color2, COLOR_SIZE, false, 1));
+    this.setAttribute('matVector1', new THREE.InstancedBufferAttribute(this._matVector1, OFFSET_SIZE, false, 1));
+    this.setAttribute('matVector2', new THREE.InstancedBufferAttribute(this._matVector2, OFFSET_SIZE, false, 1));
+    this.setAttribute('matVector3', new THREE.InstancedBufferAttribute(this._matVector3, OFFSET_SIZE, false, 1));
+    this.setAttribute('color', new THREE.InstancedBufferAttribute(this._color1, COLOR_SIZE, false, 1));
+    this.setAttribute('color2', new THREE.InstancedBufferAttribute(this._color2, COLOR_SIZE, false, 1));
 
-    this.addAttribute('alphaColor', new THREE.InstancedBufferAttribute(this._alpha, 1, false, 1));
+    this.setAttribute('alphaColor', new THREE.InstancedBufferAttribute(this._alpha, 1, false, 1));
 
     if (useZSprites) {
       this._invmatVector1 = utils.allocateTyped(Float32Array, instanceCount * OFFSET_SIZE);
       this._invmatVector2 = utils.allocateTyped(Float32Array, instanceCount * OFFSET_SIZE);
       this._invmatVector3 = utils.allocateTyped(Float32Array, instanceCount * OFFSET_SIZE);
 
-      this.addAttribute(
+      this.setAttribute(
         'invmatVector1',
         new THREE.InstancedBufferAttribute(this._invmatVector1, OFFSET_SIZE, false, 1),
       );
-      this.addAttribute(
+      this.setAttribute(
         'invmatVector2',
         new THREE.InstancedBufferAttribute(this._invmatVector2, OFFSET_SIZE, false, 1),
       );
-      this.addAttribute(
+      this.setAttribute(
         'invmatVector3',
         new THREE.InstancedBufferAttribute(this._invmatVector3, OFFSET_SIZE, false, 1),
       );

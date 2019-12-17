@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Complex from '../../chem/Complex';
 import Exporter from './Exporter';
 import PDBResult from './PDBResult';
 import Assembly from '../../chem/Assembly';
@@ -92,7 +93,7 @@ export default class PDBExporter extends Exporter {
     result.newTag('CONECT');
 
     for (let i = 0; i < atoms.length; i++) {
-      const fixedBonds = atoms[i]._bonds.filter(bond => bond._fixed);
+      const fixedBonds = atoms[i]._bonds.filter((bond) => bond._fixed);
       if (fixedBonds.length !== 0) {
         result.writeBondsArray(fixedBonds.reverse(), atoms[i]);
       }
@@ -240,7 +241,7 @@ export default class PDBExporter extends Exporter {
     result.newString();
     result.writeEntireString(this._stringForRemark350);
 
-    const assemblies = units.filter(unit => unit instanceof Assembly);
+    const assemblies = units.filter((unit) => unit instanceof Assembly);
 
     for (let i = 0; i < assemblies.length; i++) {
       result.newString();
@@ -267,3 +268,4 @@ export default class PDBExporter extends Exporter {
 }
 
 PDBExporter.formats = ['pdb'];
+PDBExporter.SourceClass = Complex;

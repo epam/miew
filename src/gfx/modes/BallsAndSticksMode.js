@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
-import LabeledMode from './LabeledMode';
+import Mode from './Mode';
 
-class BallsAndSticksMode extends LabeledMode {
+class BallsAndSticksMode extends Mode {
   static id = 'BS';
 
   calcAtomRadius(atom) {
@@ -26,20 +26,6 @@ class BallsAndSticksMode extends LabeledMode {
 
   drawMultiorderBonds() {
     return this.opts.multibond;
-  }
-
-  /** @deprecated Old-fashioned atom labels, to be removed in the next major version. */
-
-  getLabelOpts() {
-    return {
-      fg: 'none',
-      bg: '0x202020',
-      showBg: false,
-      labels: this.settings.now.labels,
-      colors: true,
-      adjustColor: true,
-      transparent: true,
-    };
   }
 }
 

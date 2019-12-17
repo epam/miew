@@ -30,9 +30,9 @@ const report = {
     index: 0,
   },
 
-  getExpectedPath: id => path.join(report.path.golden, `${id}.png`),
-  getActualPath: id => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.png`),
-  getDifferencePath: id => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.diff.png`),
+  getExpectedPath: (id) => path.join(report.path.golden, `${id}.png`),
+  getActualPath: (id) => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.png`),
+  getDifferencePath: (id) => path.join(report.path.mismatch, `${_zeroes(report.context.index, 3)}_${id}.diff.png`),
 
   getHtmlPath(filename) {
     const relative = path.relative(path.dirname(report.path.html), filename);
@@ -81,10 +81,10 @@ const report = {
 function _prepareBrowser(width = 1024, height = 768) {
   const getPadding = 'return[window.outerWidth-window.innerWidth,window.outerHeight-window.innerHeight];';
   return driver.executeScript(getPadding)
-    .then(pad => driver.manage().window().setRect({ width: width + pad[0], height: height + pad[1] }))
+    .then((pad) => driver.manage().window().setRect({ width: width + pad[0], height: height + pad[1] }))
     .then(() => driver.getCapabilities())
     .then((caps) => {
-      const browserName = caps.get('browserName').replace(/\b\w/g, c => c.toUpperCase());
+      const browserName = caps.get('browserName').replace(/\b\w/g, (c) => c.toUpperCase());
       const version = caps.get('version') || caps.get('browserVersion') || '(unknown version)';
       const platform = caps.get('platform') || caps.get('platformName') || 'unspecified platform';
       return `${browserName} ${version} for ${platform}`;
@@ -100,6 +100,7 @@ function _prepareServer(cfg) {
   }
   const app = express();
   app.use('/', express.static(cfg.localPath));
+  app.use('/data', express.static(path.resolve(__dirname, '../data')));
   return new Promise((resolve) => {
     localhost = app.listen(cfg.localPort, () => {
       resolve(`http://localhost:${cfg.localPort}`);
@@ -145,7 +146,7 @@ function _matchAsPromised(first, second) {
         resemble(first)
           .compareTo(second)
           .ignoreNothing()
-          .onComplete(diff => resolve(diff));
+          .onComplete((diff) => resolve(diff));
       }
     } catch (err) {
       reject(err);

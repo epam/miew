@@ -16,14 +16,6 @@ class XYZParser extends Parser {
     this._fileName = options.name;
   }
 
-  /** @deprecated */
-  static canParse(data, options) {
-    if (!data) {
-      return false;
-    }
-    return typeof data === 'string' && Parser.checkDataTypeOptions(options, 'xyz');
-  }
-
   static canProbablyParse(data) {
     return _.isString(data) && /^\s*\d+ *\n[^\n]*\n\s*\w{1,3}\s+-?\d/.test(data);
   }
@@ -74,7 +66,7 @@ class XYZParser extends Parser {
       const name = words[0];
       const xyz = new THREE.Vector3(parseFloat(words[1]), parseFloat(words[2]), parseFloat(words[3]));
       const type = Element.getByName(name);
-      const role = Element.Role[name]; // FIXME: Maybe should use type as additional index (" CA " vs. "CA  ")
+      const role = undefined;
 
       residue.addAtom(name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
     }

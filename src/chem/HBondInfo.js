@@ -35,7 +35,6 @@ export default class HBondInfo {
   _build() {
     const self = this;
 
-    // TODO Replace quadratic algorithm with something better (use voxel grid?)
     for (let i = 0; i < this._complex._residues.length - 1; ++i) {
       const ri = this._complex._residues[i];
       if ((ri.getType().flags & ResidueType.Flags.PROTEIN) === 0) {

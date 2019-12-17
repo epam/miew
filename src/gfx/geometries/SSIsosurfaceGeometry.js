@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import IsoSurfaceGeometry from './IsoSurfaceGeometry';
 import IsoSurfaceAtomColored from './IsoSurfaceAtomColored';
 import IsosurfaceBuildNormals from './IsosurfaceBuildNormals';
-import IsoSurfaceCluster from './IsoSurfaceCluster';
 import IsoSurfaceMarchCube from './IsoSurfaceMarchCube';
 import IsoSurfaceGeo from './IsoSurfaceGeo';
 import chem from '../../chem';
@@ -60,9 +59,9 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     }
 
     this.setIndex(new THREE.BufferAttribute(indices, 1));
-    this.addAttribute('position', new THREE.BufferAttribute(positions, 3));
-    this.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-    this.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+    this.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    this.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
+    this.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     this.computeBoundingBox();
     this.computeBoundingSphere();
 
@@ -268,7 +267,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const numCells = meshRes - 1;
     const side = meshRes;
     const side2 = meshRes * meshRes;
-    // side3 = meshRes * meshRes * meshRes;
 
     const vaEdges = new Array(arrSize);
     for (let i = 0; i < arrSize; i++) {
@@ -278,8 +276,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     for (let i = 0; i < cNumVerts; i++) {
       sign[i] = 1.0;
     }
-    // const numCellsIntersected   = 0;
-    // const numTrianglesGenerated = 0;
     const vCorner = new THREE.Vector3();
     let indCell = 0;
     let indY = 0;
@@ -298,33 +294,21 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
           const indPointValues = indCell * (2 << (2 + 2));
           for (let i = 0, j = 0; i < cNumVerts; i++) {
-            cube.pointsValuesLinear[indPointValues + j] = vCorner.x; j++;
-            cube.pointsValuesLinear[indPointValues + j] = vCorner.y; j++;
-            cube.pointsValuesLinear[indPointValues + j] = vCorner.z; j++;
+            cube.pointsValuesLinear[indPointValues + j++] = vCorner.x;
+            cube.pointsValuesLinear[indPointValues + j++] = vCorner.y;
+            cube.pointsValuesLinear[indPointValues + j++] = vCorner.z;
           }
 
-          // cell._points[1].x += vCellStep.x;
-          // cell._points[2].x += vCellStep.x;
-          // cell._points[5].x += vCellStep.x;
-          // cell._points[6].x += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 2 * 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 5 * 3] += vCellStep.x;
           cube.pointsValuesLinear[indPointValues + 6 * 3] += vCellStep.x;
 
-          // cell._points[2].z += vCellStep.z;
-          // cell._points[3].z += vCellStep.z;
-          // cell._points[6].z += vCellStep.z;
-          // cell._points[7].z += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 2 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 3 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 6 * 3 + 2] += vCellStep.z;
           cube.pointsValuesLinear[indPointValues + 7 * 3 + 2] += vCellStep.z;
 
-          // cell._points[4].y += vCellStep.y;
-          // cell._points[5].y += vCellStep.y;
-          // cell._points[6].y += vCellStep.y;
-          // cell._points[7].y += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 4 * 3 + 1] += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 5 * 3 + 1] += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 6 * 3 + 1] += vCellStep.y;
@@ -366,9 +350,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
               return 0 - 2;
             }
           } // for numTri
-
-          // numCellsIntersected++;
-          // numTrianglesGenerated += numTri;
 
           // next cell (cube)
           indCell++;
@@ -738,9 +719,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
   _innerBuild() {
     let ok;
-    const oneHundered = 100;
-    const r35 = 3.5;
-    const r12 = 1.2;
+    const expandFactor = 1.2;
 
     // performance test
     // this.performanceTest();
@@ -761,7 +740,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     this.excludeProbe = this._opts.excludeProbe;
     this.visibilitySelector = this._opts.visibilitySelector;
 
-    this.clusterizationType = this._opts.clusterizationType;
     this.geoOut = null;
 
     this.hashLines = null;
@@ -786,46 +764,9 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const side2 = side * side;
     const side3 = side2 * side;
     const corners = utils.allocateTyped(Float32Array, side3);
-
-    // settings for Clusterization
-    let numVoxels = this.meshResolution;
-
-    // Fix number of voxels (for clusterization) if too much
-    let numIdealVoxels = 4;
-    const numAtomsSrc = this.atoms.length;
-    if (numAtomsSrc >= oneHundered) {
-      numIdealVoxels = Math.floor((numAtomsSrc * 2) ** (1.0 / (1 + 2)));
-    }
-    if (numVoxels > numIdealVoxels) {
-      numVoxels = numIdealVoxels;
-    }
     const rProbeRadius = this.probeRadius * this.atomRadiusScale;
 
-    // build clustered atoms
-    let clusterBuilder = null;
-    let atomsClustered = null;
-    if (this.clusterizationType > 0) {
-      clusterBuilder = new IsoSurfaceCluster(
-        this.complex, this.atoms, atomsColored, vBoxMin, vBoxMax,
-        numVoxels, this.colorMode,
-      );
-      if (this.clusterizationType === 1) {
-        atomsClustered = clusterBuilder.buildKMeans();
-      } else {
-        atomsClustered = clusterBuilder.buildSimple();
-      }
-      // redbuild bbox again due to increase of radius
-      // this.getBoundingBox(atomsClustered, vBoxMin, vBoxMax);
-      vBoxMin.x -= r35;
-      vBoxMin.y -= r35;
-      vBoxMin.z -= r35;
-      vBoxMax.x += r35;
-      vBoxMax.y += r35;
-      vBoxMax.z += r35;
-      this.calculateGridCorners(corners, side, vBoxMin, vBoxMax, atomsClustered, rProbeRadius);
-    } else {
-      this.calculateGridCorners(corners, side, vBoxMin, vBoxMax, atomsColored, rProbeRadius);
-    }
+    this.calculateGridCorners(corners, side, vBoxMin, vBoxMax, atomsColored, rProbeRadius);
 
     const numCells = marCubeResoultion - 1;
     const cube = new IsoSurfaceMarchCube();
@@ -840,8 +781,8 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     vCellStep.z = (vBoxMax.z - vBoxMin.z) / numCells;
 
     let numIntersectedCellsEstim = this.getNumIntersectedCells(side, numCells, corners, cube);
-    let maxNumVertices = Math.floor(numIntersectedCellsEstim * r12);
-    let maxNumTriangles = Math.floor(numIntersectedCellsEstim * r12 * 2);
+    let maxNumVertices = Math.floor(numIntersectedCellsEstim * expandFactor);
+    let maxNumTriangles = Math.floor(numIntersectedCellsEstim * expandFactor * 2);
 
     this.geoOut = new IsoSurfaceGeo(maxNumVertices, maxNumTriangles, this.useVertexColors);
 
@@ -855,18 +796,10 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     if (this.excludeProbe) {
       probeRadForNormalsColors = 0.01;
     }
-    this.voxelWorld = null;
-    if (this.clusterizationType > 0) {
-      this.voxelWorld = new IsosurfaceBuildNormals(
-        atomsClustered.length, atomsClustered, // NOSONAR
-        vBoxMin, vBoxMax, probeRadForNormalsColors,
-      );
-    } else {
-      this.voxelWorld = new IsosurfaceBuildNormals(
-        atomsColored.length, atomsColored,
-        vBoxMin, vBoxMax, probeRadForNormalsColors,
-      );
-    }
+    this.voxelWorld = new IsosurfaceBuildNormals(
+      atomsColored.length, atomsColored,
+      vBoxMin, vBoxMax, probeRadForNormalsColors,
+    );
     this.voxelWorld.createVoxels();
 
     ok = this.buildGeoFromCorners(marCubeResoultion, vBoxMin, vBoxMax, corners, vCellStep, cube);
@@ -886,8 +819,8 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
       // estimage geo vertices budget again
       numIntersectedCellsEstim = this.getNumIntersectedCells(side, numCells, corners, cube);
-      maxNumVertices = Math.floor(numIntersectedCellsEstim * r12);
-      maxNumTriangles = Math.floor(numIntersectedCellsEstim * r12 * 2);
+      maxNumVertices = Math.floor(numIntersectedCellsEstim * expandFactor);
+      maxNumTriangles = Math.floor(numIntersectedCellsEstim * expandFactor * 2);
 
       // creates empty new geometry
       this.geoOut = new IsoSurfaceGeo(maxNumVertices, maxNumTriangles, this.useVertexColors);
@@ -900,28 +833,23 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     }
 
     // build vertex normals
-    if (this.voxelWorld !== null) {
-      this.voxelWorld.buildNormals(this.geoOut._vertices.length, this.geoOut._vertices, this.geoOut._normals);
-      // More value : more smooth color mixing
-      // value about 0.7: very rough colors borders
-      let radiusColorSmoothness = 6.5;
-      if (this.excludeProbe) {
-        radiusColorSmoothness -= 1.5;
-      }
-      if (this.useVertexColors) {
-        this.voxelWorld.buildColors(
-          this.geoOut._vertices.length, this.geoOut._vertices,
-          this.geoOut._colors, radiusColorSmoothness,
-        );
-      }
+    this.voxelWorld.buildNormals(this.geoOut._vertices.length, this.geoOut._vertices, this.geoOut._normals);
+    // More value : more smooth color mixing
+    // value about 0.7: very rough colors borders
+    let radiusColorSmoothness = 6.5;
+    if (this.excludeProbe) {
+      radiusColorSmoothness -= 1.5;
+    }
+    if (this.useVertexColors) {
+      this.voxelWorld.buildColors(
+        this.geoOut._vertices.length, this.geoOut._vertices,
+        this.geoOut._colors, radiusColorSmoothness,
+      );
     }
     this.voxelWorld.destroyVoxels();
     this.voxelWorld = null;
 
     // remove objects
-    if (clusterBuilder !== null) {
-      clusterBuilder.destroy();
-    }
     cube.destroy();
 
     return ok;

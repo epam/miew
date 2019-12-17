@@ -25,7 +25,7 @@ describe('LoaderList', () => {
   const typeB = ['b', 'b-type'];
   const typeAB = ['a', 'a-type', 'b', 'b-type'];
 
-  const types = list => list.keys('types');
+  const types = (list) => list.keys('types');
 
   describe('constructor', () => {
     it('creates an empty list', () => {

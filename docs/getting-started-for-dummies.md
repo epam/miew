@@ -28,7 +28,7 @@ Table of contents:
 Быстрые ссылки:
 
 -   промо-сайт: <https://epa.ms/miew/>
--   демо-приложение: <http://miew.opensource.epam.com/>
+-   демо-приложение: <https://miew.opensource.epam.com/>
 -   исходный код: <https://github.com/epam/miew/>
 
 
@@ -52,7 +52,7 @@ Miew --- это приложение, позволяющее просматри�
 [белках]: https://en.wikipedia.org/wiki/Protein
 [нуклеиновых кислотах]: https://en.wikipedia.org/wiki/Nucleic_acid
 [лигандов]: https://en.wikipedia.org/wiki/Ligand_(biochemistry)
-[Nucleosome Particles in Complex with DNA-binding Ligands]: http://miew.opensource.epam.com/?l=1M19&v=1Vo4FwggsB8JxfTXCR/aAPGbfmz84oF09uY4UvA%3D%3D
+[Nucleosome Particles in Complex with DNA-binding Ligands]: https://miew.opensource.epam.com/?l=1M19&v=1Vo4FwggsB8JxfTXCR/aAPGbfmz84oF09uY4UvA%3D%3D
 
 
 ### Embeddable Component
@@ -73,7 +73,7 @@ Miew элементом визуализации в более сложных н
 
 [адаптивного веб-дизайна]: https://en.wikipedia.org/wiki/Responsive_web_design
 [ведущих браузеров]: https://browsehappy.com/
-[Miew in a Responsive Grid Layout]: http://miew.opensource.epam.com/examples/grid.html
+[Miew in a Responsive Grid Layout]: https://miew.opensource.epam.com/examples/grid.html
 
 
 ### Display Modes
@@ -105,7 +105,7 @@ Miew элементом визуализации в более сложных н
 [мономеры]: https://en.wikipedia.org/wiki/Monomer
 ["поверхность" молекулы]: https://en.wikipedia.org/wiki/Accessible_surface_area
 [гидрофобность]: https://en.wikipedia.org/wiki/Hydrophobicity_scales
-[Гемоглобин]: http://miew.opensource.epam.com/?l=2hhb&m=TU&c=CH&m=CS&c=UN!color:0xFF00&mt=TR&s=chain+A&s=sequence+52:72&m=TU!radius:0.8&c=UN!color:0xFF0000&s=sequence+52:72+and+not+name+C,N,O&m=LC&c=EL&mt=ME
+[Гемоглобин]: https://miew.opensource.epam.com/?l=2hhb&m=TU&c=CH&m=CS&c=UN!color:0xFF00&mt=TR&s=chain+A&s=sequence+52:72&m=TU!radius:0.8&c=UN!color:0xFF0000&s=sequence+52:72+and+not+name+C,N,O&m=LC&c=EL&mt=ME
 
 
 ### Source Data

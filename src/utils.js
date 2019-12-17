@@ -1,53 +1,11 @@
 import _ from 'lodash';
 import logger from './utils/logger';
 
-//----------------------------------------------------------------------------
-// Timer
 
-function Timer() {
-  this.startTime = 0;
-  this.oldTime = 0;
-  this.elapsedTime = 0;
-  this.running = false;
-}
-
-Timer.now = (function () {
-  const p = typeof window !== 'undefined' && window.performance;
-  return (p && p.now) ? p.now.bind(p) : Date.now;
-}());
-
-Timer.prototype = {
-  constructor: Timer,
-
-  start() {
-    this.startTime = Timer.now();
-    this.oldTime = this.startTime;
-    this.running = true;
-  },
-
-  stop() {
-    this.getElapsedTime();
-    this.running = false;
-  },
-
-  getElapsedTime() {
-    this.update();
-    return this.elapsedTime;
-  },
-
-  update() {
-    let delta = 0;
-    if (this.running) {
-      const newTime = Timer.now();
-      delta = 0.001 * (newTime - this.oldTime);
-      this.oldTime = newTime;
-      this.elapsedTime += delta;
-    }
-
-    return delta;
-  },
+const browserType = {
+  DEFAULT: 0,
+  SAFARI: 1,
 };
-
 //----------------------------------------------------------------------------
 // Query string
 
@@ -68,7 +26,7 @@ Timer.prototype = {
  * @returns {string} encoded string
  */
 function encodeQueryComponent(text, excludeExp) {
-  const encode = code => String.fromCharCode(parseInt(code.substr(1), 16));
+  const encode = (code) => String.fromCharCode(parseInt(code.substr(1), 16));
   return encodeURIComponent(text).replace(excludeExp, encode).replace(/%20/g, '+');
 }
 
@@ -282,13 +240,13 @@ function DebugTracer(namespace) {
 
 DebugTracer.spaces = '                                                                                          ';
 
-function OutOfMemoryError(message) {
-  Error.call(this);
-  this.name = 'OutOfMemoryError';
-  this.message = message;
+class OutOfMemoryError extends Error {
+  constructor(message) {
+    super();
+    this.name = 'OutOfMemoryError';
+    this.message = message;
+  }
 }
-
-OutOfMemoryError.prototype = Object.create(Error.prototype);
 
 function allocateTyped(TypedArrayName, size) {
   let result = null;
@@ -439,6 +397,16 @@ function dataUrlToBlob(url) {
   return null;
 }
 
+function getBrowser() {
+  if (navigator.vendor && navigator.vendor.indexOf('Apple') > -1
+    && navigator.userAgent
+    && navigator.userAgent.indexOf('CriOS') === -1
+    && navigator.userAgent.indexOf('FxiOS') === -1) {
+    return browserType.SAFARI;
+  }
+  return browserType.DEFAULT;
+}
+
 function shotOpen(url) {
   if (typeof window !== 'undefined') {
     window.open().document.write(`<body style="margin:0"><img src="${url}" /></body>`);
@@ -519,11 +487,47 @@ function correctSelectorIdentifier(value) {
   return enquoteHelper.join('');
 }
 
+/**
+ * Concatenates two TypedArray. Doesn't check null refs o type equality
+ * Attention! It must be use very rarely because requires memory reallocation every time. Use MergeTypedArraysUnsafe to
+ * unite array of subarrays.
+ * @param{TypedArray} first  - destination array
+ * @param{TypedArray} second - source array
+ * @returns{TypedArray} resulting concatenated array
+ */
+function concatTypedArraysUnsafe(first, second) {
+  const result = new first.constructor(first.length + second.length);
+  result.set(first);
+  result.set(second, first.length);
+  return result;
+}
+
+/**
+ * Merges array of TypedArray into TypedArray. Doesn't check null refs o type equality
+ * @param{array} array  - source array of subarrays
+ * @returns{TypedArray} resulting merged array
+ */
+function mergeTypedArraysUnsafe(array) {
+  if (array.length <= 0) {
+    return null;
+  }
+  // count the size
+  const size = array.reduce((acc, cur) => acc + cur.length, 0);
+  // create combined array
+  const result = new array[0].constructor(size);
+  for (let i = 0, start = 0; i < array.length; i++) {
+    const count = array[i].length;
+    result.set(array[i], start);
+    start += count;
+  }
+  return result;
+}
+
 //----------------------------------------------------------------------------
 // Exports
 
 export default {
-  Timer,
+  browserType,
   encodeQueryComponent,
   decodeQueryComponent,
   getUrlParameters,
@@ -546,6 +550,7 @@ export default {
   forInRecursive,
   enquoteString,
   unquoteString,
+  getBrowser,
   shotOpen,
   shotDownload,
   copySubArrays,
@@ -554,4 +559,6 @@ export default {
   getFileExtension,
   splitFileName,
   download,
+  concatTypedArraysUnsafe,
+  mergeTypedArraysUnsafe,
 };

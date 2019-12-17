@@ -8,7 +8,7 @@ const DSN6Header = {
   extent: [valueType.array, 'i16', 3],
   grid: [valueType.array, 'i16', 6],
   cellDims: [valueType.vector, 'i16', 9],
-  angles: [valueType.vector, 'i16', 12],
+  angles: [valueType.array, 'i16', 12],
   div: [valueType.singular, 'i16', 15],
   adder: [valueType.singular, 'i16', 16],
   scaleFactor: [valueType.singular, 'i16', 17],
@@ -37,7 +37,7 @@ class DSN6Model extends VolumeModel {
 
     this._fillHeader(DSN6Header, arrays);
     header.cellDims.multiplyScalar(1.0 / header.scaleFactor);
-    header.angles.multiplyScalar(Math.PI / 180.0 / header.scaleFactor);
+    header.angles.forEach((angle, i, a) => { a[i] *= (Math.PI / 180.0) / header.scaleFactor; });
     header.div /= 100;
   }
 
@@ -60,7 +60,7 @@ class DSN6Model extends VolumeModel {
     yaxis.multiplyScalar(header.extent[1]);
     zaxis.multiplyScalar(header.extent[2]);
 
-    this._bboxSize = new THREE.Vector3(xaxis.length(), yaxis.length(), zaxis.length());
+    this._setBoxParams(xaxis, yaxis, zaxis);
   }
 
   _pointCalculate(xyzData, byteBuffer, z, y, x, pos, i) {
@@ -159,7 +159,7 @@ class DSN6Parser extends Parser {
 }
 
 DSN6Parser.formats = ['dsn6'];
-DSN6Parser.extensions = ['.dsn6'];
+DSN6Parser.extensions = ['.dsn6', '.omap'];
 DSN6Parser.binary = true;
 
 export default DSN6Parser;

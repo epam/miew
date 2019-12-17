@@ -1,12 +1,21 @@
 /* eslint-disable no-magic-numbers */
 import * as THREE from 'three';
+import _ from 'lodash';
+import logger from '../utils/logger';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
+import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
+import fragmentScreenQuadFromTex from './shaders/ScreenQuadFromTex.frag';
+import fragmentScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTexWithDistortion.frag';
 import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {
-  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4,
+  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4, COLOR_FROM_POSITION: 5,
 };
+
+const SELECTION_LAYERS = [ // These layers, that are used in the selection by ray casting
+  LAYERS.DEFAULT, LAYERS.TRANSPARENT,
+];
 
 THREE.Object3D.prototype.resetTransform = function () {
   this.position.set(0, 0, 0);
@@ -47,8 +56,8 @@ THREE.WebGLRenderer.prototype.renderDummyQuad = (function () {
   const _camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000);
   _camera.position.z = 100;
 
-  return function (renderTarget) {
-    this.render(_scene, _camera, renderTarget);
+  return function () {
+    this.render(_scene, _camera);
   };
 }());
 
@@ -61,102 +70,82 @@ THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
   _camera.position.z = 100;
 
 
-  return function (material, renderTarget) {
+  return function (material) {
     _quad.material = material;
-    this.render(_scene, _camera, renderTarget);
+    this.render(_scene, _camera);
   };
 }());
+
+THREE.Matrix4.prototype.isIdentity = (function () {
+  const identity = new THREE.Matrix4();
+  return function () {
+    return identity.equals(this);
+  };
+}());
+
+THREE.Matrix4.prototype.applyToPointsArray = function (array, stride, w) {
+  if (!array || !stride || stride < 3) {
+    return array;
+  }
+  w = w || 0; // use point as normal by default
+  const e = this.elements;
+  for (let i = 0; i < array.length; i += stride) {
+    const x = array[i];
+    const y = array[i + 1];
+    const z = array[i + 2];
+
+    const persp = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
+
+    array[i] = (e[0] * x + e[4] * y + e[8] * z + e[12] * w) * persp;
+    array[i + 1] = (e[1] * x + e[5] * y + e[9] * z + e[13] * w) * persp;
+    array[i + 2] = (e[2] * x + e[6] * y + e[10] * z + e[14] * w) * persp;
+  }
+  return array;
+};
+
+class ScreenQuadMaterial extends THREE.RawShaderMaterial {
+  constructor(params) {
+    if (params.uniforms === undefined) {
+      params.uniforms = {};
+    }
+    params.uniforms.srcTex = { type: 't', value: null };
+    params.vertexShader = vertexScreenQuadShader;
+    params.transparent = false;
+    params.depthTest = false;
+    params.depthWrite = false;
+    super(params);
+  }
+}
 
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
-  const _material = new THREE.ShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      opacity: { type: 'f', value: 1.0 },
-    },
-    vertexShader: 'varying vec2 vUv; '
-      + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform float opacity;'
-     + 'void main() { vec4 color = texture2D(srcTex, vUv); gl_FragColor = vec4(color.xyz, color.a * opacity); }',
+  const _material = new ScreenQuadMaterial({
+    uniforms: { opacity: { type: 'f', value: 1.0 } },
+    fragmentShader: fragmentScreenQuadFromTex,
     transparent: true,
-    depthTest: false,
-    depthWrite: false,
   });
 
 
-  return function (srcTex, opacity, renderTarget) {
+  return function (srcTex, opacity) {
     _material.uniforms.srcTex.value = srcTex;
     _material.transparent = (opacity < 1.0);
     _material.uniforms.opacity.value = opacity;
-    this.renderScreenQuad(_material, renderTarget);
-  };
-}());
-
-// render texture with depth packed in RGBA (packing is from threejs)
-THREE.WebGLRenderer.prototype.renderScreenQuadFromTexDepth = (function () {
-  const _material = new THREE.ShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      opacity: { type: 'f', value: 1.0 },
-    },
-    vertexShader: 'varying vec2 vUv; '
-    + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: ''
-    + 'const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1);\n'
-    + 'const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. )\n;'
-    + 'const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. )\n;'
-    + 'float unpackRGBAToDepth( const in vec4 v ) {\n'
-    + '  return dot( v, UnpackFactors );\n'
-    + '}\n'
-    + 'varying vec2 vUv; uniform sampler2D srcTex; uniform float opacity;\n'
-    + 'void main() { \n'
-    + '  vec4 color = texture2D(srcTex, vUv); \n'
-    + '  float depth = unpackRGBAToDepth(color);\n'
-    + '  gl_FragColor = vec4(depth, depth, depth, opacity);\n '
-    + '}\n',
-    transparent: true,
-    depthTest: false,
-    depthWrite: false,
-  });
-
-  return function (srcTex, opacity, renderTarget) {
-    _material.uniforms.srcTex.value = srcTex;
-    _material.transparent = (opacity < 1.0);
-    _material.uniforms.opacity.value = opacity;
-    this.renderScreenQuad(_material, renderTarget);
+    this.renderScreenQuad(_material);
   };
 }());
 
 THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function () {
-  const _material = new THREE.ShaderMaterial({
-    uniforms: {
-      srcTex: { type: 't', value: null },
-      coef: { type: 'f', value: 1.0 },
-    },
-    vertexShader: 'varying vec2 vUv; '
-      + 'void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }',
-    fragmentShader: 'varying vec2 vUv; uniform sampler2D srcTex; uniform float coef;'
-      + 'void main() {'
-      + 'vec2 uv = vUv * 2.0 - 1.0;'
-      + 'float r2 = dot(uv, uv);'
-      + 'vec2 tc = uv * (1.0 + coef * r2);'
-      + 'if (!all(lessThan(abs(tc), vec2(1.0)))) discard;'
-      + 'tc = 0.5 * (tc + 1.0);'
-      + 'gl_FragColor = texture2D(srcTex, tc);'
-      + '}',
-    transparent: false,
-    depthTest: false,
-    depthWrite: false,
+  const _material = new ScreenQuadMaterial({
+    uniforms: { coef: { type: 'f', value: 1.0 } },
+    fragmentShader: fragmentScreenQuadFromTexWithDistortion,
   });
 
 
-  return function (srcTex, coef, renderTarget) {
+  return function (srcTex, coef) {
     _material.uniforms.srcTex.value = srcTex;
     _material.uniforms.coef.value = coef;
-    this.renderScreenQuad(_material, renderTarget);
+    this.renderScreenQuad(_material);
   };
 }());
-
-// TODO: move to a new Camera class?
 
 /**
  * @param {number} angle - Field of view in degrees.
@@ -170,6 +159,25 @@ THREE.PerspectiveCamera.prototype.setMinimalFov = function (angle) {
 };
 
 /**
+ * @param {THREE.PerspectiveCamera} camera - Base camera for this stereo camera.
+ * @param {number} angle - Field of view in degrees.
+ */
+THREE.StereoCamera.prototype.updateHalfSized = function (camera, angle) {
+  const originalAspect = camera.aspect;
+  const originalFov = camera.fov;
+
+  camera.aspect = originalAspect / 2.0;
+  camera.setMinimalFov(angle);
+  camera.updateProjectionMatrix();
+
+  this.update(camera);
+
+  camera.aspect = originalAspect;
+  camera.fov = originalFov;
+  camera.updateProjectionMatrix();
+};
+
+/**
  * @param {number} radius - Radius of bounding sphere in angstroms to fit on screen.
  * @param {number} angle - Field of view in degrees.
  */
@@ -177,6 +185,67 @@ THREE.PerspectiveCamera.prototype.setDistanceToFit = function (radius, angle) {
   this.position.z = radius / Math.sin(0.5 * THREE.Math.degToRad(angle));
 };
 
+/**
+ * @param {RCGroup} gfxObj - All objects on scene.
+ * @param {THREE.PerspectiveCamera} camera - Camera used for rendering.
+ * @param {number} clipPlane - Distance to clip plane.
+ * @param {number} fogFarPlane - Distance to fog far plane.
+ */
+THREE.Raycaster.prototype.intersectVisibleObject = function (gfxObj, camera, clipPlane, fogFarPlane) {
+  const intersects = this.intersectObject(gfxObj, false);
+  if (intersects.length === 0) {
+    return null;
+  }
+
+  // find point closest to camera that doesn't get clipped by camera near plane or clipPlane (if it exists)
+  const nearPlane = Math.min(camera.near, clipPlane);
+  let i;
+  let p = intersects[0];
+  const v = new THREE.Vector3();
+  for (i = 0; i < intersects.length; ++i) {
+    p = intersects[i];
+    v.copy(p.point);
+    v.applyMatrix4(camera.matrixWorldInverse);
+    if (v.z <= -nearPlane) {
+      break;
+    }
+  }
+  if (i === intersects.length) {
+    return null;
+  }
+
+  // check that selected intersection point is not clipped by camera far plane or occluded by fog (if it exists)
+  const farPlane = Math.min(camera.far, fogFarPlane);
+  v.copy(p.point);
+  v.applyMatrix4(camera.matrixWorldInverse);
+  if (v.z <= -farPlane) {
+    return null;
+  }
+  return p;
+};
+
+THREE.Matrix4.prototype.extractScale = (function () {
+  const _v = new THREE.Vector3();
+
+  return function (scale) {
+    if (scale === undefined) {
+      logger.debug('extractScale(): new is too expensive operation to do it on-the-fly');
+      scale = _v.clone();
+    }
+
+    const te = this.elements;
+    scale.x = _v.set(te[0], te[1], te[2]).length();
+    scale.y = _v.set(te[4], te[5], te[6]).length();
+    scale.z = _v.set(te[8], te[9], te[10]).length();
+
+    // if determine is negative, we need to invert one scale
+    const det = this.determinant();
+    if (det < 0) {
+      scale.x = -scale.x;
+    }
+    return scale;
+  };
+}());
 
 function _calcCylinderMatrix(posBegin, posEnd, radius) {
   const posCenter = posBegin.clone().lerp(posEnd, 0.5);
@@ -324,7 +393,7 @@ function removeChildren(object) {
 
 function clearTree(object) {
   object.traverse((obj) => {
-    if (obj instanceof THREE.Mesh) {
+    if (obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments || obj instanceof THREE.Line) {
       obj.geometry.dispose();
     }
   });
@@ -340,19 +409,35 @@ function destroyObject(object) {
   }
 }
 
-function applyTransformsToMeshes(root, mtc) {
-  const meshes = [];
+function belongToSelectLayers(object) {
+  for (let i = 0; i < SELECTION_LAYERS.length; i++) {
+    if (((object.layers.mask >> SELECTION_LAYERS[i]) & 1) === 1) {
+      return true;
+    }
+  }
+  return false;
+}
 
+function _getMeshesArr(root, meshTypes) {
+  const meshes = [];
+  root.traverse((object) => {
+    for (let i = 0; i < meshTypes.length; i++) {
+      if (object instanceof meshTypes[i]) {
+        meshes[meshes.length] = object;
+        break;
+      }
+    }
+  });
+  return meshes;
+}
+
+function applyTransformsToMeshes(root, mtc) {
   const mtcCount = mtc.length;
   if (mtcCount < 1) {
     return;
   }
-  root.traverse((object) => {
-    if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments
-          || object instanceof THREE.Line) {
-      meshes[meshes.length] = object;
-    }
-  });
+
+  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments, THREE.Line]);
 
   for (let i = 0, n = meshes.length; i < n; ++i) {
     const mesh = meshes[i];
@@ -374,12 +459,7 @@ function processTransparentMaterial(root, material) {
     return;
   }
 
-  const meshes = [];
-  root.traverse((object) => {
-    if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) {
-      meshes[meshes.length] = object;
-    }
-  });
+  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
 
   for (let i = 0, n = meshes.length; i < n; ++i) {
     const mesh = meshes[i];
@@ -395,15 +475,60 @@ function processTransparentMaterial(root, material) {
     const prepassMat = mesh.material.createInstance();
     prepassMat.setValues({ prepassTransparancy: true, fakeOpacity: false });
     const prepassMesh = new mesh.constructor(mesh.geometry, prepassMat);
-    prepassMesh.material.transparent = false;
-    prepassMesh.material.colorFromDepth = false;
-    prepassMesh.material.lights = false;
-    prepassMesh.material.shadowmap = false;
-    prepassMesh.material.fog = false;
+    _.forEach(['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog'],
+      (value) => {
+        prepassMesh.material[value] = false;
+      });
     prepassMesh.material.needsUpdate = true;
     prepassMesh.applyMatrix(mesh.matrix);
     prepassMesh.layers.set(LAYERS.PREPASS_TRANSPARENT);
     parent.add(prepassMesh);
+  }
+}
+
+function processColFromPosMaterial(root, material) {
+  if (!(material instanceof UberMaterial)) {
+    return;
+  }
+
+  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
+
+  for (let i = 0, n = meshes.length; i < n; ++i) {
+    const mesh = meshes[i];
+    const { parent } = mesh;
+    if (!parent) {
+      continue;
+    }
+
+    // copy of geometry with colFromPosMat material
+    const colFromPosMat = mesh.material.createInstance();
+    colFromPosMat.setValues({ colorFromPos: true });
+    const colFromPosMesh = new mesh.constructor(mesh.geometry, colFromPosMat);
+    _.forEach(['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog', 'overrideColor', 'fogTransparent',
+      'attrColor', 'attrColor2', 'attrAlphaColor', 'fakeOpacity'],
+    (value) => {
+      colFromPosMesh.material[value] = false;
+    });
+
+    colFromPosMesh.material.needsUpdate = true;
+    colFromPosMesh.applyMatrix(mesh.matrix);
+    colFromPosMesh.layers.set(LAYERS.COLOR_FROM_POSITION);
+    parent.add(colFromPosMesh);
+  }
+}
+function prepareObjMaterialForShadow(object) {
+  if (object.castShadow) { // add casting material for casters
+    const depthMaterial = object.material.createInstance();
+    depthMaterial.setValues({
+      colorFromDepth: true,
+      lights: false,
+      shadowmap: false,
+      fog: false,
+    });
+    object.customDepthMaterial = depthMaterial;
+  }
+  if (!object.receiveShadow && object.material.shadowmap) { // remove shaodow from non-receivers
+    object.material.setValues({ shadowmap: false });
   }
 }
 
@@ -414,19 +539,17 @@ function processMaterialForShadow(root, material) {
 
   root.traverse((object) => {
     if (object instanceof THREE.Mesh) {
-      if (object.castShadow) { // add casting material for casters
-        const depthMaterial = object.material.createInstance();
-        depthMaterial.setValues({
-          colorFromDepth: true,
-          lights: false,
-          shadowmap: false,
-          fog: false,
-        });
-        object.customDepthMaterial = depthMaterial;
-      }
-      if (!object.receiveShadow && object.material.shadowmap) { // remove shaodow from non-receivers
-        object.material.setValues({ shadowmap: false });
-      }
+      prepareObjMaterialForShadow(object);
+    }
+  });
+}
+
+function processObjRenderOrder(root, idMaterial) {
+  // set renderOrder to 0 for Backdrop and to 1 in other cases to render Backdrop earlier all other materials
+  const renderOrder = +(idMaterial !== 'BA');
+  root.traverse((object) => {
+    if (object.isGroup) {
+      object.renderOrder = renderOrder;
     }
   });
 }
@@ -446,7 +569,7 @@ function applySelectionMaterial(geo) {
   geo.traverse((node) => {
     if ('material' in node) {
       node.material = node.material.clone(true);
-      // HACK: using z-offset to magically fix selection rendering artifact (on z-sprites)
+      // using z-offset to magically fix selection rendering artifact (on z-sprites)
       node.material.setValues({ depthFunc: THREE.LessEqualDepth, overrideColor: true, fog: false });
       node.material.setUberOptions({ fixedColor: new THREE.Color(0xFFFF00), zOffset: -1e-6 });
     }
@@ -475,9 +598,13 @@ export default {
   fillArray,
   clearTree,
   destroyObject,
+  belongToSelectLayers,
   applyTransformsToMeshes,
   processTransparentMaterial,
+  processColFromPosMaterial,
+  prepareObjMaterialForShadow,
   processMaterialForShadow,
+  processObjRenderOrder,
   makeVisibleMeshes,
   applySelectionMaterial,
   getMiddlePoint,

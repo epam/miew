@@ -20,7 +20,7 @@ class AtomsSphereGroup extends AtomsGroup {
   }
 
   updateToFrame(frameData) {
-    // TODO This method looks like a copy paste. However, it
+    // This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
     const atomsIdc = this._selection.chunks;
     const { atoms } = this._selection;

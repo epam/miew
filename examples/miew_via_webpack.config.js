@@ -3,7 +3,7 @@ module.exports = {
   output: {
     path: __dirname,
     chunkFilename: '[name].bundle.js',
-    filename: 'miew_via_webpack.bundle.js'
+    filename: 'miew_via_webpack.bundle.js',
   },
   module: {
     rules: [{

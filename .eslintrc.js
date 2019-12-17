@@ -7,6 +7,9 @@ module.exports = {
   parser: 'babel-eslint',
   parserOptions: {
     sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
 
   env: {
@@ -17,6 +20,8 @@ module.exports = {
     DEBUG: true,
   },
 
+  plugins: ['react'],
+
   // current deviations from AirBnB setup
   rules: {
     'linebreak-style': ['warn', os.EOL === '\n' ? 'unix' : 'windows'],
@@ -26,6 +31,16 @@ module.exports = {
       argsIgnorePattern: '^_',
       ignoreRestSiblings: true,
     }],
+    'no-mixed-operators': [
+      'error', {
+        groups: [
+          ['&', '|', '^', '~', '<<', '>>', '>>>'],
+          ['==', '!=', '===', '!==', '>', '>=', '<', '<='],
+          ['&&', '||'],
+          ['in', 'instanceof'],
+        ],
+        allowSamePrecedence: true,
+      }],
     'no-underscore-dangle': 'off',
     'no-param-reassign': 'off',
     'no-continue': 'off',
@@ -41,6 +56,9 @@ module.exports = {
     'no-restricted-syntax': 'off', // 27 problems
     'max-len': 'off', // 270 problems
     'func-names': 'off', // 562 problems
+    'max-classes-per-file': 'off',
+    'react/jsx-uses-react': 'error',
+    'react/jsx-uses-vars': 'error',
   },
 
   overrides: [{
@@ -59,6 +77,18 @@ module.exports = {
     },
     rules: {
       'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    },
+  }, {
+    files: ['examples/*.js'],
+    env: {
+      browser: true,
+      es6: false,
+    },
+    rules: {
+      'no-var': 'off',
+      'prefer-arrow-callback': 'off',
+      'prefer-template': 'off',
+      'object-shorthand': 'off',
     },
   }],
 };

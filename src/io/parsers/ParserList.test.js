@@ -29,8 +29,8 @@ describe('ParserList', () => {
   const extB = ['.b', '.b2'];
   const extAB = ['.a', '.a2', '.b', '.b2'];
 
-  const formats = list => list.keys('formats');
-  const extensions = list => list.keys('extensions');
+  const formats = (list) => list.keys('formats');
+  const extensions = (list) => list.keys('extensions');
 
   describe('constructor', () => {
     it('creates an empty list', () => {

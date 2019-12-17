@@ -1,17 +1,34 @@
 export default [{
   // just small protein loaded by default
   name: '1CRN',
-  formats: ['pdb', 'cif', 'mmtf', 'xyz'],
+  formats: ['pdb', 'cif', 'mmtf', 'xyz', 'gro', 'mol2'],
   num: {
     atoms: 327,
     bonds: 337,
     residues: { xyz: 1, default: 46 },
     chains: 1,
     molecules: 1,
-    units: { xyz: 1, default: 2 },
+    units: {
+      xyz: 1,
+      gro: 1,
+      mol2: 1,
+      default: 2,
+    },
     symmetries: { pdb: 2 },
-    helices: { mmtf: 3, xyz: 0, default: 2 },
-    sheets: { mmtf: 2, xyz: 0, default: 1 },
+    helices: {
+      mmtf: 3,
+      xyz: 0,
+      gro: 0,
+      mol2: 0,
+      default: 2,
+    },
+    sheets: {
+      mmtf: 2,
+      xyz: 0,
+      gro: 0,
+      mol2: 0,
+      default: 1,
+    },
   },
 }, {
   // hydrogens, waters, ligands, altloc, all aminoacids, biomolecules, symmetry, ANISOU, LINK
@@ -76,13 +93,28 @@ export default [{
 }, {
   // small molecule
   name: 'serotonin',
-  formats: ['pubchem', 'sdf', 'xyz'],
+  formats: ['pubchem', 'sdf', 'xyz', 'mol2'],
   num: {
     atoms: 25,
     bonds: 26,
     residues: 1,
     chains: 1,
     molecules: { pubchem: 0, default: 1 },
+    units: 1,
+    symmetries: 0,
+    helices: 0,
+    sheets: 0,
+  },
+}, {
+  // DNA with modified residues
+  name: '1K1R',
+  formats: ['pdb'],
+  num: {
+    atoms: 488,
+    bonds: 523,
+    residues: 15,
+    chains: 2,
+    molecules: 2,
     units: 1,
     symmetries: 0,
     helices: 0,

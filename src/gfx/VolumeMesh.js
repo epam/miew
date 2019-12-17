@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-// import utils from '../utils';
 import VolumeMaterial from './shaders/VolumeMaterial';
 import settings from '../settings';
 
@@ -46,7 +45,7 @@ class VolumeMesh extends THREE.Mesh {
       new THREE.Vector3(0.0, 0.0, 0.0),
     ];
 
-    geo.addAttribute('position', new THREE.BufferAttribute(new Float32Array(this.vertices.length * 3), 3));
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(this.vertices.length * 3), 3));
 
     this.name = 'VolumeMesh';
   }
@@ -284,12 +283,12 @@ class VolumeMesh extends THREE.Mesh {
     const vert = this.vertices;
     const { size } = this;
 
-    this._collectVertices(this.faces[0], vertex => vertex.z === -size.z);
-    this._collectVertices(this.faces[1], vertex => vertex.z === size.z);
-    this._collectVertices(this.faces[2], vertex => vertex.y === -size.y);
-    this._collectVertices(this.faces[3], vertex => vertex.y === size.y);
-    this._collectVertices(this.faces[4], vertex => vertex.x === -size.x);
-    this._collectVertices(this.faces[5], vertex => vertex.x === size.x);
+    this._collectVertices(this.faces[0], (vertex) => vertex.z === -size.z);
+    this._collectVertices(this.faces[1], (vertex) => vertex.z === size.z);
+    this._collectVertices(this.faces[2], (vertex) => vertex.y === -size.y);
+    this._collectVertices(this.faces[3], (vertex) => vertex.y === size.y);
+    this._collectVertices(this.faces[4], (vertex) => vertex.x === -size.x);
+    this._collectVertices(this.faces[5], (vertex) => vertex.x === size.x);
 
     const vCenter = new THREE.Vector3();
     const vRight = new THREE.Vector3();
@@ -356,24 +355,30 @@ class VolumeMesh extends THREE.Mesh {
     const dim = dataSource.getDimensions();
     const stride = dataSource.getTiledTextureStride();
     const texture = dataSource.buildTiledTexture();
+    const bbox = dataSource.getBox();
     vm.uniforms.volumeDim.value.set(dim[0], dim[1], dim[2]);
     vm.uniforms.tileTex.value = texture;
     vm.uniforms.tileTexSize.value.set(texture.image.width, texture.image.height);
     vm.uniforms.tileStride.value.set(stride[0], stride[1]);
-
     Object.assign(this.volumeInfo, dataSource.getVolumeInfo());
+
+    const volInfo = this.volumeInfo;
+    vm.uniforms.delta.value.copy(volInfo.delta);
+    vm.uniforms.boxAngles.value.set(volInfo.obtuseAngle[0], volInfo.obtuseAngle[1], volInfo.obtuseAngle[2]);
+
     this.material = vm;
 
-    const bbox = dataSource.getBox();
     bbox.getSize(this.scale);
     bbox.getCenter(this.position);
   }
 
   _updateIsoLevel() {
-    const { kSigma } = settings.now.modes.VD;
+    const { kSigma, kSigmaMed, kSigmaMax } = settings.now.modes.VD;
     const volInfo = this.volumeInfo;
-    this.material.uniforms._isoLevel0.value = (volInfo.dmean + kSigma * volInfo.sd - volInfo.dmin)
-      / (volInfo.dmax - volInfo.dmin);
+    const mean = volInfo.dmean - volInfo.dmin;
+    const span = volInfo.dmax - volInfo.dmin;
+    const level = (k) => (mean + k * volInfo.sd) / span;
+    this.material.uniforms._isoLevel0.value.set(level(kSigma), level(kSigmaMed), level(kSigmaMax));
   }
 
   static _nearClipPlaneOffset = 0.2;

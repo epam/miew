@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import Atom from './Atom';
 import Element from './Element';
-import ResidueType from './ResidueType';
 
 const cNucleicControlNames = ['C3\'', 'C3*', 'P', 'H5T', 'H3T'];
 const cNucleicWing1Names = ['OP1', 'O1P'];
@@ -40,7 +39,7 @@ class Residue {
     this._mask = 1 | 0;
     this._index = -1;
 
-    this._atoms = []; // TODO: change to range
+    this._atoms = [];
     this._secondary = null;
     this._firstAtom = null;
     this._leadAtom = null;
@@ -88,7 +87,7 @@ class Residue {
     const atom = new Atom(this, name, type, xyz, role, het, serial, altLoc, occupancy, tempFactor, charge);
     const complex = this._chain.getComplex();
     complex.addAtom(atom);
-    this._atoms.push(atom); // TODO: change to range
+    this._atoms.push(atom);
     this._het = this._het || het;
     return atom;
   }
@@ -186,21 +185,25 @@ class Residue {
     const vectorB = prevLeadPos.clone().sub(prevWingPos);
     vectorB.crossVectors(vectorA, vectorB);
     vectorB.crossVectors(vectorA, vectorB).normalize();
-    if (prevWing !== null && Math.abs(prevWing.angleTo(vectorB)) > Math.PI / 2) {
-      vectorB.negate();
+    if (prevWing !== null && prevWing.length() > 0.0001) {
+      const needToNegate = vectorB.length() > 0.0001 && Math.abs(prevWing.angleTo(vectorB)) > Math.PI / 2;
+      if (needToNegate) {
+        vectorB.negate();
+      }
     }
     return vectorB;
   }
 
-  _innerFinalize(prevRes, prev, nextRes, dst, getAtomPosition) {
+  _innerFinalize(prevRes, prev, nextRes, dst, chainAsNucleic, getAtomPosition) {
     const bFirstInChain = prev === null;
 
     const lp = getAtomPosition(this._leadAtom);
     const currLeadPos = new THREE.Vector3(lp.x, lp.y, lp.z);
-    if ((this._type.flags & ResidueType.Flags.NUCLEIC) !== 0) {
+    if (chainAsNucleic) {
       this._detectLeadWing(dst, nextRes, getAtomPosition);
       return;
     }
+
     if (bFirstInChain) { // for first one in chain
       dst._midPoint = getAtomPosition(this._firstAtom).clone();
     } else {
@@ -211,9 +214,9 @@ class Residue {
     dst._controlPoint = currLeadPos;
   }
 
-  _finalize2(prev, next) {
+  _finalize2(prev, next, asNucleic) {
     // Should be called AFTER first finalize
-    this._innerFinalize(prev, prev, next, this, atom => atom._position);
+    this._innerFinalize(prev, prev, next, this, asNucleic, (atom) => atom._position);
   }
 
   isConnected(anotherResidue) {
@@ -250,7 +253,6 @@ class Residue {
     let temperature = 0; // average temperature
     let occupCount = 0;
     let occupancy = 0; // average occupancy
-    // TODO: Is it correct? Is it fast?
     this.forEachAtom((a) => {
       if (self._leadAtom === null) {
         if (a._role === Element.Constants.Lead) {

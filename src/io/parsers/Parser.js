@@ -11,11 +11,7 @@ export default class Parser {
     throw new Error('Parsing this type of data is not implemented');
   }
 
-  parse(/** @deprecated */ callbacks) {
-    if (callbacks) {
-      return this._parseOLD(callbacks);
-    }
-
+  parse() {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         try {
@@ -36,27 +32,8 @@ export default class Parser {
     return this.model;
   }
 
-  /** @deprecated */
-  _parseOLD(callbacks) {
-    return this.parse()
-      .then((result) => {
-        callbacks.ready(result);
-      })
-      .catch((error) => {
-        callbacks.error(error);
-      });
-  }
-
   abort() {
     this._abort = true;
-  }
-
-  /** @deprecated */
-  static checkDataTypeOptions(options, type, extension) {
-    const { fileType, fileName } = options;
-    extension = (extension || (`.${type}`)).toLowerCase();
-    return Boolean((fileType && fileType.toLowerCase() === type.toLowerCase())
-      || (!fileType && fileName && fileName.toLowerCase().endsWith(extension)));
   }
 }
 

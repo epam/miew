@@ -8,17 +8,19 @@ import '@babel/polyfill';
 
 import $ from 'jquery';
 import toastr from 'toastr';
-import Miew from './Miew.full';
+import Miew from 'Miew'; // eslint-disable-line import/no-unresolved
 import Menu from './ui/Menu';
 
 window.DEBUG = true;
+
+const miewErrorId = 'miew-error';
 
 function onError(err) {
   const doc = document.createDocumentFragment();
 
   const containers = document.getElementsByClassName('miew-container');
   const parent = containers.length > 0 ? containers[0] : null;
-  let element = document.getElementById('miew-error');
+  let element = document.getElementById(miewErrorId);
 
   // on the first error
   if (!element) {
@@ -38,8 +40,8 @@ function onError(err) {
     par.appendChild(document.createElement('small')).textContent = 'for the failure';
 
     element = document.createElement('div');
-    element.setAttribute('class', 'miew-error');
-    element.id = 'miew-error';
+    element.setAttribute('class', miewErrorId);
+    element.id = miewErrorId;
     doc.appendChild(element);
   }
 
@@ -59,8 +61,6 @@ function onError(err) {
   }
 }
 
-// requirejs.onError = onError;
-
 window.onerror = function (err, url, line, col, obj) {
   onError(obj = obj || {
     name: 'window.onerror',
@@ -75,43 +75,40 @@ window.onerror = function (err, url, line, col, obj) {
 // Uncomment this to profile parsing
 // Miew.profile('data/4TNW.pdb', 10, $('miew-container').first.firstChild.firstChild);
 
-/** @deprecated */
-window.MIEWS = [];
-
 // create viewer (and run it) for each container element on the page
-$('.miew-container').each((i, container) => {
-  const viewer = window.miew = new Miew($.extend(
-    true,
-    {
-      container,
-      load: 'data/1CRN.pdb',
-      cookiePath: (typeof COOKIE_PATH !== 'undefined' && COOKIE_PATH) || '/',
-    },
-    Miew.options.fromAttr(container.getAttribute('data-miew')),
-    Miew.options.fromURL(window.location.search),
-  ));
+window.addEventListener('load', () => {
+  $('.miew-container').each((i, container) => {
+    const viewer = window.miew = new Miew($.extend(
+      true,
+      {
+        container,
+        load: 'data/1CRN.pdb',
+        cookiePath: (typeof COOKIE_PATH !== 'undefined' && COOKIE_PATH) || '/',
+      },
+      Miew.options.fromAttr(container.getAttribute('data-miew')),
+      Miew.options.fromURL(window.location.search),
+    ));
 
-  const convertLevel = {
-    error: 'error',
-    warn: 'warning',
-    report: 'info',
-  };
-  toastr.options.newestOnTop = false;
-  viewer.logger.addEventListener('message', (e) => {
-    const level = convertLevel[e.level];
-    if (level) {
-      toastr[level](e.message);
+    const convertLevel = {
+      error: 'error',
+      warn: 'warning',
+      report: 'info',
+    };
+    toastr.options.newestOnTop = false;
+    viewer.logger.addEventListener('message', (e) => {
+      const level = convertLevel[e.level];
+      if (level) {
+        toastr[level](e.message);
+      }
+    });
+
+    const menu = new Menu(container, viewer);
+
+    if (viewer.init()) {
+      viewer.benchmarkGfx().then(() => {
+        menu.showOverlay();
+        viewer.run();
+      });
     }
   });
-
-  window.MIEWS.push(viewer);
-
-  const menu = new Menu(container, viewer);
-
-  if (viewer.init()) {
-    viewer.benchmarkGfx().then(() => {
-      menu.showOverlay();
-      viewer.run();
-    });
-  }
 });

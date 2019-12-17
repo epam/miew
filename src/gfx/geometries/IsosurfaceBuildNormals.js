@@ -126,8 +126,8 @@ class IsosurfaceBuildNormals {
           for (let x = xIndMin; x <= xIndMax; x++) {
             // add atom with index "i" to this voxel list
             const indVoxel = x + y * side + z * side2;
-            // assert(indVoxel >= 0);
-            // assert(indVoxel < side3);
+            // assert indVoxel >= 0
+            // assert indVoxel < side3
 
             // add first
             if (this._voxelList[indVoxel] < 0) {
@@ -135,7 +135,7 @@ class IsosurfaceBuildNormals {
               atomsList[numAtomsRefs * 2 + 1] = 0 - 1;
               this._voxelList[indVoxel] = numAtomsRefs;
               numAtomsRefs++;
-              // assert(numAtomsRefs < maxAtomsRefs - 1);
+              // assert numAtomsRefs < maxAtomsRefs - 1
               continue;
             }
             // insert into head of list
@@ -309,13 +309,10 @@ class IsosurfaceBuildNormals {
     let vz = 0.0;
     let koef = 0.0;
     let w = 0.0;
-    // const KOEF_ALPHA = 1.0;
     const KOEF_ADD = 0.8;
 
     const maxRadAffect = radiusColorSmoothness;
     const maxRadAffect2 = maxRadAffect * maxRadAffect;
-
-    // koefAlpha = 4.4 / radiusColorSmoothness;
 
     let colorsClose = [];
     let weights = [];
@@ -336,8 +333,6 @@ class IsosurfaceBuildNormals {
       if (koef < 0.0) {
         koef = -koef;
       }
-      // w = Math.exp(expScale * koef);
-      // w = 1.0 / (KOEF_ADD + Math.pow(koef, KOEF_ALPHA));
       w = 1.0 / (KOEF_ADD + koef);
 
       colorsClose.push([atom.colorX, atom.colorY, atom.colorZ]);

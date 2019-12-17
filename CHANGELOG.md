@@ -6,6 +6,150 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.4] - 2019-11-11
+### Added
+- Add parser for MOL2 molecular format
+- Add exporter for geometry information into FBX unicode format
+- Add button 'Export FBX' in Demo application menu 'Tools'
+- Add example of using ImmediateLoader
+
+### Changed
+- Change all Miew links to https://miew... instead of http://miew...
+- Refactor unit tests for settings.js and logger.js
+
+### Fixed
+- Fix rendering of electron density in stereo mode
+- Fix rendering of electron density bbox with visual effects 
+- Fix a crash in modified DNA processing (e.g. 1K1R)
+
+### Internal
+- Rafactor normal storage in G-buffer
+- Generalize TraceMesh into InstancedMesh
+- Refactor the algorithm of simultaneously applying fog and ambient occlusion effects
+
+## [0.8.3] - 2019-09-20
+### Added
+- Add parsers for GRO molecular formats
+- Support shadows effect for the Trace mode
+
+### Fixed
+- Fix screenshot orientation in Safari
+- Fix screenshot size for HiDPI displays
+- Fix disabled button of representation addition in GUI
+
+## [0.8.2] - 2019-08-16
+### Added
+- The parameter `resolution` now effects image quality for Electron Density.
+- Add API and terminal command to center view on selection via `miew.center`.
+- Load file in Load dialog after pressing 'Enter'.
+
+### Fixed
+- Clear info panel in demo application when data haven't been loaded.
+- Fix miew crash when adding representation if data was not loaded.
+- Fix bug with incorrect discard behavior in component mode.
+- Fix wrong scaling molecules in `DISTORTED` and `SIMPLE` stereo modes.
+- Fix 'magic' rectangular lines appearing on laptops with Intel embedded GPU board.
+- Fix disappearing of molecule after 'ao' turning off.
+
+### Known issues
+- Bounding box lines in Electron Density may disappear when `ao` is tuned on. 
+
+## [0.8.1] - 2019-07-01
+### Fixed
+- Do not show the last pick information when selection was changed via the terminal.
+- Update the selection notification when the displayed unit changes.
+- Fix backdrop material so it works for sprite-based modes (B&S, VDW...)
+- Fix a bug in Cartoon geometry which led to bad raycasting performance.
+
+### Internal
+- Visual regression tests are now run in headless Chrome. This allows lowering error threshold and
+  comparing results obtained on different graphics hardware. It is a big step towards distributed
+  testing in cloud.
+
+## [0.8.0] - 2019-06-07
+### Added
+- Add isosurface rendering for electron density maps. As volumetric rendering is still in its alpha, it is done through a global `modes.VD.isoMode` flag.
+
+### Changed
+- Show detailed messages for WebGL initialization errors.
+
+### Removed - BREAKING CHANGES!
+- Remove deprecated water bonding hack.
+- Remove deprecated Complex methods.
+- Remove deprecated window.MIEWS array.
+- Remove deprecated Settings#override().
+- Remove deprecated camera panning.
+- Remove deprecated coloring ids.
+- Remove deprecated themes.
+- Remove deprecated old-fashioned atom labels.
+- Remove deprecated API in modes, colorers, materials, palettes.
+- Remove deprecated API in loaders and parsers.
+- Remove deprecated presets server integration.
+
+### Fixed
+- Fix the crash on clicking mode/color panel when representation list is empty.
+- Fix DISTORTED and ANAGLYPH stereo modes.
+- Fix incorrect shadows when molecule is moved around.
+- Fix axes disappearing when fxaa is off and ao is on.
+- Fix rendering issues for fxaa + outline + stereo=DISTORTED.
+- Fix selection information update when the terminal was used to change selection.
+- Fix raycasting performance partially. Another fix is still in progress.
+
+### Internal
+- Add rendering regression tests for post-process effects, shadows and stereo modes.
+- Fix some code smells and todos found by improved SonarCloud checks, refactor es5 code.
+
+## [0.7.24] - 2019-04-26
+### Added
+- Add wire frames for electron density volumes.
+
+### Fixed
+- Fix `unrol_loop` warning during shader compilation.
+- Use `shadow.on` setting to initialize shadowing state.
+- Fix some eslint and sonar code smells.
+
+### Changed
+- Build geometry with sharper edges for cartoon sheets and helices.
+- Reset view interpolator on file load, pause it when miew is paused.
+
+### Internal
+- Use only Node.js 10 (the current LTS) environment for CI/CD.
+- Remove unrelated TODO/FIXME/HACK comments and get rid of dead code in isosurfaces.
+
+## [0.7.23] - 2019-04-05
+### Added
+- Support dsn6 prefix for ED maps loading by PDB ID.
+- Support non-orthogonal density volumes.
+- Host full-screen viewer at a `/v` server path and add a button to launch the app from the lite viewer.
+- Add an interactive example showing residue sequences.
+
+### Changed
+- Use `https` protocol for data requests.
+- Implement soft shadow edges, make the colors more natural and reduce self-shadowing artifacts.
+- Use URL options in the corresponding example.
+- Add titles to the examples.
+
+### Fixed
+- Fix excessive rendering in case if nothing changes.
+- Fix disappearing molecule after reloading the page.
+- Fix full geometry rebuild when switching shadows on/off.
+- Fix low performance of volumetric rendering in the case when a molecule is present in the scene.
+
+## [0.7.22] - 2019-02-28
+### Changed
+- Make "fullscreen.html" example really full-screen both for desktops and mobiles.
+- Add experimental sigma-coloring of volumetric maps.
+
+### Fixed
+- Fix background transparency of the terminal.
+- Add a temporary workaround for jquery.terminal freeze: don't print square brackets
+  into the term, replace them with parentheses
+  ([jcubic/jquery.terminal#470](https://github.com/jcubic/jquery.terminal/issues/470)).
+- Fix rendering conflicts when `ssao=true` and `fxaa=false` at the same time.
+
+### Internal
+- Enforce better ES2015+ with the newer eslint config and fix the issues.
+
 ## [0.7.21] - 2019-02-14
 ### Added
 - Add parsers for MOL, SDF and XYZ molecular formats and MAP, MRC and DSN6 electron density maps.
@@ -48,8 +192,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Migrate parts of code to ES2015 syntax (`modes/`, `colorers/`, `meshes/`, `geometries/`, `groups/`, `processors/`).
 - Update golden images for e2e regression tests.
 
-[cartoon-like rendering]: http://miew.opensource.epam.com/v0.7.20/?l=1CRN&r=0&s=not+hetatm&m=CA&c=SQ&mt=TN&r=1&s=hetatm+and+not+water&m=BS&c=EL&mt=SF&resolution=high&outline.on=true&outline.threshold=0.02
-[RCSB PDB Molecule of the Month style]: http://miew.opensource.epam.com/v0.7.20/?l=pdb:5AT1&r=0&s=not+water+and+chain+C&m=VW&c=CO!subset:elem+C,baseColor:16422548,color:16494255&mt=FL&r=1&s=not+water+and+chain+B&m=VW&c=CO!subset:elem+C,baseColor:8169212,color:9550321&mt=FL&r=2&s=not+water+and+chain+D&m=VW&c=CO!subset:elem+C,baseColor:8112632,color:9888764&mt=FL&r=3&s=not+water+and+hetatm&m=VW&c=CO!subset:elem+C,baseColor:6532453,color:8837511&mt=FL&v=1SuyCwvajDcJvkg3CdGZdPKssNrtig608h/CdPw%3D%3D&fogFarFactor=2&fogColorEnable=true&theme=light&bg.color=13421772&outline.on=true&outline.threshold=0.01
+[cartoon-like rendering]: https://miew.opensource.epam.com/v0.7.20/?l=1CRN&r=0&s=not+hetatm&m=CA&c=SQ&mt=TN&r=1&s=hetatm+and+not+water&m=BS&c=EL&mt=SF&resolution=high&outline.on=true&outline.threshold=0.02
+[RCSB PDB Molecule of the Month style]: https://miew.opensource.epam.com/v0.7.20/?l=pdb:5AT1&r=0&s=not+water+and+chain+C&m=VW&c=CO!subset:elem+C,baseColor:16422548,color:16494255&mt=FL&r=1&s=not+water+and+chain+B&m=VW&c=CO!subset:elem+C,baseColor:8169212,color:9550321&mt=FL&r=2&s=not+water+and+chain+D&m=VW&c=CO!subset:elem+C,baseColor:8112632,color:9888764&mt=FL&r=3&s=not+water+and+hetatm&m=VW&c=CO!subset:elem+C,baseColor:6532453,color:8837511&mt=FL&v=1SuyCwvajDcJvkg3CdGZdPKssNrtig608h/CdPw%3D%3D&fogFarFactor=2&fogColorEnable=true&theme=light&bg.color=13421772&outline.on=true&outline.threshold=0.01
 [David S. Goodsell]: http://pdb101.rcsb.org/motm/motm-about
  
 ## [0.7.19] - 2018-06-18
@@ -367,7 +511,15 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.7.21...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.8.4...HEAD
+[0.8.4]: https://github.com/epam/miew/compare/v0.8.3...v0.8.4
+[0.8.3]: https://github.com/epam/miew/compare/v0.8.2...v0.8.3
+[0.8.2]: https://github.com/epam/miew/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/epam/miew/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/epam/miew/compare/v0.7.24...v0.8.0
+[0.7.24]: https://github.com/epam/miew/compare/v0.7.23...v0.7.24
+[0.7.23]: https://github.com/epam/miew/compare/v0.7.22...v0.7.23
+[0.7.22]: https://github.com/epam/miew/compare/v0.7.21...v0.7.22
 [0.7.21]: https://github.com/epam/miew/compare/v0.7.20...v0.7.21
 [0.7.20]: https://github.com/epam/miew/compare/v0.7.19...v0.7.20
 [0.7.19]: https://github.com/epam/miew/compare/v0.7.18...v0.7.19

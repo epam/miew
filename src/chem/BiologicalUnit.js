@@ -28,7 +28,7 @@ class BiologicalUnit {
       boundingBox.expandByPoint(atoms[0]._position);
       const bbc = new THREE.Vector3();
       boundingBox.getCenter(bbc);
-      const s = 2 * atoms[0].element.radius; // *settings.now.modes.BS.atom; FIXME N: hack commented
+      const s = 2 * atoms[0].element.radius;
       boundingBox.setFromCenterAndSize(bbc, new THREE.Vector3(s, s, s));
     } else {
       for (let i = 0; i < n; ++i) {
@@ -43,7 +43,6 @@ class BiologicalUnit {
     const center = new THREE.Vector3();
     boundingBox.getCenter(center);
     if (n === 1) {
-      // * settings.now.modes.BS.atom); FIXME N: hack commented
       this._boundaries.boundingSphere.set(center, atoms[0].element.radius);
     } else {
       for (let i = 0; i < n; ++i) {

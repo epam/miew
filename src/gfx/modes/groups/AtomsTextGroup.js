@@ -32,10 +32,6 @@ function getAtomText(atom) {
     return atom.getName().getNode();
   }
 
-  if (!atom.isLabelVisible()) {
-    return null;
-  }
-
   return atom.getVisualName();
 }
 
@@ -109,7 +105,6 @@ class AtomsTextGroup extends AtomsGroup {
 
   _build() {
     const opts = this._mode.getLabelOpts();
-    // TODO is it correct to filter atoms here?
     const atomsIdc = this._selection.chunks;
     const { atoms, parent } = this._selection;
     const colorer = this._colorer;
@@ -130,10 +125,9 @@ class AtomsTextGroup extends AtomsGroup {
   }
 
   updateToFrame(frameData) {
-    // TODO This method looks like a copy paste. However, it
+    // This method looks like a copy paste. However, it
     // was decided to postpone animation refactoring until GFX is fixed.
     const opts = this._mode.getLabelOpts();
-    // TODO is it correct to filter atoms here?
     const atomsIdc = this._selection.chunks;
     const { atoms } = this._selection;
     const colorer = this._colorer;
