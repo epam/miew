@@ -4,7 +4,7 @@ import rollupPluginBabel from 'rollup-plugin-babel';
 import rollupPluginCommonJS from 'rollup-plugin-commonjs';
 import rollupPluginReplace from 'rollup-plugin-replace';
 import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
-import rollupPluginString from 'rollup-plugin-string';
+import { string } from 'rollup-plugin-string';
 
 import path from 'path';
 import version from './tools/version';
@@ -31,7 +31,7 @@ export default {
       PACKAGE_VERSION: JSON.stringify(version.combined),
       DEBUG: false,
     }),
-    rollupPluginString({
+    string({
       include: [
         '**/*.vert',
         '**/*.frag',
