@@ -105,4 +105,19 @@ export default [{
     helices: 0,
     sheets: 0,
   },
+}, {
+  // DNA with modified residues
+  name: '1K1R',
+  formats: ['pdb'],
+  num: {
+    atoms: 488,
+    bonds: 523,
+    residues: 15,
+    chains: 2,
+    molecules: 2,
+    units: 1,
+    symmetries: 0,
+    helices: 0,
+    sheets: 0,
+  },
 }];

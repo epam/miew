@@ -7,6 +7,9 @@ module.exports = {
   parser: 'babel-eslint',
   parserOptions: {
     sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
 
   env: {
@@ -16,6 +19,8 @@ module.exports = {
   globals: {
     DEBUG: true,
   },
+
+  plugins: ['react'],
 
   // current deviations from AirBnB setup
   rules: {
@@ -52,6 +57,8 @@ module.exports = {
     'max-len': 'off', // 270 problems
     'func-names': 'off', // 562 problems
     'max-classes-per-file': 'off',
+    'react/jsx-uses-react': 'error',
+    'react/jsx-uses-vars': 'error',
   },
 
   overrides: [{

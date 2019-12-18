@@ -22,8 +22,13 @@ const configure = (prod) => ({
   module: {
     rules: [{
       test: /\.js$/,
-      exclude: /(node_modules|vendor)/,
-      use: ['babel-loader'],
+      exclude: /(node_modules[\\/](?!three))|vendor/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          extends: path.join(__dirname, '/.babelrc'),
+        },
+      },
     }, {
       test: /\.[sp]?css$/,
       use: [

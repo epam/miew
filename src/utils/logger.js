@@ -7,7 +7,7 @@
 import _ from 'lodash';
 import EventDispatcher from './EventDispatcher';
 
-const logLevels = {
+const priorities = {
   debug: 0,
   info: 1,
   report: 2,
@@ -28,7 +28,7 @@ function Logger() {
    * @type {boolean}
    */
   this.console = false;
-  this._level = logLevels.warn;
+  this._priority = priorities.warn;
 }
 
 Logger.prototype = Object.create(EventDispatcher.prototype);
@@ -42,21 +42,23 @@ Logger.prototype.instantiate = function () {
   return new Logger();
 };
 
+function verify(number) {
+  if (!_.isNumber(number)) {
+    throw new Error('Wrong log level specified!');
+  }
+  return number;
+}
+
 /**
  * @property {string} current threshold for signals and console output.
  * @name Logger#level
  */
 Object.defineProperty(Logger.prototype, 'level', {
   get() {
-    const self = this;
-    return _.findKey(logLevels, (lvl) => lvl === self._level);
+    return _.findKey(priorities, (value) => value === this._priority);
   },
-  set(strValue) {
-    const lvlVal = logLevels[strValue];
-    if (!_.isNumber(lvlVal)) {
-      throw new Error('Wrong log level specified!');
-    }
-    this._level = lvlVal;
+  set(level) {
+    this._priority = verify(priorities[level]);
   },
 });
 
@@ -65,7 +67,7 @@ Object.defineProperty(Logger.prototype, 'level', {
  * @returns {Array}
  */
 Logger.prototype.levels = function () {
-  return Object.keys(logLevels);
+  return Object.keys(priorities);
 };
 
 /**
@@ -75,11 +77,8 @@ Logger.prototype.levels = function () {
  * @param {string} message
  */
 Logger.prototype.message = function (level, message) {
-  const lvlVal = logLevels[level];
-  if (!_.isNumber(lvlVal)) {
-    throw new Error('Wrong log level specified!');
-  }
-  this._message(lvlVal, message);
+  const priority = verify(priorities[level]);
+  this._message(priority, message);
 };
 
 /**
@@ -87,7 +86,7 @@ Logger.prototype.message = function (level, message) {
  * @param message
  */
 Logger.prototype.debug = function (message) {
-  this._message(logLevels.debug, message);
+  this._message(priorities.debug, message);
 };
 
 /**
@@ -95,7 +94,7 @@ Logger.prototype.debug = function (message) {
  * @param message
  */
 Logger.prototype.info = function (message) {
-  this._message(logLevels.info, message);
+  this._message(priorities.info, message);
 };
 
 /**
@@ -103,7 +102,7 @@ Logger.prototype.info = function (message) {
  * @param message
  */
 Logger.prototype.report = function (message) {
-  this._message(logLevels.report, message);
+  this._message(priorities.report, message);
 };
 
 /**
@@ -111,7 +110,7 @@ Logger.prototype.report = function (message) {
  * @param message
  */
 Logger.prototype.warn = function (message) {
-  this._message(logLevels.warn, message);
+  this._message(priorities.warn, message);
 };
 
 /**
@@ -119,26 +118,26 @@ Logger.prototype.warn = function (message) {
  * @param message
  */
 Logger.prototype.error = function (message) {
-  this._message(logLevels.error, message);
+  this._message(priorities.error, message);
 };
 
 /**
- * Add new message with specified level.
- * @param {number} levelVal - level of the message
+ * Add new message with specified priority.
+ * @param {number} priority - priority of the message
  * @param {string} message
  * @private
  */
-Logger.prototype._message = function (levelVal, message) {
-  if (levelVal < this._level) {
+Logger.prototype._message = function (priority, message) {
+  if (priority < this._priority) {
     return;
   }
-  const level = _.findKey(logLevels, (lvl) => lvl === levelVal);
+  const level = _.findKey(priorities, (value) => value === priority);
   message = String(message);
   if (this.console) {
     const output = `miew:${level}: ${message}`;
     if (level === 'error') {
       console.error(output); // NOSONAR
-    } else if (level === 'warning') {
+    } else if (level === 'warn') {
       console.warn(output); // NOSONAR
     } else {
       console.log(output); // NOSONAR

@@ -4,8 +4,9 @@ import rollupPluginBabel from 'rollup-plugin-babel';
 import rollupPluginCommonJS from 'rollup-plugin-commonjs';
 import rollupPluginReplace from 'rollup-plugin-replace';
 import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
-import rollupPluginString from 'rollup-plugin-string';
+import { string } from 'rollup-plugin-string';
 
+import path from 'path';
 import version from './tools/version';
 import packageJson from './package.json';
 
@@ -30,7 +31,7 @@ export default {
       PACKAGE_VERSION: JSON.stringify(version.combined),
       DEBUG: false,
     }),
-    rollupPluginString({
+    string({
       include: [
         '**/*.vert',
         '**/*.frag',
@@ -51,11 +52,12 @@ export default {
     rollupPluginBabel({
       runtimeHelpers: true,
       exclude: [
-        './node_modules/**',
+        /node_modules[\\/](?!three)/,
         './vendor/js/**',
         './src/utils/SelectionParser',
         './src/utils/MiewCLIParser.js',
       ],
+      extends: path.join(__dirname, '/.babelrc'),
     }),
 
   ],

@@ -773,6 +773,7 @@ const defaults = {
     on: false,
     color: 0x000000,
     threshold: 0.1,
+    thickness: 1,
   },
 
   /**

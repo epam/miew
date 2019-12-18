@@ -45,7 +45,7 @@ class VolumeMesh extends THREE.Mesh {
       new THREE.Vector3(0.0, 0.0, 0.0),
     ];
 
-    geo.addAttribute('position', new THREE.BufferAttribute(new Float32Array(this.vertices.length * 3), 3));
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(this.vertices.length * 3), 3));
 
     this.name = 'VolumeMesh';
   }

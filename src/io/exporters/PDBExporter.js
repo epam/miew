@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Complex from '../../chem/Complex';
 import Exporter from './Exporter';
 import PDBResult from './PDBResult';
 import Assembly from '../../chem/Assembly';
@@ -267,3 +268,4 @@ export default class PDBExporter extends Exporter {
 }
 
 PDBExporter.formats = ['pdb'];
+PDBExporter.SourceClass = Complex;
