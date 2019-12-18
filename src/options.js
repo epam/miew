@@ -78,9 +78,8 @@ function ensureRepAssign(opts, prop, value) {
   const rep = opts.reps[repIndex];
   // prop specified twice therefore start new rep by cloning the current
   if (rep.hasOwnProperty(prop)) {
-    if (++repIndex >= opts.reps.length) {
-      opts.reps[repIndex] = utils.deriveDeep(rep, true);
-    }
+    repIndex = opts.reps.length;
+    opts.reps[repIndex] = utils.deriveDeep(rep, true);
   }
   if (value !== undefined) {
     opts.reps[repIndex][prop] = value;
@@ -216,9 +215,8 @@ const actions = {
     ensureRepList(opts);
     const { reps } = opts;
     const rep = reps[repIndex];
-    if (++repIndex >= reps.length) {
-      reps[repIndex] = utils.deriveDeep(rep, true);
-    }
+    repIndex = reps.length;
+    reps[repIndex] = utils.deriveDeep(rep, true);
   },
 
   // Settings shortcuts
@@ -262,7 +260,7 @@ function _fromArray(entries) {
 }
 
 function fromAttr(attr) {
-  return _fromArray(utils.getUrlParameters(`?${attr || ''}`)); // TODO: We need different processing for attrs.
+  return _fromArray(utils.getUrlParameters(`?${attr || ''}`));
 }
 
 function fromURL(url) {
@@ -282,7 +280,10 @@ function _processArgsForURL(args) {
   if (!_.isArray(args)) {
     return args;
   }
-  return args[0] + (args.length < 2 ? '' : cOptsSep + _processOptsForURL(args[1]));
+  if (args.length < 2) {
+    return args[0];
+  }
+  return `${args[0]}${cOptsSep}${_processOptsForURL(args[1])}`;
 }
 
 function _processObjForURL(objOpts) {
@@ -377,7 +378,10 @@ function _processArgsForScript(args) {
   if (!_.isArray(args)) {
     return args;
   }
-  return args[0] + (args.length < 2 ? '' : ` ${_processOptsForScript(args[1])}`);
+  if (args.length < 2) {
+    return args[0];
+  }
+  return `${args[0]} ${_processOptsForScript(args[1])}`;
 }
 
 function _processObjForScript(objOpts) {
@@ -419,7 +423,7 @@ function toScript(opts) {
   function checkAndAdd(command, value, saveQuotes) {
     if (value !== null && value !== undefined) {
       const quote = (typeof value === 'string' && saveQuotes) ? '"' : '';
-      commandsList[idx++] = `${command} ${quote}${value}${quote}`;
+      commandsList[idx++] = `${command} ${quote}${value}${quote}`.trim();
     }
   }
 

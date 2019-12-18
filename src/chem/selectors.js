@@ -104,9 +104,10 @@ class RangeList extends List {
 const valuesArray = [];
 
 class ValueList extends List {
-  constructor(arg, caseInsensitive) {
+  constructor(arg, upperOnly) {
     const list = super(arg);
-    if (caseInsensitive) {
+    if (upperOnly) {
+      this.upperOnly = true;
       const values = list._values;
       for (let i = 0, n = values.length; i < n; ++i) {
         const value = values[i];
@@ -114,11 +115,15 @@ class ValueList extends List {
           values[i] = value.toUpperCase();
         }
       }
+    } else {
+      this.upperOnly = false;
     }
     return list;
   }
 
   includes(value) {
+    // we do not convert to upper case here for perfomance reasons
+    // if list is upper case only, value must be converted before it is sent up to  here
     return this._values.indexOf(value) !== -1;
   }
 
@@ -130,6 +135,20 @@ class ValueList extends List {
       valuesArray[i] = utils.correctSelectorIdentifier(String(values[i]));
     }
     return valuesArray.join(',');
+  }
+
+  _validate(value) {
+    return (this.upperOnly && typeof value === 'string') ? value.toUpperCase() : value;
+  }
+
+  append(value) {
+    super.append(this._validate(value));
+    return this;
+  }
+
+  remove(value) {
+    super.remove(this._validate(value));
+    return this;
   }
 }
 
@@ -344,7 +363,7 @@ class InfixOperator extends Selector {
 
 InfixOperator.prototype.priority = 1000;
 
-defineOperator('Not', 1, class NotSelector extends PrefixOperator {
+defineOperator('Not', 1, class NotOperator extends PrefixOperator {
   includesAtom(atom) {
     return !this.rhs.includesAtom(atom);
   }
