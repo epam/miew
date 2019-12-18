@@ -137,21 +137,17 @@ class ValueList extends List {
     return valuesArray.join(',');
   }
 
+  _validate(value) {
+    return (this.upperOnly && typeof value === 'string') ? value.toUpperCase() : value;
+  }
+
   append(value) {
-    if (this.upperOnly && typeof value === 'string') {
-      super.append(value.toUpperCase());
-    } else {
-      super.append(value);
-    }
+    super.append(this._validate(value));
     return this;
   }
 
   remove(value) {
-    if (this.upperOnly && typeof value === 'string') {
-      super.remove(value.toUpperCase());
-    } else {
-      super.remove(value);
-    }
+    super.remove(this._validate(value));
     return this;
   }
 }
