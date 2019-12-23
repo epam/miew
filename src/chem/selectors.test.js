@@ -265,22 +265,6 @@ describe('selectors', () => {
     });
   });
 
-  describe('AllSelector', () => {
-    describe('#includesAtom(atom)', () => {
-      it('includes some not specific atom', () => {
-        expect(selectors.all().includesAtom(atom)).to.equal(true);
-      });
-    });
-  });
-
-  describe('NoneSelector', () => {
-    describe('#includesAtom(atom)', () => {
-      it('excludes some not specific atom', () => {
-        expect(selectors.none().includesAtom(atom)).to.equal(false);
-      });
-    });
-  });
-
   describe('Protein', () => {
     describe('#includesAtom(atom)', () => {
       it('includes protein atom', () => {
