@@ -2930,8 +2930,9 @@ Miew.prototype.resetPivot = function () {
     boundingBox.union(visual.getBoundaries().boundingBox);
   });
 
-  boundingBox.getCenter(this._gfx.pivot.position);
-  this._gfx.pivot.position.negate();
+  const center = new THREE.Vector3();
+  boundingBox.getCenter(center);
+  this._objectControls.setPivot(center.negate());
   this.dispatchEvent({ type: 'transform' });
 };
 
@@ -2941,9 +2942,9 @@ Miew.prototype.setPivotResidue = function (residue) {
     return;
   }
 
-  const pos = this._gfx.pivot.position;
+  const center = new THREE.Vector3();
   if (residue._controlPoint) {
-    pos.copy(residue._controlPoint);
+    center.copy(residue._controlPoint);
   } else {
     let x = 0;
     let y = 0;
@@ -2955,10 +2956,10 @@ Miew.prototype.setPivotResidue = function (residue) {
       y += p.y / amount;
       z += p.z / amount;
     }
-    pos.set(x, y, z);
+    center.set(x, y, z);
   }
-  pos.applyMatrix4(visual.matrix);
-  pos.negate();
+  center.applyMatrix4(visual.matrix).negate();
+  this._objectControls.setPivot(center);
   this.dispatchEvent({ type: 'transform' });
 };
 
@@ -2968,10 +2969,9 @@ Miew.prototype.setPivotAtom = function (atom) {
     return;
   }
 
-  const pos = this._gfx.pivot.position;
-  pos.copy(atom._position);
-  pos.applyMatrix4(visual.matrix);
-  pos.negate();
+  const center = atom._position.clone();
+  center.applyMatrix4(visual.matrix).negate();
+  this._objectControls.setPivot(center);
   this.dispatchEvent({ type: 'transform' });
 };
 
@@ -3012,7 +3012,7 @@ Miew.prototype.setPivotSubset = (function () {
     const includesAtom = (selector) ? _includesInSelector : _includesInCurSelection;
 
     if (this.getSelectionCenter(_center, includesAtom, selector)) {
-      this._gfx.pivot.position.copy(_center);
+      this._objectControls.setPivot(_center);
       this.dispatchEvent({ type: 'transform' });
     } else {
       this.logger.warn('selection is empty. Center operation not performed');

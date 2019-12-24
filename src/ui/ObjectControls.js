@@ -786,6 +786,7 @@ ObjectControls.prototype.translatePivotByMouse = function () {
 // Translate in WorldCS, translation is scaled with root scale matrix
 ObjectControls.prototype.translatePivotInWorld = function (x, y, z) {
   const pos = this.objectPivot.position;
+  const oldPos = this.objectPivot.position.clone();
   pos.applyMatrix4(this.object.matrixWorld);
   pos.setX(pos.x + x);
   pos.setY(pos.y + y);
@@ -793,7 +794,8 @@ ObjectControls.prototype.translatePivotInWorld = function (x, y, z) {
   const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
   pos.applyMatrix4(invWorldMat);
 
-  this.dispatchEvent({ type: 'change' });
+  const shift = oldPos - pos;
+  this.dispatchEvent({ type: 'change', action: 'translatePivot', shift });
 };
 
 // Translate in ModelCS, x, y, z are Ang
@@ -803,7 +805,15 @@ ObjectControls.prototype.translatePivot = function (x, y, z) {
   pos.setY(pos.y + y);
   pos.setZ(pos.z + z);
 
-  this.dispatchEvent({ type: 'change' });
+  this.dispatchEvent({ type: 'change', action: 'translatePivot', shift: { x, y, z } });
+};
+
+// Set pivot
+ObjectControls.prototype.setPivot = function (newPivot) {
+  const shift = this.objectPivot.position - newPivot;
+  this.objectPivot.position.copy(newPivot);
+
+  this.dispatchEvent({ type: 'change', action: 'translatePivot', shift });
 };
 
 export default ObjectControls;
