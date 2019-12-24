@@ -307,7 +307,7 @@ Miew.prototype.init = function () {
       // route rotate and zoom events to the external API
       switch (e.action) {
         case 'rotate':
-          self.dispatchEvent({ type: 'rotate', angle: e.angle });
+          self.dispatchEvent({ type: 'rotate', quaternion: e.quaternion });
           break;
         case 'zoom':
           self.dispatchEvent({ type: 'zoom', factor: e.factor });

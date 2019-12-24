@@ -68,12 +68,14 @@ ObjectHandler.prototype.setObjects = function (objects) {
 
 ObjectHandler.prototype.rotate = function (mousePrevPos, mouseCurPos, aboutAxis) {
   const rot = this.mouse2rotation(mousePrevPos, mouseCurPos, aboutAxis);
+  const quat = new THREE.Quaternion().setFromAxisAngle(rot.axis, rot.angle);
 
   if (rot.angle) {
-    this._rotate(new THREE.Quaternion().setFromAxisAngle(rot.axis, rot.angle));
+    this._rotate(quat);
   }
 
   this.lastRotation = rot;
+  return quat;
 };
 
 ObjectHandler.prototype.translate = function (delta) {
@@ -466,13 +468,14 @@ ObjectControls.prototype.stop = function () {
 
 // rotate object based on latest mouse/touch movement
 ObjectControls.prototype.rotateByMouse = function (aboutZAxis) {
-  this._affectedObj.rotate(this._mousePrevPos, this._mouseCurPos, aboutZAxis);
-  this.dispatchEvent({ type: 'change', action: 'rotate', angle: this._affectedObj.lastRotation.angle });
+  const quat = this._affectedObj.rotate(this._mousePrevPos, this._mouseCurPos, aboutZAxis);
+  this.dispatchEvent({ type: 'change', action: 'rotate', quaternion: quat });
 };
 
 // rotate object by specified quaternion
 ObjectControls.prototype.rotate = function (quat) {
   this.object.quaternion.multiply(quat);
+  this.dispatchEvent({ type: 'change', action: 'rotate', quaternion: quat });
 };
 
 // get object's orientation
