@@ -512,6 +512,7 @@ ObjectControls.prototype.scale = function (factor) {
     return;
   }
   this.setScale(this.object.scale.x * factor);
+  this.dispatchEvent({ type: 'change', action: 'zoom', factor });
 };
 
 ObjectControls.prototype.update = function () {
@@ -663,8 +664,6 @@ ObjectControls.prototype.mousewheel = function (event) {
   let factor = 1.0 + delta * 0.05;
   factor = Math.max(factor, 0.01);
   this.scale(factor);
-
-  this.dispatchEvent({ type: 'change', action: 'zoom', factor });
 };
 
 ObjectControls.prototype.mouseup = function (event) {
@@ -738,10 +737,9 @@ ObjectControls.prototype.touchmove = function (event) {
         const dx = event.touches[0].pageX - event.touches[1].pageX;
         const dy = event.touches[0].pageY - event.touches[1].pageY;
         this._touchDistanceCur = Math.sqrt(dx * dx + dy * dy);
-        const oldScale = this.object.scale.x;
         const newScale = this._scaleStart * this._touchDistanceCur / this._touchDistanceStart;
-        this.setScale(newScale);
-        this.dispatchEvent({ type: 'change', action: 'zoom', factor: (oldScale === 0.0) ? 1.0 : newScale / oldScale });
+        const factor = newScale / this.object.scale.x;
+        this.scale(factor);
       }
       break;
 
