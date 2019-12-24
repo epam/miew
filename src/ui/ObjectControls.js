@@ -493,7 +493,7 @@ ObjectControls.prototype.translate = function () {
   const delta = this._mouseCurPos.clone();
   delta.sub(this._mousePrevPos);
   this._affectedObj.translate(delta);
-  this.dispatchEvent({ type: 'change', action: 'translate' });
+  this.dispatchEvent({ type: 'change', action: 'translate', shift: delta });
 };
 
 // get object scale
@@ -547,8 +547,9 @@ ObjectControls.prototype.update = function () {
           this._altObj.axis.set(0, 0, 1);
         }
 
-        this._altObj.translate(new THREE.Vector2(delta * speedX, delta * speedY));
-        this.dispatchEvent({ type: 'change', action: 'translate' });
+        const shift = new THREE.Vector2(delta * speedX, delta * speedY);
+        this._altObj.translate(shift);
+        this.dispatchEvent({ type: 'change', action: 'translate', shift });
       }
     }
   }
