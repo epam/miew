@@ -7,7 +7,6 @@ import {
   NoneSelector,
   AllSelector,
 } from './selectorsBase';
-import Atom from '../Atom';
 import { Range, RangeList } from './selectArgs';
 
 chai.use(dirtyChai);
@@ -23,8 +22,11 @@ const rListAsJSON = [[2, 8], [1, 14], [18, 20]];
 const VaLuE = 'VaLu E';
 const values = [45, VaLuE];
 
-// the simplest atom
-const atom = new Atom(null, 'CA', { name: 'N' });
+const atom = {
+  residue: null,
+  name: 'CA',
+  type: { name: 'N' },
+};
 
 describe('Selector', () => {
   const defaultSelector = new Selector();
