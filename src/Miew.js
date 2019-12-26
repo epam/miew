@@ -2178,12 +2178,6 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     delete this._opts.view;
   }
 
-  if (opts.error) {
-    this.dispatchEvent({ type: 'onParseError', error: opts.error });
-  } else {
-    this.dispatchEvent({ type: 'onParseDone' });
-  }
-
   this._refreshTitle();
 
   return visualName;

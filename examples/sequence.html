@@ -57,7 +57,10 @@
         viewer.run();
       }
 
-      viewer.addEventListener('onParseDone', function() {
+      viewer.addEventListener('parsingFinished', function(e) {
+        if (e.error) {
+          return;
+        }
         var div = document.getElementById('chains');
 
         viewer._forEachComplexVisual(function(visual) {
