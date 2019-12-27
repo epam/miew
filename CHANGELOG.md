@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.5] - 2019-12-27
+### Added
+- Add parameter of line thickness for Outline effect
+- Add example of Rect application that uses Miew
+
+### Changed
+- Update a year in copyright
+
+### Fixed
+- Fix warnings in console from threejs
+- Fix crash after setting a number as a parameter of setting `shadow.on`
+
+### Internal
+- Add unit tests for modules `options.js` and `selectors.js`
+- Improve maintainability by splitting selectors.js into separate modules 
+
 ## [0.8.4] - 2019-11-11
 ### Added
 - Add parser for MOL2 molecular format
@@ -511,7 +527,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.8.4...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.8.5...HEAD
+[0.8.5]: https://github.com/epam/miew/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/epam/miew/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/epam/miew/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/epam/miew/compare/v0.8.1...v0.8.2
