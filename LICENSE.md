@@ -1,6 +1,6 @@
 The MIT License
 
-Copyright (c) 2015-2019 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015-2020 [EPAM Systems, Inc.](https://www.epam.com/)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
