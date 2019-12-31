@@ -1070,10 +1070,6 @@ Menu.prototype._initMiewEventListeners = function () {
     self._setTitle('Parsing…');
   });
 
-  this._viewer.addEventListener('convert', () => {
-    self._setTitle('Converting…');
-  });
-
   this._viewer.addEventListener('rebuild', () => {
     self._setTitle('Building geometry…');
   });
