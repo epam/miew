@@ -162,7 +162,9 @@ function Miew(opts) {
   this._spinner = null;
   /** @type {JobHandle[]} */
   this._loading = [];
-  /** @type {?number} */
+  /** @type {?number}
+   * @deprecated until Animation system refactoring
+   */
   this._animInterval = null;
 
   /** @type {object} */
@@ -1974,6 +1976,12 @@ Miew.prototype.unload = function (name) {
   }
 };
 
+/**
+ * Start new animation. Now is broken.
+ * @param fileData - new data to animate
+ * @private
+ * @deprecated until animation system refactoring.
+ */
 Miew.prototype._startAnimation = function (fileData) {
   this._stopAnimation();
   const self = this;
@@ -2008,6 +2016,11 @@ Miew.prototype._startAnimation = function (fileData) {
   this._continueAnimation();
 };
 
+/**
+ * Pause current animation. Now is broken.
+ * @private
+ * @deprecated until animation system refactoring.
+ */
 Miew.prototype._pauseAnimation = function () {
   if (this._animInterval === null) {
     return;
@@ -2026,6 +2039,11 @@ Miew.prototype._pauseAnimation = function () {
   }
 };
 
+/**
+ * Continue current animation after pausing. Now is broken.
+ * @private
+ * @deprecated until animation system refactoring.
+ */
 Miew.prototype._continueAnimation = function () {
   this._isAnimating = true;
   let minFrameTime = 1000 / settings.now.maxfps;
@@ -2063,6 +2081,11 @@ Miew.prototype._continueAnimation = function () {
   }, minFrameTime);
 };
 
+/**
+ * Stop current animation. Now is broken.
+ * @private
+ * @deprecated until animation system refactoring.
+ */
 Miew.prototype._stopAnimation = function () {
   if (this._animInterval === null) {
     return;
