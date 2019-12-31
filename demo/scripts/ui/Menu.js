@@ -1055,7 +1055,6 @@ Menu.prototype._init = function () {
   this._initRenderPanel();
   this._initToolsPanel();
   this._initSelectionPanel();
-  this._initMdPlayerControls();
 };
 
 Menu.prototype._initMiewEventListeners = function () {
@@ -1063,7 +1062,6 @@ Menu.prototype._initMiewEventListeners = function () {
 
   this._viewer.addEventListener('load', () => {
     self._setTitle('Loading…');
-    self._setMdPlayerState();
   });
 
   this._viewer.addEventListener('parse', () => {
@@ -1094,10 +1092,6 @@ Menu.prototype._initMiewEventListeners = function () {
 
   this._viewer.addEventListener('titleChanged', (e) => {
     self._setTitle(e.data);
-  });
-
-  this._viewer.addEventListener('mdPlayerStateChanged', (e) => {
-    self._setMdPlayerState(e.state);
   });
 
   this._viewer.addEventListener('editModeChanged', (e) => {
@@ -2061,43 +2055,6 @@ Menu.prototype._updateDisplayOptions = function (id, name, entityList) {
 
 Menu.prototype._setTitle = function (title) {
   $(`${this._menuId} [data-field="title"]`).text(title);
-};
-
-Menu.prototype._setMdPlayerState = function (state) {
-  const playBtn = $(`${this._menuId} [data-btn-type="md-player-play"]`);
-  const pauseBtn = $(`${this._menuId} [data-btn-type="md-player-pause"]`);
-  const loadingIndicator = $(`${this._menuId} [data-btn-type="md-player-loading"]`);
-  if (state) {
-    if (state.isPlaying) {
-      playBtn.hide();
-      pauseBtn.show();
-    } else {
-      playBtn.show();
-      pauseBtn.hide();
-    }
-    if (state.isLoading) {
-      loadingIndicator.show();
-    } else {
-      loadingIndicator.hide();
-    }
-  } else {
-    playBtn.hide();
-    pauseBtn.hide();
-    loadingIndicator.hide();
-  }
-};
-
-Menu.prototype._initMdPlayerControls = function () {
-  const playBtn = $(`${this._menuId} [data-btn-type="md-player-play"]`);
-  const pauseBtn = $(`${this._menuId} [data-btn-type="md-player-pause"]`);
-  const self = this;
-  playBtn.on('click', () => {
-    self._viewer._continueAnimation();
-  });
-  pauseBtn.on('click', () => {
-    self._viewer._pauseAnimation();
-  });
-  this._setMdPlayerState();
 };
 
 Menu.prototype._updateInfo = function (dataSource) {
