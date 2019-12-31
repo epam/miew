@@ -1096,6 +1096,8 @@ Menu.prototype._initMiewEventListeners = function () {
     self._updateInfo(e.data);
     self._fillSourceList();
     self._fillReprList();
+
+    self.presetsPanel.actions.pdb.inputs.refresh(self);
   });
 
   this._viewer.addEventListener('titleChanged', (e) => {
@@ -1108,14 +1110,6 @@ Menu.prototype._initMiewEventListeners = function () {
 
   this._viewer.addEventListener('editModeChanged', (e) => {
     self._enableToolbar(e.data);
-  });
-
-  this._viewer.addEventListener('onParseError', () => {
-    self.presetsPanel.actions.pdb.inputs.refresh(self);
-  });
-
-  this._viewer.addEventListener('onParseDone', () => {
-    self.presetsPanel.actions.pdb.inputs.refresh(self);
   });
 };
 

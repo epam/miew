@@ -2179,8 +2179,10 @@ Miew.prototype._onLoad = function (dataSource, opts) {
   }
 
   if (opts.error) {
+    // deprecated event since version 0.8.6
     this.dispatchEvent({ type: 'onParseError', error: opts.error });
   } else {
+    // deprecated event since version 0.8.6
     this.dispatchEvent({ type: 'onParseDone' });
   }
 
