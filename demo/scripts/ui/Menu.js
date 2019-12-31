@@ -1078,10 +1078,6 @@ Menu.prototype._initMiewEventListeners = function () {
     self._setTitle('Building geometry…');
   });
 
-  this._viewer.addEventListener('profile', () => {
-    self._setTitle('Profiling…');
-  });
-
   this._viewer.addEventListener('resize', () => {
     self._onResize();
   });

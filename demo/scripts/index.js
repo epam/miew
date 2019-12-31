@@ -72,9 +72,6 @@ window.onerror = function (err, url, line, col, obj) {
   throw obj;
 };
 
-// Uncomment this to profile parsing
-// Miew.profile('data/4TNW.pdb', 10, $('miew-container').first.firstChild.firstChild);
-
 // create viewer (and run it) for each container element on the page
 window.addEventListener('load', () => {
   $('.miew-container').each((i, container) => {
@@ -105,10 +102,8 @@ window.addEventListener('load', () => {
     const menu = new Menu(container, viewer);
 
     if (viewer.init()) {
-      viewer.benchmarkGfx().then(() => {
-        menu.showOverlay();
-        viewer.run();
-      });
+      menu.showOverlay();
+      viewer.run();
     }
   });
 });

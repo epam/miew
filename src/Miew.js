@@ -3022,6 +3022,10 @@ Miew.prototype.setPivotSubset = (function () {
   };
 }());
 
+/**
+ * Starts profiling tool
+ * @deprecated since 0.8.6. There are plans to make it a separate tool outside Miew
+ */
 Miew.prototype.benchmarkGfx = function (force) {
   const self = this;
   const prof = new GfxProfiler(this._gfx.renderer);
@@ -3032,6 +3036,7 @@ Miew.prototype.benchmarkGfx = function (force) {
       return;
     }
 
+    // deprecated event since 0.8.6
     self.dispatchEvent({ type: 'profile' });
 
     self._spinner.spin(self._container);

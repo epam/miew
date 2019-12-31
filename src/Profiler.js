@@ -1,5 +1,8 @@
 import Timer from './Timer';
 
+/**
+ * @deprecated since 0.8.6. Will be removed in next major version
+ */
 function Profiler() {
   // bind method to get current time
   this.now = Timer.now;

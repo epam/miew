@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import Profiler from '../Profiler';
 
+/**
+ * Profiler tool.
+ * @deprecated since 0.8.6
+ */
 function GfxProfiler(renderer) {
   this._renderer = renderer;
   this._prepareTest();
