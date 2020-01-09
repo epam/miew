@@ -871,11 +871,8 @@ Menu.prototype._init = function () {
     const state = this.getAttribute('data-state');
     if (state === 'on') {
       self._onMenuOn();
-      return false;
-    }
-    if (state === 'off') {
+    } else if (state === 'off') {
       self._onMenuOff();
-      return false;
     }
     return false;
   });
@@ -886,12 +883,9 @@ Menu.prototype._init = function () {
     if (state === 'on') {
       self._onTerminalOn();
       this.setAttribute('data-state', 'off');
-      return false;
-    }
-    if (state === 'off') {
+    } else if (state === 'off') {
       self._onTerminalOff();
       this.setAttribute('data-state', 'on');
-      return false;
     }
     return false;
   });
