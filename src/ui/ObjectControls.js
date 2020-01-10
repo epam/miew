@@ -66,17 +66,21 @@ ObjectHandler.prototype.setObjects = function (objects) {
   [this.object] = objects;
 };
 
-ObjectHandler.prototype.rotate = function (mousePrevPos, mouseCurPos, aboutAxis) {
-  const rot = this.mouse2rotation(mousePrevPos, mouseCurPos, aboutAxis);
-  const quat = new THREE.Quaternion().setFromAxisAngle(rot.axis, rot.angle);
+ObjectHandler.prototype.rotate = (function () {
+  const quaternion = new THREE.Quaternion();
 
-  if (rot.angle) {
-    this._rotate(quat);
-  }
+  return function (mousePrevPos, mouseCurPos, aboutAxis) {
+    const rot = this.mouse2rotation(mousePrevPos, mouseCurPos, aboutAxis);
+    quaternion.setFromAxisAngle(rot.axis, rot.angle);
 
-  this.lastRotation = rot;
-  return quat;
-};
+    if (rot.angle) {
+      this._rotate(quaternion);
+    }
+
+    this.lastRotation = rot;
+    return quaternion;
+  };
+}());
 
 ObjectHandler.prototype.translate = function (delta) {
   // reverse-project viewport movement to view coords (compensate for screen aspect ratio)
@@ -515,47 +519,51 @@ ObjectControls.prototype.scale = function (factor) {
   this.dispatchEvent({ type: 'change', action: 'zoom', factor });
 };
 
-ObjectControls.prototype.update = function () {
-  const curTime = this._clock.getElapsedTime();
-  const timeSinceLastUpdate = curTime - this._lastUpdateTime;
+ObjectControls.prototype.update = (function () {
+  const shift = new THREE.Vector2();
 
-  // update object handler
-  if (this._state === STATE.NONE) {
-    const timeSinceMove = curTime - this._lastMouseMoveTime;
-    if (this._mainObj.update(timeSinceLastUpdate, timeSinceMove)
-          || this._altObj.update(timeSinceLastUpdate, timeSinceMove)) {
-      this.dispatchEvent({ type: 'change', action: 'auto' });
-    }
-  }
+  return function () {
+    const curTime = this._clock.getElapsedTime();
+    const timeSinceLastUpdate = curTime - this._lastUpdateTime;
 
-  // apply arrow keys
-  if (this._isKeysTranslatingObj) {
-    const speedX = Number(this._pressedKeys[VK_RIGHT]) - Number(this._pressedKeys[VK_LEFT]);
-    const speedY = Number(this._pressedKeys[VK_UP]) - Number(this._pressedKeys[VK_DOWN]);
-    if (speedX !== 0.0 || speedY !== 0.0) {
-      const delta = timeSinceLastUpdate;
-
-      // update object translation
-      const altObj = this.getAltObj();
-      if (altObj.objects.length > 0) {
-        this._altObj.setObjects(altObj.objects);
-        this._altObj.pivot = altObj.pivot;
-
-        if ('axis' in altObj) {
-          this._altObj.axis = altObj.axis.clone();
-        } else {
-          this._altObj.axis.set(0, 0, 1);
-        }
-
-        const shift = new THREE.Vector2(delta * speedX, delta * speedY);
-        this._altObj.translate(shift);
-        this.dispatchEvent({ type: 'change', action: 'translate', shift });
+    // update object handler
+    if (this._state === STATE.NONE) {
+      const timeSinceMove = curTime - this._lastMouseMoveTime;
+      if (this._mainObj.update(timeSinceLastUpdate, timeSinceMove)
+        || this._altObj.update(timeSinceLastUpdate, timeSinceMove)) {
+        this.dispatchEvent({ type: 'change', action: 'auto' });
       }
     }
-  }
 
-  this._lastUpdateTime = curTime;
-};
+    // apply arrow keys
+    if (this._isKeysTranslatingObj) {
+      const speedX = Number(this._pressedKeys[VK_RIGHT]) - Number(this._pressedKeys[VK_LEFT]);
+      const speedY = Number(this._pressedKeys[VK_UP]) - Number(this._pressedKeys[VK_DOWN]);
+      if (speedX !== 0.0 || speedY !== 0.0) {
+        const delta = timeSinceLastUpdate;
+
+        // update object translation
+        const altObj = this.getAltObj();
+        if (altObj.objects.length > 0) {
+          this._altObj.setObjects(altObj.objects);
+          this._altObj.pivot = altObj.pivot;
+
+          if ('axis' in altObj) {
+            this._altObj.axis = altObj.axis.clone();
+          } else {
+            this._altObj.axis.set(0, 0, 1);
+          }
+
+          shift.set(delta * speedX, delta * speedY);
+          this._altObj.translate(shift);
+          this.dispatchEvent({ type: 'change', action: 'translate', shift });
+        }
+      }
+    }
+
+    this._lastUpdateTime = curTime;
+  };
+}());
 
 ObjectControls.prototype.reset = function () {
   this._state = STATE.NONE;
@@ -785,19 +793,24 @@ ObjectControls.prototype.translatePivotByMouse = function () {
 };
 
 // Translate in WorldCS, translation is scaled with root scale matrix
-ObjectControls.prototype.translatePivotInWorld = function (x, y, z) {
-  const pos = this.objectPivot.position;
-  const oldPos = this.objectPivot.position.clone();
-  pos.applyMatrix4(this.object.matrixWorld);
-  pos.setX(pos.x + x);
-  pos.setY(pos.y + y);
-  pos.setZ(pos.z + z);
-  const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-  pos.applyMatrix4(invWorldMat);
+ObjectControls.prototype.translatePivotInWorld = (function () {
+  const oldPos = new THREE.Vector3();
+  const shift = new THREE.Vector3();
 
-  const shift = oldPos - pos;
-  this.dispatchEvent({ type: 'change', action: 'translatePivot', shift });
-};
+  return function (x, y, z) {
+    const pos = this.objectPivot.position;
+    oldPos.copy(this.objectPivot.position);
+    pos.applyMatrix4(this.object.matrixWorld);
+    pos.setX(pos.x + x);
+    pos.setY(pos.y + y);
+    pos.setZ(pos.z + z);
+    const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
+    pos.applyMatrix4(invWorldMat);
+
+    shift.subVectors(oldPos, pos);
+    this.dispatchEvent({ type: 'change', action: 'translatePivot', shift });
+  };
+}());
 
 // Translate in ModelCS, x, y, z are Ang
 ObjectControls.prototype.translatePivot = function (x, y, z) {
