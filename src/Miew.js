@@ -304,7 +304,7 @@ Miew.prototype.init = function () {
       if (settings.now.shadow.on) {
         self._updateShadowCamera();
       }
-      // route rotate and zoom events to the external API
+      // route rotate, zoom, translate and translatePivot events to the external API
       switch (e.action) {
         case 'rotate':
           self.dispatchEvent({ type: 'rotate', quaternion: e.quaternion });
@@ -313,6 +313,7 @@ Miew.prototype.init = function () {
           self.dispatchEvent({ type: 'zoom', factor: e.factor });
           break;
         default:
+          self.dispatchEvent({ type: e.action });
       }
       self.dispatchEvent({ type: 'transform' });
       self._needRender = true;
