@@ -306,15 +306,16 @@ Miew.prototype.init = function () {
       if (settings.now.shadow.on) {
         self._updateShadowCamera();
       }
-      // route rotate and zoom events to the external API
+      // route rotate, zoom, translate and translatePivot events to the external API
       switch (e.action) {
         case 'rotate':
-          self.dispatchEvent({ type: 'rotate', angle: e.angle });
+          self.dispatchEvent({ type: 'rotate', quaternion: e.quaternion });
           break;
         case 'zoom':
           self.dispatchEvent({ type: 'zoom', factor: e.factor });
           break;
         default:
+          self.dispatchEvent({ type: e.action });
       }
       self.dispatchEvent({ type: 'transform' });
       self._needRender = true;
@@ -2949,56 +2950,67 @@ Miew.prototype._getAltObj = function () {
   };
 };
 
-Miew.prototype.resetPivot = function () {
+Miew.prototype.resetPivot = (function () {
   const boundingBox = new THREE.Box3();
-  this._forEachVisual((visual) => {
-    boundingBox.union(visual.getBoundaries().boundingBox);
-  });
+  const center = new THREE.Vector3();
 
-  boundingBox.getCenter(this._gfx.pivot.position);
-  this._gfx.pivot.position.negate();
-  this.dispatchEvent({ type: 'transform' });
-};
+  return function () {
+    boundingBox.makeEmpty();
+    this._forEachVisual((visual) => {
+      boundingBox.union(visual.getBoundaries().boundingBox);
+    });
 
-Miew.prototype.setPivotResidue = function (residue) {
-  const visual = this._getVisualForComplex(residue.getChain().getComplex());
-  if (!visual) {
-    return;
-  }
+    boundingBox.getCenter(center);
+    this._objectControls.setPivot(center.negate());
+    this.dispatchEvent({ type: 'transform' });
+  };
+}());
 
-  const pos = this._gfx.pivot.position;
-  if (residue._controlPoint) {
-    pos.copy(residue._controlPoint);
-  } else {
-    let x = 0;
-    let y = 0;
-    let z = 0;
-    const amount = residue._atoms.length;
-    for (let i = 0; i < amount; ++i) {
-      const p = residue._atoms[i]._position;
-      x += p.x / amount;
-      y += p.y / amount;
-      z += p.z / amount;
+Miew.prototype.setPivotResidue = (function () {
+  const center = new THREE.Vector3();
+
+  return function (residue) {
+    const visual = this._getVisualForComplex(residue.getChain().getComplex());
+    if (!visual) {
+      return;
     }
-    pos.set(x, y, z);
-  }
-  pos.applyMatrix4(visual.matrix);
-  pos.negate();
-  this.dispatchEvent({ type: 'transform' });
-};
 
-Miew.prototype.setPivotAtom = function (atom) {
-  const visual = this._getVisualForComplex(atom.getResidue().getChain().getComplex());
-  if (!visual) {
-    return;
-  }
+    if (residue._controlPoint) {
+      center.copy(residue._controlPoint);
+    } else {
+      let x = 0;
+      let y = 0;
+      let z = 0;
+      const amount = residue._atoms.length;
+      for (let i = 0; i < amount; ++i) {
+        const p = residue._atoms[i]._position;
+        x += p.x / amount;
+        y += p.y / amount;
+        z += p.z / amount;
+      }
+      center.set(x, y, z);
+    }
+    center.applyMatrix4(visual.matrix).negate();
+    this._objectControls.setPivot(center);
+    this.dispatchEvent({ type: 'transform' });
+  };
+}());
 
-  const pos = this._gfx.pivot.position;
-  pos.copy(atom._position);
-  pos.applyMatrix4(visual.matrix);
-  pos.negate();
-  this.dispatchEvent({ type: 'transform' });
-};
+Miew.prototype.setPivotAtom = (function () {
+  const center = new THREE.Vector3();
+
+  return function (atom) {
+    const visual = this._getVisualForComplex(atom.getResidue().getChain().getComplex());
+    if (!visual) {
+      return;
+    }
+
+    center.copy(atom._position);
+    center.applyMatrix4(visual.matrix).negate();
+    this._objectControls.setPivot(center);
+    this.dispatchEvent({ type: 'transform' });
+  };
+}());
 
 Miew.prototype.getSelectionCenter = (function () {
   const _centerInVisual = new THREE.Vector3(0.0, 0.0, 0.0);
@@ -3037,7 +3049,7 @@ Miew.prototype.setPivotSubset = (function () {
     const includesAtom = (selector) ? _includesInSelector : _includesInCurSelection;
 
     if (this.getSelectionCenter(_center, includesAtom, selector)) {
-      this._gfx.pivot.position.copy(_center);
+      this._objectControls.setPivot(_center);
       this.dispatchEvent({ type: 'transform' });
     } else {
       this.logger.warn('selection is empty. Center operation not performed');

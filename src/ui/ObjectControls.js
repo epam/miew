@@ -66,15 +66,21 @@ ObjectHandler.prototype.setObjects = function (objects) {
   [this.object] = objects;
 };
 
-ObjectHandler.prototype.rotate = function (mousePrevPos, mouseCurPos, aboutAxis) {
-  const rot = this.mouse2rotation(mousePrevPos, mouseCurPos, aboutAxis);
+ObjectHandler.prototype.rotate = (function () {
+  const quaternion = new THREE.Quaternion();
 
-  if (rot.angle) {
-    this._rotate(new THREE.Quaternion().setFromAxisAngle(rot.axis, rot.angle));
-  }
+  return function (mousePrevPos, mouseCurPos, aboutAxis) {
+    const rot = this.mouse2rotation(mousePrevPos, mouseCurPos, aboutAxis);
+    quaternion.setFromAxisAngle(rot.axis, rot.angle);
 
-  this.lastRotation = rot;
-};
+    if (rot.angle) {
+      this._rotate(quaternion);
+    }
+
+    this.lastRotation = rot;
+    return quaternion;
+  };
+}());
 
 ObjectHandler.prototype.translate = function (delta) {
   // reverse-project viewport movement to view coords (compensate for screen aspect ratio)
@@ -466,13 +472,14 @@ ObjectControls.prototype.stop = function () {
 
 // rotate object based on latest mouse/touch movement
 ObjectControls.prototype.rotateByMouse = function (aboutZAxis) {
-  this._affectedObj.rotate(this._mousePrevPos, this._mouseCurPos, aboutZAxis);
-  this.dispatchEvent({ type: 'change', action: 'rotate', angle: this._affectedObj.lastRotation.angle });
+  const quat = this._affectedObj.rotate(this._mousePrevPos, this._mouseCurPos, aboutZAxis);
+  this.dispatchEvent({ type: 'change', action: 'rotate', quaternion: quat });
 };
 
 // rotate object by specified quaternion
 ObjectControls.prototype.rotate = function (quat) {
   this.object.quaternion.multiply(quat);
+  this.dispatchEvent({ type: 'change', action: 'rotate', quaternion: quat });
 };
 
 // get object's orientation
@@ -509,48 +516,54 @@ ObjectControls.prototype.scale = function (factor) {
     return;
   }
   this.setScale(this.object.scale.x * factor);
+  this.dispatchEvent({ type: 'change', action: 'zoom', factor });
 };
 
-ObjectControls.prototype.update = function () {
-  const curTime = this._clock.getElapsedTime();
-  const timeSinceLastUpdate = curTime - this._lastUpdateTime;
+ObjectControls.prototype.update = (function () {
+  const shift = new THREE.Vector2();
 
-  // update object handler
-  if (this._state === STATE.NONE) {
-    const timeSinceMove = curTime - this._lastMouseMoveTime;
-    if (this._mainObj.update(timeSinceLastUpdate, timeSinceMove)
-          || this._altObj.update(timeSinceLastUpdate, timeSinceMove)) {
-      this.dispatchEvent({ type: 'change', action: 'auto' });
-    }
-  }
+  return function () {
+    const curTime = this._clock.getElapsedTime();
+    const timeSinceLastUpdate = curTime - this._lastUpdateTime;
 
-  // apply arrow keys
-  if (this._isKeysTranslatingObj) {
-    const speedX = Number(this._pressedKeys[VK_RIGHT]) - Number(this._pressedKeys[VK_LEFT]);
-    const speedY = Number(this._pressedKeys[VK_UP]) - Number(this._pressedKeys[VK_DOWN]);
-    if (speedX !== 0.0 || speedY !== 0.0) {
-      const delta = timeSinceLastUpdate;
-
-      // update object translation
-      const altObj = this.getAltObj();
-      if (altObj.objects.length > 0) {
-        this._altObj.setObjects(altObj.objects);
-        this._altObj.pivot = altObj.pivot;
-
-        if ('axis' in altObj) {
-          this._altObj.axis = altObj.axis.clone();
-        } else {
-          this._altObj.axis.set(0, 0, 1);
-        }
-
-        this._altObj.translate(new THREE.Vector2(delta * speedX, delta * speedY));
-        this.dispatchEvent({ type: 'change', action: 'translate' });
+    // update object handler
+    if (this._state === STATE.NONE) {
+      const timeSinceMove = curTime - this._lastMouseMoveTime;
+      if (this._mainObj.update(timeSinceLastUpdate, timeSinceMove)
+        || this._altObj.update(timeSinceLastUpdate, timeSinceMove)) {
+        this.dispatchEvent({ type: 'change', action: 'auto' });
       }
     }
-  }
 
-  this._lastUpdateTime = curTime;
-};
+    // apply arrow keys
+    if (this._isKeysTranslatingObj) {
+      const speedX = Number(this._pressedKeys[VK_RIGHT]) - Number(this._pressedKeys[VK_LEFT]);
+      const speedY = Number(this._pressedKeys[VK_UP]) - Number(this._pressedKeys[VK_DOWN]);
+      if (speedX !== 0.0 || speedY !== 0.0) {
+        const delta = timeSinceLastUpdate;
+
+        // update object translation
+        const altObj = this.getAltObj();
+        if (altObj.objects.length > 0) {
+          this._altObj.setObjects(altObj.objects);
+          this._altObj.pivot = altObj.pivot;
+
+          if ('axis' in altObj) {
+            this._altObj.axis = altObj.axis.clone();
+          } else {
+            this._altObj.axis.set(0, 0, 1);
+          }
+
+          shift.set(delta * speedX, delta * speedY);
+          this._altObj.translate(shift);
+          this.dispatchEvent({ type: 'change', action: 'translate' });
+        }
+      }
+    }
+
+    this._lastUpdateTime = curTime;
+  };
+}());
 
 ObjectControls.prototype.reset = function () {
   this._state = STATE.NONE;
@@ -660,8 +673,6 @@ ObjectControls.prototype.mousewheel = function (event) {
   let factor = 1.0 + delta * 0.05;
   factor = Math.max(factor, 0.01);
   this.scale(factor);
-
-  this.dispatchEvent({ type: 'change', action: 'zoom', factor });
 };
 
 ObjectControls.prototype.mouseup = function (event) {
@@ -735,10 +746,9 @@ ObjectControls.prototype.touchmove = function (event) {
         const dx = event.touches[0].pageX - event.touches[1].pageX;
         const dy = event.touches[0].pageY - event.touches[1].pageY;
         this._touchDistanceCur = Math.sqrt(dx * dx + dy * dy);
-        const oldScale = this.object.scale.x;
         const newScale = this._scaleStart * this._touchDistanceCur / this._touchDistanceStart;
-        this.setScale(newScale);
-        this.dispatchEvent({ type: 'change', action: 'zoom', factor: (oldScale === 0.0) ? 1.0 : newScale / oldScale });
+        const factor = newScale / this.object.scale.x;
+        this.scale(factor);
       }
       break;
 
@@ -792,7 +802,7 @@ ObjectControls.prototype.translatePivotInWorld = function (x, y, z) {
   const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
   pos.applyMatrix4(invWorldMat);
 
-  this.dispatchEvent({ type: 'change' });
+  this.dispatchEvent({ type: 'change', action: 'translatePivot' });
 };
 
 // Translate in ModelCS, x, y, z are Ang
@@ -802,7 +812,14 @@ ObjectControls.prototype.translatePivot = function (x, y, z) {
   pos.setY(pos.y + y);
   pos.setZ(pos.z + z);
 
-  this.dispatchEvent({ type: 'change' });
+  this.dispatchEvent({ type: 'change', action: 'translatePivot' });
+};
+
+// Set pivot
+ObjectControls.prototype.setPivot = function (newPivot) {
+  this.objectPivot.position.copy(newPivot);
+
+  this.dispatchEvent({ type: 'change', action: 'translatePivot' });
 };
 
 export default ObjectControls;
