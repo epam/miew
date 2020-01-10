@@ -497,7 +497,7 @@ ObjectControls.prototype.translate = function () {
   const delta = this._mouseCurPos.clone();
   delta.sub(this._mousePrevPos);
   this._affectedObj.translate(delta);
-  this.dispatchEvent({ type: 'change', action: 'translate', shift: delta });
+  this.dispatchEvent({ type: 'change', action: 'translate' });
 };
 
 // get object scale
@@ -556,7 +556,7 @@ ObjectControls.prototype.update = (function () {
 
           shift.set(delta * speedX, delta * speedY);
           this._altObj.translate(shift);
-          this.dispatchEvent({ type: 'change', action: 'translate', shift });
+          this.dispatchEvent({ type: 'change', action: 'translate' });
         }
       }
     }
@@ -793,24 +793,17 @@ ObjectControls.prototype.translatePivotByMouse = function () {
 };
 
 // Translate in WorldCS, translation is scaled with root scale matrix
-ObjectControls.prototype.translatePivotInWorld = (function () {
-  const oldPos = new THREE.Vector3();
-  const shift = new THREE.Vector3();
+ObjectControls.prototype.translatePivotInWorld = function (x, y, z) {
+  const pos = this.objectPivot.position;
+  pos.applyMatrix4(this.object.matrixWorld);
+  pos.setX(pos.x + x);
+  pos.setY(pos.y + y);
+  pos.setZ(pos.z + z);
+  const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
+  pos.applyMatrix4(invWorldMat);
 
-  return function (x, y, z) {
-    const pos = this.objectPivot.position;
-    oldPos.copy(this.objectPivot.position);
-    pos.applyMatrix4(this.object.matrixWorld);
-    pos.setX(pos.x + x);
-    pos.setY(pos.y + y);
-    pos.setZ(pos.z + z);
-    const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-    pos.applyMatrix4(invWorldMat);
-
-    shift.subVectors(oldPos, pos);
-    this.dispatchEvent({ type: 'change', action: 'translatePivot', shift });
-  };
-}());
+  this.dispatchEvent({ type: 'change', action: 'translatePivot' });
+};
 
 // Translate in ModelCS, x, y, z are Ang
 ObjectControls.prototype.translatePivot = function (x, y, z) {
@@ -819,15 +812,14 @@ ObjectControls.prototype.translatePivot = function (x, y, z) {
   pos.setY(pos.y + y);
   pos.setZ(pos.z + z);
 
-  this.dispatchEvent({ type: 'change', action: 'translatePivot', shift: { x, y, z } });
+  this.dispatchEvent({ type: 'change', action: 'translatePivot' });
 };
 
 // Set pivot
 ObjectControls.prototype.setPivot = function (newPivot) {
-  const shift = this.objectPivot.position - newPivot;
   this.objectPivot.position.copy(newPivot);
 
-  this.dispatchEvent({ type: 'change', action: 'translatePivot', shift });
+  this.dispatchEvent({ type: 'change', action: 'translatePivot' });
 };
 
 export default ObjectControls;
