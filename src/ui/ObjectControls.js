@@ -439,14 +439,15 @@ ObjectControls.prototype.isEditingAltObj = function () {
 
 // convert page coords of mouse/touch to uniform coords with smaller side being [-0.5, 0.5]
 // (uniform coords keep direct proportion with screen distance travelled by mouse regardless of screen aspect ratio)
-ObjectControls.prototype.getMouseOnCircle = function (pageX, pageY) {
+ObjectControls.prototype.convertMouseToOnCircle = function (coords, pageX, pageY) {
   const screenSize = Math.min(this.screen.width, this.screen.height);
 
   if (screenSize === 0) {
-    return new THREE.Vector2(0, 0);
+    coords.set(0, 0);
+    return;
   }
 
-  return new THREE.Vector2(
+  coords.set(
     ((pageX - this.screen.width * 0.5 - this.screen.left) / screenSize),
     ((0.5 * this.screen.height + this.screen.top - pageY) / screenSize),
   );
@@ -454,12 +455,13 @@ ObjectControls.prototype.getMouseOnCircle = function (pageX, pageY) {
 
 // convert page coords of mouse/touch to viewport coords with both sides being [-1, 1]
 // (those are non-uniform coords affected by screen aspect ratio)
-ObjectControls.prototype.getMouseViewport = function (pageX, pageY) {
+ObjectControls.prototype.convertMouseToViewport = function (coords, pageX, pageY) {
   if (this.screen.width === 0 || this.screen.height === 0) {
-    return new THREE.Vector2(0, 0);
+    coords.set(0, 0);
+    return;
   }
 
-  return new THREE.Vector2(
+  coords.set(
     (2.0 * (pageX - this.screen.width * 0.5 - this.screen.left) / this.screen.width),
     (2.0 * (0.5 * this.screen.height + this.screen.top - pageY) / this.screen.height),
   );
@@ -615,12 +617,12 @@ ObjectControls.prototype.mousedown = function (event) {
   }
 
   if (this._state === STATE.ROTATE) {
-    this._mouseCurPos.copy(this.getMouseOnCircle(event.pageX, event.pageY));
+    this.convertMouseToOnCircle(this._mouseCurPos, event.pageX, event.pageY);
     this._mousePrevPos.copy(this._mouseCurPos);
   }
 
   if (this._state === STATE.TRANSLATE || this._state === STATE.TRANSLATE_PIVOT) {
-    this._mouseCurPos.copy(this.getMouseViewport(event.pageX, event.pageY));
+    this.convertMouseToViewport(this._mouseCurPos, event.pageX, event.pageY);
     this._mousePrevPos.copy(this._mouseCurPos);
   }
 };
@@ -636,20 +638,20 @@ ObjectControls.prototype.mousemove = function (event) {
   switch (this._state) {
     case STATE.ROTATE:
       this._mousePrevPos.copy(this._mouseCurPos);
-      this._mouseCurPos.copy(this.getMouseOnCircle(event.pageX, event.pageY));
+      this.convertMouseToOnCircle(this._mouseCurPos, event.pageX, event.pageY);
       this.rotateByMouse((event.altKey && !this._isAltObjFreeRotationAllowed) || event.shiftKey);
       this._lastMouseMoveTime = this._clock.getElapsedTime();
       break;
 
     case STATE.TRANSLATE:
       this._mousePrevPos.copy(this._mouseCurPos);
-      this._mouseCurPos.copy(this.getMouseViewport(event.pageX, event.pageY));
+      this.convertMouseToViewport(this._mouseCurPos, event.pageX, event.pageY);
       this.translate();
       break;
 
     case STATE.TRANSLATE_PIVOT:
       this._mousePrevPos.copy(this._mouseCurPos);
-      this._mouseCurPos.copy(this.getMouseViewport(event.pageX, event.pageY));
+      this.convertMouseToViewport(this._mouseCurPos, event.pageX, event.pageY);
       this.translatePivotByMouse();
       break;
 
@@ -705,7 +707,7 @@ ObjectControls.prototype.touchstartend = function (event) {
   switch (event.touches.length) {
     case 1:
       this._state = STATE.ROTATE;
-      this._mouseCurPos.copy(this.getMouseOnCircle(event.touches[0].pageX, event.touches[0].pageY));
+      this.convertMouseToOnCircle(this._mouseCurPos, event.touches[0].pageX, event.touches[0].pageY)
       this._mousePrevPos.copy(this._mouseCurPos);
       break;
 
@@ -738,7 +740,7 @@ ObjectControls.prototype.touchmove = function (event) {
   switch (this._state) {
     case STATE.ROTATE:
       this._mousePrevPos.copy(this._mouseCurPos);
-      this._mouseCurPos.copy(this.getMouseOnCircle(event.touches[0].pageX, event.touches[0].pageY));
+      this.convertMouseToOnCircle(this._mouseCurPos, event.touches[0].pageX, event.touches[0].pageY);
       this.rotateByMouse(false);
 
       this._lastMouseMoveTime = this._clock.getElapsedTime();
