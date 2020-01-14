@@ -33,7 +33,9 @@ function ObjectHandler(objects, camera, pivot, options) {
 }
 
 ObjectHandler.prototype._rotate = (function () {
+  const p = new THREE.Vector3();
   const q = new THREE.Quaternion();
+  const s = new THREE.Vector3();
 
   return function (quat) {
     const zeroPivot = (this.pivot.x === 0.0 && this.pivot.y === 0.0 && this.pivot.z === 0.0);
@@ -48,8 +50,6 @@ ObjectHandler.prototype._rotate = (function () {
       m.multiply(new THREE.Matrix4().makeTranslation(-this.pivot.x, -this.pivot.y, -this.pivot.z));
     }
 
-    const p = new THREE.Vector3();
-    const s = new THREE.Vector3();
     m.decompose(p, q, s);
 
     // update objects
@@ -71,151 +71,170 @@ ObjectHandler.prototype.setObjects = function (objects) {
   [this.object] = objects;
 };
 
-ObjectHandler.prototype.rotate = function (quat, mousePrevPos, mouseCurPos, aboutAxis) {
-  const rot = this.mouse2rotation(mousePrevPos, mouseCurPos, aboutAxis);
-  quat.setFromAxisAngle(rot.axis, rot.angle);
+ObjectHandler.prototype.rotate = (function () {
+  const rot = {
+    axis: new THREE.Vector3(),
+    angle: 0.0,
+  };
 
-  if (rot.angle) {
-    this._rotate(quat);
-  }
+  return function (quat, mousePrevPos, mouseCurPos, aboutAxis) {
+    this.mouse2rotation(rot, mousePrevPos, mouseCurPos, aboutAxis);
+    quat.setFromAxisAngle(rot.axis, rot.angle);
 
-  this.lastRotation = rot;
-};
-
-ObjectHandler.prototype.translate = function (delta) {
-  // reverse-project viewport movement to view coords (compensate for screen aspect ratio)
-  const d = new THREE.Vector3(
-    delta.x / this.camera.projectionMatrix.elements[0],
-    delta.y / this.camera.projectionMatrix.elements[5], 0,
-  );
-  let dist = d.length();
-  d.normalize();
-
-  // transform movement direction to object local coords
-  const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-  d.transformDirection(invWorldMat);
-
-  // visible translate distance shouldn't depend on camera-to-object distance
-  const pivot = this.pivot.clone();
-  this.object.localToWorld(pivot);
-  dist *= Math.abs(pivot.z - this.camera.position.z);
-
-  // visible translate distance shouldn't depend on object scale
-  dist /= this.object.matrixWorld.getMaxScaleOnAxis();
-
-  // all objects are translated similar to principal object
-  // (we assume they all have identical pivot and scale)
-  for (let i = 0; i < this.objects.length; ++i) {
-    this.objects[i].translateOnAxis(d, dist);
-  }
-};
-
-ObjectHandler.prototype.update = function (timeSinceLastUpdate, timeSinceMove) {
-  if (settings.now.autoRotation !== 0.0) {
-    // auto-rotation with constant speed
-    let axis;
-
-    // if rotation axis is fixed or hasn't been defined yet
-    if (settings.now.autoRotationAxisFixed || this.lastRotation.axis.length() === 0.0) {
-      // use Y-axis (transformed to local object coords)
-      const invM = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-      axis = new THREE.Vector3(0, 1, 0).transformDirection(invM);
-    } else {
-      // use axis defined by last user rotation
-      ({ axis } = this.lastRotation);
+    if (rot.angle) {
+      this._rotate(quat);
     }
 
-    this._rotate(quaternion.setFromAxisAngle(axis, settings.now.autoRotation * timeSinceLastUpdate));
-    return true;
-  }
+    this.lastRotation = rot;
+  };
+}());
 
-  if (this.options.intertia && this.lastRotation.angle) {
-    // inertial object rotation
-    const angle = this.lastRotation.angle * ((1.0 - this.options.dynamicDampingFactor) ** (40.0 * timeSinceMove));
+ObjectHandler.prototype.translate = (function () {
+  const dir = new THREE.Vector3();
 
-    if (Math.abs(angle) <= this.options.intertiaThreshold) {
-      this.lastRotation.angle = 0.0;
-    } else {
-      this._rotate(quaternion.setFromAxisAngle(this.lastRotation.axis, angle));
+  return function (delta) {
+    // reverse-project viewport movement to view coords (compensate for screen aspect ratio)
+    dir.set(
+      delta.x / this.camera.projectionMatrix.elements[0],
+      delta.y / this.camera.projectionMatrix.elements[5], 0,
+    );
+    let dist = dir.length();
+    dir.normalize();
+
+    // transform movement direction to object local coords
+    const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
+    dir.transformDirection(invWorldMat);
+
+    // visible translate distance shouldn't depend on camera-to-object distance
+    const pivot = this.pivot.clone();
+    this.object.localToWorld(pivot);
+    dist *= Math.abs(pivot.z - this.camera.position.z);
+
+    // visible translate distance shouldn't depend on object scale
+    dist /= this.object.matrixWorld.getMaxScaleOnAxis();
+
+    // all objects are translated similar to principal object
+    // (we assume they all have identical pivot and scale)
+    for (let i = 0; i < this.objects.length; ++i) {
+      this.objects[i].translateOnAxis(dir, dist);
+    }
+  };
+}());
+
+ObjectHandler.prototype.update = (function () {
+  const axis = new THREE.Vector3();
+
+  return function (timeSinceLastUpdate, timeSinceMove) {
+    if (settings.now.autoRotation !== 0.0) {
+      // auto-rotation with constant speed
+
+      // if rotation axis is fixed or hasn't been defined yet
+      if (settings.now.autoRotationAxisFixed || this.lastRotation.axis.length() === 0.0) {
+        // use Y-axis (transformed to local object coords)
+        const invM = new THREE.Matrix4().getInverse(this.object.matrixWorld);
+        axis.set(0, 1, 0).transformDirection(invM);
+      } else {
+        // use axis defined by last user rotation
+        axis.copy(this.lastRotation.axis);
+      }
+
+      this._rotate(quaternion.setFromAxisAngle(axis, settings.now.autoRotation * timeSinceLastUpdate));
       return true;
     }
-  }
 
-  return false;
-};
+    if (this.options.intertia && this.lastRotation.angle) {
+      // inertial object rotation
+      const angle = this.lastRotation.angle * ((1.0 - this.options.dynamicDampingFactor) ** (40.0 * timeSinceMove));
+
+      if (Math.abs(angle) <= this.options.intertiaThreshold) {
+        this.lastRotation.angle = 0.0;
+      } else {
+        this._rotate(quaternion.setFromAxisAngle(this.lastRotation.axis, angle));
+        return true;
+      }
+    }
+
+    return false;
+  };
+}());
 
 ObjectHandler.prototype.stop = function () {
   this.lastRotation.angle = 0.0;
 };
 
 // calculate (axis, angle) pair from mouse/touch movement
-ObjectHandler.prototype.mouse2rotation = function (mousePrev, mouseCur, aboutAxis) {
-  const res = {
-    axis: new THREE.Vector3(),
-    angle: 0.0,
-  };
+ObjectHandler.prototype.mouse2rotation = (function () {
+  const center = new THREE.Vector3();
 
-  if (aboutAxis) {
-    res.axis.copy(this.axis);
-    res.angle = this.options.axisRotateFactor * (mouseCur.y - mousePrev.y);
+  const eye = new THREE.Vector3();
+  const eyeDirection = new THREE.Vector3();
 
-    /* cool method that allows rotation around Z axis to be "tied" to mouse cursor
+  const cameraUpDirection = new THREE.Vector3();
+  const cameraSidewaysDirection = new THREE.Vector3();
 
-      res.axis.copy(this.axis);
+  const moveDirection = new THREE.Vector3();
 
-      var pivot = this.pivot.clone();
-      this.object.localToWorld(pivot);
-      pivot.project(this.camera);
+  return function (rot, mousePrev, mouseCur, aboutAxis) {
+    if (aboutAxis) {
+      rot.axis.copy(this.axis);
+      rot.angle = this.options.axisRotateFactor * (mouseCur.y - mousePrev.y);
 
-      var v1 = new THREE.Vector3(mousePrev.x, mousePrev.y, this.camera.position.z);
-      v1.sub(pivot);
-      var v2 = new THREE.Vector3(mouseCur.x, mouseCur.y, this.camera.position.z);
-      v2.sub(pivot);
+      /* cool method that allows rotation around Z axis to be "tied" to mouse cursor
 
-      v1.sub(res.axis.clone().multiplyScalar(v1.dot(res.axis)));
-      v2.sub(res.axis.clone().multiplyScalar(v2.dot(res.axis)));
+        res.axis.copy(this.axis);
 
-      var abs = v1.length() * v2.length();
-      if (abs > 0) {
-        res.angle = res.axis.dot(v1.cross(v2)) / abs;
+        var pivot = this.pivot.clone();
+        this.object.localToWorld(pivot);
+        pivot.project(this.camera);
+
+        var v1 = new THREE.Vector3(mousePrev.x, mousePrev.y, this.camera.position.z);
+        v1.sub(pivot);
+        var v2 = new THREE.Vector3(mouseCur.x, mouseCur.y, this.camera.position.z);
+        v2.sub(pivot);
+
+        v1.sub(res.axis.clone().multiplyScalar(v1.dot(res.axis)));
+        v2.sub(res.axis.clone().multiplyScalar(v2.dot(res.axis)));
+
+        var abs = v1.length() * v2.length();
+        if (abs > 0) {
+          res.angle = res.axis.dot(v1.cross(v2)) / abs;
+        }
+      */
+    } else {
+      const mouseDelta = mouseCur.clone().sub(mousePrev);
+      const angle = mouseDelta.length();
+      if (angle === 0.0) {
+        return;
       }
-    */
-  } else {
-    const mouseDelta = mouseCur.clone().sub(mousePrev);
-    const angle = mouseDelta.length();
-    if (angle === 0.0) {
-      return res;
+
+      center.copy(this.pivot);
+      this.object.localToWorld(center);
+      eye.subVectors(this.camera.position, center);
+      eyeDirection.copy(eye).normalize();
+
+      cameraUpDirection.copy(this.camera.up).normalize();
+      cameraSidewaysDirection.crossVectors(cameraUpDirection, eyeDirection).normalize();
+
+      cameraUpDirection.setLength(mouseDelta.y);
+      cameraSidewaysDirection.setLength(mouseDelta.x);
+
+      moveDirection.copy(cameraUpDirection.add(cameraSidewaysDirection));
+
+      rot.axis.crossVectors(moveDirection, eye);
+
+      rot.angle = -angle * this.options.rotateFactor;
     }
 
-    const center = this.pivot.clone();
-    this.object.localToWorld(center);
-    const eye = new THREE.Vector3().subVectors(this.camera.position, center);
-    const eyeDirection = eye.clone().normalize();
+    const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
+    rot.axis.transformDirection(invWorldMat);
 
-    const cameraUpDirection = this.camera.up.clone().normalize();
-    const cameraSidewaysDirection = new THREE.Vector3().crossVectors(cameraUpDirection, eyeDirection).normalize();
-
-    cameraUpDirection.setLength(mouseDelta.y);
-    cameraSidewaysDirection.setLength(mouseDelta.x);
-
-    const moveDirection = new THREE.Vector3().copy(cameraUpDirection.add(cameraSidewaysDirection));
-
-    res.axis.crossVectors(moveDirection, eye);
-
-    res.angle = -angle * this.options.rotateFactor;
-  }
-
-  const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-  res.axis.transformDirection(invWorldMat);
-
-  // make sure angle is always positive (thus 'axis' defines both axis and direction of rotation)
-  if (res.angle < 0.0) {
-    res.axis.negate();
-    res.angle = -res.angle;
-  }
-
-  return res;
-};
+    // make sure angle is always positive (thus 'axis' defines both axis and direction of rotation)
+    if (rot.angle < 0.0) {
+      rot.axis.negate();
+      rot.angle = -rot.angle;
+    }
+  };
+}());
 
 function ObjectControls(object, objectPivot, camera, domElement, getAltObj) {
   EventDispatcher.call(this);
@@ -707,7 +726,7 @@ ObjectControls.prototype.touchstartend = function (event) {
   switch (event.touches.length) {
     case 1:
       this._state = STATE.ROTATE;
-      this.convertMouseToOnCircle(this._mouseCurPos, event.touches[0].pageX, event.touches[0].pageY)
+      this.convertMouseToOnCircle(this._mouseCurPos, event.touches[0].pageX, event.touches[0].pageY);
       this._mousePrevPos.copy(this._mouseCurPos);
       break;
 
