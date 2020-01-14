@@ -38,10 +38,12 @@ ObjectHandler.prototype._rotate = (function () {
   const q = new THREE.Quaternion();
   const s = new THREE.Vector3();
 
+  const m = new THREE.Matrix4();
+
   return function (quat) {
     const zeroPivot = (this.pivot.x === 0.0 && this.pivot.y === 0.0 && this.pivot.z === 0.0);
 
-    const m = this.object.matrix.clone();
+    m.copy(this.object.matrix);
 
     if (zeroPivot) {
       m.multiply(matrix4.makeRotationFromQuaternion(quat));
@@ -92,6 +94,7 @@ ObjectHandler.prototype.rotate = (function () {
 
 ObjectHandler.prototype.translate = (function () {
   const dir = new THREE.Vector3();
+  const pivot = new THREE.Vector3();
 
   return function (delta) {
     // reverse-project viewport movement to view coords (compensate for screen aspect ratio)
@@ -106,7 +109,7 @@ ObjectHandler.prototype.translate = (function () {
     dir.transformDirection(matrix4.getInverse(this.object.matrixWorld));
 
     // visible translate distance shouldn't depend on camera-to-object distance
-    const pivot = this.pivot.clone();
+    pivot.copy(this.pivot);
     this.object.localToWorld(pivot);
     dist *= Math.abs(pivot.z - this.camera.position.z);
 
@@ -173,6 +176,8 @@ ObjectHandler.prototype.mouse2rotation = (function () {
 
   const moveDirection = new THREE.Vector3();
 
+  const mouseDelta = new THREE.Vector2();
+
   return function (rot, mousePrev, mouseCur, aboutAxis) {
     if (aboutAxis) {
       rot.axis.copy(this.axis);
@@ -200,7 +205,7 @@ ObjectHandler.prototype.mouse2rotation = (function () {
         }
       */
     } else {
-      const mouseDelta = mouseCur.clone().sub(mousePrev);
+      mouseDelta.subVectors(mouseCur, mousePrev);
       const angle = mouseDelta.length();
       if (angle === 0.0) {
         return;
@@ -516,12 +521,14 @@ ObjectControls.prototype.setOrientation = function (quat) {
 };
 
 // translate object based on latest mouse/touch movement
-ObjectControls.prototype.translate = function () {
-  const delta = this._mouseCurPos.clone();
-  delta.sub(this._mousePrevPos);
-  this._affectedObj.translate(delta);
-  this.dispatchEvent({ type: 'change', action: 'translate' });
-};
+ObjectControls.prototype.translate = (function () {
+  const delta = new THREE.Vector2();
+  return function () {
+    delta.subVectors(this._mouseCurPos, this._mousePrevPos);
+    this._affectedObj.translate(delta);
+    this.dispatchEvent({ type: 'change', action: 'translate' });
+  };
+}());
 
 // get object scale
 ObjectControls.prototype.getScale = function () {
@@ -809,11 +816,13 @@ ObjectControls.prototype.dispose = function () {
   }
 };
 
-ObjectControls.prototype.translatePivotByMouse = function () {
-  const delta = this._mouseCurPos.clone();
-  delta.sub(this._mousePrevPos);
-  this.translatePivotInWorld(settings.now.translationSpeed * delta.x, settings.now.translationSpeed * delta.y, 0);
-};
+ObjectControls.prototype.translatePivotByMouse = (function () {
+  const delta = new THREE.Vector2();
+  return function () {
+    delta.subVectors(this._mouseCurPos, this._mousePrevPos);
+    this.translatePivotInWorld(settings.now.translationSpeed * delta.x, settings.now.translationSpeed * delta.y, 0);
+  };
+}());
 
 // Translate in WorldCS, translation is scaled with root scale matrix
 ObjectControls.prototype.translatePivotInWorld = function (x, y, z) {
