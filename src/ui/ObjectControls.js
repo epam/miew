@@ -16,6 +16,7 @@ const STATE = {
 const FULL_STOP_THRESHOLD = 0.1;
 
 const quaternion = new THREE.Quaternion();
+const matrix4 = new THREE.Matrix4();
 
 // pivot -- local offset of the rotation pivot point
 function ObjectHandler(objects, camera, pivot, options) {
@@ -43,11 +44,11 @@ ObjectHandler.prototype._rotate = (function () {
     const m = this.object.matrix.clone();
 
     if (zeroPivot) {
-      m.multiply(new THREE.Matrix4().makeRotationFromQuaternion(quat));
+      m.multiply(matrix4.makeRotationFromQuaternion(quat));
     } else {
-      m.multiply(new THREE.Matrix4().makeTranslation(this.pivot.x, this.pivot.y, this.pivot.z));
-      m.multiply(new THREE.Matrix4().makeRotationFromQuaternion(quat));
-      m.multiply(new THREE.Matrix4().makeTranslation(-this.pivot.x, -this.pivot.y, -this.pivot.z));
+      m.multiply(matrix4.makeTranslation(this.pivot.x, this.pivot.y, this.pivot.z));
+      m.multiply(matrix4.makeRotationFromQuaternion(quat));
+      m.multiply(matrix4.makeTranslation(-this.pivot.x, -this.pivot.y, -this.pivot.z));
     }
 
     m.decompose(p, q, s);
@@ -102,8 +103,7 @@ ObjectHandler.prototype.translate = (function () {
     dir.normalize();
 
     // transform movement direction to object local coords
-    const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-    dir.transformDirection(invWorldMat);
+    dir.transformDirection(matrix4.getInverse(this.object.matrixWorld));
 
     // visible translate distance shouldn't depend on camera-to-object distance
     const pivot = this.pivot.clone();
@@ -131,8 +131,7 @@ ObjectHandler.prototype.update = (function () {
       // if rotation axis is fixed or hasn't been defined yet
       if (settings.now.autoRotationAxisFixed || this.lastRotation.axis.length() === 0.0) {
         // use Y-axis (transformed to local object coords)
-        const invM = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-        axis.set(0, 1, 0).transformDirection(invM);
+        axis.set(0, 1, 0).transformDirection(matrix4.getInverse(this.object.matrixWorld));
       } else {
         // use axis defined by last user rotation
         axis.copy(this.lastRotation.axis);
@@ -225,8 +224,7 @@ ObjectHandler.prototype.mouse2rotation = (function () {
       rot.angle = -angle * this.options.rotateFactor;
     }
 
-    const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-    rot.axis.transformDirection(invWorldMat);
+    rot.axis.transformDirection(matrix4.getInverse(this.object.matrixWorld));
 
     // make sure angle is always positive (thus 'axis' defines both axis and direction of rotation)
     if (rot.angle < 0.0) {
@@ -824,8 +822,7 @@ ObjectControls.prototype.translatePivotInWorld = function (x, y, z) {
   pos.setX(pos.x + x);
   pos.setY(pos.y + y);
   pos.setZ(pos.z + z);
-  const invWorldMat = new THREE.Matrix4().getInverse(this.object.matrixWorld);
-  pos.applyMatrix4(invWorldMat);
+  pos.applyMatrix4(matrix4.getInverse(this.object.matrixWorld));
 
   this.dispatchEvent({ type: 'change', action: 'translatePivot' });
 };
