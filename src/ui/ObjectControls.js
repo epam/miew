@@ -15,6 +15,8 @@ const STATE = {
 // pausing for this amount of time before releasing mouse button prevents inertial rotation (seconds)
 const FULL_STOP_THRESHOLD = 0.1;
 
+const quaternion = new THREE.Quaternion();
+
 // pivot -- local offset of the rotation pivot point
 function ObjectHandler(objects, camera, pivot, options) {
   this.objects = objects;
@@ -30,57 +32,55 @@ function ObjectHandler(objects, camera, pivot, options) {
   };
 }
 
-ObjectHandler.prototype._rotate = function (quaternion) {
-  const zeroPivot = (this.pivot.x === 0.0 && this.pivot.y === 0.0 && this.pivot.z === 0.0);
-
-  const m = this.object.matrix.clone();
-
-  if (zeroPivot) {
-    m.multiply(new THREE.Matrix4().makeRotationFromQuaternion(quaternion));
-  } else {
-    m.multiply(new THREE.Matrix4().makeTranslation(this.pivot.x, this.pivot.y, this.pivot.z));
-    m.multiply(new THREE.Matrix4().makeRotationFromQuaternion(quaternion));
-    m.multiply(new THREE.Matrix4().makeTranslation(-this.pivot.x, -this.pivot.y, -this.pivot.z));
-  }
-
-  const p = new THREE.Vector3();
+ObjectHandler.prototype._rotate = (function () {
   const q = new THREE.Quaternion();
-  const s = new THREE.Vector3();
-  m.decompose(p, q, s);
 
-  // update objects
-  if (!zeroPivot) {
-    for (let i = 0; i < this.objects.length; ++i) {
-      this.objects[i].position.copy(p);
+  return function (quat) {
+    const zeroPivot = (this.pivot.x === 0.0 && this.pivot.y === 0.0 && this.pivot.z === 0.0);
+
+    const m = this.object.matrix.clone();
+
+    if (zeroPivot) {
+      m.multiply(new THREE.Matrix4().makeRotationFromQuaternion(quat));
+    } else {
+      m.multiply(new THREE.Matrix4().makeTranslation(this.pivot.x, this.pivot.y, this.pivot.z));
+      m.multiply(new THREE.Matrix4().makeRotationFromQuaternion(quat));
+      m.multiply(new THREE.Matrix4().makeTranslation(-this.pivot.x, -this.pivot.y, -this.pivot.z));
     }
-  }
 
-  for (let j = 0; j < this.objects.length; ++j) {
-    this.objects[j].quaternion.copy(q);
-    this.objects[j].updateMatrix();
-  }
-};
+    const p = new THREE.Vector3();
+    const s = new THREE.Vector3();
+    m.decompose(p, q, s);
+
+    // update objects
+    if (!zeroPivot) {
+      for (let i = 0; i < this.objects.length; ++i) {
+        this.objects[i].position.copy(p);
+      }
+    }
+
+    for (let j = 0; j < this.objects.length; ++j) {
+      this.objects[j].quaternion.copy(q);
+      this.objects[j].updateMatrix();
+    }
+  };
+}());
 
 ObjectHandler.prototype.setObjects = function (objects) {
   this.objects = objects;
   [this.object] = objects;
 };
 
-ObjectHandler.prototype.rotate = (function () {
-  const quaternion = new THREE.Quaternion();
+ObjectHandler.prototype.rotate = function (quat, mousePrevPos, mouseCurPos, aboutAxis) {
+  const rot = this.mouse2rotation(mousePrevPos, mouseCurPos, aboutAxis);
+  quat.setFromAxisAngle(rot.axis, rot.angle);
 
-  return function (mousePrevPos, mouseCurPos, aboutAxis) {
-    const rot = this.mouse2rotation(mousePrevPos, mouseCurPos, aboutAxis);
-    quaternion.setFromAxisAngle(rot.axis, rot.angle);
+  if (rot.angle) {
+    this._rotate(quat);
+  }
 
-    if (rot.angle) {
-      this._rotate(quaternion);
-    }
-
-    this.lastRotation = rot;
-    return quaternion;
-  };
-}());
+  this.lastRotation = rot;
+};
 
 ObjectHandler.prototype.translate = function (delta) {
   // reverse-project viewport movement to view coords (compensate for screen aspect ratio)
@@ -125,7 +125,7 @@ ObjectHandler.prototype.update = function (timeSinceLastUpdate, timeSinceMove) {
       ({ axis } = this.lastRotation);
     }
 
-    this._rotate(new THREE.Quaternion().setFromAxisAngle(axis, settings.now.autoRotation * timeSinceLastUpdate));
+    this._rotate(quaternion.setFromAxisAngle(axis, settings.now.autoRotation * timeSinceLastUpdate));
     return true;
   }
 
@@ -136,7 +136,7 @@ ObjectHandler.prototype.update = function (timeSinceLastUpdate, timeSinceMove) {
     if (Math.abs(angle) <= this.options.intertiaThreshold) {
       this.lastRotation.angle = 0.0;
     } else {
-      this._rotate(new THREE.Quaternion().setFromAxisAngle(this.lastRotation.axis, angle));
+      this._rotate(quaternion.setFromAxisAngle(this.lastRotation.axis, angle));
       return true;
     }
   }
@@ -471,10 +471,14 @@ ObjectControls.prototype.stop = function () {
 };
 
 // rotate object based on latest mouse/touch movement
-ObjectControls.prototype.rotateByMouse = function (aboutZAxis) {
-  const quat = this._affectedObj.rotate(this._mousePrevPos, this._mouseCurPos, aboutZAxis);
-  this.dispatchEvent({ type: 'change', action: 'rotate', quaternion: quat });
-};
+ObjectControls.prototype.rotateByMouse = (function () {
+  const quat = new THREE.Quaternion();
+
+  return function (aboutZAxis) {
+    this._affectedObj.rotate(quat, this._mousePrevPos, this._mouseCurPos, aboutZAxis);
+    this.dispatchEvent({ type: 'change', action: 'rotate', quaternion: quat });
+  };
+}());
 
 // rotate object by specified quaternion
 ObjectControls.prototype.rotate = function (quat) {
@@ -568,7 +572,7 @@ ObjectControls.prototype.update = (function () {
 ObjectControls.prototype.reset = function () {
   this._state = STATE.NONE;
 
-  this.object.quaternion.copy(new THREE.Quaternion(0, 0, 0, 1));
+  this.object.quaternion.copy(quaternion.set(0, 0, 0, 1));
 };
 
 // listeners
