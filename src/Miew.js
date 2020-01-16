@@ -2514,7 +2514,16 @@ Miew.prototype.repCurrent = function (index, name) {
  */
 Miew.prototype.rep = function (index, rep) {
   const visual = this._getComplexVisual('');
-  return visual ? visual.rep(index, rep) : null;
+  if (!visual) {
+    return null;
+  }
+  const res = visual.rep(index, rep);
+  if (res.created) {
+    this.dispatchEvent({ type: 'repAdded', index: res.index, name: visual.name });
+  } else if (res.changed) {
+    this.dispatchEvent({ type: 'repChanged', index: res.index, name: visual.name });
+  }
+  return res.desc;
 };
 
 /**

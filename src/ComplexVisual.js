@@ -151,7 +151,7 @@ class ComplexVisual extends Visual {
    * @param {string=} rep.mode - Mode id.
    * @param {string=} rep.colorer - Colorer id.
    * @param {string=} rep.material - Material id.
-   * @returns {?object} Representation description.
+   * @returns {?object} Representation description, index, was new rep created, was rep changed.
    */
   rep(index, rep) {
     // if index is missing then it is the current
@@ -166,9 +166,13 @@ class ComplexVisual extends Visual {
       return null;
     }
 
+    let created = false;
+    let changed = false;
+
     // a special case of adding just after the end
     if (index === this._reprList.length) {
       this.repAdd(rep);
+      created = true;
       rep = undefined;
       logger.warn(`Rep ${index} does not exist! New representation was created.`);
     }
@@ -184,8 +188,6 @@ class ComplexVisual extends Visual {
 
     // if modification is requested
     if (rep) {
-      let changed = false;
-
       // modify selector
       if (rep.selector) {
         const newSelectorObject = selectors.parse(rep.selector).selector;
@@ -245,7 +247,12 @@ class ComplexVisual extends Visual {
       }
     }
 
-    return desc;
+    return {
+      desc,
+      index,
+      created,
+      changed,
+    };
   }
 
 
