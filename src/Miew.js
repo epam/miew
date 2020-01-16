@@ -2551,7 +2551,12 @@ Miew.prototype.repAdd = function (rep, name) {
  */
 Miew.prototype.repRemove = function (index, name) {
   const visual = this._getComplexVisual(name);
-  return visual ? visual.repRemove(index) : null;
+  if (!visual) {
+    return;
+  }
+
+  visual.repRemove(index);
+  this.dispatchEvent({ type: 'repRemoved', index, name });
 };
 
 /**
