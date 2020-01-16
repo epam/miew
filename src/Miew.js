@@ -2420,6 +2420,7 @@ Miew.prototype._extractRepresentation = function () {
       return;
     }
 
+    this.dispatchEvent({ type: 'repAdded', index: idx, name: visual.name });
     visual.repCurrent(idx);
 
     changed.push(visual.name);
@@ -2427,6 +2428,8 @@ Miew.prototype._extractRepresentation = function () {
 
   if (changed.length > 0) {
     this.logger.report(`New representation from selection for complexes: ${changed.join(', ')}`);
+    // deprecated event since 0.8.6
+    // Use repAdded event instead it. Make attention there are some differences
     this.dispatchEvent({ type: 'repAdd' });
   }
 };
@@ -2531,7 +2534,15 @@ Miew.prototype.repGet = function (index, name) {
  */
 Miew.prototype.repAdd = function (rep, name) {
   const visual = this._getComplexVisual(name);
-  return visual ? visual.repAdd(rep) : -1;
+  if (!visual) {
+    return -1;
+  }
+
+  const index = visual.repAdd(rep);
+  if (index >= 0) {
+    this.dispatchEvent({ type: 'repAdded', index, name });
+  }
+  return index;
 };
 
 /**
