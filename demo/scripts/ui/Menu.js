@@ -1058,6 +1058,10 @@ Menu.prototype._initMiewEventListeners = function () {
     self._setTitle('Loading…');
   });
 
+  this._viewer.addEventListener('fetching', () => {
+    self._setTitle('Fetching…');
+  });
+
   this._viewer.addEventListener('parsing', () => {
     self._setTitle('Parsing…');
   });
