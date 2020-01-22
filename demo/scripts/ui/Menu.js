@@ -1054,15 +1054,15 @@ Menu.prototype._init = function () {
 Menu.prototype._initMiewEventListeners = function () {
   const self = this;
 
-  this._viewer.addEventListener('load', () => {
+  this._viewer.addEventListener('loading', () => {
     self._setTitle('Loading…');
   });
 
-  this._viewer.addEventListener('parse', () => {
+  this._viewer.addEventListener('parsing', () => {
     self._setTitle('Parsing…');
   });
 
-  this._viewer.addEventListener('rebuild', () => {
+  this._viewer.addEventListener('rebuilding', () => {
     self._setTitle('Building geometry…');
   });
 
@@ -1070,13 +1070,13 @@ Menu.prototype._initMiewEventListeners = function () {
     self._onResize();
   });
 
-  this._viewer.addEventListener('fetchingFinished', (e) => {
+  this._viewer.addEventListener('fetchingDone', (e) => {
     if (e.error) {
       self._updateInfo(e.data);
     }
   });
 
-  this._viewer.addEventListener('parsingFinished', (e) => {
+  this._viewer.addEventListener('parsingDone', (e) => {
     self._updateInfo(e.data);
     self._fillSourceList();
     self._fillReprList();
