@@ -1066,6 +1066,10 @@ Menu.prototype._initMiewEventListeners = function () {
     self._setTitle('Building geometry…');
   });
 
+  this._viewer.addEventListener('exporting', () => {
+    self._setTitle('Exporting…');
+  });
+
   this._viewer.addEventListener('resize', () => {
     self._onResize();
   });
