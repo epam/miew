@@ -2518,9 +2518,9 @@ Miew.prototype.rep = function (index, rep) {
     return null;
   }
   const res = visual.rep(index, rep);
-  if (res.created) {
+  if (res.status === 'created') {
     this.dispatchEvent({ type: 'repAdded', index: res.index, name: visual.name });
-  } else if (res.changed) {
+  } else if (res.status === 'changed') {
     this.dispatchEvent({ type: 'repChanged', index: res.index, name: visual.name });
   }
   return res.desc;

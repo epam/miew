@@ -151,7 +151,9 @@ class ComplexVisual extends Visual {
    * @param {string=} rep.mode - Mode id.
    * @param {string=} rep.colorer - Colorer id.
    * @param {string=} rep.material - Material id.
-   * @returns {?object} Representation description, index, was new rep created, was rep changed.
+   * @returns {Object} {desc, index, status} field desc contains rep description, index - index of correspondent rep,
+   * status - one of three strings: 'created', 'changed', ''. 'created' means new rep was created during this function,
+   * 'changed' - rep was changed during this function. '' - something else.
    */
   rep(index, rep) {
     // if index is missing then it is the current
@@ -250,8 +252,7 @@ class ComplexVisual extends Visual {
     return {
       desc,
       index,
-      created,
-      changed,
+      status: created ? 'created' : (changed ? 'changed' : ''),
     };
   }
 
