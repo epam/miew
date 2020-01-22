@@ -3190,9 +3190,11 @@ Miew.prototype.save = function (opts) {
   this._export(opts.fileType).then((dataString) => {
     const filename = this._visuals[this._curVisualName]._complex.name;
     utils.download(dataString, filename, opts.fileType);
+    this.dispatchEvent({ type: 'exportingDone' });
   }).catch((error) => {
     this.logger.error('Could not export data');
     this.logger.debug(error);
+    this.dispatchEvent({ type: 'exportingDone', error });
   });
 };
 
