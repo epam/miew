@@ -1791,6 +1791,7 @@ function _fetchData(source, opts, job) {
     if (job.shouldCancel()) {
       throw new Error('Operation cancelled');
     }
+    job.notify({ type: 'fetching' });
 
     // allow for source shortcuts
     source = resolveSourceShortcut(source, opts);
@@ -1963,6 +1964,7 @@ Miew.prototype.load = function (source, opts) {
     }
     this._spinner.stop();
     this._refreshTitle();
+    job.notify({ type: 'loadingDone', anything });
     return anything;
   };
 
@@ -2383,6 +2385,7 @@ Miew.prototype.rebuild = function () {
     self._needRender = true;
 
     self._refreshTitle();
+    this.dispatchEvent({ type: 'buildingDone' });
     self._building = false;
   });
 };
