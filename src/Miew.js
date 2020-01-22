@@ -1847,7 +1847,9 @@ function _fetchData(source, opts, job) {
       .then((data) => {
         console.timeEnd('fetch');
         opts.context.logger.info('Fetching finished');
+        // deprecated event since version 0.8.6
         job.notify({ type: 'fetchingFinished', data });
+        job.notify({ type: 'fetchingDone', data });
         return data;
       })
       .catch((error) => {
@@ -1857,7 +1859,9 @@ function _fetchData(source, opts, job) {
           opts.context.logger.debug(error.stack);
         }
         opts.context.logger.error('Fetching failed');
+        // deprecated event since version 0.8.6
         job.notify({ type: 'fetchingFinished', error });
+        job.notify({ type: 'fetchingDone', error });
         throw error;
       });
     resolve(promise);
@@ -1868,7 +1872,10 @@ function _parseData(data, opts, job) {
   if (job.shouldCancel()) {
     return Promise.reject(new Error('Operation cancelled'));
   }
+  // deprecated event since version 0.8.6
   job.notify({ type: 'parse' });
+
+  job.notify({ type: 'parsing' });
 
   const TheParser = _.head(io.parsers.find({ format: opts.fileType, ext: opts.fileExt, data }));
   if (!TheParser) {
@@ -1883,7 +1890,9 @@ function _parseData(data, opts, job) {
   return parser.parse()
     .then((dataSet) => {
       console.timeEnd('parse');
+      // deprecated event since version 0.8.6
       job.notify({ type: 'parsingFinished', data: dataSet });
+      job.notify({ type: 'parsingDone', data: dataSet });
       return dataSet;
     })
     .catch((error) => {
@@ -1894,7 +1903,9 @@ function _parseData(data, opts, job) {
         opts.context.logger.debug(error.stack);
       }
       opts.context.logger.error('Parsing failed');
+      // deprecated event since version 0.8.6
       job.notify({ type: 'parsingFinished', error });
+      job.notify({ type: 'parsingDone', error });
       throw error;
     });
 }
@@ -1932,7 +1943,10 @@ Miew.prototype.load = function (source, opts) {
 
   viewInterpolator.reset();
 
+  // deprecated event since version 0.8.6
   this.dispatchEvent({ type: 'load', options: opts, source });
+
+  this.dispatchEvent({ type: 'loading', options: opts, source });
 
   const job = new JobHandle();
   this._loading.push(job);
@@ -2340,7 +2354,10 @@ Miew.prototype.rebuild = function () {
   }
   this._building = true;
 
+  // deprecated event since version 0.8.6
   this.dispatchEvent({ type: 'rebuild' });
+
+  this.dispatchEvent({ type: 'rebuilding' });
 
   this._rebuildObjects();
 
