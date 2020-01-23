@@ -151,7 +151,9 @@ class ComplexVisual extends Visual {
    * @param {string=} rep.mode - Mode id.
    * @param {string=} rep.colorer - Colorer id.
    * @param {string=} rep.material - Material id.
-   * @returns {?object} Representation description.
+   * @returns {Object} {desc, index, status} field desc contains rep description, index - index of correspondent rep,
+   * status - one of three strings: 'created', 'changed', ''. 'created' means new rep was created during this function,
+   * 'changed' - rep was changed during this function. '' - something else.
    */
   rep(index, rep) {
     // if index is missing then it is the current
@@ -166,9 +168,12 @@ class ComplexVisual extends Visual {
       return null;
     }
 
+    let status = '';
+
     // a special case of adding just after the end
     if (index === this._reprList.length) {
       this.repAdd(rep);
+      status = 'created';
       rep = undefined;
       logger.warn(`Rep ${index} does not exist! New representation was created.`);
     }
@@ -184,8 +189,6 @@ class ComplexVisual extends Visual {
 
     // if modification is requested
     if (rep) {
-      let changed = false;
-
       // modify selector
       if (rep.selector) {
         const newSelectorObject = selectors.parse(rep.selector).selector;
@@ -194,7 +197,7 @@ class ComplexVisual extends Visual {
           target.selectorString = desc.selector = newSelector;
           target.selector = newSelectorObject;
           target.markAtoms(this._complex);
-          changed = true;
+          status = 'changed';
           logger.debug(`rep[${index}].selector changed to${newSelector}`);
         }
       }
@@ -205,7 +208,7 @@ class ComplexVisual extends Visual {
         if (!_.isEqual(desc.mode, newMode)) {
           desc.mode = newMode;
           target.setMode(lookupAndCreate(modes, rep.mode));
-          changed = true;
+          status = 'changed';
           logger.debug(`rep[${index}].mode changed to ${newMode}`);
 
           // safety trick: lower resolution for surface modes
@@ -223,7 +226,7 @@ class ComplexVisual extends Visual {
         if (!_.isEqual(desc.colorer, newColorer)) {
           desc.colorer = newColorer;
           target.colorer = lookupAndCreate(colorers, rep.colorer);
-          changed = true;
+          status = 'changed';
           logger.debug(`rep[${index}].colorer changed to ${newColorer}`);
         }
       }
@@ -234,18 +237,22 @@ class ComplexVisual extends Visual {
         if (!_.isEqual(desc.material, newMaterial)) {
           desc.material = newMaterial;
           target.setMaterialPreset(materials.get(rep.material));
-          changed = true;
+          status = 'changed';
           logger.debug(`rep[${index}].material changed to${newMaterial}`);
         }
       }
 
       // finalize
-      if (changed) {
+      if (status === 'changed') {
         target.needsRebuild = true;
       }
     }
 
-    return desc;
+    return {
+      desc,
+      index,
+      status,
+    };
   }
 
 

@@ -2441,6 +2441,7 @@ Miew.prototype._extractRepresentation = function () {
       return;
     }
 
+    this.dispatchEvent({ type: 'repAdded', index: idx, name: visual.name });
     visual.repCurrent(idx);
 
     changed.push(visual.name);
@@ -2448,6 +2449,8 @@ Miew.prototype._extractRepresentation = function () {
 
   if (changed.length > 0) {
     this.logger.report(`New representation from selection for complexes: ${changed.join(', ')}`);
+    // deprecated event since 0.8.6
+    // Use repAdded event instead it. Make attention there are some differences
     this.dispatchEvent({ type: 'repAdd' });
   }
 };
@@ -2532,7 +2535,16 @@ Miew.prototype.repCurrent = function (index, name) {
  */
 Miew.prototype.rep = function (index, rep) {
   const visual = this._getComplexVisual('');
-  return visual ? visual.rep(index, rep) : null;
+  if (!visual) {
+    return null;
+  }
+  const res = visual.rep(index, rep);
+  if (res.status === 'created') {
+    this.dispatchEvent({ type: 'repAdded', index: res.index, name: visual.name });
+  } else if (res.status === 'changed') {
+    this.dispatchEvent({ type: 'repChanged', index: res.index, name: visual.name });
+  }
+  return res.desc;
 };
 
 /**
@@ -2552,7 +2564,15 @@ Miew.prototype.repGet = function (index, name) {
  */
 Miew.prototype.repAdd = function (rep, name) {
   const visual = this._getComplexVisual(name);
-  return visual ? visual.repAdd(rep) : -1;
+  if (!visual) {
+    return -1;
+  }
+
+  const index = visual.repAdd(rep);
+  if (index >= 0) {
+    this.dispatchEvent({ type: 'repAdded', index, name });
+  }
+  return index;
 };
 
 /**
@@ -2561,7 +2581,12 @@ Miew.prototype.repAdd = function (rep, name) {
  */
 Miew.prototype.repRemove = function (index, name) {
   const visual = this._getComplexVisual(name);
-  return visual ? visual.repRemove(index) : null;
+  if (!visual) {
+    return;
+  }
+
+  visual.repRemove(index);
+  this.dispatchEvent({ type: 'repRemoved', index, name });
 };
 
 /**
