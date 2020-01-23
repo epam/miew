@@ -1665,6 +1665,7 @@ Miew.prototype._export = function (format) {
     this.logger.error('Could not find suitable exporter for this source');
     return Promise.reject(new Error('Could not find suitable exporter for this source'));
   }
+  this.dispatchEvent({ type: 'exporting' });
 
   if (this._visuals[this._curVisualName] instanceof ComplexVisual) {
     let dataSource = null;
@@ -3210,9 +3211,13 @@ Miew.prototype.save = function (opts) {
   this._export(opts.fileType).then((dataString) => {
     const filename = this._visuals[this._curVisualName]._complex.name;
     utils.download(dataString, filename, opts.fileType);
+    this._refreshTitle();
+    this.dispatchEvent({ type: 'exportingDone' });
   }).catch((error) => {
     this.logger.error('Could not export data');
     this.logger.debug(error);
+    this._refreshTitle();
+    this.dispatchEvent({ type: 'exportingDone', error });
   });
 };
 
