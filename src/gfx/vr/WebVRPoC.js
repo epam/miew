@@ -77,6 +77,7 @@ export default class WebVRPoC {
     if (typeof gfx === 'undefined') {
       logger.warn('WebVR couldn\'t be enabled, because gfx is not defined');
     }
+    // FIXME rewrite in more unstandable way
     const self = this;
     this._gfx = gfx;
     const renderer = gfx ? gfx.renderer : null;
@@ -86,12 +87,13 @@ export default class WebVRPoC {
       throw new Error('No camera is available to toggle WebVR');
     }
 
-    if (enable && !renderer.vr.enabled) {
+    // FIXME divide into two parts
+    if (enable && !renderer.xr.enabled) {
       // store common camera
       self._mainCamera.copy(gfx.camera);
       self._cameraWasStored = true;
-      // enable vr in renderer
-      renderer.vr.enabled = true;
+      // enable xr in renderer
+      renderer.xr.enabled = true;
       if (!this._button) {
         self._button = createWebVRButton(this);
         document.body.appendChild(self._button);
@@ -108,15 +110,11 @@ export default class WebVRPoC {
       gfx.scene.add(self._molContainer);
       self._molContainer.add(gfx.root);
 
-      this._controller1.standingMatrix = renderer.vr.getStandingMatrix();
-      this._controller2.standingMatrix = renderer.vr.getStandingMatrix();
-    } else if (!enable && renderer.vr.enabled) {
-      // disable vr
-      const display = self.getDevice();
-      if (display && display.isPresenting) {
-        display.exitPresent();
-      }
-      renderer.vr.enabled = false;
+    //  this._controller1.standingMatrix = renderer.xr.getStandingMatrix();
+    //  this._controller2.standingMatrix = renderer.xr.getStandingMatrix();
+    } else if (!enable && renderer.xr.enabled) {
+      renderer.setAnimationLoop(null);
+      renderer.xr.enabled = false;
       if (self._button) {
         self._button.style.display = 'none';
       }
@@ -133,7 +131,7 @@ export default class WebVRPoC {
         gfx.scene.remove(self._user);
       }
     }
-    if (self._onToggle) {
+    if (self._onToggle) { //  TODO is it needed?
       self._onToggle(enable);
     }
   }
@@ -160,36 +158,28 @@ export default class WebVRPoC {
     }
   }
 
-  // reposition molecule right before the camera
-  translateMolecule() {
-    const device = this.getDevice();
-    if (!device) {
-      return;
-    }
+  /**
+   * Reposition molecule right before the camera.
+   * @note Right way is to initiate headset in the place of common Miew's camera.
+   * But threejs limitations on setting new XRReferenceSpace enforce the molecule repositioning
+   * Hope, something will change.
+   */
+  moveSceneBegindHeadset() {
     const gfx = this._gfx;
     const { camera } = gfx;
 
     // set container position in camera space
     const container = this._molContainer;
     container.matrix.identity();
-    container.position.set(0, 0, -1.3);
+    container.position.set(0, 0, -4.0);
     container.updateMatrix();
 
     // update container world matrix
     container.matrixWorld.multiplyMatrices(camera.matrixWorld, container.matrix);
     // readd to scene
     gfx.scene.addSavingWorldTransform(container);
-  }
-
-  getDevice() {
-    const vr = (this._gfx && this._gfx.renderer) ? this._gfx.renderer.vr : null;
-    return (vr && vr.enabled) ? vr.getDevice() : null;
-  }
-
-  setDevice(display) {
-    const vr = (this._gfx && this._gfx.renderer) ? this._gfx.renderer.vr : null;
-    if (vr) {
-      vr.setDevice(display);
+    if (this._onToggle) { //  TODO is it needed?
+      this._onToggle(true);
     }
   }
 

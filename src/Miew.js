@@ -382,6 +382,15 @@ Miew.prototype._showCanvas = function () {
   _setContainerContents(this._container, this._gfx.renderer.domElement);
 };
 
+Miew.prototype._requestAnimationFrame = function (callback) {
+  const { xr } = this._gfx.renderer;
+  if (xr && xr.enabled) {
+    this._gfx.renderer.setAnimationLoop(callback);
+    return;
+  }
+  requestAnimationFrame(callback);
+};
+
 /**
  * Initialize WebGL and set 3D scene up.
  * @private
@@ -586,8 +595,9 @@ Miew.prototype._initGfx = function () {
   this._gfx = gfx;
   this._showCanvas();
 
-  if (settings.now.stereo === 'WEBVR') {
+  if (settings.now.stereo === 'WEBVR') { // TODO move the separate function
     this.webVR = new WebVRPoC(() => {
+      this._requestAnimationFrame(() => this._onTick()); // update due to mode switching
       this._needRender = true;
       this._onResize();
     });
@@ -834,8 +844,7 @@ Miew.prototype.run = function () {
     this._objectControls.enable(true);
     viewInterpolator.resume();
 
-    const device = this.webVR ? this.webVR.getDevice() : null;
-    (device || window).requestAnimationFrame(() => this._onTick());
+    this._requestAnimationFrame(() => this._onTick());
   }
 };
 
@@ -922,13 +931,12 @@ Miew.prototype._onTick = function () {
 
   this._fps.update();
 
-  const device = this.webVR ? this.webVR.getDevice() : null;
-  (device || window).requestAnimationFrame(() => this._onTick());
+  this._requestAnimationFrame(() => this._onTick());
 
   this._onUpdate();
   if (this._needRender) {
     this._onRender();
-    this._needRender = !settings.now.suspendRender || settings.now.stereo === 'WEBVR' || !!device;
+    this._needRender = !settings.now.suspendRender/* || settings.now.stereo === 'WEBVR' || !!device */;
   }
 };
 
@@ -1032,7 +1040,7 @@ Miew.prototype._onUpdate = function () {
 
   this._updateFog();
 
-  if (this._gfx.renderer.vr.enabled) {
+  if (this._gfx.renderer.xr.enabled) {
     this.webVR.updateMoleculeScale();
   }
 };
@@ -1112,7 +1120,7 @@ Miew.prototype._renderFrame = (function () {
 
     gfx.renderer2d.render(gfx.scene, gfx.camera);
 
-    if (settings.now.axes && gfx.axes && !gfx.renderer.vr.enabled) {
+    if (settings.now.axes && gfx.axes && !gfx.renderer.xr.enabled) {
       gfx.axes.render(renderer);
     }
   };
@@ -1192,7 +1200,7 @@ Miew.prototype._renderScene = (function () {
     gfx.renderer.setClearColor(settings.now.bg.color, Number(!settings.now.bg.transparent));
     gfx.renderer.setRenderTarget(target);
     gfx.renderer.clear();
-    if (gfx.renderer.vr.enabled) {
+    if (gfx.renderer.xr.enabled) {
       gfx.renderer.render(gfx.scene, camera);
       return;
     }
@@ -3668,6 +3676,7 @@ Miew.prototype._initOnSettingsChanged = function () {
   on('stereo', () => {
     if (settings.now.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
       this.webVR = new WebVRPoC(() => {
+        this._requestAnimationFrame(() => this._onTick());
         this._needRender = true;
         this._onResize();
       });
