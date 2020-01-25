@@ -121,7 +121,7 @@
     "chai-as-promised": "^7.1.1",
     "copy-webpack-plugin": "^5.1.1",
     "coveralls": "^3.0.9",
-    "cross-env": "^6.0.3",
+    "cross-env": "^7.0.0",
     "css-loader": "^3.4.0",
     "cssnano": "^4.1.10",
     "dirty-chai": "^2.0.1",
