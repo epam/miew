@@ -9,7 +9,7 @@ function initializeTerminal(viewer) {
       term.error(str);
     });
   }, {
-    greetings: 'Miew - 3D Molecular Viewer\nCopyright © 2015-2019 EPAM Systems, Inc.\n',
+    greetings: 'Miew - 3D Molecular Viewer\nCopyright © 2015-2020 EPAM Systems, Inc.\n',
     prompt: 'miew> ',
     name: 'miew',
     scrollOnEcho: true,

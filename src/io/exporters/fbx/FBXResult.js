@@ -168,7 +168,7 @@ export default class FBXResult {
     const creator = `Miew FBX Exporter v${this._info.version}`; // Supposed to be an engine
 
     return `; FBX 6.1.0 project file
-; Created by ${creator} Copyright (c) 2015-2019 EPAM Systems, Inc.
+; Created by ${creator} Copyright (c) 2015-2020 EPAM Systems, Inc.
 ; For support please contact miew@epam.com
 ; ----------------------------------------------------
 

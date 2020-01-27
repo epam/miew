@@ -1,6 +1,6 @@
 # Getting Started with Miew Development: The Beginner's Guide
 
-Copyright (c) 2015–2019 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2020 [EPAM Systems, Inc.](https://www.epam.com/)
 
 ![Miew screenshot](https://github.com/epam/miew/raw/master/README.png)
 

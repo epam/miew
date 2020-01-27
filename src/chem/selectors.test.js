@@ -2,7 +2,6 @@ import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import proxyquire from 'proxyquire';
 import selectors from './selectors';
-import Atom from './Atom';
 import ResidueType from './ResidueType';
 
 chai.use(dirtyChai);
@@ -18,7 +17,25 @@ describe('selectors', () => {
     _index: 2,
     _chain: { _name: 'B' },
   };
-  const atom = new Atom(residue, 'CA', { name: 'N' }, 1, 1, true, 5, ' ', 1, 1, 1);
+
+  const atomName = {
+    _name: 'CA',
+    getString() { return this._name; },
+  };
+
+  const atom = {
+    _residue: residue,
+    _name: atomName,
+    element: { name: 'N' },
+    _position: 1,
+    _role: 1,
+    _het: true,
+    _serial: 5,
+    _location: (' ').charCodeAt(0),
+    _occupancy: 1,
+    _temperature: 1,
+    _charge: 1,
+  };
 
   describe('#ClearContext()', () => {
     beforeEach(() => {
@@ -241,12 +258,16 @@ describe('selectors', () => {
 
   describe('PolarHSelector', () => {
     describe('#includesAtom(atom)', () => {
+      const flags = {
+        HYDROGEN: 0x0008,
+        NONPOLARH: 0x1008,
+      };
       it('includes polar atoms', () => {
-        atom.flags = Atom.Flags.HYDROGEN;
+        atom.flags = flags.HYDROGEN;
         expect(selectors.polarh().includesAtom(atom)).to.equal(true);
       });
       it('excludes nonPolar atoms', () => {
-        atom.flags = Atom.Flags.NONPOLARH;
+        atom.flags = flags.NONPOLARH;
         expect(selectors.polarh().includesAtom(atom)).to.equal(false);
       });
     });
@@ -254,12 +275,16 @@ describe('selectors', () => {
 
   describe('NonPolarHSelector', () => {
     describe('#includesAtom(atom)', () => {
+      const flags = {
+        HYDROGEN: 0x0008,
+        NONPOLARH: 0x1008,
+      };
       it('includes nonPolar atoms', () => {
-        atom.flags = Atom.Flags.NONPOLARH;
+        atom.flags = flags.NONPOLARH;
         expect(selectors.nonpolarh().includesAtom(atom)).to.equal(true);
       });
       it('excludes polar atoms', () => {
-        atom.flags = Atom.Flags.HYDROGEN;
+        atom.flags = flags.HYDROGEN;
         expect(selectors.nonpolarh().includesAtom(atom)).to.equal(false);
       });
     });
