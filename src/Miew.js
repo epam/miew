@@ -595,14 +595,7 @@ Miew.prototype._initGfx = function () {
   this._gfx = gfx;
   this._showCanvas();
 
-  if (settings.now.stereo === 'WEBVR') { // TODO move the separate function
-    this.webVR = new WebVRPoC(() => {
-      this._requestAnimationFrame(() => this._onTick()); // update due to mode switching
-      this._needRender = true;
-      this._onResize();
-    });
-    this.webVR.toggle(true, gfx);
-  }
+  this._embedWebXR(settings.now.stereo === 'WEBVR');
 
   this._container.appendChild(gfx.renderer2d.getElement());
 
@@ -936,7 +929,7 @@ Miew.prototype._onTick = function () {
   this._onUpdate();
   if (this._needRender) {
     this._onRender();
-    this._needRender = !settings.now.suspendRender/* || settings.now.stereo === 'WEBVR' || !!device */;
+    this._needRender = !settings.now.suspendRender || settings.now.stereo === 'WEBVR';
   }
 };
 
@@ -3553,6 +3546,26 @@ Miew.prototype._fogAlphaChanged = function () {
   });
 };
 
+Miew.prototype._embedWebXR = function () {
+  // switch off
+  if (settings.now.stereo !== 'WEBVR') {
+    if (this.webVR) {
+      this.webVR.disable();
+    }
+    this.webVR = null;
+    return;
+  }
+  // switch on
+  if (!this.webVR) {
+    this.webVR = new WebVRPoC(() => {
+      this._requestAnimationFrame(() => this._onTick());
+      this._needRender = true;
+      this._onResize();
+    });
+  }
+  this.webVR.enable(this._gfx);
+};
+
 Miew.prototype._initOnSettingsChanged = function () {
   const on = (props, func) => {
     props = _.isArray(props) ? props : [props];
@@ -3674,16 +3687,7 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('stereo', () => {
-    if (settings.now.stereo === 'WEBVR' && typeof this.webVR === 'undefined') {
-      this.webVR = new WebVRPoC(() => {
-        this._requestAnimationFrame(() => this._onTick());
-        this._needRender = true;
-        this._onResize();
-      });
-    }
-    if (this.webVR) {
-      this.webVR.toggle(settings.now.stereo === 'WEBVR', this._gfx);
-    }
+    this._embedWebXR(settings.now.stereo === 'WEBVR');
     this._needRender = true;
   });
 

@@ -3,9 +3,6 @@
  * VRDisplay::requestPresent should be called from user gesture:
  * https://developer.mozilla.org/en-US/docs/Web/API/VRDisplay/requestPresent
  */
-
-import * as THREE from 'three';
-
 export default function (webVRPoC) {
   function showEnterVR(button) {
     button.style.display = '';
@@ -25,7 +22,7 @@ export default function (webVRPoC) {
 
     function onSessionStarted(session) {
       session.addEventListener('end', onSessionEnded);
-      webVRPoC._gfx.renderer.xr.setReferenceSpaceType('local'); // TODO try to move it into callback below
+      webVRPoC._gfx.renderer.xr.setReferenceSpaceType('local');
       webVRPoC._gfx.renderer.xr.setSession(session);
       button.textContent = 'EXIT VR';
       currentSession = session;
@@ -45,7 +42,7 @@ export default function (webVRPoC) {
 
         const sessionInit = { optionalFeatures: ['local-floor', 'bounded-floor'] };
         navigator.xr.requestSession('immersive-vr', sessionInit).then(onSessionStarted);
-        webVRPoC.moveSceneBegindHeadset();
+        webVRPoC.moveSceneBehindHeadset();
       } else {
         currentSession.end();
       }
@@ -82,9 +79,7 @@ export default function (webVRPoC) {
     const button = document.createElement('button');
     button.style.display = 'none';
     stylizeElement(button);
-    navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
-      return supported ? showEnterVR(button) : showWebXRNotFound();
-    });
+    navigator.xr.isSessionSupported('immersive-vr').then((supported) => (supported ? showEnterVR(button) : showWebXRNotFound(button)));
     return button;
   }
   const message = document.createElement('a');
