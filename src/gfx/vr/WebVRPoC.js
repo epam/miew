@@ -8,7 +8,6 @@ import UberMaterial from '../shaders/UberMaterial';
 export default class WebVRPoC {
   constructor(onToggle) {
     this._mainCamera = new THREE.PerspectiveCamera();
-    this._cameraWasStored = false; // TODO remove the parametr, just nullify thec_mainCamera
     this._button = null;
     this._onToggle = onToggle;
 
@@ -89,7 +88,6 @@ export default class WebVRPoC {
     // TODO new method 'holdMiewScene'
     // store common scene camera
     this._mainCamera.copy(gfx.camera);
-    this._cameraWasStored = true;
     // add hierarchical structure for webVR into scene
     if (this._user) {
       gfx.scene.add(this._user);
@@ -135,7 +133,7 @@ export default class WebVRPoC {
     }
     settings.set('fog', true); // FIXME restore fog setting
     // restore common camera
-    if (this._cameraWasStored && camera) {
+    if (this._mainCamera && camera) {
       camera.copy(this._mainCamera);
     }
     // turn off webvr transformation
@@ -173,11 +171,8 @@ export default class WebVRPoC {
     if (!this._controller1 || !this._controller2) {
       return;
     }
-    // this._controller1.update();
-    // this._controller2.update();
 
     const self = this;
-
     // update molecule scaling by controllers
     if (self._pressedGripsCounter === 2) {
       // recalc scaling pivot
@@ -211,7 +206,7 @@ export default class WebVRPoC {
     container.matrixWorld.multiplyMatrices(camera.matrixWorld, container.matrix);
     // readd to scene
     gfx.scene.addSavingWorldTransform(container);
-    if (this._onToggle) { //  TODO is it needed?
+    if (this._onToggle) {
       this._onToggle(true);
     }
   }
