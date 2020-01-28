@@ -83,9 +83,10 @@ export default class WebVRPoC {
     } else {
       this._button.style.display = 'block';
     }
-    // TODO add storage
+    // store fog setting
+    this._mainFog = settings.now.fog;
     settings.set('fog', false);
-    // TODO new method 'holdMiewScene'
+    //  new method 'holdMiewScene'
     // store common scene camera
     this._mainCamera.copy(gfx.camera);
     // add hierarchical structure for webVR into scene
@@ -131,7 +132,8 @@ export default class WebVRPoC {
     if (this._button) {
       this._button.style.display = 'none';
     }
-    settings.set('fog', true); // FIXME restore fog setting
+    // restore fog param
+    settings.set('fog', this._mainFog);
     // restore common camera
     if (this._mainCamera && camera) {
       camera.copy(this._mainCamera);
