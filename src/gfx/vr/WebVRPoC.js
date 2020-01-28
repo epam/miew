@@ -86,13 +86,11 @@ export default class WebVRPoC {
     // store fog setting
     this._mainFog = settings.now.fog;
     settings.set('fog', false);
-    //  new method 'holdMiewScene'
+    // TODO new method 'holdMiewScene'
     // store common scene camera
     this._mainCamera.copy(gfx.camera);
     // add hierarchical structure for webVR into scene
-    if (this._user) {
-      gfx.scene.add(this._user);
-    }
+    gfx.scene.add(this._user);
     // turn on webvr transformation
     gfx.scene.add(this._molContainer);
     this._molContainer.add(gfx.root);
@@ -127,6 +125,10 @@ export default class WebVRPoC {
 
     // nullify webxr callback for animation frame
     renderer.setAnimationLoop(null);
+    const session = renderer.xr.getSession();
+    if (session) {
+      session.end();
+    }
     renderer.xr.enabled = false;
     // remove button of VR entering
     if (this._button) {
