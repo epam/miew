@@ -108,6 +108,11 @@ export default class WebVRPoC {
     this._controller2.addEventListener('selectstart', (event) => this.handleGripsDown(event));
     this._controller2.addEventListener('selectend', (event) => this.handleGripsUp(event));
 
+    this._controller1.addEventListener('squeezestart', (event) => this.handleGripsDown(event));
+    this._controller1.addEventListener('squeezeend', (event) => this.handleGripsUp(event));
+    this._controller2.addEventListener('squeezestart', (event) => this.handleGripsDown(event));
+    this._controller2.addEventListener('squeezeend', (event) => this.handleGripsUp(event));
+
     // make some Miew job
     if (this._onToggle) {
       this._onToggle(true);
