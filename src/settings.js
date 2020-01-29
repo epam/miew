@@ -875,7 +875,7 @@ const defaults = {
    * @type {string}
    * @instance
    */
-  stereo: 'WEBVR',
+  stereo: 'NONE',
 
   /**
    * Enable smooth transition between views
