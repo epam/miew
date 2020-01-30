@@ -174,79 +174,41 @@ class ComplexVisual extends Visual {
     if (index === this._reprList.length) {
       this.repAdd(rep);
       status = 'created';
-      rep = undefined;
       logger.warn(`Rep ${index} does not exist! New representation was created.`);
     }
 
     // gather description
     const target = this._reprList[index];
+
+    // if modification is requested
+    if (rep && status !== 'created') {
+      const diff = target.change(rep, this._complex);
+
+      // finalize
+      if (diff) {
+        status = 'changed';
+        target.needsRebuild = true;
+        for (const key in diff) {
+          if (diff.hasOwnProperty(key)) {
+            logger.debug(`rep[${index}].${key} changed to${diff.key}`);
+          }
+        }
+
+        // safety trick: lower resolution for surface modes
+        if (diff.mode && target.mode.isSurface
+          && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
+          logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
+          settings.set('resolution', 'medium');
+        }
+      }
+    }
+
     const desc = {
       selector: target.selectorString,
       mode: target.mode.identify(),
       colorer: target.colorer.identify(),
       material: target.materialPreset.id,
     };
-
-    // if modification is requested
-    if (rep) {
-      // modify selector
-      if (rep.selector) {
-        const newSelectorObject = selectors.parse(rep.selector).selector;
-        const newSelector = String(newSelectorObject);
-        if (desc.selector !== newSelector) {
-          target.selectorString = desc.selector = newSelector;
-          target.selector = newSelectorObject;
-          target.markAtoms(this._complex);
-          status = 'changed';
-          logger.debug(`rep[${index}].selector changed to${newSelector}`);
-        }
-      }
-
-      // modify mode
-      if (rep.mode) {
-        const newMode = rep.mode;
-        if (!_.isEqual(desc.mode, newMode)) {
-          desc.mode = newMode;
-          target.setMode(lookupAndCreate(modes, rep.mode));
-          status = 'changed';
-          logger.debug(`rep[${index}].mode changed to ${newMode}`);
-
-          // safety trick: lower resolution for surface modes
-          if (target.mode.isSurface
-            && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
-            logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
-            settings.set('resolution', 'medium');
-          }
-        }
-      }
-
-      // modify colorer
-      if (rep.colorer) {
-        const newColorer = rep.colorer;
-        if (!_.isEqual(desc.colorer, newColorer)) {
-          desc.colorer = newColorer;
-          target.colorer = lookupAndCreate(colorers, rep.colorer);
-          status = 'changed';
-          logger.debug(`rep[${index}].colorer changed to ${newColorer}`);
-        }
-      }
-
-      // modify material
-      if (rep.material) {
-        const newMaterial = rep.material;
-        if (!_.isEqual(desc.material, newMaterial)) {
-          desc.material = newMaterial;
-          target.setMaterialPreset(materials.get(rep.material));
-          status = 'changed';
-          logger.debug(`rep[${index}].material changed to${newMaterial}`);
-        }
-      }
-
-      // finalize
-      if (status === 'changed') {
-        target.needsRebuild = true;
-      }
-    }
 
     return {
       desc,
