@@ -4,7 +4,7 @@
  * https://developer.mozilla.org/en-US/docs/Web/API/VRDisplay/requestPresent
  */
 export default function (webVRPoC) {
-  function showEnterVR(display, button) {
+  function showEnterVR(button) {
     button.style.display = '';
     button.style.cursor = 'pointer';
     button.style.left = 'calc(50% - 50px)';
@@ -12,21 +12,44 @@ export default function (webVRPoC) {
 
     button.textContent = 'ENTER VR';
 
+    let currentSession = null;
+
+    function onSessionEnded(/* event */) {
+      currentSession.removeEventListener('end', onSessionEnded);
+      button.textContent = 'ENTER VR';
+      currentSession = null;
+    }
+
+    function onSessionStarted(session) {
+      session.addEventListener('end', onSessionEnded);
+      webVRPoC._gfx.renderer.xr.setReferenceSpaceType('local');
+      webVRPoC._gfx.renderer.xr.setSession(session);
+      button.textContent = 'EXIT VR';
+      currentSession = session;
+    }
+
     button.onmouseenter = function () { button.style.opacity = '1.0'; };
     button.onmouseleave = function () { button.style.opacity = '0.5'; };
 
     button.onclick = function () {
-      if (display.isPresenting) {
-        display.exitPresent();
+      if (currentSession === null) {
+        // WebXR's requestReferenceSpace only works if the corresponding feature
+        // was requested at session creation time. For simplicity, just ask for
+        // the interesting ones as optional features, but be aware that the
+        // requestReferenceSpace call will fail if it turns out to be unavailable.
+        // ('local' is always available for immersive sessions and doesn't need to
+        // be requested separately.)
+
+        const sessionInit = { optionalFeatures: ['local-floor', 'bounded-floor'] };
+        navigator.xr.requestSession('immersive-vr', sessionInit).then(onSessionStarted);
+        webVRPoC.moveSceneBehindHeadset();
       } else {
-        display.requestPresent([{ source: webVRPoC.getCanvas() }]);
-        webVRPoC.translateMolecule();
+        currentSession.end();
       }
     };
-    webVRPoC.setDevice(display);
   }
 
-  function showVRNotFound(button) {
+  function showWebXRNotFound(button) {
     button.style.display = '';
     button.style.cursor = 'auto';
     button.style.left = 'calc(50% - 75px)';
@@ -35,8 +58,6 @@ export default function (webVRPoC) {
     button.onmouseenter = null;
     button.onmouseleave = null;
     button.onclick = null;
-
-    webVRPoC.setDevice(null);
   }
 
   function stylizeElement(element) {
@@ -54,32 +75,18 @@ export default function (webVRPoC) {
     element.style.zIndex = '999';
   }
 
-  if ('getVRDisplays' in navigator) {
+  if ('xr' in navigator) {
     const button = document.createElement('button');
     button.style.display = 'none';
     stylizeElement(button);
-    window.addEventListener('vrdisplayconnect', (event) => {
-      showEnterVR(event.display, button);
-    }, false);
-    window.addEventListener('vrdisplaydisconnect', (_event) => {
-      showVRNotFound(button);
-    }, false);
-    window.addEventListener('vrdisplaypresentchange', (event) => {
-      button.textContent = event.display.isPresenting ? 'EXIT VR' : 'ENTER VR';
-    }, false);
-    navigator.getVRDisplays()
-      .then((displays) => {
-        if (displays.length > 0) {
-          showEnterVR(displays[0], button);
-        } else {
-          showVRNotFound(button);
-        }
-      });
+    navigator.xr.isSessionSupported('immersive-vr').then((supported) => (
+      supported ? showEnterVR(button) : showWebXRNotFound(button)
+    ));
     return button;
   }
   const message = document.createElement('a');
   message.href = 'https://webvr.info';
-  message.innerHTML = 'WEBVR NOT SUPPORTED';
+  message.innerHTML = 'WEBXR NOT SUPPORTED';
   message.style.left = 'calc(50% - 90px)';
   message.style.width = '180px';
   message.style.textDecoration = 'none';
