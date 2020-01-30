@@ -3,21 +3,10 @@ import * as THREE from 'three';
 import UberMaterial from './shaders/UberMaterial';
 import gfxutils from './gfxutils';
 import settings from '../settings';
-import modes from './modes';
-import colorers from './colorers';
 import materials from './materials';
 import chem from '../chem';
 
 const { selectors } = chem;
-
-function lookupAndCreate(entityList, specs) {
-  if (!Array.isArray(specs)) {
-    specs = [specs];
-  }
-  const [id, opts] = specs;
-  const Entity = entityList.get(id) || entityList.first;
-  return new Entity(opts);
-}
 
 class Representation {
   constructor(index, mode, colorer, selector) {
@@ -153,7 +142,7 @@ class Representation {
   /**
    * Change representation. Write fields what was changed into new object, return it.
    */
-  change(repSettings, complex) {
+  change(repSettings, complex, mode, color) {
     const diff = {};
 
     // modify selector
@@ -173,7 +162,7 @@ class Representation {
       const newMode = repSettings.mode;
       if (!_.isEqual(this.mode, newMode)) {
         diff.mode = newMode;
-        this.setMode(lookupAndCreate(modes, repSettings.mode));
+        this.setMode(mode);
       }
     }
 
@@ -182,7 +171,7 @@ class Representation {
       const newColorer = repSettings.colorer;
       if (!_.isEqual(this.colorer, newColorer)) {
         diff.colorer = newColorer;
-        this.colorer = lookupAndCreate(colorers, repSettings.colorer);
+        this.colorer = color;
       }
     }
 

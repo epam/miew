@@ -182,7 +182,9 @@ class ComplexVisual extends Visual {
 
     // if modification is requested
     if (rep && status !== 'created') {
-      const diff = target.change(rep, this._complex);
+      const diff = target.change(rep, this._complex,
+        lookupAndCreate(modes, rep.mode),
+        lookupAndCreate(colorers, rep.colorer));
 
       // finalize
       if (diff) {
