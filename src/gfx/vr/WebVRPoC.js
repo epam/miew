@@ -86,7 +86,17 @@ export default class WebVRPoC {
     // store fog setting
     this._mainFog = settings.now.fog;
     settings.set('fog', false);
-    // TODO new method 'holdMiewScene'
+
+    this._plugVRNodesIntoScene(gfx, renderer);
+    this._setControllersListeners();
+
+    // make some Miew job
+    if (this._onToggle) {
+      this._onToggle(true);
+    }
+  }
+
+  _plugVRNodesIntoScene(gfx, renderer) {
     // store common scene camera
     this._mainCamera.copy(gfx.camera);
     // add hierarchical structure for webVR into scene
@@ -102,13 +112,6 @@ export default class WebVRPoC {
     this._controller2.add(mesh.clone());
     this._user.add(this._controller1);
     this._user.add(this._controller2);
-
-    this._setControllersListeners();
-
-    // make some Miew job
-    if (this._onToggle) {
-      this._onToggle(true);
-    }
   }
 
   _setControllersListeners() {
@@ -161,6 +164,16 @@ export default class WebVRPoC {
     }
     // restore fog param
     settings.set('fog', this._mainFog);
+
+    this._unplugVRNodesFromScene(camera);
+
+    // make some Miew job
+    if (this._onToggle) {
+      this._onToggle(false);
+    }
+  }
+
+  _unplugVRNodesFromScene(camera) {
     // restore common camera
     if (this._mainCamera && camera) {
       camera.copy(this._mainCamera);
@@ -179,10 +192,6 @@ export default class WebVRPoC {
     this._user = null;
     this._controller1 = null;
     this._controller2 = null;
-    // make some Miew job
-    if (this._onToggle) {
-      this._onToggle(false);
-    }
   }
 
   _createControllerMesh() {
