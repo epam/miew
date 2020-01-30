@@ -177,7 +177,6 @@ class ComplexVisual extends Visual {
       logger.warn(`Rep ${index} does not exist! New representation was created.`);
     }
 
-    // gather description
     const target = this._reprList[index];
 
     // if modification is requested
