@@ -2,7 +2,7 @@ version: "2"
 plugins:
   eslint:
     enabled: true
-    channel: "eslint-6"
+    channel: "eslint-5"
   fixme:
     enabled: true
   duplication:
