@@ -184,33 +184,31 @@ class ComplexVisual extends Visual {
       material: target.materialPreset.id,
     };
 
-    // no modification is requested
-    if (!rep) {
-      return { desc, index, status: '' };
-    }
+    // modification is requested
+    if (rep) {
+      // modify
+      const diff = target.change(rep, this._complex,
+        lookupAndCreate(modes, rep.mode),
+        lookupAndCreate(colorers, rep.colorer));
 
-    // modify
-    const diff = target.change(rep, this._complex,
-      lookupAndCreate(modes, rep.mode),
-      lookupAndCreate(colorers, rep.colorer));
-
-    // something was changed
-    if (diff) {
-      target.needsRebuild = true;
-      for (const key in diff) {
-        if (diff.hasOwnProperty(key)) {
-          desc.key = diff.key;
-          logger.debug(`rep[${index}].${key} changed to${diff.key}`);
+      // something was changed
+      if (diff) {
+        target.needsRebuild = true;
+        for (const key in diff) {
+          if (diff.hasOwnProperty(key)) {
+            desc.key = diff.key;
+            logger.debug(`rep[${index}].${key} changed to${diff.key}`);
+          }
         }
-      }
 
-      // safety trick: lower resolution for surface modes
-      if (diff.mode && target.mode.isSurface
-        && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
-        logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
-        settings.set('resolution', 'medium');
+        // safety trick: lower resolution for surface modes
+        if (diff.mode && target.mode.isSurface
+          && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
+          logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
+          settings.set('resolution', 'medium');
+        }
+        return { desc, index, status: 'changed' };
       }
-      return { desc, index, status: 'changed' };
     }
     return { desc, index, status: '' };
   }
