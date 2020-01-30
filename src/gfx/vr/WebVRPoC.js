@@ -103,20 +103,40 @@ export default class WebVRPoC {
     this._user.add(this._controller1);
     this._user.add(this._controller2);
 
-    this._controller1.addEventListener('selectstart', (event) => this.handleGripsDown(event));
-    this._controller1.addEventListener('selectend', (event) => this.handleGripsUp(event));
-    this._controller2.addEventListener('selectstart', (event) => this.handleGripsDown(event));
-    this._controller2.addEventListener('selectend', (event) => this.handleGripsUp(event));
-
-    this._controller1.addEventListener('squeezestart', (event) => this.handleGripsDown(event));
-    this._controller1.addEventListener('squeezeend', (event) => this.handleGripsUp(event));
-    this._controller2.addEventListener('squeezestart', (event) => this.handleGripsDown(event));
-    this._controller2.addEventListener('squeezeend', (event) => this.handleGripsUp(event));
+    this._setControllersListeners();
 
     // make some Miew job
     if (this._onToggle) {
       this._onToggle(true);
     }
+  }
+
+  _setControllersListeners() {
+    this._controller1.addEventListener('selectstart', (event) => {
+      this.handleGripsDown(event);
+    });
+    this._controller1.addEventListener('selectend', (event) => {
+      this.handleGripsUp(event);
+    });
+    this._controller2.addEventListener('selectstart', (event) => {
+      this.handleGripsDown(event);
+    });
+    this._controller2.addEventListener('selectend', (event) => {
+      this.handleGripsUp(event);
+    });
+
+    this._controller1.addEventListener('squeezestart', (event) => {
+      this.handleGripsDown(event);
+    });
+    this._controller1.addEventListener('squeezeend', (event) => {
+      this.handleGripsUp(event);
+    });
+    this._controller2.addEventListener('squeezestart', (event) => {
+      this.handleGripsDown(event);
+    });
+    this._controller2.addEventListener('squeezeend', (event) => {
+      this.handleGripsUp(event);
+    });
   }
 
   disable() {

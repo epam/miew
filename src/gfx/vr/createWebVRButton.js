@@ -79,7 +79,9 @@ export default function (webVRPoC) {
     const button = document.createElement('button');
     button.style.display = 'none';
     stylizeElement(button);
-    navigator.xr.isSessionSupported('immersive-vr').then((supported) => (supported ? showEnterVR(button) : showWebXRNotFound(button)));
+    navigator.xr.isSessionSupported('immersive-vr').then((supported) => (
+      supported ? showEnterVR(button) : showWebXRNotFound(button)
+    ));
     return button;
   }
   const message = document.createElement('a');
