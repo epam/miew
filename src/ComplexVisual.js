@@ -170,20 +170,9 @@ class ComplexVisual extends Visual {
 
     // a special case of adding just after the end
     if (index === this._reprList.length) {
-      this.repAdd(rep);
+      const res = this.repAdd(rep);
       logger.warn(`Rep ${index} does not exist! New representation was created.`);
-
-      const newRep = this._reprList[index];
-      return {
-        desc: {
-          selector: newRep.selectorString,
-          mode: newRep.mode.identify(),
-          colorer: newRep.colorer.identify(),
-          material: newRep.materialPreset.id,
-        },
-        index,
-        status: 'created',
-      };
+      return { desc: res.desc, index, status: 'created' };
     }
 
     // gather description
@@ -201,7 +190,10 @@ class ComplexVisual extends Visual {
     }
 
     // modify
-    const diff = target.change(rep, this._complex, lookupAndCreate(modes, rep.mode), lookupAndCreate(colorers, rep.colorer));
+    const diff = target.change(rep, this._complex,
+      lookupAndCreate(modes, rep.mode),
+      lookupAndCreate(colorers, rep.colorer));
+
     // something was changed
     if (diff) {
       target.needsRebuild = true;
@@ -256,16 +248,16 @@ class ComplexVisual extends Visual {
   /**
    * Add new representation.
    * @param {object=} rep - Representation description.
-   * @returns {number} Index of the new representation.
+   * @returns {Object} {desc, index} field desc contains added rep description, index - index of this rep.
    */
   repAdd(rep) {
     if (this._reprList.length >= ComplexVisual.NUM_REPRESENTATION_BITS) {
-      return -1;
+      return null;
     }
 
     const newSelectionBit = this._getFreeReprIdx();
     if (newSelectionBit < 0) {
-      return -1; // no more slots for representations
+      return null; // no more slots for representations
     }
 
     const originalSelection = this.buildSelectorFromMask(1 << this._selectionBit);
@@ -298,7 +290,7 @@ class ComplexVisual extends Visual {
     // restore selection using new selection bit
     this._complex.markAtoms(originalSelection, 1 << this._selectionBit);
 
-    return this._reprList.length - 1;
+    return { desc, index: this._reprList.length - 1 };
   }
 
   /**
