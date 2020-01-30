@@ -49,6 +49,7 @@ module.exports = {
     'no-multi-assign': 'off',
     'no-nested-ternary': 'off',
     'class-methods-use-this': 'off',
+    'arrow-parens': 'error',
 
     // issues to evaluate and fix
     'no-console': 'off', // 30 problems
