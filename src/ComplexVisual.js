@@ -168,42 +168,26 @@ class ComplexVisual extends Visual {
       return null;
     }
 
-    let status = '';
-
     // a special case of adding just after the end
     if (index === this._reprList.length) {
       this.repAdd(rep);
-      status = 'created';
       logger.warn(`Rep ${index} does not exist! New representation was created.`);
+
+      const newRep = this._reprList[index];
+      return {
+        desc: {
+          selector: newRep.selectorString,
+          mode: newRep.mode.identify(),
+          colorer: newRep.colorer.identify(),
+          material: newRep.materialPreset.id,
+        },
+        index,
+        status: 'created',
+      };
     }
 
+    // gather description
     const target = this._reprList[index];
-
-    // if modification is requested
-    if (rep && status !== 'created') {
-      const diff = target.change(rep, this._complex,
-        lookupAndCreate(modes, rep.mode),
-        lookupAndCreate(colorers, rep.colorer));
-
-      // finalize
-      if (diff) {
-        status = 'changed';
-        target.needsRebuild = true;
-        for (const key in diff) {
-          if (diff.hasOwnProperty(key)) {
-            logger.debug(`rep[${index}].${key} changed to${diff.key}`);
-          }
-        }
-
-        // safety trick: lower resolution for surface modes
-        if (diff.mode && target.mode.isSurface
-          && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
-          logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
-          settings.set('resolution', 'medium');
-        }
-      }
-    }
-
     const desc = {
       selector: target.selectorString,
       mode: target.mode.identify(),
@@ -211,11 +195,32 @@ class ComplexVisual extends Visual {
       material: target.materialPreset.id,
     };
 
-    return {
-      desc,
-      index,
-      status,
-    };
+    // no modification is requested
+    if (!rep) {
+      return { desc, index, status: '' };
+    }
+
+    // modify
+    const diff = target.change(rep, this._complex, lookupAndCreate(modes, rep.mode), lookupAndCreate(colorers, rep.colorer));
+    // something was changed
+    if (diff) {
+      target.needsRebuild = true;
+      for (const key in diff) {
+        if (diff.hasOwnProperty(key)) {
+          desc.key = diff.key;
+          logger.debug(`rep[${index}].${key} changed to${diff.key}`);
+        }
+      }
+
+      // safety trick: lower resolution for surface modes
+      if (diff.mode && target.mode.isSurface
+        && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
+        logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
+        settings.set('resolution', 'medium');
+      }
+      return { desc, index, status: 'changed' };
+    }
+    return { desc, index, status: '' };
   }
 
 
