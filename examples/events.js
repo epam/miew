@@ -17,6 +17,14 @@
     viewer.load('pdb:1CRN');
   });
 
+  document.getElementById('repAdd').addEventListener('click', function () {
+    viewer._extractRepresentation();
+  });
+
+  document.getElementById('aoChange').addEventListener('change', function () {
+    viewer.set('ao', this.checked);
+  });
+
   const msg = document.getElementById('messages');
   const liStile = 'list-style-type: none; margin: 6px; text-align: center; padding: 10px; border-radius: 5px; color: #ffffff;';
 
