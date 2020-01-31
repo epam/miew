@@ -180,7 +180,9 @@ export default class WebVRPoC {
     }
     // turn off webvr transformation
     const root = this._molContainer.children[0];
-    if (root) this._gfx.scene.add(root);
+    if (root) {
+      this._gfx.scene.add(root);
+    }
     this._molContainer.parent.remove(this._molContainer);
     if (this._user) {
       this._gfx.scene.remove(this._user);
