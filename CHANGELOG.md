@@ -6,6 +6,36 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.6] - 2020-01-31
+### Added
+- Add dispatching of new events (https://github.com/epam/miew/blob/master/docs/tutorials/events.md):
+   - `translate` fires when molecule is translated with RMB
+   - `translatePivot` fires when editing pivot is translated with RMB 
+   - `repAdded`, `repChanged`, `repDeleted` fires on a representation set changes
+   - `fetching`, `exporting`, `exportingDone`
+- Add an example for the events usage and events description document
+
+### Changed
+- Refactor Event system (https://github.com/epam/miew/blob/master/docs/tutorials/events.md)
+   - Data in `rotate` event is replaced with `quaternion` instead of `angle`
+   - Rename `fetchingFinished`->`fetchingDone`, `parsingFinished`->`parsingDone`, old versions are deprecated
+   - Rename `parse`->`parsing`, `load`->`loading`, `rebuild`->`rebuilding`, old versions are deprecated
+ 
+### Deprecated
+- Deprecate broken animation API until refactoring of animation system: `Miew._startAnimation()`, `Miew._stopAnimation()`, `Miew._pauseAnimation()`, `Miew._continueAnimation()`
+- Deprecate using of obsolete performance profiler via `Miew.benchmarkGfx()`
+- Deprecate the set of obsolete events: 
+   - `onParseDone`, `onParseError`, use `parsingDone`  instead
+   - `profile`, due to deprecation of the whole profiling system
+   - `mdPlayerStateChanged` due to deprecation of animation system usage
+   - `repAdd`, use `repAdded` instead
+
+### Fixed
+
+### Internal
+- Decrease a number of unneeded object creations in `ObjectControls`
+- Migrate from WebVR to WebXR usage in stereo mode `WEBVR`
+
 ## [0.8.5] - 2019-12-27
 ### Added
 - Add parameter of line thickness for Outline effect
@@ -527,7 +557,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.8.5...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.8.6...HEAD
+[0.8.6]: https://github.com/epam/miew/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/epam/miew/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/epam/miew/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/epam/miew/compare/v0.8.2...v0.8.3
