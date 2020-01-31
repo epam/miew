@@ -2429,21 +2429,21 @@ Miew.prototype._extractRepresentation = function () {
 
     const selector = visual.buildSelectorFromMask(1 << visual.getSelectionBit());
     const defPreset = settings.now.presets.default;
-    const idx = visual.repAdd({
+    const res = visual.repAdd({
       selector,
       mode: defPreset[0].mode.id,
       colorer: defPreset[0].colorer.id,
       material: defPreset[0].material.id,
     });
-    if (idx < 0) {
+    if (!res) {
       if (visual.repCount() === ComplexVisual.NUM_REPRESENTATION_BITS) {
         this.logger.warn(`Number of representations is limited to ${ComplexVisual.NUM_REPRESENTATION_BITS}`);
       }
       return;
     }
 
-    this.dispatchEvent({ type: 'repAdded', index: idx, name: visual.name });
-    visual.repCurrent(idx);
+    this.dispatchEvent({ type: 'repAdded', index: res.index, name: visual.name });
+    visual.repCurrent(res.index);
 
     changed.push(visual.name);
   });
@@ -2569,11 +2569,12 @@ Miew.prototype.repAdd = function (rep, name) {
     return -1;
   }
 
-  const index = visual.repAdd(rep);
-  if (index >= 0) {
-    this.dispatchEvent({ type: 'repAdded', index, name });
+  const res = visual.repAdd(rep);
+  if (res) {
+    this.dispatchEvent({ type: 'repAdded', index: res.index, name });
+    return res.index;
   }
-  return index;
+  return -1;
 };
 
 /**

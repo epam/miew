@@ -168,14 +168,11 @@ class ComplexVisual extends Visual {
       return null;
     }
 
-    let status = '';
-
     // a special case of adding just after the end
     if (index === this._reprList.length) {
-      this.repAdd(rep);
-      status = 'created';
-      rep = undefined;
+      const res = this.repAdd(rep);
       logger.warn(`Rep ${index} does not exist! New representation was created.`);
+      return { desc: res.desc, index, status: 'created' };
     }
 
     // gather description
@@ -187,72 +184,33 @@ class ComplexVisual extends Visual {
       material: target.materialPreset.id,
     };
 
-    // if modification is requested
+    // modification is requested
     if (rep) {
-      // modify selector
-      if (rep.selector) {
-        const newSelectorObject = selectors.parse(rep.selector).selector;
-        const newSelector = String(newSelectorObject);
-        if (desc.selector !== newSelector) {
-          target.selectorString = desc.selector = newSelector;
-          target.selector = newSelectorObject;
-          target.markAtoms(this._complex);
-          status = 'changed';
-          logger.debug(`rep[${index}].selector changed to${newSelector}`);
-        }
-      }
+      // modify
+      const diff = target.change(rep, this._complex,
+        lookupAndCreate(modes, rep.mode),
+        lookupAndCreate(colorers, rep.colorer));
 
-      // modify mode
-      if (rep.mode) {
-        const newMode = rep.mode;
-        if (!_.isEqual(desc.mode, newMode)) {
-          desc.mode = newMode;
-          target.setMode(lookupAndCreate(modes, rep.mode));
-          status = 'changed';
-          logger.debug(`rep[${index}].mode changed to ${newMode}`);
-
-          // safety trick: lower resolution for surface modes
-          if (target.mode.isSurface
-            && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
-            logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
-            settings.set('resolution', 'medium');
+      // something was changed
+      if (diff) {
+        target.needsRebuild = true;
+        for (const key in diff) {
+          if (diff.hasOwnProperty(key)) {
+            desc.key = diff.key;
+            logger.debug(`rep[${index}].${key} changed to${diff.key}`);
           }
         }
-      }
 
-      // modify colorer
-      if (rep.colorer) {
-        const newColorer = rep.colorer;
-        if (!_.isEqual(desc.colorer, newColorer)) {
-          desc.colorer = newColorer;
-          target.colorer = lookupAndCreate(colorers, rep.colorer);
-          status = 'changed';
-          logger.debug(`rep[${index}].colorer changed to ${newColorer}`);
+        // safety trick: lower resolution for surface modes
+        if (diff.mode && target.mode.isSurface
+          && (settings.now.resolution === 'ultra' || settings.now.resolution === 'high')) {
+          logger.report('Surface resolution was changed to "medium" to avoid hang-ups.');
+          settings.set('resolution', 'medium');
         }
-      }
-
-      // modify material
-      if (rep.material) {
-        const newMaterial = rep.material;
-        if (!_.isEqual(desc.material, newMaterial)) {
-          desc.material = newMaterial;
-          target.setMaterialPreset(materials.get(rep.material));
-          status = 'changed';
-          logger.debug(`rep[${index}].material changed to${newMaterial}`);
-        }
-      }
-
-      // finalize
-      if (status === 'changed') {
-        target.needsRebuild = true;
+        return { desc, index, status: 'changed' };
       }
     }
-
-    return {
-      desc,
-      index,
-      status,
-    };
+    return { desc, index, status: '' };
   }
 
 
@@ -288,16 +246,16 @@ class ComplexVisual extends Visual {
   /**
    * Add new representation.
    * @param {object=} rep - Representation description.
-   * @returns {number} Index of the new representation.
+   * @returns {Object} {desc, index} field desc contains added rep description, index - index of this rep.
    */
   repAdd(rep) {
     if (this._reprList.length >= ComplexVisual.NUM_REPRESENTATION_BITS) {
-      return -1;
+      return null;
     }
 
     const newSelectionBit = this._getFreeReprIdx();
     if (newSelectionBit < 0) {
-      return -1; // no more slots for representations
+      return null; // no more slots for representations
     }
 
     const originalSelection = this.buildSelectorFromMask(1 << this._selectionBit);
@@ -330,7 +288,7 @@ class ComplexVisual extends Visual {
     // restore selection using new selection bit
     this._complex.markAtoms(originalSelection, 1 << this._selectionBit);
 
-    return this._reprList.length - 1;
+    return { desc, index: this._reprList.length - 1 };
   }
 
   /**
