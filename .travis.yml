@@ -25,7 +25,7 @@ after_success:
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then /tmp/cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
 deploy:
   - provider: npm
-    skip_cleanup: true
+    cleanup: true
     email: "$NPM_EMAIL"
     api_key: "$NPM_AUTH_TOKEN"
     tag: latest
@@ -34,7 +34,7 @@ deploy:
       node: "10"
       condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$
   - provider: script
-    skip_cleanup: true
+    cleanup: true
     script: "chmod +x ./tools/deploy.sh && ./tools/deploy.sh"
     on:
       all_branches: true
