@@ -1,4 +1,5 @@
 language: node_js
+version: 1.0
 node_js:
   - "10"
 cache:
@@ -24,6 +25,7 @@ after_success:
   - npm run coveralls
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then /tmp/cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
 deploy:
+  - edge: true
   - provider: npm
     cleanup: true
     email: "$NPM_EMAIL"
