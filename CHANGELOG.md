@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.7] - 2000-02-04
+### Fixed
+- Fix travis options for npm deployment 
+
 ## [0.8.6] - 2020-01-31
 ### Added
 - Add dispatching of new events (https://github.com/epam/miew/blob/master/docs/tutorials/events.md):
@@ -557,7 +561,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.8.6...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.8.7...HEAD
+[0.8.7]: https://github.com/epam/miew/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/epam/miew/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/epam/miew/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/epam/miew/compare/v0.8.3...v0.8.4

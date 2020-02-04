@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.8.6 Copyright (c) 2015-2020 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.8.7 Copyright (c) 2015-2020 EPAM Systems, Inc. */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -61299,7 +61299,7 @@
     });
   };
 
-  Miew.prototype.VERSION =  "0.8.6" ; // Uncomment this to get debug trace:
+  Miew.prototype.VERSION =  "0.8.7" ; // Uncomment this to get debug trace:
   // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
   lodash.assign(Miew,
