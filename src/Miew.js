@@ -35,7 +35,7 @@ import AOHorBlurMaterial from './gfx/shaders/AOHorBlurMaterial';
 import AOVertBlurWithBlendMaterial from './gfx/shaders/AOVertBlurWithBlendMaterial';
 import AnaglyphMaterial from './gfx/shaders/AnaglyphMaterial';
 import VolumeMaterial from './gfx/shaders/VolumeMaterial';
-import viewInterpolator from './gfx/ViewInterpolator';
+import ViewInterpolator from './gfx/ViewInterpolator';
 import EventDispatcher from './utils/EventDispatcher';
 import logger from './utils/logger';
 import Cookies from './utils/Cookies';
@@ -119,6 +119,8 @@ function Miew(opts) {
   }, opts);
   /** @type {?object} */
   this._gfx = null;
+  /** @type {ViewInterpolator} */
+  this._interpolator = new ViewInterpolator();
   /** @type {HTMLElement} */
   this._container = (opts && opts.container)
     || document.getElementById('miew-container')
@@ -838,7 +840,7 @@ Miew.prototype.run = function () {
     }
 
     this._objectControls.enable(true);
-    viewInterpolator.resume();
+    this._interpolator.resume();
 
     this._requestAnimationFrame(() => this._onTick());
   }
@@ -854,7 +856,7 @@ Miew.prototype.halt = function () {
     this._discardComponentEdit();
     this._discardFragmentEdit();
     this._objectControls.enable(false);
-    viewInterpolator.pause();
+    this._interpolator.pause();
     this._halting = true;
   }
 };
@@ -1944,7 +1946,7 @@ Miew.prototype.load = function (source, opts) {
     }
   }
 
-  viewInterpolator.reset();
+  this._interpolator.reset();
 
   // deprecated event since version 0.8.6
   this.dispatchEvent({ type: 'load', options: opts, source });
@@ -3887,12 +3889,13 @@ Miew.prototype.view = function (expression) {
       }
     }
 
-    const srcView = viewInterpolator.createView();
+    const interpolator = self._interpolator;
+    const srcView = interpolator.createView();
     srcView.position.copy(pivot.position);
     srcView.scale = self._objectControls.getScale();
     srcView.orientation.copy(self._objectControls.getOrientation());
 
-    const dstView = viewInterpolator.createView();
+    const dstView = interpolator.createView();
     dstView.position.set(transform[0], transform[1], transform[2]);
 
     // hack to make preset views work after we moved centering offset to visual nodes
@@ -3904,7 +3907,7 @@ Miew.prototype.view = function (expression) {
     dstView.scale = transform[3]; // eslint-disable-line prefer-destructuring
     dstView.orientation.setFromEuler(new THREE.Euler(transform[4], transform[5], transform[6], eulerOrder));
 
-    viewInterpolator.setup(srcView, dstView);
+    interpolator.setup(srcView, dstView);
   }
 
   if (typeof expression === 'undefined') {
@@ -3922,15 +3925,16 @@ Miew.prototype._updateView = function () {
   const self = this;
   const { pivot } = this._gfx;
 
-  if (!viewInterpolator.wasStarted()) {
-    viewInterpolator.start();
+  const interpolator = this._interpolator;
+  if (!interpolator.wasStarted()) {
+    interpolator.start();
   }
 
-  if (!viewInterpolator.isMoving()) {
+  if (!interpolator.isMoving()) {
     return;
   }
 
-  const res = viewInterpolator.getCurrentView();
+  const res = interpolator.getCurrentView();
   if (res.success) {
     const curr = res.view;
     pivot.position.copy(curr.position);

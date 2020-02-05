@@ -17,7 +17,7 @@ class View {
 
 const _transitionTime = 1.5; // in seconds
 
-class ViewInterpolator {
+export default class ViewInterpolator {
   setup(startView, endView) {
     this._startTime = undefined;
     this._endTime = undefined;
@@ -86,5 +86,3 @@ class ViewInterpolator {
     return new View();
   }
 }
-
-export default new ViewInterpolator();
