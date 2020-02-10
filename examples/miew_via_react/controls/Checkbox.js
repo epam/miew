@@ -8,7 +8,6 @@ export default class Checkbox extends React.Component {
 
   onChange(event) {
     let value = event.target.checked;
-    console.log(`checkbox updated: value ${value}`);
     if (this.props.viewer) {
       value = (value !== undefined) ? this.props.prefType(value) : this.props.prefType();
       if (!Number.isNaN(value)) {
@@ -19,7 +18,6 @@ export default class Checkbox extends React.Component {
 
   render() {
     const value = (this.props.viewer && this.props.prefType(this.props.viewer.get(this.props.prefName))) || this.props.prefType();
-    console.log('changes checkbox');
     return <input type='checkbox' checked={ value } onChange={ this.onChange } />;
   }
 }
