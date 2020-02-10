@@ -455,7 +455,7 @@ class CMLParser extends Parser {
     const atoms = complex._atoms;
     for (let i = 0, ni = atoms.length; i < ni; ++i) {
       const atom = atoms[i];
-      serialAtomMap[atom._serial] = atom;
+      serialAtomMap[atom.serial] = atom;
     }
 
     const bonds = complex._bonds;

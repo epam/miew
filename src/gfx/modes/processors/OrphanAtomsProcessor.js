@@ -6,7 +6,7 @@ class OrphanAtomsProcessor extends AtomsProcessor {
       return false;
     }
 
-    const bonds = atom._bonds;
+    const { bonds } = atom;
     for (let i = 0, n = bonds.length; i < n; ++i) {
       if ((bonds[i]._left._mask & mask) && (bonds[i]._right._mask & mask)) {
         return false;

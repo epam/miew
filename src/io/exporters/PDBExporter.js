@@ -93,7 +93,7 @@ export default class PDBExporter extends Exporter {
     result.newTag('CONECT');
 
     for (let i = 0; i < atoms.length; i++) {
-      const fixedBonds = atoms[i]._bonds.filter((bond) => bond._fixed);
+      const fixedBonds = atoms[i].bonds.filter((bond) => bond._fixed);
       if (fixedBonds.length !== 0) {
         result.writeBondsArray(fixedBonds.reverse(), atoms[i]);
       }
@@ -166,22 +166,22 @@ export default class PDBExporter extends Exporter {
     for (let i = 0; i < atoms.length; i++) {
       const tag = atoms[i]._het ? 'HETATM' : 'ATOM';
       result.newString(tag);
-      const startIndx = (atoms[i].element.name.length > 1 || atoms[i]._name._name.length > 3) ? 13 : 14;
-      result.writeString(atoms[i]._serial, 11, 7);
-      result.writeString(atoms[i]._name._name, startIndx, 16);
-      result.writeString(String.fromCharCode(atoms[i]._location), 17, 17);
-      result.writeString(atoms[i]._residue._type._name, 20, 18);
-      result.writeString(atoms[i]._residue._chain._name, 22, 22);
-      result.writeString(atoms[i]._residue._sequence, 26, 23);
-      result.writeString(atoms[i]._residue._icode, 27, 27);
-      result.writeString(atoms[i]._position.x.toFixed(3), 38, 31);
-      result.writeString(atoms[i]._position.y.toFixed(3), 46, 39);
-      result.writeString(atoms[i]._position.z.toFixed(3), 54, 47);
+      const startIndx = (atoms[i].element.name.length > 1 || atoms[i].name._name.length > 3) ? 13 : 14;
+      result.writeString(atoms[i].serial, 11, 7);
+      result.writeString(atoms[i].name._name, startIndx, 16);
+      result.writeString(String.fromCharCode(atoms[i].location), 17, 17);
+      result.writeString(atoms[i].residue._type._name, 20, 18);
+      result.writeString(atoms[i].residue._chain._name, 22, 22);
+      result.writeString(atoms[i].residue._sequence, 26, 23);
+      result.writeString(atoms[i].residue._icode, 27, 27);
+      result.writeString(atoms[i].position.x.toFixed(3), 38, 31);
+      result.writeString(atoms[i].position.y.toFixed(3), 46, 39);
+      result.writeString(atoms[i].position.z.toFixed(3), 54, 47);
       result.writeString(atoms[i]._occupancy.toFixed(2), 60, 55);
       result.writeString(atoms[i]._temperature.toFixed(2), 66, 61);
       result.writeString(atoms[i].element.name, 78, 77);
-      if (atoms[i]._charge) {
-        result.writeString(atoms[i]._charge, 79, 80);
+      if (atoms[i].charge) {
+        result.writeString(atoms[i].charge, 79, 80);
       }
     }
   }

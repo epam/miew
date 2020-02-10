@@ -8,7 +8,7 @@ const cBondTypes = {
 };
 
 function getAtomPos(atom) {
-  return atom._position;
+  return atom.position;
 }
 
 /**
@@ -49,11 +49,11 @@ class Bond {
   }
 
   calcLength() {
-    return this._left._position.distanceTo(this._right._position);
+    return this._left.position.distanceTo(this._right.position);
   }
 
   _forEachNeighbour(currAtom, process) {
-    const bonds = currAtom._bonds;
+    const { bonds } = currAtom;
     for (let i = 0, n = bonds.length; i < n; ++i) {
       process(bonds[i]._left !== currAtom ? bonds[i]._left : bonds[i]._right);
     }
@@ -151,21 +151,21 @@ class Bond {
     let first = left;
     let second = right;
     posGetter = posGetter === undefined ? getAtomPos : posGetter;
-    if (left._bonds.length > right._bonds.length) {
+    if (left.bonds.length > right.bonds.length) {
       first = right;
       second = left;
     }
     let third = first;
     let maxNeibs = 0;
-    const bonds = second._bonds;
+    const { bonds } = second;
     for (let i = 0, n = bonds.length; i < n; ++i) {
       let another = bonds[i]._left;
       if (bonds[i]._left === second) {
         another = bonds[i]._right;
       }
-      if (another._bonds.length > maxNeibs && another !== first) {
+      if (another.bonds.length > maxNeibs && another !== first) {
         third = another;
-        maxNeibs = another._bonds.length;
+        maxNeibs = another.bonds.length;
       }
     }
     const secondPos = posGetter(second);

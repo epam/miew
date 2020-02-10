@@ -29,8 +29,8 @@ class AromaticGroup extends AtomsGroup {
       const cycleRad = cycle.radius - radOffset;
       const n = cycAtoms.length;
       let i = 0;
-      const prevPos = cycAtoms[n - 1]._position;
-      let currPos = cycAtoms[i]._position;
+      const prevPos = cycAtoms[n - 1].position;
+      let currPos = cycAtoms[i].position;
       prevVector.subVectors(prevPos, center);
       currVector.subVectors(currPos, center);
       const upDir = currVector.clone().cross(prevVector).normalize();
@@ -39,7 +39,7 @@ class AromaticGroup extends AtomsGroup {
       for (; i < n; ++i) {
         const omega = prevVector.angleTo(currVector);
         tmpDir[i] = _slerp(omega, prevVector, currVector, 0.5).normalize();
-        currPos = cycAtoms[(i + 1) % n]._position;
+        currPos = cycAtoms[(i + 1) % n].position;
         prevVector.copy(currVector);
         currVector.subVectors(currPos, center);
       }

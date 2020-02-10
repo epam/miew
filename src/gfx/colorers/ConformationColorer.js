@@ -4,7 +4,7 @@ class ConformationColorer extends Colorer {
   static id = 'CF';
 
   getAtomColor(atom, _complex) {
-    return this.palette.getChainColor(String.fromCharCode(atom._location));
+    return this.palette.getChainColor(String.fromCharCode(atom.location));
   }
 
   getResidueColor(_residue, _complex) {

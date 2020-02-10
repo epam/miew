@@ -13,7 +13,7 @@ class AtomsSphereGroup extends AtomsGroup {
     const geo = this._geo;
     for (let i = 0, n = atomsIdc.length; i < n; ++i) {
       const atom = atoms[atomsIdc[i]];
-      geo.setItem(i, atom._position, mode.calcAtomRadius(atom));
+      geo.setItem(i, atom.position, mode.calcAtomRadius(atom));
       geo.setColor(i, colorer.getAtomColor(atom, parent));
     }
     geo.finalize();

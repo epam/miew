@@ -2780,7 +2780,7 @@ Miew.prototype._onPick = function (event) {
   // update last pick & find complex
   let complex = null;
   if (event.obj.atom) {
-    complex = event.obj.atom.getResidue().getChain().getComplex();
+    complex = event.obj.atom.residue.getChain().getComplex();
     this._lastPick = event.obj.atom;
   } else if (event.obj.residue) {
     complex = event.obj.residue.getChain().getComplex();
@@ -2923,25 +2923,25 @@ Miew.prototype._updateInfoPanel = function () {
 
   if (this._lastPick instanceof Atom) {
     atom = this._lastPick;
-    residue = atom._residue;
+    residue = atom.residue;
 
-    const an = atom.getName();
+    const an = atom.name;
     if (an.getNode() !== null) {
       aName = an.getNode();
     } else {
       aName = an.getString();
     }
-    const location = (atom._location !== 32) ? String.fromCharCode(atom._location) : ''; // 32 is code of white-space
-    secondLine = `${atom.element.fullName} #${atom._serial}${location}: \
+    const location = (atom.location !== 32) ? String.fromCharCode(atom.location) : ''; // 32 is code of white-space
+    secondLine = `${atom.element.fullName} #${atom.serial}${location}: \
       ${residue._chain._name}.${residue._type._name}${residue._sequence}${residue._icode.trim()}.`;
     if (typeof aName === 'string') {
       // add atom name to second line in plain text form
       secondLine += aName;
     }
 
-    coordLine = `Coord: (${atom._position.x.toFixed(2).toString()},\
-     ${atom._position.y.toFixed(2).toString()},\
-     ${atom._position.z.toFixed(2).toString()})`;
+    coordLine = `Coord: (${atom.position.x.toFixed(2).toString()},\
+     ${atom.position.y.toFixed(2).toString()},\
+     ${atom.position.z.toFixed(2).toString()})`;
   } else if (this._lastPick instanceof Residue) {
     residue = this._lastPick;
 
@@ -3033,7 +3033,7 @@ Miew.prototype.setPivotResidue = (function () {
       let z = 0;
       const amount = residue._atoms.length;
       for (let i = 0; i < amount; ++i) {
-        const p = residue._atoms[i]._position;
+        const p = residue._atoms[i].position;
         x += p.x / amount;
         y += p.y / amount;
         z += p.z / amount;
@@ -3050,12 +3050,12 @@ Miew.prototype.setPivotAtom = (function () {
   const center = new THREE.Vector3();
 
   return function (atom) {
-    const visual = this._getVisualForComplex(atom.getResidue().getChain().getComplex());
+    const visual = this._getVisualForComplex(atom.residue.getChain().getComplex());
     if (!visual) {
       return;
     }
 
-    center.copy(atom._position);
+    center.copy(atom.position);
     center.applyMatrix4(visual.matrix).negate();
     this._objectControls.setPivot(center);
     this.dispatchEvent({ type: 'transform' });
@@ -4060,7 +4060,7 @@ Miew.prototype.projected = function (fullAtomName, complexName) {
     return false;
   }
 
-  const pos = atom._position.clone();
+  const pos = atom.position.clone();
   // we consider atom position to be affected only by common complex transform
   // ignoring any transformations that may add during editing
   this._gfx.pivot.updateMatrixWorldRecursive();
@@ -4128,7 +4128,7 @@ Miew.prototype.exportCML = function () {
     complex.forEachAtom((atom) => {
       if (atom.xmlNodeRef && atom.xmlNodeRef.xmlNode) {
         xml = atom.xmlNodeRef.xmlNode;
-        ap = atom.getPosition();
+        ap = atom.position;
         v4.set(ap.x, ap.y, ap.z, 1.0);
         v4.applyMatrix4(mat);
         xml.setAttribute('x3', v4.x.toString());

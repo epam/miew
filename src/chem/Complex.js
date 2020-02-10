@@ -160,7 +160,7 @@ class Complex {
               if (currAtom) {
                 return;
               }
-              if (atomName.localeCompare(atom._name.getString()) === 0) {
+              if (atomName.localeCompare(atom.name.getString()) === 0) {
                 currAtom = atom;
               }
             });
@@ -333,7 +333,7 @@ class Complex {
           hash[hydrogenName] = hc;
         }
       }
-      actualCharge += a.getCharge();
+      actualCharge += a.charge;
     });
     const k = Object.keys(hash);
     if (hash.C) {
@@ -395,7 +395,7 @@ class Complex {
     const n = arr.length;
     let cumCharge = 0;
     for (let i = 0; i < n; i++) {
-      cumCharge += arr[i].getCharge();
+      cumCharge += arr[i].charge;
     }
     return cumCharge;
   }
@@ -483,21 +483,21 @@ class Complex {
       return formula;
     }
     this.forEachAtom((a) => {
-      if (atomsHash[a.getSerial()]) {
+      if (atomsHash[a.serial]) {
         logger.warn('Broken complex. Formula can be invalid...');
       }
-      atomsHash[a.getSerial()] = { atom: a, taken: null };
+      atomsHash[a.serial] = { atom: a, taken: null };
     });
     // groups part goes first
     this.forEachSGroup((grp) => {
-      if (grp._charge === 0 && grp._repeat === 1) {
+      if (grp.charge === 0 && grp._repeat === 1) {
         // if do not we have valid reason to take part ==> skip
         return;
       }
       currPart = { owner: grp, atoms: [], repeatCount: 1 };
       pAtoms = currPart.atoms;
       grp._atoms.forEach((a) => {
-        hEntry = atomsHash[a.getSerial()];
+        hEntry = atomsHash[a.serial];
         // check is not taken
         if (hEntry.taken === null) {
           pAtoms.push(a);
@@ -516,7 +516,7 @@ class Complex {
       pAtoms = currPart.atoms;
       cmp.forEachResidue((r) => {
         r._atoms.forEach((a) => {
-          hEntry = atomsHash[a.getSerial()];
+          hEntry = atomsHash[a.serial];
           // check is not taken
           if (hEntry.taken === null) {
             pAtoms.push(a);
@@ -792,8 +792,8 @@ class Complex {
       if (bond._left === null || bond._right === null) {
         bonds.splice(i, 1);
       } else {
-        bond._left._bonds.push(bond);
-        bond._right._bonds.push(bond);
+        bond._left.bonds.push(bond);
+        bond._right.bonds.push(bond);
       }
     }
 
@@ -866,8 +866,8 @@ class Complex {
     // mark non-polar hydrogens
     for (i = 0, n = atoms.length; i < n; ++i) {
       const atom = atoms[i];
-      if (atom.flags & Atom.Flags.HYDROGEN && atom._bonds.length === 1) {
-        const bond = atom._bonds[0];
+      if (atom.flags & Atom.Flags.HYDROGEN && atom.bonds.length === 1) {
+        const bond = atom.bonds[0];
         const other = (bond._left !== atom && bond._left) || bond._right;
         if (other.flags & Atom.Flags.CARBON) {
           atom.flags |= Atom.Flags.NONPOLARH;
@@ -987,7 +987,7 @@ class Complex {
 
     const dict = {};
     this.forEachAtom((atom) => {
-      dict[atom._name._name] = 1;
+      dict[atom.name._name] = 1;
     });
     this._atomNames = Object.keys(dict);
 
@@ -1043,7 +1043,7 @@ class Complex {
 
     const dict = {};
     this.forEachAtom((atom) => {
-      dict[String.fromCharCode(atom._location)] = 1;
+      dict[String.fromCharCode(atom.location)] = 1;
     });
     this._altlocNames = Object.keys(dict);
 
@@ -1105,7 +1105,7 @@ class Complex {
     let componentBias = 0;
 
     function processAtom(atom, bias) {
-      atom._serial += bias;
+      atom.serial += bias;
       atom._index += bias;
     }
 

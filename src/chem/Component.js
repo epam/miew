@@ -67,7 +67,7 @@ class Component {
 
     for (let i = 0, n = bonds.length; i < n; ++i) {
       const bond = bonds[i];
-      if (bond._left._residue._component === this) {
+      if (bond._left.residue._component === this) {
         process(bond);
       }
     }

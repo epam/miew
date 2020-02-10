@@ -49,7 +49,7 @@ class SGroup {
     const bLow = new THREE.Vector3(nLimon, nLimon, nLimon);
     const bHight = new THREE.Vector3(-nLimon, -nLimon, -nLimon);
     for (let j = 0, n = this._atoms.length; j < n; j++) {
-      const aPos = this._atoms[j].getPosition();
+      const aPos = this._atoms[j].position;
       bLow.set(Math.min(bLow.x, aPos.x), Math.min(bLow.y, aPos.y), Math.min(bLow.z, aPos.z));
       bHight.set(Math.max(bHight.x, aPos.x), Math.max(bHight.y, aPos.y), Math.max(bHight.z, aPos.z));
     }

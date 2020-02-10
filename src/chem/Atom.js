@@ -28,31 +28,31 @@ function getCylinderCount(bondOrder) {
 class Atom {
   constructor(residue, name, type, position, role, het, serial, location, occupancy, temperature, charge) {
     this._index = -1;
-    this._residue = residue;
+    this.residue = residue;
     if (name instanceof AtomName) {
-      this._name = name;
+      this.name = name;
     } else {
-      this._name = new AtomName(name);
+      this.name = new AtomName(name);
     }
 
     this.element = type;
-    this._position = position;
+    this.position = position;
     this._role = role;
     this._mask = 1 | 0;
     this._index = -1;
 
     this._het = het;
 
-    this._serial = serial;
-    this._location = (location || ' ').charCodeAt(0);
+    this.serial = serial;
+    this.location = (location || ' ').charCodeAt(0);
     this._occupancy = occupancy || 1;
     this._temperature = temperature;
-    this._charge = charge;
+    this.charge = charge;
     this._hydrogenCount = -1; // explicitly invalid
     this._radicalCount = 0;
     this._valence = -1; // explicitly invalid
 
-    this._bonds = [];
+    this.bonds = [];
 
     this.flags = 0x0000;
     if (type.name === 'H') {
@@ -60,31 +60,6 @@ class Atom {
     } else if (type.name === 'C') {
       this.flags |= Atom.Flags.CARBON;
     }
-  }
-
-
-  /**
-   * Get atom full name.
-   * @returns {AtomName} Atom full name.
-   */
-  getName() {
-    return this._name;
-  }
-
-  getPosition() {
-    return this._position;
-  }
-
-  getResidue() {
-    return this._residue;
-  }
-
-  getSerial() {
-    return this._serial;
-  }
-
-  getBonds() {
-    return this._bonds;
   }
 
   isHet() {
@@ -100,7 +75,7 @@ class Atom {
   }
 
   getVisualName() {
-    const name = this.getName();
+    const { name } = this;
     if (name.getString().length > 0) {
       return name.getString();
     }
@@ -108,7 +83,7 @@ class Atom {
   }
 
   forEachBond(process) {
-    const bonds = this._bonds;
+    const { bonds } = this;
     for (let i = 0, n = bonds.length; i < n; ++i) {
       process(bonds[i]);
     }
@@ -118,7 +93,7 @@ class Atom {
     // examples
     // BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
     const valence = 3; // hardcoded as 3
-    const hc = valence - this.getCharge() - this.getAtomBondsCount() - this._radicalCount;
+    const hc = valence - this.charge - this.getAtomBondsCount() - this._radicalCount;
     return Math.max(0, hc);
   }
 
@@ -129,7 +104,7 @@ class Atom {
     }
 
     let defVal = this.findSuitableValence(valence);
-    if (this.getCharge() !== 0) {
+    if (this.charge !== 0) {
       defVal = 4;
     }
     // find default valency for our case
@@ -156,7 +131,7 @@ class Atom {
     // January 2012) Standard Valence – (Valence + Charge + Number of Radical(s))
     let valence = this._valence;
     if (valence === -1) {
-      valence = this.getAtomBondsCount() - this.getCharge() + this._radicalCount;
+      valence = this.getAtomBondsCount() - this.charge + this._radicalCount;
     }
     const defVal = this.findSuitableValence(valence);
 
@@ -165,7 +140,7 @@ class Atom {
   }
 
   getHydrogenCountHydrogen() {
-    if (this.getAtomBondsCount() === 0 && this.getCharge() === 0
+    if (this.getAtomBondsCount() === 0 && this.charge === 0
       && this.getValence() === 0 && this._radicalCount === 0) {
       return 1;
     }
@@ -233,7 +208,7 @@ class Atom {
   }
 
   getAtomBondsCount() {
-    const explicitBonds = this.getBonds();
+    const explicitBonds = this.bonds;
     let ebCount = 0;
     for (let i = 0; i < explicitBonds.length; i++) {
       ebCount += getCylinderCount(explicitBonds[i].getOrder());
@@ -253,25 +228,17 @@ class Atom {
     return defVal;
   }
 
-  getCharge() {
-    return this._charge;
-  }
-
-  getLocation() {
-    return this._location;
-  }
-
   getFullName() {
     let name = '';
-    if (this._residue !== null) {
-      if (this._residue._chain !== null) {
-        name += `${this._residue._chain.getName()}.`;
+    if (this.residue !== null) {
+      if (this.residue._chain !== null) {
+        name += `${this.residue._chain.getName()}.`;
       }
 
-      name += `${this._residue._sequence}.`;
+      name += `${this.residue._sequence}.`;
     }
 
-    name += this._name.getString();
+    name += this.name.getString();
 
     return name;
   }

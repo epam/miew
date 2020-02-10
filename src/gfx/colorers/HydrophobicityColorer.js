@@ -4,7 +4,7 @@ class HydrophobicityColorer extends Colorer {
   static id = 'HY';
 
   getAtomColor(atom, complex) {
-    return this.getResidueColor(atom._residue, complex);
+    return this.getResidueColor(atom.residue, complex);
   }
 
   getResidueColor(residue, _complex) {

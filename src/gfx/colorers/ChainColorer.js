@@ -4,7 +4,7 @@ class ChainColorer extends Colorer {
   static id = 'CH';
 
   getAtomColor(atom, complex) {
-    return this.getResidueColor(atom._residue, complex);
+    return this.getResidueColor(atom.residue, complex);
   }
 
   getResidueColor(residue, _complex) {

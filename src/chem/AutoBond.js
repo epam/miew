@@ -25,7 +25,7 @@ function _getBondingRadius(atom) {
 
 function _isAtomEligible(atom) {
   // build for all non-hetatm and for hetatm without bonds
-  return !atom.isHet() || (atom._bonds && atom._bonds.length === 0);
+  return !atom.isHet() || (atom.bonds && atom.bonds.length === 0);
 }
 
 /**
@@ -58,7 +58,7 @@ class AutoBond {
     const collection = this._pairCollection;
 
     for (; aInd < numAtoms; aInd++) {
-      const bonds = atoms[aInd]._bonds;
+      const { bonds } = atoms[aInd];
       const numBondsForAtom = bonds.length;
       for (let bInd = 0; bInd < numBondsForAtom; bInd++) {
         const bond = bonds[bInd];
@@ -92,14 +92,14 @@ class AutoBond {
         return;
       }
 
-      const locationB = atomB.getLocation();
+      const locationB = atomB.location;
       if ((locationA !== cSpaceCode)
         && (locationB !== cSpaceCode)
         && (locationA !== locationB)) {
         return;
       }
 
-      const dist2 = posA.distanceToSquared(atomB._position);
+      const dist2 = posA.distanceToSquared(atomB.position);
       const rB = atomB.element.radiusBonding;
       const maxAcceptable = cBondRadInJMOL ? rA + rB + cBondTolerance : cVMDTolerance * (rA + rB);
 
@@ -122,8 +122,8 @@ class AutoBond {
 
       rA = atomA.element.radiusBonding;
       isHydrogenA = atomA.isHydrogen();
-      posA = atomA._position;
-      locationA = atomA.getLocation();
+      posA = atomA.position;
+      locationA = atomA.location;
 
       vw.forEachAtomWithinRadius(posA, 2 * this._maxRad + cBondTolerance, processAtom);
     }
@@ -140,7 +140,7 @@ class AutoBond {
   }
 
   _addPair(atomA, atomB) {
-    const bondsA = atomA._bonds;
+    const bondsA = atomA.bonds;
     const indexA = atomA._index;
     const indexB = atomB._index;
     for (let j = 0, numBonds = bondsA.length; j < numBonds; ++j) {
@@ -153,7 +153,7 @@ class AutoBond {
     const right = indexA < indexB ? atomB : atomA;
     const newBond = this._complex.addBond(left, right, 0, Bond.BondType.UNKNOWN, false);
     bondsA.push(newBond);
-    atomB.getBonds().push(newBond);
+    atomB.bonds.push(newBond);
   }
 
   build() {

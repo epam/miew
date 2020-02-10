@@ -28,8 +28,8 @@ function inverseColor(color) {
 }
 
 function getAtomText(atom) {
-  if (atom.getName().getNode() !== null) {
-    return atom.getName().getNode();
+  if (atom.name.getNode() !== null) {
+    return atom.name.getNode();
   }
 
   return atom.getVisualName();
@@ -60,7 +60,7 @@ function propagateColor(color, rule) {
 
 const templateMappings = {
   serial(a) {
-    return a.getSerial();
+    return a.serial;
   },
   name(a) {
     return a.getVisualName();
@@ -69,19 +69,19 @@ const templateMappings = {
     return a.element.name;
   },
   residue(a) {
-    return a._residue.getType().getName();
+    return a.residue.getType().getName();
   },
   sequence(a) {
-    return a._residue.getSequence();
+    return a.residue.getSequence();
   },
   chain(a) {
-    return a._residue.getChain().getName();
+    return a.residue.getChain().getName();
   },
   hetatm(a) {
     return a.isHet();
   },
   water(a) {
-    return a._residue.getType().getName() === 'HOH' || a._residue.getType().getName() === 'WAT';
+    return a.residue.getType().getName() === 'HOH' || a.residue.getType().getName() === 'WAT';
   },
 };
 
@@ -118,7 +118,7 @@ class AtomsTextGroup extends AtomsGroup {
       const color = colorer.getAtomColor(atom, parent);
       const fgColor = parseInt(propagateColor(color, opts.fg).substring(1), 16);
       const bgColor = opts.showBg ? parseInt(propagateColor(color, opts.bg).substring(1), 16) : 'transparent';
-      geo.setItem(i, atom.getPosition(), text);
+      geo.setItem(i, atom.position, text);
       geo.setColor(i, fgColor, bgColor);
     }
     geo.finalize();

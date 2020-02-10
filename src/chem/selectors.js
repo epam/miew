@@ -31,19 +31,19 @@ function defineSelector(name, SelectorClass) {
 
 defineSelector('Serial', class SerialSelector extends RangeListSelector {
   includesAtom(atom) {
-    return this.list.includes(atom._serial);
+    return this.list.includes(atom.serial);
   }
 });
 
 defineSelector('Name', class NameSelector extends ValueListSelector {
   includesAtom(atom) {
-    return this.list.includes(atom._name.getString());
+    return this.list.includes(atom.name.getString());
   }
 });
 
 defineSelector('AltLoc', class AltLocSelector extends ValueListSelector {
   includesAtom(atom) {
-    return this.list.includes(String.fromCharCode(atom._location));
+    return this.list.includes(String.fromCharCode(atom.location));
   }
 });
 
@@ -55,13 +55,13 @@ defineSelector('Elem', class ElemSelector extends ValueListSelector {
 
 defineSelector('Residue', class ResidueSelector extends ValueListSelector {
   includesAtom(atom) {
-    return this.list.includes(atom._residue._type._name);
+    return this.list.includes(atom.residue._type._name);
   }
 });
 
 defineSelector('Sequence', class SequenceSelector extends RangeListSelector {
   includesAtom(atom) {
-    return this.list.includes(atom._residue._sequence);
+    return this.list.includes(atom.residue._sequence);
   }
 });
 
@@ -71,13 +71,13 @@ defineSelector('ICode', class ICodeSelector extends ValueListSelector {
   }
 
   includesAtom(atom) {
-    return this.list.includes(atom._residue._icode);
+    return this.list.includes(atom.residue._icode);
   }
 });
 
 defineSelector('ResIdx', class ResIdxSelector extends RangeListSelector {
   includesAtom(atom) {
-    return this.list.includes(atom._residue._index);
+    return this.list.includes(atom.residue._index);
   }
 });
 
@@ -87,7 +87,7 @@ defineSelector('Chain', class ChainSelector extends ValueListSelector {
   }
 
   includesAtom(atom) {
-    return this.list.includes(atom._residue._chain._name);
+    return this.list.includes(atom.residue._chain._name);
   }
 });
 
@@ -148,7 +148,7 @@ defineOperator('Or', 3, class OrOperator extends InfixOperator {
 function byResidueTypeFlag(flag, name) {
   return defineSelector(name, class extends Selector {
     includesAtom(atom) {
-      return (atom._residue._type.flags & flag) !== 0;
+      return (atom.residue._type.flags & flag) !== 0;
     }
   });
 }

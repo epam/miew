@@ -230,7 +230,7 @@ class MOL2Parser extends Parser {
     const atoms = this._complex._atoms;
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
-      this._serialAtomMap[atom._serial] = atom;
+      this._serialAtomMap[atom.serial] = atom;
     }
   }
 

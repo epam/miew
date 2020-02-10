@@ -372,7 +372,7 @@ class ComplexVisual extends Visual {
     const clearMask = ~setMask;
 
     if (atom) {
-      residue = atom._residue;
+      residue = atom.residue;
       chain = residue._chain;
       molecule = residue._molecule;
 
@@ -509,7 +509,7 @@ class ComplexVisual extends Visual {
 
     // mark hanging atoms
     this._complex.forEachAtom((atom) => {
-      if ((atom._mask & selectionMask) && (atom._bonds.length === 1)) {
+      if ((atom._mask & selectionMask) && (atom.bonds.length === 1)) {
         atom._mask |= tmpMask;
       }
     });
@@ -536,8 +536,8 @@ class ComplexVisual extends Visual {
     this._complex.forEachAtom((atom) => {
       if (atom._mask & selectionMask) {
         if (component === null) {
-          component = atom._residue._component;
-        } else if (component !== atom._residue._component) {
+          component = atom.residue._component;
+        } else if (component !== atom.residue._component) {
           multiple = true;
         }
       }
@@ -552,7 +552,7 @@ class ComplexVisual extends Visual {
 
     this._complex.forEachAtom((atom) => {
       if (includesAtom(atom, selRule)) {
-        center.add(atom._position);
+        center.add(atom.position);
         count++;
       }
     });
@@ -762,8 +762,8 @@ class ComplexVisual extends Visual {
     });
 
     complex.forEachAtom((atom) => {
-      if (atom._mask & mask && !(atom._residue._mask & mask)) {
-        atoms.push(atom._serial);
+      if (atom._mask & mask && !(atom.residue._mask & mask)) {
+        atoms.push(atom.serial);
       }
     });
 

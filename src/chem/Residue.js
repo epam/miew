@@ -108,7 +108,7 @@ class Residue {
   _findAtomByName(name) {
     let res = null;
     this.forEachAtom((atom) => {
-      if (atom._name._name === name) {
+      if (atom.name._name === name) {
         res = atom;
         return true;
       }
@@ -216,7 +216,7 @@ class Residue {
 
   _finalize2(prev, next, asNucleic) {
     // Should be called AFTER first finalize
-    this._innerFinalize(prev, prev, next, this, asNucleic, (atom) => atom._position);
+    this._innerFinalize(prev, prev, next, this, asNucleic, (atom) => atom.position);
   }
 
   isConnected(anotherResidue) {
@@ -228,10 +228,10 @@ class Residue {
     }
     let res = false;
     this.forEachAtom((atom) => {
-      const bonds = atom._bonds;
+      const { bonds } = atom;
       for (let i = 0, n = bonds.length; i < n; ++i) {
         const bond = bonds[i];
-        if (bond._left._residue === anotherResidue || bond._right._residue === anotherResidue) {
+        if (bond._left.residue === anotherResidue || bond._right.residue === anotherResidue) {
           res = true;
           return true;
         }

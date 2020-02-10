@@ -66,11 +66,11 @@ class Cycle {
     const center = new THREE.Vector3();
     const nA = atoms.length;
     for (let j = 0; j < nA; ++j) {
-      center.add(atoms[j]._position);
+      center.add(atoms[j].position);
     }
     center.multiplyScalar(1.0 / nA);
     this.center = center;
-    this.radius = center.distanceTo(atoms[0]._position.clone().lerp(atoms[1]._position, 0.5));
+    this.radius = center.distanceTo(atoms[0].position.clone().lerp(atoms[1].position, 0.5));
   }
 
   forEachBond(process) {
@@ -158,7 +158,7 @@ class AromaticLoopsMarker {
     const bondsOrder = [];
     const bondsData = this._bondsData;
     const currLeft = _anotherAtom(prevBond, currRight);
-    const currVec = currRight._position.clone().sub(currLeft._position);
+    const currVec = currRight.position.clone().sub(currLeft.position);
     const startAtomRef = this._currStart;
     const self = this;
     const bondMarks = this._bondMarks;
@@ -173,7 +173,7 @@ class AromaticLoopsMarker {
         return;
       }
       const anotherAtom = _anotherAtom(newBond, currRight);
-      const anotherVec = anotherAtom._position.clone().sub(currRight._position);
+      const anotherVec = anotherAtom.position.clone().sub(currRight.position);
       const val = anotherAtom === startAtomRef ? -2.0 : 1 - _cosBetween(currVec, anotherVec);
       const newDir = anotherVec.cross(currVec);
       if (!_coDirVectors(newDir, currDir)) {

@@ -297,7 +297,7 @@ export default class SDFParser extends Parser {
 
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
-      serialAtomMap[atom._serial] = atom;
+      serialAtomMap[atom.serial] = atom;
     }
 
     this._complex._finalizeBonds();

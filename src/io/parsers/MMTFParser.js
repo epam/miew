@@ -289,8 +289,8 @@ class MMTFParser extends Parser {
   _linkAtomsToResidues() {
     for (let i = 0; i < this._complex._atoms.length; ++i) {
       const atom = this._complex._atoms[i];
-      const residue = this._complex._residues[atom._residue];
-      atom._residue = residue;
+      const residue = this._complex._residues[atom.residue];
+      atom.residue = residue;
       residue._atoms.push(atom);
     }
   }
