@@ -196,8 +196,8 @@ class ComplexVisual extends Visual {
         target.needsRebuild = true;
         for (const key in diff) {
           if (diff.hasOwnProperty(key)) {
-            desc.key = diff.key;
-            logger.debug(`rep[${index}].${key} changed to${diff.key}`);
+            desc[key] = diff[key];
+            logger.debug(`rep[${index}].${key} changed to ${diff[key]}`);
           }
         }
 
