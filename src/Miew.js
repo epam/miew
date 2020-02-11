@@ -396,6 +396,10 @@ Miew.prototype._requestAnimationFrame = function (callback) {
   requestAnimationFrame(callback);
 };
 
+function arezSpritesSupported(context) {
+  return context.getExtension('EXT_frag_depth');
+}
+
 function isAOSupported(context) {
   return (context.getExtension('WEBGL_depth_texture')
   && context.getExtension('WEBGL_draw_buffers'));
@@ -424,7 +428,7 @@ Miew.prototype._initGfx = function () {
   capabilities.init(gfx.renderer);
 
   // z-sprites and ambient occlusion possibility
-  if (!gfx.renderer.getContext().getExtension('EXT_frag_depth')) {
+  if (!arezSpritesSupported(gfx.renderer.getContext())) {
     settings.set('zSprites', false);
   }
   if (isAOSupported(gfx.renderer.getContext())) {
@@ -3698,6 +3702,13 @@ Miew.prototype._initOnSettingsChanged = function () {
     } else {
       const values = { normalsToGBuffer: settings.now.ao };
       this._setUberMaterialValues(values);
+    }
+  });
+
+  on('zSprites', () => {
+    if (settings.now.zSprites && !arezSpritesSupported(this._gfx.renderer.getContext())) {
+      this.logger.warn('Your device or browser does not support zSprites');
+      settings.set('zSprites', false);
     }
   });
 
