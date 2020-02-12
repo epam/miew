@@ -164,7 +164,7 @@ export default class PDBExporter extends Exporter {
     const atoms = this._source._atoms;
 
     for (let i = 0; i < atoms.length; i++) {
-      const tag = atoms[i]._het ? 'HETATM' : 'ATOM';
+      const tag = atoms[i].het ? 'HETATM' : 'ATOM';
       result.newString(tag);
       const startIndx = (atoms[i].element.name.length > 1 || atoms[i].name._name.length > 3) ? 13 : 14;
       result.writeString(atoms[i].serial, 11, 7);
@@ -177,8 +177,8 @@ export default class PDBExporter extends Exporter {
       result.writeString(atoms[i].position.x.toFixed(3), 38, 31);
       result.writeString(atoms[i].position.y.toFixed(3), 46, 39);
       result.writeString(atoms[i].position.z.toFixed(3), 54, 47);
-      result.writeString(atoms[i]._occupancy.toFixed(2), 60, 55);
-      result.writeString(atoms[i]._temperature.toFixed(2), 66, 61);
+      result.writeString(atoms[i].occupancy.toFixed(2), 60, 55);
+      result.writeString(atoms[i].temperature.toFixed(2), 66, 61);
       result.writeString(atoms[i].element.name, 78, 77);
       if (atoms[i].charge) {
         result.writeString(atoms[i].charge, 79, 80);

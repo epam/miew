@@ -28,12 +28,12 @@ describe('selectors', () => {
     name: atomName,
     element: { name: 'N' },
     position: 1,
-    _role: 1,
-    _het: true,
+    role: 1,
+    het: true,
     serial: 5,
     location: (' ').charCodeAt(0),
-    _occupancy: 1,
-    _temperature: 1,
+    occupancy: 1,
+    temperature: 1,
     charge: 1,
   };
 
@@ -246,11 +246,11 @@ describe('selectors', () => {
   describe('HetatmSelector', () => {
     describe('#includesAtom(atom)', () => {
       it('includes hetatoms', () => {
-        atom._het = true;
+        atom.het = true;
         expect(selectors.hetatm().includesAtom(atom)).to.equal(true);
       });
       it('excludes other', () => {
-        atom._het = false;
+        atom.het = false;
         expect(selectors.hetatm().includesAtom(atom)).to.equal(false);
       });
     });

@@ -845,7 +845,7 @@ class Complex {
     const atoms = this._atoms;
     for (i = 0, n = atoms.length; i < n; ++i) {
       const currAtom = atoms[i];
-      currAtom._index = i;
+      currAtom.index = i;
     }
 
     if (opts.needAutoBonding) {
@@ -910,7 +910,7 @@ class Complex {
     let count = 0;
 
     this.forEachAtom((atom) => {
-      if ((atom._mask & mask) !== 0) {
+      if ((atom.mask & mask) !== 0) {
         count++;
       }
     });
@@ -932,7 +932,7 @@ class Complex {
 
   resetAtomMask(mask) {
     this.forEachAtom((atom) => {
-      atom._mask = mask;
+      atom.mask = mask;
     });
   }
 
@@ -944,10 +944,10 @@ class Complex {
 
     this.forEachAtom((atom) => {
       if (totalSelector.includesAtom(atom)) {
-        atom._mask |= setMask;
+        atom.mask |= setMask;
         count++;
       } else {
-        atom._mask &= clearMask;
+        atom.mask &= clearMask;
       }
     });
     this._maskNeedsUpdate = true;
@@ -960,8 +960,8 @@ class Complex {
     let count = 0;
 
     this.forEachAtom((atom) => {
-      if (selector.includesAtom(atom) && (atom._mask & mask) !== mask) {
-        atom._mask |= setMask;
+      if (selector.includesAtom(atom) && (atom.mask & mask) !== mask) {
+        atom.mask |= setMask;
         count++;
       }
     });
@@ -972,7 +972,7 @@ class Complex {
   clearAtomBits(mask) {
     const clearMask = ~mask;
     const reseter = (a) => {
-      a._mask &= clearMask;
+      a.mask &= clearMask;
     };
     this.forEachAtom(reseter);
     this.forEachResidue(reseter);
@@ -1106,7 +1106,7 @@ class Complex {
 
     function processAtom(atom, bias) {
       atom.serial += bias;
-      atom._index += bias;
+      atom.index += bias;
     }
 
     function processBond(bond, bias) {

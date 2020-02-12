@@ -563,10 +563,10 @@ class CMLParser extends Parser {
             true, atomSerial, ' ', 1.0, 0.0, atomCharge,
           );
           if (atom.hydrogenCount) {
-            added._hydrogenCount = parseInt(atom.hydrogenCount, 10);
+            added.hydrogenCount = parseInt(atom.hydrogenCount, 10);
           }
           if (atom.mrvValence) {
-            added._valence = parseInt(atom.mrvValence, 10);
+            added.valence = parseInt(atom.mrvValence, 10);
           }
           addFunc(added);
         }

@@ -20,9 +20,9 @@ class AromaticProcessor extends RCGroup {
         const cycAtoms = cycle.atoms;
         let perCycle = 0;
         for (let i = 0, n = cycAtoms.length; i < n; ++i) {
-          if ((cycAtoms[i]._mask & mask) !== 0) {
+          if ((cycAtoms[i].mask & mask) !== 0) {
             ++perCycle;
-            atomsIdc[chunksCount++] = cycAtoms[i]._index;
+            atomsIdc[chunksCount++] = cycAtoms[i].index;
           }
         }
         if (perCycle > 0) {

@@ -45,7 +45,7 @@ class AromaticGroup extends AtomsGroup {
       }
 
       for (i = 0; i < n; ++i) {
-        if (cycAtoms[i]._index !== currAtomIdx) {
+        if (cycAtoms[i].index !== currAtomIdx) {
           continue;
         }
         const start = tmpDir[i];

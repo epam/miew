@@ -63,8 +63,8 @@ class LinesObj extends SceneObject {
     }
 
     const geo = this._line.geometry;
-    geo.vertices[0].copy(frameData.getAtomPos(this._atom1._index));
-    geo.vertices[1].copy(frameData.getAtomPos(this._atom2._index));
+    geo.vertices[0].copy(frameData.getAtomPos(this._atom1.index));
+    geo.vertices[1].copy(frameData.getAtomPos(this._atom2.index));
     this._line.computeLineDistances();
     geo.computeBoundingSphere();
 

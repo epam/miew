@@ -118,7 +118,7 @@ class ComplexComponentEditor extends ComplexEditor {
     component.forEachResidue((residue) => {
       const atoms = residue._atoms;
       for (j = 0; j < atoms.length; ++j) {
-        if (atoms[j]._mask & selectionMask) {
+        if (atoms[j].mask & selectionMask) {
           bbmin.min(atoms[j].position);
           bbmax.max(atoms[j].position);
         }
@@ -351,12 +351,12 @@ class ComplexFragmentEditor extends ComplexEditor {
     const atomHash = {};
 
     complex.forEachBond((bond) => {
-      if (bond._left._mask & selectionMask) {
-        if ((bond._right._mask & selectionMask) === 0) {
-          atomHash[bond._left._index] = 1;
+      if (bond._left.mask & selectionMask) {
+        if ((bond._right.mask & selectionMask) === 0) {
+          atomHash[bond._left.index] = 1;
         }
-      } else if (bond._right._mask & selectionMask) {
-        atomHash[bond._right._index] = 1;
+      } else if (bond._right.mask & selectionMask) {
+        atomHash[bond._right.index] = 1;
       }
     });
 
@@ -372,7 +372,7 @@ class ComplexFragmentEditor extends ComplexEditor {
 
   _bakeAtomTransform(matrix, mask) {
     this._complexVisual.getComplex().forEachAtom((atom) => {
-      if (atom._mask & mask) {
+      if (atom.mask & mask) {
         atom.position.applyMatrix4(matrix);
       }
     });

@@ -132,7 +132,7 @@ class Residue {
     let mask = 0xffffffff;
     const atoms = this._atoms;
     for (let i = 0, n = atoms.length; i < n; ++i) {
-      mask &= atoms[i]._mask;
+      mask &= atoms[i].mask;
     }
     this._mask = mask;
   }
@@ -255,21 +255,21 @@ class Residue {
     let occupancy = 0; // average occupancy
     this.forEachAtom((a) => {
       if (self._leadAtom === null) {
-        if (a._role === Element.Constants.Lead) {
+        if (a.role === Element.Constants.Lead) {
           self._leadAtom = a;
         }
       }
       if (self._wingAtom === null) {
-        if (a._role === Element.Constants.Wing) {
+        if (a.role === Element.Constants.Wing) {
           self._wingAtom = a;
         }
       }
-      if (a._temperature) {
-        temperature += a._temperature;
+      if (a.temperature) {
+        temperature += a.temperature;
         tempCount++;
       }
-      if (a._occupancy) {
-        occupancy += a._occupancy;
+      if (a.occupancy) {
+        occupancy += a.occupancy;
         occupCount++;
       }
       return (self._leadAtom !== null && self._wingAtom !== null);

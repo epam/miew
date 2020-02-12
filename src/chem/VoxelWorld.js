@@ -334,7 +334,7 @@ class VoxelWorld {
   forEachAtomWithinDistFromMasked(complex, mask, dist, process) {
     this._forEachAtomWithinDistFromGroup((atomProc) => {
       complex.forEachAtom((atom) => {
-        if ((atom._mask & mask) !== 0) {
+        if ((atom.mask & mask) !== 0) {
           atomProc(atom);
         }
       });

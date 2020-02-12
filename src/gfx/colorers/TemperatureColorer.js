@@ -18,11 +18,11 @@ class TemperatureColorer extends Colorer {
   getAtomColor(atom, _complex) {
     const { opts } = this;
     let factor = 1;
-    if (atom._temperature && opts) {
+    if (atom.temperature && opts) {
       if (opts.min === opts.max) {
-        factor = atom._temperature > opts.max ? 1 : 0;
+        factor = atom.temperature > opts.max ? 1 : 0;
       } else {
-        factor = (atom._temperature - opts.min) / (opts.max - opts.min);
+        factor = (atom.temperature - opts.min) / (opts.max - opts.min);
       }
       return this.palette.getGradientColor(factor, opts.gradient);
     }

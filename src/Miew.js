@@ -3088,7 +3088,7 @@ Miew.prototype.setPivotSubset = (function () {
   const _center = new THREE.Vector3(0.0, 0.0, 0.0);
 
   function _includesInCurSelection(atom, selectionBit) {
-    return atom._mask & (1 << selectionBit);
+    return atom.mask & (1 << selectionBit);
   }
 
   function _includesInSelector(atom, selector) {

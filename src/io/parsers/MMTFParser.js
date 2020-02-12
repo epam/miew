@@ -146,7 +146,7 @@ class MMTFParser extends Parser {
     );
 
     this._complex._atoms[atomData.atomIndex] = atom;
-    atom._index = atomData.atomIndex;
+    atom.index = atomData.atomIndex;
 
     this._serialAtomMap[atomData.atomId] = atom;
   }
@@ -405,7 +405,7 @@ class MMTFParser extends Parser {
           for (let k = 0; k < chain._residues.length; ++k) {
             const res = chain._residues[k];
             for (let m = 0; m < res._atoms.length; ++m) {
-              res._atoms[m]._het = true;
+              res._atoms[m].het = true;
             }
           }
         }

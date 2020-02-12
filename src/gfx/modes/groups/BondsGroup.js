@@ -52,10 +52,10 @@ class BondsGroup extends ChemGroup {
     const chunksToIdx = this._chunksIdc;
     for (let i = 0, n = chunksToIdx.length; i < n; ++i) {
       const bond = bonds[chunksToIdx[i]];
-      if ((bond._left._mask & mask) && (!innerOnly || (bond._right._mask & mask))) {
+      if ((bond._left.mask & mask) && (!innerOnly || (bond._right.mask & mask))) {
         chunksList.push(2 * i);
       }
-      if ((bond._right._mask & mask) && (!innerOnly || (bond._left._mask & mask))) {
+      if ((bond._right.mask & mask) && (!innerOnly || (bond._left.mask & mask))) {
         chunksList.push(2 * i + 1);
       }
     }

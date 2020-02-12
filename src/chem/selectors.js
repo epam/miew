@@ -93,7 +93,7 @@ defineSelector('Chain', class ChainSelector extends ValueListSelector {
 
 defineSelector('Hetatm', class HetatmSelector extends Selector {
   includesAtom(atom) {
-    return atom._het;
+    return atom.het;
   }
 });
 

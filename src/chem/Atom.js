@@ -27,7 +27,7 @@ function getCylinderCount(bondOrder) {
 
 class Atom {
   constructor(residue, name, type, position, role, het, serial, location, occupancy, temperature, charge) {
-    this._index = -1;
+    this.index = -1;
     this.residue = residue;
     if (name instanceof AtomName) {
       this.name = name;
@@ -37,20 +37,19 @@ class Atom {
 
     this.element = type;
     this.position = position;
-    this._role = role;
-    this._mask = 1 | 0;
-    this._index = -1;
+    this.role = role;
+    this.mask = 1 | 0;
 
-    this._het = het;
+    this.het = het;
 
     this.serial = serial;
     this.location = (location || ' ').charCodeAt(0);
-    this._occupancy = occupancy || 1;
-    this._temperature = temperature;
+    this.occupancy = occupancy || 1;
+    this.temperature = temperature;
     this.charge = charge;
-    this._hydrogenCount = -1; // explicitly invalid
-    this._radicalCount = 0;
-    this._valence = -1; // explicitly invalid
+    this.hydrogenCount = -1; // explicitly invalid
+    this.radicalCount = 0;
+    this.valence = -1; // explicitly invalid
 
     this.bonds = [];
 
@@ -63,7 +62,7 @@ class Atom {
   }
 
   isHet() {
-    return this._het;
+    return this.het;
   }
 
   isHydrogen() {
@@ -71,7 +70,7 @@ class Atom {
   }
 
   getValence() {
-    return (this._valence === -1) ? 0 : this._valence;
+    return (this.valence === -1) ? 0 : this.valence;
   }
 
   getVisualName() {
@@ -93,14 +92,14 @@ class Atom {
     // examples
     // BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
     const valence = 3; // hardcoded as 3
-    const hc = valence - this.charge - this.getAtomBondsCount() - this._radicalCount;
+    const hc = valence - this.charge - this.getAtomBondsCount() - this.radicalCount;
     return Math.max(0, hc);
   }
 
   getHydrogenCountTin() {
-    let valence = this._valence;
+    let { valence } = this;
     if (valence === -1) {
-      valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this._radicalCount;
+      valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this.radicalCount;
     }
 
     let defVal = this.findSuitableValence(valence);
@@ -116,9 +115,9 @@ class Atom {
   }
 
   getHydrogenCountGroup14() {
-    let valence = this._valence;
+    let { valence } = this;
     if (valence === -1) {
-      valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this._radicalCount;
+      valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this.radicalCount;
     }
 
     const defVal = this.findSuitableValence(valence);
@@ -129,9 +128,9 @@ class Atom {
   getHydrogenCountNonMetal() {
     // apply from Reaxys Drawing Guidelines (Version 2.04
     // January 2012) Standard Valence – (Valence + Charge + Number of Radical(s))
-    let valence = this._valence;
+    let { valence } = this;
     if (valence === -1) {
-      valence = this.getAtomBondsCount() - this.charge + this._radicalCount;
+      valence = this.getAtomBondsCount() - this.charge + this.radicalCount;
     }
     const defVal = this.findSuitableValence(valence);
 
@@ -141,7 +140,7 @@ class Atom {
 
   getHydrogenCountHydrogen() {
     if (this.getAtomBondsCount() === 0 && this.charge === 0
-      && this.getValence() === 0 && this._radicalCount === 0) {
+      && this.getValence() === 0 && this.radicalCount === 0) {
       return 1;
     }
     // do add in any other case
@@ -149,8 +148,8 @@ class Atom {
   }
 
   getHydrogenCount() {
-    if (this._hydrogenCount >= 0) {
-      return this._hydrogenCount;
+    if (this.hydrogenCount >= 0) {
+      return this.hydrogenCount;
     }
 
     const { element } = this;

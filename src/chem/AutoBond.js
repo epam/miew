@@ -62,9 +62,9 @@ class AutoBond {
       const numBondsForAtom = bonds.length;
       for (let bInd = 0; bInd < numBondsForAtom; bInd++) {
         const bond = bonds[bInd];
-        const indTo = bond._left._index;
+        const indTo = bond._left.index;
         if (indTo === aInd) {
-          collection.addPair(aInd, bond._right._index);
+          collection.addPair(aInd, bond._right.index);
         }
       } // for (b) all bonds in atom
     } // for (a)
@@ -111,7 +111,7 @@ class AutoBond {
         return;
       }
 
-      self._pairCollection.addPair(atomA._index, atomB._index);
+      self._pairCollection.addPair(atomA.index, atomB.index);
     };
 
     for (let i = 0; i < atomsNum; ++i) {
@@ -141,11 +141,11 @@ class AutoBond {
 
   _addPair(atomA, atomB) {
     const bondsA = atomA.bonds;
-    const indexA = atomA._index;
-    const indexB = atomB._index;
+    const indexA = atomA.index;
+    const indexB = atomB.index;
     for (let j = 0, numBonds = bondsA.length; j < numBonds; ++j) {
       const bond = bondsA[j];
-      if (bond._left._index === indexB || bond._right._index === indexB) {
+      if (bond._left.index === indexB || bond._right.index === indexB) {
         return;
       }
     }
@@ -172,7 +172,7 @@ class AutoBond {
     if (atoms.length < 2) {
       return;
     }
-    if (atoms[0]._index < 0) {
+    if (atoms[0].index < 0) {
       throw new Error('AutoBond: Atoms in complex were not indexed.');
     }
 
