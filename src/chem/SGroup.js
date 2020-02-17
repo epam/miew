@@ -56,43 +56,6 @@ class SGroup {
     this._center.addVectors(bLow, bHight);
     this._center.multiplyScalar(0.5);
   }
-
-  buildChemicalFormula(complex, part) {
-    let calcCharge = 0;
-    let atomsCount = 0;
-    let formula = complex._buildFormulaSimple(part, (l, c) => {
-      atomsCount = l;
-      calcCharge = c;
-    });
-    const finalCharge = this._charge + calcCharge;
-    if (finalCharge !== 0) {
-      if (this._repeat > 1) {
-        if (atomsCount > 1) {
-          formula = `${this._repeat.toString()}(${formula})`;
-        } else {
-          formula = this._repeat.toString() + formula;
-        }
-      } else if (atomsCount > 1) {
-        formula = `(${formula})`;
-      }
-
-      if (finalCharge > 1) {
-        formula += `^${finalCharge.toString()}+`;
-      }
-      if (finalCharge === 1) {
-        formula += '^+';
-      }
-      if (finalCharge < -1) {
-        formula += `^${Math.abs(finalCharge).toString()}-`;
-      }
-      if (finalCharge === -1) {
-        formula += '^-';
-      }
-    } else if (this._repeat > 1) {
-      formula = this._repeat.toString() + formula;
-    }
-    return formula;
-  }
 }
 
 export default SGroup;

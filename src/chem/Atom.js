@@ -1,9 +1,5 @@
 import AtomName from './AtomName';
 
-function getCylinderCount(bondOrder) {
-  return bondOrder < 2 ? 1 : bondOrder;
-}
-
 /**
  * Atom measurements.
  *
@@ -69,10 +65,6 @@ class Atom {
     return this.element.number === 1;
   }
 
-  getValence() {
-    return (this.valence === -1) ? 0 : this.valence;
-  }
-
   getVisualName() {
     const { name } = this;
     if (name.getString().length > 0) {
@@ -86,145 +78,6 @@ class Atom {
     for (let i = 0, n = bonds.length; i < n; ++i) {
       process(bonds[i]);
     }
-  }
-
-  getHydrogenCountBoron() {
-    // examples
-    // BH3*BH4(1-)*BH2(1+)*BH3(2-)*BH(2+)
-    const valence = 3; // hardcoded as 3
-    const hc = valence - this.charge - this.getAtomBondsCount() - this.radicalCount;
-    return Math.max(0, hc);
-  }
-
-  getHydrogenCountTin() {
-    let { valence } = this;
-    if (valence === -1) {
-      valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this.radicalCount;
-    }
-
-    let defVal = this.findSuitableValence(valence);
-    if (this.charge !== 0) {
-      defVal = 4;
-    }
-    // find default valency for our case
-    return Math.max(0, defVal - valence);
-  }
-
-  getHydrogenCountMetal() {
-    return 0;
-  }
-
-  getHydrogenCountGroup14() {
-    let { valence } = this;
-    if (valence === -1) {
-      valence = this.getAtomBondsCount() - Math.abs(this.getCharge()) + this.radicalCount;
-    }
-
-    const defVal = this.findSuitableValence(valence);
-    // find default valency for our case
-    return Math.max(0, defVal - valence);
-  }
-
-  getHydrogenCountNonMetal() {
-    // apply from Reaxys Drawing Guidelines (Version 2.04
-    // January 2012) Standard Valence – (Valence + Charge + Number of Radical(s))
-    let { valence } = this;
-    if (valence === -1) {
-      valence = this.getAtomBondsCount() - this.charge + this.radicalCount;
-    }
-    const defVal = this.findSuitableValence(valence);
-
-    // find default valency for our case
-    return Math.max(0, defVal - valence);
-  }
-
-  getHydrogenCountHydrogen() {
-    if (this.getAtomBondsCount() === 0 && this.charge === 0
-      && this.getValence() === 0 && this.radicalCount === 0) {
-      return 1;
-    }
-    // do add in any other case
-    return 0;
-  }
-
-  getHydrogenCount() {
-    if (this.hydrogenCount >= 0) {
-      return this.hydrogenCount;
-    }
-
-    const { element } = this;
-    const val = element.hydrogenValency;
-    if (val.length === 1 && val[0] === 0) {
-      return 0;
-    }
-
-    switch (element.number) {
-      case 1:
-        return this.getHydrogenCountHydrogen();
-      case 3:
-      case 11:
-      case 19:
-      case 37:
-      case 55:
-      case 87: // group 1
-      case 4:
-      case 12:
-      case 20:
-      case 38:
-      case 56:
-      case 88: // group 2
-      case 13:
-      case 31:
-      case 49:
-      case 41: // group 13 but Boron
-      case 82:
-      case 83: // Bi and Pb
-        return this.getHydrogenCountMetal();
-      case 6:
-      case 14:
-      case 32:
-      case 51: // C, Si, Ge, Sb
-        return this.getHydrogenCountGroup14();
-      case 50: // Sn
-        return this.getHydrogenCountTin();
-      case 7:
-      case 8:
-      case 9:
-      case 15:
-      case 16:
-      case 17: // N, O, F, P, S, Cl
-      case 33:
-      case 34:
-      case 35:
-      case 53:
-      case 85: // As, Se, Br, I, At
-        return this.getHydrogenCountNonMetal();
-      case 5:
-        return this.getHydrogenCountBoron();
-      default:
-        return 0;
-    }
-  }
-
-  getAtomBondsCount() {
-    const explicitBonds = this.bonds;
-    let ebCount = 0;
-    for (let i = 0; i < explicitBonds.length; i++) {
-      ebCount += getCylinderCount(explicitBonds[i].getOrder());
-    }
-    return ebCount;
-  }
-
-  findSuitableValence(valence) {
-    const val = this.element.hydrogenValency;
-    let defVal = val[val.length - 1];
-    for (let i = 0; i < val.length; i++) {
-      if (val[i] >= valence) {
-        defVal = val[i];
-        break;
-      }
-    }
-    return defVal;
   }
 
   getFullName() {
