@@ -3,9 +3,9 @@ import AtomName from './AtomName';
 /**
  * Atom measurements.
  *
- * @param {Residue} residue    - Residue containing the atom
- * @param {AtomName} name        - Name, unique in the residue
- * @param {Element} type      - Chemical element reference
+ * @param {Residue} residue    - (required) Residue containing the atom
+ * @param {AtomName} name      - (required) Name, unique in the residue
+ * @param {Element} type       - (required) Chemical element reference
  * @param {THREE.Vector3} position - Registered coordinates
  *
  * @param {number} role        - Role of atom inside monomer: Lead and wing are particularity interesting
