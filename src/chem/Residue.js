@@ -108,7 +108,7 @@ class Residue {
   _findAtomByName(name) {
     let res = null;
     this.forEachAtom((atom) => {
-      if (atom.name._name === name) {
+      if (atom.name === name) {
         res = atom;
         return true;
       }

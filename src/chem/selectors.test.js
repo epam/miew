@@ -18,14 +18,9 @@ describe('selectors', () => {
     _chain: { _name: 'B' },
   };
 
-  const atomName = {
-    _name: 'CA',
-    getString() { return this._name; },
-  };
-
   const atom = {
     residue,
-    name: atomName,
+    name: 'CA',
     element: { name: 'N' },
     position: 1,
     role: 1,

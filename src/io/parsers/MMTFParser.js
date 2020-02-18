@@ -9,7 +9,6 @@ const {
   Complex,
   Chain,
   Atom,
-  AtomName,
   Element,
   Helix,
   Sheet,
@@ -133,7 +132,7 @@ class MMTFParser extends Parser {
     const altLoc = !atomData.altLoc.charCodeAt(0) ? '' : atomData.altLoc;
     const atom = new Atom(
       atomData.groupIndex, // we store residue index here to replace it later with actual reference
-      new AtomName(atomData.atomName),
+      atomData.atomName,
       Element.getByName(atomData.element.toUpperCase()),
       new THREE.Vector3(atomData.xCoord, atomData.yCoord, atomData.zCoord),
       Element.Role[atomData.atomName],

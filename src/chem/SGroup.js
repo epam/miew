@@ -4,7 +4,7 @@ import * as THREE from 'three';
  * Atom measurements.
  *
  * @param {string} id              - SGroup id
- * @param {AtomName} name          - Name of the group
+ * @param {string} name            - Name of the group
  * @param {THREE.Vector3} position - Registered coordinates
  * @param {array} atoms            - Atoms group consists of
  * @param {object} saveNode        - XML node from file for saving
@@ -26,7 +26,7 @@ class SGroup {
 
   /**
    * Get atom full name.
-   * @returns {AtomName} Atom full name.
+   * @returns {string} Atom full name.
    */
   getName() {
     return this._name;

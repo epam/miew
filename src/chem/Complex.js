@@ -158,7 +158,7 @@ class Complex {
               if (currAtom) {
                 return;
               }
-              if (atomName.localeCompare(atom.name.getString()) === 0) {
+              if (atomName.localeCompare(atom.name) === 0) {
                 currAtom = atom;
               }
             });
@@ -674,7 +674,7 @@ class Complex {
 
     const dict = {};
     this.forEachAtom((atom) => {
-      dict[atom.name._name] = 1;
+      dict[atom.name] = 1;
     });
     this._atomNames = Object.keys(dict);
 

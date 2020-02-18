@@ -166,9 +166,9 @@ export default class PDBExporter extends Exporter {
     for (let i = 0; i < atoms.length; i++) {
       const tag = atoms[i].het ? 'HETATM' : 'ATOM';
       result.newString(tag);
-      const startIndx = (atoms[i].element.name.length > 1 || atoms[i].name._name.length > 3) ? 13 : 14;
+      const startIndx = (atoms[i].element.name.length > 1 || atoms[i].name.length > 3) ? 13 : 14;
       result.writeString(atoms[i].serial, 11, 7);
-      result.writeString(atoms[i].name._name, startIndx, 16);
+      result.writeString(atoms[i].name, startIndx, 16);
       result.writeString(String.fromCharCode(atoms[i].location), 17, 17);
       result.writeString(atoms[i].residue._type._name, 20, 18);
       result.writeString(atoms[i].residue._chain._name, 22, 22);

@@ -130,7 +130,7 @@ export default class HBondInfo {
 
   _residueGetCAlpha(res) {
     for (let i = 0; i < res._atoms.length; ++i) {
-      const name = res._atoms[i].name.getString();
+      const { name } = res._atoms[i];
       if (name === 'CA'
         || name === 'C1') {
         return res._atoms[i].position;
@@ -145,9 +145,9 @@ export default class HBondInfo {
     let o = null;
 
     res.forEachAtom((a) => {
-      if (a.name.getString() === 'C') {
+      if (a.name === 'C') {
         c = a.position;
-      } else if (a.name.getString() === 'O') {
+      } else if (a.name === 'O') {
         o = a.position;
       }
     });
@@ -161,7 +161,7 @@ export default class HBondInfo {
 
     let n;
     res.forEachAtom((a) => {
-      if (a.name.getString() === 'N') {
+      if (a.name === 'N') {
         n = a.position;
       }
     });

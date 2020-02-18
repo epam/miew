@@ -6,7 +6,6 @@ import chem from '../../chem';
 const {
   Complex,
   Element,
-  AtomName,
   SGroup,
   Bond,
 } = chem;
@@ -508,9 +507,7 @@ class CMLParser extends Parser {
       const lLabel = labels[reorder[i]];
       if (this._unpackLabel(lLabel).molId === this._unpackLabel(currentLabel).molId) {
         atom = atoms[reorder[i]];
-        const atomHtmlNode = null;
-
-        const atomFullNameStruct = new AtomName(atom.elementType, atomHtmlNode);
+        const atomFullNameStruct = atom.elementType;
 
         if (atom.sgroupRef) {
           const countRef = atom.sgroupRef.length;

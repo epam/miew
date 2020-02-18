@@ -37,7 +37,7 @@ defineSelector('Serial', class SerialSelector extends RangeListSelector {
 
 defineSelector('Name', class NameSelector extends ValueListSelector {
   includesAtom(atom) {
-    return this.list.includes(atom.name.getString());
+    return this.list.includes(atom.name);
   }
 });
 

@@ -1,10 +1,8 @@
-import AtomName from './AtomName';
-
 /**
  * Atom measurements.
  *
  * @param {Residue} residue    - (required) Residue containing the atom
- * @param {AtomName} name      - (required) Name, unique in the residue
+ * @param {string} name        - (required) Name, unique in the residue
  * @param {Element} type       - (required) Chemical element reference
  * @param {THREE.Vector3} position - Registered coordinates
  *
@@ -25,12 +23,7 @@ class Atom {
   constructor(residue, name, type, position, role, het, serial, location, occupancy, temperature, charge) {
     this.index = -1;
     this.residue = residue;
-    if (name instanceof AtomName) {
-      this.name = name;
-    } else {
-      this.name = new AtomName(name);
-    }
-
+    this.name = name;
     this.element = type;
     this.position = position;
     this.role = role;
@@ -67,8 +60,8 @@ class Atom {
 
   getVisualName() {
     const { name } = this;
-    if (name.getString().length > 0) {
-      return name.getString();
+    if (name.length > 0) {
+      return name;
     }
     return this.element.name.trim();
   }
@@ -86,12 +79,9 @@ class Atom {
       if (this.residue._chain !== null) {
         name += `${this.residue._chain.getName()}.`;
       }
-
       name += `${this.residue._sequence}.`;
     }
-
-    name += this.name.getString();
-
+    name += this.name;
     return name;
   }
 

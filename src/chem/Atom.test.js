@@ -5,36 +5,20 @@ import Atom from './Atom';
 chai.use(dirtyChai);
 
 describe('Atom', () => {
-  // Chain stub
-  const chain = {
-    _name: 'B',
-    getName() { return this._name; },
-  };
-
-  // Residue stub
-  const residue = {
-    _type: { _name: 'ALA', flags: 0x0000 },
-    _sequence: 4,
-    _icode: 'A',
-    _index: 2,
-    _chain: chain,
-  };
-  // Element stub
   const typeH = { number: 1, name: 'H', hydrogenValency: [1] };
   const typeC = { number: 6, name: 'C', hydrogenValency: [4] };
-
   const name = 'CA';
 
   describe('constructor', () => {
     it('throws an error when required parameter is missed', () => {
       expect(() => new Atom()).to.throw();
-      expect(() => new Atom(residue)).to.throw();
-      expect(() => new Atom(residue, name)).to.throw();
+      expect(() => new Atom({})).to.throw();
+      expect(() => new Atom({}, '')).to.throw();
     });
 
     it('creates default atom with defined name, residue and type', () => {
       const a = new Atom(null, '', {});
-      expect(a.name._name).to.deep.equal('Unknown');
+      expect(a.name).to.equal('');
       expect(a.residue).to.deep.equal(null);
       expect(a.element).to.deep.equal({});
       expect(a.index).to.equal(-1);
@@ -71,23 +55,23 @@ describe('Atom', () => {
 
   describe('#getVisualName()', () => {
     it('returns name', () => {
-      const a = new Atom(residue, name, typeC);
-      expect(a.getVisualName()).to.equal(name);
+      const a = new Atom({}, 'Name', typeC);
+      expect(a.getVisualName()).to.equal('Name');
     });
-    it('returns unknown name when it is empty', () => {
-      const a = new Atom(residue, '', {});
-      expect(a.getVisualName()).to.equal('Unknown');
+    it('returns element\'s name if atom\'s name is missed', () => {
+      const a = new Atom({}, '', typeC);
+      expect(a.getVisualName()).to.equal(typeC.name);
     });
   });
 
   describe('#getFullName()', () => {
     it('builds name taking into account residue and chain', () => {
-      const a = new Atom(null, '', {});
-      expect(a.getFullName()).to.equal('Unknown');
+      const a = new Atom(null, 'Atom', {});
+      expect(a.getFullName()).to.equal('Atom');
       a.residue = { _sequence: 'ResSeq', _chain: null };
-      expect(a.getFullName()).to.equal('ResSeq.Unknown');
+      expect(a.getFullName()).to.equal('ResSeq.Atom');
       a.residue._chain = { _name: 'Chain', getName() { return 'Chain'; } };
-      expect(a.getFullName()).to.equal('Chain.ResSeq.Unknown');
+      expect(a.getFullName()).to.equal('Chain.ResSeq.Atom');
     });
   });
 });
