@@ -415,6 +415,7 @@ Miew.prototype._initGfx = function () {
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
   gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
+  gfx.renderer.shadowMap.autoUpdate = false;
   gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
   capabilities.init(gfx.renderer);
 
@@ -477,6 +478,7 @@ Miew.prototype._initGfx = function () {
   light12.shadow = new THREE.DirectionalLightShadow();
   light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
+  light12.shadow.camera.layers.set(gfxutils.LAYERS.SHADOWMAP);
 
   const pixelRatio = gfx.renderer.getPixelRatio();
   const shadowMapSize = Math.max(gfx.width, gfx.height) * pixelRatio;
@@ -1220,6 +1222,10 @@ Miew.prototype._renderScene = (function () {
       this._enableMRT(true, gfx.offscreenBuf, gfx.offscreenBuf4);
     }
 
+    if (settings.now.shadow.on) {
+      this._renderShadowMap();
+    }
+
     if (settings.now.transparency === 'prepass') {
       this._renderWithPrepassTransparency(camera, gfx.offscreenBuf);
     } else if (settings.now.transparency === 'standard') {
@@ -1355,6 +1361,51 @@ Miew.prototype._renderOutline = (function () {
 
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.renderScreenQuad(_outlineMaterial);
+  };
+}());
+
+Miew.prototype._renderShadowMap = (function () {
+  return function () {
+    const gfx = this._gfx;
+
+    const currentRenderTarget = gfx.renderer.getRenderTarget();
+    const activeCubeFace = gfx.renderer.getActiveCubeFace();
+    const activeMipmapLevel = gfx.renderer.getActiveMipmapLevel();
+
+    const _state = gfx.renderer.state;
+
+    // Set GL state for depth map.
+    _state.setBlending(THREE.NoBlending);
+    _state.buffers.color.setClear(1, 1, 1, 1);
+    _state.buffers.depth.setTest(true);
+    _state.setScissorTest(false);
+
+    for (let i = 0; i < gfx.scene.children.length; i++) {
+      if (gfx.scene.children[i].type === 'DirectionalLight') {
+        const light = gfx.scene.children[i];
+
+        const pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
+
+        if (light.shadow.map == null) {
+          light.shadow.map = new THREE.WebGLRenderTarget(light.shadow.mapSize.width, light.shadow.mapSize.height, pars);
+          // shadowmap.texture.name = light.name + ".shadowMap";
+
+          light.shadow.camera.updateProjectionMatrix();
+        }
+
+        const viewportCount = light.shadow.getViewportCount();
+
+        for (let vp = 0; vp < viewportCount; vp++) {
+          light.shadow.updateMatrices(light, vp);
+
+          gfx.renderer.setRenderTarget(light.shadow.map);
+          gfx.renderer.clear();
+
+          gfx.renderer.render(gfx.scene, light.shadow.camera);
+        }
+      }
+    }
+    gfx.renderer.setRenderTarget(currentRenderTarget, activeCubeFace, activeMipmapLevel);
   };
 }());
 
@@ -3622,6 +3673,16 @@ Miew.prototype._fogFarUpdateValue = function () {
   }
 };
 
+Miew.prototype._updateShadowmapMeshes = function (process) {
+  this._forEachComplexVisual((visual) => {
+    const reprList = visual._reprList;
+    for (let i = 0, n = reprList.length; i < n; ++i) {
+      const repr = reprList[i];
+      process(repr.geo, repr.material);
+    }
+  });
+};
+
 Miew.prototype._updateMaterials = function (values, needTraverse = false, process = undefined) {
   this._forEachComplexVisual((visual) => visual.setMaterialValues(values, needTraverse, process));
   for (let i = 0, n = this._objects.length; i < n; ++i) {
@@ -3725,16 +3786,13 @@ Miew.prototype._initOnSettingsChanged = function () {
     if (gfx) {
       gfx.renderer.shadowMap.enabled = Boolean(values.shadowmap);
     }
+    this._updateMaterials(values, true);
     if (values.shadowmap) {
       this._updateShadowCamera();
+      this._updateShadowmapMeshes(gfxutils.createShadowmapMaterial);
+    } else {
+      this._updateShadowmapMeshes(gfxutils.removeShadowmapMaterial);
     }
-    this._updateMaterials(values, true, (object) => {
-      if (values.shadowmap) {
-        gfxutils.prepareObjMaterialForShadow(object);
-      } else {
-        object.customDepthMaterial = null;
-      }
-    });
     this._needRender = true;
   });
 
