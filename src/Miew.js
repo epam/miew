@@ -431,7 +431,7 @@ Miew.prototype._initGfx = function () {
   if (!arezSpritesSupported(gfx.renderer.getContext())) {
     settings.set('zSprites', false);
   }
-  if (isAOSupported(gfx.renderer.getContext())) {
+  if (!isAOSupported(gfx.renderer.getContext())) {
     settings.set('ao', false);
   }
 
