@@ -196,9 +196,9 @@ export default class PDBExporter extends Exporter {
     for (let i = 0; i < molecules.length; i++) {
       const chains = this._getMoleculeChains(molecules[i]);
       result.newString();
-      result.writeString(`MOL_ID: ${molecules[i]._index};`, 11, 80);
+      result.writeString(`MOL_ID: ${molecules[i].index};`, 11, 80);
       result.newString();
-      result.writeString(`MOLECULE: ${molecules[i]._name};`, 11, 80);
+      result.writeString(`MOLECULE: ${molecules[i].name};`, 11, 80);
       result.newString();
       result.writeString('CHAIN: ', 11, 18);
       const chainsString = `${chains.join(', ')};`;
@@ -262,7 +262,7 @@ export default class PDBExporter extends Exporter {
     function getChainName(residue) {
       return residue._chain._name;
     }
-    const chainNames = molecule._residues.map(getChainName);
+    const chainNames = molecule.residues.map(getChainName);
     return chainNames.filter((item, pos) => chainNames.indexOf(item) === pos);
   }
 }

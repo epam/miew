@@ -232,7 +232,7 @@ class MMTFParser extends Parser {
         residues = residues.concat(chain._residues.slice());
       }
       const molecule = new Molecule(this._complex, entity.description, i + 1);
-      molecule._residues = residues;
+      molecule.residues = residues;
       this._complex._molecules[i] = molecule;
     }
   }

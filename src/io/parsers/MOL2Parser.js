@@ -261,7 +261,7 @@ class MOL2Parser extends Parser {
       const currMolecule = this._molecules[i];
       const molResidues = chain._residues;
       const molecule = new Molecule(this._complex, currMolecule._name, i + 1);
-      molecule._residues = molResidues;
+      molecule.residues = molResidues;
       this._complex._molecules[i] = molecule;
     }
   }

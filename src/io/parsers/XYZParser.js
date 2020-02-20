@@ -72,7 +72,7 @@ class XYZParser extends Parser {
     }
 
     const molecule = new Molecule(this._complex, this._complex.name, 1);
-    molecule._residues = residue;
+    molecule.residues = residue;
     this._complex._molecules[0] = molecule;
   }
 

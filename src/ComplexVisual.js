@@ -381,7 +381,7 @@ class ComplexVisual extends Visual {
         residue._mask &= clearMask;
         chain._mask &= clearMask;
         if (molecule) {
-          molecule._mask &= clearMask;
+          molecule.mask &= clearMask;
         }
         this._selectionCount--;
       } else {

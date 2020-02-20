@@ -578,9 +578,9 @@ class Complex {
     // add reference to molecule into residue
     for (let i = 0; i < this._molecules.length; i++) {
       const molecule = this._molecules[i];
-      const count = molecule._residues.length;
+      const count = molecule.residues.length;
       for (let j = 0; j < count; j++) {
-        const residue = molecule._residues[j];
+        const residue = molecule.residues[j];
         residue._molecule = molecule;
       }
     }

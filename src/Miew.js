@@ -2795,7 +2795,7 @@ Miew.prototype._onPick = function (event) {
     complex = event.obj.chain.getComplex();
     this._lastPick = event.obj.chain;
   } else if (event.obj.molecule) {
-    complex = event.obj.molecule.getComplex();
+    complex = event.obj.molecule.complex;
     this._lastPick = event.obj.molecule;
   } else {
     this._lastPick = null;
