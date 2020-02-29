@@ -7,11 +7,11 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "ci": "npm run clean lint build",
-    "lint": "eslint -f unix *.js src/ ",
-    "start": "webpack-dev-server --mode development --open",
+    "ci": "run-s clean lint build",
     "clean": "rimraf build/*",
-    "build": "webpack --mode production"
+    "lint": "eslint -f unix *.js src/ ",
+    "build": "webpack --mode production",
+    "start": "webpack-dev-server --mode development --open"
   },
   "keywords": [
     "molecule",

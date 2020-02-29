@@ -1,7 +1,9 @@
+const path = require('path');
+
 module.exports = {
-  entry: './index.js',
+  entry: './src/App.js',
   output: {
-    path: __dirname,
+    path: path.resolve(__dirname, 'build'),
     chunkFilename: '[name].bundle.js',
     filename: 'index.js',
   },
