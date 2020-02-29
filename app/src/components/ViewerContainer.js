@@ -1,5 +1,5 @@
 import React from 'react';
-import Miew from 'Miew';
+import Miew from 'miew';
 
 const style = {
   width: '640px',
