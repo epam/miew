@@ -1,8 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import ViewerContainer from './components/ViewerContainer';
+import ViewerContainer from './viewer/ViewerContainer';
 
-class App extends React.Component {
+export default class App extends React.Component {
   constructor() {
     super();
     this._viewer = null;
@@ -23,6 +22,3 @@ class App extends React.Component {
     </div>;
   }
 }
-
-const root = document.getElementsByClassName('main')[0];
-ReactDOM.render(<App/>, root);
