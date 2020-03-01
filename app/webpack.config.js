@@ -2,7 +2,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    app: './src/index.js',
+  },
   output: {
     path: path.resolve(__dirname, 'build'),
     chunkFilename: '[name].bundle.js',
@@ -36,4 +38,32 @@ module.exports = {
       template: './src/index.html',
     }),
   ],
+  optimization: {
+    runtimeChunk: {
+      name: 'manifest',
+    },
+    splitChunks: {
+      name: false,
+      chunks: 'all',
+      cacheGroups: {
+        miew: {
+          name: 'miew',
+          test: /[\\/]node_modules[\\/]miew[\\/]/,
+        },
+        vendor: {
+          name: 'vendor',
+          test: /[\\/]node_modules[\\/](?!miew[\\/])/,
+        },
+      },
+    },
+  },
+  devtool: 'source-map',
+  stats: {
+    assets: false,
+    colors: true,
+    chunks: true,
+  },
+  watchOptions: {
+    ignored: /node_modules/,
+  },
 };
