@@ -36,6 +36,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
+      title: 'Miew – 3D Molecular Viewer',
     }),
   ],
   optimization: {
