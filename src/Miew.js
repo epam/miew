@@ -1088,6 +1088,10 @@ Miew.prototype._renderFrame = (function () {
     const pixelRatio = gfx.renderer.getPixelRatio();
     this._resizeOffscreenBuffers(_size.width * pixelRatio, _size.height * pixelRatio, stereo);
 
+    if (settings.now.shadow.on) {
+      this._renderShadowMap();
+    }
+
     switch (stereo) {
       case 'WEBVR':
       case 'NONE':
@@ -1220,10 +1224,6 @@ Miew.prototype._renderScene = (function () {
 
     if (ssao) {
       this._enableMRT(true, gfx.offscreenBuf, gfx.offscreenBuf4);
-    }
-
-    if (settings.now.shadow.on) {
-      this._renderShadowMap();
     }
 
     if (settings.now.transparency === 'prepass') {
@@ -1365,6 +1365,8 @@ Miew.prototype._renderOutline = (function () {
 }());
 
 Miew.prototype._renderShadowMap = (function () {
+  const pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
+
   return function () {
     const gfx = this._gfx;
 
@@ -1384,25 +1386,16 @@ Miew.prototype._renderShadowMap = (function () {
       if (gfx.scene.children[i].type === 'DirectionalLight') {
         const light = gfx.scene.children[i];
 
-        const pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
-
         if (light.shadow.map == null) {
           light.shadow.map = new THREE.WebGLRenderTarget(light.shadow.mapSize.width, light.shadow.mapSize.height, pars);
-          // shadowmap.texture.name = light.name + ".shadowMap";
-
           light.shadow.camera.updateProjectionMatrix();
         }
+        light.shadow.updateMatrices(light);
 
-        const viewportCount = light.shadow.getViewportCount();
+        gfx.renderer.setRenderTarget(light.shadow.map);
+        gfx.renderer.clear();
 
-        for (let vp = 0; vp < viewportCount; vp++) {
-          light.shadow.updateMatrices(light, vp);
-
-          gfx.renderer.setRenderTarget(light.shadow.map);
-          gfx.renderer.clear();
-
-          gfx.renderer.render(gfx.scene, light.shadow.camera);
-        }
+        gfx.renderer.render(gfx.scene, light.shadow.camera);
       }
     }
     gfx.renderer.setRenderTarget(currentRenderTarget, activeCubeFace, activeMipmapLevel);
