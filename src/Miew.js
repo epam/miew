@@ -1088,9 +1088,7 @@ Miew.prototype._renderFrame = (function () {
     const pixelRatio = gfx.renderer.getPixelRatio();
     this._resizeOffscreenBuffers(_size.width * pixelRatio, _size.height * pixelRatio, stereo);
 
-    if (settings.now.shadow.on) {
-      this._renderShadowMap();
-    }
+    this._renderShadowMap();
 
     switch (stereo) {
       case 'WEBVR':
@@ -1368,8 +1366,11 @@ Miew.prototype._renderShadowMap = (function () {
   const pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
   return function () {
-    const gfx = this._gfx;
+    if (!settings.now.shadow.on) {
+      return;
+    }
 
+    const gfx = this._gfx;
     const currentRenderTarget = gfx.renderer.getRenderTarget();
     const activeCubeFace = gfx.renderer.getActiveCubeFace();
     const activeMipmapLevel = gfx.renderer.getActiveMipmapLevel();
