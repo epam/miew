@@ -16,6 +16,7 @@
   "license": "MIT",
   "scripts": {
     "ci": "run-s clean lint test-cover build",
+    "ci-app": "cd app/ && run-s ci",
     "ci-fast": "run-s lint:js test:unit build:demo",
     "lint": "run-s lint:*",
     "lint-fix": "run-s \"lint:* -- --fix\"",
