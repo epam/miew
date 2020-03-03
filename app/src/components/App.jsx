@@ -1,5 +1,5 @@
 import React from 'react';
-import ViewerContainer from './viewer/ViewerContainer';
+import ViewerContainer from './viewer/ViewerContainer.jsx';
 
 export default class App extends React.Component {
   constructor() {
