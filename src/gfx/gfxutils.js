@@ -10,7 +10,7 @@ import fragmentScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTex
 import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {
-  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4, COLOR_FROM_POSITION: 5,
+  DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4, COLOR_FROM_POSITION: 5, SHADOWMAP: 6,
 };
 
 const SELECTION_LAYERS = [ // These layers, that are used in the selection by ray casting
@@ -516,32 +516,58 @@ function processColFromPosMaterial(root, material) {
     parent.add(colFromPosMesh);
   }
 }
-function prepareObjMaterialForShadow(object) {
-  if (object.castShadow) { // add casting material for casters
-    const depthMaterial = object.material.createInstance();
-    depthMaterial.setValues({
-      colorFromDepth: true,
-      lights: false,
-      shadowmap: false,
-      fog: false,
-    });
-    object.customDepthMaterial = depthMaterial;
-  }
-  if (!object.receiveShadow && object.material.shadowmap) { // remove shaodow from non-receivers
-    object.material.setValues({ shadowmap: false });
-  }
-}
 
-function processMaterialForShadow(root, material) {
+function createShadowmapMaterial(root, material) {
   if (!(material instanceof UberMaterial)) {
     return;
   }
 
-  root.traverse((object) => {
-    if (object instanceof THREE.Mesh) {
-      prepareObjMaterialForShadow(object);
+  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
+
+  for (let i = 0, n = meshes.length; i < n; ++i) {
+    const mesh = meshes[i];
+    if (!mesh.receiveShadow && mesh.material.shadowmap) { // remove shadow from non-receivers
+      mesh.material.setValues({ shadowmap: false });
     }
-  });
+    if (!mesh.castShadow) { // skip creating shadowmap meshes for non-casters
+      continue;
+    }
+
+    // create special mesh for shadowmap
+    const { parent } = mesh;
+    if (!parent) {
+      continue;
+    }
+
+    // copy of geometry with shadowmap material
+    const shadowmapMat = mesh.material.createInstance();
+    shadowmapMat.setValues({ colorFromDepth: true });
+    const shadowmapMesh = new mesh.constructor(mesh.geometry, shadowmapMat);
+    _.forEach(['lights', 'shadowmap', 'fog'],
+      (value) => {
+        shadowmapMesh.material[value] = false;
+      });
+    shadowmapMesh.isShadowmapMesh = true;
+    shadowmapMesh.material.needsUpdate = true;
+    shadowmapMesh.applyMatrix(mesh.matrix);
+    shadowmapMesh.layers.set(LAYERS.SHADOWMAP);
+    parent.add(shadowmapMesh);
+  }
+}
+
+function removeShadowmapMaterial(root, material) {
+  if (!(material instanceof UberMaterial)) {
+    return;
+  }
+
+  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
+
+  for (let i = 0, n = meshes.length; i < n; ++i) {
+    const mesh = meshes[i];
+    if (mesh.isShadowmapMesh && mesh.parent) {
+      mesh.parent.remove(mesh);
+    }
+  }
 }
 
 function processObjRenderOrder(root, idMaterial) {
@@ -602,8 +628,8 @@ export default {
   applyTransformsToMeshes,
   processTransparentMaterial,
   processColFromPosMaterial,
-  prepareObjMaterialForShadow,
-  processMaterialForShadow,
+  createShadowmapMaterial,
+  removeShadowmapMaterial,
   processObjRenderOrder,
   makeVisibleMeshes,
   applySelectionMaterial,

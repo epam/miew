@@ -75,12 +75,12 @@ class Representation {
     }
     this.geo.visible = this.visible;
 
-    if (settings.now.shadow.on) {
-      gfxutils.processMaterialForShadow(this.geo, this.material);
-    }
-
     gfxutils.processObjRenderOrder(this.geo, this.materialPreset.id);
     gfxutils.processColFromPosMaterial(this.geo, this.material);
+
+    if (settings.now.shadow.on) {
+      gfxutils.createShadowmapMaterial(this.geo, this.material);
+    }
 
     return this.geo;
   }
