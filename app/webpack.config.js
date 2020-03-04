@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -7,8 +8,8 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'build'),
-    chunkFilename: '[name].bundle.js',
-    filename: 'index.js',
+    filename: '[name].[chunkhash].js',
+    chunkFilename: '[name].[chunkhash].js',
   },
   module: {
     rules: [
@@ -42,6 +43,7 @@ module.exports = {
       template: './src/index.html',
       title: 'Miew – 3D Molecular Viewer',
     }),
+    new webpack.HashedModuleIdsPlugin(),
   ],
   optimization: {
     runtimeChunk: {
