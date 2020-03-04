@@ -762,7 +762,7 @@ class ComplexVisual extends Visual {
     });
 
     complex.forEachAtom((atom) => {
-      if (atom._mask & mask && !(atom.residue._mask & mask)) {
+      if (atom.mask & mask && !(atom.residue._mask & mask)) {
         atoms.push(atom.serial);
       }
     });

@@ -2976,19 +2976,11 @@ Miew.prototype._updateInfoPanel = function () {
     atom = this._lastPick;
     residue = atom.residue;
 
-    const an = atom.name;
-    if (an.getNode() !== null) {
-      aName = an.getNode();
-    } else {
-      aName = an.getString();
-    }
+    aName = atom.name;
     const location = (atom.location !== 32) ? String.fromCharCode(atom.location) : ''; // 32 is code of white-space
     secondLine = `${atom.element.fullName} #${atom.serial}${location}: \
       ${residue._chain._name}.${residue._type._name}${residue._sequence}${residue._icode.trim()}.`;
-    if (typeof aName === 'string') {
-      // add atom name to second line in plain text form
-      secondLine += aName;
-    }
+    secondLine += aName;
 
     coordLine = `Coord: (${atom.position.x.toFixed(2).toString()},\
      ${atom.position.y.toFixed(2).toString()},\
@@ -3009,13 +3001,6 @@ Miew.prototype._updateInfoPanel = function () {
   if (secondLine !== '') {
     info.appendChild(document.createElement('br'));
     info.appendChild(document.createTextNode(secondLine));
-  }
-
-  if (typeof aName !== 'string') {
-    // add atom name to second line in HTML form
-    const newNode = aName.cloneNode(true);
-    newNode.style.fontSize = '85%';
-    info.appendChild(newNode);
   }
 
   if (coordLine !== '') {
