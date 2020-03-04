@@ -20,7 +20,7 @@ before_script:
   - chmod +x /tmp/cc-test-reporter
 script:
   - yarn run ci
-  - yarn run ci-app
+  - cd app && yarn run ci
 after_success:
   - sonar-scanner
   - npm run coveralls
