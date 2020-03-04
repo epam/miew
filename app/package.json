@@ -33,6 +33,10 @@
     "last 2 ChromeAndroid versions",
     "last 2 FirefoxAndroid versions"
   ],
+  "moduleDirectories": [
+    "node_modules",
+    "src"
+  ],
   "babel": {
     "presets": [
       "@babel/preset-env",
