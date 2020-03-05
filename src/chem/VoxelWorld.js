@@ -103,7 +103,7 @@ class VoxelWorld {
 
     complex.forEachAtom((atom) => {
       // find which voxel contains this atom
-      const voxelIdx = self._findVoxel(atom._position);
+      const voxelIdx = self._findVoxel(atom.position);
 
       // push current atom to the head of voxel's atom list
       self._atoms[idx] = atom;
@@ -315,7 +315,7 @@ class VoxelWorld {
         self._forEachAtomInVoxel(voxel, process);
       } else {
         self._forEachAtomInVoxel(voxel, (atom) => {
-          if (center.distanceToSquared(atom._position) <= r2) {
+          if (center.distanceToSquared(atom.position) <= r2) {
             process(atom);
           }
         });
@@ -334,7 +334,7 @@ class VoxelWorld {
   forEachAtomWithinDistFromMasked(complex, mask, dist, process) {
     this._forEachAtomWithinDistFromGroup((atomProc) => {
       complex.forEachAtom((atom) => {
-        if ((atom._mask & mask) !== 0) {
+        if ((atom.mask & mask) !== 0) {
           atomProc(atom);
         }
       });
@@ -376,7 +376,7 @@ class VoxelWorld {
 
     // build "within radius" atom list for each voxel
     forEachAtom((atom) => {
-      self._forEachVoxelWithinRadius(atom._position, dist, (voxel, isInside) => {
+      self._forEachVoxelWithinRadius(atom.position, dist, (voxel, isInside) => {
         if (isInside) {
           // this voxel is inside circle -- no check will be required
           voxels[voxel] = -1;
@@ -412,7 +412,7 @@ class VoxelWorld {
 
       // check distance to each atom within radius from this voxel
       for (; idx >= 0; idx = atoms[idx + 1]) {
-        if (atom._position.distanceToSquared(atoms[idx]._position) < r2) {
+        if (atom.position.distanceToSquared(atoms[idx].position) < r2) {
           process(atom);
           break;
         }

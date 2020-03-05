@@ -27,7 +27,7 @@ function _createSecondary(strArray, complex) {
   const atoms = complex._atoms;
   for (let i = 0, n = strArray.length; i < n; ++i) {
     const atom = atoms[i];
-    resid[atom._residue._index] = strArray[i];
+    resid[atom.residue._index] = strArray[i];
   }
 
   const secondary = [];
@@ -212,7 +212,7 @@ class FrameInfo {
   }
 
   getAtomColor(colorer, atom) {
-    return colorer.getResidueColor(this._residues[atom._residue._index], this._complex);
+    return colorer.getResidueColor(this._residues[atom.residue._index], this._complex);
   }
 
   getResidueColor(colorer, residue) {

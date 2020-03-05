@@ -10,31 +10,15 @@
  */
 class Molecule {
   constructor(complex, name, index) {
-    this._complex = complex;
-    this._name = name || '';
-    this._residues = [];
-    this._mask = 1 | 0;
-    this._index = index || -1; // start with 1
-  }
-
-  getComplex() {
-    return this._complex;
-  }
-
-  getName() {
-    return this._name;
-  }
-
-  getResidues() {
-    return this._residues;
-  }
-
-  getIndex() {
-    return this._index;
+    this.complex = complex;
+    this.name = name || '';
+    this.residues = [];
+    this.mask = 1 | 0;
+    this.index = index || -1; // start with 1
   }
 
   forEachResidue(process) {
-    const residues = this._residues;
+    const { residues } = this;
     for (let i = 0, n = residues.length; i < n; ++i) {
       process(residues[i]);
     }
@@ -42,11 +26,11 @@ class Molecule {
 
   collectMask() {
     let mask = 0xffffffff;
-    const residues = this._residues;
+    const { residues } = this;
     for (let i = 0, n = residues.length; i < n; ++i) {
       mask &= residues[i]._mask;
     }
-    this._mask = mask;
+    this.mask = mask;
   }
 }
 

@@ -4,7 +4,7 @@ class SequenceColorer extends Colorer {
   static id = 'SQ';
 
   getAtomColor(atom, complex) {
-    return this.getResidueColor(atom._residue, complex);
+    return this.getResidueColor(atom.residue, complex);
   }
 
   getResidueColor(residue, _complex) {

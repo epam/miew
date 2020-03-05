@@ -2122,7 +2122,7 @@ Menu.prototype._updateInfo = function (dataSource) {
   const molecules = complex.getMolecules();
   const molList = createElement('ol');
   for (let i = 0; i < molecules.length; i++) {
-    molList.appendChild(createElement('li', null, molecules[i]._name));
+    molList.appendChild(createElement('li', null, molecules[i].name));
   }
   frag.appendChild(createElement('table', { 'class': 'table' }, [
     createElement(

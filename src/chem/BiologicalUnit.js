@@ -25,7 +25,7 @@ class BiologicalUnit {
     const { boundingBox } = this._boundaries;
     boundingBox.makeEmpty();
     if (n === 1) {
-      boundingBox.expandByPoint(atoms[0]._position);
+      boundingBox.expandByPoint(atoms[0].position);
       const bbc = new THREE.Vector3();
       boundingBox.getCenter(bbc);
       const s = 2 * atoms[0].element.radius;
@@ -33,7 +33,7 @@ class BiologicalUnit {
     } else {
       for (let i = 0; i < n; ++i) {
         if (selector.includesAtom(atoms[i])) {
-          boundingBox.expandByPoint(atoms[i]._position);
+          boundingBox.expandByPoint(atoms[i].position);
         }
       }
     }
@@ -49,7 +49,7 @@ class BiologicalUnit {
         if (!selector.includesAtom(atoms[i])) {
           continue;
         }
-        const pos = atoms[i]._position;
+        const pos = atoms[i].position;
         const lengthSquared = center.distanceToSquared(pos);
         if (radiusSquared < lengthSquared) {
           radiusSquared = lengthSquared;

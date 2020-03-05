@@ -1,6 +1,5 @@
 import Atom from './chem/Atom';
 import Element from './chem/Element';
-import AtomName from './chem/AtomName';
 import Bond from './chem/Bond';
 import Residue from './chem/Residue';
 import ResidueType from './chem/ResidueType';
@@ -19,7 +18,6 @@ import Molecule from './chem/Molecule';
 export default {
   Atom,
   Element,
-  AtomName,
   Bond,
   Residue,
   ResidueType,

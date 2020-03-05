@@ -83,7 +83,7 @@ export default class HBondInfo {
     const pairs = new PairCollection(this._complex._residues.length * this._complex._residues.length / 2);
 
     function processAtom(atom) {
-      const rj = atom._residue;
+      const rj = atom.residue;
 
       if (rj._index === ri._index) {
         return;
@@ -130,10 +130,10 @@ export default class HBondInfo {
 
   _residueGetCAlpha(res) {
     for (let i = 0; i < res._atoms.length; ++i) {
-      const name = res._atoms[i].getName().getString();
+      const { name } = res._atoms[i];
       if (name === 'CA'
         || name === 'C1') {
-        return res._atoms[i].getPosition();
+        return res._atoms[i].position;
       }
     }
 
@@ -145,10 +145,10 @@ export default class HBondInfo {
     let o = null;
 
     res.forEachAtom((a) => {
-      if (a.getName().getString() === 'C') {
-        c = a.getPosition();
-      } else if (a.getName().getString() === 'O') {
-        o = a.getPosition();
+      if (a.name === 'C') {
+        c = a.position;
+      } else if (a.name === 'O') {
+        o = a.position;
       }
     });
 
@@ -161,8 +161,8 @@ export default class HBondInfo {
 
     let n;
     res.forEachAtom((a) => {
-      if (a.getName().getString() === 'N') {
-        n = a.getPosition();
+      if (a.name === 'N') {
+        n = a.position;
       }
     });
 

@@ -396,6 +396,15 @@ Miew.prototype._requestAnimationFrame = function (callback) {
   requestAnimationFrame(callback);
 };
 
+function arezSpritesSupported(context) {
+  return context.getExtension('EXT_frag_depth');
+}
+
+function isAOSupported(context) {
+  return (context.getExtension('WEBGL_depth_texture')
+  && context.getExtension('WEBGL_draw_buffers'));
+}
+
 /**
  * Initialize WebGL and set 3D scene up.
  * @private
@@ -420,13 +429,10 @@ Miew.prototype._initGfx = function () {
   capabilities.init(gfx.renderer);
 
   // z-sprites and ambient occlusion possibility
-  if (!gfx.renderer.getContext().getExtension('EXT_frag_depth')) {
+  if (!arezSpritesSupported(gfx.renderer.getContext())) {
     settings.set('zSprites', false);
   }
-  if (
-    !gfx.renderer.getContext().getExtension('WEBGL_depth_texture')
-    || !gfx.renderer.getContext().getExtension('WEBGL_draw_buffers')
-  ) {
+  if (!isAOSupported(gfx.renderer.getContext())) {
     settings.set('ao', false);
   }
 
@@ -2825,7 +2831,7 @@ Miew.prototype._onPick = function (event) {
   // update last pick & find complex
   let complex = null;
   if (event.obj.atom) {
-    complex = event.obj.atom.getResidue().getChain().getComplex();
+    complex = event.obj.atom.residue.getChain().getComplex();
     this._lastPick = event.obj.atom;
   } else if (event.obj.residue) {
     complex = event.obj.residue.getChain().getComplex();
@@ -2834,7 +2840,7 @@ Miew.prototype._onPick = function (event) {
     complex = event.obj.chain.getComplex();
     this._lastPick = event.obj.chain;
   } else if (event.obj.molecule) {
-    complex = event.obj.molecule.getComplex();
+    complex = event.obj.molecule.complex;
     this._lastPick = event.obj.molecule;
   } else {
     this._lastPick = null;
@@ -2968,25 +2974,17 @@ Miew.prototype._updateInfoPanel = function () {
 
   if (this._lastPick instanceof Atom) {
     atom = this._lastPick;
-    residue = atom._residue;
+    residue = atom.residue;
 
-    const an = atom.getName();
-    if (an.getNode() !== null) {
-      aName = an.getNode();
-    } else {
-      aName = an.getString();
-    }
-    const location = (atom._location !== 32) ? String.fromCharCode(atom._location) : ''; // 32 is code of white-space
-    secondLine = `${atom.element.fullName} #${atom._serial}${location}: \
+    aName = atom.name;
+    const location = (atom.location !== 32) ? String.fromCharCode(atom.location) : ''; // 32 is code of white-space
+    secondLine = `${atom.element.fullName} #${atom.serial}${location}: \
       ${residue._chain._name}.${residue._type._name}${residue._sequence}${residue._icode.trim()}.`;
-    if (typeof aName === 'string') {
-      // add atom name to second line in plain text form
-      secondLine += aName;
-    }
+    secondLine += aName;
 
-    coordLine = `Coord: (${atom._position.x.toFixed(2).toString()},\
-     ${atom._position.y.toFixed(2).toString()},\
-     ${atom._position.z.toFixed(2).toString()})`;
+    coordLine = `Coord: (${atom.position.x.toFixed(2).toString()},\
+     ${atom.position.y.toFixed(2).toString()},\
+     ${atom.position.z.toFixed(2).toString()})`;
   } else if (this._lastPick instanceof Residue) {
     residue = this._lastPick;
 
@@ -3003,13 +3001,6 @@ Miew.prototype._updateInfoPanel = function () {
   if (secondLine !== '') {
     info.appendChild(document.createElement('br'));
     info.appendChild(document.createTextNode(secondLine));
-  }
-
-  if (typeof aName !== 'string') {
-    // add atom name to second line in HTML form
-    const newNode = aName.cloneNode(true);
-    newNode.style.fontSize = '85%';
-    info.appendChild(newNode);
   }
 
   if (coordLine !== '') {
@@ -3078,7 +3069,7 @@ Miew.prototype.setPivotResidue = (function () {
       let z = 0;
       const amount = residue._atoms.length;
       for (let i = 0; i < amount; ++i) {
-        const p = residue._atoms[i]._position;
+        const p = residue._atoms[i].position;
         x += p.x / amount;
         y += p.y / amount;
         z += p.z / amount;
@@ -3095,12 +3086,12 @@ Miew.prototype.setPivotAtom = (function () {
   const center = new THREE.Vector3();
 
   return function (atom) {
-    const visual = this._getVisualForComplex(atom.getResidue().getChain().getComplex());
+    const visual = this._getVisualForComplex(atom.residue.getChain().getComplex());
     if (!visual) {
       return;
     }
 
-    center.copy(atom._position);
+    center.copy(atom.position);
     center.applyMatrix4(visual.matrix).negate();
     this._objectControls.setPivot(center);
     this.dispatchEvent({ type: 'transform' });
@@ -3133,7 +3124,7 @@ Miew.prototype.setPivotSubset = (function () {
   const _center = new THREE.Vector3(0.0, 0.0, 0.0);
 
   function _includesInCurSelection(atom, selectionBit) {
-    return atom._mask & (1 << selectionBit);
+    return atom.mask & (1 << selectionBit);
   }
 
   function _includesInSelector(atom, selector) {
@@ -3745,8 +3736,20 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('ao', () => {
-    const values = { normalsToGBuffer: settings.now.ao };
-    this._setUberMaterialValues(values);
+    if (settings.now.ao && !isAOSupported(this._gfx.renderer.getContext())) {
+      this.logger.warn('Your device or browser does not support ao');
+      settings.set('ao', false);
+    } else {
+      const values = { normalsToGBuffer: settings.now.ao };
+      this._setUberMaterialValues(values);
+    }
+  });
+
+  on('zSprites', () => {
+    if (settings.now.zSprites && !arezSpritesSupported(this._gfx.renderer.getContext())) {
+      this.logger.warn('Your device or browser does not support zSprites');
+      settings.set('zSprites', false);
+    }
   });
 
   on('fogColor', () => {
@@ -4112,7 +4115,7 @@ Miew.prototype.projected = function (fullAtomName, complexName) {
     return false;
   }
 
-  const pos = atom._position.clone();
+  const pos = atom.position.clone();
   // we consider atom position to be affected only by common complex transform
   // ignoring any transformations that may add during editing
   this._gfx.pivot.updateMatrixWorldRecursive();
@@ -4180,7 +4183,7 @@ Miew.prototype.exportCML = function () {
     complex.forEachAtom((atom) => {
       if (atom.xmlNodeRef && atom.xmlNodeRef.xmlNode) {
         xml = atom.xmlNodeRef.xmlNode;
-        ap = atom.getPosition();
+        ap = atom.position;
         v4.set(ap.x, ap.y, ap.z, 1.0);
         v4.applyMatrix4(mat);
         xml.setAttribute('x3', v4.x.toString());

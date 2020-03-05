@@ -17,8 +17,8 @@ class OccupancyColorer extends Colorer {
 
   getAtomColor(atom, _complex) {
     const { opts } = this;
-    if (atom._occupancy && opts) {
-      const factor = 1 - atom._occupancy;
+    if (atom.occupancy && opts) {
+      const factor = 1 - atom.occupancy;
       return this.palette.getGradientColor(factor, opts.gradient);
     }
     return this.palette.defaultGradientColor;

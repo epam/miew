@@ -158,10 +158,10 @@ export default class SecondaryStructureMap {
 
   _residueGetCAlpha(res) {
     for (let i = 0; i < res._atoms.length; ++i) {
-      const name = res._atoms[i].getName().getString();
+      const { name } = res._atoms[i];
       if (name === 'CA'
           || name === 'C1') {
-        return res._atoms[i].getPosition();
+        return res._atoms[i].position;
       }
     }
 

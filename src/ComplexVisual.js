@@ -192,7 +192,7 @@ class ComplexVisual extends Visual {
         lookupAndCreate(colorers, rep.colorer));
 
       // something was changed
-      if (diff) {
+      if (!_.isEmpty(diff)) {
         target.needsRebuild = true;
         for (const key in diff) {
           if (diff.hasOwnProperty(key)) {
@@ -372,20 +372,20 @@ class ComplexVisual extends Visual {
     const clearMask = ~setMask;
 
     if (atom) {
-      residue = atom._residue;
+      residue = atom.residue;
       chain = residue._chain;
       molecule = residue._molecule;
 
-      if (atom._mask & setMask) {
-        atom._mask &= clearMask;
+      if (atom.mask & setMask) {
+        atom.mask &= clearMask;
         residue._mask &= clearMask;
         chain._mask &= clearMask;
         if (molecule) {
-          molecule._mask &= clearMask;
+          molecule.mask &= clearMask;
         }
         this._selectionCount--;
       } else {
-        atom._mask |= setMask;
+        atom.mask |= setMask;
         this._selectionCount++;
 
         // select residue if all atoms in it are selected
@@ -404,16 +404,16 @@ class ComplexVisual extends Visual {
         residue._mask &= clearMask;
         chain._mask &= clearMask;
         residue.forEachAtom((a) => {
-          if (a._mask & setMask) {
-            a._mask &= clearMask;
+          if (a.mask & setMask) {
+            a.mask &= clearMask;
             self._selectionCount--;
           }
         });
       } else {
         residue._mask |= setMask;
         residue.forEachAtom((a) => {
-          if (!(a._mask & setMask)) {
-            a._mask |= setMask;
+          if (!(a.mask & setMask)) {
+            a.mask |= setMask;
             self._selectionCount++;
           }
         });
@@ -432,8 +432,8 @@ class ComplexVisual extends Visual {
           if (r._mask & setMask) {
             r._mask &= clearMask;
             r.forEachAtom((a) => {
-              if (a._mask & setMask) {
-                a._mask &= clearMask;
+              if (a.mask & setMask) {
+                a.mask &= clearMask;
                 self._selectionCount--;
               }
             });
@@ -446,8 +446,8 @@ class ComplexVisual extends Visual {
           if (!(r._mask & setMask)) {
             r._mask |= setMask;
             r.forEachAtom((a) => {
-              if (!(a._mask & setMask)) {
-                a._mask |= setMask;
+              if (!(a.mask & setMask)) {
+                a.mask |= setMask;
                 self._selectionCount++;
               }
             });
@@ -470,20 +470,20 @@ class ComplexVisual extends Visual {
 
     // mark atoms to add
     this._complex.forEachBond((bond) => {
-      if (bond._left._mask & selectionMask) {
-        if ((bond._right._mask & selectionMask) === 0) {
-          bond._right._mask |= tmpMask;
+      if (bond._left.mask & selectionMask) {
+        if ((bond._right.mask & selectionMask) === 0) {
+          bond._right.mask |= tmpMask;
         }
-      } else if (bond._right._mask & selectionMask) {
-        bond._left._mask |= tmpMask;
+      } else if (bond._right.mask & selectionMask) {
+        bond._left.mask |= tmpMask;
       }
     });
 
     // select marked atoms
     const deselectionMask = ~tmpMask;
     this._complex.forEachAtom((atom) => {
-      if (atom._mask & tmpMask) {
-        atom._mask = (atom._mask & deselectionMask) | selectionMask;
+      if (atom.mask & tmpMask) {
+        atom.mask = (atom.mask & deselectionMask) | selectionMask;
         ++self._selectionCount;
       }
     });
@@ -498,27 +498,27 @@ class ComplexVisual extends Visual {
 
     // mark atoms neighbouring to unselected ones
     this._complex.forEachBond((bond) => {
-      if (bond._left._mask & selectionMask) {
-        if ((bond._right._mask & selectionMask) === 0) {
-          bond._left._mask |= tmpMask;
+      if (bond._left.mask & selectionMask) {
+        if ((bond._right.mask & selectionMask) === 0) {
+          bond._left.mask |= tmpMask;
         }
-      } else if (bond._right._mask & selectionMask) {
-        bond._right._mask |= tmpMask;
+      } else if (bond._right.mask & selectionMask) {
+        bond._right.mask |= tmpMask;
       }
     });
 
     // mark hanging atoms
     this._complex.forEachAtom((atom) => {
-      if ((atom._mask & selectionMask) && (atom._bonds.length === 1)) {
-        atom._mask |= tmpMask;
+      if ((atom.mask & selectionMask) && (atom.bonds.length === 1)) {
+        atom.mask |= tmpMask;
       }
     });
 
     // deselect marked atoms
     const deselectionMask = ~(selectionMask | tmpMask);
     this._complex.forEachAtom((atom) => {
-      if (atom._mask & tmpMask) {
-        atom._mask &= deselectionMask;
+      if (atom.mask & tmpMask) {
+        atom.mask &= deselectionMask;
         --self._selectionCount;
       }
     });
@@ -534,10 +534,10 @@ class ComplexVisual extends Visual {
 
     // find which component is selected (exclusively)
     this._complex.forEachAtom((atom) => {
-      if (atom._mask & selectionMask) {
+      if (atom.mask & selectionMask) {
         if (component === null) {
-          component = atom._residue._component;
-        } else if (component !== atom._residue._component) {
+          component = atom.residue._component;
+        } else if (component !== atom.residue._component) {
           multiple = true;
         }
       }
@@ -552,7 +552,7 @@ class ComplexVisual extends Visual {
 
     this._complex.forEachAtom((atom) => {
       if (includesAtom(atom, selRule)) {
-        center.add(atom._position);
+        center.add(atom.position);
         count++;
       }
     });
@@ -762,8 +762,8 @@ class ComplexVisual extends Visual {
     });
 
     complex.forEachAtom((atom) => {
-      if (atom._mask & mask && !(atom._residue._mask & mask)) {
-        atoms.push(atom._serial);
+      if (atom.mask & mask && !(atom.residue._mask & mask)) {
+        atoms.push(atom.serial);
       }
     });
 
@@ -858,7 +858,7 @@ class ComplexVisual extends Visual {
     // mark all atoms within distance as selected
     if (vw) {
       vw.forEachAtomWithinDistFromMasked(this._complex, selectionMask, Number(radius), (atom) => {
-        atom._mask |= selectionMask;
+        atom.mask |= selectionMask;
       });
     }
 

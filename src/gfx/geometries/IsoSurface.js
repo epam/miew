@@ -475,12 +475,12 @@ class IsoSurface {
     function collectWeight(ai, coefX, coefY, coefZ) {
       const a = atomMap[ai]; // atomWeightMap is a scalar field, so index into atom map should be the same
       if (a != null) {
-        atomLookup[a._index] = a;
+        atomLookup[a.index] = a;
         const w = coefX * coefY * coefZ * atomWeightData[ai];
-        if (typeof atomWeights[a._index] === 'undefined') {
-          atomWeights[a._index] = w;
+        if (typeof atomWeights[a.index] === 'undefined') {
+          atomWeights[a.index] = w;
         } else {
-          atomWeights[a._index] += w;
+          atomWeights[a.index] += w;
         }
       }
     }

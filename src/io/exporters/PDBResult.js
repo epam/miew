@@ -153,11 +153,11 @@ export default class PDBResult {
 
     for (let k = 0; k < bondsArrays.length; k++) {
       this.newString();
-      this.writeString(atom._serial, 11, 7);
+      this.writeString(atom.serial, 11, 7);
 
       for (let j = 0; j < bondsArrays[k].length; j++) {
-        const serial = (bondsArrays[k][j]._left._serial === atom._serial)
-          ? bondsArrays[k][j]._right._serial : bondsArrays[k][j]._left._serial;
+        const serial = (bondsArrays[k][j]._left.serial === atom.serial)
+          ? bondsArrays[k][j]._right.serial : bondsArrays[k][j]._left.serial;
 
         this.writeString(serial, 16 + 5 * j, 12 + 5 * j);
       }

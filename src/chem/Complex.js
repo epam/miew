@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import logger from '../utils/logger';
 import Atom from './Atom';
 import Chain from './Chain';
-import Element from './Element';
 import Helix from './Helix';
 import Strand from './Strand';
 import Sheet from './Sheet';
@@ -10,7 +9,6 @@ import Component from './Component';
 import ResidueType from './ResidueType';
 import Bond from './Bond';
 import AutoBond from './AutoBond';
-import SGroup from './SGroup';
 import AromaticLoopsMarker from './AromaticLoopsMarker';
 import BiologicalUnit from './BiologicalUnit';
 import selectors from './selectors';
@@ -160,7 +158,7 @@ class Complex {
               if (currAtom) {
                 return;
               }
-              if (atomName.localeCompare(atom._name.getString()) === 0) {
+              if (atomName.localeCompare(atom.name) === 0) {
                 currAtom = atom;
               }
             });
@@ -275,317 +273,6 @@ class Complex {
 
   getResidueType(name) {
     return this._residueTypes[name] || null;
-  }
-
-  _atomNameCompare(a, b, hVal) {
-    const hydrogenName = Element.ByName.H.name;
-    const carbideName = Element.ByName.C.name;
-
-    function snc(str) {
-      if (str === carbideName) {
-        return String.fromCharCode(1);
-      }
-      if (str === hydrogenName) {
-        return String.fromCharCode(hVal);
-      }
-      return str;
-    }
-
-    const ca = snc(a);
-    const cb = snc(b);
-    if (ca < cb) {
-      return -1;
-    }
-    if (ca > cb) {
-      return 1;
-    }
-    return 0;
-  }
-
-  _atomNameCompareCWithH(a, b) {
-    return this._atomNameCompare(a, b, 2);
-  }
-
-  _atomNameCompareCWithoutH(a, b) {
-    return this._atomNameCompare(a, b, 254);
-  }
-
-  _buildFormulaSimple(part, charge) {
-    const { atoms } = part;
-    let element = null;
-    const hash = {};
-    let out = '';
-    const self = this;
-    const hydrogenName = Element.ByName.H.name;
-    let actualCharge = 0;
-    atoms.forEach((a) => {
-      const hc = a.getHydrogenCount();
-      ({ element } = a);
-      if (hash[element.name]) {
-        hash[element.name] += 1;
-      } else {
-        hash[element.name] = 1;
-      }
-      if (hc > 0) {
-        if (hash[hydrogenName]) {
-          hash[hydrogenName] += hc;
-        } else {
-          hash[hydrogenName] = hc;
-        }
-      }
-      actualCharge += a.getCharge();
-    });
-    const k = Object.keys(hash);
-    if (hash.C) {
-      k.sort(this._atomNameCompareCWithH.bind(this));
-    } else {
-      k.sort((a, b) => self._atomNameCompare(a, b, 'H'.charCodeAt(0)));
-    }
-    k.forEach((e) => {
-      const cname = e.substr(0, 1).toUpperCase() + e.substr(1).toLowerCase();
-      if (hash[e] > 1) {
-        out += cname + hash[e].toString();
-      } else {
-        out += cname;
-      }
-    });
-    if (charge === null) {
-      // apply ourselves
-      if (actualCharge !== 0) {
-        if (k.length > 1) {
-          out = `(${out})`;
-        }
-        if (actualCharge > 1) {
-          out += `^{${actualCharge.toString()}+}`;
-        }
-        if (actualCharge === 1) {
-          out += '^+';
-        }
-        if (actualCharge < -1) {
-          out += `^{${Math.abs(actualCharge).toString()}-}`;
-        }
-        if (actualCharge === -1) {
-          out += '^-';
-        }
-      }
-      if (part.repeatCount > 1) {
-        out = part.repeatCount.toString(10) + out;
-      }
-    } else {
-      charge(k.length, actualCharge);
-    }
-    return out;
-  }
-
-  _buildPartFormula(part) {
-    if ((part.owner instanceof Complex) || (part.owner instanceof Component)) {
-      return this._buildFormulaSimple(part, null);
-    }
-    if (part.owner instanceof SGroup) {
-      return part.owner.buildChemicalFormula(this, part);
-    }
-    return '';
-  }
-
-  _partCompareFunc(a, b) {
-    return this._partCompareFuncInt(a, b, true);
-  }
-
-  _getCumulativeCharge(arr) {
-    const n = arr.length;
-    let cumCharge = 0;
-    for (let i = 0; i < n; i++) {
-      cumCharge += arr[i].getCharge();
-    }
-    return cumCharge;
-  }
-
-  _partCompareFuncInt(a, b, skipH) {
-    const self = this;
-    const hydroName = Element.ByName.H.name;
-    function buildAtomArray(atms, skipHydro) {
-      const r = {};
-      atms.forEach((singleAtom) => {
-        if (r[singleAtom.element.name]) {
-          r[singleAtom.element.name] += 1;
-        } else {
-          r[singleAtom.element.name] = 1;
-        }
-        if (!skipHydro) {
-          const hCount = singleAtom.getHydrogenCount();
-          if (hCount > 0) {
-            if (r[hydroName]) {
-              r[hydroName] += hCount;
-            } else {
-              r[hydroName] = hCount;
-            }
-          }
-        }
-      });
-      const k = Object.keys(r);
-      k.sort(self._atomNameCompareCWithoutH.bind(self));
-      return { seq: k, data: r };
-    }
-    const skipArr = [skipH, false];
-    let atomDiff;
-    for (let i = 0; i < skipArr.length; i++) {
-      const skipPar = skipArr[i];
-
-      const aData = buildAtomArray(a.atoms, skipPar);
-      const bData = buildAtomArray(b.atoms, skipPar);
-
-      for (let aIdx = 0, bIdx = 0; aIdx < aData.seq.length && bIdx < bData.seq.length;) {
-        if (aData.seq[aIdx] === bData.seq[bIdx]) {
-          if (aData.data[aData.seq[aIdx]] === bData.data[bData.seq[bIdx]]) {
-            aIdx += 1;
-            bIdx += 1;
-          } else {
-            atomDiff = bData.data[bData.seq[bIdx]] - aData.data[aData.seq[aIdx]];
-            return atomDiff;
-          }
-        } else {
-          return self._atomNameCompareCWithoutH(aData.seq[aIdx], bData.seq[bIdx]);
-        }
-      }
-      atomDiff = aData.seq.length - bData.seq.length;
-      if (atomDiff !== 0 || !skipPar) {
-        if (atomDiff === 0) {
-          return this._getCumulativeCharge(a.atoms) - this._getCumulativeCharge(b.atoms);
-        }
-        return atomDiff;
-      }
-    }
-    return this._getCumulativeCharge(a.atoms) - this._getCumulativeCharge(b.atoms);
-  }
-
-  _checkFormulaBuildable() {
-    const atoms = this.getAtoms();
-    const nAtoms = atoms.length;
-    for (let i = 0; i < nAtoms; i++) {
-      const atom = atoms[i];
-      if (atom.element.number > Element.ByName.MT.number) {
-        return '}\\text{Could not create chemical formula for this structure.}{';
-      }
-    }
-    return '';
-  }
-
-  buildChemicalFormula() {
-    const retDelim = '*';
-    const formulaParts = []; // object array
-    let currPart = null;
-    let pAtoms = null;
-    const atomsHash = {};
-    let hEntry = null;
-    const self = this;
-    let formula = this._checkFormulaBuildable();
-    if (formula !== '') {
-      return formula;
-    }
-    this.forEachAtom((a) => {
-      if (atomsHash[a.getSerial()]) {
-        logger.warn('Broken complex. Formula can be invalid...');
-      }
-      atomsHash[a.getSerial()] = { atom: a, taken: null };
-    });
-    // groups part goes first
-    this.forEachSGroup((grp) => {
-      if (grp._charge === 0 && grp._repeat === 1) {
-        // if do not we have valid reason to take part ==> skip
-        return;
-      }
-      currPart = { owner: grp, atoms: [], repeatCount: 1 };
-      pAtoms = currPart.atoms;
-      grp._atoms.forEach((a) => {
-        hEntry = atomsHash[a.getSerial()];
-        // check is not taken
-        if (hEntry.taken === null) {
-          pAtoms.push(a);
-          // mark as taken
-          hEntry.taken = grp;
-        }
-      });
-      if (currPart.atoms.length > 0) {
-        formulaParts.push(currPart);
-      }
-      currPart = null;
-    });
-    // components part
-    this.forEachComponent((cmp) => {
-      currPart = { owner: cmp, atoms: [], repeatCount: 1 };
-      pAtoms = currPart.atoms;
-      cmp.forEachResidue((r) => {
-        r._atoms.forEach((a) => {
-          hEntry = atomsHash[a.getSerial()];
-          // check is not taken
-          if (hEntry.taken === null) {
-            pAtoms.push(a);
-            // mark as taken
-            hEntry.taken = cmp;
-          }
-        });
-      });
-      if (currPart.atoms.length > 0) {
-        formulaParts.push(currPart);
-      }
-      currPart = null;
-    });
-    // collect main part
-    const atomKeys = Object.keys(atomsHash);
-    atomKeys.forEach((a) => {
-      if (a.taken === null) {
-        if (currPart === null) {
-          currPart = { owner: self, atoms: [], repeatCount: 1 };
-        }
-        currPart.atoms.push(a.atom);
-        a.taken = self;
-      }
-    });
-    // add first part
-    if (currPart !== null) {
-      if (currPart.atoms.length > 0) {
-        formulaParts.push(currPart);
-      }
-    }
-    // sort parts
-    formulaParts.sort((a, b) => self._partCompareFunc(a, b));
-    // now join the same parts
-    let i = formulaParts.length - 1;
-    let j = formulaParts.length - 2;
-    while (i >= 0 && j >= 0) {
-      const pi = formulaParts[i];
-      const pj = formulaParts[j];
-      if (!((pi.owner instanceof Complex) || (pi.owner instanceof Component))) {
-        i--;
-        if (i === j) {
-          j--;
-        }
-        continue;
-      }
-      if (!((pj.owner instanceof Complex) || (pj.owner instanceof Component))) {
-        j--;
-        continue;
-      }
-
-      if (this._partCompareFuncInt(pj, pi, false) === 0) {
-        pj.repeatCount += pi.repeatCount;
-        formulaParts.splice(i, 1);
-      }
-      j--;
-      i--;
-    }
-
-    // build formula for each part individually
-    formulaParts.forEach((p) => {
-      const pf = self._buildPartFormula(p);
-      if (pf.length > 0) {
-        if (formula.length > 0) {
-          formula += retDelim;
-        }
-        formula += pf;
-      }
-    });
-    return formula;
   }
 
   getUnifiedSerial(chain, serial, iCode) {
@@ -792,8 +479,8 @@ class Complex {
       if (bond._left === null || bond._right === null) {
         bonds.splice(i, 1);
       } else {
-        bond._left._bonds.push(bond);
-        bond._right._bonds.push(bond);
+        bond._left.bonds.push(bond);
+        bond._right.bonds.push(bond);
       }
     }
 
@@ -845,7 +532,7 @@ class Complex {
     const atoms = this._atoms;
     for (i = 0, n = atoms.length; i < n; ++i) {
       const currAtom = atoms[i];
-      currAtom._index = i;
+      currAtom.index = i;
     }
 
     if (opts.needAutoBonding) {
@@ -866,8 +553,8 @@ class Complex {
     // mark non-polar hydrogens
     for (i = 0, n = atoms.length; i < n; ++i) {
       const atom = atoms[i];
-      if (atom.flags & Atom.Flags.HYDROGEN && atom._bonds.length === 1) {
-        const bond = atom._bonds[0];
+      if (atom.flags & Atom.Flags.HYDROGEN && atom.bonds.length === 1) {
+        const bond = atom.bonds[0];
         const other = (bond._left !== atom && bond._left) || bond._right;
         if (other.flags & Atom.Flags.CARBON) {
           atom.flags |= Atom.Flags.NONPOLARH;
@@ -891,9 +578,9 @@ class Complex {
     // add reference to molecule into residue
     for (let i = 0; i < this._molecules.length; i++) {
       const molecule = this._molecules[i];
-      const count = molecule._residues.length;
+      const count = molecule.residues.length;
       for (let j = 0; j < count; j++) {
-        const residue = molecule._residues[j];
+        const residue = molecule.residues[j];
         residue._molecule = molecule;
       }
     }
@@ -910,7 +597,7 @@ class Complex {
     let count = 0;
 
     this.forEachAtom((atom) => {
-      if ((atom._mask & mask) !== 0) {
+      if ((atom.mask & mask) !== 0) {
         count++;
       }
     });
@@ -932,7 +619,7 @@ class Complex {
 
   resetAtomMask(mask) {
     this.forEachAtom((atom) => {
-      atom._mask = mask;
+      atom.mask = mask;
     });
   }
 
@@ -944,10 +631,10 @@ class Complex {
 
     this.forEachAtom((atom) => {
       if (totalSelector.includesAtom(atom)) {
-        atom._mask |= setMask;
+        atom.mask |= setMask;
         count++;
       } else {
-        atom._mask &= clearMask;
+        atom.mask &= clearMask;
       }
     });
     this._maskNeedsUpdate = true;
@@ -960,8 +647,8 @@ class Complex {
     let count = 0;
 
     this.forEachAtom((atom) => {
-      if (selector.includesAtom(atom) && (atom._mask & mask) !== mask) {
-        atom._mask |= setMask;
+      if (selector.includesAtom(atom) && (atom.mask & mask) !== mask) {
+        atom.mask |= setMask;
         count++;
       }
     });
@@ -971,6 +658,9 @@ class Complex {
 
   clearAtomBits(mask) {
     const clearMask = ~mask;
+    this.forEachAtom((atom) => {
+      atom.mask &= clearMask;
+    });
     const reseter = (a) => {
       a._mask &= clearMask;
     };
@@ -987,7 +677,7 @@ class Complex {
 
     const dict = {};
     this.forEachAtom((atom) => {
-      dict[atom._name._name] = 1;
+      dict[atom.name] = 1;
     });
     this._atomNames = Object.keys(dict);
 
@@ -1043,7 +733,7 @@ class Complex {
 
     const dict = {};
     this.forEachAtom((atom) => {
-      dict[String.fromCharCode(atom._location)] = 1;
+      dict[String.fromCharCode(atom.location)] = 1;
     });
     this._altlocNames = Object.keys(dict);
 
@@ -1105,8 +795,8 @@ class Complex {
     let componentBias = 0;
 
     function processAtom(atom, bias) {
-      atom._serial += bias;
-      atom._index += bias;
+      atom.serial += bias;
+      atom.index += bias;
     }
 
     function processBond(bond, bias) {

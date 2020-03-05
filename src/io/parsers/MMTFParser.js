@@ -9,7 +9,6 @@ const {
   Complex,
   Chain,
   Atom,
-  AtomName,
   Element,
   Helix,
   Sheet,
@@ -133,7 +132,7 @@ class MMTFParser extends Parser {
     const altLoc = !atomData.altLoc.charCodeAt(0) ? '' : atomData.altLoc;
     const atom = new Atom(
       atomData.groupIndex, // we store residue index here to replace it later with actual reference
-      new AtomName(atomData.atomName),
+      atomData.atomName,
       Element.getByName(atomData.element.toUpperCase()),
       new THREE.Vector3(atomData.xCoord, atomData.yCoord, atomData.zCoord),
       Element.Role[atomData.atomName],
@@ -146,7 +145,7 @@ class MMTFParser extends Parser {
     );
 
     this._complex._atoms[atomData.atomIndex] = atom;
-    atom._index = atomData.atomIndex;
+    atom.index = atomData.atomIndex;
 
     this._serialAtomMap[atomData.atomId] = atom;
   }
@@ -233,7 +232,7 @@ class MMTFParser extends Parser {
         residues = residues.concat(chain._residues.slice());
       }
       const molecule = new Molecule(this._complex, entity.description, i + 1);
-      molecule._residues = residues;
+      molecule.residues = residues;
       this._complex._molecules[i] = molecule;
     }
   }
@@ -289,8 +288,8 @@ class MMTFParser extends Parser {
   _linkAtomsToResidues() {
     for (let i = 0; i < this._complex._atoms.length; ++i) {
       const atom = this._complex._atoms[i];
-      const residue = this._complex._residues[atom._residue];
-      atom._residue = residue;
+      const residue = this._complex._residues[atom.residue];
+      atom.residue = residue;
       residue._atoms.push(atom);
     }
   }
@@ -405,7 +404,7 @@ class MMTFParser extends Parser {
           for (let k = 0; k < chain._residues.length; ++k) {
             const res = chain._residues[k];
             for (let m = 0; m < res._atoms.length; ++m) {
-              res._atoms[m]._het = true;
+              res._atoms[m].het = true;
             }
           }
         }

@@ -51,16 +51,16 @@ function _addPointsForLoneResidue(centerPoints, topPoints, idx, residue) {
   residue.forEachAtom((atom) => {
     const name = atom.getVisualName();
     if (!posFrom && name === nameFrom) {
-      posFrom = atom._position;
+      posFrom = atom.position;
     } else if (!posTo && name === nameTo) {
-      posTo = atom._position;
+      posTo = atom.position;
     }
   });
 
   // provide a fallback for unknown residues
   if (!(posFrom && posTo)) {
-    posFrom = residue._firstAtom._position;
-    posTo = residue._lastAtom._position;
+    posFrom = residue._firstAtom.position;
+    posTo = residue._lastAtom.position;
   }
 
   if (posFrom && posTo) {
