@@ -15,8 +15,11 @@
 #if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	#if NUM_DIR_LIGHTS > 0
 		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
+    uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ]; //only for sprites
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
 		varying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
+    vec4 vDirLightWorldCoord[ NUM_DIR_LIGHTS ];
+    vec3 vDirLightWorldNormal[ NUM_DIR_LIGHTS ];
 
     #ifdef SHADOWMAP_PCF_RAND
       // We use 4 instead uniform variable or define because this value is used in for(... i < value; ...) with
@@ -80,7 +83,10 @@ varying vec3 vViewPosition;
 
 #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
   uniform float zOffset;
-  uniform mat4 projectionMatrix;
+
+  #if !defined(SHADOWMAP_PCF_RAND)
+    uniform mat4 projectionMatrix;
+  #endif
 
   float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {
     vec4 pixelPosScreen = projMatrix * pixelPosEye;
@@ -393,8 +399,8 @@ float unpackRGBAToDepth( const in vec4 v ) {
   	#pragma unroll_loop
   	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
   	    #ifdef SHADOWMAP
-  	    if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );
-  	    #endif
+  	      if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirLightWorldCoord[ i ], vViewPosition, vDirLightWorldNormal[ i ] );
+        #endif
 
   		  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );
   		}
@@ -421,6 +427,17 @@ void main() {
 
 #ifdef ZCLIP
   if (vViewPosition.z < zClipValue) discard;
+#endif
+
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
+  #if NUM_DIR_LIGHTS > 0
+    // see THREE.WebGLProgram.unrollLoops
+    #pragma unroll_loop
+    for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+      vDirLightWorldCoord[ i ] = vDirectionalShadowCoord[ i ];
+      vDirLightWorldNormal[ i ] = vDirectionalShadowNormal[ i ];
+    }
+  #endif
 #endif
 
   vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);
@@ -457,8 +474,18 @@ void main() {
     #ifdef NORMALS_TO_G_BUFFER
       viewNormalSprites = normalize(mat3(modelViewMatrix)*p);
     #endif
-  }
 
+    #if defined(USE_LIGHTS) && defined(SHADOWMAP)
+      #if NUM_DIR_LIGHTS > 0
+        // see THREE.WebGLProgram.unrollLoops
+        #pragma unroll_loop
+          for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+            vDirLightWorldCoord[ i ] = directionalShadowMatrix[ i ] * pixelPosWorld;
+            vDirLightWorldNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(p, 0.0))).xyz;
+          }
+      #endif
+    #endif
+  }
 #endif
 
 #ifdef CYLINDER_SPRITE
@@ -466,28 +493,40 @@ void main() {
   vec3 viewNormalSprites;
   float cylinderY = 0.0;
 
-    // ray-trace cylinder surface
-    {
-      vec3 p;
-      if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;
+  // ray-trace cylinder surface
+  {
+    vec3 p;
+    if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;
 
-      cylinderY = 0.5 * (p.y + 1.0);
+    cylinderY = 0.5 * (p.y + 1.0);
 
-      vec4 v = vec4(p, 1.0);
-      v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);
-      pixelPosWorld = modelMatrix * v;
-      pixelPosEye = modelViewMatrix * v;
+    vec4 v = vec4(p, 1.0);
+    v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);
+    pixelPosWorld = modelMatrix * v;
+    pixelPosEye = modelViewMatrix * v;
 
-      vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));
-      normal = vec3(
-        dot(localNormal, matVec1.xyz),
-        dot(localNormal, matVec2.xyz),
-        dot(localNormal, matVec3.xyz));
-      #ifdef NORMALS_TO_G_BUFFER
-        viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
+    vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));
+    normal = vec3(
+      dot(localNormal, matVec1.xyz),
+      dot(localNormal, matVec2.xyz),
+      dot(localNormal, matVec3.xyz));
+    #ifdef NORMALS_TO_G_BUFFER
+      viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
+    #endif
+
+    #if defined(USE_LIGHTS) && defined(SHADOWMAP)
+      #if NUM_DIR_LIGHTS > 0
+        // see THREE.WebGLProgram.unrollLoops
+        #pragma unroll_loop
+          for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+            vDirLightWorldCoord[ i ] = directionalShadowMatrix[ i ] * pixelPosWorld;
+            vDirLightWorldNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(normal, 0.0))).xyz;
+          }
       #endif
-      normal = normalize(normalMatrix * normal);
-    }
+    #endif
+
+    normal = normalize(normalMatrix * normal);
+  }
 #endif
 
   #ifdef ATTR_COLOR
@@ -570,9 +609,15 @@ void main() {
   #endif
 
   #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
-    GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
+    vec3 viewDir;
+    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+      viewDir = -pixelPosEye.xyz;
+    #else
+      viewDir = vViewPosition;
+    #endif
+    GeometricContext geometry = GeometricContext(normal, normalize( viewDir ));
     BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
-    vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);
+    vec3 outgoingLight = calcLighting(geometry, material, viewDir);
   #else
     vec3 outgoingLight = diffuseColor.rgb;
   #endif

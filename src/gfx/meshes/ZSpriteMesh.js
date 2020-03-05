@@ -4,6 +4,12 @@ import UberObject from './UberObject';
 const Mesh = UberObject(THREE.Mesh);
 
 class ZSpriteMesh extends Mesh {
+  constructor(...rest) {
+    super(...rest);
+    this.castShadow = false;
+    this.receiveShadow = true;
+  }
+
   _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
     Mesh.prototype._onBeforeRender.call(this, renderer, scene, camera);
     const { material } = this;
