@@ -6,7 +6,7 @@ const Mesh = UberObject(THREE.Mesh);
 class ZSpriteMesh extends Mesh {
   constructor(...rest) {
     super(...rest);
-    this.castShadow = false;
+    this.castShadow = true;
     this.receiveShadow = true;
   }
 

@@ -193,16 +193,23 @@ vec3 transformedNormal = normalMatrix * objectNormal;
     posEye.xyz = mix(p1.xyz, p2.xyz, 0.5);
     posEye.w = 1.0;
 
-    // basic sprite size at screen plane (covers only cylinder axis)
-    vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);
-
     // cylinder radius in eye space
     float rad = length(modelViewMatrix[0]) * length(vec3(matVector1.x, matVector2.x, matVector3.x));
+    vec2 spriteSize;
+    #ifdef ORTHOGRAPHIC_CAMERA
+      // In ortho projection we skip z coordinate
+      // basic sprite size at screen plane (covers only cylinder axis)
+      vec2 spriteSizeScreen = abs(p2.xy - p1.xy);
 
-    // full sprite size in eye coords
-    float minZ = min(abs(p1.z), abs(p2.z));
-    vec2 spriteSize = INSTANCED_SPRITE_OVERSCALE  * abs(posEye.z) *
-      (spriteSizeScreen + 2.0 * rad / minZ);
+      spriteSize = vec2(1.0, 1.0) * INSTANCED_SPRITE_OVERSCALE * (spriteSizeScreen + 2.0 * rad);
+    #else
+      // basic sprite size at screen plane (covers only cylinder axis)
+      vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);
+
+      // full sprite size in eye coords
+      float minZ = min(abs(p1.z), abs(p2.z));
+      spriteSize = vec2(1.0, 1.0) * INSTANCED_SPRITE_OVERSCALE * abs(posEye.z) * (spriteSizeScreen + 2.0 * rad / minZ);
+    #endif
 
     mvPosition = posEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );
   #else

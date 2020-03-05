@@ -546,6 +546,7 @@ function createShadowmapMaterial(root, material) {
     const shadowmapMat = mesh.material.createInstance();
     shadowmapMat.setValues({
       colorFromDepth: true,
+      orthoCam: true,
       lights: false,
       shadowmap: false,
       fog: false,
