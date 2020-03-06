@@ -1,11 +1,6 @@
 import React from 'react';
 import Miew from 'miew';
 
-const style = {
-  width: '640px',
-  height: '480px',
-};
-
 export default class ViewerContainer extends React.Component {
   constructor(props) {
     super(props);
@@ -39,6 +34,6 @@ export default class ViewerContainer extends React.Component {
     }
 
     render() {
-      return <div className='miew-container' ref={this.domElement} style={ style }/>;
+      return <div className='miew-container' ref={this.domElement}/>;
     }
 }
