@@ -37,4 +37,10 @@ return Miew && JSON.stringify(${expression});`)
 var miew = window.miew;
 return miew && !miew._loading.length && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
   }
+
+  waitForExport() {
+    return this.driver.wait(() => this.driver.executeScript(`\
+var miew = window.miew;
+return miew && !miew._exporting;`), timeout);
+  }
 }
