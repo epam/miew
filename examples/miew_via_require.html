@@ -13,6 +13,12 @@
   <div class="miew-container" style="width:640px; height:480px"></div>
 
   <script>
+    require.config({
+      paths: {
+        'lodash': 'https://unpkg.com/lodash@^4.17.15/lodash',
+        'three': 'https://unpkg.com/three@0.112.1/build/three.min',
+      }
+    });
     require(['../dist/Miew.min'], function(Miew) {
       var viewer = new Miew({
         container: document.getElementsByClassName('miew-container')[0],

@@ -101,6 +101,10 @@
       "jquery.terminal"
     ]
   },
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "three": "0.112.1"
+  },
   "devDependencies": {
     "@babel/core": "^7.8.7",
     "@babel/plugin-external-helpers": "^7.8.3",
@@ -138,7 +142,6 @@
     "jquery": "3.4.1",
     "jquery.terminal": "=2.1.0",
     "jsdoc": "^3.6.3",
-    "lodash": "^4.17.15",
     "mini-css-extract-plugin": "^0.9.0",
     "mkdirp": "^1.0.3",
     "mocha": "^7.1.0",
@@ -173,7 +176,6 @@
     "style-loader": "^1.1.3",
     "stylelint": "^13.2.1",
     "stylelint-config-standard": "^20.0.0",
-    "three": "0.112.1",
     "toastr": "^2.1.4",
     "uglify-js": "^3.8.0",
     "url-loader": "^3.0.0",
