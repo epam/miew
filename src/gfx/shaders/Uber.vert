@@ -68,6 +68,7 @@ varying vec3 vViewPosition;
     varying vec4 invmatVec1;
     varying vec4 invmatVec2;
     varying vec4 invmatVec3;
+    varying vec4 spritePosEye;
   #endif
 #endif
 
@@ -192,6 +193,7 @@ vec3 transformedNormal = normalMatrix * objectNormal;
     vec4 posEye;
     posEye.xyz = mix(p1.xyz, p2.xyz, 0.5);
     posEye.w = 1.0;
+    spritePosEye = posEye;
 
     // cylinder radius in eye space
     float rad = length(modelViewMatrix[0]) * length(vec3(matVector1.x, matVector2.x, matVector3.x));
