@@ -73,11 +73,15 @@ function fbxDownload(fn) {
       .then(() => page.waitForMiew())
       .then(() => driver.executeScript(fn))
       .then(() => page.waitUntilRebuildIsDone())
-      //.then(() => driver.executeScript(() => { miew.save({ fileType: 'fbx' }); }))
-      //.then(() => page.waitForExport())
+      .then(() => driver.executeScript(() => { miew.save({ fileType: 'fbx' }); }))
+      .then(() => page.waitForExport())
       .then(() => {
-        const goldenFBXData = fs.readFileSync('D:\\Demian\\miew\\test\\functional\\goldenFBX\\1CRN.fbx', 'utf8');
-        const currentFBXData = fs.readFileSync('D:\\Demian\\miew\\test\\1CRN.fbx', 'utf8');
+        let goldenFBXData = fs.readFileSync(path.resolve(__dirname, './goldenFBX/1CRN.fbx'), 'utf8');
+        let currentFBXData = fs.readFileSync(path.resolve(__dirname, '../1CRN.fbx'), 'utf8');
+        const usefulInfoGoldenInd = goldenFBXData.indexOf('Object properties');
+        const usefulInfoCurrentInd = currentFBXData.indexOf('Object properties');
+        goldenFBXData = goldenFBXData.slice(usefulInfoGoldenInd);
+        currentFBXData = currentFBXData.slice(usefulInfoCurrentInd);
         expect(goldenFBXData).equal(currentFBXData);
       });
   };
@@ -100,7 +104,7 @@ describe('The FBX exporter', function () {
   before(() => {
     const chromeOptions = new chromeDriver.Options();
     chromeOptions.addArguments(['--disable-gpu']);
-    chromeOptions.setUserPreferences({ 'download.default_directory': 'D:\\Demian\\miew\\test' });
+    chromeOptions.setUserPreferences({ 'download.default_directory': path.resolve(__dirname, '../') });
 
     driver = new webdriver.Builder()
       .forBrowser('chrome')
@@ -115,7 +119,7 @@ describe('The FBX exporter', function () {
       });
   });
 
-  //after(() => shutdown());
+  after(() => shutdown());
 
   it('some test', fbxDownload(() => {
     window.miew = new window.Miew({
