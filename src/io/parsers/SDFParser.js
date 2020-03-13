@@ -226,7 +226,7 @@ export default class SDFParser extends Parser {
     const { molecules } = this._metadata;
     for (let i = 0; i < molecules.length; i++) {
       const molecule = new Molecule(this._complex, molecules[i].name, i + 1);
-      molecule._residues = molecules[i]._residues;
+      molecule.residues = molecules[i]._residues;
       this._complex._molecules[i] = molecule;
     }
 
@@ -297,7 +297,7 @@ export default class SDFParser extends Parser {
 
     for (let i = 0; i < atoms.length; i++) {
       const atom = atoms[i];
-      serialAtomMap[atom._serial] = atom;
+      serialAtomMap[atom.serial] = atom;
     }
 
     this._complex._finalizeBonds();

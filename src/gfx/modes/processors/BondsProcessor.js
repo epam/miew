@@ -14,7 +14,7 @@ class BondsProcessor extends RCGroup {
       component.forEachBond((bond) => {
         const atom1 = bond._left;
         const atom2 = bond._right;
-        if (!(atom1._mask & mask) || !(atom2._mask & mask)) {
+        if (!(atom1.mask & mask) || !(atom2.mask & mask)) {
           return;
         }
         bondsIdc[bondsCount++] = bond._index;

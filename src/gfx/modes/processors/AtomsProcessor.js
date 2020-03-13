@@ -16,7 +16,7 @@ class AtomsProcessor extends RCGroup {
         if (!self._checkAtom(atom, mask)) {
           return;
         }
-        atomsIdc[atomCount++] = atom._index;
+        atomsIdc[atomCount++] = atom.index;
       });
       if (atomCount === 0) {
         return;
@@ -32,7 +32,7 @@ class AtomsProcessor extends RCGroup {
   }
 
   _checkAtom(atom, mask) {
-    return atom._mask & mask;
+    return atom.mask & mask;
   }
 
   getSubset(mask, innerOnly) {

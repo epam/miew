@@ -122,7 +122,7 @@ Picker.prototype.pickObject = function (screenPos) {
 
   let picked = {};
   if (point.residue || point.atom) {
-    const residue = point.residue || point.atom.getResidue();
+    const residue = point.residue || point.atom.residue;
     if (settings.now.pick === 'chain') {
       picked = { chain: residue.getChain() };
     } else if (settings.now.pick === 'molecule') {

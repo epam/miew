@@ -28,8 +28,8 @@ class LinesObj extends SceneObject {
     this._atom1 = this._getAtomFromName(complex, this._id1);
     this._atom2 = this._getAtomFromName(complex, this._id2);
 
-    geom.vertices[0] = this._atom1._position.clone();
-    geom.vertices[1] = this._atom2._position.clone();
+    geom.vertices[0] = this._atom1.position.clone();
+    geom.vertices[1] = this._atom2.position.clone();
     geom.dynamic = true;
     geom.computeBoundingBox();
 
@@ -63,8 +63,8 @@ class LinesObj extends SceneObject {
     }
 
     const geo = this._line.geometry;
-    geo.vertices[0].copy(frameData.getAtomPos(this._atom1._index));
-    geo.vertices[1].copy(frameData.getAtomPos(this._atom2._index));
+    geo.vertices[0].copy(frameData.getAtomPos(this._atom1.index));
+    geo.vertices[1].copy(frameData.getAtomPos(this._atom2.index));
     this._line.computeLineDistances();
     geo.computeBoundingSphere();
 

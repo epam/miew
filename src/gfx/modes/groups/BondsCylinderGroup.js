@@ -22,8 +22,8 @@ class BondsCylinderGroup extends BondsGroup {
       const bond = bonds[bondsIdc[i]];
       const atom1 = bond._left;
       const atom2 = bond._right;
-      const a1Pos = atom1._position;
-      const a2Pos = atom2._position;
+      const a1Pos = atom1.position;
+      const a2Pos = atom2.position;
       normDir = bond.calcNormalDir();
       const order = this.getBondOrder(bond, drawMultiple, showAromatic);
       const minRad = Math.min(mode.calcAtomRadius(atom1), mode.calcAtomRadius(atom2));
@@ -68,8 +68,8 @@ class BondsCylinderGroup extends BondsGroup {
       const bond = bonds[bondsIdc[i]];
       const atom1 = bond._left;
       const atom2 = bond._right;
-      const a1Pos = frameData.getAtomPos(atom1._index).clone();
-      const a2Pos = frameData.getAtomPos(atom2._index);
+      const a1Pos = frameData.getAtomPos(atom1.index).clone();
+      const a2Pos = frameData.getAtomPos(atom2.index);
       normDir = bond.calcNormalDir();
       const order = this.getBondOrder(bond, drawMultiple, showAromatic);
       const minRad = Math.min(mode.calcAtomRadius(atom1), mode.calcAtomRadius(atom2));

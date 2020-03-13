@@ -117,7 +117,7 @@ class PDBParser extends Parser {
         residues = residues.concat(chain._residues.slice());
       }
       const molecule = new Molecule(this._complex, m._name, i + 1);
-      molecule._residues = residues;
+      molecule.residues = residues;
       this._complex._molecules[i] = molecule;
     }
   }
@@ -141,7 +141,7 @@ class PDBParser extends Parser {
     const atoms = complex._atoms;
     for (let i = 0, ni = atoms.length; i < ni; ++i) {
       const atom = atoms[i];
-      serialAtomMap[atom._serial] = atom;
+      serialAtomMap[atom.serial] = atom;
     }
 
     const bonds = complex._bonds;

@@ -142,7 +142,7 @@ class GROParser extends Parser {
   _finalize() {
     const molecule = new Molecule(this._complex, this._complex.metadata.name, 1);
     // aggregate residues from chain
-    molecule._residues = this._chain._residues;
+    molecule.residues = this._chain._residues;
     molecule._chains = this._chain;
     this._complex._molecules[0] = molecule;
     this._molecules.push(molecule);

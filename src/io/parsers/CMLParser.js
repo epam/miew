@@ -6,7 +6,6 @@ import chem from '../../chem';
 const {
   Complex,
   Element,
-  AtomName,
   SGroup,
   Bond,
 } = chem;
@@ -455,7 +454,7 @@ class CMLParser extends Parser {
     const atoms = complex._atoms;
     for (let i = 0, ni = atoms.length; i < ni; ++i) {
       const atom = atoms[i];
-      serialAtomMap[atom._serial] = atom;
+      serialAtomMap[atom.serial] = atom;
     }
 
     const bonds = complex._bonds;
@@ -508,9 +507,7 @@ class CMLParser extends Parser {
       const lLabel = labels[reorder[i]];
       if (this._unpackLabel(lLabel).molId === this._unpackLabel(currentLabel).molId) {
         atom = atoms[reorder[i]];
-        const atomHtmlNode = null;
-
-        const atomFullNameStruct = new AtomName(atom.elementType, atomHtmlNode);
+        const atomFullNameStruct = atom.elementType;
 
         if (atom.sgroupRef) {
           const countRef = atom.sgroupRef.length;
@@ -563,10 +560,10 @@ class CMLParser extends Parser {
             true, atomSerial, ' ', 1.0, 0.0, atomCharge,
           );
           if (atom.hydrogenCount) {
-            added._hydrogenCount = parseInt(atom.hydrogenCount, 10);
+            added.hydrogenCount = parseInt(atom.hydrogenCount, 10);
           }
           if (atom.mrvValence) {
-            added._valence = parseInt(atom.mrvValence, 10);
+            added.valence = parseInt(atom.mrvValence, 10);
           }
           addFunc(added);
         }

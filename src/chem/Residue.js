@@ -108,7 +108,7 @@ class Residue {
   _findAtomByName(name) {
     let res = null;
     this.forEachAtom((atom) => {
-      if (atom._name._name === name) {
+      if (atom.name === name) {
         res = atom;
         return true;
       }
@@ -132,7 +132,7 @@ class Residue {
     let mask = 0xffffffff;
     const atoms = this._atoms;
     for (let i = 0, n = atoms.length; i < n; ++i) {
-      mask &= atoms[i]._mask;
+      mask &= atoms[i].mask;
     }
     this._mask = mask;
   }
@@ -216,7 +216,7 @@ class Residue {
 
   _finalize2(prev, next, asNucleic) {
     // Should be called AFTER first finalize
-    this._innerFinalize(prev, prev, next, this, asNucleic, (atom) => atom._position);
+    this._innerFinalize(prev, prev, next, this, asNucleic, (atom) => atom.position);
   }
 
   isConnected(anotherResidue) {
@@ -228,10 +228,10 @@ class Residue {
     }
     let res = false;
     this.forEachAtom((atom) => {
-      const bonds = atom._bonds;
+      const { bonds } = atom;
       for (let i = 0, n = bonds.length; i < n; ++i) {
         const bond = bonds[i];
-        if (bond._left._residue === anotherResidue || bond._right._residue === anotherResidue) {
+        if (bond._left.residue === anotherResidue || bond._right.residue === anotherResidue) {
           res = true;
           return true;
         }
@@ -255,21 +255,21 @@ class Residue {
     let occupancy = 0; // average occupancy
     this.forEachAtom((a) => {
       if (self._leadAtom === null) {
-        if (a._role === Element.Constants.Lead) {
+        if (a.role === Element.Constants.Lead) {
           self._leadAtom = a;
         }
       }
       if (self._wingAtom === null) {
-        if (a._role === Element.Constants.Wing) {
+        if (a.role === Element.Constants.Wing) {
           self._wingAtom = a;
         }
       }
-      if (a._temperature) {
-        temperature += a._temperature;
+      if (a.temperature) {
+        temperature += a.temperature;
         tempCount++;
       }
-      if (a._occupancy) {
-        occupancy += a._occupancy;
+      if (a.occupancy) {
+        occupancy += a.occupancy;
         occupCount++;
       }
       return (self._leadAtom !== null && self._wingAtom !== null);

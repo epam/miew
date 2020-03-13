@@ -71,7 +71,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
   convertToAtomsColored(packedArrays, atomsColored) {
     const { atoms, colors } = packedArrays;
     for (let i = 0, numAtoms = atoms.length; i < numAtoms; i++) {
-      const vCenter = atoms[i].getPosition();
+      const vCenter = atoms[i].position;
       const { radius } = atoms[i].element;
       atomsColored[i] = new IsoSurfaceAtomColored(vCenter, radius);
       const nm = atoms[i].element.number;

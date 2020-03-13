@@ -18,23 +18,18 @@ describe('selectors', () => {
     _chain: { _name: 'B' },
   };
 
-  const atomName = {
-    _name: 'CA',
-    getString() { return this._name; },
-  };
-
   const atom = {
-    _residue: residue,
-    _name: atomName,
+    residue,
+    name: 'CA',
     element: { name: 'N' },
-    _position: 1,
-    _role: 1,
-    _het: true,
-    _serial: 5,
-    _location: (' ').charCodeAt(0),
-    _occupancy: 1,
-    _temperature: 1,
-    _charge: 1,
+    position: 1,
+    role: 1,
+    het: true,
+    serial: 5,
+    location: (' ').charCodeAt(0),
+    occupancy: 1,
+    temperature: 1,
+    charge: 1,
   };
 
   describe('#ClearContext()', () => {
@@ -246,11 +241,11 @@ describe('selectors', () => {
   describe('HetatmSelector', () => {
     describe('#includesAtom(atom)', () => {
       it('includes hetatoms', () => {
-        atom._het = true;
+        atom.het = true;
         expect(selectors.hetatm().includesAtom(atom)).to.equal(true);
       });
       it('excludes other', () => {
-        atom._het = false;
+        atom.het = false;
         expect(selectors.hetatm().includesAtom(atom)).to.equal(false);
       });
     });
@@ -293,11 +288,11 @@ describe('selectors', () => {
   describe('Protein', () => {
     describe('#includesAtom(atom)', () => {
       it('includes protein atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.PROTEIN;
+        atom.residue._type.flags = ResidueType.Flags.PROTEIN;
         expect(selectors.protein().includesAtom(atom)).to.equal(true);
       });
       it('excludes not protein atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.protein().includesAtom(atom)).to.equal(false);
       });
     });
@@ -306,11 +301,11 @@ describe('selectors', () => {
   describe('Basic', () => {
     describe('#includesAtom(atom)', () => {
       it('includes basic atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.BASIC;
+        atom.residue._type.flags = ResidueType.Flags.BASIC;
         expect(selectors.basic().includesAtom(atom)).to.equal(true);
       });
       it('excludes not basic atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.basic().includesAtom(atom)).to.equal(false);
       });
     });
@@ -319,11 +314,11 @@ describe('selectors', () => {
   describe('Acidic', () => {
     describe('#includesAtom(atom)', () => {
       it('includes acidic atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.ACIDIC;
+        atom.residue._type.flags = ResidueType.Flags.ACIDIC;
         expect(selectors.acidic().includesAtom(atom)).to.equal(true);
       });
       it('excludes not acidic atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.acidic().includesAtom(atom)).to.equal(false);
       });
     });
@@ -332,15 +327,15 @@ describe('selectors', () => {
   describe('Charged', () => {
     describe('#includesAtom(atom)', () => {
       it('includes acidic atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.ACIDIC;
+        atom.residue._type.flags = ResidueType.Flags.ACIDIC;
         expect(selectors.charged().includesAtom(atom)).to.equal(true);
       });
       it('check on correct including basic atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.BASIC;
+        atom.residue._type.flags = ResidueType.Flags.BASIC;
         expect(selectors.charged().includesAtom(atom)).to.equal(true);
       });
       it('excludes not acidic or basic atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.charged().includesAtom(atom)).to.equal(false);
       });
     });
@@ -349,11 +344,11 @@ describe('selectors', () => {
   describe('Polar', () => {
     describe('#includesAtom(atom)', () => {
       it('includes polar atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.POLAR;
+        atom.residue._type.flags = ResidueType.Flags.POLAR;
         expect(selectors.polar().includesAtom(atom)).to.equal(true);
       });
       it('excludes not polar atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.polar().includesAtom(atom)).to.equal(false);
       });
     });
@@ -362,11 +357,11 @@ describe('selectors', () => {
   describe('NonPolar', () => {
     describe('#includesAtom(atom)', () => {
       it('includes nonPolar atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.NONPOLAR;
+        atom.residue._type.flags = ResidueType.Flags.NONPOLAR;
         expect(selectors.nonpolar().includesAtom(atom)).to.equal(true);
       });
       it('excludes not nonPolar atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.nonpolar().includesAtom(atom)).to.equal(false);
       });
     });
@@ -375,11 +370,11 @@ describe('selectors', () => {
   describe('Aromatic', () => {
     describe('#includesAtom(atom)', () => {
       it('includes aromatic atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.AROMATIC;
+        atom.residue._type.flags = ResidueType.Flags.AROMATIC;
         expect(selectors.aromatic().includesAtom(atom)).to.equal(true);
       });
       it('excludes not aromatic atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.aromatic().includesAtom(atom)).to.equal(false);
       });
     });
@@ -388,11 +383,11 @@ describe('selectors', () => {
   describe('Nucleic', () => {
     describe('#includesAtom(atom)', () => {
       it('includes nucleic atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.NUCLEIC;
+        atom.residue._type.flags = ResidueType.Flags.NUCLEIC;
         expect(selectors.nucleic().includesAtom(atom)).to.equal(true);
       });
       it('excludes not nucleic atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.nucleic().includesAtom(atom)).to.equal(false);
       });
     });
@@ -401,11 +396,11 @@ describe('selectors', () => {
   describe('Purine', () => {
     describe('#includesAtom(atom)', () => {
       it('includes purine atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.PURINE;
+        atom.residue._type.flags = ResidueType.Flags.PURINE;
         expect(selectors.purine().includesAtom(atom)).to.equal(true);
       });
       it('excludes not purine atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.purine().includesAtom(atom)).to.equal(false);
       });
     });
@@ -414,11 +409,11 @@ describe('selectors', () => {
   describe('Pyrimidine', () => {
     describe('#includesAtom(atom)', () => {
       it('includes pyrimidine atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.PYRIMIDINE;
+        atom.residue._type.flags = ResidueType.Flags.PYRIMIDINE;
         expect(selectors.pyrimidine().includesAtom(atom)).to.equal(true);
       });
       it('excludes not pyrimidine atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.pyrimidine().includesAtom(atom)).to.equal(false);
       });
     });
@@ -427,11 +422,11 @@ describe('selectors', () => {
   describe('Water', () => {
     describe('#includesAtom(atom)', () => {
       it('includes water atom', () => {
-        atom._residue._type.flags = ResidueType.Flags.WATER;
+        atom.residue._type.flags = ResidueType.Flags.WATER;
         expect(selectors.water().includesAtom(atom)).to.equal(true);
       });
       it('excludes not water atom', () => {
-        atom._residue._type.flags = 0x0000;
+        atom.residue._type.flags = 0x0000;
         expect(selectors.water().includesAtom(atom)).to.equal(false);
       });
     });

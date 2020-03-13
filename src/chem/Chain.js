@@ -117,7 +117,7 @@ class Chain {
     const frameRes = frameData._residues;
     const n = residues.length;
     function getAtomPos(atom) {
-      return frameData.getAtomPos(atom._index);
+      return frameData.getAtomPos(atom.index);
     }
 
     for (let i = 0; i < n; ++i) {

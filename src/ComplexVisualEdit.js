@@ -118,9 +118,9 @@ class ComplexComponentEditor extends ComplexEditor {
     component.forEachResidue((residue) => {
       const atoms = residue._atoms;
       for (j = 0; j < atoms.length; ++j) {
-        if (atoms[j]._mask & selectionMask) {
-          bbmin.min(atoms[j]._position);
-          bbmax.max(atoms[j]._position);
+        if (atoms[j].mask & selectionMask) {
+          bbmin.min(atoms[j].position);
+          bbmax.max(atoms[j].position);
         }
       }
     });
@@ -138,7 +138,7 @@ class ComplexComponentEditor extends ComplexEditor {
       component.forEachResidue((residue) => {
         const atoms = residue._atoms;
         for (let j = 0; j < atoms.length; ++j) {
-          atoms[j]._position.applyMatrix4(t.matrix);
+          atoms[j].position.applyMatrix4(t.matrix);
         }
       });
     }
@@ -215,10 +215,10 @@ class ComplexFragmentEditor extends ComplexEditor {
     }
 
     // create visible fragment representation to rotate
-    const pivotPos = atoms[0]._position.clone();
+    const pivotPos = atoms[0].position.clone();
 
     if (atoms.length === 2) {
-      pivotPos.lerp(atoms[1]._position, 0.5);
+      pivotPos.lerp(atoms[1].position, 0.5);
     }
 
     this._fragmentGeo = new THREE.Group();
@@ -327,16 +327,16 @@ class ComplexFragmentEditor extends ComplexEditor {
 
     const boundAtoms = this._fragmentBoundAtoms;
     if (boundAtoms.length === 1) {
-      if (boundAtoms[0]._bonds.length === 1) {
+      if (boundAtoms[0].bonds.length === 1) {
         // single external bond allows rotation about bond axis
-        const bond = boundAtoms[0]._bonds[0];
-        res.axis = new THREE.Vector3().subVectors(bond._right._position, bond._left._position);
+        const bond = boundAtoms[0].bonds[0];
+        res.axis = new THREE.Vector3().subVectors(bond._right.position, bond._left.position);
         res.axis.normalize();
         res.axis.transformDirection(this._complexVisual.matrixWorld);
       }
     } else if (boundAtoms.length === 2) {
       // two bound atoms allow rotation only about axis running through their centers
-      res.axis = new THREE.Vector3().subVectors(boundAtoms[1]._position, boundAtoms[0]._position);
+      res.axis = new THREE.Vector3().subVectors(boundAtoms[1].position, boundAtoms[0].position);
       res.axis.normalize();
       res.axis.transformDirection(this._complexVisual.matrixWorld);
     }
@@ -351,12 +351,12 @@ class ComplexFragmentEditor extends ComplexEditor {
     const atomHash = {};
 
     complex.forEachBond((bond) => {
-      if (bond._left._mask & selectionMask) {
-        if ((bond._right._mask & selectionMask) === 0) {
-          atomHash[bond._left._index] = 1;
+      if (bond._left.mask & selectionMask) {
+        if ((bond._right.mask & selectionMask) === 0) {
+          atomHash[bond._left.index] = 1;
         }
-      } else if (bond._right._mask & selectionMask) {
-        atomHash[bond._right._index] = 1;
+      } else if (bond._right.mask & selectionMask) {
+        atomHash[bond._right.index] = 1;
       }
     });
 
@@ -372,8 +372,8 @@ class ComplexFragmentEditor extends ComplexEditor {
 
   _bakeAtomTransform(matrix, mask) {
     this._complexVisual.getComplex().forEachAtom((atom) => {
-      if (atom._mask & mask) {
-        atom._position.applyMatrix4(matrix);
+      if (atom.mask & mask) {
+        atom.position.applyMatrix4(matrix);
       }
     });
   }

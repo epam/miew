@@ -25,7 +25,7 @@ class AtomsGroup extends ChemGroup {
     const atomsIdc = this._chunksIdc;
     for (let i = 0, n = atomsIdc.length; i < n; ++i) {
       const atom = atoms[atomsIdc[i]];
-      if ((atom._mask & mask) !== 0) {
+      if ((atom.mask & mask) !== 0) {
         chunksList.push(i);
       }
     }

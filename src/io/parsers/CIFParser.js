@@ -226,7 +226,7 @@ class CIFParser extends Parser {
     for (i = 0; i < count; i++) {
       const molecule = this.molecules[i];
       molecules[i] = new Molecule(complex, molecule.name, i + 1);
-      molecules[i]._residues = molecule.residues;
+      molecules[i].residues = molecule.residues;
     }
   }
 
