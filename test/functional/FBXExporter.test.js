@@ -17,6 +17,24 @@ let driver = null;
 let localhost = null;
 let page;
 
+const testReps = [{
+  name: 'CR',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{
+      mode: 'TU',
+      colorer: 'SQ',
+      material: 'SF',
+    }],
+  },
+}, {
+  name: 'SE',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{ mode: 'SE', colorer: 'SQ', material: 'SF' }],
+  },
+}];
+
 function _prepareBrowser(width = 1024, height = 768) {
   const getPadding = 'return[window.outerWidth-window.innerWidth,window.outerHeight-window.innerHeight];';
   return driver.executeScript(getPadding)
@@ -73,8 +91,9 @@ function fbxDownload(fn) {
       .then(() => page.waitForMiew())
       .then(() => driver.executeScript(fn))
       .then(() => page.waitUntilRebuildIsDone())
+      // clean
       .then(() => driver.executeScript(() => { miew.save({ fileType: 'fbx' }); }))
-      .then(() => page.waitForExport())
+      .then(() => page.waitForExport(path.resolve(__dirname, '../1CRN.fbx')))
       .then(() => {
         let goldenFBXData = fs.readFileSync(path.resolve(__dirname, './goldenFBX/1CRN.fbx'), 'utf8');
         let currentFBXData = fs.readFileSync(path.resolve(__dirname, '../1CRN.fbx'), 'utf8');
@@ -90,7 +109,6 @@ function fbxDownload(fn) {
 describe('The FBX exporter', function () {
   this.timeout(0);
   this.slow(1000);
-
 
   const cfg = {
     title: 'FBX Tests',
@@ -121,21 +139,17 @@ describe('The FBX exporter', function () {
 
   after(() => shutdown());
 
-  it('some test', fbxDownload(() => {
-    window.miew = new window.Miew({
-      load: '../data/1CRN.pdb',
-      reps: [{
-        mode: 'TU',
-        colorer: 'SQ',
-        material: 'SF',
-      }, {
-        mode: 'LN',
-        colorer: ['UN', { color: 0xFFFFFF }],
-        material: 'SF',
-      }],
-    });
-    if (miew.init()) {
-      miew.run();
-    }
-  }));
+  const myscript = function (opts) {
+    const _opts = opts;
+    return function () {
+      window.miew = new window.Miew(_opts);
+      if (miew.init()) {
+        miew.run();
+      }
+    };
+  };
+
+  for (let i = 0; i < testReps.length; i++) {
+    it(testReps[i].name, fbxDownload(myscript(testReps[0].opts)));
+  }
 });

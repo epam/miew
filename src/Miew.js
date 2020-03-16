@@ -139,8 +139,6 @@ function Miew(opts) {
   this._needRender = true;
   /** @type {boolean} */
   this._hotKeysEnabled = true;
-  /** @type {boolean} */
-  this._exporting = true;
 
   /** @type {Settings} */
   this.settings = settings;
@@ -3290,13 +3288,11 @@ Miew.prototype.screenshotSave = function (filename, width, height) {
 };
 
 Miew.prototype.save = function (opts) {
-  this._exporting = true;
   this._export(opts.fileType).then((dataString) => {
     const filename = this._visuals[this._curVisualName]._complex.name;
     utils.download(dataString, filename, opts.fileType);
     this._refreshTitle();
     this.dispatchEvent({ type: 'exportingDone' });
-    this._exporting = false;
   }).catch((error) => {
     this.logger.error('Could not export data');
     this.logger.debug(error);
