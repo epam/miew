@@ -12,7 +12,6 @@ import Visual from './Visual';
 import ComplexVisual from './ComplexVisual';
 import Complex from './chem/Complex';
 import VolumeVisual from './VolumeVisual';
-import GfxProfiler from './gfx/GfxProfiler';
 import io from './io/io';
 import modes from './gfx/modes';
 import colorers from './gfx/colorers';
@@ -3142,39 +3141,6 @@ Miew.prototype.setPivotSubset = (function () {
     }
   };
 }());
-
-/**
- * Starts profiling tool
- * @deprecated since 0.8.6. There are plans to make it a separate tool outside Miew
- */
-Miew.prototype.benchmarkGfx = function (force) {
-  const self = this;
-  const prof = new GfxProfiler(this._gfx.renderer);
-
-  return new Promise(((resolve) => {
-    if (!force && !settings.now.autoResolution) {
-      resolve();
-      return;
-    }
-
-    // deprecated event since 0.8.6
-    self.dispatchEvent({ type: 'profile' });
-
-    self._spinner.spin(self._container);
-    prof.runOnTicks(50, 1000, 2000).then((numResults) => {
-      self._gfxScore = 0.0;
-      if (numResults >= 5) {
-        self._gfxScore = 1000.0 / prof.mean();
-      }
-      if (numResults > 0) {
-        self._gfxScore = 0.5 * numResults;
-      }
-
-      self._spinner.stop();
-      resolve();
-    });
-  }));
-};
 
 /**
  * Makes a screenshot.
