@@ -601,7 +601,13 @@ function applySelectionMaterial(geo) {
     if ('material' in node) {
       node.material = node.material.clone(true);
       // using z-offset to magically fix selection rendering artifact (on z-sprites)
-      node.material.setValues({ depthFunc: THREE.LessEqualDepth, overrideColor: true, fog: false });
+      node.material.setValues({
+        depthFunc: THREE.LessEqualDepth,
+        overrideColor: true,
+        fog: false,
+        lights: false,
+        shadowmap: false,
+      });
       node.material.setUberOptions({ fixedColor: new THREE.Color(0xFFFF00), zOffset: -1e-6 });
     }
   });
