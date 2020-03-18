@@ -17,21 +17,40 @@ let driver = null;
 let localhost = null;
 let page;
 
-const testReps = [{
-  name: 'CR',
+const goldenFolder = './goldenFBX/';
+const tmpFolder = './goldenFBX/tmp';
+
+const testComplexes = [{
+  name: 'Cartoon',
+  prefix: 'CR',
+  pdbId: '1CRN',
   opts: {
     load: '../data/1CRN.pdb',
-    reps: [{
-      mode: 'TU',
-      colorer: 'SQ',
-      material: 'SF',
-    }],
+    reps: [{ mode: 'TU', colorer: 'SQ', material: 'SF' }],
   },
 }, {
-  name: 'SE',
+  name: 'Solvent Excluded Surface',
+  prefix: 'SE',
+  pdbId: '1CRN',
   opts: {
     load: '../data/1CRN.pdb',
     reps: [{ mode: 'SE', colorer: 'SQ', material: 'SF' }],
+  },
+}, {
+  name: 'Solvent Accessible Surface',
+  prefix: 'SA',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{ mode: 'SA', colorer: 'SQ', material: 'SF' }],
+  },
+}, {
+  name: 'Van der Waals',
+  prefix: 'VW',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{ mode: 'VW', colorer: 'SQ', material: 'SF' }],
   },
 }];
 
@@ -67,7 +86,6 @@ function _prepareServer(cfg) {
 
 function startup(webDriver, cfg) {
   driver = webDriver;
-
   return _prepareBrowser()
     .then(() => _prepareServer(cfg))
     .then((url) => url);
@@ -84,24 +102,27 @@ function shutdown() {
     });
 }
 
+function fbxDownload(fn, complexInfo) {
+  const pathToGolden = path.resolve(__dirname, goldenFolder, `${complexInfo.prefix}_${complexInfo.pdbId}.fbx`);
+  const pathToCurrent = path.resolve(__dirname, tmpFolder, `${complexInfo.pdbId}.fbx`);
 
-function fbxDownload(fn) {
   return function () {
     return page.reload()
       .then(() => page.waitForMiew())
-      .then(() => driver.executeScript(fn))
+      .then(() => driver.executeScript(fn, complexInfo))
       .then(() => page.waitUntilRebuildIsDone())
-      // clean
       .then(() => driver.executeScript(() => { miew.save({ fileType: 'fbx' }); }))
-      .then(() => page.waitForExport(path.resolve(__dirname, '../1CRN.fbx')))
+      .then(() => page.waitForExport(pathToCurrent))
       .then(() => {
-        let goldenFBXData = fs.readFileSync(path.resolve(__dirname, './goldenFBX/1CRN.fbx'), 'utf8');
-        let currentFBXData = fs.readFileSync(path.resolve(__dirname, '../1CRN.fbx'), 'utf8');
+        let goldenFBXData = fs.readFileSync(pathToGolden, 'utf8');
+        let currentFBXData = fs.readFileSync(pathToCurrent, 'utf8');
         const usefulInfoGoldenInd = goldenFBXData.indexOf('Object properties');
         const usefulInfoCurrentInd = currentFBXData.indexOf('Object properties');
         goldenFBXData = goldenFBXData.slice(usefulInfoGoldenInd);
         currentFBXData = currentFBXData.slice(usefulInfoCurrentInd);
-        expect(goldenFBXData).equal(currentFBXData);
+        fs.unlinkSync(pathToCurrent); // deleting tmp file
+
+        expect(currentFBXData).equal(goldenFBXData);
       });
   };
 }
@@ -121,14 +142,23 @@ describe('The FBX exporter', function () {
 
   before(() => {
     const chromeOptions = new chromeDriver.Options();
+    const tmpDirectory = path.resolve(__dirname, tmpFolder);
     chromeOptions.addArguments(['--disable-gpu']);
-    chromeOptions.setUserPreferences({ 'download.default_directory': path.resolve(__dirname, '../') });
+    chromeOptions.setUserPreferences({ 'download.default_directory': tmpDirectory });
 
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
       .setChromeOptions(chromeOptions) // '--headless'
       .build();
+
+    // cleaning tmp folder
+    fs.readdir(tmpDirectory, (err, files) => {
+      if (err) throw err;
+      for (const file of files) {
+        fs.unlinkSync(path.join(tmpDirectory, file));
+      }
+    });
 
     return startup(driver, cfg)
       .then((url) => {
@@ -139,17 +169,13 @@ describe('The FBX exporter', function () {
 
   after(() => shutdown());
 
-  const myscript = function (opts) {
-    const _opts = opts;
-    return function () {
-      window.miew = new window.Miew(_opts);
+  for (let i = 0, n = testComplexes.length; i < n; i++) {
+    it(testComplexes[i].name, fbxDownload((complex) => {
+      window.miew = new window.Miew(complex.opts);
       if (miew.init()) {
         miew.run();
       }
-    };
-  };
-
-  for (let i = 0; i < testReps.length; i++) {
-    it(testReps[i].name, fbxDownload(myscript(testReps[0].opts)));
+    },
+    testComplexes[i]));
   }
 });
