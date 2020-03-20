@@ -20,21 +20,53 @@ let page;
 const goldenFolder = './goldenFBX/';
 const tmpFolder = './goldenFBX/tmp';
 
-const testComplexes = [{
+const testComplexesFull = [{
   name: 'Cartoon',
-  prefix: 'CR',
+  prefix: 'CA',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{mode: 'CA', colorer: 'SQ', material: 'SF'}],
+  },
+}, {
+  name: 'Licorice',
+  prefix: 'LC',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{ mode: 'LC', colorer: 'SQ', material: 'SF' }],
+  },
+}, {
+  name: 'Trace',
+  prefix: 'TR',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{ mode: 'TR', colorer: 'SQ', material: 'SF' }],
+  },
+}, {
+  name: 'Balls and Sticks',
+  prefix: 'BS',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{ mode: 'BS', colorer: 'SQ', material: 'SF' }],
+  },
+}, {
+  name: 'Tube',
+  prefix: 'TU',
   pdbId: '1CRN',
   opts: {
     load: '../data/1CRN.pdb',
     reps: [{ mode: 'TU', colorer: 'SQ', material: 'SF' }],
   },
 }, {
-  name: 'Solvent Excluded Surface',
-  prefix: 'SE',
+  name: 'Quick Surface',
+  prefix: 'QS',
   pdbId: '1CRN',
   opts: {
     load: '../data/1CRN.pdb',
-    reps: [{ mode: 'SE', colorer: 'SQ', material: 'SF' }],
+    reps: [{ mode: 'QS', colorer: 'SQ', material: 'SF' }],
   },
 }, {
   name: 'Solvent Accessible Surface',
@@ -45,12 +77,58 @@ const testComplexes = [{
     reps: [{ mode: 'SA', colorer: 'SQ', material: 'SF' }],
   },
 }, {
+  name: 'Solvent Excluded Surface',
+  prefix: 'SE',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{ mode: 'SE', colorer: 'SQ', material: 'SF' }],
+  },
+}, {
+  name: 'Contact Surface',
+  prefix: 'CS',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [{ mode: 'CS', colorer: 'SQ', material: 'SF' }],
+  },
+}, {
   name: 'Van der Waals',
   prefix: 'VW',
   pdbId: '1CRN',
   opts: {
     load: '../data/1CRN.pdb',
     reps: [{ mode: 'VW', colorer: 'SQ', material: 'SF' }],
+  },
+}];
+
+const testComplexesFast = [{
+  name: 'Lines',
+  prefix: 'Line',
+  pdbId: '4XN6',
+  opts: {
+    load: '../data/4XN6.pdb',
+    reps: [
+      { selector: 'serial 1:200', mode: 'CA', colorer: 'SS' },
+      { selector: 'serial 201:400', mode: 'BS', colorer: 'SS' },
+      { selector: 'serial 401:600', mode: 'LC', colorer: 'SS' },
+      { selector: 'serial 601:800', mode: 'TU', colorer: 'SS' },
+      { selector: 'serial 801:1000', mode: 'TR', colorer: 'SS' },
+    ],
+  },
+}, {
+  name: 'Surfaces',
+  prefix: 'Surf',
+  pdbId: '1CRN',
+  opts: {
+    load: '../data/1CRN.pdb',
+    reps: [
+      { selector: 'serial 1:60', mode: 'VW', colorer: 'SS' },
+      { selector: 'serial 61:120', mode: 'QS', colorer: 'SS' },
+      { selector: 'serial 121:180', mode: 'SA', colorer: 'SS' },
+      { selector: 'serial 181:240', mode: 'SE', colorer: 'SS' },
+      { selector: 'serial 241:300', mode: 'CS', colorer: 'SS' },
+    ],
   },
 }];
 
@@ -143,13 +221,13 @@ describe('The FBX exporter', function () {
   before(() => {
     const chromeOptions = new chromeDriver.Options();
     const tmpDirectory = path.resolve(__dirname, tmpFolder);
-    chromeOptions.addArguments(['--disable-gpu']);
+    chromeOptions.addArguments(['--disable-gpu']);// '--headless'
     chromeOptions.setUserPreferences({ 'download.default_directory': tmpDirectory });
 
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
-      .setChromeOptions(chromeOptions) // '--headless'
+      .setChromeOptions(chromeOptions)
       .build();
 
     // cleaning tmp folder
@@ -168,7 +246,7 @@ describe('The FBX exporter', function () {
   });
 
   after(() => shutdown());
-
+  const testComplexes = testComplexesFast; // testComplexesFull
   for (let i = 0, n = testComplexes.length; i < n; i++) {
     it(testComplexes[i].name, fbxDownload((complex) => {
       window.miew = new window.Miew(complex.opts);
