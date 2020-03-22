@@ -42,7 +42,7 @@ class VolumeFarPlane {
       // update material props
       material.uniforms.aspectRatio.value = camera.aspect;
       material.uniforms.farZ.value = camera.far;
-      material.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * camera.fov);
+      material.uniforms.tanHalfFOV.value = Math.tan(THREE.MathUtils.DEG2RAD * 0.5 * camera.fov);
       material.uniforms.matWorld2Volume.value = matWorldToVolume;
     };
 

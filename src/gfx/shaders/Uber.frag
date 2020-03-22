@@ -248,14 +248,16 @@ float unpackRGBAToDepth( const in vec4 v ) {
   struct DirectionalLight {
     vec3 direction;
     vec3 color;
-
-    int shadow;
-    vec2 shadowMapSize;
-    float shadowBias;
-    float shadowRadius;
   };
-
   uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
+
+  struct DirectionalLightShadow {
+     vec2 shadowMapSize;
+     float shadowBias;
+     float shadowRadius;
+   };
+  uniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHTS ];
+
   uniform vec3 ambientLightColor;
 
   /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
@@ -265,7 +267,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
   		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
   	}
 
-    float getShadow( sampler2D shadowMap, DirectionalLight dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {
+    float getShadow( sampler2D shadowMap, DirectionalLightShadow dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {
    	  float shadow = 0.0;
 
       // When shadows for sprites will appear use here for them normals as it done for G-buffer
@@ -393,7 +395,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
   	#pragma unroll_loop
   	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
   	    #ifdef SHADOWMAP
-  	    if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );
+  	      shadowMask = getShadow( directionalShadowMap[ i ], directionalLightShadows[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );
   	    #endif
 
   		  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );

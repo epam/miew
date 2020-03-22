@@ -80,7 +80,7 @@ class CSS2DRenderer {
           element.style.background = colorAsHex(object.userData.background);
         }
       } else {
-        const fogFactor = THREE.Math.smoothstep(-this._vector.z, scene.fog.near, scene.fog.far);
+        const fogFactor = THREE.MathUtils.smoothstep(-this._vector.z, scene.fog.near, scene.fog.far);
         element.style.color = lerpColorAsHex(object.userData.color, scene.fog.color, fogFactor);
         if (object.userData.background !== 'transparent') {
           element.style.background = lerpColorAsHex(object.userData.background, scene.fog.color, fogFactor);
