@@ -137,7 +137,7 @@
     "file-loader": "^5.1.0",
     "glob": "^7.1.6",
     "handlebars": "^4.7.3",
-    "html-webpack-plugin": "^3.2.0",
+    "html-webpack-plugin": "^4.0.0",
     "jison": "^0.4.18",
     "jquery": "3.4.1",
     "jquery.terminal": "=2.1.0",
