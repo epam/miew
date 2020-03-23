@@ -1618,7 +1618,7 @@ Miew.prototype._performAO = (function () {
       return;
     }
     const gfx = this._gfx;
-    const tanHalfFOV = Math.tan(THREE.MathUtils.DEG2RAD * 0.5 * gfx.camera.fov);
+    const tanHalfFOV = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
 
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
     _aoMaterial.uniforms.depthTexture.value = srcDepthTexture;
@@ -3128,11 +3128,11 @@ Miew.prototype.screenshot = function (width, height) {
   const deviceHeight = gfx.renderer.domElement.height;
 
   function fov2Tan(fov) {
-    return Math.tan(THREE.MathUtils.degToRad(0.5 * fov));
+    return Math.tan(THREE.Math.degToRad(0.5 * fov));
   }
 
   function tan2Fov(tan) {
-    return THREE.MathUtils.radToDeg(Math.atan(tan)) * 2.0;
+    return THREE.Math.radToDeg(Math.atan(tan)) * 2.0;
   }
 
   function getDataURL() {

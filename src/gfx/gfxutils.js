@@ -154,7 +154,7 @@ THREE.PerspectiveCamera.prototype.setMinimalFov = function (angle) {
   if (this.aspect >= 1.0) {
     this.fov = angle;
   } else {
-    this.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(angle) * 0.5) / this.aspect));
+    this.fov = THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(angle) * 0.5) / this.aspect));
   }
 };
 
@@ -182,7 +182,7 @@ THREE.StereoCamera.prototype.updateHalfSized = function (camera, angle) {
  * @param {number} angle - Field of view in degrees.
  */
 THREE.PerspectiveCamera.prototype.setDistanceToFit = function (radius, angle) {
-  this.position.z = radius / Math.sin(0.5 * THREE.MathUtils.degToRad(angle));
+  this.position.z = radius / Math.sin(0.5 * THREE.Math.degToRad(angle));
 };
 
 /**
@@ -445,11 +445,11 @@ function applyTransformsToMeshes(root, mtc) {
     if (!parent) {
       continue;
     }
-    mesh.applyMatrix4(mtc[0]);
+    mesh.applyMatrix(mtc[0]);
     for (let j = 1; j < mtcCount; ++j) {
       const newMesh = new mesh.constructor(mesh.geometry, mesh.material);
       parent.add(newMesh);
-      newMesh.applyMatrix4(mtc[j]);
+      newMesh.applyMatrix(mtc[j]);
     }
   }
 }
@@ -480,7 +480,7 @@ function processTransparentMaterial(root, material) {
         prepassMesh.material[value] = false;
       });
     prepassMesh.material.needsUpdate = true;
-    prepassMesh.applyMatrix4(mesh.matrix);
+    prepassMesh.applyMatrix(mesh.matrix);
     prepassMesh.layers.set(LAYERS.PREPASS_TRANSPARENT);
     parent.add(prepassMesh);
   }
@@ -511,7 +511,7 @@ function processColFromPosMaterial(root, material) {
     });
 
     colFromPosMesh.material.needsUpdate = true;
-    colFromPosMesh.applyMatrix4(mesh.matrix);
+    colFromPosMesh.applyMatrix(mesh.matrix);
     colFromPosMesh.layers.set(LAYERS.COLOR_FROM_POSITION);
     parent.add(colFromPosMesh);
   }
@@ -549,7 +549,7 @@ function createShadowmapMaterial(root, material) {
       });
     shadowmapMesh.isShadowmapMesh = true;
     shadowmapMesh.material.needsUpdate = true;
-    shadowmapMesh.applyMatrix4(mesh.matrix);
+    shadowmapMesh.applyMatrix(mesh.matrix);
     shadowmapMesh.layers.set(LAYERS.SHADOWMAP);
     parent.add(shadowmapMesh);
   }
