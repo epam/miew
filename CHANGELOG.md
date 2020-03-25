@@ -6,6 +6,29 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.9.0] - 2020-03-23
+### Added
+- Add unittests for Atom and Molecule
+
+### Changed - BREAKING CHANGES!
+- Move threejs and lodash to external dependencies (halving size of Miew bundle). See examples for migrating ideas.
+ 
+### Removed - BREAKING CHANGES!
+- Remove deprecated GXProfiler and Miew.profile
+- Remove dispatching of deprecated events
+ 
+### Fixed
+- Fix crash in IE when turning on the effects which are not supported by the browser
+- Fix crash on uploading molecule with ssao on
+- Remove permanent rebuild after Menu close in case when nothing has changed
+
+### Internal
+- Make ViewInterpolator being an object to prevent its sharing between several instances of Miew
+- Remove primitive getters from Atom and Molecule, use members instead
+- Simplify Atom.name
+- Remove a code for building chemical formula, it's obsolete
+- Implement shadowmaps using common renderer.scene routine for future overcome of threejs restrictions in shadowmaps for zSprites modes 
+
 ## [0.8.7] - 2000-02-04
 ### Fixed
 - Fix travis options for npm deployment 
@@ -561,7 +584,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.8.7...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/epam/miew/compare/v0.8.7...v0.9.0
 [0.8.7]: https://github.com/epam/miew/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/epam/miew/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/epam/miew/compare/v0.8.4...v0.8.5
