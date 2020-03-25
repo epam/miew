@@ -107,6 +107,8 @@ function UberMaterial(params) {
   this.shadowmapType = 'random';
   // used to render pixel view deph
   this.colorFromDepth = false;
+  // mark that rendering is for orthographic camera
+  this.orthoCam = false;
   // used to render dashed line
   this.dashedLine = false;
   // mark as transparent
@@ -220,6 +222,7 @@ UberMaterial.prototype.copy = function (source) {
   this.shadowmap = source.shadowmap;
   this.shadowmapType = source.shadowmapType;
   this.colorFromDepth = source.colorFromDepth;
+  this.orthoCam = source.orthoCam;
   this.prepassTransparancy = source.prepassTransparancy;
   this.dashedLine = source.dashedLine;
   this.thickLine = source.thickLine;
@@ -308,6 +311,9 @@ UberMaterial.prototype.setValues = function (values) {
   }
   if (this.colorFromDepth) {
     defines.COLOR_FROM_DEPTH = 1;
+  }
+  if (this.orthoCam) {
+    defines.ORTHOGRAPHIC_CAMERA = 1;
   }
   if (this.prepassTransparancy) {
     defines.PREPASS_TRANSP = 1;
