@@ -15,8 +15,11 @@
 #if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	#if NUM_DIR_LIGHTS > 0
 		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
+    uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ]; //only for sprites
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
 		varying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
+    vec4 vDirLightWorldCoord[ NUM_DIR_LIGHTS ];
+    vec3 vDirLightWorldNormal[ NUM_DIR_LIGHTS ];
 
     #ifdef SHADOWMAP_PCF_RAND
       // We use 4 instead uniform variable or define because this value is used in for(... i < value; ...) with
@@ -80,7 +83,10 @@ varying vec3 vViewPosition;
 
 #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
   uniform float zOffset;
-  uniform mat4 projectionMatrix;
+
+  #if !defined(SHADOWMAP_PCF_RAND)
+    uniform mat4 projectionMatrix;
+  #endif
 
   float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {
     vec4 pixelPosScreen = projMatrix * pixelPosEye;
@@ -95,14 +101,14 @@ varying vec3 vViewPosition;
   uniform mat4 invModelViewMatrix;
   uniform mat3 normalMatrix;
 
-  float intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {
+  bool intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {
 
     // intersect XZ-projected ray with circle
     float a = dot(ray, ray);
     float b = dot(ray, origin);
     float c = dot(origin, origin) - 1.0;
     float det = b * b - a * c;
-    if (det < 0.0) return -1.0;
+    if (det < 0.0) return false;
     float t1 = (-b - sqrt(det)) / a;
     float t2 = (-b + sqrt(det)) / a;
 
@@ -110,27 +116,47 @@ varying vec3 vViewPosition;
     vec3 p1 = origin + ray * t1;
     vec3 p2 = origin + ray * t2;
 
-    // choose nearest point
-    if (t1 >= 0.0) {
+    // choose nearest point inside frustum
+    #ifdef ORTHOGRAPHIC_CAMERA
+      // orthografic camera is used for dirLight sources. So in it for all spheres the point with smaller 't' is visible
+      // t1 is always smaller than t2 (from calculations)
       point = p1;
-      return t1;
-    }
-    if (t2 >= 0.0) {
-      point = p2;
-      return t2;
-    }
+      return true;
+    #else
+      // for perspective camera first intersection can be behind it. If not intersection is p1 else - p2
+      // think. As reason to discard intersection we must use position relative to near plane not to camera coordinates
+      if (t1 >= 0.0) {
+        point = p1;
+        return true;
+      }
+      if (t2 >= 0.0) {
+        point = p2;
+        return true;
+      }
+    #endif
 
-    return -1.0;
+    return false;
   }
 
-  float get_sphere_point(in vec3 pixelPosEye, out vec3 point) {
-    // transform camera pos into sphere local coords
-    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-    vec3 origin = (v.xyz - instOffset.xyz) / instOffset.w;
+  bool get_sphere_point(in vec3 pixelPosEye, out vec3 point) {
+    vec3 origin, ray;
 
-    // transform (camera -> pixel) ray into cylinder local coords
-    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);
-    vec3 ray = normalize(v.xyz);
+    #ifdef ORTHOGRAPHIC_CAMERA
+      // transform vector from sprite center to curPixel into sphere local coords
+      origin = pixelPosEye.xyz - spritePosEye.xyz;
+      origin = (invModelViewMatrix * vec4(origin, 0.0)).xyz / instOffset.w;
+
+      // transform camera orientation vector into sphere local coords
+      ray = (invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
+    #else
+      // transform camera pos into sphere local coords
+      vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+      origin = (v.xyz - instOffset.xyz) / instOffset.w;
+
+      // transform vector from camera pos to curPixel into sphere local coords
+      ray = (invModelViewMatrix * vec4(pixelPosEye, 0.0)).xyz;
+    #endif
+    ray = normalize(ray);
 
     return intersect_ray_sphere(origin, ray, point);
   }
@@ -149,14 +175,16 @@ varying vec3 vViewPosition;
   uniform mat4 invModelViewMatrix;
   uniform mat3 normalMatrix;
 
-  float intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {
+  varying vec4 spritePosEye;
+
+  bool intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {
 
     // intersect XZ-projected ray with circle
     float a = dot(ray.xz, ray.xz);
     float b = dot(ray.xz, origin.xz);
     float c = dot(origin.xz, origin.xz) - 1.0;
     float det = b * b - a * c;
-    if (det < 0.0) return -1.0;
+    if (det < 0.0) return false;
     float t1 = (-b - sqrt(det)) / a;
     float t2 = (-b + sqrt(det)) / a;
 
@@ -164,34 +192,57 @@ varying vec3 vViewPosition;
     vec3 p1 = origin + ray * t1;
     vec3 p2 = origin + ray * t2;
 
-    // choose nearest point
     float halfHeight = 0.5;
-    if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {
-      point = p1;
-      return t1;
-    }
-    if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {
-      point = p2;
-      return t2;
-    }
 
-    return -1.0;
+    // choose nearest point
+    #ifdef ORTHOGRAPHIC_CAMERA
+      // orthografic camera is used for dirLight sources. So in it for all cylinders the point with smaller 't' is visible
+      // if it is not outside of cylinnder (t1 is always smaller than t2)
+      if (p1.y >= -halfHeight && p1.y <= halfHeight) {
+        point = p1;
+        return true;
+      }
+      if (p2.y >= -halfHeight && p2.y <= halfHeight) {
+        point = p2;
+        return true;
+      }
+    #else
+      // for perspective camera first intersection can be behind it. If not intersection is p1 else - p2
+      // think. As reason to discard intersection we must use position relative to near plane not to camera coordinates
+      if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {
+        point = p1;
+        return true;
+      }
+      if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {
+        point = p2;
+        return true;
+      }
+    #endif
+
+    return false;
   }
 
-  float get_cylinder_point(in vec3 pixelPosEye, out vec3 point) {
-    // transform camera pos into cylinder local coords
-    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-    vec3 origin = vec3(
-      dot(v, invmatVec1),
-      dot(v, invmatVec2),
-      dot(v, invmatVec3));
+  bool get_cylinder_point(in vec3 pixelPosEye, out vec3 point) {
+    vec3 origin, ray;
+    vec4 v;
 
-    // transform (camera -> pixel) ray into cylinder local coords
-    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);
-    vec3 ray = vec3(
-      dot(v, invmatVec1),
-      dot(v, invmatVec2),
-      dot(v, invmatVec3));
+    #ifdef ORTHOGRAPHIC_CAMERA
+      // transform vector from sprite center to curPixel into cylinder local coords
+      v = invModelViewMatrix * vec4(pixelPosEye.xyz - spritePosEye.xyz, 0.0);
+      origin = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));
+
+      // transform camera orientation vector into cylinder local coords
+      v = invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0);
+      ray = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));
+    #else
+      // transform camera pos into cylinder local coords
+      v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+      origin = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));
+
+      // transform vector from camera pos to curPixel into cylinder local coords
+      v = invModelViewMatrix * vec4(pixelPosEye, 0.0);
+      ray = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));
+    #endif
     ray = normalize(ray);
 
     return intersect_ray_cylinder(origin, ray, point);
@@ -393,8 +444,8 @@ float unpackRGBAToDepth( const in vec4 v ) {
   	#pragma unroll_loop
   	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
   	    #ifdef SHADOWMAP
-  	    if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );
-  	    #endif
+  	      if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirLightWorldCoord[ i ], vViewPosition, vDirLightWorldNormal[ i ] );
+        #endif
 
   		  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );
   		}
@@ -423,6 +474,17 @@ void main() {
   if (vViewPosition.z < zClipValue) discard;
 #endif
 
+#if defined(USE_LIGHTS) && defined(SHADOWMAP)
+  #if NUM_DIR_LIGHTS > 0
+    // see THREE.WebGLProgram.unrollLoops
+    #pragma unroll_loop
+    for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+      vDirLightWorldCoord[ i ] = vDirectionalShadowCoord[ i ];
+      vDirLightWorldNormal[ i ] = vDirectionalShadowNormal[ i ];
+    }
+  #endif
+#endif
+
   vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);
   vec4 pixelPosEye;
 
@@ -445,7 +507,7 @@ void main() {
   // ray-trace sphere surface
   {
     vec3 p;
-    if (get_sphere_point(-vViewPosition, p) < 0.0) discard;
+    if (!get_sphere_point(-vViewPosition, p)) discard;
     pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
     // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
     pixelPosEye = vec4(spritePosEye.xyz, 1.0);
@@ -457,8 +519,18 @@ void main() {
     #ifdef NORMALS_TO_G_BUFFER
       viewNormalSprites = normalize(mat3(modelViewMatrix)*p);
     #endif
-  }
 
+    #if defined(USE_LIGHTS) && defined(SHADOWMAP)
+      #if NUM_DIR_LIGHTS > 0
+        // see THREE.WebGLProgram.unrollLoops
+        #pragma unroll_loop
+          for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+            vDirLightWorldCoord[ i ] = directionalShadowMatrix[ i ] * pixelPosWorld;
+            vDirLightWorldNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(p, 0.0))).xyz;
+          }
+      #endif
+    #endif
+  }
 #endif
 
 #ifdef CYLINDER_SPRITE
@@ -466,28 +538,40 @@ void main() {
   vec3 viewNormalSprites;
   float cylinderY = 0.0;
 
-    // ray-trace cylinder surface
-    {
-      vec3 p;
-      if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;
+  // ray-trace cylinder surface
+  {
+    vec3 p;
+    if (!get_cylinder_point(-vViewPosition, p)) discard;
 
-      cylinderY = 0.5 * (p.y + 1.0);
+    cylinderY = 0.5 * (p.y + 1.0);
 
-      vec4 v = vec4(p, 1.0);
-      v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);
-      pixelPosWorld = modelMatrix * v;
-      pixelPosEye = modelViewMatrix * v;
+    vec4 v = vec4(p, 1.0);
+    v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);
+    pixelPosWorld = modelMatrix * v;
+    pixelPosEye = modelViewMatrix * v;
 
-      vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));
-      normal = vec3(
-        dot(localNormal, matVec1.xyz),
-        dot(localNormal, matVec2.xyz),
-        dot(localNormal, matVec3.xyz));
-      #ifdef NORMALS_TO_G_BUFFER
-        viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
+    vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));
+    normal = vec3(
+      dot(localNormal, matVec1.xyz),
+      dot(localNormal, matVec2.xyz),
+      dot(localNormal, matVec3.xyz));
+    #ifdef NORMALS_TO_G_BUFFER
+      viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);
+    #endif
+
+    #if defined(USE_LIGHTS) && defined(SHADOWMAP)
+      #if NUM_DIR_LIGHTS > 0
+        // see THREE.WebGLProgram.unrollLoops
+        #pragma unroll_loop
+          for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+            vDirLightWorldCoord[ i ] = directionalShadowMatrix[ i ] * pixelPosWorld;
+            vDirLightWorldNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(normal, 0.0))).xyz;
+          }
       #endif
-      normal = normalize(normalMatrix * normal);
-    }
+    #endif
+
+    normal = normalize(normalMatrix * normal);
+  }
 #endif
 
   #ifdef ATTR_COLOR
@@ -570,9 +654,15 @@ void main() {
   #endif
 
   #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
-    GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));
+    vec3 viewDir;
+    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
+      viewDir = -pixelPosEye.xyz;
+    #else
+      viewDir = vViewPosition;
+    #endif
+    GeometricContext geometry = GeometricContext(normal, normalize( viewDir ));
     BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);
-    vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);
+    vec3 outgoingLight = calcLighting(geometry, material, viewDir);
   #else
     vec3 outgoingLight = diffuseColor.rgb;
   #endif
