@@ -218,7 +218,11 @@ class CIFParser extends Parser {
 
     // molecules names from cif
     for (i = 0; i < count; i++) {
-      this.molecules[i].name = names[i];
+      if (this.molecules[i]) { // molecule was created during atoms processing
+        this.molecules[i].name = names[i];
+      } else { // molecule wasn't created, because there is no atom which is contained
+        this.molecules[i] = { name: names[i], residues: [] };
+      }
     }
 
     // reorganize molecules for complex and check chains
@@ -290,10 +294,10 @@ class CIFParser extends Parser {
       if (!residue || residue.getSequence() !== resSeq || residue.getICode() !== iCode) {
         residue = chain.addResidue(resName, resSeq, iCode);
 
-        // store molecule (entity)
+        // store residue in appropriate molecule
         const moleculeIdx = molecules[i] - 1;
         let entity = this.molecules[moleculeIdx];
-        if (!entity) {
+        if (!entity) { // create new molecule if it hasn't been created
           this.molecules[moleculeIdx] = { name: '', residues: [] };
           entity = this.molecules[moleculeIdx];
         }

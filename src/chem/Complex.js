@@ -658,8 +658,11 @@ class Complex {
 
   clearAtomBits(mask) {
     const clearMask = ~mask;
+    this.forEachAtom((atom) => {
+      atom.mask &= clearMask;
+    });
     const reseter = (a) => {
-      a.mask &= clearMask;
+      a._mask &= clearMask;
     };
     this.forEachAtom(reseter);
     this.forEachResidue(reseter);

@@ -12,7 +12,6 @@ import Visual from './Visual';
 import ComplexVisual from './ComplexVisual';
 import Complex from './chem/Complex';
 import VolumeVisual from './VolumeVisual';
-import GfxProfiler from './gfx/GfxProfiler';
 import io from './io/io';
 import modes from './gfx/modes';
 import colorers from './gfx/colorers';
@@ -424,6 +423,7 @@ Miew.prototype._initGfx = function () {
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
   gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
+  gfx.renderer.shadowMap.autoUpdate = false;
   gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
   capabilities.init(gfx.renderer);
 
@@ -431,7 +431,7 @@ Miew.prototype._initGfx = function () {
   if (!arezSpritesSupported(gfx.renderer.getContext())) {
     settings.set('zSprites', false);
   }
-  if (isAOSupported(gfx.renderer.getContext())) {
+  if (!isAOSupported(gfx.renderer.getContext())) {
     settings.set('ao', false);
   }
 
@@ -483,6 +483,7 @@ Miew.prototype._initGfx = function () {
   light12.shadow = new THREE.DirectionalLightShadow();
   light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
+  light12.shadow.camera.layers.set(gfxutils.LAYERS.SHADOWMAP);
 
   const pixelRatio = gfx.renderer.getPixelRatio();
   const shadowMapSize = Math.max(gfx.width, gfx.height) * pixelRatio;
@@ -1092,6 +1093,8 @@ Miew.prototype._renderFrame = (function () {
     const pixelRatio = gfx.renderer.getPixelRatio();
     this._resizeOffscreenBuffers(_size.width * pixelRatio, _size.height * pixelRatio, stereo);
 
+    this._renderShadowMap();
+
     switch (stereo) {
       case 'WEBVR':
       case 'NONE':
@@ -1361,6 +1364,47 @@ Miew.prototype._renderOutline = (function () {
 
     gfx.renderer.setRenderTarget(targetBuffer);
     gfx.renderer.renderScreenQuad(_outlineMaterial);
+  };
+}());
+
+Miew.prototype._renderShadowMap = (function () {
+  const pars = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
+
+  return function () {
+    if (!settings.now.shadow.on) {
+      return;
+    }
+
+    const gfx = this._gfx;
+    const currentRenderTarget = gfx.renderer.getRenderTarget();
+    const activeCubeFace = gfx.renderer.getActiveCubeFace();
+    const activeMipmapLevel = gfx.renderer.getActiveMipmapLevel();
+
+    const _state = gfx.renderer.state;
+
+    // Set GL state for depth map.
+    _state.setBlending(THREE.NoBlending);
+    _state.buffers.color.setClear(1, 1, 1, 1);
+    _state.buffers.depth.setTest(true);
+    _state.setScissorTest(false);
+
+    for (let i = 0; i < gfx.scene.children.length; i++) {
+      if (gfx.scene.children[i].type === 'DirectionalLight') {
+        const light = gfx.scene.children[i];
+
+        if (light.shadow.map == null) {
+          light.shadow.map = new THREE.WebGLRenderTarget(light.shadow.mapSize.width, light.shadow.mapSize.height, pars);
+          light.shadow.camera.updateProjectionMatrix();
+        }
+        light.shadow.updateMatrices(light);
+
+        gfx.renderer.setRenderTarget(light.shadow.map);
+        gfx.renderer.clear();
+
+        gfx.renderer.render(gfx.scene, light.shadow.camera);
+      }
+    }
+    gfx.renderer.setRenderTarget(currentRenderTarget, activeCubeFace, activeMipmapLevel);
   };
 }());
 
@@ -1858,8 +1902,6 @@ function _fetchData(source, opts, job) {
       .then((data) => {
         console.timeEnd('fetch');
         opts.context.logger.info('Fetching finished');
-        // deprecated event since version 0.8.6
-        job.notify({ type: 'fetchingFinished', data });
         job.notify({ type: 'fetchingDone', data });
         return data;
       })
@@ -1870,8 +1912,6 @@ function _fetchData(source, opts, job) {
           opts.context.logger.debug(error.stack);
         }
         opts.context.logger.error('Fetching failed');
-        // deprecated event since version 0.8.6
-        job.notify({ type: 'fetchingFinished', error });
         job.notify({ type: 'fetchingDone', error });
         throw error;
       });
@@ -1883,8 +1923,6 @@ function _parseData(data, opts, job) {
   if (job.shouldCancel()) {
     return Promise.reject(new Error('Operation cancelled'));
   }
-  // deprecated event since version 0.8.6
-  job.notify({ type: 'parse' });
 
   job.notify({ type: 'parsing' });
 
@@ -1901,8 +1939,6 @@ function _parseData(data, opts, job) {
   return parser.parse()
     .then((dataSet) => {
       console.timeEnd('parse');
-      // deprecated event since version 0.8.6
-      job.notify({ type: 'parsingFinished', data: dataSet });
       job.notify({ type: 'parsingDone', data: dataSet });
       return dataSet;
     })
@@ -1914,8 +1950,6 @@ function _parseData(data, opts, job) {
         opts.context.logger.debug(error.stack);
       }
       opts.context.logger.error('Parsing failed');
-      // deprecated event since version 0.8.6
-      job.notify({ type: 'parsingFinished', error });
       job.notify({ type: 'parsingDone', error });
       throw error;
     });
@@ -1953,9 +1987,6 @@ Miew.prototype.load = function (source, opts) {
   }
 
   this._interpolator.reset();
-
-  // deprecated event since version 0.8.6
-  this.dispatchEvent({ type: 'load', options: opts, source });
 
   this.dispatchEvent({ type: 'loading', options: opts, source });
 
@@ -2228,14 +2259,6 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     delete this._opts.view;
   }
 
-  if (opts.error) {
-    // deprecated event since version 0.8.6
-    this.dispatchEvent({ type: 'onParseError', error: opts.error });
-  } else {
-    // deprecated event since version 0.8.6
-    this.dispatchEvent({ type: 'onParseDone' });
-  }
-
   this._refreshTitle();
 
   return visualName;
@@ -2366,9 +2389,6 @@ Miew.prototype.rebuild = function () {
   }
   this._building = true;
 
-  // deprecated event since version 0.8.6
-  this.dispatchEvent({ type: 'rebuild' });
-
   this.dispatchEvent({ type: 'rebuilding' });
 
   this._rebuildObjects();
@@ -2458,9 +2478,6 @@ Miew.prototype._extractRepresentation = function () {
 
   if (changed.length > 0) {
     this.logger.report(`New representation from selection for complexes: ${changed.join(', ')}`);
-    // deprecated event since 0.8.6
-    // Use repAdded event instead it. Make attention there are some differences
-    this.dispatchEvent({ type: 'repAdd' });
   }
 };
 
@@ -2931,19 +2948,11 @@ Miew.prototype._updateInfoPanel = function () {
     atom = this._lastPick;
     residue = atom.residue;
 
-    const an = atom.name;
-    if (an.getNode() !== null) {
-      aName = an.getNode();
-    } else {
-      aName = an.getString();
-    }
+    aName = atom.name;
     const location = (atom.location !== 32) ? String.fromCharCode(atom.location) : ''; // 32 is code of white-space
     secondLine = `${atom.element.fullName} #${atom.serial}${location}: \
       ${residue._chain._name}.${residue._type._name}${residue._sequence}${residue._icode.trim()}.`;
-    if (typeof aName === 'string') {
-      // add atom name to second line in plain text form
-      secondLine += aName;
-    }
+    secondLine += aName;
 
     coordLine = `Coord: (${atom.position.x.toFixed(2).toString()},\
      ${atom.position.y.toFixed(2).toString()},\
@@ -2964,13 +2973,6 @@ Miew.prototype._updateInfoPanel = function () {
   if (secondLine !== '') {
     info.appendChild(document.createElement('br'));
     info.appendChild(document.createTextNode(secondLine));
-  }
-
-  if (typeof aName !== 'string') {
-    // add atom name to second line in HTML form
-    const newNode = aName.cloneNode(true);
-    newNode.style.fontSize = '85%';
-    info.appendChild(newNode);
   }
 
   if (coordLine !== '') {
@@ -3112,39 +3114,6 @@ Miew.prototype.setPivotSubset = (function () {
     }
   };
 }());
-
-/**
- * Starts profiling tool
- * @deprecated since 0.8.6. There are plans to make it a separate tool outside Miew
- */
-Miew.prototype.benchmarkGfx = function (force) {
-  const self = this;
-  const prof = new GfxProfiler(this._gfx.renderer);
-
-  return new Promise(((resolve) => {
-    if (!force && !settings.now.autoResolution) {
-      resolve();
-      return;
-    }
-
-    // deprecated event since 0.8.6
-    self.dispatchEvent({ type: 'profile' });
-
-    self._spinner.spin(self._container);
-    prof.runOnTicks(50, 1000, 2000).then((numResults) => {
-      self._gfxScore = 0.0;
-      if (numResults >= 5) {
-        self._gfxScore = 1000.0 / prof.mean();
-      }
-      if (numResults > 0) {
-        self._gfxScore = 0.5 * numResults;
-      }
-
-      self._spinner.stop();
-      resolve();
-    });
-  }));
-};
 
 /**
  * Makes a screenshot.
@@ -3628,6 +3597,16 @@ Miew.prototype._fogFarUpdateValue = function () {
   }
 };
 
+Miew.prototype._updateShadowmapMeshes = function (process) {
+  this._forEachComplexVisual((visual) => {
+    const reprList = visual._reprList;
+    for (let i = 0, n = reprList.length; i < n; ++i) {
+      const repr = reprList[i];
+      process(repr.geo, repr.material);
+    }
+  });
+};
+
 Miew.prototype._updateMaterials = function (values, needTraverse = false, process = undefined) {
   this._forEachComplexVisual((visual) => visual.setMaterialValues(values, needTraverse, process));
   for (let i = 0, n = this._objects.length; i < n; ++i) {
@@ -3743,16 +3722,13 @@ Miew.prototype._initOnSettingsChanged = function () {
     if (gfx) {
       gfx.renderer.shadowMap.enabled = Boolean(values.shadowmap);
     }
+    this._updateMaterials(values, true);
     if (values.shadowmap) {
       this._updateShadowCamera();
+      this._updateShadowmapMeshes(gfxutils.createShadowmapMaterial);
+    } else {
+      this._updateShadowmapMeshes(gfxutils.removeShadowmapMaterial);
     }
-    this._updateMaterials(values, true, (object) => {
-      if (values.shadowmap) {
-        gfxutils.prepareObjMaterialForShadow(object);
-      } else {
-        object.customDepthMaterial = null;
-      }
-    });
     this._needRender = true;
   });
 

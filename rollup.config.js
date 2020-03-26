@@ -19,6 +19,7 @@ const warnExceptions = {
 };
 
 export default {
+  external: ['three', 'lodash'],
   input: './src/index.js',
   onwarn(warning, warn) {
     const exceptions = (warning.loc && warnExceptions[warning.code]) || [];
@@ -67,6 +68,10 @@ export default {
     file: `build/${packageJson.main}`,
     banner,
     sourcemap: true,
+    globals: {
+      three: 'THREE',
+      lodash: '_',
+    },
   }, {
     format: 'es',
     file: `build/${packageJson.module}`,

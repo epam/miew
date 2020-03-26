@@ -192,7 +192,7 @@ class ComplexVisual extends Visual {
         lookupAndCreate(colorers, rep.colorer));
 
       // something was changed
-      if (diff) {
+      if (!_.isEmpty(diff)) {
         target.needsRebuild = true;
         for (const key in diff) {
           if (diff.hasOwnProperty(key)) {
@@ -762,7 +762,7 @@ class ComplexVisual extends Visual {
     });
 
     complex.forEachAtom((atom) => {
-      if (atom._mask & mask && !(atom.residue._mask & mask)) {
+      if (atom.mask & mask && !(atom.residue._mask & mask)) {
         atoms.push(atom.serial);
       }
     });

@@ -75,12 +75,12 @@ class Representation {
     }
     this.geo.visible = this.visible;
 
-    if (settings.now.shadow.on) {
-      gfxutils.processMaterialForShadow(this.geo, this.material);
-    }
-
     gfxutils.processObjRenderOrder(this.geo, this.materialPreset.id);
     gfxutils.processColFromPosMaterial(this.geo, this.material);
+
+    if (settings.now.shadow.on) {
+      gfxutils.createShadowmapMaterial(this.geo, this.material);
+    }
 
     return this.geo;
   }
@@ -160,7 +160,7 @@ class Representation {
     // modify mode
     if (repSettings.mode) {
       const newMode = repSettings.mode;
-      if (!_.isEqual(this.mode, newMode)) {
+      if (!_.isEqual(this.mode.identify(), newMode)) {
         diff.mode = newMode;
         this.setMode(mode);
       }
@@ -169,7 +169,7 @@ class Representation {
     // modify colorer
     if (repSettings.colorer) {
       const newColorer = repSettings.colorer;
-      if (!_.isEqual(this.colorer, newColorer)) {
+      if (!_.isEqual(this.colorer.identify(), newColorer)) {
         diff.colorer = newColorer;
         this.colorer = color;
       }
@@ -178,7 +178,7 @@ class Representation {
     // modify material
     if (repSettings.material) {
       const newMaterial = repSettings.material;
-      if (!_.isEqual(this.material, newMaterial)) {
+      if (!_.isEqual(this.materialPreset.id, newMaterial)) {
         diff.material = newMaterial;
         this.setMaterialPreset(materials.get(repSettings.material));
       }
