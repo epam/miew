@@ -1,5 +1,5 @@
 const timeout = 10000;
-const fs = require('fs')
+const fs = require('fs');
 
 export default class EmptyPage {
   constructor(driver, url) {
