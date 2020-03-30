@@ -110,7 +110,7 @@ const testComplexesSets = {
 
   complexesFast:
   [{
-    name: 'Lines',
+    name: 'Non-surfaces',
     pdbId: '4XN6',
     checksum: 'b94d46b3528a9e350fa2b2a1bbfbd15f',
     opts: {
@@ -171,13 +171,13 @@ function fbxDownload(fn, complexInfo) {
   };
 }
 
-describe('The FBX exporter', function () {
+describe('As a third-party developer, I want to ', function () {
   this.timeout(0);
   this.slow(1000);
 
   const cfg = {
     title: 'FBX Tests',
-    report: 'report-fbxExporter.html',
+    report: 'report-fbx.html',
     url: null, // 'https://miew.opensource.epam.com/master',
     localPath: path.resolve(__dirname, '../../build'),
     localPort: 8008,
@@ -210,7 +210,7 @@ describe('The FBX exporter', function () {
 
   const testComplexes = testComplexesSets.complexesFast;
   for (let i = 0, n = testComplexes.length; i < n; i++) {
-    it(testComplexes[i].name, fbxDownload(
+    it(`export fbx from ${testComplexes[i].name} modes`, fbxDownload(
       (complex) => {
         window.miew = new window.Miew(complex.opts);
         if (miew.init()) {
