@@ -1,4 +1,5 @@
 const timeout = 10000;
+const fs = require('fs');
 
 export default class EmptyPage {
   constructor(driver, url) {
@@ -36,5 +37,9 @@ return Miew && JSON.stringify(${expression});`)
     return this.driver.wait(() => this.driver.executeScript(`\
 var miew = window.miew;
 return miew && !miew._loading.length && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
+  }
+
+  waitForExport(name) {
+    return this.driver.wait(() => fs.existsSync(name), timeout);
   }
 }
