@@ -21,8 +21,6 @@ export default class FBXInfoExtractor {
 
   process(data) {
     this._extractModelsAndMaterials(data);
-
-
     const models = this._flattenModels();
 
     return {
