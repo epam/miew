@@ -9,10 +9,11 @@ init:
   - git config --global core.autocrlf true
 install:
   - ps: Install-Product node $env:nodejs_version
-  - yarn install
+  - yarn global add lerna jest now
+  - lerna bootstrap
 test_script:
   - node --version
-  - npm run ci
+  - lerna run ci
 build: off
 notifications:
   - provider: Slack
