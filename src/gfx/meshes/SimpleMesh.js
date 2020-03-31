@@ -3,13 +3,12 @@ import UberObject from './UberObject';
 
 const Mesh = UberObject(THREE.Mesh);
 
-function SimpleMesh(geometry, material) {
-  Mesh.call(this, geometry, material);
-  this.castShadow = true;
-  this.receiveShadow = true;
+class SimpleMesh extends Mesh {
+  constructor(geometry, material) {
+    super(geometry, material);
+    this.castShadow = true;
+    this.receiveShadow = true;
+  }
 }
-
-SimpleMesh.prototype = Object.create(Mesh.prototype);
-SimpleMesh.prototype.constructor = SimpleMesh;
 
 export default SimpleMesh;

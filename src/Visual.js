@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import utils from './utils';
 import gfxutils from './gfx/gfxutils';
 
 const _defaultBoundaries = {
@@ -7,28 +6,27 @@ const _defaultBoundaries = {
   boundingSphere: new THREE.Sphere(new THREE.Vector3(0, 0, 0), 1),
 };
 
-function Visual(name, dataSource) {
-  gfxutils.RCGroup.call(this);
+class Visual extends gfxutils.RCGroup {
+  constructor(name, dataSource) {
+    super(name, dataSource);
+    this.name = name;
+    this._dataSource = dataSource;
+  }
 
-  this.name = name;
+  release() {
+    if (this.parent) {
+      this.parent.remove(this);
+    }
+  }
 
-  this._dataSource = dataSource;
+  getDataSource() {
+    return this._dataSource;
+  }
+
+  getBoundaries() {
+    return _defaultBoundaries;
+  }
 }
 
-utils.deriveClass(Visual, gfxutils.RCGroup);
-
-Visual.prototype.release = function () {
-  if (this.parent) {
-    this.parent.remove(this);
-  }
-};
-
-Visual.prototype.getDataSource = function () {
-  return this._dataSource;
-};
-
-Visual.prototype.getBoundaries = function () {
-  return _defaultBoundaries;
-};
 
 export default Visual;
