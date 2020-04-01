@@ -1,5 +1,6 @@
 node_modules/
 build/
+coverage/
 .nyc_output/
 .sonar/
 .idea/workspace.xml
