@@ -25,7 +25,7 @@ script:
   - lerna run ci
 after_success:
   - sonar-scanner
-  - npm run coveralls
+  - lerna run coveralls
   # See https://github.com/codeclimate/test-reporter/issues/263
 - - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
       for f in packages/*; do
