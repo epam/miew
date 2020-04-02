@@ -77,6 +77,10 @@ varying vec3 vViewPosition;
 #endif
 
 /////////////////////////////////////////// ZSprites ////////////////////////////////////////////////
+#if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
+  uniform float nearPlaneValue;
+#endif
+
 #ifdef SPHERE_SPRITE
   varying vec4 spritePosEye;
 #endif
@@ -153,11 +157,9 @@ varying vec3 vViewPosition;
       // transform camera orientation vector into sphere local coords
       ray = (invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
     #else
-      float near = -0.5;
-
       // find point of intersection near plane by the ray from camera to curPixel
       ray = normalize(pixelPosEye);
-      vec4 v = vec4((near / ray.z) * ray, 1.0);
+      vec4 v = vec4(-(nearPlaneValue / ray.z) * ray, 1.0);
 
       // transform intersection point into sphere local coords
       v = invModelViewMatrix * v;
@@ -249,11 +251,9 @@ varying vec3 vViewPosition;
       v = invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0);
       ray = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));
     #else
-      float near = -0.5;
-
       // find point of intersection near plane by the ray from camera to curPixel
       ray = normalize(pixelPosEye);
-      v = vec4((near / ray.z) * ray, 1.0);
+      v = vec4(-(nearPlaneValue / ray.z) * ray, 1.0);
 
       // transform intersection point into cylinder local coords
       v = invModelViewMatrix * v;
