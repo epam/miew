@@ -117,7 +117,7 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-istanbul": "^6.0.0",
-    "babel-preset-airbnb": "^4.4.0",
+    "babel-preset-airbnb": "^5.0.0",
     "bootstrap": "^3.3.7",
     "bootstrap-switch": "=3.3.4",
     "browserify": "^16.5.0",
