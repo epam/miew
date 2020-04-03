@@ -41,7 +41,7 @@ export default {
     rollupPluginNodeResolve(),
     rollupPluginCommonJS({
       include: [
-        './node_modules/**',
+        /node_modules/,
         './vendor/js/**',
         './src/utils/SelectionParser.js',
         './src/utils/MiewCLIParser.js',

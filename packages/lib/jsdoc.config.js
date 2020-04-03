@@ -37,7 +37,7 @@ module.exports = {
       staticFiles: {
         include: [
           'README.png',
-          'node_modules/jsdoc/templates/default/static',
+          '../../node_modules/jsdoc/templates/default/static',
           'docs/template/static',
         ],
       },

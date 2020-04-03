@@ -2,13 +2,13 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
-        <item url="file://$PROJECT_DIR$/src/utils/MiewCLIParser.js" />
-        <item url="file://$PROJECT_DIR$/src/utils/SelectionParser.js" />
+        <item url="file://$PROJECT_DIR$/packages/lib/src/utils/MiewCLIParser.js" />
+        <item url="file://$PROJECT_DIR$/packages/lib/src/utils/SelectionParser.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/src/utils/MiewCLIParser.js" />
-      <root url="file://$PROJECT_DIR$/src/utils/SelectionParser.js" />
+      <root url="file://$PROJECT_DIR$/packages/lib/src/utils/MiewCLIParser.js" />
+      <root url="file://$PROJECT_DIR$/packages/lib/src/utils/SelectionParser.js" />
     </CLASSES>
     <SOURCES />
   </library>

@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 // Timer
 
-class Timer {
+export default class Timer {
   constructor() {
     this.startTime = 0;
     this.oldTime = 0;
@@ -42,5 +42,3 @@ Timer.now = (function () {
   const p = typeof window !== 'undefined' && window.performance;
   return (p && p.now) ? p.now.bind(p) : Date.now;
 }());
-
-export default Timer;

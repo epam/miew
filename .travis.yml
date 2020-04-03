@@ -15,15 +15,28 @@ addons:
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.22.4
   - export PATH="$HOME/.yarn/bin:$PATH"
+install:
+  - yarn global add lerna
+  - lerna bootstrap
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > /tmp/cc-test-reporter
   - chmod +x /tmp/cc-test-reporter
 script:
-  - yarn run ci
+  - lerna run ci
 after_success:
   - sonar-scanner
-  - npm run coveralls
-  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then /tmp/cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+  - lerna run coveralls
+  # See https://github.com/codeclimate/test-reporter/issues/263
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+      for f in packages/*; do
+        if [ -d $f ]; then
+          echo $f;
+          ./cc-test-reporter format-coverage -t lcov -o coverage/coverage.${f//\//-}.json $f/coverage/lcov.info;
+        fi
+      done;
+      ./cc-test-reporter sum-coverage -o coverage/coverage.total.json coverage/coverage.*.json;
+      ./cc-test-reporter upload-coverage -i coverage/coverage.total.json;
+    fi
 deploy:
   - provider: npm
     edge: true
