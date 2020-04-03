@@ -1,8 +1,8 @@
 /* global COOKIE_PATH:false */
-import '../../node_modules/bootstrap/dist/css/bootstrap.css';
-import '../../node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css';
-import '../../node_modules/toastr/build/toastr.min.css';
-import '../../node_modules/jquery.terminal/css/jquery.terminal.min.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css';
+import 'toastr/build/toastr.min.css';
+import 'jquery.terminal/css/jquery.terminal.min.css';
 import '../styles/main.scss';
 import '@babel/polyfill';
 

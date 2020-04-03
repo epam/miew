@@ -1,0 +1,9 @@
+{
+  "groups": {
+    "library": {
+      "packages": [
+        "lib/package.json"
+      ]
+    }
+  }
+}
