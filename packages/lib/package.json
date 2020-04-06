@@ -95,12 +95,6 @@
     "sourceMap": false,
     "instrument": false
   },
-  "greenkeeper": {
-    "ignore": [
-      "bootstrap",
-      "jquery.terminal"
-    ]
-  },
   "dependencies": {
     "lodash": "^4.17.15",
     "three": "0.112.1"

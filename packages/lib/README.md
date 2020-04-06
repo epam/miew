@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/miew.svg)](https://www.npmjs.com/package/miew)
 [![Linux Build Status](https://img.shields.io/travis/epam/miew/master.svg?label=linux)](https://travis-ci.org/epam/miew)
 [![Windows Build Status](https://img.shields.io/appveyor/ci/paulsmirnov/miew/master.svg?label=windows)](https://ci.appveyor.com/project/paulsmirnov/miew/branch/master)
-[![Greenkeeper badge](https://badges.greenkeeper.io/epam/miew.svg)](https://greenkeeper.io/)
+[![Snyk badge](https://snyk.io/test/github/epam/miew/badge.svg)](https://snyk.io/)
 [![Coverage Status](https://coveralls.io/repos/github/epam/miew/badge.svg)](https://coveralls.io/github/epam/miew)
 <br>
 [![Code Climate](https://codeclimate.com/github/epam/miew/badges/gpa.svg)](https://codeclimate.com/github/epam/miew)
