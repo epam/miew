@@ -23,6 +23,7 @@ class ZSpriteMesh extends Mesh {
       this.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.matrixWorld);
       // get inverse matrix
       material.uniforms.invModelViewMatrix.value.getInverse(this.modelViewMatrix);
+      material.uniforms.nearPlaneValue.value = camera.near;
       material.uniformsNeedUpdate = true;
     }
   }

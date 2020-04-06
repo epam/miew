@@ -77,6 +77,10 @@ varying vec3 vViewPosition;
 #endif
 
 /////////////////////////////////////////// ZSprites ////////////////////////////////////////////////
+#if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
+  uniform float nearPlaneValue;
+#endif
+
 #ifdef SPHERE_SPRITE
   varying vec4 spritePosEye;
 #endif
@@ -101,7 +105,8 @@ varying vec3 vViewPosition;
   uniform mat4 invModelViewMatrix;
   uniform mat3 normalMatrix;
 
-  bool intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {
+
+  bool intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point, out float frontFaced) {
 
     // intersect XZ-projected ray with circle
     float a = dot(ray, ray);
@@ -121,16 +126,19 @@ varying vec3 vViewPosition;
       // orthografic camera is used for dirLight sources. So in it for all spheres the point with smaller 't' is visible
       // t1 is always smaller than t2 (from calculations)
       point = p1;
+      frontFaced = 1.0;
       return true;
     #else
-      // for perspective camera first intersection can be behind it. If not intersection is p1 else - p2
-      // think. As reason to discard intersection we must use position relative to near plane not to camera coordinates
+      // for perspective camera first intersection can be in front of near plane. If not intersection is p1 else - p2
+      // t* = 0.0 corresponds to point of intersection near plane by the ray from camera to curPixel
       if (t1 >= 0.0) {
         point = p1;
+        frontFaced = 1.0;
         return true;
       }
       if (t2 >= 0.0) {
         point = p2;
+        frontFaced = -1.0;
         return true;
       }
     #endif
@@ -138,7 +146,7 @@ varying vec3 vViewPosition;
     return false;
   }
 
-  bool get_sphere_point(in vec3 pixelPosEye, out vec3 point) {
+  bool get_sphere_point(in vec3 pixelPosEye, out vec3 point, out float frontFaced) {
     vec3 origin, ray;
 
     #ifdef ORTHOGRAPHIC_CAMERA
@@ -149,8 +157,12 @@ varying vec3 vViewPosition;
       // transform camera orientation vector into sphere local coords
       ray = (invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
     #else
-      // transform camera pos into sphere local coords
-      vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+      // find point of intersection near plane by the ray from camera to curPixel
+      ray = normalize(pixelPosEye);
+      vec4 v = vec4(-(nearPlaneValue / ray.z) * ray, 1.0);
+
+      // transform intersection point into sphere local coords
+      v = invModelViewMatrix * v;
       origin = (v.xyz - instOffset.xyz) / instOffset.w;
 
       // transform vector from camera pos to curPixel into sphere local coords
@@ -158,7 +170,7 @@ varying vec3 vViewPosition;
     #endif
     ray = normalize(ray);
 
-    return intersect_ray_sphere(origin, ray, point);
+    return intersect_ray_sphere(origin, ray, point, frontFaced);
   }
 #endif
 
@@ -177,7 +189,7 @@ varying vec3 vViewPosition;
 
   varying vec4 spritePosEye;
 
-  bool intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {
+  bool intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point, out float frontFaced) {
 
     // intersect XZ-projected ray with circle
     float a = dot(ray.xz, ray.xz);
@@ -197,24 +209,28 @@ varying vec3 vViewPosition;
     // choose nearest point
     #ifdef ORTHOGRAPHIC_CAMERA
       // orthografic camera is used for dirLight sources. So in it for all cylinders the point with smaller 't' is visible
-      // if it is not outside of cylinnder (t1 is always smaller than t2)
+      // if it is not outside of cylinnder (t1 is always smaller than t2).
       if (p1.y >= -halfHeight && p1.y <= halfHeight) {
         point = p1;
+        frontFaced = 1.0;
         return true;
       }
       if (p2.y >= -halfHeight && p2.y <= halfHeight) {
         point = p2;
+        frontFaced = -1.0;
         return true;
       }
     #else
-      // for perspective camera first intersection can be behind it. If not intersection is p1 else - p2
-      // think. As reason to discard intersection we must use position relative to near plane not to camera coordinates
+      // for perspective camera first intersection can be in front of near plane. If not intersection is p1 else - p2
+      // t* = 0.0 corresponds to point of intersection near plane by the ray from camera to curPixel
       if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {
         point = p1;
+        frontFaced = 1.0;
         return true;
       }
       if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {
         point = p2;
+        frontFaced = -1.0;
         return true;
       }
     #endif
@@ -222,7 +238,7 @@ varying vec3 vViewPosition;
     return false;
   }
 
-  bool get_cylinder_point(in vec3 pixelPosEye, out vec3 point) {
+  bool get_cylinder_point(in vec3 pixelPosEye, out vec3 point, out float frontFaced) {
     vec3 origin, ray;
     vec4 v;
 
@@ -235,8 +251,12 @@ varying vec3 vViewPosition;
       v = invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0);
       ray = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));
     #else
-      // transform camera pos into cylinder local coords
-      v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+      // find point of intersection near plane by the ray from camera to curPixel
+      ray = normalize(pixelPosEye);
+      v = vec4(-(nearPlaneValue / ray.z) * ray, 1.0);
+
+      // transform intersection point into cylinder local coords
+      v = invModelViewMatrix * v;
       origin = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));
 
       // transform vector from camera pos to curPixel into cylinder local coords
@@ -245,7 +265,7 @@ varying vec3 vViewPosition;
     #endif
     ray = normalize(ray);
 
-    return intersect_ray_cylinder(origin, ray, point);
+    return intersect_ray_cylinder(origin, ray, point, frontFaced);
   }
 #endif
 
@@ -491,6 +511,7 @@ void main() {
 #ifdef SPHERE_SPRITE
 
   vec3 viewNormalSprites;
+  float frontFaced = 1.0;
   vec3 normal;
 
 /* quick-and-dirty method
@@ -507,7 +528,7 @@ void main() {
   // ray-trace sphere surface
   {
     vec3 p;
-    if (!get_sphere_point(-vViewPosition, p)) discard;
+    if (!get_sphere_point(-vViewPosition, p, frontFaced)) discard;
     pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
     // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
     pixelPosEye = vec4(spritePosEye.xyz, 1.0);
@@ -536,12 +557,13 @@ void main() {
 #ifdef CYLINDER_SPRITE
   vec3 normal;
   vec3 viewNormalSprites;
+  float frontFaced = 1.0;
   float cylinderY = 0.0;
 
   // ray-trace cylinder surface
   {
     vec3 p;
-    if (!get_cylinder_point(-vViewPosition, p)) discard;
+    if (!get_cylinder_point(-vViewPosition, p, frontFaced)) discard;
 
     cylinderY = 0.5 * (p.y + 1.0);
 
@@ -643,7 +665,6 @@ void main() {
   #ifdef NORMALS_TO_G_BUFFER
     #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)
       vec3 viewNormaInColor = viewNormalSprites;
-      float frontFaced = 1.0;
     #else
       vec3 viewNormaInColor = viewNormal;
       float frontFaced = float( gl_FrontFacing );

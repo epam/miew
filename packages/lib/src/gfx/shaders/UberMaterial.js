@@ -32,6 +32,7 @@ const defaultUniforms = THREE.UniformsUtils.merge([
     zOffset: { type: 'f', value: 0.0 },
     zClipValue: { type: 'f', value: 0.0 },
     clipPlaneValue: { type: 'f', value: 0.0 },
+    nearPlaneValue: { type: 'f', value: -0.5 },
     invModelViewMatrix: { type: '4fv', value: new THREE.Matrix4() },
     world2colorMatrix: { type: '4fv', value: new THREE.Matrix4() },
     dashedLineSize: { type: 'f', value: 0.1 },
