@@ -48,7 +48,7 @@ function _anotherAtom(bond, currAtom) {
 
 function _cosBetween(v1, v2) {
   const theta = v1.dot(v2) / (Math.sqrt(v1.lengthSq() * v2.lengthSq()));
-  return THREE.Math.clamp(theta, -1, 1);
+  return THREE.MathUtils.clamp(theta, -1, 1);
 }
 
 function _markAromatic(bond) {

@@ -11,7 +11,7 @@ class ThickLineMesh extends Mesh {
       return;
     }
 
-    material.uberOptions.projMatrixInv.getInverse(camera.projectionMatrix, true);
+    material.uberOptions.projMatrixInv.getInverse(camera.projectionMatrix);
     renderer.getSize(_viewport);
     material.uberOptions.viewport.set(_viewport.width, _viewport.height);
   }

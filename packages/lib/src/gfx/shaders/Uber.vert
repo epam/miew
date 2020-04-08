@@ -230,11 +230,12 @@ vec3 transformedNormal = normalMatrix * objectNormal;
 	#if NUM_DIR_LIGHTS > 0
 	  vec4 worldPosition;
 	  // see THREE.WebGLProgram.unrollLoops
-	  #pragma unroll_loop
+	  #pragma unroll_loop_start
 	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
       vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * vec4(vWorldPosition, 1.0);
       vDirectionalShadowNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(objectNormal, 0.0))).xyz;
 	  }
+	  #pragma unroll_loop_end
 	#endif
 #endif
 

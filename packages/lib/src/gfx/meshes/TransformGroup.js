@@ -74,8 +74,7 @@ class TransformGroup extends THREE.Object3D {
     const meshes = [];
     for (let i = 0, n = transforms.length; i < n; ++i) {
       const mesh = new Mesh(geometry, material);
-      mesh.applyMatrix(transforms[i]);
-
+      mesh.applyMatrix4(transforms[i]);
       meshes[i] = mesh;
     }
 

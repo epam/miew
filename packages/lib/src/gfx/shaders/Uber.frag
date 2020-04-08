@@ -319,14 +319,16 @@ float unpackRGBAToDepth( const in vec4 v ) {
   struct DirectionalLight {
     vec3 direction;
     vec3 color;
-
-    int shadow;
-    vec2 shadowMapSize;
-    float shadowBias;
-    float shadowRadius;
   };
-
   uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
+
+  struct DirectionalLightShadow {
+     vec2 shadowMapSize;
+     float shadowBias;
+     float shadowRadius;
+   };
+  uniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHTS ];
+
   uniform vec3 ambientLightColor;
 
   /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////
@@ -336,7 +338,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
   		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
   	}
 
-    float getShadow( sampler2D shadowMap, DirectionalLight dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {
+    float getShadow( sampler2D shadowMap, DirectionalLightShadow dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {
    	  float shadow = 0.0;
 
       // When shadows for sprites will appear use here for them normals as it done for G-buffer
@@ -384,11 +386,12 @@ float unpackRGBAToDepth( const in vec4 v ) {
           mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);
 
           vec2 offset;
-          #pragma unroll_loop
+          #pragma unroll_loop_start
           for ( int i = 0; i < 4; i ++ ) { // 4 is length of _samplesKernel which is defined in UberMaterial.js
             offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );
             shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );
           }
+          #pragma unroll_loop_end
           shadow /= float( 4 ); // 4 is length of _samplesKernel which is defined in UberMaterial.js
         #endif
       }
@@ -461,14 +464,15 @@ float unpackRGBAToDepth( const in vec4 v ) {
 
     float shadowMask = 1.0;
     // see THREE.WebGLProgram.unrollLoops
-  	#pragma unroll_loop
+  	#pragma unroll_loop_start
   	  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
   	    #ifdef SHADOWMAP
-  	      if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirLightWorldCoord[ i ], vViewPosition, vDirLightWorldNormal[ i ] );
+  	      shadowMask = getShadow( directionalShadowMap[ i ], directionalLightShadows[ i ], vDirLightWorldCoord[ i ], vViewPosition, vDirLightWorldNormal[ i ] );
         #endif
 
   		  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );
   		}
+  		#pragma unroll_loop_end
 
     RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);
 
@@ -497,11 +501,12 @@ void main() {
 #if defined(USE_LIGHTS) && defined(SHADOWMAP)
   #if NUM_DIR_LIGHTS > 0
     // see THREE.WebGLProgram.unrollLoops
-    #pragma unroll_loop
+    #pragma unroll_loop_start
     for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
       vDirLightWorldCoord[ i ] = vDirectionalShadowCoord[ i ];
       vDirLightWorldNormal[ i ] = vDirectionalShadowNormal[ i ];
     }
+    #pragma unroll_loop_end
   #endif
 #endif
 
@@ -544,11 +549,12 @@ void main() {
     #if defined(USE_LIGHTS) && defined(SHADOWMAP)
       #if NUM_DIR_LIGHTS > 0
         // see THREE.WebGLProgram.unrollLoops
-        #pragma unroll_loop
+        #pragma unroll_loop_start
           for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
             vDirLightWorldCoord[ i ] = directionalShadowMatrix[ i ] * pixelPosWorld;
             vDirLightWorldNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(p, 0.0))).xyz;
           }
+        #pragma unroll_loop_end
       #endif
     #endif
   }
@@ -584,11 +590,12 @@ void main() {
     #if defined(USE_LIGHTS) && defined(SHADOWMAP)
       #if NUM_DIR_LIGHTS > 0
         // see THREE.WebGLProgram.unrollLoops
-        #pragma unroll_loop
+        #pragma unroll_loop_start
           for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
             vDirLightWorldCoord[ i ] = directionalShadowMatrix[ i ] * pixelPosWorld;
             vDirLightWorldNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(normal, 0.0))).xyz;
           }
+        #pragma unroll_loop_end
       #endif
     #endif
 
