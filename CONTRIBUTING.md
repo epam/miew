@@ -2,6 +2,9 @@
 
 Thank you for choosing to contribute!
 
+**THE INSTRUCTION IS UNDER CONSTRUCTION** and doesn't cover recent repository changes to monorepo. We 
+apologize for any inconvenience and are going to update it soon. 
+
 There are many ways you can do this, and you do not even have to write code at all. You could
 report issues or write docs instead if you'd like. We would also be happy if you could provide a
 feedback: we are eager to learn your use cases, your experience with the viewer, your
