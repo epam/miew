@@ -11,7 +11,10 @@
     "clean": "rimraf build/*",
     "lint": "eslint -f unix *.js src/ ",
     "build": "webpack --mode production",
-    "start": "webpack-dev-server --mode development --open"
+    "start": "webpack-dev-server --mode development --open",
+    "test": "jest",
+    "test-cover": "jest --coverage",
+    "show:cover": "node tools/open.js coverage/lcov-report/index.html"
   },
   "keywords": [
     "molecule",
@@ -57,6 +60,18 @@
       "./node_modules"
     ]
   },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.jsx"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ],
+    "coverageReporters": [
+      "lcov"
+    ],
+    "coverageDirectory": "coverage"
+  },
   "dependencies": {
     "miew": "=0.8.7",
     "react": "^16.13.1",
@@ -72,13 +87,17 @@
     "@babel/preset-react": "^7.9.4",
     "@babel/register": "^7.9.0",
     "@babel/runtime": "^7.9.2",
+    "@types/jest": "^25.2.1",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.3.2",
-    "eslint": "^6.7.2",
+    "eslint": "^6.8.0",
+    "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-react": "^7.19.0",
     "html-loader": "^1.0.0",
     "html-webpack-plugin": "^4.0.2",
+    "jest": "^25.1.0",
+    "jest-canvas-mock": "^2.2.0",
     "npm-run-all": "^4.1.5",
     "postcss-loader": "^3.0.0",
     "postcss-scss": "^2.0.0",

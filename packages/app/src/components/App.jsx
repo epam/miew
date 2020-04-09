@@ -2,8 +2,8 @@ import React from 'react';
 import ViewerContainer from './viewer/ViewerContainer.jsx';
 
 export default class App extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this._viewer = null;
 
     this._onViewerChange = this._onViewerChange.bind(this);

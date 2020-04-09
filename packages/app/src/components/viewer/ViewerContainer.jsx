@@ -23,7 +23,7 @@ export default class ViewerContainer extends React.Component {
     }
 
     componentWillUnmount() {
-      this._viewer.settings.now.removeEventListener(this._onChange);
+      // this._viewer.settings.now.removeEventListener(this._onChange);
       this._viewer.dispose();
       this._viewer = null;
       this.props.onChange({ viewer: this._viewer });
