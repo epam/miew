@@ -1,7 +1,7 @@
 module.exports = {
   verbose: true,
   reporters: [
-    ['jest-simple-dot-reporter', {'color': true}],
+    ['jest-simple-dot-reporter', { color: true }],
   ],
   collectCoverageFrom: [
     'src/**/*.jsx',
