@@ -50,7 +50,7 @@ Type                |Argument                   |Description
 **loadingDone**	    |result: name or error	    |On loading end
 **fetchingDone**	|result: data or error	    |On fetching end
 **parsingDone**	    |result: data or error	    |On parsing end
-**rebuildingDone**	|-	                        |On building end
+**buildingDone**	|-	                        |On building end
 **exportingDone**	|-	                        |On exporting end
 
 
