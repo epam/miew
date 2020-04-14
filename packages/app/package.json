@@ -14,7 +14,8 @@
     "start": "webpack-dev-server --mode development --open",
     "test": "jest",
     "test-cover": "jest --coverage",
-    "show:cover": "node tools/open.js coverage/lcov-report/index.html"
+    "show:cover": "node tools/open.js coverage/lcov-report/index.html",
+    "coveralls": "cat coverage/lcov.info | coveralls"
   },
   "keywords": [
     "molecule",
@@ -78,6 +79,7 @@
     "@types/jest": "^25.2.1",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.1.0",
+    "coveralls": "^3.0.11",
     "css-loader": "^3.3.2",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.8.2",
