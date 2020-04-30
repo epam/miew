@@ -51,7 +51,9 @@
     "version": "cross-env NODE_ENV=production run-s build:js build:css dist",
     "jison": "node tools/jison.js src/utils/*.jison",
     "jison:one": "node ./tools/jison.js",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "bugs": {
     "url": "https://github.com/epam/miew/issues"
@@ -98,7 +100,8 @@
   },
   "dependencies": {
     "lodash": "^4.17.15",
-    "three": "0.115.0"
+    "three": "0.115.0",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",
@@ -178,5 +181,6 @@
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3",
     "yargs": "^15.3.0"
-  }
+  },
+  "snyk": true
 }
