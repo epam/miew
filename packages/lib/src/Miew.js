@@ -3689,6 +3689,7 @@ Miew.prototype._initOnSettingsChanged = function () {
       this.logger.warn('Your device or browser does not support zSprites');
       settings.set('zSprites', false);
     }
+    this.rebuildAll();
   });
 
   on('fogColor', () => {
