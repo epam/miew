@@ -534,13 +534,9 @@ void main() {
   {
     vec3 p;
     if (!get_sphere_point(-vViewPosition, p, frontFaced)) discard;
-    pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
-    // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);
-    pixelPosEye = vec4(spritePosEye.xyz, 1.0);
-    pixelPosEye.z += instOffset.w *
-      (modelViewMatrix[0][2] * p.x +
-       modelViewMatrix[1][2] * p.y +
-       modelViewMatrix[2][2] * p.z);
+    vec4 v = vec4(instOffset.xyz + p * instOffset.w, 1.0);
+    pixelPosWorld = modelMatrix * v;
+    pixelPosEye = modelViewMatrix * v;
     normal = normalize(normalMatrix * p);
     #ifdef NORMALS_TO_G_BUFFER
       viewNormalSprites = normalize(mat3(modelViewMatrix)*p);
