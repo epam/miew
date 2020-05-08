@@ -50,8 +50,7 @@
     "preversion": "run-s lint test",
     "version": "cross-env NODE_ENV=production run-s build:js build:css dist",
     "jison": "node tools/jison.js src/utils/*.jison",
-    "jison:one": "node ./tools/jison.js",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "jison:one": "node ./tools/jison.js"
   },
   "bugs": {
     "url": "https://github.com/epam/miew/issues"

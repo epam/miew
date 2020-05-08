@@ -7,7 +7,12 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
+    "coveralls": "cat coverage/general.info | coveralls"
+  },
   "devDependencies": {
+    "lcov-result-merger": "^3.1.0",
     "lerna": "^3.20.2"
   }
 }
