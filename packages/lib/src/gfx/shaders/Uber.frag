@@ -158,8 +158,7 @@ varying vec3 vViewPosition;
       ray = (invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0)).xyz;
     #else
       // find point of intersection near plane by the ray from camera to curPixel
-      ray = normalize(pixelPosEye);
-      vec4 v = vec4(-(nearPlaneValue / ray.z) * ray, 1.0);
+      vec4 v = vec4(-(nearPlaneValue / pixelPosEye.z) * pixelPosEye, 1.0);
 
       // transform intersection point into sphere local coords
       v = invModelViewMatrix * v;
@@ -252,8 +251,7 @@ varying vec3 vViewPosition;
       ray = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));
     #else
       // find point of intersection near plane by the ray from camera to curPixel
-      ray = normalize(pixelPosEye);
-      v = vec4(-(nearPlaneValue / ray.z) * ray, 1.0);
+      v = vec4(-(nearPlaneValue / pixelPosEye.z) * pixelPosEye, 1.0);
 
       // transform intersection point into cylinder local coords
       v = invModelViewMatrix * v;
