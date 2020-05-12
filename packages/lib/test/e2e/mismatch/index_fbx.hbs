@@ -1,0 +1,58 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <style>
+    body {
+      font-family: "Source Sans Pro", "Trebuchet", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: #464547;
+    }
+    h1, h2, h3 {
+      font-family: Oswald, "Arial Black", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      text-transform: uppercase;
+      color: #464547;
+    }
+    a, a:visited, a:active { color: #39C2D7 }
+    table {
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+    th { background-color: #39C2D7; color: white; font-weight: bold; }
+    th, td { padding: 1ex; }
+    .left { text-align: left; }
+    .center { text-align: center; }
+    .white { background-color: white; }
+    .fail { background-color: #B22746; color: white; font-weight: bold; }
+    .skip { background-color: #CCCCCC }
+    .pass { display: none; }
+  </style>
+</head>
+<body>
+  <h1>{{title}}</h1>
+
+  <dl>
+      <dt><b>Version</b></dt><dd>{{version}}</dd>
+      <dt><b>URL</b></dt><dd><a href="{{url}}">{{url}}</a></dd>
+      <dt><b>Browser</b></dt><dd>{{browser}}</dd>
+      <dt><b>Date</b></dt><dd>{{date}}</dd>
+  </dl>
+  <table>
+      <thead>
+      <tr>
+          <th class="center">Failed tests</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{#entries}}
+          <tr class="{{rowClass}}">
+              <td class="center">{{testName}}</td>
+          </tr>
+      {{/entries}}
+      {{^entries}}
+          <tr><td colspan="5">No results available</td></tr>
+      {{/entries}}
+      </tbody>
+  </table>
+  <h3>Passed tests are not displayed!</h3>
+</body>
+</html>

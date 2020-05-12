@@ -166,6 +166,10 @@ function fbxDownload(fn, complexInfo) {
         currentFBXData = currentFBXData.slice(usefulInfoCurrentInd);
         const md5sum = crypto.createHash('md5').update(currentFBXData, 'utf8').digest('hex');
 
+        golden.report.data.entries.push({
+          testName: `"${complexInfo.name}"`,
+          rowClass: (complexInfo.checksum === md5sum) ? 'pass' : 'fail',
+        });
         expect(complexInfo.checksum).equal(md5sum);
       });
   };
@@ -196,17 +200,22 @@ describe('As a third-party developer, I want to ', function () {
       .setChromeOptions(chromeOptions)
       .build();
 
+    golden.report.path.template = path.resolve(__dirname, 'mismatch/index_fbx.hbs');
     return golden.startup(driver, cfg)
       .then((url) => {
         page = new EmptyPage(driver, `${url}/examples/empty.html`);
         return page.waitForMiew();
+      })
+      .then((version) => {
+        golden.report.data.version = version;
       });
   });
 
-  after(() => {
-    cleanFolderFromFBX(path.resolve(__dirname, tmpFolder));
-    golden.shutdown();
-  });
+  after(() => golden.shutdown()
+    .then(() => {
+      golden.report.path.template = path.resolve(__dirname, 'mismatch/index.hbs');
+      cleanFolderFromFBX(path.resolve(__dirname, tmpFolder));
+    }));
 
   const testComplexes = testComplexesSets.complexesFast;
   for (let i = 0, n = testComplexes.length; i < n; i++) {
