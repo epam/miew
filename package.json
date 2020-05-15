@@ -12,7 +12,8 @@
     "coveralls": "cat coverage/general.info | coveralls"
   },
   "devDependencies": {
+    "coveralls": "^3.1.0",
     "lcov-result-merger": "^3.1.0",
-    "lerna": "^3.20.2"
+    "lerna": "^3.21.0"
   }
 }
