@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.9.0 Copyright (c) 2015-2020 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.9.0+20200517.183250.1c2ee28-mod Copyright (c) 2015-2020 EPAM Systems, Inc. */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('lodash'), require('three')) :
@@ -15,10 +15,7 @@
   var arrayWithHoles = _arrayWithHoles;
 
   function _iterableToArrayLimit(arr, i) {
-    if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
-      return;
-    }
-
+    if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
     var _arr = [];
     var _n = true;
     var _d = false;
@@ -46,14 +43,37 @@
 
   var iterableToArrayLimit = _iterableToArrayLimit;
 
+  function _arrayLikeToArray(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+
+    for (var i = 0, arr2 = new Array(len); i < len; i++) {
+      arr2[i] = arr[i];
+    }
+
+    return arr2;
+  }
+
+  var arrayLikeToArray = _arrayLikeToArray;
+
+  function _unsupportedIterableToArray(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return arrayLikeToArray(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);
+  }
+
+  var unsupportedIterableToArray = _unsupportedIterableToArray;
+
   function _nonIterableRest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
   var nonIterableRest = _nonIterableRest;
 
   function _slicedToArray(arr, i) {
-    return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || nonIterableRest();
+    return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
   }
 
   var slicedToArray = _slicedToArray;
@@ -403,6 +423,36 @@
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
 
+  var setPrototypeOf = createCommonjsModule(function (module) {
+  function _setPrototypeOf(o, p) {
+    module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+
+    return _setPrototypeOf(o, p);
+  }
+
+  module.exports = _setPrototypeOf;
+  });
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function");
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) setPrototypeOf(subClass, superClass);
+  }
+
+  var inherits = _inherits;
+
   var _typeof_1 = createCommonjsModule(function (module) {
   function _typeof(obj) {
     "@babel/helpers - typeof";
@@ -454,44 +504,13 @@
   module.exports = _getPrototypeOf;
   });
 
-  var setPrototypeOf = createCommonjsModule(function (module) {
-  function _setPrototypeOf(o, p) {
-    module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-      o.__proto__ = p;
-      return o;
-    };
-
-    return _setPrototypeOf(o, p);
-  }
-
-  module.exports = _setPrototypeOf;
-  });
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function");
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) setPrototypeOf(subClass, superClass);
-  }
-
-  var inherits = _inherits;
-
   function _isNativeFunction(fn) {
     return Function.toString.call(fn).indexOf("[native code]") !== -1;
   }
 
   var isNativeFunction = _isNativeFunction;
 
-  var construct = createCommonjsModule(function (module) {
-  function isNativeReflectConstruct() {
+  function _isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -504,6 +523,9 @@
     }
   }
 
+  var isNativeReflectConstruct = _isNativeReflectConstruct;
+
+  var construct = createCommonjsModule(function (module) {
   function _construct(Parent, args, Class) {
     if (isNativeReflectConstruct()) {
       module.exports = _construct = Reflect.construct;
@@ -821,6 +843,9 @@
 
   var logger = new Logger();
 
+  function _createSuper(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var browserType = {
     DEFAULT: 0,
     SAFARI: 1
@@ -1098,12 +1123,14 @@
   var OutOfMemoryError = /*#__PURE__*/function (_Error) {
     inherits(OutOfMemoryError, _Error);
 
+    var _super = _createSuper(OutOfMemoryError);
+
     function OutOfMemoryError(message) {
       var _this;
 
       classCallCheck(this, OutOfMemoryError);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(OutOfMemoryError).call(this));
+      _this = _super.call(this);
       _this.name = 'OutOfMemoryError';
       _this.message = message;
       return _this;
@@ -1468,15 +1495,21 @@
     mergeTypedArraysUnsafe: mergeTypedArraysUnsafe
   };
 
+  function _createSuper$1(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$2()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$2() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var JobHandle = /*#__PURE__*/function (_EventDispatcher) {
     inherits(JobHandle, _EventDispatcher);
+
+    var _super = _createSuper$1(JobHandle);
 
     function JobHandle() {
       var _this;
 
       classCallCheck(this, JobHandle);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(JobHandle).call(this));
+      _this = _super.call(this);
       _this._shouldCancel = false;
       return _this;
     }
@@ -4373,6 +4406,9 @@
 
   StructuralElement.genericByType = (_StructuralElement$ge = {}, defineProperty(_StructuralElement$ge, StructuralElementType.STRAND, StructuralElementGeneric.STRAND), defineProperty(_StructuralElement$ge, StructuralElementType.HELIX_310, StructuralElementGeneric.HELIX), defineProperty(_StructuralElement$ge, StructuralElementType.HELIX_ALPHA, StructuralElementGeneric.HELIX), defineProperty(_StructuralElement$ge, StructuralElementType.HELIX_PI, StructuralElementGeneric.HELIX), defineProperty(_StructuralElement$ge, StructuralElementType.HELIX, StructuralElementGeneric.HELIX), _StructuralElement$ge);
 
+  function _createSuper$2(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$3()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$3() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var StructuralElementType$1 = StructuralElement.Type;
   var typeByPDBHelixClass = {
     1: StructuralElementType$1.HELIX_ALPHA,
@@ -4386,6 +4422,8 @@
 
   var Helix = /*#__PURE__*/function (_StructuralElement) {
     inherits(Helix, _StructuralElement);
+
+    var _super = _createSuper$2(Helix);
 
     /**
      * Create a helix.
@@ -4404,7 +4442,7 @@
 
       classCallCheck(this, Helix);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(Helix).call(this, typeByPDBHelixClass[helixClass] || StructuralElement.Type.HELIX, init, term));
+      _this = _super.call(this, typeByPDBHelixClass[helixClass] || StructuralElement.Type.HELIX, init, term);
       /**
        * Serial number of the helix (see PDB Format).
        * @type {number}
@@ -4470,6 +4508,9 @@
   module.exports = _get;
   });
 
+  function _createSuper$3(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$4()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$4() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * A single strand of a sheet in a protein secondary structure.
    * @extends StructuralElement
@@ -4477,6 +4518,8 @@
 
   var Strand = /*#__PURE__*/function (_StructuralElement) {
     inherits(Strand, _StructuralElement);
+
+    var _super = _createSuper$3(Strand);
 
     /**
      * Create a strand.
@@ -4496,7 +4539,7 @@
 
       classCallCheck(this, Strand);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(Strand).call(this, StructuralElement.Type.STRAND, init, term));
+      _this = _super.call(this, StructuralElement.Type.STRAND, init, term);
       /**
        * Parent sheet this strand belongs to.
        * @type {Sheet}
@@ -5605,6 +5648,10 @@
   };
   var SelectionParser_1 = SelectionParser.parser;
 
+  function _createSuper$4(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$5()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$5() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var Range = /*#__PURE__*/function () {
     function Range(min, max) {
       classCallCheck(this, Range);
@@ -5699,10 +5746,12 @@
   var RangeList = /*#__PURE__*/function (_List) {
     inherits(RangeList, _List);
 
+    var _super = _createSuper$4(RangeList);
+
     function RangeList() {
       classCallCheck(this, RangeList);
 
-      return possibleConstructorReturn(this, getPrototypeOf(RangeList).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(RangeList, [{
@@ -5729,12 +5778,14 @@
   var ValueList = /*#__PURE__*/function (_List2) {
     inherits(ValueList, _List2);
 
+    var _super2 = _createSuper$4(ValueList);
+
     function ValueList(arg, upperOnly) {
       var _this;
 
       classCallCheck(this, ValueList);
 
-      var list = _this = possibleConstructorReturn(this, getPrototypeOf(ValueList).call(this, arg));
+      var list = _this = _super2.call(this, arg);
 
       if (upperOnly) {
         _this.upperOnly = true;
@@ -5798,6 +5849,9 @@
     return ValueList;
   }(List);
 
+  function _createSuper$5(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$6()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$6() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /** Base class for atom selectors. */
 
   var Selector = /*#__PURE__*/function () {
@@ -5827,12 +5881,14 @@
   var ListSelector = /*#__PURE__*/function (_Selector) {
     inherits(ListSelector, _Selector);
 
+    var _super = _createSuper$5(ListSelector);
+
     function ListSelector(list) {
       var _this;
 
       classCallCheck(this, ListSelector);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ListSelector).call(this));
+      _this = _super.call(this);
       _this.list = list;
       return _this;
     }
@@ -5855,10 +5911,12 @@
   var RangeListSelector = /*#__PURE__*/function (_ListSelector) {
     inherits(RangeListSelector, _ListSelector);
 
+    var _super2 = _createSuper$5(RangeListSelector);
+
     function RangeListSelector(arg) {
       classCallCheck(this, RangeListSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(RangeListSelector).call(this, new RangeList(arg)));
+      return _super2.call(this, new RangeList(arg));
     }
 
     return RangeListSelector;
@@ -5867,10 +5925,12 @@
   var ValueListSelector = /*#__PURE__*/function (_ListSelector2) {
     inherits(ValueListSelector, _ListSelector2);
 
+    var _super3 = _createSuper$5(ValueListSelector);
+
     function ValueListSelector(arg, caseSensitive) {
       classCallCheck(this, ValueListSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ValueListSelector).call(this, new ValueList(arg, !caseSensitive)));
+      return _super3.call(this, new ValueList(arg, !caseSensitive));
     }
 
     return ValueListSelector;
@@ -5879,10 +5939,12 @@
   var NoneSelector = /*#__PURE__*/function (_Selector2) {
     inherits(NoneSelector, _Selector2);
 
+    var _super4 = _createSuper$5(NoneSelector);
+
     function NoneSelector() {
       classCallCheck(this, NoneSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(NoneSelector).apply(this, arguments));
+      return _super4.apply(this, arguments);
     }
 
     createClass(NoneSelector, [{
@@ -5901,10 +5963,12 @@
   var AllSelector = /*#__PURE__*/function (_Selector3) {
     inherits(AllSelector, _Selector3);
 
+    var _super5 = _createSuper$5(AllSelector);
+
     function AllSelector() {
       classCallCheck(this, AllSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AllSelector).apply(this, arguments));
+      return _super5.apply(this, arguments);
     }
 
     createClass(AllSelector, [{
@@ -5920,6 +5984,9 @@
   AllSelector.prototype.name = 'All';
   AllSelector.prototype.keyword = 'all';
 
+  function _createSuper$6(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$7()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$7() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   // Operators
   //----------------------------------------------------------------------------
 
@@ -5928,12 +5995,14 @@
   var PrefixOperator = /*#__PURE__*/function (_Selector) {
     inherits(PrefixOperator, _Selector);
 
+    var _super = _createSuper$6(PrefixOperator);
+
     function PrefixOperator(rhs) {
       var _this;
 
       classCallCheck(this, PrefixOperator);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(PrefixOperator).call(this));
+      _this = _super.call(this);
       _this.rhs = rhs || none;
       return _this;
     }
@@ -5959,12 +6028,14 @@
   var InfixOperator = /*#__PURE__*/function (_Selector2) {
     inherits(InfixOperator, _Selector2);
 
+    var _super2 = _createSuper$6(InfixOperator);
+
     function InfixOperator(lhs, rhs) {
       var _this2;
 
       classCallCheck(this, InfixOperator);
 
-      _this2 = possibleConstructorReturn(this, getPrototypeOf(InfixOperator).call(this));
+      _this2 = _super2.call(this);
       _this2.lhs = lhs || none;
       _this2.rhs = rhs || none;
       return _this2;
@@ -5989,6 +6060,9 @@
 
   InfixOperator.prototype.priority = 1000;
 
+  function _createSuper$7(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$8()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$8() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var keywords = {}; //----------------------------------------------------------------------------
   // Named selectors
   //----------------------------------------------------------------------------
@@ -6014,10 +6088,12 @@
   defineSelector('Serial', /*#__PURE__*/function (_RangeListSelector) {
     inherits(SerialSelector, _RangeListSelector);
 
+    var _super = _createSuper$7(SerialSelector);
+
     function SerialSelector() {
       classCallCheck(this, SerialSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(SerialSelector).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(SerialSelector, [{
@@ -6032,10 +6108,12 @@
   defineSelector('Name', /*#__PURE__*/function (_ValueListSelector) {
     inherits(NameSelector, _ValueListSelector);
 
+    var _super2 = _createSuper$7(NameSelector);
+
     function NameSelector() {
       classCallCheck(this, NameSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(NameSelector).apply(this, arguments));
+      return _super2.apply(this, arguments);
     }
 
     createClass(NameSelector, [{
@@ -6050,10 +6128,12 @@
   defineSelector('AltLoc', /*#__PURE__*/function (_ValueListSelector2) {
     inherits(AltLocSelector, _ValueListSelector2);
 
+    var _super3 = _createSuper$7(AltLocSelector);
+
     function AltLocSelector() {
       classCallCheck(this, AltLocSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AltLocSelector).apply(this, arguments));
+      return _super3.apply(this, arguments);
     }
 
     createClass(AltLocSelector, [{
@@ -6068,10 +6148,12 @@
   defineSelector('Elem', /*#__PURE__*/function (_ValueListSelector3) {
     inherits(ElemSelector, _ValueListSelector3);
 
+    var _super4 = _createSuper$7(ElemSelector);
+
     function ElemSelector() {
       classCallCheck(this, ElemSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ElemSelector).apply(this, arguments));
+      return _super4.apply(this, arguments);
     }
 
     createClass(ElemSelector, [{
@@ -6086,10 +6168,12 @@
   defineSelector('Residue', /*#__PURE__*/function (_ValueListSelector4) {
     inherits(ResidueSelector, _ValueListSelector4);
 
+    var _super5 = _createSuper$7(ResidueSelector);
+
     function ResidueSelector() {
       classCallCheck(this, ResidueSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ResidueSelector).apply(this, arguments));
+      return _super5.apply(this, arguments);
     }
 
     createClass(ResidueSelector, [{
@@ -6104,10 +6188,12 @@
   defineSelector('Sequence', /*#__PURE__*/function (_RangeListSelector2) {
     inherits(SequenceSelector, _RangeListSelector2);
 
+    var _super6 = _createSuper$7(SequenceSelector);
+
     function SequenceSelector() {
       classCallCheck(this, SequenceSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(SequenceSelector).apply(this, arguments));
+      return _super6.apply(this, arguments);
     }
 
     createClass(SequenceSelector, [{
@@ -6122,10 +6208,12 @@
   defineSelector('ICode', /*#__PURE__*/function (_ValueListSelector5) {
     inherits(ICodeSelector, _ValueListSelector5);
 
+    var _super7 = _createSuper$7(ICodeSelector);
+
     function ICodeSelector(arg) {
       classCallCheck(this, ICodeSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ICodeSelector).call(this, arg, true));
+      return _super7.call(this, arg, true);
     }
 
     createClass(ICodeSelector, [{
@@ -6140,10 +6228,12 @@
   defineSelector('ResIdx', /*#__PURE__*/function (_RangeListSelector3) {
     inherits(ResIdxSelector, _RangeListSelector3);
 
+    var _super8 = _createSuper$7(ResIdxSelector);
+
     function ResIdxSelector() {
       classCallCheck(this, ResIdxSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ResIdxSelector).apply(this, arguments));
+      return _super8.apply(this, arguments);
     }
 
     createClass(ResIdxSelector, [{
@@ -6158,10 +6248,12 @@
   defineSelector('Chain', /*#__PURE__*/function (_ValueListSelector6) {
     inherits(ChainSelector, _ValueListSelector6);
 
+    var _super9 = _createSuper$7(ChainSelector);
+
     function ChainSelector(arg) {
       classCallCheck(this, ChainSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ChainSelector).call(this, arg, true));
+      return _super9.call(this, arg, true);
     }
 
     createClass(ChainSelector, [{
@@ -6176,10 +6268,12 @@
   defineSelector('Hetatm', /*#__PURE__*/function (_Selector) {
     inherits(HetatmSelector, _Selector);
 
+    var _super10 = _createSuper$7(HetatmSelector);
+
     function HetatmSelector() {
       classCallCheck(this, HetatmSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(HetatmSelector).apply(this, arguments));
+      return _super10.apply(this, arguments);
     }
 
     createClass(HetatmSelector, [{
@@ -6194,10 +6288,12 @@
   defineSelector('PolarH', /*#__PURE__*/function (_Selector2) {
     inherits(PolarHSelector, _Selector2);
 
+    var _super11 = _createSuper$7(PolarHSelector);
+
     function PolarHSelector() {
       classCallCheck(this, PolarHSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(PolarHSelector).apply(this, arguments));
+      return _super11.apply(this, arguments);
     }
 
     createClass(PolarHSelector, [{
@@ -6212,10 +6308,12 @@
   defineSelector('NonPolarH', /*#__PURE__*/function (_Selector3) {
     inherits(NonPolarHSelector, _Selector3);
 
+    var _super12 = _createSuper$7(NonPolarHSelector);
+
     function NonPolarHSelector() {
       classCallCheck(this, NonPolarHSelector);
 
-      return possibleConstructorReturn(this, getPrototypeOf(NonPolarHSelector).apply(this, arguments));
+      return _super12.apply(this, arguments);
     }
 
     createClass(NonPolarHSelector, [{
@@ -6241,10 +6339,12 @@
   defineOperator('Not', 1, /*#__PURE__*/function (_PrefixOperator) {
     inherits(NotOperator, _PrefixOperator);
 
+    var _super13 = _createSuper$7(NotOperator);
+
     function NotOperator() {
       classCallCheck(this, NotOperator);
 
-      return possibleConstructorReturn(this, getPrototypeOf(NotOperator).apply(this, arguments));
+      return _super13.apply(this, arguments);
     }
 
     createClass(NotOperator, [{
@@ -6259,10 +6359,12 @@
   defineOperator('And', 2, /*#__PURE__*/function (_InfixOperator) {
     inherits(AndOperator, _InfixOperator);
 
+    var _super14 = _createSuper$7(AndOperator);
+
     function AndOperator() {
       classCallCheck(this, AndOperator);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AndOperator).apply(this, arguments));
+      return _super14.apply(this, arguments);
     }
 
     createClass(AndOperator, [{
@@ -6277,10 +6379,12 @@
   defineOperator('Or', 3, /*#__PURE__*/function (_InfixOperator2) {
     inherits(OrOperator, _InfixOperator2);
 
+    var _super15 = _createSuper$7(OrOperator);
+
     function OrOperator() {
       classCallCheck(this, OrOperator);
 
-      return possibleConstructorReturn(this, getPrototypeOf(OrOperator).apply(this, arguments));
+      return _super15.apply(this, arguments);
     }
 
     createClass(OrOperator, [{
@@ -6299,10 +6403,12 @@
     return defineSelector(name, /*#__PURE__*/function (_Selector4) {
       inherits(_class, _Selector4);
 
+      var _super16 = _createSuper$7(_class);
+
       function _class() {
         classCallCheck(this, _class);
 
-        return possibleConstructorReturn(this, getPrototypeOf(_class).apply(this, arguments));
+        return _super16.apply(this, arguments);
       }
 
       createClass(_class, [{
@@ -6465,6 +6571,9 @@
     return BiologicalUnit;
   }();
 
+  function _createSuper$8(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$9()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$9() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Biological assembly.
    *
@@ -6475,12 +6584,14 @@
   var Assembly = /*#__PURE__*/function (_BiologicalUnit) {
     inherits(Assembly, _BiologicalUnit);
 
+    var _super = _createSuper$8(Assembly);
+
     function Assembly(complex) {
       var _this;
 
       classCallCheck(this, Assembly);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(Assembly).call(this, complex));
+      _this = _super.call(this, complex);
       _this.chains = [];
       _this.matrices = [];
       return _this;
@@ -7109,7 +7220,7 @@
 
   function _cosBetween(v1, v2) {
     var theta = v1.dot(v2) / Math.sqrt(v1.lengthSq() * v2.lengthSq());
-    return THREE.Math.clamp(theta, -1, 1);
+    return THREE.MathUtils.clamp(theta, -1, 1);
   }
 
   function _markAromatic(bond) {
@@ -8080,6 +8191,11 @@
     return HBondInfo;
   }();
 
+  function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray$1(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+  function _unsupportedIterableToArray$1(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$1(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$1(o, minLen); }
+
+  function _arrayLikeToArray$1(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
   var BridgeType = Object.freeze({
     NO_BRIDGE: 0,
     PARALLEL: 1,
@@ -8342,12 +8458,12 @@
 
 
                 var found = false;
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
+
+                var _iterator = _createForOfIteratorHelper(bridges),
+                    _step;
 
                 try {
-                  for (var _iterator = bridges[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                  for (_iterator.s(); !(_step = _iterator.n()).done;) {
                     var bridge = _step.value;
 
                     if (type !== bridge.type || ri._index !== bridge.i[bridge.i.length - 1] + 1) {
@@ -8370,18 +8486,9 @@
                   } // this bridge cannot be attached anywhere, start a new sequence
 
                 } catch (err) {
-                  _didIteratorError = true;
-                  _iteratorError = err;
+                  _iterator.e(err);
                 } finally {
-                  try {
-                    if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-                      _iterator["return"]();
-                    }
-                  } finally {
-                    if (_didIteratorError) {
-                      throw _iteratorError;
-                    }
-                  }
+                  _iterator.f();
                 }
 
                 if (!found) {
@@ -8463,19 +8570,19 @@
 
           do {
             toMove = new Set();
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
+
+            var _iterator2 = _createForOfIteratorHelper(sheetset.values()),
+                _step2;
 
             try {
-              for (var _iterator2 = sheetset.values()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
                 var _a = _step2.value;
-                var _iteratorNormalCompletion4 = true;
-                var _didIteratorError4 = false;
-                var _iteratorError4 = undefined;
+
+                var _iterator4 = _createForOfIteratorHelper(ladderset.values()),
+                    _step4;
 
                 try {
-                  for (var _iterator4 = ladderset.values()[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                  for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
                     var _b = _step4.value;
 
                     if (this._areBridgesLinked(_a, _b)) {
@@ -8483,67 +8590,38 @@
                     }
                   }
                 } catch (err) {
-                  _didIteratorError4 = true;
-                  _iteratorError4 = err;
+                  _iterator4.e(err);
                 } finally {
-                  try {
-                    if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
-                      _iterator4["return"]();
-                    }
-                  } finally {
-                    if (_didIteratorError4) {
-                      throw _iteratorError4;
-                    }
-                  }
+                  _iterator4.f();
                 }
               }
             } catch (err) {
-              _didIteratorError2 = true;
-              _iteratorError2 = err;
+              _iterator2.e(err);
             } finally {
-              try {
-                if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-                  _iterator2["return"]();
-                }
-              } finally {
-                if (_didIteratorError2) {
-                  throw _iteratorError2;
-                }
-              }
+              _iterator2.f();
             }
 
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+            var _iterator3 = _createForOfIteratorHelper(toMove.values()),
+                _step3;
 
             try {
-              for (var _iterator3 = toMove.values()[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
                 _bridge = _step3.value;
                 sheetset.add(_bridge);
                 ladderset["delete"](_bridge);
               }
             } catch (err) {
-              _didIteratorError3 = true;
-              _iteratorError3 = err;
+              _iterator3.e(err);
             } finally {
-              try {
-                if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
-                  _iterator3["return"]();
-                }
-              } finally {
-                if (_didIteratorError3) {
-                  throw _iteratorError3;
-                }
-              }
+              _iterator3.f();
             }
           } while (toMove.size > 0);
 
-          var _iteratorNormalCompletion5 = true;
-          var _didIteratorError5 = false;
-          var _iteratorError5 = undefined;
+          var _iterator5 = _createForOfIteratorHelper(sheetset.values()),
+              _step5;
 
           try {
-            for (var _iterator5 = sheetset.values()[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
               _bridge = _step5.value;
               _bridge.ladder = ladder;
               _bridge.sheet = sheet;
@@ -8551,18 +8629,9 @@
               ++ladder;
             }
           } catch (err) {
-            _didIteratorError5 = true;
-            _iteratorError5 = err;
+            _iterator5.e(err);
           } finally {
-            try {
-              if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
-                _iterator5["return"]();
-              }
-            } finally {
-              if (_didIteratorError5) {
-                throw _iteratorError5;
-              }
-            }
+            _iterator5.f();
           }
 
           ++sheet;
@@ -8679,12 +8748,12 @@
       value: function _areBridgesLinked(a, b) {
         var ai = new Set(a.i);
         var aj = new Set(a.j);
-        var _iteratorNormalCompletion6 = true;
-        var _didIteratorError6 = false;
-        var _iteratorError6 = undefined;
+
+        var _iterator6 = _createForOfIteratorHelper(b.i),
+            _step6;
 
         try {
-          for (var _iterator6 = b.i[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+          for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
             var i = _step6.value;
 
             if (ai.has(i) || aj.has(i)) {
@@ -8692,26 +8761,16 @@
             }
           }
         } catch (err) {
-          _didIteratorError6 = true;
-          _iteratorError6 = err;
+          _iterator6.e(err);
         } finally {
-          try {
-            if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
-              _iterator6["return"]();
-            }
-          } finally {
-            if (_didIteratorError6) {
-              throw _iteratorError6;
-            }
-          }
+          _iterator6.f();
         }
 
-        var _iteratorNormalCompletion7 = true;
-        var _didIteratorError7 = false;
-        var _iteratorError7 = undefined;
+        var _iterator7 = _createForOfIteratorHelper(b.j),
+            _step7;
 
         try {
-          for (var _iterator7 = b.j[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+          for (_iterator7.s(); !(_step7 = _iterator7.n()).done;) {
             var _i11 = _step7.value;
 
             if (ai.has(_i11) || aj.has(_i11)) {
@@ -8719,18 +8778,9 @@
             }
           }
         } catch (err) {
-          _didIteratorError7 = true;
-          _iteratorError7 = err;
+          _iterator7.e(err);
         } finally {
-          try {
-            if (!_iteratorNormalCompletion7 && _iterator7["return"] != null) {
-              _iterator7["return"]();
-            }
-          } finally {
-            if (_didIteratorError7) {
-              throw _iteratorError7;
-            }
-          }
+          _iterator7.f();
         }
 
         return false;
@@ -10175,15 +10225,21 @@
     Molecule: Molecule
   };
 
+  function _createSuper$9(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$a()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$a() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var CSS2DObject = /*#__PURE__*/function (_THREE$Object3D) {
     inherits(CSS2DObject, _THREE$Object3D);
+
+    var _super = _createSuper$9(CSS2DObject);
 
     function CSS2DObject(element) {
       var _this;
 
       classCallCheck(this, CSS2DObject);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(CSS2DObject).call(this));
+      _this = _super.call(this);
 
       var self = assertThisInitialized(_this);
 
@@ -10243,13 +10299,19 @@
     return CSS2DObject;
   }(THREE.Object3D);
 
+  function _createSuper$a(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$b()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$b() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var RCGroup = /*#__PURE__*/function (_THREE$Group) {
     inherits(RCGroup, _THREE$Group);
+
+    var _super = _createSuper$a(RCGroup);
 
     function RCGroup() {
       classCallCheck(this, RCGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(RCGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(RCGroup, [{
@@ -10328,9 +10390,9 @@
 
   var fragmentScreenQuadFromTexWithDistortion = "precision highp float;\r\n\r\nvarying vec2 vUv;\r\nuniform sampler2D srcTex;\r\nuniform float coef;\r\n\r\nvoid main() {\r\n  vec2 uv = vUv * 2.0 - 1.0;\r\n  float r2 = dot(uv, uv);\r\n  vec2 tc = uv * (1.0 + coef * r2);\r\n  if (!all(lessThan(abs(tc), vec2(1.0))))\r\n    discard;\r\n  tc = 0.5 * (tc + 1.0);\r\n  gl_FragColor = texture2D(srcTex, tc);\r\n}\r\n";
 
-  var vertexShader = "float INSTANCED_SPRITE_OVERSCALE = 1.3;\r\n\r\nattribute vec3 normal;\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  varying vec3 viewNormal;\r\n#endif\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  varying vec3 vNormal;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec4 position; // W contains vert pos or neg offset\r\n#else\r\n  attribute vec3 position;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition;\r\nvarying vec3 vViewPosition;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  attribute float alphaColor;\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t\tuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  attribute vec3 color;\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  attribute vec3 color2;\r\n  varying vec3 vColor2;\r\n  attribute vec2 uv;\r\n  #ifndef CYLINDER_SPRITE\r\n    varying vec2 vUv;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_POS\r\n  attribute vec4 offset;\r\n  #ifdef SPHERE_SPRITE\r\n    varying vec4 instOffset;\r\n  varying vec4 spritePosEye;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  attribute vec4 matVector1;\r\n  attribute vec4 matVector2;\r\n  attribute vec4 matVector3;\r\n  attribute vec4 invmatVector1;\r\n  attribute vec4 invmatVector2;\r\n  attribute vec4 invmatVector3;\r\n\r\n  #ifdef CYLINDER_SPRITE\r\n    varying vec4 matVec1;\r\n    varying vec4 matVec2;\r\n    varying vec4 matVec3;\r\n    varying vec4 invmatVec1;\r\n    varying vec4 invmatVec2;\r\n    varying vec4 invmatVec3;\r\n  #endif\r\n#endif\r\n\r\nuniform mat4 modelViewMatrix; // optional\r\nuniform mat4 projectionMatrix; // optional\r\nuniform mat3 normalMatrix; // optional\r\nuniform mat4 modelMatrix; // optional\r\n\r\n#ifdef DASHED_LINE\r\n  attribute float lineDistance;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec3 direction;\r\n  uniform mat4 projMatrixInv;\r\n  uniform vec2 viewport;\r\n  uniform float lineWidth;\r\n\r\n  vec4 transform(vec4 coord){\r\n    return projectionMatrix * modelViewMatrix * coord;\r\n  }\r\n\r\n  vec2 project(vec4 device){\r\n    vec3 device_normal = device.xyz/device.w;\r\n    vec2 clip_pos = (device_normal*0.5+0.5).xy;\r\n    return clip_pos * viewport;\r\n  }\r\n\r\n  vec4 unproject(vec2 screen, float z, float w){\r\n    vec2 clip_pos = screen/viewport;\r\n    vec2 device_normal = clip_pos*2.0-1.0;\r\n    return vec4(device_normal*w, z, w);\r\n  }\r\n#endif\r\n\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  alphaCol = alphaColor;\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  vec3 objectNormal = vec3(\r\n    dot(normal, matVector1.xyz),\r\n    dot(normal, matVector2.xyz),\r\n    dot(normal, matVector3.xyz));\r\n#else\r\n  vec3 objectNormal = vec3( normal );\r\n#endif\r\n\r\nvec3 transformedNormal = normalMatrix * objectNormal;\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  vNormal = normalize(transformedNormal);\r\n#endif\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  viewNormal = normalize(mat3(modelViewMatrix)*objectNormal);\r\n#endif\r\n\r\n  vec4 localPos = vec4(position.xyz, 1.0);\r\n  vec4 worldPos = modelMatrix * localPos;\r\n  vec4 mvPosition = modelViewMatrix * localPos;\r\n\r\n// make thick line offset\r\n#ifdef THICK_LINE\r\n   // get screen pos\r\n   vec4 dPos = transform(vec4(position.xyz, 1.0));\r\n   vec2 sPos = project(dPos);\r\n   // move pos forward\r\n   vec3 position2 = position.xyz + direction.xyz * 0.5;\r\n   // get screen offset pos\r\n   vec4 dPos2 = transform(vec4(position2.xyz, 1.0));\r\n   vec2 sPos2 = project(dPos2);\r\n   // screen line direction\r\n   vec2 sDir = normalize(sPos2 - sPos);\r\n   // vertex offset (orthogonal to line direction)\r\n   vec2 offset1 = vec2(-sDir.y, sDir.x);\r\n   // move screen vertex\r\n   vec2 newPos = sPos + offset1 * position.w * lineWidth;\r\n   // get moved pos in view space\r\n   vec4 dNewPos =  unproject(newPos, dPos.z, dPos.w);\r\n   mvPosition.xyz = (projMatrixInv * dNewPos).xyz;\r\n#endif // THICK_LINE\r\n\r\n#ifdef INSTANCED_POS\r\n  #ifdef SPHERE_SPRITE\r\n    instOffset = offset;\r\n\r\n    vec4 posEye = modelViewMatrix * vec4( offset.xyz, 1.0 );\r\n    float scale = length(modelViewMatrix[0]);\r\n    mvPosition = posEye + vec4( position.xyz * offset.w * scale * INSTANCED_SPRITE_OVERSCALE, 0.0 );\r\n    posEye.w = offset.w * scale;\r\n\r\n    spritePosEye = posEye;\r\n #else\r\n    localPos = vec4( offset.xyz + position.xyz * offset.w, 1.0 );\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  #ifdef CYLINDER_SPRITE\r\n    matVec1 = matVector1;\r\n    matVec2 = matVector2;\r\n    matVec3 = matVector3;\r\n    invmatVec1 = invmatVector1;\r\n    invmatVec2 = invmatVector2;\r\n    invmatVec3 = invmatVector3;\r\n\r\n    // calculate eye coords of cylinder endpoints\r\n    vec4 v = vec4(0, -0.5, 0, 1);\r\n    vec4 p1 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n    v.y = 0.5;\r\n    vec4 p2 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n\r\n    // sprite is placed at the center of cylinder\r\n    vec4 posEye;\r\n    posEye.xyz = mix(p1.xyz, p2.xyz, 0.5);\r\n    posEye.w = 1.0;\r\n\r\n    // basic sprite size at screen plane (covers only cylinder axis)\r\n    vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);\r\n\r\n    // cylinder radius in eye space\r\n    float rad = length(modelViewMatrix[0]) * length(vec3(matVector1.x, matVector2.x, matVector3.x));\r\n\r\n    // full sprite size in eye coords\r\n    float minZ = min(abs(p1.z), abs(p2.z));\r\n    vec2 spriteSize = INSTANCED_SPRITE_OVERSCALE  * abs(posEye.z) *\r\n      (spriteSizeScreen + 2.0 * rad / minZ);\r\n\r\n    mvPosition = posEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );\r\n  #else\r\n    localPos = vec4(dot(localPos, matVector1), dot(localPos, matVector2), dot(localPos, matVector3), 1.0);\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n  gl_Position = projectionMatrix * mvPosition;\r\n\r\n  vWorldPosition = worldPos.xyz;\r\n  vViewPosition = - mvPosition.xyz;\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t  vec4 worldPosition;\r\n\t  // see THREE.WebGLProgram.unrollLoops\r\n\t  #pragma unroll_loop\r\n\t  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n      vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * vec4(vWorldPosition, 1.0);\r\n      vDirectionalShadowNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(objectNormal, 0.0))).xyz;\r\n\t  }\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  vColor = color.xyz;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  vColor2 = color2;\r\n  #ifndef CYLINDER_SPRITE\r\n    vUv = uv;\r\n  #endif\r\n#endif\r\n\r\n#ifdef DASHED_LINE\r\n  vLineDistance = lineDistance;\r\n#endif\r\n}\r\n";
+  var vertexShader = "float INSTANCED_SPRITE_OVERSCALE = 1.3;\r\n\r\nattribute vec3 normal;\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  varying vec3 viewNormal;\r\n#endif\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  varying vec3 vNormal;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec4 position; // W contains vert pos or neg offset\r\n#else\r\n  attribute vec3 position;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition;\r\nvarying vec3 vViewPosition;\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  attribute float alphaColor;\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t\tuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  attribute vec3 color;\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  attribute vec3 color2;\r\n  varying vec3 vColor2;\r\n  attribute vec2 uv;\r\n  #ifndef CYLINDER_SPRITE\r\n    varying vec2 vUv;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_POS\r\n  attribute vec4 offset;\r\n  #ifdef SPHERE_SPRITE\r\n    varying vec4 instOffset;\r\n  varying vec4 spritePosEye;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  attribute vec4 matVector1;\r\n  attribute vec4 matVector2;\r\n  attribute vec4 matVector3;\r\n  attribute vec4 invmatVector1;\r\n  attribute vec4 invmatVector2;\r\n  attribute vec4 invmatVector3;\r\n\r\n  #ifdef CYLINDER_SPRITE\r\n    varying vec4 matVec1;\r\n    varying vec4 matVec2;\r\n    varying vec4 matVec3;\r\n    varying vec4 invmatVec1;\r\n    varying vec4 invmatVec2;\r\n    varying vec4 invmatVec3;\r\n    varying vec4 spritePosEye;\r\n  #endif\r\n#endif\r\n\r\nuniform mat4 modelViewMatrix; // optional\r\nuniform mat4 projectionMatrix; // optional\r\nuniform mat3 normalMatrix; // optional\r\nuniform mat4 modelMatrix; // optional\r\n\r\n#ifdef DASHED_LINE\r\n  attribute float lineDistance;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n#ifdef THICK_LINE\r\n  attribute vec3 direction;\r\n  uniform mat4 projMatrixInv;\r\n  uniform vec2 viewport;\r\n  uniform float lineWidth;\r\n\r\n  vec4 transform(vec4 coord){\r\n    return projectionMatrix * modelViewMatrix * coord;\r\n  }\r\n\r\n  vec2 project(vec4 device){\r\n    vec3 device_normal = device.xyz/device.w;\r\n    vec2 clip_pos = (device_normal*0.5+0.5).xy;\r\n    return clip_pos * viewport;\r\n  }\r\n\r\n  vec4 unproject(vec2 screen, float z, float w){\r\n    vec2 clip_pos = screen/viewport;\r\n    vec2 device_normal = clip_pos*2.0-1.0;\r\n    return vec4(device_normal*w, z, w);\r\n  }\r\n#endif\r\n\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  alphaCol = alphaColor;\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  vec3 objectNormal = vec3(\r\n    dot(normal, matVector1.xyz),\r\n    dot(normal, matVector2.xyz),\r\n    dot(normal, matVector3.xyz));\r\n#else\r\n  vec3 objectNormal = vec3( normal );\r\n#endif\r\n\r\nvec3 transformedNormal = normalMatrix * objectNormal;\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  vNormal = normalize(transformedNormal);\r\n#endif\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  viewNormal = normalize(mat3(modelViewMatrix)*objectNormal);\r\n#endif\r\n\r\n  vec4 localPos = vec4(position.xyz, 1.0);\r\n  vec4 worldPos = modelMatrix * localPos;\r\n  vec4 mvPosition = modelViewMatrix * localPos;\r\n\r\n// make thick line offset\r\n#ifdef THICK_LINE\r\n   // get screen pos\r\n   vec4 dPos = transform(vec4(position.xyz, 1.0));\r\n   vec2 sPos = project(dPos);\r\n   // move pos forward\r\n   vec3 position2 = position.xyz + direction.xyz * 0.5;\r\n   // get screen offset pos\r\n   vec4 dPos2 = transform(vec4(position2.xyz, 1.0));\r\n   vec2 sPos2 = project(dPos2);\r\n   // screen line direction\r\n   vec2 sDir = normalize(sPos2 - sPos);\r\n   // vertex offset (orthogonal to line direction)\r\n   vec2 offset1 = vec2(-sDir.y, sDir.x);\r\n   // move screen vertex\r\n   vec2 newPos = sPos + offset1 * position.w * lineWidth;\r\n   // get moved pos in view space\r\n   vec4 dNewPos =  unproject(newPos, dPos.z, dPos.w);\r\n   mvPosition.xyz = (projMatrixInv * dNewPos).xyz;\r\n#endif // THICK_LINE\r\n\r\n#ifdef INSTANCED_POS\r\n  #ifdef SPHERE_SPRITE\r\n    instOffset = offset;\r\n\r\n    vec4 posEye = modelViewMatrix * vec4( offset.xyz, 1.0 );\r\n    float scale = length(modelViewMatrix[0]);\r\n    mvPosition = posEye + vec4( position.xyz * offset.w * scale * INSTANCED_SPRITE_OVERSCALE, 0.0 );\r\n    posEye.w = offset.w * scale;\r\n\r\n    spritePosEye = posEye;\r\n #else\r\n    localPos = vec4( offset.xyz + position.xyz * offset.w, 1.0 );\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n#ifdef INSTANCED_MATRIX\r\n  #ifdef CYLINDER_SPRITE\r\n    matVec1 = matVector1;\r\n    matVec2 = matVector2;\r\n    matVec3 = matVector3;\r\n    invmatVec1 = invmatVector1;\r\n    invmatVec2 = invmatVector2;\r\n    invmatVec3 = invmatVector3;\r\n\r\n    // calculate eye coords of cylinder endpoints\r\n    vec4 v = vec4(0, -0.5, 0, 1);\r\n    vec4 p1 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n    v.y = 0.5;\r\n    vec4 p2 = modelViewMatrix * vec4(dot(v, matVector1), dot(v, matVector2), dot(v, matVector3), 1.0);\r\n\r\n    // sprite is placed at the center of cylinder\r\n    vec4 posEye;\r\n    posEye.xyz = mix(p1.xyz, p2.xyz, 0.5);\r\n    posEye.w = 1.0;\r\n    spritePosEye = posEye;\r\n\r\n    // cylinder radius in eye space\r\n    float rad = length(modelViewMatrix[0]) * length(vec3(matVector1.x, matVector2.x, matVector3.x));\r\n    vec2 spriteSize;\r\n    #ifdef ORTHOGRAPHIC_CAMERA\r\n      // In ortho projection we skip z coordinate\r\n      // basic sprite size at screen plane (covers only cylinder axis)\r\n      vec2 spriteSizeScreen = abs(p2.xy - p1.xy);\r\n\r\n      spriteSize = vec2(1.0, 1.0) * INSTANCED_SPRITE_OVERSCALE * (spriteSizeScreen + 2.0 * rad);\r\n    #else\r\n      // basic sprite size at screen plane (covers only cylinder axis)\r\n      vec2 spriteSizeScreen = abs(p2.xy / p2.z - p1.xy / p1.z);\r\n\r\n      // full sprite size in eye coords\r\n      float minZ = min(abs(p1.z), abs(p2.z));\r\n      spriteSize = vec2(1.0, 1.0) * INSTANCED_SPRITE_OVERSCALE * abs(posEye.z) * (spriteSizeScreen + 2.0 * rad / minZ);\r\n    #endif\r\n\r\n    mvPosition = posEye + vec4( position.xy * 0.5 * spriteSize, 0, 0 );\r\n  #else\r\n    localPos = vec4(dot(localPos, matVector1), dot(localPos, matVector2), dot(localPos, matVector3), 1.0);\r\n    worldPos = modelMatrix * localPos;\r\n    mvPosition = modelViewMatrix * localPos;\r\n  #endif\r\n#endif\r\n\r\n  gl_Position = projectionMatrix * mvPosition;\r\n\r\n  vWorldPosition = worldPos.xyz;\r\n  vViewPosition = - mvPosition.xyz;\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t  vec4 worldPosition;\r\n\t  // see THREE.WebGLProgram.unrollLoops\r\n\t  #pragma unroll_loop_start\r\n\t  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n      vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * vec4(vWorldPosition, 1.0);\r\n      vDirectionalShadowNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(objectNormal, 0.0))).xyz;\r\n\t  }\r\n\t  #pragma unroll_loop_end\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  vColor = color.xyz;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  vColor2 = color2;\r\n  #ifndef CYLINDER_SPRITE\r\n    vUv = uv;\r\n  #endif\r\n#endif\r\n\r\n#ifdef DASHED_LINE\r\n  vLineDistance = lineDistance;\r\n#endif\r\n}\r\n";
 
-  var fragmentShader = "#if defined (NORMALS_TO_G_BUFFER)\r\n  #define fragColor gl_FragData[0]\r\n#else\r\n  #define fragColor gl_FragColor\r\n#endif\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#ifdef COLOR_FROM_POS\r\n  uniform mat4 world2colorMatrix;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];\r\n\r\n    #ifdef SHADOWMAP_PCF_RAND\r\n      // We use 4 instead uniform variable or define because this value is used in for(... i < value; ...) with\r\n      // unroll_loop and unroll_loop has pattern:\r\n      // /#pragma unroll_loop[\\s]+?for \\( int i \\= (\\d+)\\; i < (\\d+)\\; i \\+\\+ \\) \\{([\\s\\S]+?)(?=\\})\\}/g\r\n      uniform vec2 samplesKernel[4]; // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n      uniform sampler2D noiseTex;\r\n      uniform vec2 noiseTexelSize;\r\n      uniform vec2 srcTexelSize;\r\n      uniform mat4 projectionMatrix;\r\n    #endif\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  varying vec3 vColor2;\r\n  #ifndef CYLINDER_SPRITE\r\n    varying vec2 vUv;\r\n  #endif\r\n#endif\r\n\r\nuniform vec3 diffuse;\r\nuniform vec3 emissive;\r\nuniform vec3 specular;\r\nuniform float shininess;\r\nuniform vec3 fixedColor;\r\nuniform float opacity;\r\nuniform float zClipValue;\r\nuniform float clipPlaneValue;\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  varying vec3 viewNormal;\r\n#endif\r\n\r\n#define PI 3.14159265359\r\n#define RECIPROCAL_PI 0.31830988618\r\n#define saturate(a) clamp( a, 0.0, 1.0 )\r\n\r\n#ifdef USE_FOG\r\n  uniform vec3 fogColor;\r\n  uniform float fogAlpha;\r\n  uniform float fogNear;\r\n  uniform float fogFar;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)\r\nvarying vec3 vViewPosition;\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  varying vec3 vNormal;\r\n#endif\r\n\r\n/////////////////////////////////////////// ZSprites ////////////////////////////////////////////////\r\n#ifdef SPHERE_SPRITE\r\n  varying vec4 spritePosEye;\r\n#endif\r\n\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  uniform float zOffset;\r\n  uniform mat4 projectionMatrix;\r\n\r\n  float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {\r\n    vec4 pixelPosScreen = projMatrix * pixelPosEye;\r\n    return 0.5 * (pixelPosScreen.z / pixelPosScreen.w + 1.0) + zOffset;\r\n  }\r\n#endif\r\n\r\n#ifdef SPHERE_SPRITE\r\n  varying vec4 instOffset;\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n\r\n  float intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray, ray);\r\n    float b = dot(ray, origin);\r\n    float c = dot(origin, origin) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    if (t1 >= 0.0) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_sphere_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into sphere local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = (v.xyz - instOffset.xyz) / instOffset.w;\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = normalize(v.xyz);\r\n\r\n    return intersect_ray_sphere(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  varying vec4 matVec1;\r\n  varying vec4 matVec2;\r\n  varying vec4 matVec3;\r\n  varying vec4 invmatVec1;\r\n  varying vec4 invmatVec2;\r\n  varying vec4 invmatVec3;\r\n\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n\r\n  float intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray.xz, ray.xz);\r\n    float b = dot(ray.xz, origin.xz);\r\n    float c = dot(origin.xz, origin.xz) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return -1.0;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point\r\n    float halfHeight = 0.5;\r\n    if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {\r\n      point = p1;\r\n      return t1;\r\n    }\r\n    if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {\r\n      point = p2;\r\n      return t2;\r\n    }\r\n\r\n    return -1.0;\r\n  }\r\n\r\n  float get_cylinder_point(in vec3 pixelPosEye, out vec3 point) {\r\n    // transform camera pos into cylinder local coords\r\n    vec4 v = invModelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);\r\n    vec3 origin = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n\r\n    // transform (camera -> pixel) ray into cylinder local coords\r\n    v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n    vec3 ray = vec3(\r\n      dot(v, invmatVec1),\r\n      dot(v, invmatVec2),\r\n      dot(v, invmatVec3));\r\n    ray = normalize(ray);\r\n\r\n    return intersect_ray_cylinder(origin, ray, point);\r\n  }\r\n#endif\r\n\r\n///////////////////////////////////// Pack and unpack ///////////////////////////////////////////////\r\nconst float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)\r\nconst float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)\r\n\r\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\r\n\r\n\r\nconst float ShiftRight8 = 1. / 256.;\r\n\r\nvec4 packDepthToRGBA( const in float v ) {\r\n  vec4 r = vec4( fract( v * PackFactors ), v );\r\n  r.yzw -= r.xyz * ShiftRight8; // tidy overflow\r\n  return r * PackUpscale;\r\n}\r\n\r\nfloat unpackRGBAToDepth( const in vec4 v ) {\r\n  return dot( v, UnpackFactors );\r\n}\r\n\r\n////////////////////////////////////////// All Lighting /////////////////////////////////////////////////\r\n#ifdef TOON_SHADING\r\n  #define LOW_TOON_BORDER 0.0\r\n  #define MEDIUM_TOON_BORDER 0.7\r\n  #define HIGH_TOON_BORDER 1.0\r\n\r\n  #define MEDIUM_TOON_RANGE 0.5\r\n  #define HIGH_TOON_RANGE 0.95\r\n#endif\r\n#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n  struct ReflectedLight {\r\n    vec3 directDiffuse;\r\n    vec3 directSpecular;\r\n    vec3 indirectDiffuse;\r\n  };\r\n\r\n  struct BlinnPhongMaterial {\r\n    vec3  diffuseColor;\r\n    vec3  specularColor;\r\n    float specularShininess;\r\n  };\r\n\r\n  struct GeometricContext {\r\n    vec3 normal;\r\n    vec3 viewDir;\r\n  };\r\n\r\n  struct DirectionalLight {\r\n    vec3 direction;\r\n    vec3 color;\r\n\r\n    int shadow;\r\n    vec2 shadowMapSize;\r\n    float shadowBias;\r\n    float shadowRadius;\r\n  };\r\n\r\n  uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\r\n  uniform vec3 ambientLightColor;\r\n\r\n  /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////\r\n\r\n  #if defined(SHADOWMAP)\r\n  \tfloat texture2DCompare( sampler2D depths, vec2 uv, float compare ) {\r\n  \t\treturn step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\r\n  \t}\r\n\r\n    float getShadow( sampler2D shadowMap, DirectionalLight dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {\r\n   \t  float shadow = 0.0;\r\n\r\n      // When shadows for sprites will appear use here for them normals as it done for G-buffer\r\n      shadowCoord.xyz += dirLight.shadowBias * vNormal;\r\n      shadowCoord.xyz /= shadowCoord.w;\r\n\r\n      bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\r\n      bool inFrustum = all( inFrustumVec );\r\n      bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\r\n      bool frustumTest = all( frustumTestVec );\r\n\r\n      if ( frustumTest ) {\r\n        #ifdef SHADOWMAP_BASIC\r\n      \t  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\r\n      \t#endif\r\n\r\n      \t#ifdef SHADOWMAP_PCF_SHARP\r\n      \t  vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;\r\n\r\n            float dx0 = - texelSize.x * dirLight.shadowRadius;\r\n            float dy0 = - texelSize.y * dirLight.shadowRadius;\r\n            float dx1 = + texelSize.x * dirLight.shadowRadius;\r\n            float dy1 = + texelSize.y * dirLight.shadowRadius;\r\n\r\n            shadow = (\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n            ) * ( 1.0 / 9.0 );\r\n        #endif\r\n\r\n        #ifdef SHADOWMAP_PCF_RAND\r\n          vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;\r\n\r\n          vec4 vUv = ((projectionMatrix * vec4(vViewPosition, 1.0)) + 1.0) / 2.0;\r\n          vec2 vUvNoise = vUv.xy / srcTexelSize * noiseTexelSize;\r\n\r\n          vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);\r\n          mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);\r\n\r\n          vec2 offset;\r\n          #pragma unroll_loop\r\n          for ( int i = 0; i < 4; i ++ ) { // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n            offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );\r\n            shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );\r\n          }\r\n          shadow /= float( 4 ); // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n        #endif\r\n      }\r\n      return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);\r\n   }\r\n  #endif\r\n\r\n  /////////////////////////////////////////// Lighting /////////////////////////////////////////////////\r\n\r\n  vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\r\n    return RECIPROCAL_PI * diffuseColor;\r\n  } // validated\r\n\r\n  vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\r\n    // Original approximation by Christophe Schlick '94\r\n    //;float fresnel = pow( 1.0 - dotLH, 5.0 );\r\n    // Optimized variant (presented by Epic at SIGGRAPH '13)\r\n    float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\r\n    return ( 1.0 - specularColor ) * fresnel + specularColor;\r\n  } // validated\r\n\r\n  float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) {\r\n    // geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)\r\n    return 0.25;\r\n  }\r\n\r\n  float D_BlinnPhong( const in float shininess, const in float dotNH ) {\r\n    return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\r\n  }\r\n\r\n  vec3 BRDF_Specular_BlinnPhong( const in DirectionalLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\r\n    vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\r\n    float dotNH = saturate(dot( geometry.normal, halfDir ));\r\n    float dotLH = saturate(dot( incidentLight.direction, halfDir ));\r\n\r\n    vec3 F = F_Schlick( specularColor, dotLH );\r\n    float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );\r\n    float D = D_BlinnPhong( shininess, dotNH );\r\n\r\n    return F * ( G * D );\r\n  } // validated\r\n\r\n  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight, float penumbra ) {\r\n\r\n    float dotNL = saturate( dot( geometry.normal, directLight.direction ));\r\n    #ifdef TOON_SHADING\r\n      if(dotNL < MEDIUM_TOON_RANGE){\r\n        dotNL = LOW_TOON_BORDER;\r\n      }\r\n      else if(dotNL < HIGH_TOON_RANGE){\r\n        dotNL = MEDIUM_TOON_BORDER;\r\n      }\r\n      else{\r\n        dotNL = HIGH_TOON_BORDER;\r\n      }\r\n    #endif\r\n\r\n    vec3 irradiance = dotNL * directLight.color * PI;\r\n    reflectedLight.directDiffuse += penumbra * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n    reflectedLight.directSpecular += penumbra * irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );\r\n  }\r\n\r\n  void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\r\n    reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n  }\r\n\r\n  vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material, vec3 vViewPosition) {\r\n    ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));\r\n    vec3 irradiance = ambientLightColor * PI;\r\n\r\n    float shadowMask = 1.0;\r\n    // see THREE.WebGLProgram.unrollLoops\r\n  \t#pragma unroll_loop\r\n  \t  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n  \t    #ifdef SHADOWMAP\r\n  \t    if ( directionalLights[ i ].shadow > 0 ) shadowMask = getShadow( directionalShadowMap[ i ], directionalLights[ i ], vDirectionalShadowCoord[ i ], vViewPosition, vDirectionalShadowNormal[ i ] );\r\n  \t    #endif\r\n\r\n  \t\t  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );\r\n  \t\t}\r\n\r\n    RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);\r\n\r\n    return saturate(reflectedLight.indirectDiffuse + reflectedLight.directDiffuse + reflectedLight.directSpecular);\r\n  }\r\n#endif\r\n\r\n/////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////\r\n#ifdef DASHED_LINE\r\n  uniform float dashedLineSize;\r\n  uniform float dashedLinePeriod;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef CLIP_PLANE\r\n  if (vViewPosition.z < clipPlaneValue) discard;\r\n#endif\r\n\r\n#ifdef ZCLIP\r\n  if (vViewPosition.z < zClipValue) discard;\r\n#endif\r\n\r\n  vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);\r\n  vec4 pixelPosEye;\r\n\r\n#ifdef SPHERE_SPRITE\r\n\r\n  vec3 viewNormalSprites;\r\n  vec3 normal;\r\n\r\n/* quick-and-dirty method\r\n  normal.xy = ' + INSTANCED_SPRITE_OVERSCALE + ' * (2.0 * vUv - 1.0);\r\n  float r2 = dot(normal.xy, normal.xy);\r\n  if (r2 > 1.0) discard;\r\n  float normalZ = sqrt(1.0 - r2);\r\n  normal.z = normalZ;\r\n  normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\r\n  pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n  pixelPosEye.z += spritePosEye.w * normalZ;\r\n*/\r\n\r\n  // ray-trace sphere surface\r\n  {\r\n    vec3 p;\r\n    if (get_sphere_point(-vViewPosition, p) < 0.0) discard;\r\n    pixelPosWorld = modelMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    // pixelPosEye = modelViewMatrix * vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n    pixelPosEye.z += instOffset.w *\r\n      (modelViewMatrix[0][2] * p.x +\r\n       modelViewMatrix[1][2] * p.y +\r\n       modelViewMatrix[2][2] * p.z);\r\n    normal = normalize(normalMatrix * p);\r\n    #ifdef NORMALS_TO_G_BUFFER\r\n      viewNormalSprites = normalize(mat3(modelViewMatrix)*p);\r\n    #endif\r\n  }\r\n\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  vec3 normal;\r\n  vec3 viewNormalSprites;\r\n  float cylinderY = 0.0;\r\n\r\n    // ray-trace cylinder surface\r\n    {\r\n      vec3 p;\r\n      if (get_cylinder_point(-vViewPosition, p) < 0.0) discard;\r\n\r\n      cylinderY = 0.5 * (p.y + 1.0);\r\n\r\n      vec4 v = vec4(p, 1.0);\r\n      v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);\r\n      pixelPosWorld = modelMatrix * v;\r\n      pixelPosEye = modelViewMatrix * v;\r\n\r\n      vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));\r\n      normal = vec3(\r\n        dot(localNormal, matVec1.xyz),\r\n        dot(localNormal, matVec2.xyz),\r\n        dot(localNormal, matVec3.xyz));\r\n      #ifdef NORMALS_TO_G_BUFFER\r\n        viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);\r\n      #endif\r\n      normal = normalize(normalMatrix * normal);\r\n    }\r\n#endif\r\n\r\n  #ifdef ATTR_COLOR\r\n    vec3 vertexColor = vColor;\r\n  #else\r\n    vec3 vertexColor = vec3(1.0, 1.0, 1.0);\r\n  #endif\r\n\r\n  #ifdef ATTR_COLOR2\r\n    #ifdef CYLINDER_SPRITE\r\n      float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing\r\n    #else\r\n      float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord\r\n    #endif\r\n      // choose either color or color2\r\n    vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));\r\n  #endif\r\n\r\n  // negative red component is a special condition\r\n  if (vertexColor.x < 0.0) discard;\r\n\r\n  #ifdef DASHED_LINE\r\n    if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;\r\n  #endif\r\n\r\n  // transparency prepass writes only z, so we don't need to calc the color\r\n  #ifdef PREPASS_TRANSP\r\n    fragColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n    #endif\r\n    return;\r\n  #endif\r\n\r\n    float totalOpacity = opacity;\r\n\r\n  #ifdef ATTR_ALPHA_COLOR\r\n    totalOpacity *= alphaCol;\r\n  #endif\r\n\r\n  // discard fully transparent pixels\r\n  if (totalOpacity == 0.0) discard;\r\n\r\n  #ifdef FAKE_OPACITY\r\n    // discard pixels in checker pattern\r\n    vec2 dm_coord = floor(gl_FragCoord.xy);\r\n    dm_coord = fract(dm_coord * 0.5);\r\n    if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;\r\n    vec4 diffuseColor = vec4(diffuse, 1.0);\r\n  #else\r\n    vec4 diffuseColor = vec4(diffuse, totalOpacity);\r\n  #endif\r\n\r\n  float flipNormal;\r\n  #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n    flipNormal = 1.0;\r\n    #ifdef DOUBLE_SIDED\r\n      flipNormal = float( gl_FrontFacing );\r\n    #endif\r\n    vec3 normal = normalize( vNormal ) * flipNormal;\r\n  #endif\r\n\r\n    diffuseColor.rgb *= vertexColor;\r\n\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n  #endif\r\n\r\n  #ifdef NORMALS_TO_G_BUFFER\r\n    #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)\r\n      vec3 viewNormaInColor = viewNormalSprites;\r\n      float frontFaced = 1.0;\r\n    #else\r\n      vec3 viewNormaInColor = viewNormal;\r\n      float frontFaced = float( gl_FrontFacing );\r\n    #endif\r\n    // [-1, 1] -> [0, 1]\r\n    viewNormaInColor = 0.5 * viewNormaInColor + 0.5;\r\n    gl_FragData[1] = vec4(viewNormaInColor, frontFaced);\r\n  #endif\r\n\r\n  #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n    GeometricContext geometry = GeometricContext(normal, normalize( vViewPosition ));\r\n    BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);\r\n    vec3 outgoingLight = calcLighting(geometry, material, vViewPosition);\r\n  #else\r\n    vec3 outgoingLight = diffuseColor.rgb;\r\n  #endif\r\n\r\n  #ifdef COLOR_FROM_DEPTH\r\n    float depth = 0.0;\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n      depth = gl_FragDepthEXT;\r\n    #else\r\n      depth = gl_FragCoord.z;\r\n    #endif\r\n    fragColor = packDepthToRGBA(depth);\r\n    return;\r\n  #endif\r\n\r\n  #ifdef COLOR_FROM_POS\r\n    fragColor = world2colorMatrix * pixelPosWorld;\r\n  #else\r\n    #ifdef OVERRIDE_COLOR\r\n      fragColor = vec4(fixedColor, diffuseColor.a);\r\n    #else\r\n      fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);\r\n    #endif\r\n\r\n    #ifdef USE_FOG\r\n      float viewDistance;\r\n      #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n        viewDistance = abs(pixelPosEye.z);\r\n      #else\r\n        viewDistance = vViewPosition.z;\r\n      #endif\r\n      float fogFactor = smoothstep( fogNear, fogFar, viewDistance) * fogAlpha;\r\n      #ifdef FOG_TRANSPARENT\r\n        fragColor.a = fragColor.a * (1.0 - fogFactor);\r\n      #else\r\n        fragColor.rgb = mix( fragColor.rgb, fogColor, fogFactor );\r\n      #endif\r\n    #endif\r\n\r\n  #endif\r\n}\r\n";
+  var fragmentShader = "#if defined (NORMALS_TO_G_BUFFER)\r\n  #define fragColor gl_FragData[0]\r\n#else\r\n  #define fragColor gl_FragColor\r\n#endif\r\n\r\n#ifdef ATTR_ALPHA_COLOR\r\n  varying float alphaCol;\r\n#endif\r\n\r\n#ifdef COLOR_FROM_POS\r\n  uniform mat4 world2colorMatrix;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n\t#if NUM_DIR_LIGHTS > 0\r\n\t\tuniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];\r\n    uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ]; //only for sprites\r\n\t\tvarying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];\r\n\t\tvarying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];\r\n    vec4 vDirLightWorldCoord[ NUM_DIR_LIGHTS ];\r\n    vec3 vDirLightWorldNormal[ NUM_DIR_LIGHTS ];\r\n\r\n    #ifdef SHADOWMAP_PCF_RAND\r\n      // We use 4 instead uniform variable or define because this value is used in for(... i < value; ...) with\r\n      // unroll_loop and unroll_loop has pattern:\r\n      // /#pragma unroll_loop[\\s]+?for \\( int i \\= (\\d+)\\; i < (\\d+)\\; i \\+\\+ \\) \\{([\\s\\S]+?)(?=\\})\\}/g\r\n      uniform vec2 samplesKernel[4]; // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n      uniform sampler2D noiseTex;\r\n      uniform vec2 noiseTexelSize;\r\n      uniform vec2 srcTexelSize;\r\n      uniform mat4 projectionMatrix;\r\n    #endif\r\n\t#endif\r\n#endif\r\n\r\n#ifdef ATTR_COLOR\r\n  varying vec3 vColor;\r\n#endif\r\n\r\n#ifdef ATTR_COLOR2\r\n  varying vec3 vColor2;\r\n  #ifndef CYLINDER_SPRITE\r\n    varying vec2 vUv;\r\n  #endif\r\n#endif\r\n\r\nuniform vec3 diffuse;\r\nuniform vec3 emissive;\r\nuniform vec3 specular;\r\nuniform float shininess;\r\nuniform vec3 fixedColor;\r\nuniform float opacity;\r\nuniform float zClipValue;\r\nuniform float clipPlaneValue;\r\n\r\n#ifdef NORMALS_TO_G_BUFFER\r\n  varying vec3 viewNormal;\r\n#endif\r\n\r\n#define PI 3.14159265359\r\n#define RECIPROCAL_PI 0.31830988618\r\n#define saturate(a) clamp( a, 0.0, 1.0 )\r\n\r\n#ifdef USE_FOG\r\n  uniform vec3 fogColor;\r\n  uniform float fogAlpha;\r\n  uniform float fogNear;\r\n  uniform float fogFar;\r\n#endif\r\n\r\nvarying vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)\r\nvarying vec3 vViewPosition;\r\n\r\n#if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n  varying vec3 vNormal;\r\n#endif\r\n\r\n/////////////////////////////////////////// ZSprites ////////////////////////////////////////////////\r\n#if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)\r\n  uniform float nearPlaneValue;\r\n#endif\r\n\r\n#ifdef SPHERE_SPRITE\r\n  varying vec4 spritePosEye;\r\n#endif\r\n\r\n#if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n  uniform float zOffset;\r\n\r\n  #if !defined(SHADOWMAP_PCF_RAND)\r\n    uniform mat4 projectionMatrix;\r\n  #endif\r\n\r\n  float calcDepthForSprites(vec4 pixelPosEye, float zOffset, mat4 projMatrix) {\r\n    vec4 pixelPosScreen = projMatrix * pixelPosEye;\r\n    return 0.5 * (pixelPosScreen.z / pixelPosScreen.w + 1.0) + zOffset;\r\n  }\r\n#endif\r\n\r\n#ifdef SPHERE_SPRITE\r\n  varying vec4 instOffset;\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n\r\n\r\n  bool intersect_ray_sphere(in vec3 origin, in vec3 ray, out vec3 point, out float frontFaced) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray, ray);\r\n    float b = dot(ray, origin);\r\n    float c = dot(origin, origin) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return false;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    // choose nearest point inside frustum\r\n    #ifdef ORTHOGRAPHIC_CAMERA\r\n      // orthografic camera is used for dirLight sources. So in it for all spheres the point with smaller 't' is visible\r\n      // t1 is always smaller than t2 (from calculations)\r\n      point = p1;\r\n      frontFaced = 1.0;\r\n      return true;\r\n    #else\r\n      // for perspective camera first intersection can be in front of near plane. If not intersection is p1 else - p2\r\n      // t* = 0.0 corresponds to point of intersection near plane by the ray from camera to curPixel\r\n      if (t1 >= 0.0) {\r\n        point = p1;\r\n        frontFaced = 1.0;\r\n        return true;\r\n      }\r\n      if (t2 >= 0.0) {\r\n        point = p2;\r\n        frontFaced = -1.0;\r\n        return true;\r\n      }\r\n    #endif\r\n\r\n    return false;\r\n  }\r\n\r\n  bool get_sphere_point(in vec3 pixelPosEye, out vec3 point, out float frontFaced) {\r\n    vec3 origin, ray;\r\n\r\n    #ifdef ORTHOGRAPHIC_CAMERA\r\n      // transform vector from sprite center to curPixel into sphere local coords\r\n      origin = pixelPosEye.xyz - spritePosEye.xyz;\r\n      origin = (invModelViewMatrix * vec4(origin, 0.0)).xyz / instOffset.w;\r\n\r\n      // transform camera orientation vector into sphere local coords\r\n      ray = (invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0)).xyz;\r\n    #else\r\n      // find point of intersection near plane by the ray from camera to curPixel\r\n      vec4 v = vec4(-(nearPlaneValue / pixelPosEye.z) * pixelPosEye, 1.0);\r\n\r\n      // transform intersection point into sphere local coords\r\n      v = invModelViewMatrix * v;\r\n      origin = (v.xyz - instOffset.xyz) / instOffset.w;\r\n\r\n      // transform vector from camera pos to curPixel into sphere local coords\r\n      ray = (invModelViewMatrix * vec4(pixelPosEye, 0.0)).xyz;\r\n    #endif\r\n    ray = normalize(ray);\r\n\r\n    return intersect_ray_sphere(origin, ray, point, frontFaced);\r\n  }\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  varying vec4 matVec1;\r\n  varying vec4 matVec2;\r\n  varying vec4 matVec3;\r\n  varying vec4 invmatVec1;\r\n  varying vec4 invmatVec2;\r\n  varying vec4 invmatVec3;\r\n\r\n  uniform mat4 modelMatrix;\r\n  uniform mat4 modelViewMatrix;\r\n  uniform mat4 invModelViewMatrix;\r\n  uniform mat3 normalMatrix;\r\n\r\n  varying vec4 spritePosEye;\r\n\r\n  bool intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point, out float frontFaced) {\r\n\r\n    // intersect XZ-projected ray with circle\r\n    float a = dot(ray.xz, ray.xz);\r\n    float b = dot(ray.xz, origin.xz);\r\n    float c = dot(origin.xz, origin.xz) - 1.0;\r\n    float det = b * b - a * c;\r\n    if (det < 0.0) return false;\r\n    float t1 = (-b - sqrt(det)) / a;\r\n    float t2 = (-b + sqrt(det)) / a;\r\n\r\n    // calculate both intersection points\r\n    vec3 p1 = origin + ray * t1;\r\n    vec3 p2 = origin + ray * t2;\r\n\r\n    float halfHeight = 0.5;\r\n\r\n    // choose nearest point\r\n    #ifdef ORTHOGRAPHIC_CAMERA\r\n      // orthografic camera is used for dirLight sources. So in it for all cylinders the point with smaller 't' is visible\r\n      // if it is not outside of cylinnder (t1 is always smaller than t2).\r\n      if (p1.y >= -halfHeight && p1.y <= halfHeight) {\r\n        point = p1;\r\n        frontFaced = 1.0;\r\n        return true;\r\n      }\r\n      if (p2.y >= -halfHeight && p2.y <= halfHeight) {\r\n        point = p2;\r\n        frontFaced = -1.0;\r\n        return true;\r\n      }\r\n    #else\r\n      // for perspective camera first intersection can be in front of near plane. If not intersection is p1 else - p2\r\n      // t* = 0.0 corresponds to point of intersection near plane by the ray from camera to curPixel\r\n      if (t1 >= 0.0 && p1.y >= -halfHeight && p1.y <= halfHeight) {\r\n        point = p1;\r\n        frontFaced = 1.0;\r\n        return true;\r\n      }\r\n      if (t2 >= 0.0 && p2.y >= -halfHeight && p2.y <= halfHeight) {\r\n        point = p2;\r\n        frontFaced = -1.0;\r\n        return true;\r\n      }\r\n    #endif\r\n\r\n    return false;\r\n  }\r\n\r\n  bool get_cylinder_point(in vec3 pixelPosEye, out vec3 point, out float frontFaced) {\r\n    vec3 origin, ray;\r\n    vec4 v;\r\n\r\n    #ifdef ORTHOGRAPHIC_CAMERA\r\n      // transform vector from sprite center to curPixel into cylinder local coords\r\n      v = invModelViewMatrix * vec4(pixelPosEye.xyz - spritePosEye.xyz, 0.0);\r\n      origin = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));\r\n\r\n      // transform camera orientation vector into cylinder local coords\r\n      v = invModelViewMatrix * vec4(0.0, 0.0, -1.0, 0.0);\r\n      ray = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));\r\n    #else\r\n      // find point of intersection near plane by the ray from camera to curPixel\r\n      v = vec4(-(nearPlaneValue / pixelPosEye.z) * pixelPosEye, 1.0);\r\n\r\n      // transform intersection point into cylinder local coords\r\n      v = invModelViewMatrix * v;\r\n      origin = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));\r\n\r\n      // transform vector from camera pos to curPixel into cylinder local coords\r\n      v = invModelViewMatrix * vec4(pixelPosEye, 0.0);\r\n      ray = vec3(dot(v, invmatVec1), dot(v, invmatVec2), dot(v, invmatVec3));\r\n    #endif\r\n    ray = normalize(ray);\r\n\r\n    return intersect_ray_cylinder(origin, ray, point, frontFaced);\r\n  }\r\n#endif\r\n\r\n///////////////////////////////////// Pack and unpack ///////////////////////////////////////////////\r\nconst float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)\r\nconst float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)\r\n\r\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );\r\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\r\n\r\n\r\nconst float ShiftRight8 = 1. / 256.;\r\n\r\nvec4 packDepthToRGBA( const in float v ) {\r\n  vec4 r = vec4( fract( v * PackFactors ), v );\r\n  r.yzw -= r.xyz * ShiftRight8; // tidy overflow\r\n  return r * PackUpscale;\r\n}\r\n\r\nfloat unpackRGBAToDepth( const in vec4 v ) {\r\n  return dot( v, UnpackFactors );\r\n}\r\n\r\n////////////////////////////////////////// All Lighting /////////////////////////////////////////////////\r\n#ifdef TOON_SHADING\r\n  #define LOW_TOON_BORDER 0.0\r\n  #define MEDIUM_TOON_BORDER 0.7\r\n  #define HIGH_TOON_BORDER 1.0\r\n\r\n  #define MEDIUM_TOON_RANGE 0.5\r\n  #define HIGH_TOON_RANGE 0.95\r\n#endif\r\n#if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n  struct ReflectedLight {\r\n    vec3 directDiffuse;\r\n    vec3 directSpecular;\r\n    vec3 indirectDiffuse;\r\n  };\r\n\r\n  struct BlinnPhongMaterial {\r\n    vec3  diffuseColor;\r\n    vec3  specularColor;\r\n    float specularShininess;\r\n  };\r\n\r\n  struct GeometricContext {\r\n    vec3 normal;\r\n    vec3 viewDir;\r\n  };\r\n\r\n  struct DirectionalLight {\r\n    vec3 direction;\r\n    vec3 color;\r\n  };\r\n  uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\r\n\r\n  struct DirectionalLightShadow {\r\n     vec2 shadowMapSize;\r\n     float shadowBias;\r\n     float shadowRadius;\r\n   };\r\n  uniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHTS ];\r\n\r\n  uniform vec3 ambientLightColor;\r\n\r\n  /////////////////////////////////////////// Shadowmap ////////////////////////////////////////////////\r\n\r\n  #if defined(SHADOWMAP)\r\n  \tfloat texture2DCompare( sampler2D depths, vec2 uv, float compare ) {\r\n  \t\treturn step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );\r\n  \t}\r\n\r\n    float getShadow( sampler2D shadowMap, DirectionalLightShadow dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {\r\n   \t  float shadow = 0.0;\r\n\r\n      // When shadows for sprites will appear use here for them normals as it done for G-buffer\r\n      shadowCoord.xyz += dirLight.shadowBias * vNormal;\r\n      shadowCoord.xyz /= shadowCoord.w;\r\n\r\n      bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );\r\n      bool inFrustum = all( inFrustumVec );\r\n      bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );\r\n      bool frustumTest = all( frustumTestVec );\r\n\r\n      if ( frustumTest ) {\r\n        #ifdef SHADOWMAP_BASIC\r\n      \t  shadow = texture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z );\r\n      \t#endif\r\n\r\n      \t#ifdef SHADOWMAP_PCF_SHARP\r\n      \t  vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;\r\n\r\n            float dx0 = - texelSize.x * dirLight.shadowRadius;\r\n            float dy0 = - texelSize.y * dirLight.shadowRadius;\r\n            float dx1 = + texelSize.x * dirLight.shadowRadius;\r\n            float dy1 = + texelSize.y * dirLight.shadowRadius;\r\n\r\n            shadow = (\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy, shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +\r\n            \ttexture2DCompare( shadowMap, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )\r\n            ) * ( 1.0 / 9.0 );\r\n        #endif\r\n\r\n        #ifdef SHADOWMAP_PCF_RAND\r\n          vec2 texelSize = vec2( 1.0 ) / dirLight.shadowMapSize;\r\n\r\n          vec4 vUv = ((projectionMatrix * vec4(vViewPosition, 1.0)) + 1.0) / 2.0;\r\n          vec2 vUvNoise = vUv.xy / srcTexelSize * noiseTexelSize;\r\n\r\n          vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);\r\n          mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);\r\n\r\n          vec2 offset;\r\n          #pragma unroll_loop_start\r\n          for ( int i = 0; i < 4; i ++ ) { // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n            offset = mNoise * ( normalize( samplesKernel[ i ]) * texelSize * dirLight.shadowRadius );\r\n            shadow +=  texture2DCompare( shadowMap, shadowCoord.xy + offset, shadowCoord.z );\r\n          }\r\n          #pragma unroll_loop_end\r\n          shadow /= float( 4 ); // 4 is length of _samplesKernel which is defined in UberMaterial.js\r\n        #endif\r\n      }\r\n      return shadow;//(shadow != 1.0) ? 0.5 : 1.0;//vec4(shadow, shadow, shadow, 1.0);\r\n   }\r\n  #endif\r\n\r\n  /////////////////////////////////////////// Lighting /////////////////////////////////////////////////\r\n\r\n  vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {\r\n    return RECIPROCAL_PI * diffuseColor;\r\n  } // validated\r\n\r\n  vec3 F_Schlick( const in vec3 specularColor, const in float dotLH ) {\r\n    // Original approximation by Christophe Schlick '94\r\n    //;float fresnel = pow( 1.0 - dotLH, 5.0 );\r\n    // Optimized variant (presented by Epic at SIGGRAPH '13)\r\n    float fresnel = exp2( ( -5.55473 * dotLH - 6.98316 ) * dotLH );\r\n    return ( 1.0 - specularColor ) * fresnel + specularColor;\r\n  } // validated\r\n\r\n  float G_BlinnPhong_Implicit( /* const in float dotNL, const in float dotNV */ ) {\r\n    // geometry term is (n dot l)(n dot v) / 4(n dot l)(n dot v)\r\n    return 0.25;\r\n  }\r\n\r\n  float D_BlinnPhong( const in float shininess, const in float dotNH ) {\r\n    return RECIPROCAL_PI * ( shininess * 0.5 + 1.0 ) * pow( dotNH, shininess );\r\n  }\r\n\r\n  vec3 BRDF_Specular_BlinnPhong( const in DirectionalLight incidentLight, const in GeometricContext geometry, const in vec3 specularColor, const in float shininess ) {\r\n    vec3 halfDir = normalize( incidentLight.direction + geometry.viewDir );\r\n    float dotNH = saturate(dot( geometry.normal, halfDir ));\r\n    float dotLH = saturate(dot( incidentLight.direction, halfDir ));\r\n\r\n    vec3 F = F_Schlick( specularColor, dotLH );\r\n    float G = G_BlinnPhong_Implicit( /* dotNL, dotNV */ );\r\n    float D = D_BlinnPhong( shininess, dotNH );\r\n\r\n    return F * ( G * D );\r\n  } // validated\r\n\r\n  void RE_Direct_BlinnPhong( const in DirectionalLight directLight, const in GeometricContext geometry, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight, float penumbra ) {\r\n\r\n    float dotNL = saturate( dot( geometry.normal, directLight.direction ));\r\n    #ifdef TOON_SHADING\r\n      if(dotNL < MEDIUM_TOON_RANGE){\r\n        dotNL = LOW_TOON_BORDER;\r\n      }\r\n      else if(dotNL < HIGH_TOON_RANGE){\r\n        dotNL = MEDIUM_TOON_BORDER;\r\n      }\r\n      else{\r\n        dotNL = HIGH_TOON_BORDER;\r\n      }\r\n    #endif\r\n\r\n    vec3 irradiance = dotNL * directLight.color * PI;\r\n    reflectedLight.directDiffuse += penumbra * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n    reflectedLight.directSpecular += penumbra * irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );\r\n  }\r\n\r\n  void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in BlinnPhongMaterial material, inout ReflectedLight reflectedLight ) {\r\n    reflectedLight.indirectDiffuse += irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );\r\n  }\r\n\r\n  vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material, vec3 vViewPosition) {\r\n    ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));\r\n    vec3 irradiance = ambientLightColor * PI;\r\n\r\n    float shadowMask = 1.0;\r\n    // see THREE.WebGLProgram.unrollLoops\r\n  \t#pragma unroll_loop_start\r\n  \t  for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n  \t    #ifdef SHADOWMAP\r\n  \t      shadowMask = getShadow( directionalShadowMap[ i ], directionalLightShadows[ i ], vDirLightWorldCoord[ i ], vViewPosition, vDirLightWorldNormal[ i ] );\r\n        #endif\r\n\r\n  \t\t  if ( shadowMask > 0.0 ) RE_Direct_BlinnPhong( directionalLights[ i ], geometry, material, reflectedLight, shadowMask );\r\n  \t\t}\r\n  \t\t#pragma unroll_loop_end\r\n\r\n    RE_IndirectDiffuse_BlinnPhong(irradiance, material, reflectedLight);\r\n\r\n    return saturate(reflectedLight.indirectDiffuse + reflectedLight.directDiffuse + reflectedLight.directSpecular);\r\n  }\r\n#endif\r\n\r\n/////////////////////////////////////////// Dashed Line ///////////////////////////////////////////////\r\n#ifdef DASHED_LINE\r\n  uniform float dashedLineSize;\r\n  uniform float dashedLinePeriod;\r\n  varying float vLineDistance;\r\n#endif\r\n\r\n/////////////////////////////////////////// Main ///////////////////////////////////////////////\r\nvoid main() {\r\n\r\n#ifdef CLIP_PLANE\r\n  if (vViewPosition.z < clipPlaneValue) discard;\r\n#endif\r\n\r\n#ifdef ZCLIP\r\n  if (vViewPosition.z < zClipValue) discard;\r\n#endif\r\n\r\n#if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n  #if NUM_DIR_LIGHTS > 0\r\n    // see THREE.WebGLProgram.unrollLoops\r\n    #pragma unroll_loop_start\r\n    for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n      vDirLightWorldCoord[ i ] = vDirectionalShadowCoord[ i ];\r\n      vDirLightWorldNormal[ i ] = vDirectionalShadowNormal[ i ];\r\n    }\r\n    #pragma unroll_loop_end\r\n  #endif\r\n#endif\r\n\r\n  vec4 pixelPosWorld = vec4(vWorldPosition, 1.0);\r\n  vec4 pixelPosEye;\r\n\r\n#ifdef SPHERE_SPRITE\r\n\r\n  vec3 viewNormalSprites;\r\n  float frontFaced = 1.0;\r\n  vec3 normal;\r\n\r\n/* quick-and-dirty method\r\n  normal.xy = ' + INSTANCED_SPRITE_OVERSCALE + ' * (2.0 * vUv - 1.0);\r\n  float r2 = dot(normal.xy, normal.xy);\r\n  if (r2 > 1.0) discard;\r\n  float normalZ = sqrt(1.0 - r2);\r\n  normal.z = normalZ;\r\n  normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );\r\n  pixelPosEye = vec4(spritePosEye.xyz, 1.0);\r\n  pixelPosEye.z += spritePosEye.w * normalZ;\r\n*/\r\n\r\n  // ray-trace sphere surface\r\n  {\r\n    vec3 p;\r\n    if (!get_sphere_point(-vViewPosition, p, frontFaced)) discard;\r\n    vec4 v = vec4(instOffset.xyz + p * instOffset.w, 1.0);\r\n    pixelPosWorld = modelMatrix * v;\r\n    pixelPosEye = modelViewMatrix * v;\r\n    normal = normalize(normalMatrix * p);\r\n    #ifdef NORMALS_TO_G_BUFFER\r\n      viewNormalSprites = normalize(mat3(modelViewMatrix)*p);\r\n    #endif\r\n\r\n    #if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n      #if NUM_DIR_LIGHTS > 0\r\n        // see THREE.WebGLProgram.unrollLoops\r\n        #pragma unroll_loop_start\r\n          for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n            vDirLightWorldCoord[ i ] = directionalShadowMatrix[ i ] * pixelPosWorld;\r\n            vDirLightWorldNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(p, 0.0))).xyz;\r\n          }\r\n        #pragma unroll_loop_end\r\n      #endif\r\n    #endif\r\n  }\r\n#endif\r\n\r\n#ifdef CYLINDER_SPRITE\r\n  vec3 normal;\r\n  vec3 viewNormalSprites;\r\n  float frontFaced = 1.0;\r\n  float cylinderY = 0.0;\r\n\r\n  // ray-trace cylinder surface\r\n  {\r\n    vec3 p;\r\n    if (!get_cylinder_point(-vViewPosition, p, frontFaced)) discard;\r\n\r\n    cylinderY = 0.5 * (p.y + 1.0);\r\n\r\n    vec4 v = vec4(p, 1.0);\r\n    v = vec4(dot(v, matVec1), dot(v, matVec2), dot(v, matVec3), 1.0);\r\n    pixelPosWorld = modelMatrix * v;\r\n    pixelPosEye = modelViewMatrix * v;\r\n\r\n    vec3 localNormal = normalize(vec3(p.x, 0.0, p.z));\r\n    normal = vec3(\r\n      dot(localNormal, matVec1.xyz),\r\n      dot(localNormal, matVec2.xyz),\r\n      dot(localNormal, matVec3.xyz));\r\n    #ifdef NORMALS_TO_G_BUFFER\r\n      viewNormalSprites = normalize(mat3(modelViewMatrix)*normal);\r\n    #endif\r\n\r\n    #if defined(USE_LIGHTS) && defined(SHADOWMAP)\r\n      #if NUM_DIR_LIGHTS > 0\r\n        // see THREE.WebGLProgram.unrollLoops\r\n        #pragma unroll_loop_start\r\n          for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\r\n            vDirLightWorldCoord[ i ] = directionalShadowMatrix[ i ] * pixelPosWorld;\r\n            vDirLightWorldNormal[ i ] = (directionalShadowMatrix[ i ] * (modelMatrix * vec4(normal, 0.0))).xyz;\r\n          }\r\n        #pragma unroll_loop_end\r\n      #endif\r\n    #endif\r\n\r\n    normal = normalize(normalMatrix * normal);\r\n  }\r\n#endif\r\n\r\n  #ifdef ATTR_COLOR\r\n    vec3 vertexColor = vColor;\r\n  #else\r\n    vec3 vertexColor = vec3(1.0, 1.0, 1.0);\r\n  #endif\r\n\r\n  #ifdef ATTR_COLOR2\r\n    #ifdef CYLINDER_SPRITE\r\n      float colorCoef = cylinderY; // cylinder parameter is calculated from ray-tracing\r\n    #else\r\n      float colorCoef = vUv.y; // cylinder parameter is interpolated as tex coord\r\n    #endif\r\n      // choose either color or color2\r\n    vertexColor = mix(vColor2, vColor, step(0.5, colorCoef));\r\n  #endif\r\n\r\n  // negative red component is a special condition\r\n  if (vertexColor.x < 0.0) discard;\r\n\r\n  #ifdef DASHED_LINE\r\n    if ( mod( vLineDistance, dashedLinePeriod ) > dashedLineSize ) discard;\r\n  #endif\r\n\r\n  // transparency prepass writes only z, so we don't need to calc the color\r\n  #ifdef PREPASS_TRANSP\r\n    fragColor = vec4(1.0, 1.0, 1.0, 1.0);\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n    #endif\r\n    return;\r\n  #endif\r\n\r\n    float totalOpacity = opacity;\r\n\r\n  #ifdef ATTR_ALPHA_COLOR\r\n    totalOpacity *= alphaCol;\r\n  #endif\r\n\r\n  // discard fully transparent pixels\r\n  if (totalOpacity == 0.0) discard;\r\n\r\n  #ifdef FAKE_OPACITY\r\n    // discard pixels in checker pattern\r\n    vec2 dm_coord = floor(gl_FragCoord.xy);\r\n    dm_coord = fract(dm_coord * 0.5);\r\n    if (totalOpacity < 1.0 && (dm_coord.x < 0.5 ^^ dm_coord.y < 0.5)) discard;\r\n    vec4 diffuseColor = vec4(diffuse, 1.0);\r\n  #else\r\n    vec4 diffuseColor = vec4(diffuse, totalOpacity);\r\n  #endif\r\n\r\n  float flipNormal;\r\n  #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)\r\n    flipNormal = 1.0;\r\n    #ifdef DOUBLE_SIDED\r\n      flipNormal = float( gl_FrontFacing );\r\n    #endif\r\n    vec3 normal = normalize( vNormal ) * flipNormal;\r\n  #endif\r\n\r\n    diffuseColor.rgb *= vertexColor;\r\n\r\n  #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n  #endif\r\n\r\n  #ifdef NORMALS_TO_G_BUFFER\r\n    #if defined (SPHERE_SPRITE) || defined (CYLINDER_SPRITE)\r\n      vec3 viewNormaInColor = viewNormalSprites;\r\n    #else\r\n      vec3 viewNormaInColor = viewNormal;\r\n      float frontFaced = float( gl_FrontFacing );\r\n    #endif\r\n    // [-1, 1] -> [0, 1]\r\n    viewNormaInColor = 0.5 * viewNormaInColor + 0.5;\r\n    gl_FragData[1] = vec4(viewNormaInColor, frontFaced);\r\n  #endif\r\n\r\n  #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0\r\n    vec3 viewDir;\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      viewDir = -pixelPosEye.xyz;\r\n    #else\r\n      viewDir = vViewPosition;\r\n    #endif\r\n    GeometricContext geometry = GeometricContext(normal, normalize( viewDir ));\r\n    BlinnPhongMaterial material = BlinnPhongMaterial(diffuseColor.rgb, specular, shininess);\r\n    vec3 outgoingLight = calcLighting(geometry, material, viewDir);\r\n  #else\r\n    vec3 outgoingLight = diffuseColor.rgb;\r\n  #endif\r\n\r\n  #ifdef COLOR_FROM_DEPTH\r\n    float depth = 0.0;\r\n    #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);\r\n      depth = gl_FragDepthEXT;\r\n    #else\r\n      depth = gl_FragCoord.z;\r\n    #endif\r\n    fragColor = packDepthToRGBA(depth);\r\n    return;\r\n  #endif\r\n\r\n  #ifdef COLOR_FROM_POS\r\n    fragColor = world2colorMatrix * pixelPosWorld;\r\n  #else\r\n    #ifdef OVERRIDE_COLOR\r\n      fragColor = vec4(fixedColor, diffuseColor.a);\r\n    #else\r\n      fragColor = vec4(outgoingLight, diffuseColor.a);//vec4(vNormal, 1.0);\r\n    #endif\r\n\r\n    #ifdef USE_FOG\r\n      float viewDistance;\r\n      #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)\r\n        viewDistance = abs(pixelPosEye.z);\r\n      #else\r\n        viewDistance = vViewPosition.z;\r\n      #endif\r\n      float fogFactor = smoothstep( fogNear, fogFar, viewDistance) * fogAlpha;\r\n      #ifdef FOG_TRANSPARENT\r\n        fragColor.a = fragColor.a * (1.0 - fogFactor);\r\n      #else\r\n        fragColor.rgb = mix( fragColor.rgb, fogColor, fogFactor );\r\n      #endif\r\n    #endif\r\n\r\n  #endif\r\n}\r\n";
 
   var capabilities = {
     precision: 'mediump',
@@ -10400,6 +10462,10 @@
     clipPlaneValue: {
       type: 'f',
       value: 0.0
+    },
+    nearPlaneValue: {
+      type: 'f',
+      value: -0.5
     },
     invModelViewMatrix: {
       type: '4fv',
@@ -10486,7 +10552,9 @@
 
     this.shadowmapType = 'random'; // used to render pixel view deph
 
-    this.colorFromDepth = false; // used to render dashed line
+    this.colorFromDepth = false; // mark that rendering is for orthographic camera
+
+    this.orthoCam = false; // used to render dashed line
 
     this.dashedLine = false; // mark as transparent
 
@@ -10602,6 +10670,7 @@
     this.shadowmap = source.shadowmap;
     this.shadowmapType = source.shadowmapType;
     this.colorFromDepth = source.colorFromDepth;
+    this.orthoCam = source.orthoCam;
     this.prepassTransparancy = source.prepassTransparancy;
     this.dashedLine = source.dashedLine;
     this.thickLine = source.thickLine;
@@ -10705,6 +10774,10 @@
       defines.COLOR_FROM_DEPTH = 1;
     }
 
+    if (this.orthoCam) {
+      defines.ORTHOGRAPHIC_CAMERA = 1;
+    }
+
     if (this.prepassTransparancy) {
       defines.PREPASS_TRANSP = 1;
     }
@@ -10774,6 +10847,9 @@
     });
   };
 
+  function _createSuper$b(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$c()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$c() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var LAYERS = {
     DEFAULT: 0,
     VOLUME: 1,
@@ -10888,6 +10964,8 @@
   var ScreenQuadMaterial = /*#__PURE__*/function (_THREE$RawShaderMater) {
     inherits(ScreenQuadMaterial, _THREE$RawShaderMater);
 
+    var _super = _createSuper$b(ScreenQuadMaterial);
+
     function ScreenQuadMaterial(params) {
       classCallCheck(this, ScreenQuadMaterial);
 
@@ -10903,7 +10981,7 @@
       params.transparent = false;
       params.depthTest = false;
       params.depthWrite = false;
-      return possibleConstructorReturn(this, getPrototypeOf(ScreenQuadMaterial).call(this, params));
+      return _super.call(this, params);
     }
 
     return ScreenQuadMaterial;
@@ -10955,7 +11033,7 @@
     if (this.aspect >= 1.0) {
       this.fov = angle;
     } else {
-      this.fov = THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(angle) * 0.5) / this.aspect));
+      this.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(angle) * 0.5) / this.aspect));
     }
   };
   /**
@@ -10982,7 +11060,7 @@
 
 
   THREE.PerspectiveCamera.prototype.setDistanceToFit = function (radius, angle) {
-    this.position.z = radius / Math.sin(0.5 * THREE.Math.degToRad(angle));
+    this.position.z = radius / Math.sin(0.5 * THREE.MathUtils.degToRad(angle));
   };
   /**
    * @param {RCGroup} gfxObj - All objects on scene.
@@ -11253,6 +11331,32 @@
     return meshes;
   }
 
+  function addDescribedMesh(mesh, matValues, layer) {
+    // copy of geometry with described material values
+    var material = mesh.material.createInstance();
+    material.setValues(matValues);
+    var newMesh = new mesh.constructor(mesh.geometry, material);
+    newMesh.material.needsUpdate = true;
+    newMesh.applyMatrix4(mesh.matrix);
+    newMesh.layers.set(layer);
+    mesh.parent.add(newMesh);
+    return newMesh;
+  }
+
+  function traverseMeshes(root, meshTypes, func) {
+    var meshes = _getMeshesArr(root, meshTypes);
+
+    for (var i = 0, n = meshes.length; i < n; ++i) {
+      var mesh = meshes[i];
+
+      if (!mesh.parent) {
+        continue;
+      }
+
+      func(mesh);
+    }
+  }
+
   function applyTransformsToMeshes(root, mtc) {
     var mtcCount = mtc.length;
 
@@ -11260,70 +11364,63 @@
       return;
     }
 
-    var meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments, THREE.Line]);
-
-    for (var i = 0, n = meshes.length; i < n; ++i) {
-      var mesh = meshes[i];
-      var parent = mesh.parent;
-
-      if (!parent) {
-        continue;
-      }
-
-      mesh.applyMatrix(mtc[0]);
+    var meshTypes = [THREE.Mesh, THREE.LineSegments, THREE.Line];
+    traverseMeshes(root, meshTypes, function (mesh) {
+      mesh.applyMatrix4(mtc[0]);
 
       for (var j = 1; j < mtcCount; ++j) {
         var newMesh = new mesh.constructor(mesh.geometry, mesh.material);
-        parent.add(newMesh);
-        newMesh.applyMatrix(mtc[j]);
+        mesh.parent.add(newMesh);
+        newMesh.applyMatrix4(mtc[j]);
       }
-    }
+    });
   }
+
+  var valueTransp = {
+    prepassTransparancy: true,
+    fakeOpacity: false,
+    transparent: false,
+    colorFromDepth: false,
+    lights: false,
+    shadowmap: false,
+    fog: false
+  };
+  var valueColor = {
+    colorFromPos: true,
+    transparent: false,
+    colorFromDepth: false,
+    lights: false,
+    shadowmap: false,
+    fog: false,
+    overrideColor: false,
+    fogTransparent: false,
+    attrColor: false,
+    attrColor2: false,
+    attrAlphaColor: false,
+    fakeOpacity: false
+  };
+  var valueShadow = {
+    colorFromDepth: true,
+    orthoCam: true,
+    lights: false,
+    shadowmap: false,
+    fog: false
+  };
 
   function processTransparentMaterial(root, material) {
     if (!(material instanceof UberMaterial)) {
       return;
     }
 
-    var meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
-
-    var _loop = function _loop(i, n) {
-      var mesh = meshes[i];
-      var parent = mesh.parent;
-
-      if (!parent) {
-        return "continue";
-      }
-
+    traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], function (mesh) {
       mesh.material.setValues({
         prepassTransparancy: false,
         fakeOpacity: false
       });
       mesh.material.needsUpdate = true;
-      mesh.layers.set(LAYERS.TRANSPARENT); // copy of geometry with prepass material
-
-      var prepassMat = mesh.material.createInstance();
-      prepassMat.setValues({
-        prepassTransparancy: true,
-        fakeOpacity: false
-      });
-      var prepassMesh = new mesh.constructor(mesh.geometry, prepassMat);
-
-      _.forEach(['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog'], function (value) {
-        prepassMesh.material[value] = false;
-      });
-
-      prepassMesh.material.needsUpdate = true;
-      prepassMesh.applyMatrix(mesh.matrix);
-      prepassMesh.layers.set(LAYERS.PREPASS_TRANSPARENT);
-      parent.add(prepassMesh);
-    };
-
-    for (var i = 0, n = meshes.length; i < n; ++i) {
-      var _ret = _loop(i);
-
-      if (_ret === "continue") continue;
-    }
+      mesh.layers.set(LAYERS.TRANSPARENT);
+      addDescribedMesh(mesh, valueTransp, LAYERS.PREPASS_TRANSPARENT);
+    });
   }
 
   function processColFromPosMaterial(root, material) {
@@ -11331,38 +11428,9 @@
       return;
     }
 
-    var meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
-
-    var _loop2 = function _loop2(i, n) {
-      var mesh = meshes[i];
-      var parent = mesh.parent;
-
-      if (!parent) {
-        return "continue";
-      } // copy of geometry with colFromPosMat material
-
-
-      var colFromPosMat = mesh.material.createInstance();
-      colFromPosMat.setValues({
-        colorFromPos: true
-      });
-      var colFromPosMesh = new mesh.constructor(mesh.geometry, colFromPosMat);
-
-      _.forEach(['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog', 'overrideColor', 'fogTransparent', 'attrColor', 'attrColor2', 'attrAlphaColor', 'fakeOpacity'], function (value) {
-        colFromPosMesh.material[value] = false;
-      });
-
-      colFromPosMesh.material.needsUpdate = true;
-      colFromPosMesh.applyMatrix(mesh.matrix);
-      colFromPosMesh.layers.set(LAYERS.COLOR_FROM_POSITION);
-      parent.add(colFromPosMesh);
-    };
-
-    for (var i = 0, n = meshes.length; i < n; ++i) {
-      var _ret2 = _loop2(i);
-
-      if (_ret2 === "continue") continue;
-    }
+    traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], function (mesh) {
+      addDescribedMesh(mesh, valueColor, LAYERS.COLOR_FROM_POSITION);
+    });
   }
 
   function createShadowmapMaterial(root, material) {
@@ -11370,11 +11438,7 @@
       return;
     }
 
-    var meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
-
-    var _loop3 = function _loop3(i, n) {
-      var mesh = meshes[i];
-
+    traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], function (mesh) {
       if (!mesh.receiveShadow && mesh.material.shadowmap) {
         // remove shadow from non-receivers
         mesh.material.setValues({
@@ -11384,39 +11448,17 @@
 
       if (!mesh.castShadow) {
         // skip creating shadowmap meshes for non-casters
-        return "continue";
-      } // create special mesh for shadowmap
+        return;
+      }
 
+      if (!belongToSelectLayers(mesh)) {
+        // skip creating shadowmap meshes for selection layer
+        return;
+      }
 
-      var parent = mesh.parent;
-
-      if (!parent) {
-        return "continue";
-      } // copy of geometry with shadowmap material
-
-
-      var shadowmapMat = mesh.material.createInstance();
-      shadowmapMat.setValues({
-        colorFromDepth: true
-      });
-      var shadowmapMesh = new mesh.constructor(mesh.geometry, shadowmapMat);
-
-      _.forEach(['lights', 'shadowmap', 'fog'], function (value) {
-        shadowmapMesh.material[value] = false;
-      });
-
-      shadowmapMesh.isShadowmapMesh = true;
-      shadowmapMesh.material.needsUpdate = true;
-      shadowmapMesh.applyMatrix(mesh.matrix);
-      shadowmapMesh.layers.set(LAYERS.SHADOWMAP);
-      parent.add(shadowmapMesh);
-    };
-
-    for (var i = 0, n = meshes.length; i < n; ++i) {
-      var _ret3 = _loop3(i);
-
-      if (_ret3 === "continue") continue;
-    }
+      var shadowmapMesh = addDescribedMesh(mesh, valueShadow, LAYERS.SHADOWMAP);
+      shadowmapMesh.isShadowmapMesh = true; // mesh.parent.add(shadowmapMesh);
+    });
   }
 
   function removeShadowmapMaterial(root, material) {
@@ -11424,15 +11466,11 @@
       return;
     }
 
-    var meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
-
-    for (var i = 0, n = meshes.length; i < n; ++i) {
-      var mesh = meshes[i];
-
-      if (mesh.isShadowmapMesh && mesh.parent) {
+    traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], function (mesh) {
+      if (mesh.isShadowmapMesh) {
         mesh.parent.remove(mesh);
       }
-    }
+    });
   }
 
   function processObjRenderOrder(root, idMaterial) {
@@ -11465,7 +11503,9 @@
         node.material.setValues({
           depthFunc: THREE.LessEqualDepth,
           overrideColor: true,
-          fog: false
+          fog: false,
+          lights: false,
+          shadowmap: false
         });
         node.material.setUberOptions({
           fixedColor: new THREE.Color(0xFFFF00),
@@ -11507,59 +11547,72 @@
     LAYERS: LAYERS
   };
 
+  function _createSuper$c(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$d()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$d() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var _defaultBoundaries = {
     boundingBox: new THREE.Box3(new THREE.Vector3(-1, -1, -1), new THREE.Vector3(1, 1, 1)),
     boundingSphere: new THREE.Sphere(new THREE.Vector3(0, 0, 0), 1)
   };
 
-  function Visual(name, dataSource) {
-    gfxutils.RCGroup.call(this);
-    this.name = name;
-    this._dataSource = dataSource;
-  }
+  var Visual = /*#__PURE__*/function (_gfxutils$RCGroup) {
+    inherits(Visual, _gfxutils$RCGroup);
 
-  utils.deriveClass(Visual, gfxutils.RCGroup);
+    var _super = _createSuper$c(Visual);
 
-  Visual.prototype.release = function () {
-    if (this.parent) {
-      this.parent.remove(this);
+    function Visual(name, dataSource) {
+      var _this;
+
+      classCallCheck(this, Visual);
+
+      _this = _super.call(this, name, dataSource);
+      _this.name = name;
+      _this._dataSource = dataSource;
+      return _this;
     }
-  };
 
-  Visual.prototype.getDataSource = function () {
-    return this._dataSource;
-  };
+    createClass(Visual, [{
+      key: "release",
+      value: function release() {
+        if (this.parent) {
+          this.parent.remove(this);
+        }
+      }
+    }, {
+      key: "getDataSource",
+      value: function getDataSource() {
+        return this._dataSource;
+      }
+    }, {
+      key: "getBoundaries",
+      value: function getBoundaries() {
+        return _defaultBoundaries;
+      }
+    }]);
 
-  Visual.prototype.getBoundaries = function () {
-    return _defaultBoundaries;
-  };
+    return Visual;
+  }(gfxutils.RCGroup);
 
   function _arrayWithoutHoles(arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
-        arr2[i] = arr[i];
-      }
-
-      return arr2;
-    }
+    if (Array.isArray(arr)) return arrayLikeToArray(arr);
   }
 
   var arrayWithoutHoles = _arrayWithoutHoles;
 
   function _iterableToArray(iter) {
-    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
   }
 
   var iterableToArray = _iterableToArray;
 
   function _nonIterableSpread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance");
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
   var nonIterableSpread = _nonIterableSpread;
 
   function _toConsumableArray(arr) {
-    return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
+    return arrayWithoutHoles(arr) || iterableToArray(arr) || unsupportedIterableToArray(arr) || nonIterableSpread();
   }
 
   var toConsumableArray = _toConsumableArray;
@@ -11814,6 +11867,10 @@
     });
   }
 
+  function _createSuper$d(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$e()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$e() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var CollisionSphere = /*#__PURE__*/function () {
     function CollisionSphere(position, radius) {
       classCallCheck(this, CollisionSphere);
@@ -11846,94 +11903,96 @@
   defineProperty(CollisionSphere, "_sphere", new THREE.Sphere());
 
   var SphereCollisionGeo = function SphereCollisionGeo(base) {
-    return (/*#__PURE__*/function (_base) {
-        inherits(_class, _base);
+    return /*#__PURE__*/function (_base) {
+      inherits(_class, _base);
 
-        function _class(count) {
-          var _getPrototypeOf2;
+      var _super = _createSuper$d(_class);
 
-          var _this;
+      function _class(count) {
+        var _this;
 
-          classCallCheck(this, _class);
+        classCallCheck(this, _class);
 
-          for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-            args[_key - 1] = arguments[_key];
-          }
-
-          _this = possibleConstructorReturn(this, (_getPrototypeOf2 = getPrototypeOf(_class)).call.apply(_getPrototypeOf2, [this].concat(args)));
-          _this._objects = new Array(count);
-          _this.boundingSphere = null;
-          _this.boundingBox = null;
-          return _this;
+        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
         }
 
-        createClass(_class, [{
-          key: "setSphere",
-          value: function setSphere(idx, position, radius) {
-            this._objects[idx] = new CollisionSphere(position, radius);
-          }
-        }, {
-          key: "raycast",
-          value: function raycast(raycaster, intersects) {
-            // TODO raycast with bounding sphere? How to deal with updates?
-            for (var i = 0, n = this._objects.length; i < n; ++i) {
-              var inters = this._objects[i].raycast(raycaster);
+        _this = _super.call.apply(_super, [this].concat(args));
+        _this._objects = new Array(count);
+        _this.boundingSphere = null;
+        _this.boundingBox = null;
+        return _this;
+      }
 
-              if (inters) {
-                inters.chunkIdx = i;
-                intersects.push(inters);
-              }
+      createClass(_class, [{
+        key: "setSphere",
+        value: function setSphere(idx, position, radius) {
+          this._objects[idx] = new CollisionSphere(position, radius);
+        }
+      }, {
+        key: "raycast",
+        value: function raycast(raycaster, intersects) {
+          // TODO raycast with bounding sphere? How to deal with updates?
+          for (var i = 0, n = this._objects.length; i < n; ++i) {
+            var inters = this._objects[i].raycast(raycaster);
+
+            if (inters) {
+              inters.chunkIdx = i;
+              intersects.push(inters);
             }
           }
-        }, {
-          key: "computeBoundingBox",
-          value: function computeBoundingBox() {
-            var objects = this._objects;
-            var boundingBox = this.boundingBox;
+        }
+      }, {
+        key: "computeBoundingBox",
+        value: function computeBoundingBox() {
+          var objects = this._objects;
+          var boundingBox = this.boundingBox;
 
-            if (boundingBox === null) {
-              this.boundingBox = boundingBox = new THREE.Box3();
-            }
+          if (boundingBox === null) {
+            this.boundingBox = boundingBox = new THREE.Box3();
+          }
 
-            boundingBox.makeEmpty();
+          boundingBox.makeEmpty();
 
-            for (var i = 0, n = objects.length; i < n; ++i) {
-              boundingBox.expandByPoint(objects[i]._position);
+          for (var i = 0, n = objects.length; i < n; ++i) {
+            boundingBox.expandByPoint(objects[i]._position);
+          }
+        }
+      }, {
+        key: "computeBoundingSphere",
+        value: function computeBoundingSphere() {
+          this.computeBoundingBox();
+          var objects = this._objects;
+          var boundingBox = this.boundingBox; // Build bounding sphere
+
+          var radiusSquared = 0.0;
+          var center = new THREE.Vector3();
+          boundingBox.getCenter(center);
+
+          for (var i = 0, n = objects.length; i < n; ++i) {
+            var pos = objects[i]._position;
+            var lengthSquared = center.distanceToSquared(pos);
+
+            if (radiusSquared < lengthSquared) {
+              radiusSquared = lengthSquared;
             }
           }
-        }, {
-          key: "computeBoundingSphere",
-          value: function computeBoundingSphere() {
-            this.computeBoundingBox();
-            var objects = this._objects;
-            var boundingBox = this.boundingBox; // Build bounding sphere
 
-            var radiusSquared = 0.0;
-            var center = new THREE.Vector3();
-            boundingBox.getCenter(center);
-
-            for (var i = 0, n = objects.length; i < n; ++i) {
-              var pos = objects[i]._position;
-              var lengthSquared = center.distanceToSquared(pos);
-
-              if (radiusSquared < lengthSquared) {
-                radiusSquared = lengthSquared;
-              }
-            }
-
-            if (this.boundingSphere === null) {
-              this.boundingSphere = new THREE.Sphere();
-            }
-
-            this.boundingSphere.set(center, Math.sqrt(radiusSquared));
+          if (this.boundingSphere === null) {
+            this.boundingSphere = new THREE.Sphere();
           }
-        }]);
 
-        return _class;
-      }(base)
-    );
+          this.boundingSphere.set(center, Math.sqrt(radiusSquared));
+        }
+      }]);
+
+      return _class;
+    }(base);
   };
 
+  function _createSuper$e(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$f()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$f() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var tmpColor = new THREE.Color();
   var OFFSET_SIZE = 4;
   var COLOR_SIZE = 3;
@@ -11955,12 +12014,14 @@
   var InstancedSpheresGeometry = /*#__PURE__*/function (_SphereCollisionGeo) {
     inherits(InstancedSpheresGeometry, _SphereCollisionGeo);
 
+    var _super = _createSuper$e(InstancedSpheresGeometry);
+
     function InstancedSpheresGeometry(spheresCount, sphereComplexity, useZSprites) {
       var _this;
 
       classCallCheck(this, InstancedSpheresGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(InstancedSpheresGeometry).call(this, spheresCount));
+      _this = _super.call(this, spheresCount);
       _this._sphGeometry = useZSprites ? new THREE.PlaneBufferGeometry(2, 2, 1, 1) : new THREE.SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
 
       _this._init(spheresCount, _this._sphGeometry);
@@ -12041,6 +12102,9 @@
     return InstancedSpheresGeometry;
   }(SphereCollisionGeo(THREE.InstancedBufferGeometry));
 
+  function _createSuper$f(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$g()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$g() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * This class adds raycasting interface to indexed
    * THREE.BufferGeometry.
@@ -12050,10 +12114,12 @@
   var RaycastableBufferGeometry = /*#__PURE__*/function (_THREE$BufferGeometry) {
     inherits(RaycastableBufferGeometry, _THREE$BufferGeometry);
 
+    var _super = _createSuper$f(RaycastableBufferGeometry);
+
     function RaycastableBufferGeometry() {
       classCallCheck(this, RaycastableBufferGeometry);
 
-      return possibleConstructorReturn(this, getPrototypeOf(RaycastableBufferGeometry).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(RaycastableBufferGeometry, [{
@@ -12178,6 +12244,9 @@
 
   defineProperty(RaycastableBufferGeometry, "_intersectionPoint", new THREE.Vector3());
 
+  function _createSuper$g(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$h()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$h() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var MAX_IDC_16BIT = 65535;
   var VEC_SIZE = 3;
   var tmpColor$1 = new THREE.Color();
@@ -12191,12 +12260,14 @@
   var ChunkedObjectsGeometry = /*#__PURE__*/function (_RaycastableBufferGeo) {
     inherits(ChunkedObjectsGeometry, _RaycastableBufferGeo);
 
+    var _super = _createSuper$g(ChunkedObjectsGeometry);
+
     function ChunkedObjectsGeometry(chunkGeo, chunksCount) {
       var _this;
 
       classCallCheck(this, ChunkedObjectsGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ChunkedObjectsGeometry).call(this));
+      _this = _super.call(this);
 
       if (_this.constructor === ChunkedObjectsGeometry) {
         throw new Error('Can not instantiate abstract class!');
@@ -12340,10 +12411,15 @@
     return ChunkedObjectsGeometry;
   }(RaycastableBufferGeometry);
 
+  function _createSuper$h(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$i()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$i() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var VEC_SIZE$1 = 3;
 
   var SimpleSpheresGeometry = /*#__PURE__*/function (_SphereCollisionGeo) {
     inherits(SimpleSpheresGeometry, _SphereCollisionGeo);
+
+    var _super = _createSuper$h(SimpleSpheresGeometry);
 
     function SimpleSpheresGeometry(spheresCount, sphereComplexity) {
       var _this;
@@ -12351,7 +12427,7 @@
       classCallCheck(this, SimpleSpheresGeometry);
 
       var sphGeometry = new THREE.SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
-      _this = possibleConstructorReturn(this, getPrototypeOf(SimpleSpheresGeometry).call(this, spheresCount, sphGeometry, spheresCount));
+      _this = _super.call(this, spheresCount, sphGeometry, spheresCount);
       var normals = _this._normals;
       var geoNormals = sphGeometry.attributes.normal.array;
       var chunkSize = _this._chunkSize;
@@ -12388,6 +12464,9 @@
     return SimpleSpheresGeometry;
   }(SphereCollisionGeo(ChunkedObjectsGeometry));
 
+  function _createSuper$i(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$j()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$j() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var VEC_SIZE$2 = 3;
   var centerPos = new THREE.Vector3();
   var tmpVector = new THREE.Vector3();
@@ -12396,13 +12475,15 @@
   var Simple2CCylindersGeometry = /*#__PURE__*/function (_ChunkedObjectsGeomet) {
     inherits(Simple2CCylindersGeometry, _ChunkedObjectsGeomet);
 
+    var _super = _createSuper$i(Simple2CCylindersGeometry);
+
     function Simple2CCylindersGeometry(instanceCount, polyComplexity) {
       var _this;
 
       classCallCheck(this, Simple2CCylindersGeometry);
 
       var cylGeometry = new THREE.CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, true);
-      _this = possibleConstructorReturn(this, getPrototypeOf(Simple2CCylindersGeometry).call(this, cylGeometry, 2 * instanceCount));
+      _this = _super.call(this, cylGeometry, 2 * instanceCount);
       var chunkSize = _this._chunkSize;
       _this._chunkPos = _this._chunkGeo.attributes.position.array;
       _this._chunkNorms = _this._chunkGeo.attributes.normal.array;
@@ -12472,18 +12553,23 @@
     return Simple2CCylindersGeometry;
   }(ChunkedObjectsGeometry);
 
+  function _createSuper$j(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$k()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$k() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var MAX_POINTS_COUNT_16BIT = 65536;
   var PTS_PER_TRIANGLE = 3;
 
   var CylinderBufferGeometry = /*#__PURE__*/function (_THREE$BufferGeometry) {
     inherits(CylinderBufferGeometry, _THREE$BufferGeometry);
 
+    var _super = _createSuper$j(CylinderBufferGeometry);
+
     function CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded) {
       var _this;
 
       classCallCheck(this, CylinderBufferGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(CylinderBufferGeometry).call(this));
+      _this = _super.call(this);
       var thetaStart = 0;
       var thetaLength = 2 * Math.PI;
       _this.type = 'CylinderBufferGeometry';
@@ -12610,6 +12696,9 @@
     return CylinderBufferGeometry;
   }(THREE.BufferGeometry);
 
+  function _createSuper$k(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$l()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$l() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var tmpColor$2 = new THREE.Color();
   var invMatrix = new THREE.Matrix4();
   var OFFSET_SIZE$1 = 4;
@@ -12684,12 +12773,14 @@
   var Instanced2CCylindersGeometry = /*#__PURE__*/function (_THREE$InstancedBuffe) {
     inherits(Instanced2CCylindersGeometry, _THREE$InstancedBuffe);
 
+    var _super = _createSuper$k(Instanced2CCylindersGeometry);
+
     function Instanced2CCylindersGeometry(instanceCount, polyComplexity, useZSprites, openEnded) {
       var _this;
 
       classCallCheck(this, Instanced2CCylindersGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(Instanced2CCylindersGeometry).call(this));
+      _this = _super.call(this);
       _this._useZSprites = useZSprites;
       _this._cylGeometry = useZSprites ? new THREE.PlaneBufferGeometry(2, 2, 1, 1) : new CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, openEnded);
 
@@ -12857,6 +12948,9 @@
     return Instanced2CCylindersGeometry;
   }(THREE.InstancedBufferGeometry);
 
+  function _createSuper$l(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$m()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$m() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var VEC_SIZE$3 = 3;
   var TRI_SIZE = 3;
   var tmpPrev = new THREE.Vector3();
@@ -12904,6 +12998,8 @@
   var ExtrudedObjectsGeometry = /*#__PURE__*/function (_ChunkedObjectsGeomet) {
     inherits(ExtrudedObjectsGeometry, _ChunkedObjectsGeomet);
 
+    var _super = _createSuper$l(ExtrudedObjectsGeometry);
+
     function ExtrudedObjectsGeometry(shape, ringsCount, chunksCount) {
       var _this;
 
@@ -12911,7 +13007,7 @@
 
       var chunkGeo = _createExtrudedChunkGeometry(shape, ringsCount);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ExtrudedObjectsGeometry).call(this, chunkGeo, chunksCount));
+      _this = _super.call(this, chunkGeo, chunksCount);
       _this._ringsCount = ringsCount;
       var tmpShape = _this._tmpShape = [];
 
@@ -13068,6 +13164,9 @@
     return ExtrudedObjectsGeometry;
   }(ChunkedObjectsGeometry);
 
+  function _createSuper$m(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$n()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$n() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var MAX_IDC_16BIT$1 = 65535;
   var VERTEX_PER_SEGMENT = 4;
   var POS_SIZE = 4;
@@ -13107,12 +13206,14 @@
   var ThickLinesGeometry = /*#__PURE__*/function (_THREE$BufferGeometry) {
     inherits(ThickLinesGeometry, _THREE$BufferGeometry);
 
+    var _super = _createSuper$m(ThickLinesGeometry);
+
     function ThickLinesGeometry(segmentsCount) {
       var _this;
 
       classCallCheck(this, ThickLinesGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ThickLinesGeometry).call(this));
+      _this = _super.call(this);
 
       _this._initVertices(segmentsCount);
 
@@ -13265,6 +13366,9 @@
     return ThickLinesGeometry;
   }(THREE.BufferGeometry);
 
+  function _createSuper$n(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$o()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$o() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * This class represents geometry which consists lines. This can build bounding volumes
    * @constructor
@@ -13275,10 +13379,12 @@
   var LinesGeometry = /*#__PURE__*/function (_BaseLinesGeometry) {
     inherits(LinesGeometry, _BaseLinesGeometry);
 
+    var _super = _createSuper$n(LinesGeometry);
+
     function LinesGeometry() {
       classCallCheck(this, LinesGeometry);
 
-      return possibleConstructorReturn(this, getPrototypeOf(LinesGeometry).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(LinesGeometry, [{
@@ -13343,6 +13449,9 @@
     return LinesGeometry;
   }(ThickLinesGeometry);
 
+  function _createSuper$o(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$p()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$p() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var VEC_SIZE$4 = 3;
   var tmpVector$1 = new THREE.Vector3();
   var normMtx$1 = new THREE.Matrix3();
@@ -13350,13 +13459,15 @@
   var CylinderCollisionGeo = /*#__PURE__*/function (_ChunkedObjectsGeomet) {
     inherits(CylinderCollisionGeo, _ChunkedObjectsGeomet);
 
+    var _super = _createSuper$o(CylinderCollisionGeo);
+
     function CylinderCollisionGeo(instanceCount, polyComplexity) {
       var _this;
 
       classCallCheck(this, CylinderCollisionGeo);
 
       var cylGeometry = new THREE.CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, true);
-      _this = possibleConstructorReturn(this, getPrototypeOf(CylinderCollisionGeo).call(this, cylGeometry, instanceCount));
+      _this = _super.call(this, cylGeometry, instanceCount);
       var chunkSize = _this._chunkSize;
       _this._chunkPos = _this._chunkGeo.attributes.position.array;
       _this._chunkNorms = _this._chunkGeo.attributes.normal.array;
@@ -13399,6 +13510,9 @@
     return CylinderCollisionGeo;
   }(ChunkedObjectsGeometry);
 
+  function _createSuper$p(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$q()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$q() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var COLLISION_RAD = 0.1;
   /**
    * This class represents geometry which consists of separate chunks.
@@ -13416,12 +13530,14 @@
   var ChunkedLinesGeometry = /*#__PURE__*/function (_LinesGeometry) {
     inherits(ChunkedLinesGeometry, _LinesGeometry);
 
+    var _super = _createSuper$p(ChunkedLinesGeometry);
+
     function ChunkedLinesGeometry(chunksCount, segmentsCount, enableCollision) {
       var _this;
 
       classCallCheck(this, ChunkedLinesGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ChunkedLinesGeometry).call(this, chunksCount * segmentsCount));
+      _this = _super.call(this, chunksCount * segmentsCount);
 
       _this._init(segmentsCount);
 
@@ -13550,18 +13666,23 @@
     return ChunkedLinesGeometry;
   }(LinesGeometry);
 
+  function _createSuper$q(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$r()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$r() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var COLLISION_RAD$1 = 0.3;
   var tmpVector$2 = new THREE.Vector3();
 
   var TwoColorLinesGeometry = /*#__PURE__*/function (_LinesGeometry) {
     inherits(TwoColorLinesGeometry, _LinesGeometry);
 
+    var _super = _createSuper$q(TwoColorLinesGeometry);
+
     function TwoColorLinesGeometry(segmentsCount) {
       var _this;
 
       classCallCheck(this, TwoColorLinesGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(TwoColorLinesGeometry).call(this, segmentsCount * 2));
+      _this = _super.call(this, segmentsCount * 2);
 
       _this._init(segmentsCount);
 
@@ -13624,6 +13745,9 @@
     return TwoColorLinesGeometry;
   }(LinesGeometry); // (???)parent = LinesGeometry.prototype;
 
+  function _createSuper$r(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$s()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$s() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var vectors = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, -1)];
   var vecCount = vectors.length;
   var tempPos1 = new THREE.Vector3();
@@ -13632,10 +13756,12 @@
   var CrossGeometry = /*#__PURE__*/function (_SphereCollisionGeo) {
     inherits(CrossGeometry, _SphereCollisionGeo);
 
+    var _super = _createSuper$r(CrossGeometry);
+
     function CrossGeometry(chunksCount) {
       classCallCheck(this, CrossGeometry);
 
-      return possibleConstructorReturn(this, getPrototypeOf(CrossGeometry).call(this, chunksCount, chunksCount, vecCount / 2 | 0, false));
+      return _super.call(this, chunksCount, chunksCount, vecCount / 2 | 0, false);
     }
 
     createClass(CrossGeometry, [{
@@ -13660,6 +13786,9 @@
     return CrossGeometry;
   }(SphereCollisionGeo(ChunkedLinesGeometry));
 
+  function _createSuper$s(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$t()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$t() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var POS_RAD_SIZE = 4;
   var COLOR_SIZE$2 = 3;
   var tmpColor$4 = new THREE.Color();
@@ -13673,12 +13802,14 @@
   var IsoSurfaceGeometry = /*#__PURE__*/function (_RaycastableBufferGeo) {
     inherits(IsoSurfaceGeometry, _RaycastableBufferGeo);
 
+    var _super = _createSuper$s(IsoSurfaceGeometry);
+
     function IsoSurfaceGeometry(spheresCount, opts) {
       var _this;
 
       classCallCheck(this, IsoSurfaceGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(IsoSurfaceGeometry).call(this));
+      _this = _super.call(this);
       _this._opts = opts;
       _this.zClip = _this._opts.zClip;
       _this._posRad = utils.allocateTyped(Float32Array, spheresCount * POS_RAD_SIZE);
@@ -14372,6 +14503,9 @@
 
   defineProperty(IsoSurface, "_normalList", createArray(IsoSurface._arrSize));
 
+  function _createSuper$t(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$u()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$u() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * This is a base class for volumetric maps based isosurface algorithms.
    * @param spheresCount - number of atoms/spheres
@@ -14382,10 +14516,12 @@
   var VolumeSurfaceGeometry = /*#__PURE__*/function (_IsoSurfaceGeometry) {
     inherits(VolumeSurfaceGeometry, _IsoSurfaceGeometry);
 
+    var _super = _createSuper$t(VolumeSurfaceGeometry);
+
     function VolumeSurfaceGeometry() {
       classCallCheck(this, VolumeSurfaceGeometry);
 
-      return possibleConstructorReturn(this, getPrototypeOf(VolumeSurfaceGeometry).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(VolumeSurfaceGeometry, [{
@@ -14511,6 +14647,9 @@
     return VolumeSurfaceGeometry;
   }(IsoSurfaceGeometry);
 
+  function _createSuper$u(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$v()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$v() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Volume$1 = chem.Volume;
   /**
    * This class implements 'quick' isosurface geometry generation algorithm.
@@ -14522,10 +14661,12 @@
   var QuickSurfGeometry = /*#__PURE__*/function (_VolumeSurfaceGeometr) {
     inherits(QuickSurfGeometry, _VolumeSurfaceGeometr);
 
+    var _super = _createSuper$u(QuickSurfGeometry);
+
     function QuickSurfGeometry() {
       classCallCheck(this, QuickSurfGeometry);
 
-      return possibleConstructorReturn(this, getPrototypeOf(QuickSurfGeometry).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(QuickSurfGeometry, [{
@@ -15233,6 +15374,9 @@
     };
   }
 
+  function _createSuper$v(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$w()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$w() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Volume$2 = chem.Volume;
   /**
    * This class implements 'contact' isosurface geometry generation algorithm.
@@ -15244,10 +15388,12 @@
   var ContactSurfaceGeometry = /*#__PURE__*/function (_VolumeSurfaceGeometr) {
     inherits(ContactSurfaceGeometry, _VolumeSurfaceGeometr);
 
+    var _super = _createSuper$v(ContactSurfaceGeometry);
+
     function ContactSurfaceGeometry() {
       classCallCheck(this, ContactSurfaceGeometry);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ContactSurfaceGeometry).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ContactSurfaceGeometry, [{
@@ -15718,6 +15864,9 @@
     return IsoSurfaceGeo;
   }();
 
+  function _createSuper$w(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$x()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$x() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var COLOR_SIZE$3 = 3;
   var HASH_SIZE = 32768;
   var Element$1 = chem.Element;
@@ -15731,10 +15880,12 @@
   var SSIsosurfaceGeometry = /*#__PURE__*/function (_IsoSurfaceGeometry) {
     inherits(SSIsosurfaceGeometry, _IsoSurfaceGeometry);
 
+    var _super = _createSuper$w(SSIsosurfaceGeometry);
+
     function SSIsosurfaceGeometry() {
       classCallCheck(this, SSIsosurfaceGeometry);
 
-      return possibleConstructorReturn(this, getPrototypeOf(SSIsosurfaceGeometry).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(SSIsosurfaceGeometry, [{
@@ -16624,6 +16775,10 @@
     return SSIsosurfaceGeometry;
   }(IsoSurfaceGeometry); // All code below must be erased from every device and each developer's memory
 
+  function _createSuper$x(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$y()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$y() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function createLabel(fieldTxt, className) {
     var text = document.createElement('div');
     text.className = className;
@@ -16656,12 +16811,14 @@
   var LabelsGeometry = /*#__PURE__*/function (_EventDispatcher) {
     inherits(LabelsGeometry, _EventDispatcher);
 
+    var _super = _createSuper$x(LabelsGeometry);
+
     function LabelsGeometry(instanceCount, opts) {
       var _this;
 
       classCallCheck(this, LabelsGeometry);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(LabelsGeometry).call(this));
+      _this = _super.call(this);
       _this._opts = opts;
       _this.items = [];
       _this.needsUpdate = false;
@@ -16765,13 +16922,16 @@
     LabelsGeometry: LabelsGeometry
   };
 
+  function _createSuper$y(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$z()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$z() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   function UberObject (SuperClass) {
     var NewObjectType = /*#__PURE__*/function (_SuperClass) {
       inherits(NewObjectType, _SuperClass);
 
-      function NewObjectType() {
-        var _getPrototypeOf2;
+      var _super = _createSuper$y(NewObjectType);
 
+      function NewObjectType() {
         var _this;
 
         classCallCheck(this, NewObjectType);
@@ -16780,7 +16940,7 @@
           rest[_key] = arguments[_key];
         }
 
-        _this = possibleConstructorReturn(this, (_getPrototypeOf2 = getPrototypeOf(NewObjectType)).call.apply(_getPrototypeOf2, [this].concat(rest)));
+        _this = _super.call.apply(_super, [this].concat(rest));
         _this.onBeforeRender = NewObjectType.prototype.onBeforeRender;
         return _this;
       }
@@ -16816,15 +16976,29 @@
     return NewObjectType;
   }
 
+  function _createSuper$z(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$A()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$A() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Mesh = UberObject(THREE.Mesh);
 
   var ZSpriteMesh = /*#__PURE__*/function (_Mesh) {
     inherits(ZSpriteMesh, _Mesh);
 
+    var _super = _createSuper$z(ZSpriteMesh);
+
     function ZSpriteMesh() {
+      var _this;
+
       classCallCheck(this, ZSpriteMesh);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ZSpriteMesh).apply(this, arguments));
+      for (var _len = arguments.length, rest = new Array(_len), _key = 0; _key < _len; _key++) {
+        rest[_key] = arguments[_key];
+      }
+
+      _this = _super.call.apply(_super, [this].concat(rest));
+      _this.castShadow = true;
+      _this.receiveShadow = true;
+      return _this;
     }
 
     createClass(ZSpriteMesh, [{
@@ -16844,6 +17018,7 @@
           this.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.matrixWorld); // get inverse matrix
 
           material.uniforms.invModelViewMatrix.value.getInverse(this.modelViewMatrix);
+          material.uniforms.nearPlaneValue.value = camera.near;
           material.uniformsNeedUpdate = true;
         }
       }
@@ -16852,17 +17027,22 @@
     return ZSpriteMesh;
   }(Mesh);
 
+  function _createSuper$A(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$B()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$B() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Mesh$1 = UberObject(THREE.Mesh);
 
   var ZClippedMesh = /*#__PURE__*/function (_Mesh) {
     inherits(ZClippedMesh, _Mesh);
+
+    var _super = _createSuper$A(ZClippedMesh);
 
     function ZClippedMesh(geometry, material) {
       var _this;
 
       classCallCheck(this, ZClippedMesh);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ZClippedMesh).call(this, geometry, material));
+      _this = _super.call(this, geometry, material);
       _this.castShadow = true;
       _this.receiveShadow = true;
       return _this;
@@ -16901,15 +17081,21 @@
 
   defineProperty(ZClippedMesh, "_modelView", new THREE.Matrix4());
 
+  function _createSuper$B(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$C()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$C() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var TextMesh = /*#__PURE__*/function (_THREE$Group) {
     inherits(TextMesh, _THREE$Group);
+
+    var _super = _createSuper$B(TextMesh);
 
     function TextMesh(geometry, _material) {
       var _this;
 
       classCallCheck(this, TextMesh);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(TextMesh).call(this));
+      _this = _super.call(this);
       _this.geometry = geometry;
 
       var self = assertThisInitialized(_this);
@@ -16982,17 +17168,33 @@
     return TextMesh;
   }(THREE.Group);
 
+  function _createSuper$C(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$D()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$D() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Mesh$2 = UberObject(THREE.Mesh);
 
-  function SimpleMesh(geometry, material) {
-    Mesh$2.call(this, geometry, material);
-    this.castShadow = true;
-    this.receiveShadow = true;
-  }
+  var SimpleMesh = /*#__PURE__*/function (_Mesh) {
+    inherits(SimpleMesh, _Mesh);
 
-  SimpleMesh.prototype = Object.create(Mesh$2.prototype);
-  SimpleMesh.prototype.constructor = SimpleMesh;
+    var _super = _createSuper$C(SimpleMesh);
 
+    function SimpleMesh(geometry, material) {
+      var _this;
+
+      classCallCheck(this, SimpleMesh);
+
+      _this = _super.call(this, geometry, material);
+      _this.castShadow = true;
+      _this.receiveShadow = true;
+      return _this;
+    }
+
+    return SimpleMesh;
+  }(Mesh$2);
+
+  function _createSuper$D(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$E()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$E() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Mesh$3 = UberObject(THREE.Mesh);
 
   var _viewport = new THREE.Vector2();
@@ -17000,10 +17202,12 @@
   var ThickLineMesh = /*#__PURE__*/function (_Mesh) {
     inherits(ThickLineMesh, _Mesh);
 
+    var _super = _createSuper$D(ThickLineMesh);
+
     function ThickLineMesh() {
       classCallCheck(this, ThickLineMesh);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ThickLineMesh).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ThickLineMesh, [{
@@ -17015,7 +17219,7 @@
           return;
         }
 
-        material.uberOptions.projMatrixInv.getInverse(camera.projectionMatrix, true);
+        material.uberOptions.projMatrixInv.getInverse(camera.projectionMatrix);
         renderer.getSize(_viewport);
         material.uberOptions.viewport.set(_viewport.width, _viewport.height);
       }
@@ -17024,14 +17228,17 @@
     return ThickLineMesh;
   }(Mesh$3);
 
+  function _createSuper$E(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$F()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$F() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Mesh$4 = UberObject(THREE.Mesh);
 
   var InstancedMesh = /*#__PURE__*/function (_Mesh) {
     inherits(InstancedMesh, _Mesh);
 
-    function InstancedMesh() {
-      var _getPrototypeOf2;
+    var _super = _createSuper$E(InstancedMesh);
 
+    function InstancedMesh() {
       var _this;
 
       classCallCheck(this, InstancedMesh);
@@ -17040,7 +17247,7 @@
         rest[_key] = arguments[_key];
       }
 
-      _this = possibleConstructorReturn(this, (_getPrototypeOf2 = getPrototypeOf(InstancedMesh)).call.apply(_getPrototypeOf2, [this].concat(rest)));
+      _this = _super.call.apply(_super, [this].concat(rest));
       _this.castShadow = true;
       _this.receiveShadow = true;
       return _this;
@@ -17211,15 +17418,21 @@
     return MeshCreator;
   }();
 
+  function _createSuper$F(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$G()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$G() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var TransformGroup = /*#__PURE__*/function (_THREE$Object3D) {
     inherits(TransformGroup, _THREE$Object3D);
+
+    var _super = _createSuper$F(TransformGroup);
 
     function TransformGroup(geometry, geoParams, material, transforms) {
       var _this;
 
       classCallCheck(this, TransformGroup);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(TransformGroup).call(this));
+      _this = _super.call(this);
       _this._geometry = geometry;
       _this._geoParams = geoParams;
       var mat = material.createInstance();
@@ -17302,7 +17515,7 @@
 
         for (var i = 0, n = transforms.length; i < n; ++i) {
           var mesh = new Mesh(geometry, material);
-          mesh.applyMatrix(transforms[i]);
+          mesh.applyMatrix4(transforms[i]);
           meshes[i] = mesh;
         }
 
@@ -17317,6 +17530,10 @@
 
   defineProperty(TransformGroup, "_ray", new THREE.Ray());
 
+  function _createSuper$G(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$H()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$H() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function wrapper(Name, args) {
     var params = [Name].concat(args);
     return Name.bind.apply(Name, toConsumableArray(params));
@@ -17325,12 +17542,14 @@
   var ChemGroup = /*#__PURE__*/function (_RCGroup) {
     inherits(ChemGroup, _RCGroup);
 
+    var _super = _createSuper$G(ChemGroup);
+
     function ChemGroup(geoParams, selection, colorer, mode, transforms, polyComplexity, material) {
       var _this;
 
       classCallCheck(this, ChemGroup);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ChemGroup).call(this));
+      _this = _super.call(this);
 
       if (_this.constructor === ChemGroup) {
         throw new Error('Can not instantiate abstract class!');
@@ -17407,13 +17626,19 @@
     return ChemGroup;
   }(RCGroup);
 
+  function _createSuper$H(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$I()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$I() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var AtomsGroup = /*#__PURE__*/function (_ChemGroup) {
     inherits(AtomsGroup, _ChemGroup);
+
+    var _super = _createSuper$H(AtomsGroup);
 
     function AtomsGroup() {
       classCallCheck(this, AtomsGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AtomsGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(AtomsGroup, [{
@@ -17461,13 +17686,19 @@
     return AtomsGroup;
   }(ChemGroup);
 
+  function _createSuper$I(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$J()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$J() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var AtomsSphereGroup = /*#__PURE__*/function (_AtomsGroup) {
     inherits(AtomsSphereGroup, _AtomsGroup);
+
+    var _super = _createSuper$I(AtomsSphereGroup);
 
     function AtomsSphereGroup() {
       classCallCheck(this, AtomsSphereGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AtomsSphereGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(AtomsSphereGroup, [{
@@ -17522,13 +17753,19 @@
     return AtomsSphereGroup;
   }(AtomsGroup);
 
+  function _createSuper$J(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$K()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$K() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var AtomsSurfaceGroup = /*#__PURE__*/function (_AtomsSphereGroup) {
     inherits(AtomsSurfaceGroup, _AtomsSphereGroup);
+
+    var _super = _createSuper$J(AtomsSurfaceGroup);
 
     function AtomsSurfaceGroup() {
       classCallCheck(this, AtomsSurfaceGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AtomsSurfaceGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(AtomsSurfaceGroup, [{
@@ -17554,13 +17791,19 @@
     return AtomsSurfaceGroup;
   }(AtomsSphereGroup);
 
+  function _createSuper$K(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$L()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$L() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var AtomsSASSESGroupStub = /*#__PURE__*/function (_AtomsSphereGroup) {
     inherits(AtomsSASSESGroupStub, _AtomsSphereGroup);
+
+    var _super = _createSuper$K(AtomsSASSESGroupStub);
 
     function AtomsSASSESGroupStub() {
       classCallCheck(this, AtomsSASSESGroupStub);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AtomsSASSESGroupStub).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(AtomsSASSESGroupStub, [{
@@ -17587,6 +17830,10 @@
 
     return AtomsSASSESGroupStub;
   }(AtomsSphereGroup);
+
+  function _createSuper$L(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$M()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$M() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
   function adjustColor(color) {
     var r = color >> 16 & 255;
@@ -17690,10 +17937,12 @@
   var AtomsTextGroup = /*#__PURE__*/function (_AtomsGroup) {
     inherits(AtomsTextGroup, _AtomsGroup);
 
+    var _super = _createSuper$L(AtomsTextGroup);
+
     function AtomsTextGroup() {
       classCallCheck(this, AtomsTextGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AtomsTextGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(AtomsTextGroup, [{
@@ -17770,6 +18019,10 @@
     return AtomsTextGroup;
   }(AtomsGroup);
 
+  function _createSuper$M(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$N()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$N() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function _slerp(omega, v1, v2, t) {
     var oSin = Math.sin(omega);
     return v1.clone().multiplyScalar(Math.sin((1 - t) * omega) / oSin).addScaledVector(v2, Math.sin(t * omega) / oSin);
@@ -17778,10 +18031,12 @@
   var AromaticGroup = /*#__PURE__*/function (_AtomsGroup) {
     inherits(AromaticGroup, _AtomsGroup);
 
+    var _super = _createSuper$M(AromaticGroup);
+
     function AromaticGroup() {
       classCallCheck(this, AromaticGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AromaticGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(AromaticGroup, [{
@@ -17846,6 +18101,10 @@
     return AromaticGroup;
   }(AtomsGroup);
 
+  function _createSuper$N(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$O()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$O() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function _createShape(rad, parts) {
     var pts = [];
 
@@ -17862,10 +18121,12 @@
   var AromaticTorusGroup = /*#__PURE__*/function (_AromaticGroup) {
     inherits(AromaticTorusGroup, _AromaticGroup);
 
+    var _super = _createSuper$N(AromaticTorusGroup);
+
     function AromaticTorusGroup() {
       classCallCheck(this, AromaticTorusGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AromaticTorusGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(AromaticTorusGroup, [{
@@ -17906,13 +18167,19 @@
     return AromaticTorusGroup;
   }(AromaticGroup);
 
+  function _createSuper$O(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$P()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$P() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var AromaticLinesGroup = /*#__PURE__*/function (_AromaticGroup) {
     inherits(AromaticLinesGroup, _AromaticGroup);
+
+    var _super = _createSuper$O(AromaticLinesGroup);
 
     function AromaticLinesGroup() {
       classCallCheck(this, AromaticLinesGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(AromaticLinesGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(AromaticLinesGroup, [{
@@ -17949,13 +18216,19 @@
     return AromaticLinesGroup;
   }(AromaticGroup);
 
+  function _createSuper$P(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$Q()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$Q() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var ResiduesGroup = /*#__PURE__*/function (_ChemGroup) {
     inherits(ResiduesGroup, _ChemGroup);
+
+    var _super = _createSuper$P(ResiduesGroup);
 
     function ResiduesGroup() {
       classCallCheck(this, ResiduesGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ResiduesGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ResiduesGroup, [{
@@ -18003,13 +18276,19 @@
     return ResiduesGroup;
   }(ChemGroup);
 
+  function _createSuper$Q(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$R()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$R() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var NucleicItemGroup = /*#__PURE__*/function (_ResiduesGroup) {
     inherits(NucleicItemGroup, _ResiduesGroup);
+
+    var _super = _createSuper$Q(NucleicItemGroup);
 
     function NucleicItemGroup() {
       classCallCheck(this, NucleicItemGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(NucleicItemGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(NucleicItemGroup, [{
@@ -18106,13 +18385,19 @@
     return NucleicItemGroup;
   }(ResiduesGroup);
 
+  function _createSuper$R(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$S()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$S() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var NucleicCylindersGroup = /*#__PURE__*/function (_NucleicItemGroup) {
     inherits(NucleicCylindersGroup, _NucleicItemGroup);
+
+    var _super = _createSuper$R(NucleicCylindersGroup);
 
     function NucleicCylindersGroup() {
       classCallCheck(this, NucleicCylindersGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(NucleicCylindersGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(NucleicCylindersGroup, [{
@@ -18132,13 +18417,19 @@
     return NucleicCylindersGroup;
   }(NucleicItemGroup);
 
+  function _createSuper$S(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$T()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$T() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var NucleicSpheresGroup = /*#__PURE__*/function (_NucleicItemGroup) {
     inherits(NucleicSpheresGroup, _NucleicItemGroup);
+
+    var _super = _createSuper$S(NucleicSpheresGroup);
 
     function NucleicSpheresGroup() {
       classCallCheck(this, NucleicSpheresGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(NucleicSpheresGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(NucleicSpheresGroup, [{
@@ -18775,6 +19066,10 @@
     return CartoonHelper;
   }();
 
+  function _createSuper$T(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$U()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$U() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function _createShape$1(rad, parts) {
     var pts = [];
 
@@ -18822,10 +19117,12 @@
   var ResiduesSubseqGroup = /*#__PURE__*/function (_ResiduesGroup) {
     inherits(ResiduesSubseqGroup, _ResiduesGroup);
 
+    var _super = _createSuper$T(ResiduesSubseqGroup);
+
     function ResiduesSubseqGroup() {
       classCallCheck(this, ResiduesSubseqGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ResiduesSubseqGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ResiduesSubseqGroup, [{
@@ -18892,13 +19189,19 @@
     return ResiduesSubseqGroup;
   }(ResiduesGroup);
 
+  function _createSuper$U(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$V()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$V() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var ResiduesTraceGroup = /*#__PURE__*/function (_ChemGroup) {
     inherits(ResiduesTraceGroup, _ChemGroup);
+
+    var _super = _createSuper$U(ResiduesTraceGroup);
 
     function ResiduesTraceGroup() {
       classCallCheck(this, ResiduesTraceGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ResiduesTraceGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ResiduesTraceGroup, [{
@@ -19046,6 +19349,10 @@
     return ResiduesTraceGroup;
   }(ChemGroup);
 
+  function _createSuper$V(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$W()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$W() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function getCylinderCount(bondOrder) {
     return bondOrder < 2 ? 1 : bondOrder;
   }
@@ -19053,10 +19360,12 @@
   var BondsGroup = /*#__PURE__*/function (_ChemGroup) {
     inherits(BondsGroup, _ChemGroup);
 
+    var _super = _createSuper$V(BondsGroup);
+
     function BondsGroup() {
       classCallCheck(this, BondsGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(BondsGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(BondsGroup, [{
@@ -19138,13 +19447,19 @@
     return BondsGroup;
   }(ChemGroup);
 
+  function _createSuper$W(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$X()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$X() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var BondsCylinderGroup = /*#__PURE__*/function (_BondsGroup) {
     inherits(BondsCylinderGroup, _BondsGroup);
+
+    var _super = _createSuper$W(BondsCylinderGroup);
 
     function BondsCylinderGroup() {
       classCallCheck(this, BondsCylinderGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(BondsCylinderGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(BondsCylinderGroup, [{
@@ -19247,15 +19562,20 @@
     return BondsCylinderGroup;
   }(BondsGroup);
 
+  function _createSuper$X(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$Y()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$Y() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var STEP_SIZE = 0.15;
 
   var BondsLinesGroup = /*#__PURE__*/function (_BondsGroup) {
     inherits(BondsLinesGroup, _BondsGroup);
 
+    var _super = _createSuper$X(BondsLinesGroup);
+
     function BondsLinesGroup() {
       classCallCheck(this, BondsLinesGroup);
 
-      return possibleConstructorReturn(this, getPrototypeOf(BondsLinesGroup).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(BondsLinesGroup, [{
@@ -19397,15 +19717,21 @@
     BondsLinesGroup: BondsLinesGroup
   };
 
+  function _createSuper$Y(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$Z()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$Z() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var AtomsProcessor = /*#__PURE__*/function (_RCGroup) {
     inherits(AtomsProcessor, _RCGroup);
+
+    var _super = _createSuper$Y(AtomsProcessor);
 
     function AtomsProcessor(AtomsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
       var _this;
 
       classCallCheck(this, AtomsProcessor);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(AtomsProcessor).call(this));
+      _this = _super.call(this);
 
       var self = assertThisInitialized(_this);
 
@@ -19470,13 +19796,19 @@
     return AtomsProcessor;
   }(RCGroup);
 
+  function _createSuper$Z(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$_()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$_() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var OrphanAtomsProcessor = /*#__PURE__*/function (_AtomsProcessor) {
     inherits(OrphanAtomsProcessor, _AtomsProcessor);
+
+    var _super = _createSuper$Z(OrphanAtomsProcessor);
 
     function OrphanAtomsProcessor() {
       classCallCheck(this, OrphanAtomsProcessor);
 
-      return possibleConstructorReturn(this, getPrototypeOf(OrphanAtomsProcessor).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(OrphanAtomsProcessor, [{
@@ -19501,15 +19833,21 @@
     return OrphanAtomsProcessor;
   }(AtomsProcessor);
 
+  function _createSuper$_(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$$()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$$() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var ResiduesProcessor = /*#__PURE__*/function (_RCGroup) {
     inherits(ResiduesProcessor, _RCGroup);
+
+    var _super = _createSuper$_(ResiduesProcessor);
 
     function ResiduesProcessor(ResidueGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
       var _this;
 
       classCallCheck(this, ResiduesProcessor);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ResiduesProcessor).call(this));
+      _this = _super.call(this);
 
       var self = assertThisInitialized(_this);
 
@@ -19571,13 +19909,19 @@
     return ResiduesProcessor;
   }(RCGroup);
 
+  function _createSuper$$(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$10()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$10() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var NucleicProcessor = /*#__PURE__*/function (_ResidueProcessor) {
     inherits(NucleicProcessor, _ResidueProcessor);
+
+    var _super = _createSuper$$(NucleicProcessor);
 
     function NucleicProcessor() {
       classCallCheck(this, NucleicProcessor);
 
-      return possibleConstructorReturn(this, getPrototypeOf(NucleicProcessor).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(NucleicProcessor, [{
@@ -19590,15 +19934,21 @@
     return NucleicProcessor;
   }(ResiduesProcessor);
 
+  function _createSuper$10(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$11()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$11() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var SubseqsProcessor = /*#__PURE__*/function (_RCGroup) {
     inherits(SubseqsProcessor, _RCGroup);
+
+    var _super = _createSuper$10(SubseqsProcessor);
 
     function SubseqsProcessor(ResidueGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
       var _this;
 
       classCallCheck(this, SubseqsProcessor);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(SubseqsProcessor).call(this));
+      _this = _super.call(this);
 
       var self = assertThisInitialized(_this);
 
@@ -19662,15 +20012,21 @@
     return SubseqsProcessor;
   }(RCGroup);
 
+  function _createSuper$11(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$12()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$12() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var BondsProcessor = /*#__PURE__*/function (_RCGroup) {
     inherits(BondsProcessor, _RCGroup);
+
+    var _super = _createSuper$11(BondsProcessor);
 
     function BondsProcessor(BondsGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
       var _this;
 
       classCallCheck(this, BondsProcessor);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(BondsProcessor).call(this));
+      _this = _super.call(this);
 
       var self = assertThisInitialized(_this);
 
@@ -19732,15 +20088,21 @@
     return BondsProcessor;
   }(RCGroup);
 
+  function _createSuper$12(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$13()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$13() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var AromaticProcessor = /*#__PURE__*/function (_RCGroup) {
     inherits(AromaticProcessor, _RCGroup);
+
+    var _super = _createSuper$12(AromaticProcessor);
 
     function AromaticProcessor(AromaticGroup, geoParams, complex, colorer, mode, polyComplexity, mask, material) {
       var _this;
 
       classCallCheck(this, AromaticProcessor);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(AromaticProcessor).call(this));
+      _this = _super.call(this);
 
       var self = assertThisInitialized(_this);
 
@@ -20020,6 +20382,10 @@
 
   Mode.prototype.depGroups = [];
 
+  function _createSuper$13(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$14()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$14() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function getRenderParams() {
     return {
       lineWidth: this.opts.lineWidth
@@ -20029,12 +20395,14 @@
   var LinesMode = /*#__PURE__*/function (_Mode) {
     inherits(LinesMode, _Mode);
 
+    var _super = _createSuper$13(LinesMode);
+
     function LinesMode(opts) {
       var _this;
 
       classCallCheck(this, LinesMode);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(LinesMode).call(this, opts));
+      _this = _super.call(this, opts);
       _this.depGroups = _this.depGroups.slice(0); // clone depGroups to prevent prototype edits
 
       var groups = _this.depGroups;
@@ -20083,13 +20451,19 @@
   LinesMode.prototype.shortName = 'Lines';
   LinesMode.prototype.depGroups = ['ALoopsLines', 'BondsLines', 'OrphanedAtomsCrosses'];
 
+  function _createSuper$14(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$15()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$15() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var LicoriceMode = /*#__PURE__*/function (_Mode) {
     inherits(LicoriceMode, _Mode);
+
+    var _super = _createSuper$14(LicoriceMode);
 
     function LicoriceMode() {
       classCallCheck(this, LicoriceMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(LicoriceMode).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(LicoriceMode, [{
@@ -20134,13 +20508,19 @@
   LicoriceMode.prototype.shortName = 'Licorice';
   LicoriceMode.prototype.depGroups = ['AtomsSpheres', 'BondsCylinders', 'ALoopsTorus'];
 
+  function _createSuper$15(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$16()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$16() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var BallsAndSticksMode = /*#__PURE__*/function (_Mode) {
     inherits(BallsAndSticksMode, _Mode);
+
+    var _super = _createSuper$15(BallsAndSticksMode);
 
     function BallsAndSticksMode() {
       classCallCheck(this, BallsAndSticksMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(BallsAndSticksMode).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(BallsAndSticksMode, [{
@@ -20185,13 +20565,19 @@
   BallsAndSticksMode.prototype.shortName = 'Balls';
   BallsAndSticksMode.prototype.depGroups = ['AtomsSpheres', 'BondsCylinders', 'ALoopsTorus'];
 
+  function _createSuper$16(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$17()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$17() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var VanDerWaalsMode = /*#__PURE__*/function (_Mode) {
     inherits(VanDerWaalsMode, _Mode);
+
+    var _super = _createSuper$16(VanDerWaalsMode);
 
     function VanDerWaalsMode() {
       classCallCheck(this, VanDerWaalsMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(VanDerWaalsMode).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(VanDerWaalsMode, [{
@@ -20211,13 +20597,19 @@
   VanDerWaalsMode.prototype.shortName = 'VDW';
   VanDerWaalsMode.prototype.depGroups = ['AtomsSpheres'];
 
+  function _createSuper$17(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$18()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$18() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var TraceMode = /*#__PURE__*/function (_Mode) {
     inherits(TraceMode, _Mode);
+
+    var _super = _createSuper$17(TraceMode);
 
     function TraceMode() {
       classCallCheck(this, TraceMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(TraceMode).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(TraceMode, [{
@@ -20237,13 +20629,19 @@
   TraceMode.prototype.shortName = 'Trace';
   TraceMode.prototype.depGroups = ['TraceChains'];
 
+  function _createSuper$18(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$19()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$19() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var TubeMode = /*#__PURE__*/function (_Mode) {
     inherits(TubeMode, _Mode);
+
+    var _super = _createSuper$18(TubeMode);
 
     function TubeMode() {
       classCallCheck(this, TubeMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(TubeMode).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(TubeMode, [{
@@ -20280,15 +20678,21 @@
   TubeMode.prototype.shortName = 'Tube';
   TubeMode.prototype.depGroups = ['CartoonChains'];
 
+  function _createSuper$19(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1a()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1a() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var CartoonMode = /*#__PURE__*/function (_Mode) {
     inherits(CartoonMode, _Mode);
+
+    var _super = _createSuper$19(CartoonMode);
 
     function CartoonMode(opts) {
       var _this;
 
       classCallCheck(this, CartoonMode);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(CartoonMode).call(this, opts)); // cache for secondary structure options
+      _this = _super.call(this, opts); // cache for secondary structure options
 
       _this.secCache = {};
       return _this;
@@ -20403,6 +20807,9 @@
   CartoonMode.prototype.shortName = 'Cartoon';
   CartoonMode.prototype.depGroups = ['CartoonChains', 'NucleicSpheres', 'NucleicCylinders'];
 
+  function _createSuper$1a(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1b()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1b() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var selectors$1 = chem.selectors;
 
   function getRenderParams$1() {
@@ -20415,12 +20822,14 @@
   var SurfaceMode = /*#__PURE__*/function (_Mode) {
     inherits(SurfaceMode, _Mode);
 
+    var _super = _createSuper$1a(SurfaceMode);
+
     function SurfaceMode(opts) {
       var _this;
 
       classCallCheck(this, SurfaceMode);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(SurfaceMode).call(this, opts));
+      _this = _super.call(this, opts);
       _this.depGroups = _this.depGroups.slice(0); // clone depGroups to prevent prototype edits
 
       var surfaces = _this.surfaceNames;
@@ -20461,13 +20870,19 @@
   SurfaceMode.prototype.isSurface = true;
   SurfaceMode.prototype.surfaceNames = [];
 
+  function _createSuper$1b(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1c()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1c() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var QuickSurfaceMode = /*#__PURE__*/function (_SurfaceMode) {
     inherits(QuickSurfaceMode, _SurfaceMode);
+
+    var _super = _createSuper$1b(QuickSurfaceMode);
 
     function QuickSurfaceMode() {
       classCallCheck(this, QuickSurfaceMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(QuickSurfaceMode).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(QuickSurfaceMode, [{
@@ -20495,15 +20910,21 @@
   QuickSurfaceMode.prototype.shortName = 'Quick Surf';
   QuickSurfaceMode.prototype.surfaceNames = ['QuickSurfGeo'];
 
+  function _createSuper$1c(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1d()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1d() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var IsoSurfaceMode = /*#__PURE__*/function (_SurfaceMode) {
     inherits(IsoSurfaceMode, _SurfaceMode);
+
+    var _super = _createSuper$1c(IsoSurfaceMode);
 
     function IsoSurfaceMode(excludeProbe, opts) {
       var _this;
 
       classCallCheck(this, IsoSurfaceMode);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(IsoSurfaceMode).call(this, opts));
+      _this = _super.call(this, opts);
       _this._excludeProbe = excludeProbe;
       return _this;
     }
@@ -20537,13 +20958,19 @@
   IsoSurfaceMode.prototype._radScale = 1;
   IsoSurfaceMode.prototype._excludeProbe = false;
 
+  function _createSuper$1d(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1e()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1e() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var IsoSurfaceSASMode = /*#__PURE__*/function (_IsoSurfaceMode) {
     inherits(IsoSurfaceSASMode, _IsoSurfaceMode);
+
+    var _super = _createSuper$1d(IsoSurfaceSASMode);
 
     function IsoSurfaceSASMode(opts) {
       classCallCheck(this, IsoSurfaceSASMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(IsoSurfaceSASMode).call(this, false, opts));
+      return _super.call(this, false, opts);
     }
 
     return IsoSurfaceSASMode;
@@ -20555,13 +20982,19 @@
   IsoSurfaceSASMode.prototype.name = 'Solvent Accessible Surface';
   IsoSurfaceSASMode.prototype.shortName = 'SAS';
 
+  function _createSuper$1e(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1f()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1f() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var IsoSurfaceSESMode = /*#__PURE__*/function (_IsoSurfaceMode) {
     inherits(IsoSurfaceSESMode, _IsoSurfaceMode);
+
+    var _super = _createSuper$1e(IsoSurfaceSESMode);
 
     function IsoSurfaceSESMode(opts) {
       classCallCheck(this, IsoSurfaceSESMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(IsoSurfaceSESMode).call(this, true, opts));
+      return _super.call(this, true, opts);
     }
 
     return IsoSurfaceSESMode;
@@ -20573,13 +21006,19 @@
   IsoSurfaceSESMode.prototype.name = 'Solvent Excluded Surface';
   IsoSurfaceSESMode.prototype.shortName = 'SES';
 
+  function _createSuper$1f(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1g()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1g() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var ContactSurfaceMode = /*#__PURE__*/function (_SurfaceMode) {
     inherits(ContactSurfaceMode, _SurfaceMode);
+
+    var _super = _createSuper$1f(ContactSurfaceMode);
 
     function ContactSurfaceMode() {
       classCallCheck(this, ContactSurfaceMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ContactSurfaceMode).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ContactSurfaceMode, [{
@@ -20609,13 +21048,19 @@
   ContactSurfaceMode.prototype.isSurface = true;
   ContactSurfaceMode.prototype.surfaceNames = ['ContactSurfaceGeo'];
 
+  function _createSuper$1g(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1h()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1h() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var TextMode = /*#__PURE__*/function (_Mode) {
     inherits(TextMode, _Mode);
+
+    var _super = _createSuper$1g(TextMode);
 
     function TextMode() {
       classCallCheck(this, TextMode);
 
-      return possibleConstructorReturn(this, getPrototypeOf(TextMode).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(TextMode, [{
@@ -21199,6 +21644,9 @@
 
   Colorer.prototype.id = '__';
 
+  function _createSuper$1h(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1i()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1i() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Create new colorer.
    *
@@ -21215,10 +21663,12 @@
   var ElementColorer = /*#__PURE__*/function (_Colorer) {
     inherits(ElementColorer, _Colorer);
 
+    var _super = _createSuper$1h(ElementColorer);
+
     function ElementColorer() {
       classCallCheck(this, ElementColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ElementColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ElementColorer, [{
@@ -21248,6 +21698,9 @@
   ElementColorer.prototype.name = 'Element';
   ElementColorer.prototype.shortName = 'Element';
 
+  function _createSuper$1i(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1j()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1j() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Coloring algorithm based on residue type.
    *
@@ -21260,10 +21713,12 @@
   var ResidueTypeColorer = /*#__PURE__*/function (_Colorer) {
     inherits(ResidueTypeColorer, _Colorer);
 
+    var _super = _createSuper$1i(ResidueTypeColorer);
+
     function ResidueTypeColorer() {
       classCallCheck(this, ResidueTypeColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ResidueTypeColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ResidueTypeColorer, [{
@@ -21287,13 +21742,19 @@
   ResidueTypeColorer.prototype.name = 'Residue Type';
   ResidueTypeColorer.prototype.shortName = 'Residue';
 
+  function _createSuper$1j(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1k()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1k() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var SequenceColorer = /*#__PURE__*/function (_Colorer) {
     inherits(SequenceColorer, _Colorer);
+
+    var _super = _createSuper$1j(SequenceColorer);
 
     function SequenceColorer() {
       classCallCheck(this, SequenceColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(SequenceColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(SequenceColorer, [{
@@ -21325,13 +21786,19 @@
   SequenceColorer.prototype.name = 'Sequence';
   SequenceColorer.prototype.shortName = 'Sequence';
 
+  function _createSuper$1k(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1l()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1l() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var ChainColorer = /*#__PURE__*/function (_Colorer) {
     inherits(ChainColorer, _Colorer);
+
+    var _super = _createSuper$1k(ChainColorer);
 
     function ChainColorer() {
       classCallCheck(this, ChainColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ChainColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ChainColorer, [{
@@ -21355,13 +21822,19 @@
   ChainColorer.prototype.name = 'Chain';
   ChainColorer.prototype.shortName = 'Chain';
 
+  function _createSuper$1l(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1m()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1m() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var SecondaryStructureColorer = /*#__PURE__*/function (_Colorer) {
     inherits(SecondaryStructureColorer, _Colorer);
+
+    var _super = _createSuper$1l(SecondaryStructureColorer);
 
     function SecondaryStructureColorer() {
       classCallCheck(this, SecondaryStructureColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(SecondaryStructureColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(SecondaryStructureColorer, [{
@@ -21405,13 +21878,19 @@
   SecondaryStructureColorer.prototype.name = 'Secondary Structure';
   SecondaryStructureColorer.prototype.shortName = 'Structure';
 
+  function _createSuper$1m(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1n()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1n() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var UniformColorer = /*#__PURE__*/function (_Colorer) {
     inherits(UniformColorer, _Colorer);
+
+    var _super = _createSuper$1m(UniformColorer);
 
     function UniformColorer() {
       classCallCheck(this, UniformColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(UniformColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(UniformColorer, [{
@@ -21435,6 +21914,9 @@
   UniformColorer.prototype.name = 'Uniform';
   UniformColorer.prototype.shortName = 'Uniform';
 
+  function _createSuper$1n(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1o()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1o() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Create new colorer.
    *
@@ -21449,12 +21931,14 @@
   var ConditionalColorer = /*#__PURE__*/function (_Colorer) {
     inherits(ConditionalColorer, _Colorer);
 
+    var _super = _createSuper$1n(ConditionalColorer);
+
     function ConditionalColorer(opts) {
       var _this;
 
       classCallCheck(this, ConditionalColorer);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ConditionalColorer).call(this, opts));
+      _this = _super.call(this, opts);
       var parsed = selectors.parse(_this.opts.subset);
       _this._subsetCached = parsed.error ? selectors.none() : parsed.selector;
       return _this;
@@ -21489,13 +21973,19 @@
   ConditionalColorer.prototype.name = 'Conditional';
   ConditionalColorer.prototype.shortName = 'Conditional';
 
+  function _createSuper$1o(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1p()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1p() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var ConformationColorer = /*#__PURE__*/function (_Colorer) {
     inherits(ConformationColorer, _Colorer);
+
+    var _super = _createSuper$1o(ConformationColorer);
 
     function ConformationColorer() {
       classCallCheck(this, ConformationColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ConformationColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ConformationColorer, [{
@@ -21519,6 +22009,9 @@
   ConformationColorer.prototype.name = 'Conformation';
   ConformationColorer.prototype.shortName = 'Conformation';
 
+  function _createSuper$1p(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1q()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1q() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Create new colorer.
    *
@@ -21535,10 +22028,12 @@
   var TemperatureColorer = /*#__PURE__*/function (_Colorer) {
     inherits(TemperatureColorer, _Colorer);
 
+    var _super = _createSuper$1p(TemperatureColorer);
+
     function TemperatureColorer() {
       classCallCheck(this, TemperatureColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(TemperatureColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(TemperatureColorer, [{
@@ -21594,6 +22089,9 @@
   TemperatureColorer.prototype.name = 'Temperature';
   TemperatureColorer.prototype.shortName = 'Temperature';
 
+  function _createSuper$1q(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1r()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1r() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Create new colorer.
    *
@@ -21610,10 +22108,12 @@
   var OccupancyColorer = /*#__PURE__*/function (_Colorer) {
     inherits(OccupancyColorer, _Colorer);
 
+    var _super = _createSuper$1q(OccupancyColorer);
+
     function OccupancyColorer() {
       classCallCheck(this, OccupancyColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(OccupancyColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(OccupancyColorer, [{
@@ -21656,13 +22156,19 @@
   OccupancyColorer.prototype.name = 'Occupancy';
   OccupancyColorer.prototype.shortName = 'Occupancy';
 
+  function _createSuper$1r(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1s()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1s() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var HydrophobicityColorer = /*#__PURE__*/function (_Colorer) {
     inherits(HydrophobicityColorer, _Colorer);
+
+    var _super = _createSuper$1r(HydrophobicityColorer);
 
     function HydrophobicityColorer() {
       classCallCheck(this, HydrophobicityColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(HydrophobicityColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(HydrophobicityColorer, [{
@@ -21695,13 +22201,19 @@
   HydrophobicityColorer.prototype.name = 'Hydrophobicity';
   HydrophobicityColorer.prototype.shortName = 'Hydrophobicity';
 
+  function _createSuper$1s(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1t()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1t() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var MoleculeColorer = /*#__PURE__*/function (_Colorer) {
     inherits(MoleculeColorer, _Colorer);
+
+    var _super = _createSuper$1s(MoleculeColorer);
 
     function MoleculeColorer() {
       classCallCheck(this, MoleculeColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(MoleculeColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(MoleculeColorer, [{
@@ -21733,6 +22245,10 @@
   MoleculeColorer.prototype.name = 'Molecule';
   MoleculeColorer.prototype.shortName = 'Molecule';
 
+  function _createSuper$1t(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1u()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1u() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function scaleColor(c, factor) {
     var r1 = c >> 16 & 0xff;
     var g1 = c >> 8 & 0xff;
@@ -21757,10 +22273,12 @@
   var CarbonColorer = /*#__PURE__*/function (_Colorer) {
     inherits(CarbonColorer, _Colorer);
 
+    var _super = _createSuper$1t(CarbonColorer);
+
     function CarbonColorer() {
       classCallCheck(this, CarbonColorer);
 
-      return possibleConstructorReturn(this, getPrototypeOf(CarbonColorer).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(CarbonColorer, [{
@@ -22167,6 +22685,10 @@
     return Representation;
   }();
 
+  function _createSuper$1u(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1v()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1v() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   function _traverseComponentGroups(root, component, callback) {
     var children = root.children;
 
@@ -22192,12 +22714,14 @@
   var ComplexComponentEditor = /*#__PURE__*/function (_ComplexEditor) {
     inherits(ComplexComponentEditor, _ComplexEditor);
 
+    var _super = _createSuper$1u(ComplexComponentEditor);
+
     function ComplexComponentEditor(complexVisual) {
       var _this;
 
       classCallCheck(this, ComplexComponentEditor);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ComplexComponentEditor).call(this));
+      _this = _super.call(this);
       _this._complexVisual = complexVisual;
       _this._inProgress = false;
       return _this;
@@ -22375,12 +22899,14 @@
   var ComplexFragmentEditor = /*#__PURE__*/function (_ComplexEditor2) {
     inherits(ComplexFragmentEditor, _ComplexEditor2);
 
+    var _super2 = _createSuper$1u(ComplexFragmentEditor);
+
     function ComplexFragmentEditor(complexVisual) {
       var _this2;
 
       classCallCheck(this, ComplexFragmentEditor);
 
-      _this2 = possibleConstructorReturn(this, getPrototypeOf(ComplexFragmentEditor).call(this));
+      _this2 = _super2.call(this);
       _this2._complexVisual = complexVisual;
       _this2._inProgress = false;
       return _this2;
@@ -22593,6 +23119,9 @@
     FragmentEditor: ComplexFragmentEditor
   };
 
+  function _createSuper$1v(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1w()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1w() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var selectors$3 = chem.selectors;
 
   function lookupAndCreate(entityList, specs) {
@@ -22612,12 +23141,14 @@
   var ComplexVisual = /*#__PURE__*/function (_Visual) {
     inherits(ComplexVisual, _Visual);
 
+    var _super = _createSuper$1v(ComplexVisual);
+
     function ComplexVisual(name, dataSource) {
       var _this;
 
       classCallCheck(this, ComplexVisual);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ComplexVisual).call(this, name, dataSource));
+      _this = _super.call(this, name, dataSource);
       _this._complex = dataSource;
       /** @type {Representation[]} */
 
@@ -23575,6 +24106,9 @@
 
   var fragmentFarPlane = "varying vec4 volPos;\r\n\r\nvoid main() {\r\n  gl_FragColor = volPos;\r\n}";
 
+  function _createSuper$1w(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1x()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1x() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var volumeUniforms = THREE.UniformsUtils.merge([{
     volumeDim: {
       type: 'v3',
@@ -23661,11 +24195,13 @@
   var BackFacePosMaterial = /*#__PURE__*/function (_THREE$ShaderMaterial) {
     inherits(BackFacePosMaterial, _THREE$ShaderMaterial);
 
+    var _super = _createSuper$1w(BackFacePosMaterial);
+
     function BackFacePosMaterial(params) {
       classCallCheck(this, BackFacePosMaterial);
 
       var backFaceParams = facesPosMaterialParams(params, THREE.BackSide);
-      return possibleConstructorReturn(this, getPrototypeOf(BackFacePosMaterial).call(this, backFaceParams));
+      return _super.call(this, backFaceParams);
     }
 
     return BackFacePosMaterial;
@@ -23685,6 +24221,8 @@
 
   var BackFacePosMaterialFarPlane = /*#__PURE__*/function (_THREE$ShaderMaterial2) {
     inherits(BackFacePosMaterialFarPlane, _THREE$ShaderMaterial2);
+
+    var _super2 = _createSuper$1w(BackFacePosMaterialFarPlane);
 
     function BackFacePosMaterialFarPlane(params) {
       classCallCheck(this, BackFacePosMaterialFarPlane);
@@ -23708,7 +24246,7 @@
         }
       }]);
       var shaderParams = new ShaderParams(params, matUniforms, vertexFarPlane, fragmentFarPlane);
-      return possibleConstructorReturn(this, getPrototypeOf(BackFacePosMaterialFarPlane).call(this, shaderParams));
+      return _super2.call(this, shaderParams);
     }
 
     return BackFacePosMaterialFarPlane;
@@ -23717,11 +24255,13 @@
   var FrontFacePosMaterial = /*#__PURE__*/function (_THREE$ShaderMaterial3) {
     inherits(FrontFacePosMaterial, _THREE$ShaderMaterial3);
 
+    var _super3 = _createSuper$1w(FrontFacePosMaterial);
+
     function FrontFacePosMaterial(params) {
       classCallCheck(this, FrontFacePosMaterial);
 
       var frontFaceParams = facesPosMaterialParams(params, THREE.FrontSide);
-      return possibleConstructorReturn(this, getPrototypeOf(FrontFacePosMaterial).call(this, frontFaceParams));
+      return _super3.call(this, frontFaceParams);
     }
 
     return FrontFacePosMaterial;
@@ -23729,6 +24269,8 @@
 
   var VolumeMaterial = /*#__PURE__*/function (_THREE$ShaderMaterial4) {
     inherits(VolumeMaterial, _THREE$ShaderMaterial4);
+
+    var _super4 = _createSuper$1w(VolumeMaterial);
 
     function VolumeMaterial(params) {
       var _this;
@@ -23738,7 +24280,7 @@
       var shaderParams = new ShaderParams(params, volumeUniforms, vertexVolume, fragmentVolume);
       shaderParams.transparent = true;
       shaderParams.depthTest = true;
-      _this = possibleConstructorReturn(this, getPrototypeOf(VolumeMaterial).call(this, shaderParams));
+      _this = _super4.call(this, shaderParams);
 
       _this.updateDefines();
 
@@ -23766,8 +24308,14 @@
     VolumeMaterial: VolumeMaterial
   };
 
+  function _createSuper$1x(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1y()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1y() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var VolumeMesh = /*#__PURE__*/function (_THREE$Mesh) {
     inherits(VolumeMesh, _THREE$Mesh);
+
+    var _super = _createSuper$1x(VolumeMesh);
 
     // data for noise filter
     function VolumeMesh() {
@@ -23776,7 +24324,7 @@
       classCallCheck(this, VolumeMesh);
 
       var geo = new THREE.BufferGeometry();
-      _this = possibleConstructorReturn(this, getPrototypeOf(VolumeMesh).call(this, geo));
+      _this = _super.call(this, geo);
 
       defineProperty(assertThisInitialized(_this), "volumeInfo", {});
 
@@ -24328,7 +24876,7 @@
 
         material.uniforms.aspectRatio.value = camera.aspect;
         material.uniforms.farZ.value = camera.far;
-        material.uniforms.tanHalfFOV.value = Math.tan(THREE.Math.DEG2RAD * 0.5 * camera.fov);
+        material.uniforms.tanHalfFOV.value = Math.tan(THREE.MathUtils.DEG2RAD * 0.5 * camera.fov);
         material.uniforms.matWorld2Volume.value = matWorldToVolume;
       }; // set it to special layer to draw only into BFTexture
 
@@ -24360,41 +24908,70 @@
     return VolumeFarPlane;
   }();
 
-  function VolumeVisual(name, dataSource) {
-    Visual.call(this, name, dataSource);
-    this._mesh = new VolumeMesh();
+  function _createSuper$1y(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1z()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
 
-    this._mesh.setDataSource(dataSource);
+  function _isNativeReflectConstruct$1z() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
-    this.add(this._mesh);
-    this._frame = new VolumeBounds(this.getBoundaries().boundingBox, this._mesh.volumeInfo);
-    this.add(this._frame.getMesh());
-    this.showFrame(settings.now.modes.VD.frame);
-    this._farPlane = new VolumeFarPlane(this._mesh, 2, 2);
-    this.add(this._farPlane.getMesh());
-  }
+  var VolumeVisual = /*#__PURE__*/function (_Visual) {
+    inherits(VolumeVisual, _Visual);
 
-  utils.deriveClass(VolumeVisual, Visual);
+    var _super = _createSuper$1y(VolumeVisual);
 
-  VolumeVisual.prototype.getBoundaries = function () {
-    var box = this._dataSource.getBox();
+    function VolumeVisual(name, dataSource) {
+      var _this;
 
-    var sphere = new THREE.Sphere();
-    box.getBoundingSphere(sphere);
-    return {
-      boundingBox: box,
-      boundingSphere: sphere
-    };
-  };
+      classCallCheck(this, VolumeVisual);
 
-  VolumeVisual.prototype.getMesh = function () {
-    return this._mesh;
-  };
+      _this = _super.call(this, name, dataSource);
+      _this._mesh = new VolumeMesh();
 
-  VolumeVisual.prototype.showFrame = function (needShow) {
-    this._frame.getMesh().material.visible = needShow;
-  };
+      _this._mesh.setDataSource(dataSource);
 
+      _this.add(_this._mesh);
+
+      _this._frame = new VolumeBounds(_this.getBoundaries().boundingBox, _this._mesh.volumeInfo);
+
+      _this.add(_this._frame.getMesh());
+
+      _this.showFrame(settings.now.modes.VD.frame);
+
+      _this._farPlane = new VolumeFarPlane(_this._mesh, 2, 2);
+
+      _this.add(_this._farPlane.getMesh());
+
+      return _this;
+    }
+
+    createClass(VolumeVisual, [{
+      key: "getBoundaries",
+      value: function getBoundaries() {
+        var box = this._dataSource.getBox();
+
+        var sphere = new THREE.Sphere();
+        box.getBoundingSphere(sphere);
+        return {
+          boundingBox: box,
+          boundingSphere: sphere
+        };
+      }
+    }, {
+      key: "getMesh",
+      value: function getMesh() {
+        return this._mesh;
+      }
+    }, {
+      key: "showFrame",
+      value: function showFrame(needShow) {
+        this._frame.getMesh().material.visible = needShow;
+      }
+    }]);
+
+    return VolumeVisual;
+  }(Visual);
+
+  function _createSuper$1z(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1A()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1A() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * A list of available loaders.
    * @extends EntityList
@@ -24402,6 +24979,8 @@
 
   var LoaderList = /*#__PURE__*/function (_EntityList) {
     inherits(LoaderList, _EntityList);
+
+    var _super = _createSuper$1z(LoaderList);
 
     /**
      * Create a list of loaders.
@@ -24418,7 +24997,7 @@
 
       classCallCheck(this, LoaderList);
 
-      return possibleConstructorReturn(this, getPrototypeOf(LoaderList).call(this, someLoaders, ['types']));
+      return _super.call(this, someLoaders, ['types']);
     }
     /**
      * Find a suitable loader for a source type.
@@ -24449,15 +25028,21 @@
     return LoaderList;
   }(EntityList);
 
+  function _createSuper$1A(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1B()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1B() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var Loader = /*#__PURE__*/function (_EventDispatcher) {
     inherits(Loader, _EventDispatcher);
+
+    var _super = _createSuper$1A(Loader);
 
     function Loader(source, options) {
       var _this;
 
       classCallCheck(this, Loader);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(Loader).call(this));
+      _this = _super.call(this);
       _this._source = source;
       _this._options = options || {};
       _this._abort = false;
@@ -24490,15 +25075,21 @@
   }(EventDispatcher);
   makeContextDependent(Loader.prototype);
 
+  function _createSuper$1B(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1C()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1C() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var FileLoader = /*#__PURE__*/function (_Loader) {
     inherits(FileLoader, _Loader);
+
+    var _super = _createSuper$1B(FileLoader);
 
     function FileLoader(source, options) {
       var _this;
 
       classCallCheck(this, FileLoader);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(FileLoader).call(this, source, options));
+      _this = _super.call(this, source, options);
       options = _this._options;
       _this._binary = options.binary === true;
       return _this;
@@ -24552,17 +25143,23 @@
   }(Loader);
   FileLoader.types = ['file', 'blob'];
 
+  function _createSuper$1C(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1D()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1D() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var urlStartRegexp = /^(https?|ftp):\/\//i;
 
   var XHRLoader = /*#__PURE__*/function (_Loader) {
     inherits(XHRLoader, _Loader);
+
+    var _super = _createSuper$1C(XHRLoader);
 
     function XHRLoader(source, options) {
       var _this;
 
       classCallCheck(this, XHRLoader);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(XHRLoader).call(this, source, options));
+      _this = _super.call(this, source, options);
       options = _this._options;
       _this._binary = options.binary === true;
       return _this;
@@ -24628,13 +25225,19 @@
   }(Loader);
   XHRLoader.types = ['url'];
 
+  function _createSuper$1D(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1E()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1E() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var ImmediateLoader = /*#__PURE__*/function (_Loader) {
     inherits(ImmediateLoader, _Loader);
+
+    var _super = _createSuper$1D(ImmediateLoader);
 
     function ImmediateLoader() {
       classCallCheck(this, ImmediateLoader);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ImmediateLoader).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(ImmediateLoader, [{
@@ -24664,6 +25267,9 @@
   var loaders = new LoaderList([// note: order might be important
   FileLoader, XHRLoader, ImmediateLoader]);
 
+  function _createSuper$1E(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1F()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1F() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * A list of available parsers.
    * @extends EntityList
@@ -24671,6 +25277,8 @@
 
   var ParserList = /*#__PURE__*/function (_EntityList) {
     inherits(ParserList, _EntityList);
+
+    var _super = _createSuper$1E(ParserList);
 
     /**
      * Create a list of parsers.
@@ -24687,7 +25295,7 @@
 
       classCallCheck(this, ParserList);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ParserList).call(this, someParsers, ['formats', 'extensions']));
+      return _super.call(this, someParsers, ['formats', 'extensions']);
     }
     /**
      * Find a suitable parser for data.
@@ -25066,6 +25674,9 @@
     return PDBStream;
   }();
 
+  function _createSuper$1F(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1G()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1G() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$1 = chem.Complex,
       Element$2 = chem.Element,
       Helix$1 = chem.Helix,
@@ -25101,12 +25712,14 @@
   var PDBParser = /*#__PURE__*/function (_Parser) {
     inherits(PDBParser, _Parser);
 
+    var _super = _createSuper$1F(PDBParser);
+
     function PDBParser(data, options) {
       var _this;
 
       classCallCheck(this, PDBParser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(PDBParser).call(this, data, options));
+      _this = _super.call(this, data, options);
       _this._complex = null;
       _this._chain = null;
       _this._residue = null;
@@ -25555,6 +26168,9 @@
   PDBParser.formats = ['pdb'];
   PDBParser.extensions = ['.pdb', '.ent'];
 
+  function _createSuper$1G(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1H()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1H() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$2 = chem.Complex,
       Element$3 = chem.Element,
       SGroup$1 = chem.SGroup,
@@ -25570,12 +26186,14 @@
   var CMLParser = /*#__PURE__*/function (_Parser) {
     inherits(CMLParser, _Parser);
 
+    var _super = _createSuper$1G(CMLParser);
+
     function CMLParser(data, options) {
       var _this;
 
       classCallCheck(this, CMLParser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(CMLParser).call(this, data, options));
+      _this = _super.call(this, data, options);
       _this._complex = null;
       _this._residue = null;
       _this._serialAtomMap = null;
@@ -26319,6 +26937,9 @@
   !function(r,t){t(exports);}(commonjsGlobal,function(r){function t(r,t,n){for(var e=(r.byteLength,0),i=n.length;i>e;e++){var o=n.charCodeAt(e);if(128>o)r.setUint8(t++,o>>>0&127|0);else if(2048>o)r.setUint8(t++,o>>>6&31|192),r.setUint8(t++,o>>>0&63|128);else if(65536>o)r.setUint8(t++,o>>>12&15|224),r.setUint8(t++,o>>>6&63|128),r.setUint8(t++,o>>>0&63|128);else {if(!(1114112>o))throw new Error("bad codepoint "+o);r.setUint8(t++,o>>>18&7|240),r.setUint8(t++,o>>>12&63|128),r.setUint8(t++,o>>>6&63|128),r.setUint8(t++,o>>>0&63|128);}}}function n(r){for(var t=0,n=0,e=r.length;e>n;n++){var i=r.charCodeAt(n);if(128>i)t+=1;else if(2048>i)t+=2;else if(65536>i)t+=3;else {if(!(1114112>i))throw new Error("bad codepoint "+i);t+=4;}}return t}function e(r,i,o){var a=typeof r;if("string"===a){var u=n(r);if(32>u)return i.setUint8(o,160|u),t(i,o+1,r),1+u;if(256>u)return i.setUint8(o,217),i.setUint8(o+1,u),t(i,o+2,r),2+u;if(65536>u)return i.setUint8(o,218),i.setUint16(o+1,u),t(i,o+3,r),3+u;if(4294967296>u)return i.setUint8(o,219),i.setUint32(o+1,u),t(i,o+5,r),5+u}if(r instanceof Uint8Array){var u=r.byteLength,s=new Uint8Array(i.buffer);if(256>u)return i.setUint8(o,196),i.setUint8(o+1,u),s.set(r,o+2),2+u;if(65536>u)return i.setUint8(o,197),i.setUint16(o+1,u),s.set(r,o+3),3+u;if(4294967296>u)return i.setUint8(o,198),i.setUint32(o+1,u),s.set(r,o+5),5+u}if("number"===a){if(!isFinite(r))throw new Error("Number not finite: "+r);if(Math.floor(r)!==r)return i.setUint8(o,203),i.setFloat64(o+1,r),9;if(r>=0){if(128>r)return i.setUint8(o,r),1;if(256>r)return i.setUint8(o,204),i.setUint8(o+1,r),2;if(65536>r)return i.setUint8(o,205),i.setUint16(o+1,r),3;if(4294967296>r)return i.setUint8(o,206),i.setUint32(o+1,r),5;throw new Error("Number too big 0x"+r.toString(16))}if(r>=-32)return i.setInt8(o,r),1;if(r>=-128)return i.setUint8(o,208),i.setInt8(o+1,r),2;if(r>=-32768)return i.setUint8(o,209),i.setInt16(o+1,r),3;if(r>=-2147483648)return i.setUint8(o,210),i.setInt32(o+1,r),5;throw new Error("Number too small -0x"+(-r).toString(16).substr(1))}if(null===r)return i.setUint8(o,192),1;if("boolean"===a)return i.setUint8(o,r?195:194),1;if("object"===a){var u,f=0,c=Array.isArray(r);if(c)u=r.length;else {var d=Object.keys(r);u=d.length;}var f;if(16>u?(i.setUint8(o,u|(c?144:128)),f=1):65536>u?(i.setUint8(o,c?220:222),i.setUint16(o+1,u),f=3):4294967296>u&&(i.setUint8(o,c?221:223),i.setUint32(o+1,u),f=5),c)for(var l=0;u>l;l++)f+=e(r[l],i,o+f);else for(var l=0;u>l;l++){var v=d[l];f+=e(v,i,o+f),f+=e(r[v],i,o+f);}return f}throw new Error("Unknown type "+a)}function i(r){var t=typeof r;if("string"===t){var e=n(r);if(32>e)return 1+e;if(256>e)return 2+e;if(65536>e)return 3+e;if(4294967296>e)return 5+e}if(r instanceof Uint8Array){var e=r.byteLength;if(256>e)return 2+e;if(65536>e)return 3+e;if(4294967296>e)return 5+e}if("number"===t){if(Math.floor(r)!==r)return 9;if(r>=0){if(128>r)return 1;if(256>r)return 2;if(65536>r)return 3;if(4294967296>r)return 5;throw new Error("Number too big 0x"+r.toString(16))}if(r>=-32)return 1;if(r>=-128)return 2;if(r>=-32768)return 3;if(r>=-2147483648)return 5;throw new Error("Number too small -0x"+r.toString(16).substr(1))}if("boolean"===t||null===r)return 1;if("object"===t){var e,o=0;if(Array.isArray(r)){e=r.length;for(var a=0;e>a;a++)o+=i(r[a]);}else {var u=Object.keys(r);e=u.length;for(var a=0;e>a;a++){var s=u[a];o+=i(s)+i(r[s]);}}if(16>e)return 1+o;if(65536>e)return 3+o;if(4294967296>e)return 5+o;throw new Error("Array or object too long 0x"+e.toString(16))}throw new Error("Unknown type "+t)}function o(r){var t=new ArrayBuffer(i(r)),n=new DataView(t);return e(r,n,0),new Uint8Array(t)}function a(r,t,n){return t?new r(t.buffer,t.byteOffset,t.byteLength/(n||1)):void 0}function u(r){return a(DataView,r)}function s(r){return a(Uint8Array,r)}function f(r){return a(Int8Array,r)}function c(r){return a(Int32Array,r,4)}function d(r){return a(Float32Array,r,4)}function l(r,t){var n=r.length/2;t||(t=new Int16Array(n));for(var e=0,i=0;n>e;++e,i+=2)t[e]=r[i]<<8^r[i+1]<<0;return t}function v(r,t){var n=r.length;t||(t=new Uint8Array(2*n));for(var e=u(t),i=0;n>i;++i)e.setInt16(2*i,r[i]);return s(t)}function g(r,t){var n=r.length/4;t||(t=new Int32Array(n));for(var e=0,i=0;n>e;++e,i+=4)t[e]=r[i]<<24^r[i+1]<<16^r[i+2]<<8^r[i+3]<<0;return t}function L(r,t){var n=r.length;t||(t=new Uint8Array(4*n));for(var e=u(t),i=0;n>i;++i)e.setInt32(4*i,r[i]);return s(t)}function h(r,t){var n=r.length;t||(t=new Float32Array(n/4));for(var e=u(t),i=u(r),o=0,a=0,s=n/4;s>o;++o,a+=4)e.setFloat32(a,i.getFloat32(a),!0);return t}function y(r,t,n){var e=r.length,i=1/t;n||(n=new Float32Array(e));for(var o=0;e>o;++o)n[o]=r[o]*i;return n}function m(r,t,n){var e=r.length;n||(n=new Int32Array(e));for(var i=0;e>i;++i)n[i]=Math.round(r[i]*t);return n}function p(r,t){var n,e;if(!t){var i=0;for(n=0,e=r.length;e>n;n+=2)i+=r[n+1];t=new r.constructor(i);}var o=0;for(n=0,e=r.length;e>n;n+=2)for(var a=r[n],u=r[n+1],s=0;u>s;++s)t[o]=a,++o;return t}function U(r){if(0===r.length)return new Int32Array;var t,n,e=2;for(t=1,n=r.length;n>t;++t)r[t-1]!==r[t]&&(e+=2);var i=new Int32Array(e),o=0,a=1;for(t=1,n=r.length;n>t;++t)r[t-1]!==r[t]?(i[o]=r[t-1],i[o+1]=a,a=1,o+=2):++a;return i[o]=r[r.length-1],i[o+1]=a,i}function b(r,t){var n=r.length;t||(t=new r.constructor(n)),n&&(t[0]=r[0]);for(var e=1;n>e;++e)t[e]=r[e]+t[e-1];return t}function I(r,t){var n=r.length;t||(t=new r.constructor(n)),t[0]=r[0];for(var e=1;n>e;++e)t[e]=r[e]-r[e-1];return t}function w(r,t){var n,e,i=r instanceof Int8Array?127:32767,o=-i-1,a=r.length;if(!t){var u=0;for(n=0;a>n;++n)r[n]<i&&r[n]>o&&++u;t=new Int32Array(u);}for(n=0,e=0;a>n;){for(var s=0;r[n]===i||r[n]===o;)s+=r[n],++n;s+=r[n],++n,t[e]=s,++e;}return t}function C(r,t){var n,e=t?127:32767,i=-e-1,o=r.length,a=0;for(n=0;o>n;++n){var u=r[n];0===u?++a:a+=u===e||u===i?2:u>0?Math.ceil(u/e):Math.ceil(u/i);}var s=t?new Int8Array(a):new Int16Array(a),f=0;for(n=0;o>n;++n){var u=r[n];if(u>=0)for(;u>=e;)s[f]=e,++f,u-=e;else for(;i>=u;)s[f]=i,++f,u-=i;s[f]=u,++f;}return s}function A(r,t){return b(p(r),t)}function x(r){return U(I(r))}function M(r,t,n){return y(p(r,c(n)),t,n)}function F(r,t){return U(m(r,t))}function S(r,t,n){return y(b(r,c(n)),t,n)}function E(r,t,n){return I(m(r,t),n)}function N(r,t,n){return y(w(r,c(n)),t,n)}function O(r,t,n){var e=w(r,c(n));return S(e,t,d(e))}function T(r,t,n){return C(E(r,t),n)}function k(r){var t=u(r),n=t.getInt32(0),e=t.getInt32(4),i=r.subarray(8,12),r=r.subarray(12);return [n,r,e,i]}function j(r,t,n,e){var i=new ArrayBuffer(12+e.byteLength),o=new Uint8Array(i),a=new DataView(i);return a.setInt32(0,r),a.setInt32(4,t),n&&o.set(n,8),o.set(e,12),o}function q(r){var t=r.length,n=s(r);return j(2,t,void 0,n)}function D(r){var t=r.length,n=L(r);return j(4,t,void 0,n)}function P(r,t){var n=r.length/t,e=L([t]),i=s(r);return j(5,n,e,i)}function z(r){var t=r.length,n=L(U(r));return j(6,t,void 0,n)}function B(r){var t=r.length,n=L(x(r));return j(8,t,void 0,n)}function V(r,t){var n=r.length,e=L([t]),i=L(F(r,t));return j(9,n,e,i)}function G(r,t){var n=r.length,e=L([t]),i=v(T(r,t));return j(10,n,e,i)}function R(r){var t={};return rr.forEach(function(n){void 0!==r[n]&&(t[n]=r[n]);}),r.bondAtomList&&(t.bondAtomList=D(r.bondAtomList)),r.bondOrderList&&(t.bondOrderList=q(r.bondOrderList)),t.xCoordList=G(r.xCoordList,1e3),t.yCoordList=G(r.yCoordList,1e3),t.zCoordList=G(r.zCoordList,1e3),r.bFactorList&&(t.bFactorList=G(r.bFactorList,100)),r.atomIdList&&(t.atomIdList=B(r.atomIdList)),r.altLocList&&(t.altLocList=z(r.altLocList)),r.occupancyList&&(t.occupancyList=V(r.occupancyList,100)),t.groupIdList=B(r.groupIdList),t.groupTypeList=D(r.groupTypeList),r.secStructList&&(t.secStructList=q(r.secStructList)),r.insCodeList&&(t.insCodeList=z(r.insCodeList)),r.sequenceIndexList&&(t.sequenceIndexList=B(r.sequenceIndexList)),t.chainIdList=P(r.chainIdList,4),r.chainNameList&&(t.chainNameList=P(r.chainNameList,4)),t}function H(r){function t(r){for(var t={},n=0;r>n;n++){var e=o();t[e]=o();}return t}function n(t){var n=r.subarray(a,a+t);return a+=t,n}function e(t){var n=r.subarray(a,a+t);a+=t;var e=65535;if(t>e){for(var i=[],o=0;o<n.length;o+=e)i.push(String.fromCharCode.apply(null,n.subarray(o,o+e)));return i.join("")}return String.fromCharCode.apply(null,n)}function i(r){for(var t=new Array(r),n=0;r>n;n++)t[n]=o();return t}function o(){var o,s,f=r[a];if(0===(128&f))return a++,f;if(128===(240&f))return s=15&f,a++,t(s);if(144===(240&f))return s=15&f,a++,i(s);if(160===(224&f))return s=31&f,a++,e(s);if(224===(224&f))return o=u.getInt8(a),a++,o;switch(f){case 192:return a++,null;case 194:return a++,!1;case 195:return a++,!0;case 196:return s=u.getUint8(a+1),a+=2,n(s);case 197:return s=u.getUint16(a+1),a+=3,n(s);case 198:return s=u.getUint32(a+1),a+=5,n(s);case 202:return o=u.getFloat32(a+1),a+=5,o;case 203:return o=u.getFloat64(a+1),a+=9,o;case 204:return o=r[a+1],a+=2,o;case 205:return o=u.getUint16(a+1),a+=3,o;case 206:return o=u.getUint32(a+1),a+=5,o;case 208:return o=u.getInt8(a+1),a+=2,o;case 209:return o=u.getInt16(a+1),a+=3,o;case 210:return o=u.getInt32(a+1),a+=5,o;case 217:return s=u.getUint8(a+1),a+=2,e(s);case 218:return s=u.getUint16(a+1),a+=3,e(s);case 219:return s=u.getUint32(a+1),a+=5,e(s);case 220:return s=u.getUint16(a+1),a+=3,i(s);case 221:return s=u.getUint32(a+1),a+=5,i(s);case 222:return s=u.getUint16(a+1),a+=3,t(s);case 223:return s=u.getUint32(a+1),a+=5,t(s)}throw new Error("Unknown type 0x"+f.toString(16))}var a=0,u=new DataView(r.buffer);return o()}function W(r,t,n,e){switch(r){case 1:return h(t);case 2:return f(t);case 3:return l(t);case 4:return g(t);case 5:return s(t);case 6:return p(g(t),new Uint8Array(n));case 7:return p(g(t));case 8:return A(g(t));case 9:return M(g(t),g(e)[0]);case 10:return O(l(t),g(e)[0]);case 11:return y(l(t),g(e)[0]);case 12:return N(l(t),g(e)[0]);case 13:return N(f(t),g(e)[0]);case 14:return w(l(t));case 15:return w(f(t))}}function X(r,t){t=t||{};var n=t.ignoreFields,e={};return nr.forEach(function(t){var i=n?-1!==n.indexOf(t):!1,o=r[t];i||void 0===o||(o instanceof Uint8Array?e[t]=W.apply(null,k(o)):e[t]=o);}),e}function J(r){return String.fromCharCode.apply(null,r).replace(/\0/g,"")}function K(r,t,n){n=n||{};var e,i,o,a,u,s,f=n.firstModelOnly,c=t.onModel,d=t.onChain,l=t.onGroup,v=t.onAtom,g=t.onBond,L=0,h=0,y=0,m=0,p=0,U=-1,b=r.chainNameList,I=r.secStructList,w=r.insCodeList,C=r.sequenceIndexList,A=r.atomIdList,x=r.bFactorList,M=r.altLocList,F=r.occupancyList,S=r.bondAtomList,E=r.bondOrderList;for(e=0,i=r.chainsPerModel.length;i>e&&!(f&&L>0);++e){var N=r.chainsPerModel[L];for(c&&c({chainCount:N,modelIndex:L}),o=0;N>o;++o){var O=r.groupsPerChain[h];if(d){var T=J(r.chainIdList.subarray(4*h,4*h+4)),k=null;b&&(k=J(b.subarray(4*h,4*h+4))),d({groupCount:O,chainIndex:h,modelIndex:L,chainId:T,chainName:k});}for(a=0;O>a;++a){var j=r.groupList[r.groupTypeList[y]],q=j.atomNameList.length;if(l){var D=null;I&&(D=I[y]);var P=null;r.insCodeList&&(P=String.fromCharCode(w[y]));var z=null;C&&(z=C[y]),l({atomCount:q,groupIndex:y,chainIndex:h,modelIndex:L,groupId:r.groupIdList[y],groupType:r.groupTypeList[y],groupName:j.groupName,singleLetterCode:j.singleLetterCode,chemCompType:j.chemCompType,secStruct:D,insCode:P,sequenceIndex:z});}for(u=0;q>u;++u){if(v){var B=null;A&&(B=A[m]);var V=null;x&&(V=x[m]);var G=null;M&&(G=String.fromCharCode(M[m]));var R=null;F&&(R=F[m]),v({atomIndex:m,groupIndex:y,chainIndex:h,modelIndex:L,atomId:B,element:j.elementList[u],atomName:j.atomNameList[u],formalCharge:j.formalChargeList[u],xCoord:r.xCoordList[m],yCoord:r.yCoordList[m],zCoord:r.zCoordList[m],bFactor:V,altLoc:G,occupancy:R});}m+=1;}if(g){var H=j.bondAtomList;for(u=0,s=j.bondOrderList.length;s>u;++u)g({atomIndex1:m-q+H[2*u],atomIndex2:m-q+H[2*u+1],bondOrder:j.bondOrderList[u]});}y+=1;}h+=1;}if(p=U+1,U=m-1,g&&S)for(u=0,s=S.length;s>u;u+=2){var W=S[u],X=S[u+1];(W>=p&&U>=W||X>=p&&U>=X)&&g({atomIndex1:W,atomIndex2:X,bondOrder:E?E[u/2]:null});}L+=1;}}function Q(r){return o(R(r))}function Y(r,t){r instanceof ArrayBuffer&&(r=new Uint8Array(r));var n;return n=r instanceof Uint8Array?H(r):r,X(n,t)}function Z(r,t,n,e){function i(){try{var r=Y(o.response);n(r);}catch(t){e(t);}}var o=new XMLHttpRequest;o.addEventListener("load",i,!0),o.addEventListener("error",e,!0),o.responseType="arraybuffer",o.open("GET",t+r.toUpperCase()),o.send();}function $(r,t,n){Z(r,or,t,n);}function _(r,t,n){Z(r,ar,t,n);}var rr=["mmtfVersion","mmtfProducer","unitCell","spaceGroup","structureId","title","depositionDate","releaseDate","experimentalMethods","resolution","rFree","rWork","bioAssemblyList","ncsOperatorList","entityList","groupList","numBonds","numAtoms","numGroups","numChains","numModels","groupsPerChain","chainsPerModel"],tr=["xCoordList","yCoordList","zCoordList","groupIdList","groupTypeList","chainIdList","bFactorList","atomIdList","altLocList","occupancyList","secStructList","insCodeList","sequenceIndexList","chainNameList","bondAtomList","bondOrderList"],nr=rr.concat(tr),er="v1.1.0dev",ir="//mmtf.rcsb.org/v1.0/",or=ir+"full/",ar=ir+"reduced/";r.encode=Q,r.decode=Y,r.traverse=K,r.fetch=$,r.fetchReduced=_,r.version=er,r.fetchUrl=or,r.fetchReducedUrl=ar,r.encodeMsgpack=o,r.encodeMmtf=R,r.decodeMsgpack=H,r.decodeMmtf=X;});
   });
 
+  function _createSuper$1H(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1I()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1I() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$3 = chem.Complex,
       Chain$1 = chem.Chain,
       Atom$1 = chem.Atom,
@@ -26402,12 +27023,14 @@
   var MMTFParser = /*#__PURE__*/function (_Parser) {
     inherits(MMTFParser, _Parser);
 
+    var _super = _createSuper$1H(MMTFParser);
+
     function MMTFParser(data, options) {
       var _this;
 
       classCallCheck(this, MMTFParser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(MMTFParser).call(this, data, options));
+      _this = _super.call(this, data, options);
       _this._options.fileType = 'mmtf';
       return _this;
     }
@@ -26843,15 +27466,21 @@
   MMTFParser.extensions = ['.mmtf'];
   MMTFParser.binary = true;
 
+  function _createSuper$1I(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1J()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1J() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var ParsingError = /*#__PURE__*/function (_Error) {
     inherits(ParsingError, _Error);
+
+    var _super = _createSuper$1I(ParsingError);
 
     function ParsingError(message, line, column) {
       var _this;
 
       classCallCheck(this, ParsingError);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(ParsingError).call(this, "data:".concat(line, ":").concat(column, ": ").concat(message)));
+      _this = _super.call(this, "data:".concat(line, ":").concat(column, ": ").concat(message));
 
       if (Error.captureStackTrace) {
         Error.captureStackTrace(assertThisInitialized(_this), ParsingError);
@@ -27188,6 +27817,9 @@
     return result;
   }
 
+  function _createSuper$1J(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1K()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1K() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$4 = chem.Complex,
       Element$5 = chem.Element,
       Helix$3 = chem.Helix,
@@ -27244,12 +27876,14 @@
   var AtomDataError = /*#__PURE__*/function (_Error) {
     inherits(AtomDataError, _Error);
 
+    var _super = _createSuper$1J(AtomDataError);
+
     function AtomDataError(message) {
       var _this;
 
       classCallCheck(this, AtomDataError);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(AtomDataError).call(this));
+      _this = _super.call(this);
       _this.name = 'AtomDataError';
       _this.message = message;
       return _this;
@@ -27345,12 +27979,14 @@
   var CIFParser = /*#__PURE__*/function (_Parser) {
     inherits(CIFParser, _Parser);
 
+    var _super2 = _createSuper$1J(CIFParser);
+
     function CIFParser(data, options) {
       var _this2;
 
       classCallCheck(this, CIFParser);
 
-      _this2 = possibleConstructorReturn(this, getPrototypeOf(CIFParser).call(this, data, options));
+      _this2 = _super2.call(this, data, options);
       _this2.asymDict = {};
       _this2.molecules = [];
       _this2._options.fileType = 'cif';
@@ -27428,7 +28064,16 @@
         var i; // molecules names from cif
 
         for (i = 0; i < count; i++) {
-          this.molecules[i].name = names[i];
+          if (this.molecules[i]) {
+            // molecule was created during atoms processing
+            this.molecules[i].name = names[i];
+          } else {
+            // molecule wasn't created, because there is no atom which is contained
+            this.molecules[i] = {
+              name: names[i],
+              residues: []
+            };
+          }
         } // reorganize molecules for complex and check chains
 
 
@@ -27506,12 +28151,13 @@
           var resName = String(resNames[i] || '');
 
           if (!residue || residue.getSequence() !== resSeq || residue.getICode() !== iCode) {
-            residue = chain.addResidue(resName, resSeq, iCode); // store molecule (entity)
+            residue = chain.addResidue(resName, resSeq, iCode); // store residue in appropriate molecule
 
             var moleculeIdx = molecules[i] - 1;
             var entity = this.molecules[moleculeIdx];
 
             if (!entity) {
+              // create new molecule if it hasn't been created
               this.molecules[moleculeIdx] = {
                 name: '',
                 residues: []
@@ -27946,6 +28592,9 @@
     return VolumeModel;
   }();
 
+  function _createSuper$1K(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1L()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1L() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var CCP4Header = {
     extent: [valueType.array, 'u32', 0],
     type: [valueType.singular, 'u32', 3],
@@ -27972,10 +28621,12 @@
   var Ccp4Model = /*#__PURE__*/function (_VolumeModel) {
     inherits(Ccp4Model, _VolumeModel);
 
+    var _super = _createSuper$1K(Ccp4Model);
+
     function Ccp4Model() {
       classCallCheck(this, Ccp4Model);
 
-      return possibleConstructorReturn(this, getPrototypeOf(Ccp4Model).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(Ccp4Model, [{
@@ -28107,12 +28758,14 @@
   var CCP4Parser = /*#__PURE__*/function (_Parser) {
     inherits(CCP4Parser, _Parser);
 
+    var _super2 = _createSuper$1K(CCP4Parser);
+
     function CCP4Parser(data, options) {
       var _this;
 
       classCallCheck(this, CCP4Parser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(CCP4Parser).call(this, data, options));
+      _this = _super2.call(this, data, options);
       _this._options.fileType = 'ccp4';
       _this.model = new Ccp4Model();
       return _this;
@@ -28137,6 +28790,9 @@
   CCP4Parser.extensions = ['.ccp4', '.map', '.mrc'];
   CCP4Parser.binary = true;
 
+  function _createSuper$1L(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1M()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1M() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$5 = chem.Complex,
       Element$6 = chem.Element,
       Molecule$4 = chem.Molecule;
@@ -28144,12 +28800,14 @@
   var XYZParser = /*#__PURE__*/function (_Parser) {
     inherits(XYZParser, _Parser);
 
+    var _super = _createSuper$1L(XYZParser);
+
     function XYZParser(data, options) {
       var _this;
 
       classCallCheck(this, XYZParser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(XYZParser).call(this, data, options));
+      _this = _super.call(this, data, options);
       _this._complex = null;
       _this._atomsInf = null;
       _this._options.fileType = 'xyz';
@@ -28256,18 +28914,23 @@
 
   defineProperty(XYZParser, "extensions", ['.xyz']);
 
+  function _createSuper$1M(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1N()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1N() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$6 = chem.Complex,
       Element$7 = chem.Element;
 
   var PubChemParser = /*#__PURE__*/function (_Parser) {
     inherits(PubChemParser, _Parser);
 
+    var _super = _createSuper$1M(PubChemParser);
+
     function PubChemParser(data, options) {
       var _this;
 
       classCallCheck(this, PubChemParser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(PubChemParser).call(this, data, options));
+      _this = _super.call(this, data, options);
       _this._options.fileType = 'pubchem+json';
       return _this;
     }
@@ -28429,6 +29092,9 @@
     return SDFStream;
   }();
 
+  function _createSuper$1N(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1O()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1O() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$7 = chem.Complex,
       Element$8 = chem.Element,
       Bond$4 = chem.Bond,
@@ -28486,12 +29152,14 @@
   var SDFParser = /*#__PURE__*/function (_Parser) {
     inherits(SDFParser, _Parser);
 
+    var _super = _createSuper$1N(SDFParser);
+
     function SDFParser(data, options) {
       var _this;
 
       classCallCheck(this, SDFParser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(SDFParser).call(this, data, options));
+      _this = _super.call(this, data, options);
       _this._format = 'sdf';
       _this._complex = null;
       _this._chain = null;
@@ -28833,6 +29501,10 @@
   SDFParser.formats = ['mol', 'sdf'];
   SDFParser.extensions = ['.mol', '.sdf'];
 
+  function _createSuper$1O(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1P()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1P() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var DSN6Header = {
     nstart: [valueType.array, 'i16', 0],
     extent: [valueType.array, 'i16', 3],
@@ -28847,10 +29519,12 @@
   var DSN6Model = /*#__PURE__*/function (_VolumeModel) {
     inherits(DSN6Model, _VolumeModel);
 
+    var _super = _createSuper$1O(DSN6Model);
+
     function DSN6Model() {
       classCallCheck(this, DSN6Model);
 
-      return possibleConstructorReturn(this, getPrototypeOf(DSN6Model).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(DSN6Model, [{
@@ -29005,12 +29679,14 @@
   var DSN6Parser = /*#__PURE__*/function (_Parser) {
     inherits(DSN6Parser, _Parser);
 
+    var _super2 = _createSuper$1O(DSN6Parser);
+
     function DSN6Parser(data, options) {
       var _this;
 
       classCallCheck(this, DSN6Parser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(DSN6Parser).call(this, data, options));
+      _this = _super2.call(this, data, options);
       _this._options.fileType = 'dsn6';
       _this.model = new DSN6Model();
       return _this;
@@ -29044,6 +29720,9 @@
   DSN6Parser.extensions = ['.dsn6', '.omap'];
   DSN6Parser.binary = true;
 
+  function _createSuper$1P(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1Q()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1Q() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Little helper class for GRO Parser usage.
    * @extends PDBStream
@@ -29052,12 +29731,14 @@
   var GROReader = /*#__PURE__*/function (_PDBStream) {
     inherits(GROReader, _PDBStream);
 
+    var _super = _createSuper$1P(GROReader);
+
     function GROReader(data) {
       var _this;
 
       classCallCheck(this, GROReader);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(GROReader).call(this, data));
+      _this = _super.call(this, data);
       /** @type Number */
 
       _this._next = -1; // End position of line
@@ -29082,6 +29763,9 @@
     return GROReader;
   }(PDBStream);
 
+  function _createSuper$1Q(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1R()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1R() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$8 = chem.Complex,
       Element$9 = chem.Element,
       Molecule$6 = chem.Molecule;
@@ -29092,6 +29776,8 @@
 
   var GROParser = /*#__PURE__*/function (_Parser) {
     inherits(GROParser, _Parser);
+
+    var _super = _createSuper$1Q(GROParser);
 
     /**
      * Create parser for .gro file format
@@ -29104,7 +29790,7 @@
 
       classCallCheck(this, GROParser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(GROParser).call(this, data, options));
+      _this = _super.call(this, data, options);
       /** @type Date */
 
       _this._time = null; // Time in ps, optional field for animations
@@ -29358,6 +30044,9 @@
   GROParser.formats = ['gro'];
   GROParser.extensions = ['.gro'];
 
+  function _createSuper$1R(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1S()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1S() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var Complex$9 = chem.Complex,
       Element$a = chem.Element,
       Bond$5 = chem.Bond,
@@ -29404,12 +30093,14 @@
   var MOL2Parser = /*#__PURE__*/function (_Parser) {
     inherits(MOL2Parser, _Parser);
 
+    var _super = _createSuper$1R(MOL2Parser);
+
     function MOL2Parser(data, options) {
       var _this;
 
       classCallCheck(this, MOL2Parser);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(MOL2Parser).call(this, data, options));
+      _this = _super.call(this, data, options);
       _this._complex = null;
       _this._chain = null;
       _this._residue = null;
@@ -29724,6 +30415,9 @@
   var parsers = new ParserList([// note: order might be important
   PDBParser, CIFParser, MMTFParser, XYZParser, CMLParser, PubChemParser, SDFParser, CCP4Parser, DSN6Parser, GROParser, MOL2Parser]);
 
+  function _createSuper$1S(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1T()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1T() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * A list of available exporters.
    * @extends EntityList
@@ -29731,6 +30425,8 @@
 
   var ExporterList = /*#__PURE__*/function (_EntityList) {
     inherits(ExporterList, _EntityList);
+
+    var _super = _createSuper$1S(ExporterList);
 
     /**
      * Create a list of exporters.
@@ -29747,7 +30443,7 @@
 
       classCallCheck(this, ExporterList);
 
-      return possibleConstructorReturn(this, getPrototypeOf(ExporterList).call(this, someExporters, ['formats']));
+      return _super.call(this, someExporters, ['formats']);
     }
     /**
      * Find a suitable exporter for data.
@@ -30045,15 +30741,21 @@
     return PDBResult;
   }();
 
+  function _createSuper$1T(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1U()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1U() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var PDBExporter = /*#__PURE__*/function (_Exporter) {
     inherits(PDBExporter, _Exporter);
+
+    var _super = _createSuper$1T(PDBExporter);
 
     function PDBExporter(source, options) {
       var _this;
 
       classCallCheck(this, PDBExporter);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(PDBExporter).call(this, source, options));
+      _this = _super.call(this, source, options);
       _this._tags = ['HEADER', 'TITLE', 'COMPND', 'REMARK', 'HELIX', 'SHEET', 'ATOM and HETATM', 'CONECT'];
       _this._result = null;
       _this._tagExtractors = {
@@ -30572,6 +31274,9 @@
     return FBXGeometry;
   }();
 
+  function _createSuper$1U(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1V()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1V() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Fbx geometry, that copies positions+normals, indexes and creates colors filled with defined value.
    * @extends FBXGeometry
@@ -30580,10 +31285,12 @@
   var FBX1CGeometry = /*#__PURE__*/function (_FBXGeometry) {
     inherits(FBX1CGeometry, _FBXGeometry);
 
+    var _super = _createSuper$1U(FBX1CGeometry);
+
     function FBX1CGeometry() {
       classCallCheck(this, FBX1CGeometry);
 
-      return possibleConstructorReturn(this, getPrototypeOf(FBX1CGeometry).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     createClass(FBX1CGeometry, [{
@@ -30630,6 +31337,9 @@
     return FBX1CGeometry;
   }(FBXGeometry);
 
+  function _createSuper$1V(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1W()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1W() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   /**
    * Fbx geometry, that copies positions+normals, indexes from cylinder  geometry and creates colors filled with two
    * defined values.
@@ -30639,12 +31349,14 @@
   var FBX2CCylinder = /*#__PURE__*/function (_FBXGeometry) {
     inherits(FBX2CCylinder, _FBXGeometry);
 
+    var _super = _createSuper$1V(FBX2CCylinder);
+
     function FBX2CCylinder() {
       var _this;
 
       classCallCheck(this, FBX2CCylinder);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(FBX2CCylinder).call(this));
+      _this = _super.call(this);
       _this._cutRawStart = 0;
       _this._cutRawEnd = 0;
       _this._facesPerSlice = 0;
@@ -31440,15 +32152,21 @@
     return FBXResult;
   }();
 
+  function _createSuper$1W(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1X()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1X() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var FBXExporter = /*#__PURE__*/function (_Exporter) {
     inherits(FBXExporter, _Exporter);
+
+    var _super = _createSuper$1W(FBXExporter);
 
     function FBXExporter(source, options) {
       var _this;
 
       classCallCheck(this, FBXExporter);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(FBXExporter).call(this, source, options)); // Data
+      _this = _super.call(this, source, options); // Data
 
       _this._data = source;
       _this._version = options.miewVersion || '0.0-UNSPECIFIED';
@@ -31573,7 +32291,7 @@
               element.style.background = colorAsHex(object.userData.background);
             }
           } else {
-            var fogFactor = THREE.Math.smoothstep(-this._vector.z, scene.fog.near, scene.fog.far);
+            var fogFactor = THREE.MathUtils.smoothstep(-this._vector.z, scene.fog.near, scene.fog.far);
             element.style.color = lerpColorAsHex(object.userData.color, scene.fog.color, fogFactor);
 
             if (object.userData.background !== 'transparent') {
@@ -33225,15 +33943,21 @@
 
   SceneObject.prototype.type = '__';
 
+  function _createSuper$1X(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1Y()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1Y() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var LinesObj = /*#__PURE__*/function (_SceneObject) {
     inherits(LinesObj, _SceneObject);
+
+    var _super = _createSuper$1X(LinesObj);
 
     function LinesObj(params, opts) {
       var _this;
 
       classCallCheck(this, LinesObj);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(LinesObj).call(this, params, opts));
+      _this = _super.call(this, params, opts);
 
       if (params.length < 2) {
         throw new Error('Wrong number of argumets on line object creation!');
@@ -33324,8 +34048,14 @@
 
   var fragmentShader$1 = "precision highp float;\r\n\r\nuniform sampler2D srcTex;\r\nuniform vec2 srcTexSize;\r\nuniform vec2 thickness;\r\nvarying vec2 vUv;\r\n\r\n#ifdef DEPTH_OUTLINE\r\n  uniform sampler2D srcDepthTex; //depthTexture\r\n  uniform vec3 color;\r\n  uniform float threshold;\r\n#endif\r\n\r\nvoid main() {\r\n\r\n  vec2 pixelSize = thickness / srcTexSize;\r\n\r\n  #ifdef DEPTH_OUTLINE\r\n    float c00 = texture2D(srcDepthTex, vUv + vec2(-pixelSize.x,-pixelSize.y)).x;\r\n    float c01 = texture2D(srcDepthTex, vUv + vec2(0,-pixelSize.y)).x;\r\n    float c02 = texture2D(srcDepthTex, vUv + vec2(pixelSize.x,-pixelSize.y)).x;\r\n    float c10 = texture2D(srcDepthTex, vUv + vec2(-pixelSize.x,0)).x;\r\n    float c12 = texture2D(srcDepthTex, vUv + vec2(pixelSize.x,0)).x;\r\n    float c20 = texture2D(srcDepthTex, vUv + vec2(-pixelSize.x,pixelSize.y)).x;\r\n    float c21 = texture2D(srcDepthTex, vUv + vec2(0,pixelSize.y)).x;\r\n    float c22 = texture2D(srcDepthTex, vUv + vec2(pixelSize.x,pixelSize.y)).x;\r\n\r\n    float horizEdge = - c00 - 2.0 * c01 - c02 + c20 + 2.0 * c21 + c22;\r\n    float vertEdge  = - c00 - 2.0 * c10 - c20 + c02 + 2.0 * c12 + c22;\r\n\r\n    float grad = sqrt(horizEdge * horizEdge + vertEdge * vertEdge);\r\n\r\n    gl_FragColor = ( grad > threshold ) ? vec4(color.rgb, 1.0) : gl_FragColor = texture2D(srcTex, vUv);\r\n\r\n  #else\r\n    vec4 c00 = texture2D(srcTex, vUv + vec2(-pixelSize.x,-pixelSize.y));\r\n    vec4 c01 = texture2D(srcTex, vUv + vec2(0,-pixelSize.y));\r\n    vec4 c02 = texture2D(srcTex, vUv + vec2(pixelSize.x,-pixelSize.y));\r\n    vec4 c10 = texture2D(srcTex, vUv + vec2(-pixelSize.x,0));\r\n    vec4 c12 = texture2D(srcTex, vUv + vec2(pixelSize.x,0));\r\n    vec4 c20 = texture2D(srcTex, vUv + vec2(-pixelSize.x,pixelSize.y));\r\n    vec4 c21 = texture2D(srcTex, vUv + vec2(0,pixelSize.y));\r\n    vec4 c22 = texture2D(srcTex, vUv + vec2(pixelSize.x,pixelSize.y));\r\n\r\n    vec4 horizEdge = - c00 - 2.0 * c01 - c02 + c20 + 2.0 * c21 + c22;\r\n    vec4 vertEdge  = - c00 - 2.0 * c10 - c20 + c02 + 2.0 * c12 + c22;\r\n\r\n    vec4 grad = sqrt(horizEdge * horizEdge + vertEdge * vertEdge);\r\n    gl_FragColor = grad;\r\n  #endif\r\n}\r\n";
 
+  function _createSuper$1Y(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1Z()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1Z() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var OutlineMaterial = /*#__PURE__*/function (_THREE$RawShaderMater) {
     inherits(OutlineMaterial, _THREE$RawShaderMater);
+
+    var _super = _createSuper$1Y(OutlineMaterial);
 
     function OutlineMaterial(params) {
       var _this;
@@ -33333,7 +34063,7 @@
       classCallCheck(this, OutlineMaterial);
 
       // add depth outline
-      _this = possibleConstructorReturn(this, getPrototypeOf(OutlineMaterial).call(this, params));
+      _this = _super.call(this, params);
       var settings = {
         uniforms: {
           srcTex: {
@@ -33412,15 +34142,21 @@
 
   var fragmentShader$2 = "precision highp float;\r\n\r\n// edge end finding algorithm parameters\r\n#define FXAA_QUALITY_PS 8\r\n#define FXAA_QUALITY_P0 1.0\r\n#define FXAA_QUALITY_P1 1.5\r\n#define FXAA_QUALITY_P2 2.0\r\n#define FXAA_QUALITY_P3 2.0\r\n#define FXAA_QUALITY_P4 2.0\r\n#define FXAA_QUALITY_P5 2.0\r\n#define FXAA_QUALITY_P6 4.0\r\n#define FXAA_QUALITY_P7 12.0\r\n// constants\r\nfloat fxaaQualityEdgeThreshold = 0.125;\r\nfloat fxaaQualityEdgeThresholdMin = 0.0625;\r\nfloat fxaaQualitySubpix = 0.7; //0.65;\r\n// global params\r\nuniform sampler2D srcTex;\r\nuniform vec2 srcTexelSize;\r\nuniform vec3 bgColor;\r\n// from vs\r\nvarying vec2 vUv;\r\n//=====================================================================//\r\n// calc luminance from rgb\r\n//'float FxaaLuma(vec3 rgb) {return rgb.y * (0.587/0.299) + rgb.x; } // Lotte's idea about game luminance\r\nfloat FxaaLuma(vec3 rgb) {return dot(rgb, vec3(0.299, 0.587, 0.114)); } // real luminance calculation\r\n                                                                           // for non-real scene rendering\r\n// texture sampling by pixel position(coords) and offset(in pixels)\r\n vec3 FxaaTex(sampler2D tex, vec2 pos, vec2 off,  vec2 res ) {\r\n  #ifdef BG_TRANSPARENT\r\n    vec4 color = texture2D( tex, pos + off * res );\r\n    return mix(color.rgb, bgColor, 1.0 - color.a);\r\n  #else\r\n    return texture2D( tex, pos + off * res ).xyz;\r\n  #endif\r\n}\r\nvec3 FxaaTexTop(sampler2D tex, vec2 pos) {\r\n  #ifdef BG_TRANSPARENT\r\n    vec4 color = texture2D( tex, pos );\r\n    return mix(color.rgb, bgColor, 1.0 - color.a);\r\n  #else\r\n    return texture2D( tex, pos).xyz;\r\n  #endif\r\n}\r\nvec4 FxaaTexTopAlpha(sampler2D tex, vec2 pos) {\r\n  return texture2D( tex, pos);\r\n}\r\n\r\n//=====================================================================//\r\nvoid main() {\r\n  // renaming\r\n  vec2 posM = vUv;\r\n  // get luminance for neighbours\r\n  float lumaS = FxaaLuma(FxaaTex(srcTex, posM, vec2( 0.0, 1.0 ), srcTexelSize));\r\n  float lumaE = FxaaLuma(FxaaTex(srcTex, posM, vec2( 1.0, 0.0 ), srcTexelSize));\r\n  float lumaN = FxaaLuma(FxaaTex(srcTex, posM, vec2( 0.0, -1.0 ), srcTexelSize));\r\n  float lumaW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0, 0.0 ), srcTexelSize));\r\n  float lumaM = FxaaLuma(FxaaTexTop(srcTex, posM));\r\n  // find max and min luminance\r\n  float rangeMax = max(max(lumaN, lumaW), max(lumaE, max(lumaS, lumaM)));\r\n  float rangeMin = min(min(lumaN, lumaW), min(lumaE, min(lumaS, lumaM)));\r\n  // calc maximum non-edge range\r\n  float rangeMaxScaled = rangeMax * fxaaQualityEdgeThreshold;\r\n  float range = rangeMax - rangeMin;\r\n  float rangeMaxClamped = max(fxaaQualityEdgeThresholdMin, rangeMaxScaled);\r\n  // exit when luma contrast is small (is not edge)\r\n  if(range < rangeMaxClamped){\r\n    gl_FragColor = FxaaTexTopAlpha(srcTex, posM);\r\n    return;\r\n  }\r\n  float subpixRcpRange = 1.0/range;\r\n  // note: the sampling coordinates can be calculated in vertex shader but the approach doesn't affect performance\r\n  // visibly, thus we decided to leave calculation here for better readability.\r\n  // calc other neighbours luminance\r\n  float lumaNE = FxaaLuma(FxaaTex(srcTex, posM, vec2(  1.0, -1.0 ), srcTexelSize));\r\n  float lumaSW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0,  1.0 ), srcTexelSize));\r\n  float lumaSE = FxaaLuma(FxaaTex(srcTex, posM, vec2(  1.0,  1.0 ), srcTexelSize));\r\n  float lumaNW = FxaaLuma(FxaaTex(srcTex, posM, vec2( -1.0, -1.0 ), srcTexelSize));\r\n/*--------------span calculation and subpix amount calulation-----------------*/\r\n  float lumaNS = lumaN + lumaS;\r\n  float lumaWE = lumaW + lumaE;\r\n  float subpixNSWE = lumaNS + lumaWE;\r\n  float edgeHorz1 = (-2.0 * lumaM) + lumaNS;\r\n  float edgeVert1 = (-2.0 * lumaM) + lumaWE;\r\n/*--------------------------------------------------------------------------*/\r\n  float lumaNESE = lumaNE + lumaSE;\r\n  float lumaNWNE = lumaNW + lumaNE;\r\n  float edgeHorz2 = (-2.0 * lumaE) + lumaNESE;\r\n  float edgeVert2 = (-2.0 * lumaN) + lumaNWNE;\r\n/*--------------------------------------------------------------------------*/\r\n  float lumaNWSW = lumaNW + lumaSW;\r\n  float lumaSWSE = lumaSW + lumaSE;\r\n  float edgeHorz4 = (abs(edgeHorz1) * 2.0) + abs(edgeHorz2);\r\n  float edgeVert4 = (abs(edgeVert1) * 2.0) + abs(edgeVert2);\r\n  float edgeHorz3 = (-2.0 * lumaW) + lumaNWSW;\r\n  float edgeVert3 = (-2.0 * lumaS) + lumaSWSE;\r\n  float edgeHorz = abs(edgeHorz3) + edgeHorz4;\r\n  float edgeVert = abs(edgeVert3) + edgeVert4;\r\n/*--------------------subpix amount calulation------------------------------*/\r\n  float subpixNWSWNESE = lumaNWSW + lumaNESE;\r\n  float lengthSign = srcTexelSize.x;\r\n  bool horzSpan = edgeHorz >= edgeVert;\r\n   // debug  code edge span visualization\r\n/*'  if (horzSpan)\r\n      gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\r\n  else\r\n    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\r\n  return;*/\r\n  float subpixA = subpixNSWE * 2.0 + subpixNWSWNESE;\r\n/*--------------------------------------------------------------------------*/\r\n  if(!horzSpan) lumaN = lumaW;\r\n  if(!horzSpan) lumaS = lumaE;\r\n  if(horzSpan) lengthSign = srcTexelSize.y;\r\n  float subpixB = (subpixA * (1.0/12.0)) - lumaM;\r\n/*--------------------------------------------------------------------------*/\r\n  float gradientN = lumaN - lumaM;\r\n  float gradientS = lumaS - lumaM;\r\n  float lumaNN = lumaN + lumaM;\r\n  float lumaSS = lumaS + lumaM;\r\n  bool pairN = abs(gradientN) >= abs(gradientS);\r\n  float gradient = max(abs(gradientN), abs(gradientS));\r\n  if(pairN) lengthSign = -lengthSign;\r\n  float subpixC = clamp(abs(subpixB) * subpixRcpRange, 0.0, 1.0);\r\n/*--------------------------------------------------------------------------*/\r\n  vec2 posB;\r\n  posB = posM;\r\n  vec2 offNP;\r\n  offNP.x = (!horzSpan) ? 0.0 : srcTexelSize.x;\r\n  offNP.y = ( horzSpan) ? 0.0 : srcTexelSize.y;\r\n  if(!horzSpan) posB.x += lengthSign * 0.5;\r\n  if( horzSpan) posB.y += lengthSign * 0.5;\r\n/*--------------------------------------------------------------------------*/\r\n  vec2 posN;\r\n  posN = posB - offNP * FXAA_QUALITY_P0;\r\n  vec2 posP;\r\n  posP = posB + offNP * FXAA_QUALITY_P0;\r\n  float subpixD = ((-2.0)*subpixC) + 3.0;\r\n  float lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN));\r\n  float subpixE = subpixC * subpixC;\r\n  float lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP));\r\n/*--------------------------------------------------------------------------*/\r\n  if(!pairN) lumaNN = lumaSS;\r\n  float gradientScaled = gradient * 1.0/4.0;\r\n  float lumaMM = lumaM - lumaNN * 0.5;\r\n  float subpixF = subpixD * subpixE;\r\n  bool lumaMLTZero = lumaMM < 0.0;\r\n/*---------------------looped edge-end search-------------------------------*/\r\n  lumaEndN -= lumaNN * 0.5;\r\n  lumaEndP -= lumaNN * 0.5;\r\n  bool doneN = abs(lumaEndN) >= gradientScaled;\r\n  bool doneP = abs(lumaEndP) >= gradientScaled;\r\n  if(!doneN) posN -= offNP * FXAA_QUALITY_P1;\r\n  bool doneNP = (!doneN) || (!doneP);\r\n  if(!doneP) posP += offNP * FXAA_QUALITY_P1;\r\n/*--------------------------------------------------------------------------*/\r\n  if(doneNP) {\r\n    if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n    if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n    if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n    if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n    doneN = abs(lumaEndN) >= gradientScaled;\r\n    doneP = abs(lumaEndP) >= gradientScaled;\r\n    if(!doneN) posN -= offNP * FXAA_QUALITY_P2;\r\n    doneNP = (!doneN) || (!doneP);\r\n    if(!doneP) posP += offNP * FXAA_QUALITY_P2;\r\n/*--------------------------------------------------------------------------*/\r\n    #if (FXAA_QUALITY_PS > 3)\r\n      if(doneNP) {\r\n        if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n        if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n        if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n        if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n        doneN = abs(lumaEndN) >= gradientScaled;\r\n        doneP = abs(lumaEndP) >= gradientScaled;\r\n        if(!doneN) posN -= offNP * FXAA_QUALITY_P3;\r\n        doneNP = (!doneN) || (!doneP);\r\n        if(!doneP) posP += offNP * FXAA_QUALITY_P3;\r\n/*--------------------------------------------------------------------------*/\r\n        #if (FXAA_QUALITY_PS > 4)\r\n          if(doneNP) {\r\n            if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n            if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n            if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n            if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n            doneN = abs(lumaEndN) >= gradientScaled;\r\n            doneP = abs(lumaEndP) >= gradientScaled;\r\n            if(!doneN) posN -= offNP * FXAA_QUALITY_P4;\r\n            doneNP = (!doneN) || (!doneP);\r\n            if(!doneP) posP += offNP * FXAA_QUALITY_P4;\r\n/*--------------------------------------------------------------------------*/\r\n            #if (FXAA_QUALITY_PS > 5)\r\n               if(doneNP) {\r\n                 if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n                 if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n                 if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n                 if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n                 doneN = abs(lumaEndN) >= gradientScaled;\r\n                 doneP = abs(lumaEndP) >= gradientScaled;\r\n                 if(!doneN) posN -= offNP * FXAA_QUALITY_P5;\r\n                 doneNP = (!doneN) || (!doneP);\r\n                 if(!doneP) posP += offNP * FXAA_QUALITY_P5;\r\n/*--------------------------------------------------------------------------*/\r\n                 #if (FXAA_QUALITY_PS > 6)\r\n                   if(doneNP) {\r\n                     if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n                     if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n                     if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n                     if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n                     doneN = abs(lumaEndN) >= gradientScaled;\r\n                     doneP = abs(lumaEndP) >= gradientScaled;\r\n                     if(!doneN) posN -= offNP * FXAA_QUALITY_P6;\r\n                     doneNP = (!doneN) || (!doneP);\r\n                     if(!doneP) posP += offNP * FXAA_QUALITY_P6;\r\n/*--------------------------------------------------------------------------*/\r\n                     #if (FXAA_QUALITY_PS > 7)\r\n                       if(doneNP) {\r\n                         if(!doneN) lumaEndN = FxaaLuma(FxaaTexTop(srcTex, posN.xy));\r\n                         if(!doneP) lumaEndP = FxaaLuma(FxaaTexTop(srcTex, posP.xy));\r\n                         if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;\r\n                         if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;\r\n                         doneN = abs(lumaEndN) >= gradientScaled;\r\n                         doneP = abs(lumaEndP) >= gradientScaled;\r\n                         if(!doneN) posN -= offNP * FXAA_QUALITY_P7;\r\n                         doneNP = (!doneN) || (!doneP);\r\n                         if(!doneP) posP += offNP * FXAA_QUALITY_P7;\r\n/*--------------------------------------------------------------------------*/\r\n                       }\r\n                     #endif\r\n                   }\r\n                 #endif\r\n               }\r\n             #endif\r\n           }\r\n         #endif\r\n      }\r\n    #endif\r\n  }\r\n/*----------------calculate subpix offset due to edge ends-------------------*/\r\n  float dstN = posM.x - posN.x;\r\n  float dstP = posP.x - posM.x;\r\n  if(!horzSpan) dstN = posM.y - posN.y;\r\n  if(!horzSpan) dstP = posP.y - posM.y;\r\n/*--------------------------------------------------------------------------*/\r\n  bool goodSpanN = (lumaEndN < 0.0) != lumaMLTZero;\r\n  float spanLength = (dstP + dstN);\r\n  bool goodSpanP = (lumaEndP < 0.0) != lumaMLTZero;\r\n  float spanLengthRcp = 1.0 / spanLength;\r\n/*--------------------------------------------------------------------------*/\r\n  bool directionN = dstN < dstP;\r\n  float dst = min(dstN, dstP);\r\n  bool goodSpan = directionN ? goodSpanN : goodSpanP;\r\n  float subpixG = subpixF * subpixF;\r\n  float pixelOffset = (dst * (-spanLengthRcp)) + 0.5;\r\n  float subpixH = subpixG * fxaaQualitySubpix;\r\n/*-----------------calc texture offest using subpix-------------------------*/\r\n  float pixelOffsetGood = goodSpan ? pixelOffset : 0.0;\r\n  float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);\r\n\r\n  float offset = pixelOffsetSubpix * lengthSign;\r\n  #ifdef BG_TRANSPARENT\r\n    // get original texel\r\n    vec4 rgbaA = FxaaTexTopAlpha(srcTex, posM);\r\n    // calc step to blended texel\r\n    vec2 step = sign((!horzSpan) ? vec2 (offset, 0.0) : vec2 (0.0, offset));\r\n    // get neighboring texel\r\n    vec4 rgbaB = FxaaTexTopAlpha(srcTex, posM + step * srcTexelSize);\r\n    //  calc blend factor from offset\r\n    float f = (!horzSpan) ? offset / srcTexelSize.x : offset / srcTexelSize.y;\r\n    f = abs(f);\r\n    // calc alpha (special formula to emulate blending with bg)\r\n    gl_FragColor.a = 1.0 - mix(1.0 - rgbaA.a, 1.0 - rgbaB.a, f);\r\n    // calc color (special formula to emulate blending with bg)\r\n    gl_FragColor.rgb = mix(rgbaA.rgb * rgbaA.a, rgbaB.rgb * rgbaB.a, f) / gl_FragColor.a;\r\n  #else\r\n    if(!horzSpan) {\r\n       posM.x += offset;\r\n    } else {\r\n       posM.y += offset;\r\n    }\r\n    gl_FragColor = FxaaTexTopAlpha(srcTex, posM);\r\n  #endif\r\n  return;\r\n}\r\n";
 
+  function _createSuper$1Z(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1_()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1_() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var FXAAMaterial = /*#__PURE__*/function (_THREE$RawShaderMater) {
     inherits(FXAAMaterial, _THREE$RawShaderMater);
+
+    var _super = _createSuper$1Z(FXAAMaterial);
 
     function FXAAMaterial(params) {
       var _this;
 
       classCallCheck(this, FXAAMaterial);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(FXAAMaterial).call(this, params)); // set default values
+      _this = _super.call(this, params); // set default values
 
       _this.setValues.call(assertThisInitialized(_this), {
         uniforms: {
@@ -33484,18 +34220,23 @@
 
   var fragmentShader$3 = "precision highp float;\r\n#define EPSILON 0.0000001\r\n\r\n#define MAX_SAMPLES_COUNT 32\r\nuniform vec3 samplesKernel[MAX_SAMPLES_COUNT];\r\nuniform sampler2D noiseTexture;\r\nuniform vec2      noiseTexelSize;\r\nuniform sampler2D diffuseTexture;\r\nuniform sampler2D depthTexture;\r\nuniform sampler2D normalTexture;\r\nuniform vec2      srcTexelSize;\r\nuniform vec2      camNearFar;\r\nuniform mat4      projMatrix;\r\n\r\nuniform float aspectRatio;\r\nuniform float tanHalfFOV;\r\n\r\nuniform float kernelRadius;\r\nuniform float depthThreshold;\r\nuniform float factor;\r\n\r\nvarying vec2 vUv;\r\n\r\nfloat CalcViewZ(vec2 screenPos)\r\n{\r\n  float depth = texture2D(depthTexture, screenPos).x;\r\n  // [0, 1]->[-1, 1]\r\n  float clipedZ = 2.0 * depth - 1.0;\r\n  // see THREE.js camera.makeFrustum for projection details\r\n  return (-projMatrix[3][2] / (clipedZ + projMatrix[2][2]));\r\n}\r\n\r\nvec3 ViewPosFromDepth(vec2 screenPos)\r\n{\r\n  vec3 viewPos;\r\n  viewPos.z = CalcViewZ(screenPos);\r\n  //[0, 1]->[-1, 1]\r\n  vec2 projPos = 2.0 * screenPos - 1.0;\r\n  // reconstruct viewposition in right-handed sc with z to viewer\r\n  viewPos.xy = vec2(\r\n                    projPos.x * aspectRatio * tanHalfFOV * abs(viewPos.z),\r\n                    projPos.y * tanHalfFOV * abs(viewPos.z)\r\n                   );\r\n  return viewPos;\r\n}\r\n\r\nvoid main() {\r\n  vec3 viewPos = ViewPosFromDepth(vUv);\r\n  // remap coordinates to prevent noise exture rescale\r\n  vec2 vUvNoise = vUv / srcTexelSize * noiseTexelSize;\r\n  vec4 normalData = texture2D(normalTexture, vUv);\r\n  // return for background fragments (their normals are zero vectors)\r\n  if (length(normalData.rgb) < EPSILON) {\r\n    // 0.0 in alpha component means that it is background fragment\r\n    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\r\n    return;\r\n  }\r\n  //[0, 1] -> [-1, 1]\r\n  vec3 normal = (normalData.rgb * 2.0 - 1.0);\r\n  // normalData.a store 1.0 if normal was build for frontfaced surface\r\n  // and 0.0 in other case\r\n  if (normalData.a < EPSILON) {\r\n    normal *= -1.0;\r\n  }\r\n  // get random vector for sampling sphere rotation\r\n  vec3 randN = texture2D(noiseTexture, vUvNoise).rgb * 2.0 - 1.0;\r\n  randN = normalize(randN);\r\n  // build TBN (randomly rotated around normal)\r\n  vec3 tangent   = normalize(randN - normal * dot(randN, normal));\r\n  vec3 bitangent = cross(tangent, normal);\r\n  mat3 TBN = mat3(tangent, bitangent, normal);\r\n  // calc AO value\r\n  float AO = 0.0;\r\n  for (int i = 0 ; i < MAX_SAMPLES_COUNT ; i++) {\r\n    // rotate sampling kernel around normal\r\n    vec3 reflectedSample = TBN * samplesKernel[i];\r\n    // get sample\r\n    vec3 samplePos = viewPos + reflectedSample * kernelRadius;\r\n\r\n    // project sample to screen to get sample's screen pos\r\n    vec4 SampleScrPos = vec4(samplePos, 1.0);\r\n    // eye -> clip\r\n    SampleScrPos = projMatrix * SampleScrPos;\r\n    // normalize\r\n    SampleScrPos.xy /= SampleScrPos.w;\r\n    //[-1, 1] -> [0, 1]\r\n    SampleScrPos.xy = (SampleScrPos.xy + vec2(1.0)) * 0.5;\r\n\r\n    // get view z for sample projected to the objct surface\r\n    float sampleDepth = CalcViewZ(SampleScrPos.xy);\r\n    // calc occlusion made by object surface at the sample\r\n    AO += step(samplePos.z, sampleDepth);\r\n  }\r\n  // calc result AO-map color\r\n  AO = 1.0 - max(0.0, AO / float(MAX_SAMPLES_COUNT) * factor);\r\n  // write value to AO-map\r\n  gl_FragColor = vec4(AO, AO, AO, 1.0);\r\n}\r\n";
 
+  function _createSuper$1_(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$1$()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1$() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var _samplesKernel$1 = [// hemisphere samples adopted to sphere
   new THREE.Vector3(0.295184, 0.077723, 0.068429), new THREE.Vector3(-0.271976, -0.365221, 0.838363), new THREE.Vector3(0.547713, 0.467576, 0.488515), new THREE.Vector3(0.662808, -0.031733, 0.584758), new THREE.Vector3(-0.025717, 0.218955, 0.657094), new THREE.Vector3(-0.310153, -0.365223, 0.370701), new THREE.Vector3(-0.101407, -0.006313, 0.747665), new THREE.Vector3(-0.769138, 0.360399, 0.086847), new THREE.Vector3(-0.271988, -0.275140, 0.905353), new THREE.Vector3(0.096740, -0.566901, 0.700151), new THREE.Vector3(0.562872, -0.735136, 0.094647), new THREE.Vector3(0.379877, 0.359278, 0.190061), new THREE.Vector3(0.519064, -0.023055, 0.405068), new THREE.Vector3(-0.301036, 0.114696, 0.088885), new THREE.Vector3(-0.282922, 0.598305, 0.487214), new THREE.Vector3(-0.181859, 0.251670, 0.679702), new THREE.Vector3(-0.191463, -0.635818, 0.512919), new THREE.Vector3(-0.293655, 0.427423, 0.078921), new THREE.Vector3(-0.267983, 0.680534, 0.132880), new THREE.Vector3(0.139611, 0.319637, 0.477439), new THREE.Vector3(-0.352086, 0.311040, 0.653913), new THREE.Vector3(0.321032, 0.805279, 0.487345), new THREE.Vector3(0.073516, 0.820734, 0.414183), new THREE.Vector3(-0.155324, 0.589983, 0.411460), new THREE.Vector3(0.335976, 0.170782, 0.527627), new THREE.Vector3(0.463460, -0.355658, 0.167689), new THREE.Vector3(0.222654, 0.596550, 0.769406), new THREE.Vector3(0.922138, -0.042070, 0.147555), new THREE.Vector3(-0.727050, -0.329192, 0.369826), new THREE.Vector3(-0.090731, 0.533820, 0.463767), new THREE.Vector3(-0.323457, -0.876559, 0.238524), new THREE.Vector3(-0.663277, -0.372384, 0.342856)];
 
   var AOMaterial = /*#__PURE__*/function (_THREE$RawShaderMater) {
     inherits(AOMaterial, _THREE$RawShaderMater);
 
+    var _super = _createSuper$1_(AOMaterial);
+
     function AOMaterial() {
       var _this;
 
       classCallCheck(this, AOMaterial);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(AOMaterial).call(this)); // set default values
+      _this = _super.call(this); // set default values
 
       _this.setValues.call(assertThisInitialized(_this), {
         uniforms: {
@@ -33571,17 +34312,22 @@
 
   var fragmentShader$4 = "precision highp float;\r\n#define EPSILON 0.0000001\r\n\r\n#define MAX_SAMPLES_COUNT 5\r\nuniform float samplesOffsets[MAX_SAMPLES_COUNT];\r\nuniform sampler2D aoMap;\r\nuniform sampler2D depthTexture;\r\nuniform vec2      srcTexelSize;\r\n\r\nvarying vec2 vUv;\r\n\r\nvoid main() {\r\n  float x = vUv.x;\r\n  float y = vUv.y;\r\n  vec4 res = vec4(0.0);\r\n  res.a = texture2D(aoMap, vec2(x, y )).a;\r\n  // return for background fragments (0.0 in alpha component means that it is background fragment)\r\n  if (res.a < EPSILON) {\r\n    gl_FragColor = res;\r\n    return;\r\n  }\r\n\r\n  float pixelDepth = texture2D(depthTexture, vec2(x, y)).x;\r\n  float weightSum = 0.0;\r\n  for (int i = 0; i < MAX_SAMPLES_COUNT; ++i) {\r\n    if (texture2D(aoMap, vec2(x + samplesOffsets[i] * srcTexelSize.x, y )).a < EPSILON) {\r\n      continue;\r\n    }\r\n    vec2 samplePos = vec2(x + samplesOffsets[i] * srcTexelSize.x, y);\r\n    float depth = texture2D(depthTexture, samplePos).x;\r\n    float weight = (1.0 / (0.0001 + abs(depth - pixelDepth)));\r\n    res.rgb += texture2D(aoMap, vec2(x + samplesOffsets[i] * srcTexelSize.x, y )).rgb * weight;\r\n    weightSum += weight;\r\n  }\r\n  res.rgb = res.rgb / weightSum;\r\n  gl_FragColor = res;\r\n}\r\n";
 
+  function _createSuper$1$(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$20()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$20() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var _kernelOffsets = [-2.0, -1.0, 0.0, 1.0, 2.0];
 
   var AOHorBlurMaterial = /*#__PURE__*/function (_THREE$RawShaderMater) {
     inherits(AOHorBlurMaterial, _THREE$RawShaderMater);
+
+    var _super = _createSuper$1$(AOHorBlurMaterial);
 
     function AOHorBlurMaterial() {
       var _this;
 
       classCallCheck(this, AOHorBlurMaterial);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(AOHorBlurMaterial).call(this)); // set default values
+      _this = _super.call(this); // set default values
 
       _this.setValues.call(assertThisInitialized(_this), {
         uniforms: {
@@ -33617,17 +34363,22 @@
 
   var fragmentShader$5 = "precision highp float;\r\n#define EPSILON 0.0000001\r\n\r\n#define MAX_SAMPLES_COUNT 5\r\nuniform float samplesOffsets[MAX_SAMPLES_COUNT];\r\nuniform sampler2D diffuseTexture;\r\nuniform sampler2D aoMap;\r\nuniform sampler2D depthTexture;\r\nuniform vec2      srcTexelSize;\r\n\r\nuniform mat4  projMatrix;\r\nuniform float aspectRatio;\r\nuniform float tanHalfFOV;\r\n\r\n#ifdef USE_FOG\r\n  uniform vec2 fogNearFar;\r\n  uniform vec4 fogColor;\r\n#endif\r\nvarying vec2 vUv;\r\n\r\nfloat CalcViewZ(vec2 screenPos)\r\n{\r\n  float depth = texture2D(depthTexture, screenPos).x;\r\n  // [0, 1]->[-1, 1]\r\n  float clipedZ = 2.0 * depth - 1.0;\r\n  // see THREE.js camera.makeFrustum for projection details\r\n  return (-projMatrix[3][2] / (clipedZ + projMatrix[2][2]));\r\n}\r\n\r\nvec3 ViewPosFromDepth(vec2 screenPos)\r\n{\r\n  vec3 viewPos;\r\n  viewPos.z = CalcViewZ(screenPos);\r\n  //[0, 1]->[-1, 1]\r\n  vec2 projPos = 2.0 * screenPos - 1.0;\r\n  // reconstruct viewposition in right-handed sc with z to viewer\r\n  viewPos.xy = vec2(\r\n  projPos.x * aspectRatio * tanHalfFOV * abs(viewPos.z),\r\n  projPos.y * tanHalfFOV * abs(viewPos.z)\r\n  );\r\n  return viewPos;\r\n}\r\n\r\nvoid main() {\r\n  vec3 viewPos = ViewPosFromDepth(vUv);\r\n  float x = vUv.x;\r\n  float y = vUv.y;\r\n  vec4 color = texture2D(diffuseTexture, vec2(x, y));\r\n  vec4 res = vec4(0.0);\r\n  res.a = texture2D(aoMap, vec2(x, y )).a;\r\n  // return for background fragments (0.0 in alpha component means that it is background fragment)\r\n  if (res.a < EPSILON) {\r\n    gl_FragColor = color;\r\n    return;\r\n  }\r\n\r\n  float pixelDepth = texture2D(depthTexture, vec2(x, y)).x;\r\n  float weightSum = 0.0;\r\n  for (int i = 0; i < MAX_SAMPLES_COUNT; ++i) {\r\n    if (texture2D(aoMap, vec2(x, y + samplesOffsets[i] * srcTexelSize.y)).a < EPSILON) {\r\n      continue;\r\n    }\r\n    vec2 samplePos = vec2(x, y + samplesOffsets[i] * srcTexelSize.y);\r\n    float depth = texture2D(depthTexture, samplePos).x;\r\n    float weight = (1.0 / (0.0001 + abs(depth - pixelDepth)));\r\n    res.rgb += texture2D(aoMap, vec2(x, y + samplesOffsets[i] * srcTexelSize.y)).rgb * weight;\r\n    weightSum += weight;\r\n  }\r\n  res.rgb /= weightSum;\r\n\r\n  #if defined(USE_FOG) && !defined(FOG_TRANSPARENT)\r\n    // Add fog to the result value\r\n    // Proper way to get an image with fog and ao requires formula:\r\n    //          gl_FragColor = fragColor*AO*(1-fogFactor) + fogColor*fogFactor\r\n    // But we have already fogged molecule to add AO too. Let's split the straight formula into our real steps!\r\n    // We have:  AO, fogFactor, fogColor,\r\n    //          color = fragColor*(1-fogFactor) + fogColor*fogFactor (it comes from diffuseTexture,\r\n    //                                                                where molecule has been already drawn with fog)\r\n    // Transform:\r\n    //          fragColor*AO*(1-fogFactor) + fogColor*fogFactor =\r\n    //        = [fragColor*(1-fogFactor) = color - fogColor*fogFactor] =\r\n    //        = (color - fogColor*fogFactor)*AO + fogColor*fogFactor =\r\n    //        = color*AO + fogColor*fogFactor*(1 - AO)\r\n    // Result:  gl_FragColor = color*AO + fogColor*fogFactor*(1 - AO)\r\n    float fogFactor = smoothstep(fogNearFar.x, fogNearFar.y, - viewPos.z) * fogColor.a;\r\n    gl_FragColor.rgb = color.rgb * res.rgb + fogColor.rgb * fogFactor *(vec3(1.0, 1.0, 1.0) - res.rgb);\r\n  #else\r\n    gl_FragColor.rgb = color.rgb * res.rgb;\r\n  #endif\r\n  gl_FragColor.a = color.a;\r\n}\r\n";
 
+  function _createSuper$20(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$21()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$21() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
   var _kernelOffsets$1 = [-2.0, -1.0, 0.0, 1.0, 2.0];
 
   var AOVertBlurWithBlendMaterial = /*#__PURE__*/function (_THREE$RawShaderMater) {
     inherits(AOVertBlurWithBlendMaterial, _THREE$RawShaderMater);
+
+    var _super = _createSuper$20(AOVertBlurWithBlendMaterial);
 
     function AOVertBlurWithBlendMaterial(params) {
       var _this;
 
       classCallCheck(this, AOVertBlurWithBlendMaterial);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(AOVertBlurWithBlendMaterial).call(this, params)); // set default values
+      _this = _super.call(this, params); // set default values
 
       _this.setValues.call(assertThisInitialized(_this), {
         uniforms: {
@@ -33717,15 +34468,21 @@
 
   var fragmentShader$6 = "precision highp float;\r\n\r\nuniform sampler2D srcL;\r\nuniform sampler2D srcR;\r\nvarying vec2 vUv;\r\n\r\nvoid main() {\r\n  vec4 l = texture2D(srcL, vUv);\r\n  vec4 r = texture2D(srcR, vUv);\r\n  gl_FragColor = vec4(l.r, r.g, r.b, 1.0);\r\n}\r\n";
 
+  function _createSuper$21(Derived) { return function () { var Super = getPrototypeOf(Derived), result; if (_isNativeReflectConstruct$22()) { var NewTarget = getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$22() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
   var AnaglyphMaterial = /*#__PURE__*/function (_THREE$RawShaderMater) {
     inherits(AnaglyphMaterial, _THREE$RawShaderMater);
+
+    var _super = _createSuper$21(AnaglyphMaterial);
 
     function AnaglyphMaterial() {
       var _this;
 
       classCallCheck(this, AnaglyphMaterial);
 
-      _this = possibleConstructorReturn(this, getPrototypeOf(AnaglyphMaterial).call(this));
+      _this = _super.call(this);
       var settings = {
         uniforms: {
           srcL: {
@@ -36111,7 +36868,7 @@
       }
 
       var gfx = this._gfx;
-      var tanHalfFOV = Math.tan(THREE.Math.DEG2RAD * 0.5 * gfx.camera.fov);
+      var tanHalfFOV = Math.tan(THREE.MathUtils.DEG2RAD * 0.5 * gfx.camera.fov);
       _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture;
       _aoMaterial.uniforms.depthTexture.value = srcDepthTexture;
       _aoMaterial.uniforms.normalTexture.value = normalBuffer.texture;
@@ -37912,11 +38669,11 @@
     var deviceHeight = gfx.renderer.domElement.height;
 
     function fov2Tan(fov) {
-      return Math.tan(THREE.Math.degToRad(0.5 * fov));
+      return Math.tan(THREE.MathUtils.degToRad(0.5 * fov));
     }
 
     function tan2Fov(tan) {
-      return THREE.Math.radToDeg(Math.atan(tan)) * 2.0;
+      return THREE.MathUtils.radToDeg(Math.atan(tan)) * 2.0;
     }
 
     function getDataURL() {
@@ -38542,6 +39299,8 @@
 
         settings.set('zSprites', false);
       }
+
+      _this9.rebuildAll();
     });
     on('fogColor', function () {
       _this9._onFogColorChanged();
@@ -39111,7 +39870,7 @@
     });
   };
 
-  Miew.prototype.VERSION =  "0.9.0" ; // Uncomment this to get debug trace:
+  Miew.prototype.VERSION =  "0.9.0+20200517.183250.1c2ee28-mod" ; // Uncomment this to get debug trace:
   // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
   _.assign(Miew,
