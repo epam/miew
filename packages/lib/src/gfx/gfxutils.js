@@ -418,7 +418,7 @@ function belongToSelectLayers(object) {
   return false;
 }
 
-function _getMeshesArr(root, meshTypes) {
+function _gatherObjects(root, meshTypes) {
   const meshes = [];
   root.traverse((object) => {
     for (let i = 0; i < meshTypes.length; i++) {
@@ -431,27 +431,49 @@ function _getMeshesArr(root, meshTypes) {
   return meshes;
 }
 
+function addDescribedMesh(mesh, matTrueValues, matFalseValues, layer) {
+  // copy of geometry with described material values
+  const material = mesh.material.createInstance();
+  material.setValues(matTrueValues);
+
+  const newMesh = new mesh.constructor(mesh.geometry, material);
+  _.forEach(matFalseValues, (value) => {
+    newMesh.material[value] = false;
+  });
+  newMesh.material.needsUpdate = true;
+  newMesh.applyMatrix4(mesh.matrix);
+  newMesh.layers.set(layer);
+  mesh.parent.add(newMesh);
+  return newMesh;
+}
+
+function traverseMeshes(root, meshTypes, func) {
+  const meshes = _gatherObjects(root, meshTypes);
+
+  for (let i = 0, n = meshes.length; i < n; ++i) {
+    const mesh = meshes[i];
+    if (!mesh.parent) {
+      continue;
+    }
+    func(mesh);
+  }
+}
+
 function applyTransformsToMeshes(root, mtc) {
   const mtcCount = mtc.length;
   if (mtcCount < 1) {
     return;
   }
 
-  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments, THREE.Line]);
-
-  for (let i = 0, n = meshes.length; i < n; ++i) {
-    const mesh = meshes[i];
-    const { parent } = mesh;
-    if (!parent) {
-      continue;
-    }
+  const meshTypes = [THREE.Mesh, THREE.LineSegments, THREE.Line];
+  traverseMeshes(root, meshTypes, (mesh) => {
     mesh.applyMatrix4(mtc[0]);
     for (let j = 1; j < mtcCount; ++j) {
       const newMesh = new mesh.constructor(mesh.geometry, mesh.material);
-      parent.add(newMesh);
+      mesh.parent.add(newMesh);
       newMesh.applyMatrix4(mtc[j]);
     }
-  }
+  });
 }
 
 function processTransparentMaterial(root, material) {
@@ -459,31 +481,15 @@ function processTransparentMaterial(root, material) {
     return;
   }
 
-  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
-
-  for (let i = 0, n = meshes.length; i < n; ++i) {
-    const mesh = meshes[i];
-    const { parent } = mesh;
-    if (!parent) {
-      continue;
-    }
+  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
     mesh.material.setValues({ prepassTransparancy: false, fakeOpacity: false });
     mesh.material.needsUpdate = true;
     mesh.layers.set(LAYERS.TRANSPARENT);
 
-    // copy of geometry with prepass material
-    const prepassMat = mesh.material.createInstance();
-    prepassMat.setValues({ prepassTransparancy: true, fakeOpacity: false });
-    const prepassMesh = new mesh.constructor(mesh.geometry, prepassMat);
-    _.forEach(['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog'],
-      (value) => {
-        prepassMesh.material[value] = false;
-      });
-    prepassMesh.material.needsUpdate = true;
-    prepassMesh.applyMatrix4(mesh.matrix);
-    prepassMesh.layers.set(LAYERS.PREPASS_TRANSPARENT);
-    parent.add(prepassMesh);
-  }
+    const trueMatSettings = { prepassTransparancy: true };
+    const falseMatSettings = ['fakeOpacity', 'transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog'];
+    addDescribedMesh(mesh, trueMatSettings, falseMatSettings, LAYERS.PREPASS_TRANSPARENT);
+  });
 }
 
 function processColFromPosMaterial(root, material) {
@@ -491,30 +497,12 @@ function processColFromPosMaterial(root, material) {
     return;
   }
 
-  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
-
-  for (let i = 0, n = meshes.length; i < n; ++i) {
-    const mesh = meshes[i];
-    const { parent } = mesh;
-    if (!parent) {
-      continue;
-    }
-
-    // copy of geometry with colFromPosMat material
-    const colFromPosMat = mesh.material.createInstance();
-    colFromPosMat.setValues({ colorFromPos: true });
-    const colFromPosMesh = new mesh.constructor(mesh.geometry, colFromPosMat);
-    _.forEach(['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog', 'overrideColor', 'fogTransparent',
-      'attrColor', 'attrColor2', 'attrAlphaColor', 'fakeOpacity'],
-    (value) => {
-      colFromPosMesh.material[value] = false;
-    });
-
-    colFromPosMesh.material.needsUpdate = true;
-    colFromPosMesh.applyMatrix4(mesh.matrix);
-    colFromPosMesh.layers.set(LAYERS.COLOR_FROM_POSITION);
-    parent.add(colFromPosMesh);
-  }
+  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
+    const trueMatSettings = { colorFromPos: true };
+    const falseMatSettings = ['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog', 'overrideColor',
+      'colorFromDepth', 'fogTransparent', 'attrColor', 'attrColor2', 'attrAlphaColor', 'fakeOpacity'];
+    addDescribedMesh(mesh, trueMatSettings, falseMatSettings, LAYERS.COLOR_FROM_POSITION);
+  });
 }
 
 function createShadowmapMaterial(root, material) {
@@ -522,42 +510,22 @@ function createShadowmapMaterial(root, material) {
     return;
   }
 
-  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
-
-  for (let i = 0, n = meshes.length; i < n; ++i) {
-    const mesh = meshes[i];
+  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
     if (!mesh.receiveShadow && mesh.material.shadowmap) { // remove shadow from non-receivers
       mesh.material.setValues({ shadowmap: false });
     }
     if (!mesh.castShadow) { // skip creating shadowmap meshes for non-casters
-      continue;
+      return;
+    }
+    if (!belongToSelectLayers(mesh)) { // skip creating shadowmap meshes for selection layer
+      return;
     }
 
-    // create special mesh for shadowmap
-    const { parent } = mesh;
-    if (!parent) {
-      continue;
-    }
-    if (!belongToSelectLayers(mesh)) {
-      continue;
-    }
-
-    // copy of geometry with shadowmap material
-    const shadowmapMat = mesh.material.createInstance();
-    shadowmapMat.setValues({
-      colorFromDepth: true,
-      orthoCam: true,
-      lights: false,
-      shadowmap: false,
-      fog: false,
-    });
-    const shadowmapMesh = new mesh.constructor(mesh.geometry, shadowmapMat);
+    const trueMatSettings = { colorFromDepth: true, orthoCam: true };
+    const falseMatSettings = ['lights', 'shadowmap', 'fog'];
+    const shadowmapMesh = addDescribedMesh(mesh, trueMatSettings, falseMatSettings, LAYERS.SHADOWMAP);
     shadowmapMesh.isShadowmapMesh = true;
-    shadowmapMesh.material.needsUpdate = true;
-    shadowmapMesh.applyMatrix4(mesh.matrix);
-    shadowmapMesh.layers.set(LAYERS.SHADOWMAP);
-    parent.add(shadowmapMesh);
-  }
+  });
 }
 
 function removeShadowmapMaterial(root, material) {
@@ -565,14 +533,11 @@ function removeShadowmapMaterial(root, material) {
     return;
   }
 
-  const meshes = _getMeshesArr(root, [THREE.Mesh, THREE.LineSegments]);
-
-  for (let i = 0, n = meshes.length; i < n; ++i) {
-    const mesh = meshes[i];
-    if (mesh.isShadowmapMesh && mesh.parent) {
+  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
+    if (mesh.isShadowmapMesh) {
       mesh.parent.remove(mesh);
     }
-  }
+  });
 }
 
 function processObjRenderOrder(root, idMaterial) {
