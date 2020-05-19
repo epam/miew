@@ -6,6 +6,7 @@ import MiewPage from './pages/miew.page';
 import golden from './golden';
 
 import goldenCfg from './golden.cfg';
+import chromeOptionsArguments from './webdriver.cfg';
 
 const cfg = {
   ...goldenCfg,
@@ -25,7 +26,7 @@ describe('As a power user, I want to', function () {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
-      .setChromeOptions(new chromeDriver.Options().addArguments(['--headless', '--disable-gpu']))
+      .setChromeOptions(new chromeDriver.Options().addArguments(chromeOptionsArguments))
       .build();
 
     return golden.startup(driver, cfg)

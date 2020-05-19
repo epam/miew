@@ -11,6 +11,7 @@ import dirtyChai from 'dirty-chai';
 import golden from './golden';
 
 import EmptyPage from './pages/empty.page';
+import chromeOptionsArguments from './webdriver.cfg';
 
 chai.use(dirtyChai);
 
@@ -191,7 +192,7 @@ describe('As a third-party developer, I want to ', function () {
   before(() => {
     const chromeOptions = new chromeDriver.Options();
     const tmpDirectory = path.resolve(__dirname, tmpFolder);
-    chromeOptions.addArguments(['--headless', '--disable-gpu']);
+    chromeOptions.addArguments(chromeOptionsArguments);
     chromeOptions.setUserPreferences({ 'download.default_directory': tmpDirectory });
 
     driver = new webdriver.Builder()

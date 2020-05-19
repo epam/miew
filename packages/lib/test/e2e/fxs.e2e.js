@@ -8,6 +8,7 @@ import dirtyChai from 'dirty-chai';
 import EmptyPage from './pages/empty.page';
 import golden from './golden';
 import goldenCfg from './golden.cfg';
+import chromeOptionsArguments from './webdriver.cfg';
 
 import testPostProcess from './gfx/postprocess';
 import testShadows from './gfx/shadows';
@@ -53,7 +54,7 @@ describe('As a third-party developer, I want to', function () {
     driver = new webdriver.Builder()
       .forBrowser('chrome')
       .setIeOptions(new ieDriver.Options().requireWindowFocus(true).enablePersistentHover(false))
-      .setChromeOptions(new chromeDriver.Options().addArguments(['--headless', '--disable-gpu']))
+      .setChromeOptions(new chromeDriver.Options().addArguments(chromeOptionsArguments))
       .build();
 
     return golden.startup(driver, cfg)
