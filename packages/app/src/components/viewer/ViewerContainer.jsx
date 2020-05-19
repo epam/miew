@@ -1,5 +1,5 @@
 import React from 'react';
-import Miew from 'miew';
+import Miew from 'MiewModule'; // eslint-disable-line import/no-unresolved
 
 export default class ViewerContainer extends React.Component {
   constructor(props) {

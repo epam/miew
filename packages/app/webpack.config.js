@@ -2,6 +2,8 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const prod = process.env.NODE_ENV === 'production';
+
 module.exports = {
   entry: {
     app: './src/index.js',
@@ -37,6 +39,12 @@ module.exports = {
   },
   performance: {
     hints: false,
+  },
+  resolve: {
+    alias: {
+      MiewModule: (prod) ? path.resolve(__dirname, 'node_modules/miew/dist/Miew.module.js') : path.resolve(__dirname, '../lib/build/dist/Miew.module.js'),
+      MiewStyles: (prod) ? path.resolve(__dirname, 'node_modules/miew/dist/Miew.css') : path.resolve(__dirname, '../lib/build/dist/Miew.css'),
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({
