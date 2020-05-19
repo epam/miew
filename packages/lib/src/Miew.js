@@ -23,6 +23,7 @@ import ObjectControls from './ui/ObjectControls';
 import Picker from './ui/Picker';
 import Axes from './gfx/Axes';
 import gfxutils from './gfx/gfxutils';
+import meshutils from './gfx/meshutils';
 import FrameInfo from './gfx/FrameInfo';
 import meshes from './gfx/meshes/meshes';
 import LinesObject from './gfx/objects/LinesObj';
@@ -3726,9 +3727,9 @@ Miew.prototype._initOnSettingsChanged = function () {
     this._updateMaterials(values, true);
     if (values.shadowmap) {
       this._updateShadowCamera();
-      this._updateShadowmapMeshes(gfxutils.createShadowmapMaterial);
+      this._updateShadowmapMeshes(meshutils.createShadowmapMaterial);
     } else {
-      this._updateShadowmapMeshes(gfxutils.removeShadowmapMaterial);
+      this._updateShadowmapMeshes(meshutils.removeShadowmapMaterial);
     }
     this._needRender = true;
   });

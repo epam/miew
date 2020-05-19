@@ -1,13 +1,11 @@
 /* eslint-disable no-magic-numbers */
 import * as THREE from 'three';
-import _ from 'lodash';
 import logger from '../utils/logger';
 import CSS2DObject from './CSS2DObject';
 import RCGroup from './RCGroup';
 import vertexScreenQuadShader from './shaders/ScreenQuad.vert';
 import fragmentScreenQuadFromTex from './shaders/ScreenQuadFromTex.frag';
 import fragmentScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTexWithDistortion.frag';
-import UberMaterial from './shaders/UberMaterial';
 
 const LAYERS = {
   DEFAULT: 0, VOLUME: 1, TRANSPARENT: 2, PREPASS_TRANSPARENT: 3, VOLUME_BFPLANE: 4, COLOR_FROM_POSITION: 5, SHADOWMAP: 6,
@@ -277,45 +275,6 @@ function _calcChunkMatrix(eye, target, up, rad) {
   return matRotLook;
 }
 
-function _forEachMeshInGroup(group, process) {
-  function processObj(object) {
-    if (object instanceof THREE.Mesh) {
-      process(object);
-    }
-    for (let i = 0, l = object.children.length; i < l; i++) {
-      processObj(object.children[i]);
-    }
-  }
-  processObj(group);
-}
-
-function _countMeshTriangles(mesh) {
-  const geom = mesh.geometry;
-  if (geom instanceof THREE.InstancedBufferGeometry) {
-    const attribs = geom.attributes;
-    for (const property in attribs) {
-      if (attribs.hasOwnProperty(property) && attribs[property] instanceof THREE.InstancedBufferAttribute) {
-        const currAttr = attribs[property];
-        const indexSize = geom.index ? geom.index.array.length / 3 : 0;
-        return indexSize * currAttr.array.length / currAttr.itemSize;
-      }
-    }
-    return 0;
-  }
-  if (geom instanceof THREE.BufferGeometry) {
-    return geom.index ? geom.index.array.length / 3 : 0;
-  }
-  return geom.faces ? geom.faces.length : 0;
-}
-
-function _countTriangles(group) {
-  let totalCount = 0;
-  _forEachMeshInGroup(group, (mesh) => {
-    totalCount += _countMeshTriangles(mesh);
-  });
-  return totalCount;
-}
-
 function _groupHasGeometryToRender(group) {
   let hasGeoms = false;
   group.traverse((node) => {
@@ -418,128 +377,6 @@ function belongToSelectLayers(object) {
   return false;
 }
 
-function _gatherObjects(root, meshTypes) {
-  const meshes = [];
-  root.traverse((object) => {
-    for (let i = 0; i < meshTypes.length; i++) {
-      if (object instanceof meshTypes[i]) {
-        meshes[meshes.length] = object;
-        break;
-      }
-    }
-  });
-  return meshes;
-}
-
-function addDescribedMesh(mesh, matTrueValues, matFalseValues, layer) {
-  // copy of geometry with described material values
-  const material = mesh.material.createInstance();
-  material.setValues(matTrueValues);
-
-  const newMesh = new mesh.constructor(mesh.geometry, material);
-  _.forEach(matFalseValues, (value) => {
-    newMesh.material[value] = false;
-  });
-  newMesh.material.needsUpdate = true;
-  newMesh.applyMatrix4(mesh.matrix);
-  newMesh.layers.set(layer);
-  mesh.parent.add(newMesh);
-  return newMesh;
-}
-
-function traverseMeshes(root, meshTypes, func) {
-  const meshes = _gatherObjects(root, meshTypes);
-
-  for (let i = 0, n = meshes.length; i < n; ++i) {
-    const mesh = meshes[i];
-    if (!mesh.parent) {
-      continue;
-    }
-    func(mesh);
-  }
-}
-
-function applyTransformsToMeshes(root, mtc) {
-  const mtcCount = mtc.length;
-  if (mtcCount < 1) {
-    return;
-  }
-
-  const meshTypes = [THREE.Mesh, THREE.LineSegments, THREE.Line];
-  traverseMeshes(root, meshTypes, (mesh) => {
-    mesh.applyMatrix4(mtc[0]);
-    for (let j = 1; j < mtcCount; ++j) {
-      const newMesh = new mesh.constructor(mesh.geometry, mesh.material);
-      mesh.parent.add(newMesh);
-      newMesh.applyMatrix4(mtc[j]);
-    }
-  });
-}
-
-function processTransparentMaterial(root, material) {
-  if (!(material instanceof UberMaterial)) {
-    return;
-  }
-
-  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
-    mesh.material.setValues({ prepassTransparancy: false, fakeOpacity: false });
-    mesh.material.needsUpdate = true;
-    mesh.layers.set(LAYERS.TRANSPARENT);
-
-    const trueMatSettings = { prepassTransparancy: true };
-    const falseMatSettings = ['fakeOpacity', 'transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog'];
-    addDescribedMesh(mesh, trueMatSettings, falseMatSettings, LAYERS.PREPASS_TRANSPARENT);
-  });
-}
-
-function processColFromPosMaterial(root, material) {
-  if (!(material instanceof UberMaterial)) {
-    return;
-  }
-
-  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
-    const trueMatSettings = { colorFromPos: true };
-    const falseMatSettings = ['transparent', 'colorFromDepth', 'lights', 'shadowmap', 'fog', 'overrideColor',
-      'colorFromDepth', 'fogTransparent', 'attrColor', 'attrColor2', 'attrAlphaColor', 'fakeOpacity'];
-    addDescribedMesh(mesh, trueMatSettings, falseMatSettings, LAYERS.COLOR_FROM_POSITION);
-  });
-}
-
-function createShadowmapMaterial(root, material) {
-  if (!(material instanceof UberMaterial)) {
-    return;
-  }
-
-  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
-    if (!mesh.receiveShadow && mesh.material.shadowmap) { // remove shadow from non-receivers
-      mesh.material.setValues({ shadowmap: false });
-    }
-    if (!mesh.castShadow) { // skip creating shadowmap meshes for non-casters
-      return;
-    }
-    if (!belongToSelectLayers(mesh)) { // skip creating shadowmap meshes for selection layer
-      return;
-    }
-
-    const trueMatSettings = { colorFromDepth: true, orthoCam: true };
-    const falseMatSettings = ['lights', 'shadowmap', 'fog'];
-    const shadowmapMesh = addDescribedMesh(mesh, trueMatSettings, falseMatSettings, LAYERS.SHADOWMAP);
-    shadowmapMesh.isShadowmapMesh = true;
-  });
-}
-
-function removeShadowmapMaterial(root, material) {
-  if (!(material instanceof UberMaterial)) {
-    return;
-  }
-
-  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
-    if (mesh.isShadowmapMesh) {
-      mesh.parent.remove(mesh);
-    }
-  });
-}
-
 function processObjRenderOrder(root, idMaterial) {
   // set renderOrder to 0 for Backdrop and to 1 in other cases to render Backdrop earlier all other materials
   const renderOrder = +(idMaterial !== 'BA');
@@ -548,17 +385,6 @@ function processObjRenderOrder(root, idMaterial) {
       object.renderOrder = renderOrder;
     }
   });
-}
-
-/** Traverse tree and make visible only needed meshes */
-function makeVisibleMeshes(object, checker) {
-  if (object && object.traverse) {
-    object.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        obj.visible = checker(obj);
-      }
-    });
-  }
 }
 
 function applySelectionMaterial(geo) {
@@ -588,12 +414,9 @@ function getMiddlePoint(point1, point2, optionalTarget) {
   return result;
 }
 
-
 export default {
   calcCylinderMatrix: _calcCylinderMatrix,
   calcChunkMatrix: _calcChunkMatrix,
-  forEachMeshInGroup: _forEachMeshInGroup,
-  countTriangles: _countTriangles,
   groupHasGeometryToRender: _groupHasGeometryToRender,
   buildDistorionMesh: _buildDistorionMesh,
   RCGroup,
@@ -601,13 +424,7 @@ export default {
   clearTree,
   destroyObject,
   belongToSelectLayers,
-  applyTransformsToMeshes,
-  processTransparentMaterial,
-  processColFromPosMaterial,
-  createShadowmapMaterial,
-  removeShadowmapMaterial,
   processObjRenderOrder,
-  makeVisibleMeshes,
   applySelectionMaterial,
   getMiddlePoint,
   LAYERS,
