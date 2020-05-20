@@ -49,12 +49,6 @@
       "@babel/plugin-proposal-class-properties"
     ]
   },
-  "greenkeeper": {
-    "ignore": [
-      "bootstrap",
-      "jquery.terminal"
-    ]
-  },
   "css": {
     "includePaths": [
       "./node_modules"
