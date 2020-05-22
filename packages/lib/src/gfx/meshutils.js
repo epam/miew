@@ -1,3 +1,10 @@
+/**
+ * Utils functions which is worked with meshes
+ *
+ * functions for doing something with all/specified meshes
+ * functions for traversihg tree and create auxiliary meshes for transparency/shadowmaps...
+ * functions for calculating data connected with meshes
+ */
 import * as THREE from 'three';
 import UberMaterial from './shaders/UberMaterial';
 import gfxutils from './gfxutils';
@@ -15,8 +22,8 @@ function _gatherObjects(root, meshTypes) {
   return meshes;
 }
 
+// new mesh with the same geometry and specified material values and layer
 function createDerivativeMesh(mesh, values, layer) {
-  // copy of geometry with described material values
   const material = mesh.material.createInstance();
   material.setValues(values);
 
