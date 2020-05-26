@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -24,9 +25,9 @@ module.exports = {
         use: ['babel-loader'],
       },
       {
-        test: /\.[s]?css$/,
+        test: /\.[sp]?css$/,
         use: [
-          'style-loader',
+          prod ? MiniCssExtractPlugin.loader : 'style-loader',
           {
             loader: 'css-loader',
             options: {
@@ -52,6 +53,7 @@ module.exports = {
       title: 'Miew – 3D Molecular Viewer',
     }),
     new webpack.HashedModuleIdsPlugin(),
+    new MiniCssExtractPlugin(),
   ],
   optimization: {
     runtimeChunk: {

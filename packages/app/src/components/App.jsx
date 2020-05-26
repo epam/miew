@@ -1,5 +1,14 @@
 import React from 'react';
+
+import Menu from './menu/Menu.jsx';
 import ViewerContainer from './viewer/ViewerContainer.jsx';
+
+const style = {
+  width: '100%',
+  height: '100%',
+  overflow: 'hidden',
+  position: 'relative',
+};
 
 export default class App extends React.Component {
   constructor(props) {
@@ -16,8 +25,9 @@ export default class App extends React.Component {
   }
 
   render() {
-    return <div style = {{ width: '100%', height: '100%' }}>
+    return <div style={ style } >
       <ViewerContainer onChange={ this._onViewerChange } />
+      <Menu/>
     </div>;
   }
 }

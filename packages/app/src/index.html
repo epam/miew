@@ -1,8 +1,22 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
+<head >
     <meta charset="UTF-8">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: #202020;
+
+            --titlebar-color: silver;
+            --titlebar-gray: 64;
+            --titlebar-alpha: 0.75;
+            --titlebar-height: 40px;
+            --back-gray: 32;
+            --menu-gray: calc(#{$titlebar-alpha} * #{$titlebar-gray} + (1 - #{$titlebar-alpha}) * #{$back-gray});
+            --selection-panel-row-height: 42px;
+        }
+    </style>
 </head>
 <body>
   <div id="miew-react-app" style="width: 100%; height: 100%;">Miew wrapper as a React component.</div>
