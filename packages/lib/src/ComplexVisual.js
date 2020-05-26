@@ -12,6 +12,7 @@ import materials from './gfx/materials';
 import Representation from './gfx/Representation';
 import Visual from './Visual';
 import ComplexVisualEdit from './ComplexVisualEdit';
+import meshutils from './gfx/meshutils';
 
 const { selectors } = chem;
 
@@ -622,7 +623,7 @@ class ComplexVisual extends Visual {
             }
 
             if (DEBUG && !errorOccured) {
-              logger.debug(`Triangles count: ${gfxutils.countTriangles(repr.geo)}`);
+              logger.debug(`Triangles count: ${meshutils.countTriangles(repr.geo)}`);
             }
           }
 

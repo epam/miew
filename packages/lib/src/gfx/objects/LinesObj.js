@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import SceneObject from './SceneObject';
-import gfxutils from '../gfxutils';
+import meshutils from '../meshutils';
 import UberMaterial from '../shaders/UberMaterial';
 import meshes from '../meshes/meshes';
 import settings from '../../settings';
@@ -53,7 +53,7 @@ class LinesObj extends SceneObject {
     if (transforms.length > 0) {
       this._mesh = new THREE.Group();
       this._mesh.add(this._line);
-      gfxutils.applyTransformsToMeshes(this._mesh, transforms);
+      meshutils.applyTransformsToMeshes(this._mesh, transforms);
     }
   }
 

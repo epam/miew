@@ -2,6 +2,7 @@ import _ from 'lodash';
 import * as THREE from 'three';
 import UberMaterial from './shaders/UberMaterial';
 import gfxutils from './gfxutils';
+import meshutils from './meshutils';
 import settings from '../settings';
 import materials from './materials';
 import chem from '../chem';
@@ -71,15 +72,15 @@ class Representation {
     this.geo = this.mode.buildGeometry(complex, this.colorer, 1 << this.index, this.material);
 
     if (this.material.uberOptions.opacity < 0.99 && settings.now.transparency === 'prepass') {
-      gfxutils.processTransparentMaterial(this.geo, this.material);
+      meshutils.processTransparentMaterial(this.geo, this.material);
     }
     this.geo.visible = this.visible;
 
     gfxutils.processObjRenderOrder(this.geo, this.materialPreset.id);
-    gfxutils.processColFromPosMaterial(this.geo, this.material);
+    meshutils.processColFromPosMaterial(this.geo, this.material);
 
     if (settings.now.shadow.on) {
-      gfxutils.createShadowmapMaterial(this.geo, this.material);
+      meshutils.createShadowmapMaterial(this.geo, this.material);
     }
 
     return this.geo;
