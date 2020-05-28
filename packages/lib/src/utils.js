@@ -383,9 +383,9 @@ function getFileExtension(fileName) {
 }
 
 function splitFileName(fileName) {
-  const ext = getFileExtension(fileName);
-  const name = fileName.slice(0, fileName.length - ext.length);
-  return [name, ext];
+  const reNameExtCompress = /^([\w-]+)(?:(\.pdb|\.cif|\.mmtf|\.ccp4|\.dsn6|\.map))\.?(?:(gz))?$/i;
+  const matchName = reNameExtCompress.exec(fileName);
+  return [matchName[1], matchName[2], matchName[3] || ''];
 }
 
 function dataUrlToBlob(url) {

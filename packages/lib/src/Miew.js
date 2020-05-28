@@ -1736,7 +1736,7 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
-const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
+const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6|map):\s*)?(\d[a-z\d]{3})$/i;
 const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
 
@@ -1752,6 +1752,7 @@ function resolveSourceShortcut(source, opts) {
 
     format = format.toLowerCase();
     id = id.toUpperCase();
+    let compressType = '';
 
     switch (format) {
       case 'pdb':
@@ -1769,12 +1770,16 @@ function resolveSourceShortcut(source, opts) {
       case 'dsn6':
         source = `https://edmaps.rcsb.org/maps/${id.toLowerCase()}_2fofc.dsn6`;
         break;
+      case 'map':
+        source = `https://ftp.wwpdb.org/pub/emdb/structures/EMD-${id}/map/emd_${id}.map.gz`;
+        compressType = '.gz';
+        break;
       default:
         throw new Error('Unexpected data format shortcut');
     }
 
     opts.fileType = format;
-    opts.fileName = `${id}.${format}`;
+    opts.fileName = `${id}.${format}${compressType}`;
     opts.sourceType = 'url';
     return source;
   }
@@ -1807,7 +1812,7 @@ function updateBinaryMode(opts) {
   let { binary } = opts;
 
   // detect by format
-  if (opts.fileType !== undefined) {
+  if (binary === undefined && opts.fileType !== undefined) {
     const TheParser = _.head(io.parsers.find({ format: opts.fileType }));
     if (TheParser) {
       binary = TheParser.binary || false;
@@ -1859,8 +1864,8 @@ function _fetchData(source, opts, job) {
     // split file name
     const fileName = opts.fileName || TheLoader.extractName(source);
     if (fileName) {
-      const [name, fileExt] = utils.splitFileName(fileName);
-      _.defaults(opts, { name, fileExt, fileName });
+      const [name, fileExt, compressType] = utils.splitFileName(fileName);
+      _.defaults(opts, { name, fileExt, fileName, compressType });
     }
 
     // should it be text or binary?
@@ -1916,6 +1921,24 @@ function _fetchData(source, opts, job) {
         throw error;
       });
     resolve(promise);
+  }));
+}
+
+function _decompressData(data, opts, job) {
+  return new Promise(((resolve) => {
+    if (opts.compressType === '') {
+      resolve(data);
+    }
+    if (opts.compressType === 'gz') {
+      const pako = require('pako');
+      let typeDecompressedData = 'string';
+      if (opts.binary) {
+        typeDecompressedData = 'Uint8Array';
+      }
+      data = pako.inflate(data, { to: typeDecompressedData });
+      resolve(data);
+    }
+    // resolve(data);
   }));
 }
 
@@ -2010,6 +2033,7 @@ Miew.prototype.load = function (source, opts) {
   };
 
   return _fetchData(source, opts, job)
+    .then((data) => _decompressData(data, opts, job))
     .then((data) => _parseData(data, opts, job))
     .then((object) => {
       const name = this._onLoad(object, opts);

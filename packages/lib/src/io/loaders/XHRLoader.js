@@ -9,7 +9,7 @@ export default class XHRLoader extends Loader {
     super(source, options);
 
     options = this._options;
-    this._binary = (options.binary === true);
+    this._binary = (options.binary === true || options.compressType !== '');
   }
 
   load() {
