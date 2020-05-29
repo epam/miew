@@ -1845,6 +1845,38 @@ function updateBinaryMode(opts) {
   opts.binary = binary || false;
 }
 
+function getSourceUnits(source) {
+  return new Promise((resolve) => {
+    if (_.isString(source)) {
+      const reMatchMultiSource = /^(?:(vd):\s*)?(\d[a-z\d]{3})$/i;
+      // e.g. "mmtf:1CRN"
+      const matchesMultiSource = reMatchMultiSource.exec(source);
+      if (matchesMultiSource) {
+        const [, format, id] = matchesMultiSource;
+        utils.getEmdFromPdbId(id)
+          .then((emdId) => {
+            switch (format) {
+              case 'vd':
+                if (emdId) {
+                  source = `map: ${emdId}`;
+                } else {
+                  source = `dsn6: ${id}`;
+                }
+                resolve(source);
+                break;
+              default:
+                throw new Error('Unexpected multi format data shortcut');
+            }
+          });
+      }  else{
+        resolve(source);
+      }
+    } else {
+      resolve(source);
+    }
+  });
+}
+
 function _fetchData(source, opts, job) {
   return new Promise(((resolve) => {
     if (job.shouldCancel()) {
@@ -1852,62 +1884,68 @@ function _fetchData(source, opts, job) {
     }
     job.notify({ type: 'fetching' });
 
-    // allow for source shortcuts
-    source = resolveSourceShortcut(source, opts);
+    const fetchPromise = getSourceUnits(source)
+      .then((source) => {
+        // allow for source shortcuts
+        source = resolveSourceShortcut(source, opts);
 
-    // detect a proper loader
-    const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
-    if (!TheLoader) {
-      throw new Error(LOADER_NOT_FOUND);
-    }
+        // detect a proper loader
+        const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
+        if (!TheLoader) {
+          throw new Error(LOADER_NOT_FOUND);
+        }
 
-    // split file name
-    const fileName = opts.fileName || TheLoader.extractName(source);
-    if (fileName) {
-      const [name, fileExt, compressType] = utils.splitFileName(fileName);
-      _.defaults(opts, { name, fileExt, fileName, compressType });
-    }
+        // split file name
+        const fileName = opts.fileName || TheLoader.extractName(source);
+        if (fileName) {
+          const [name, fileExt, compressType] = utils.splitFileName(fileName);
+          _.defaults(opts, {
+            name, fileExt, fileName, compressType,
+          });
+        }
 
-    // should it be text or binary?
-    updateBinaryMode(opts);
+        // should it be text or binary?
+        updateBinaryMode(opts);
 
-    // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
-    // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
-    // all hacks and everybody's happy.
-    let newOptions = _.get(opts, 'preset.expression');
-    if (!_.isUndefined(newOptions)) {
-      newOptions = JSON.parse(newOptions);
-      if (newOptions && newOptions.settings) {
-        const keys = ['singleUnit'];
-        for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
-          const key = keys[keyIndex];
-          const value = _.get(newOptions.settings, key);
-          if (!_.isUndefined(value)) {
-            settings.set(key, value);
+        // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
+        // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
+        // all hacks and everybody's happy.
+        let newOptions = _.get(opts, 'preset.expression');
+        if (!_.isUndefined(newOptions)) {
+          newOptions = JSON.parse(newOptions);
+          if (newOptions && newOptions.settings) {
+            const keys = ['singleUnit'];
+            for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
+              const key = keys[keyIndex];
+              const value = _.get(newOptions.settings, key);
+              if (!_.isUndefined(value)) {
+                settings.set(key, value);
+              }
+            }
           }
         }
-      }
-    }
 
-    // create a loader
-    const loader = new TheLoader(source, opts);
-    loader.context = opts.context;
-    job.addEventListener('cancel', () => loader.abort());
+        // create a loader
+        const loader = new TheLoader(source, opts);
+        loader.context = opts.context;
+        job.addEventListener('cancel', () => loader.abort());
 
-    loader.addEventListener('progress', (event) => {
-      if (event.lengthComputable && event.total > 0) {
-        reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
-      } else {
-        reportProgress(loader.logger, 'Fetching');
-      }
-    });
+        loader.addEventListener('progress', (event) => {
+          if (event.lengthComputable && event.total > 0) {
+            reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
+          } else {
+            reportProgress(loader.logger, 'Fetching');
+          }
+        });
 
-    console.time('fetch');
-    const promise = loader.load()
+        console.time('fetch');
+        return loader;
+      })
+      .then((loader) => loader.load())
       .then((data) => {
         console.timeEnd('fetch');
         opts.context.logger.info('Fetching finished');
-        job.notify({ type: 'fetchingDone', data });
+        job.notify({type: 'fetchingDone', data});
         return data;
       })
       .catch((error) => {
@@ -1917,10 +1955,11 @@ function _fetchData(source, opts, job) {
           opts.context.logger.debug(error.stack);
         }
         opts.context.logger.error('Fetching failed');
-        job.notify({ type: 'fetchingDone', error });
+        job.notify({type: 'fetchingDone', error});
         throw error;
       });
-    resolve(promise);
+
+    resolve(fetchPromise);
   }));
 }
 

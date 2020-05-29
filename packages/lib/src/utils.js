@@ -523,6 +523,29 @@ function mergeTypedArraysUnsafe(array) {
   return result;
 }
 
+function getEmdFromPdbId(pdbID) {
+  return new Promise((resolve) => {
+    const request = new XMLHttpRequest();
+    request.addEventListener('load', () => {
+      if (request.status === 200) {
+        const headerFile = request.response;
+        const indEmd = headerFile.indexOf('EMD-');
+        if (indEmd !== -1) {
+          const strEmd = headerFile.substring(indEmd + 4, indEmd + 10);
+          const expNumber = /\d+/g;
+          resolve(expNumber.exec(strEmd)[0]);
+        }
+      }
+      resolve(null);
+    });
+
+    const url = `https://files.rcsb.org/header/${pdbID}.pdb`;
+    request.open('GET', url);
+    request.responseType = 'text';
+    request.send();
+  });
+}
+
 //----------------------------------------------------------------------------
 // Exports
 
@@ -561,4 +584,5 @@ export default {
   download,
   concatTypedArraysUnsafe,
   mergeTypedArraysUnsafe,
+  getEmdFromPdbId,
 };
