@@ -1736,7 +1736,7 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
-const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6|map):\s*)?(\d[a-z\d]{3})$/i;
+const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6|map):\s*)?(\d[a-z\d]+)$/i;
 const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
 
@@ -1845,46 +1845,46 @@ function updateBinaryMode(opts) {
   opts.binary = binary || false;
 }
 
-function getSourceUnits(source) {
+// Keyword in loader string can mean different formats depending on the file origin, we might have ability to clarify this
+function clarifyMultiFormat(source) {
   return new Promise((resolve) => {
-    if (_.isString(source)) {
-      const reMatchMultiSource = /^(?:(vd):\s*)?(\d[a-z\d]{3})$/i;
-      // e.g. "mmtf:1CRN"
-      const matchesMultiSource = reMatchMultiSource.exec(source);
-      if (matchesMultiSource) {
-        const [, format, id] = matchesMultiSource;
-        utils.getEmdFromPdbId(id)
-          .then((emdId) => {
-            switch (format) {
-              case 'vd':
-                if (emdId) {
-                  source = `map: ${emdId}`;
-                } else {
-                  source = `dsn6: ${id}`;
-                }
-                resolve(source);
-                break;
-              default:
-                throw new Error('Unexpected multi format data shortcut');
-            }
-          });
-      }  else{
-        resolve(source);
-      }
-    } else {
+    if (!_.isString(source)) {
       resolve(source);
     }
+
+    const reMatchMultiSource = /^(?:(vd):\s*)(\d[a-z\d]+)$/i;
+    const matchesMultiSource = reMatchMultiSource.exec(source);
+    if (!matchesMultiSource) {
+      resolve(source);
+    }
+
+    const [, format, id] = matchesMultiSource;
+    utils.getEmdFromPdbId(id)
+      .then((emdId) => {
+        switch (format) {
+          case 'vd':
+            if (emdId) {
+              source = `map: ${emdId}`;
+            } else {
+              source = `dsn6: ${id}`;
+            }
+            resolve(source);
+            break;
+          default:
+            throw new Error('Unexpected multi format data shortcut');
+        }
+      });
   });
 }
 
-function _fetchData(source, opts, job) {
+function _fetchData(sources, opts, job) {
   return new Promise(((resolve) => {
     if (job.shouldCancel()) {
       throw new Error('Operation cancelled');
     }
     job.notify({ type: 'fetching' });
 
-    const fetchPromise = getSourceUnits(source)
+    const fetchPromise = clarifyMultiFormat(sources)
       .then((source) => {
         // allow for source shortcuts
         source = resolveSourceShortcut(source, opts);
@@ -1945,7 +1945,7 @@ function _fetchData(source, opts, job) {
       .then((data) => {
         console.timeEnd('fetch');
         opts.context.logger.info('Fetching finished');
-        job.notify({type: 'fetchingDone', data});
+        job.notify({ type: 'fetchingDone', data });
         return data;
       })
       .catch((error) => {
@@ -1955,7 +1955,7 @@ function _fetchData(source, opts, job) {
           opts.context.logger.debug(error.stack);
         }
         opts.context.logger.error('Fetching failed');
-        job.notify({type: 'fetchingDone', error});
+        job.notify({ type: 'fetchingDone', error });
         throw error;
       });
 
@@ -1964,21 +1964,19 @@ function _fetchData(source, opts, job) {
 }
 
 function _decompressData(data, opts, job) {
-  return new Promise(((resolve) => {
+  if (job.shouldCancel()) {
+    return Promise.reject(new Error('Operation cancelled'));
+  }
+
+  return new Promise((resolve) => {
     if (opts.compressType === '') {
       resolve(data);
     }
-    if (opts.compressType === 'gz') {
-      const pako = require('pako');
-      let typeDecompressedData = 'string';
-      if (opts.binary) {
-        typeDecompressedData = 'Uint8Array';
-      }
-      data = pako.inflate(data, { to: typeDecompressedData });
-      resolve(data);
-    }
-    // resolve(data);
-  }));
+
+    job.notify({ type: 'decompressing' });
+
+    resolve(utils.decompress(data, opts));
+  });
 }
 
 function _parseData(data, opts, job) {

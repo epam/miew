@@ -1,6 +1,6 @@
 import _ from 'lodash';
+import pako from 'pako';
 import logger from './utils/logger';
-
 
 const browserType = {
   DEFAULT: 0,
@@ -523,9 +523,32 @@ function mergeTypedArraysUnsafe(array) {
   return result;
 }
 
+/**
+ * Decompress input data, if it compressed, used in load conveyor
+ * @param{array} compressedData  - byte array data
+ * @param{object} opts  - data description
+ * @returns{array} binary or string decompressed array
+ */
+function decompress(compressedData, opts) {
+  if (opts.compressType === 'gz') {
+    let typeDecompressedData = 'string';
+    if (opts.binary) {
+      typeDecompressedData = 'Uint8Array';
+    }
+    return pako.inflate(compressedData, { to: typeDecompressedData });
+  }
+  return compressedData;
+}
+
+/**
+ * Find in RSCB PDB EMD-ID with pdb id. It is needed for volume density: some maps have not pdb id, but EMD id
+ * @param{string} pdbID  - pdb id in RSCB PDB
+ * @returns{Promise} resolve string EMD ID, or null if this pdb has no map in EMD
+ */
 function getEmdFromPdbId(pdbID) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
+
     request.addEventListener('load', () => {
       if (request.status === 200) {
         const headerFile = request.response;
@@ -537,6 +560,14 @@ function getEmdFromPdbId(pdbID) {
         }
       }
       resolve(null);
+    });
+
+    request.addEventListener('error', () => {
+      reject(new Error('HTTP request failed'));
+    });
+
+    request.addEventListener('abort', () => {
+      reject(new Error('Loading aborted'));
     });
 
     const url = `https://files.rcsb.org/header/${pdbID}.pdb`;
@@ -584,5 +615,6 @@ export default {
   download,
   concatTypedArraysUnsafe,
   mergeTypedArraysUnsafe,
+  decompress,
   getEmdFromPdbId,
 };
