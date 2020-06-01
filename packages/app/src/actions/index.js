@@ -1,4 +1,4 @@
-export const showNav = (enable) => ({
+export const showNav = (enable) => ({ // TODO rename to toggle
   type: 'SHOW_NAV',
   visible: enable,
 });

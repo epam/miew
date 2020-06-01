@@ -4,10 +4,17 @@ import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+import styled from 'styled-components';
+
+const StyledRow = styled(Row)`
+  visibility: ${(props) => (props.visibility ? 'visible' : 'hidden')};
+`;
+
 export default class PanelsList extends React.Component {
   render() {
+    // return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1" style={{ visibility: this.props.visibility ? 'visible' : 'hidden' }}>
     return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1">
-      <Row>
+      <StyledRow visibility={ this.props.visibility }>
         <Col sm={4}>
           <ListGroup.Item action variant="light" href="#link1">Info</ListGroup.Item>
           <ListGroup.Item action disabled variant="light">Gallery</ListGroup.Item>
@@ -23,7 +30,7 @@ export default class PanelsList extends React.Component {
             </Tab.Pane>
           </Tab.Content>
         </Col>
-      </Row>
+      </StyledRow>
     </Tab.Container>;
   }
 }

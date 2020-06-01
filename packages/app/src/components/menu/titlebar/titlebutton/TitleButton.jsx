@@ -20,8 +20,13 @@ export default class TitleButton extends React.Component {
           {this.props.tip}
         </Tooltip>
       }
-     >
-      <StyledButton><span>{this.props.content}</span></StyledButton>
+    >
+      <StyledButton onClick={ (e) => {
+        e.preventDefault();
+        if (this.props.onClick) {
+          this.props.onClick();
+        }
+      }}>{this.props.content}</StyledButton>
     </OverlayTrigger>;
   }
 }

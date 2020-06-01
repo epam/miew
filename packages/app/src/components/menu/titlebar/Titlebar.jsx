@@ -7,6 +7,7 @@ import { AiOutlinePicture } from 'react-icons/ai';
 import { GiDrop } from 'react-icons/gi';
 
 import TitleButton from './titlebutton/TitleButton.jsx';
+import ShowPanelsButton from '../../../containers/ShowPanelsButton.jsx';
 
 const style = {
   display: 'flex',
@@ -20,7 +21,7 @@ export default class Titlebar extends React.Component {
   render() {
     return <ButtonToolbar style = { style }>
       <ButtonGroup>
-        <TitleButton content={<FiMenu/>} tip="Menu"/>
+        <ShowPanelsButton content={<FiMenu/>} tip="Menu"/>
         <TitleButton content={<FiChevronRight/>} tip="Terminal"></TitleButton>
       </ButtonGroup>
 
