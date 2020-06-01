@@ -37,31 +37,30 @@ describe('Colorer', () => {
       expect(() => new Colorer()).to.throw();
     });
 
-    it('for inherit creates without params', () => {
+    it('creates inheritor without params using default settings', () => {
       const ih = new InheritorColorer();
       expect(ih.opts).to.deep.equal(defOpts);
       expect(ih.palette).to.equal(firstPalette);
     });
 
-    it('for inherit creates with opts', () => {
+    it('creates inheritor with opts merging them with default settings', () => {
       const ih = new InheritorColorer(opts);
       expect(ih.opts).to.deep.equal(mergedOpts);
       expect(ih.palette).to.equal(firstPalette);
     });
 
-    it('check for changing opts not influence on created colorer', () => {
+    it('checks for changing opts not influence on created colorer', () => {
       const ih = new InheritorColorer(opts);
       expect(ih.opts).to.deep.equal(mergedOpts);
-      opts.max = 15;
-      expect(ih.opts).to.deep.equal(mergedOpts);
+      opts.max += 10;
+      expect(ih.opts.max).to.equal(mergedOpts.max);
     });
 
-    it('check for changing default opts influence on created colorer', () => {
+    it('checks for changing default opts influence on created colorer', () => {
       const ih = new InheritorColorer(opts);
       expect(ih.opts).to.deep.equal(mergedOpts);
-      defOpts.min = 8;
-      mergedOpts.min = defOpts.min;
-      expect(ih.opts).to.deep.equal(mergedOpts);
+      defOpts.min += 10;
+      expect(ih.opts.min).to.equal(defOpts.min);
     });
   });
 
