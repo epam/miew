@@ -65,5 +65,34 @@ describe('Colorer', () => {
   });
 
   describe('#identify', () => {
+    let settingsStub;
+    let defOpts = { min: 4, max: 19 };
+    let opts = { max: 9 };
+
+    beforeEach(() => {
+      defOpts = { min: 4, max: 19 };
+      opts = { max: 9 };
+
+      settingsStub = sinon.stub(settings, 'now').value({ colorers: { IH: defOpts } });
+    });
+    afterEach(() => {
+      settingsStub.restore();
+    });
+
+    it('returns only id for colorer created with no difference from settings', () => {
+      const ih = new InheritorColorer();
+      const id = ih.identify();
+      expect(id instanceof Array).to.equal(false);
+      expect(id).to.equal(ih.id);
+    });
+
+    it('returns array [id diff] for colorer created with differences from settings', () => {
+      const ih = new InheritorColorer(opts);
+      const id = ih.identify();
+      expect(id instanceof Array).to.equal(true);
+      expect(id.length).to.equal(2);
+      expect(id[0]).to.equal(ih.id);
+      expect(id[1]).to.deep.equal(opts);
+    });
   });
 });
