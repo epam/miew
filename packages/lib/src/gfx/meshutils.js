@@ -135,6 +135,9 @@ const createShadowmapMaterial = (function () {
       if (!mesh.receiveShadow && mesh.material.shadowmap) { // remove shadow from non-receivers
         mesh.material.setValues({ shadowmap: false });
       }
+      if (!mesh.material.lights) { // skip creating shadowmap meshes for materials without lighting
+        return;
+      }
       if (!mesh.castShadow) { // skip creating shadowmap meshes for non-casters
         return;
       }

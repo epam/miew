@@ -88,7 +88,7 @@ varying vec3 vViewPosition;
 #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
   uniform float zOffset;
 
-  #if !defined(SHADOWMAP_PCF_RAND)
+  #if !defined(USE_LIGHTS) || !defined(SHADOWMAP) || !defined(SHADOWMAP_PCF_RAND) || !(NUM_DIR_LIGHTS > 0)
     uniform mat4 projectionMatrix;
   #endif
 
