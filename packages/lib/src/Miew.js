@@ -1736,7 +1736,8 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
-const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6|map):\s*)?(\d[a-z\d]+)$/i;
+const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
+const reMapId = /^(?:(map):\s*)?(\d+)$/i;
 const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
 
@@ -1746,9 +1747,9 @@ function resolveSourceShortcut(source, opts) {
   }
 
   // e.g. "mmtf:1CRN"
-  const matchesPdbId = rePdbId.exec(source);
-  if (matchesPdbId) {
-    let [, format = 'pdb', id] = matchesPdbId;
+  const matchesId = rePdbId.exec(source) || reMapId.exec(source);
+  if (matchesId) {
+    let [, format = 'pdb', id] = matchesId;
 
     format = format.toLowerCase();
     id = id.toUpperCase();
@@ -1852,7 +1853,7 @@ function clarifyMultiFormat(source) {
       resolve(source);
     }
 
-    const reMatchMultiSource = /^(?:(vd):\s*)(\d[a-z\d]+)$/i;
+    const reMatchMultiSource = /^(?:(v|volume):\s*)(\d[a-z\d]+)$/i;
     const matchesMultiSource = reMatchMultiSource.exec(source);
     if (!matchesMultiSource) {
       resolve(source);
@@ -1861,17 +1862,15 @@ function clarifyMultiFormat(source) {
     const [, format, id] = matchesMultiSource;
     utils.getEmdFromPdbId(id)
       .then((emdId) => {
-        switch (format) {
-          case 'vd':
-            if (emdId) {
-              source = `map: ${emdId}`;
-            } else {
-              source = `dsn6: ${id}`;
-            }
-            resolve(source);
-            break;
-          default:
-            throw new Error('Unexpected multi format data shortcut');
+        if (format === 'v' || format === 'volume') {
+          if (emdId) {
+            source = `map: ${emdId}`;
+          } else {
+            source = `dsn6: ${id}`;
+          }
+          resolve(source);
+        } else {
+          throw new Error('Unexpected multi format data shortcut');
         }
       });
   });
