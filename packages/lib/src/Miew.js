@@ -1813,7 +1813,7 @@ function updateBinaryMode(opts) {
   let { binary } = opts;
 
   // detect by format
-  if (binary === undefined && opts.fileType !== undefined) {
+  if (opts.fileType !== undefined) {
     const TheParser = _.head(io.parsers.find({ format: opts.fileType }));
     if (TheParser) {
       binary = TheParser.binary || false;
