@@ -8,9 +8,6 @@ import App from './components/App.jsx';
 
 const store = createStore(rootReducer);
 
-// const root = document.getElementById('miew-react-app');
-// ReactDOM.render(<App/>, root);
-
 ReactDOM.render(
   <Provider store={store}>
     <App />

@@ -12,7 +12,6 @@ const StyledRow = styled(Row)`
 
 export default class PanelsList extends React.Component {
   render() {
-    // return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1" style={{ visibility: this.props.visibility ? 'visible' : 'hidden' }}>
     return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1">
       <StyledRow visibility={ this.props.visibility }>
         <Col sm={4}>

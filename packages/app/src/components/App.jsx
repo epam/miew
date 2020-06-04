@@ -1,6 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 
+import theme from './theme';
 import Menu from './menu/Menu.jsx';
 import ViewerContainer from './viewer/ViewerContainer.jsx';
 
@@ -26,7 +27,9 @@ export default class App extends React.Component {
   render() {
     return <DivStyled>
       <ViewerContainer onChange={ this._onViewerChange } />
-      <Menu/>
+      <ThemeProvider theme={theme}>
+        <Menu/>
+      </ThemeProvider>
     </DivStyled>;
   }
 }
