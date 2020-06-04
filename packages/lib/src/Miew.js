@@ -1736,12 +1736,58 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
+function _resolveShortcutId(source, opts, matchesId) {
+  let [, format = 'pdb', id] = matchesId;
+
+  format = format.toLowerCase();
+  id = id.toUpperCase();
+  let compressType = '';
+
+  switch (format) {
+    case 'pdb':
+      source = `https://files.rcsb.org/download/${id}.pdb`;
+      break;
+    case 'cif':
+      source = `https://files.rcsb.org/download/${id}.cif`;
+      break;
+    case 'mmtf':
+      source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
+      break;
+    case 'ccp4':
+      source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
+      break;
+    case 'dsn6':
+      source = `https://edmaps.rcsb.org/maps/${id.toLowerCase()}_2fofc.dsn6`;
+      break;
+    case 'map':
+      source = `https://ftp.wwpdb.org/pub/emdb/structures/EMD-${id}/map/emd_${id}.map.gz`;
+      compressType = '.gz';
+      break;
+    default:
+      throw new Error('Unexpected data format shortcut');
+  }
+
+  opts.fileType = format;
+  opts.fileName = `${id}.${format}${compressType}`;
+  opts.sourceType = 'url';
+  return source;
+}
+
+function _resolveShortcutPubchem(source, opts, matchesPubchem) {
+  const compound = matchesPubchem[1].toLowerCase();
+  source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
+  opts.fileType = 'pubchem';
+  opts.fileName = `${compound}.json`;
+  opts.sourceType = 'url';
+  return source;
+}
+
 const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
 const reMapId = /^(?:(map):\s*)?(\d+)$/i;
 const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
 
-function resolveSourceShortcut(source, opts) {
+function _resolveSourceShortcut(source, opts) {
   if (!_.isString(source)) {
     return source;
   }
@@ -1749,51 +1795,13 @@ function resolveSourceShortcut(source, opts) {
   // e.g. "mmtf:1CRN"
   const matchesId = rePdbId.exec(source) || reMapId.exec(source);
   if (matchesId) {
-    let [, format = 'pdb', id] = matchesId;
-
-    format = format.toLowerCase();
-    id = id.toUpperCase();
-    let compressType = '';
-
-    switch (format) {
-      case 'pdb':
-        source = `https://files.rcsb.org/download/${id}.pdb`;
-        break;
-      case 'cif':
-        source = `https://files.rcsb.org/download/${id}.cif`;
-        break;
-      case 'mmtf':
-        source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
-        break;
-      case 'ccp4':
-        source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
-        break;
-      case 'dsn6':
-        source = `https://edmaps.rcsb.org/maps/${id.toLowerCase()}_2fofc.dsn6`;
-        break;
-      case 'map':
-        source = `https://ftp.wwpdb.org/pub/emdb/structures/EMD-${id}/map/emd_${id}.map.gz`;
-        compressType = '.gz';
-        break;
-      default:
-        throw new Error('Unexpected data format shortcut');
-    }
-
-    opts.fileType = format;
-    opts.fileName = `${id}.${format}${compressType}`;
-    opts.sourceType = 'url';
-    return source;
+    return _resolveShortcutId(source, opts, matchesId);
   }
 
   // e.g. "pc:aspirin"
   const matchesPubchem = rePubchem.exec(source);
   if (matchesPubchem) {
-    const compound = matchesPubchem[1].toLowerCase();
-    source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
-    opts.fileType = 'pubchem';
-    opts.fileName = `${compound}.json`;
-    opts.sourceType = 'url';
-    return source;
+    return _resolveShortcutPubchem(source, opts, matchesPubchem);
   }
 
   // otherwise is should be an URL
@@ -1847,7 +1855,7 @@ function updateBinaryMode(opts) {
 }
 
 // Keyword in loader string can mean different formats depending on the file origin, we might have ability to clarify this
-function clarifyMultiFormat(source) {
+function _clarifyMultiFormat(source) {
   return new Promise((resolve) => {
     if (!_.isString(source)) {
       resolve(source);
@@ -1883,10 +1891,10 @@ function _fetchData(sources, opts, job) {
     }
     job.notify({ type: 'fetching' });
 
-    const fetchPromise = clarifyMultiFormat(sources)
+    const fetchPromise = _clarifyMultiFormat(sources)
       .then((source) => {
         // allow for source shortcuts
-        source = resolveSourceShortcut(source, opts);
+        source = _resolveSourceShortcut(source, opts);
 
         // detect a proper loader
         const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));

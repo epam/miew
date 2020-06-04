@@ -5,13 +5,6 @@ import Loader from './Loader';
 const urlStartRegexp = /^(https?|ftp):\/\//i;
 
 export default class XHRLoader extends Loader {
-  constructor(source, options) {
-    super(source, options);
-
-    options = this._options;
-    this._binary = (options.binary === true || options.compressType !== '');
-  }
-
   load() {
     return new Promise((resolve, reject) => {
       if (this._abort) {

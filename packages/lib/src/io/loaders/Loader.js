@@ -6,6 +6,7 @@ export default class Loader extends EventDispatcher {
     super();
     this._source = source;
     this._options = options || {};
+    this._binary = (options.binary === true || options.compressType !== '');
     this._abort = false;
     this._agent = null;
   }
