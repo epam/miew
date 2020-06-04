@@ -2307,7 +2307,7 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     }
   } else if (dataSource.id === 'Volume') {
     this.resetEd();
-    visualName = this._onLoadEd(dataSource);
+    visualName = this._onLoadEd(dataSource, opts.name);
   }
 
   gfx.camera.updateProjectionMatrix();
@@ -2379,10 +2379,10 @@ Miew.prototype.loadEd = function (source) {
   });
 };
 
-Miew.prototype._onLoadEd = function (dataSource) {
+Miew.prototype._onLoadEd = function (dataSource, name) {
   dataSource.normalize();
 
-  const volumeVisual = new VolumeVisual('volume', dataSource);
+  const volumeVisual = new VolumeVisual(`Volume Map: ${name}`, dataSource);
   volumeVisual.getMesh().layers.set(gfxutils.LAYERS.VOLUME); // volume mesh is not visible to common render
   const visualName = this._addVisual(volumeVisual);
 
@@ -2506,11 +2506,14 @@ Miew.prototype.rebuildAll = function () {
 Miew.prototype._refreshTitle = function (appendix) {
   let title;
   appendix = appendix === undefined ? '' : appendix;
-  const visual = this._getComplexVisual();
-  if (visual) {
-    title = visual.getComplex().name;
-    const rep = visual.repGet(visual.repCurrent());
+  const complexVisual = this._getComplexVisual();
+  const volumeVisual = this._getVolumeVisual();
+  if (complexVisual) {
+    title = complexVisual.getComplex().name;
+    const rep = complexVisual.repGet(complexVisual.repCurrent());
     title += (rep ? ` – ${rep.mode.name} Mode` : '');
+  } else if (volumeVisual) {
+    title = volumeVisual.name;
   } else {
     title = Object.keys(this._visuals).length > 0 ? 'Unknown' : 'No Data';
   }
