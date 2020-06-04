@@ -1736,12 +1736,13 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
-function _resolveShortcutId(source, opts, matchesId) {
+function _resolveShortcutId(opts, matchesId) {
   let [, format = 'pdb', id] = matchesId;
 
   format = format.toLowerCase();
   id = id.toUpperCase();
   let compressType = '';
+  let source = '';
 
   switch (format) {
     case 'pdb':
@@ -1773,9 +1774,9 @@ function _resolveShortcutId(source, opts, matchesId) {
   return source;
 }
 
-function _resolveShortcutPubchem(source, opts, matchesPubchem) {
+function _resolveShortcutPubchem(opts, matchesPubchem) {
   const compound = matchesPubchem[1].toLowerCase();
-  source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
+  const source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
   opts.fileType = 'pubchem';
   opts.fileName = `${compound}.json`;
   opts.sourceType = 'url';
@@ -1795,13 +1796,13 @@ function _resolveSourceShortcut(source, opts) {
   // e.g. "mmtf:1CRN"
   const matchesId = rePdbId.exec(source) || reMapId.exec(source);
   if (matchesId) {
-    return _resolveShortcutId(source, opts, matchesId);
+    return _resolveShortcutId(opts, matchesId);
   }
 
   // e.g. "pc:aspirin"
   const matchesPubchem = rePubchem.exec(source);
   if (matchesPubchem) {
-    return _resolveShortcutPubchem(source, opts, matchesPubchem);
+    return _resolveShortcutPubchem(opts, matchesPubchem);
   }
 
   // otherwise is should be an URL
