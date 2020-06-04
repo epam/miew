@@ -15,7 +15,11 @@ const Toolbar = styled(ButtonToolbar)`
   height: ${(props) => props.theme.titlebarHeight};
   background-color: ${(props) => props.theme.titlebarBkg}; 
   justify-content: space-between;
+  font-size: smaller; 
 `;
+
+// TODO move title to separate componen
+// TODO solve the font for the whole app
 
 export default class Titlebar extends React.Component {
   render() {
@@ -25,7 +29,7 @@ export default class Titlebar extends React.Component {
         <TitleButton content={<FiChevronRight/>} tip="Terminal"></TitleButton>
       </ButtonGroup>
 
-      <span data-field="title">3D Molecular Viewer</span>
+      <span data-field="title" style={{ margin: '10px' }}>3D Molecular Viewer</span>
 
       <ButtonGroup>
         <TitleButton content={<AiOutlinePicture/>} tip="Display mode"/>
