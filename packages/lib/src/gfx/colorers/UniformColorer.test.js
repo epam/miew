@@ -43,14 +43,14 @@ describe('UniformColorer', () => {
   });
 
   describe('#getAtomColor', () => {
-    it('returns color stored as opts field', () => {
+    it('returns color set during construction', () => {
       const uc = new UniformColorer(opts);
       expect(uc.getAtomColor()).to.equal(opts.color);
     });
   });
 
   describe('#getResidueColor', () => {
-    it('returns color stored as opts field', () => {
+    it('returns color set during construction', () => {
       const uc = new UniformColorer(opts);
       expect(uc.getResidueColor()).to.equal(opts.color);
     });
