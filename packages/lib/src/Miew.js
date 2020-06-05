@@ -1885,6 +1885,26 @@ function _clarifyMultiFormat(source) {
   });
 }
 
+function _saveLoadOptions(opts) {
+  // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
+  // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
+  // all hacks and everybody's happy.
+  let newOptions = _.get(opts, 'preset.expression');
+  if (!_.isUndefined(newOptions)) {
+    newOptions = JSON.parse(newOptions);
+    if (newOptions && newOptions.settings) {
+      const keys = ['singleUnit'];
+      for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
+        const key = keys[keyIndex];
+        const value = _.get(newOptions.settings, key);
+        if (!_.isUndefined(value)) {
+          settings.set(key, value);
+        }
+      }
+    }
+  }
+}
+
 function _fetchData(sources, opts, job) {
   return new Promise(((resolve) => {
     if (job.shouldCancel()) {
@@ -1915,23 +1935,7 @@ function _fetchData(sources, opts, job) {
         // should it be text or binary?
         updateBinaryMode(opts);
 
-        // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
-        // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
-        // all hacks and everybody's happy.
-        let newOptions = _.get(opts, 'preset.expression');
-        if (!_.isUndefined(newOptions)) {
-          newOptions = JSON.parse(newOptions);
-          if (newOptions && newOptions.settings) {
-            const keys = ['singleUnit'];
-            for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
-              const key = keys[keyIndex];
-              const value = _.get(newOptions.settings, key);
-              if (!_.isUndefined(value)) {
-                settings.set(key, value);
-              }
-            }
-          }
-        }
+        _saveLoadOptions(opts);
 
         // create a loader
         const loader = new TheLoader(source, opts);
