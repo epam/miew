@@ -30,11 +30,25 @@ export default class ViewerContainer extends React.Component {
     this.props.onChange({ viewer: this._viewer });
   }
 
-  shouldComponentUpdate() {
-    return false;
+  componentDidUpdate(prevProps) {
+    if (this.props.frozen !== prevProps.frozen) {
+      if (this.props.frozen) {
+        this._viewer.halt();
+      } else {
+        this._viewer.run();
+      }
+    }
   }
+
+  // shouldComponentUpdate() {
+  //   return false;
+  // }
 
   render() {
     return <div className='miew-container' ref={this.domElement}/>;
   }
 }
+
+ViewerContainer.defaultProps = {
+  frozen: false,
+};
