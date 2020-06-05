@@ -14,7 +14,7 @@ export default class ViewerContainer extends React.Component {
   };
 
   componentDidMount() {
-    this._viewer = new Miew({ container: this.domElement, load: '1crn' });
+    this._viewer = window.miew = new Miew({ container: this.domElement, load: '1crn' });
     this._viewer.settings.addEventListener('change:axes', this._onChange);
     this._viewer.settings.addEventListener('change:autoRotation', this._onChange);
     this.props.onChange({ viewer: this._viewer });
