@@ -4,6 +4,8 @@ import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+import UpdateInfoPanel from '../../../containers/UpdateInfoPanel.jsx';
+
 export default class PanelsList extends React.Component {
   render() {
     return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1">
@@ -16,7 +18,7 @@ export default class PanelsList extends React.Component {
         <Col sm={8}>
           <Tab.Content>
             <Tab.Pane eventKey="#link1" >
-              <span style={{ color: 'silver' }}> Info panel</span>
+              <UpdateInfoPanel/>
             </Tab.Pane>
             <Tab.Pane eventKey="#link2">
               <span style={{ color: 'silver' }}> About panel</span>
