@@ -9,7 +9,7 @@ class HydrophobicityColorer extends Colorer {
 
   getResidueColor(residue, _complex) {
     let color = this.palette.defaultResidueColor;
-    if (residue._type.hydrophobicity) {
+    if (residue._type.hydrophobicity) { // if hydrophobicity = 0.0?
       // Kyte Doolitle hydro [-4.5,4.5]->[0.1]
       const min = -4.5;
       const max = 4.5;
