@@ -55,6 +55,7 @@ const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 
 const LOADER_NOT_FOUND = 'Could not find suitable loader for this source';
 const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
+const OPERATION_CANCELED = 'Operation cancelled';
 
 const { createElement } = utils;
 
@@ -1908,7 +1909,7 @@ function _saveLoadOptions(opts) {
 function _fetchData(sources, opts, job) {
   return new Promise(((resolve) => {
     if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
+      throw new Error(OPERATION_CANCELED);
     }
     job.notify({ type: 'fetching' });
 
@@ -1977,7 +1978,7 @@ function _fetchData(sources, opts, job) {
 
 function _decompressData(data, opts, job) {
   if (job.shouldCancel()) {
-    return Promise.reject(new Error('Operation cancelled'));
+    return Promise.reject(new Error(OPERATION_CANCELED));
   }
 
   return new Promise((resolve) => {
@@ -1993,7 +1994,7 @@ function _decompressData(data, opts, job) {
 
 function _parseData(data, opts, job) {
   if (job.shouldCancel()) {
-    return Promise.reject(new Error('Operation cancelled'));
+    return Promise.reject(new Error(OPERATION_CANCELED));
   }
 
   job.notify({ type: 'parsing' });
