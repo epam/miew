@@ -145,7 +145,7 @@ class CCP4Parser extends Parser {
   }
 }
 
-CCP4Parser.formats = ['ccp4'];
+CCP4Parser.formats = ['ccp4', 'map'];
 CCP4Parser.extensions = ['.ccp4', '.map', '.mrc'];
 CCP4Parser.binary = true;
 

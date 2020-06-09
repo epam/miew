@@ -56,6 +56,7 @@ const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 
 const LOADER_NOT_FOUND = 'Could not find suitable loader for this source';
 const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
+const OPERATION_CANCELED = 'Operation cancelled';
 
 const { createElement } = utils;
 
@@ -1737,58 +1738,73 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
+function _resolveShortcutId(opts, matchesId) {
+  let [, format = 'pdb', id] = matchesId;
+
+  format = format.toLowerCase();
+  id = id.toUpperCase();
+  let compressType = '';
+  let source = '';
+
+  switch (format) {
+    case 'pdb':
+      source = `https://files.rcsb.org/download/${id}.pdb`;
+      break;
+    case 'cif':
+      source = `https://files.rcsb.org/download/${id}.cif`;
+      break;
+    case 'mmtf':
+      source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
+      break;
+    case 'ccp4':
+      source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
+      break;
+    case 'dsn6':
+      source = `https://edmaps.rcsb.org/maps/${id.toLowerCase()}_2fofc.dsn6`;
+      break;
+    case 'map':
+      source = `https://ftp.wwpdb.org/pub/emdb/structures/EMD-${id}/map/emd_${id}.map.gz`;
+      compressType = '.gz';
+      break;
+    default:
+      throw new Error('Unexpected data format shortcut');
+  }
+
+  opts.fileType = format;
+  opts.fileName = `${id}.${format}${compressType}`;
+  opts.sourceType = 'url';
+  return source;
+}
+
+function _resolveShortcutPubchem(opts, matchesPubchem) {
+  const compound = matchesPubchem[1].toLowerCase();
+  const source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
+  opts.fileType = 'pubchem';
+  opts.fileName = `${compound}.json`;
+  opts.sourceType = 'url';
+  return source;
+}
+
 const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
+const reMapId = /^(?:(map):\s*)?(\d+)$/i;
 const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
 
-function resolveSourceShortcut(source, opts) {
+function _resolveSourceShortcut(source, opts) {
   if (!_.isString(source)) {
     return source;
   }
 
   // e.g. "mmtf:1CRN"
-  const matchesPdbId = rePdbId.exec(source);
-  if (matchesPdbId) {
-    let [, format = 'pdb', id] = matchesPdbId;
-
-    format = format.toLowerCase();
-    id = id.toUpperCase();
-
-    switch (format) {
-      case 'pdb':
-        source = `https://files.rcsb.org/download/${id}.pdb`;
-        break;
-      case 'cif':
-        source = `https://files.rcsb.org/download/${id}.cif`;
-        break;
-      case 'mmtf':
-        source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
-        break;
-      case 'ccp4':
-        source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
-        break;
-      case 'dsn6':
-        source = `https://edmaps.rcsb.org/maps/${id.toLowerCase()}_2fofc.dsn6`;
-        break;
-      default:
-        throw new Error('Unexpected data format shortcut');
-    }
-
-    opts.fileType = format;
-    opts.fileName = `${id}.${format}`;
-    opts.sourceType = 'url';
-    return source;
+  const matchesId = rePdbId.exec(source) || reMapId.exec(source);
+  if (matchesId) {
+    return _resolveShortcutId(opts, matchesId);
   }
 
   // e.g. "pc:aspirin"
   const matchesPubchem = rePubchem.exec(source);
   if (matchesPubchem) {
-    const compound = matchesPubchem[1].toLowerCase();
-    source = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${compound}/JSON?record_type=3d`;
-    opts.fileType = 'pubchem';
-    opts.fileName = `${compound}.json`;
-    opts.sourceType = 'url';
-    return source;
+    return _resolveShortcutPubchem(opts, matchesPubchem);
   }
 
   // otherwise is should be an URL
@@ -1841,88 +1857,146 @@ function updateBinaryMode(opts) {
   opts.binary = binary || false;
 }
 
-function _fetchData(source, opts, job) {
-  return new Promise(((resolve) => {
-    if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
-    }
-    job.notify({ type: 'fetching' });
-
-    // allow for source shortcuts
-    source = resolveSourceShortcut(source, opts);
-
-    // detect a proper loader
-    const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
-    if (!TheLoader) {
-      throw new Error(LOADER_NOT_FOUND);
+// Keyword in loader string can mean different formats depending on the file origin, we might have ability to clarify this
+function _clarifyMultiFormat(source) {
+  return new Promise((resolve) => {
+    if (!_.isString(source)) {
+      resolve(source);
     }
 
-    // split file name
-    const fileName = opts.fileName || TheLoader.extractName(source);
-    if (fileName) {
-      const [name, fileExt] = utils.splitFileName(fileName);
-      _.defaults(opts, { name, fileExt, fileName });
+    const reMatchMultiSource = /^(?:(v|volume):\s*)(\d[a-z\d]+)$/i;
+    const matchesMultiSource = reMatchMultiSource.exec(source);
+    if (!matchesMultiSource) {
+      resolve(source);
     }
 
-    // should it be text or binary?
-    updateBinaryMode(opts);
-
-    // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
-    // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
-    // all hacks and everybody's happy.
-    let newOptions = _.get(opts, 'preset.expression');
-    if (!_.isUndefined(newOptions)) {
-      newOptions = JSON.parse(newOptions);
-      if (newOptions && newOptions.settings) {
-        const keys = ['singleUnit'];
-        for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
-          const key = keys[keyIndex];
-          const value = _.get(newOptions.settings, key);
-          if (!_.isUndefined(value)) {
-            settings.set(key, value);
+    const [, format, id] = matchesMultiSource;
+    utils.getEmdFromPdbId(id)
+      .then((emdId) => {
+        if (format === 'v' || format === 'volume') {
+          if (emdId) {
+            source = `map: ${emdId}`;
+          } else {
+            source = `dsn6: ${id}`;
           }
+          resolve(source);
+        } else {
+          throw new Error('Unexpected multi format data shortcut');
+        }
+      });
+  });
+}
+
+function _saveLoadOptions(opts) {
+  // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
+  // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
+  // all hacks and everybody's happy.
+  let newOptions = _.get(opts, 'preset.expression');
+  if (!_.isUndefined(newOptions)) {
+    newOptions = JSON.parse(newOptions);
+    if (newOptions && newOptions.settings) {
+      const keys = ['singleUnit'];
+      for (let keyIndex = 0, keyCount = keys.length; keyIndex < keyCount; ++keyIndex) {
+        const key = keys[keyIndex];
+        const value = _.get(newOptions.settings, key);
+        if (!_.isUndefined(value)) {
+          settings.set(key, value);
         }
       }
     }
+  }
+}
+function _fetchingErrorCallback(error, opts, job) {
+  console.timeEnd('fetch');
+  opts.context.logger.debug(error.message);
+  if (error.stack) {
+    opts.context.logger.debug(error.stack);
+  }
+  opts.context.logger.error('Fetching failed');
+  job.notify({ type: 'fetchingDone', error });
+  throw error;
+}
 
-    // create a loader
-    const loader = new TheLoader(source, opts);
-    loader.context = opts.context;
-    job.addEventListener('cancel', () => loader.abort());
+function _fetchData(sources, opts, job) {
+  return new Promise(((resolve) => {
+    if (job.shouldCancel()) {
+      throw new Error(OPERATION_CANCELED);
+    }
+    job.notify({ type: 'fetching' });
 
-    loader.addEventListener('progress', (event) => {
-      if (event.lengthComputable && event.total > 0) {
-        reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
-      } else {
-        reportProgress(loader.logger, 'Fetching');
-      }
-    });
+    const fetchPromise = _clarifyMultiFormat(sources)
+      .then((source) => {
+        // allow for source shortcuts
+        source = _resolveSourceShortcut(source, opts);
 
-    console.time('fetch');
-    const promise = loader.load()
+        // detect a proper loader
+        const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
+        if (!TheLoader) {
+          throw new Error(LOADER_NOT_FOUND);
+        }
+
+        // split file name
+        const fileName = opts.fileName || TheLoader.extractName(source);
+        if (fileName) {
+          const [name, fileExt, compressType] = utils.splitFileName(fileName);
+          _.defaults(opts, {
+            name, fileExt, fileName, compressType,
+          });
+        }
+
+        // should it be text or binary?
+        updateBinaryMode(opts);
+
+        _saveLoadOptions(opts);
+
+        // create a loader
+        const loader = new TheLoader(source, opts);
+        loader.context = opts.context;
+        job.addEventListener('cancel', () => loader.abort());
+
+        loader.addEventListener('progress', (event) => {
+          if (event.lengthComputable && event.total > 0) {
+            reportProgress(loader.logger, 'Fetching', event.loaded / event.total);
+          } else {
+            reportProgress(loader.logger, 'Fetching');
+          }
+        });
+
+        console.time('fetch');
+        return loader;
+      })
+      .then((loader) => loader.load())
       .then((data) => {
         console.timeEnd('fetch');
         opts.context.logger.info('Fetching finished');
         job.notify({ type: 'fetchingDone', data });
         return data;
       })
-      .catch((error) => {
-        console.timeEnd('fetch');
-        opts.context.logger.debug(error.message);
-        if (error.stack) {
-          opts.context.logger.debug(error.stack);
-        }
-        opts.context.logger.error('Fetching failed');
-        job.notify({ type: 'fetchingDone', error });
-        throw error;
-      });
-    resolve(promise);
+      .catch((error) => _fetchingErrorCallback(error, opts, job));
+
+    resolve(fetchPromise);
   }));
+}
+
+function _decompressData(data, opts, job) {
+  if (job.shouldCancel()) {
+    return Promise.reject(new Error(OPERATION_CANCELED));
+  }
+
+  return new Promise((resolve) => {
+    if (opts.compressType === '') {
+      resolve(data);
+    }
+
+    job.notify({ type: 'decompressing' });
+
+    resolve(utils.decompress(data, opts));
+  });
 }
 
 function _parseData(data, opts, job) {
   if (job.shouldCancel()) {
-    return Promise.reject(new Error('Operation cancelled'));
+    return Promise.reject(new Error(OPERATION_CANCELED));
   }
 
   job.notify({ type: 'parsing' });
@@ -2011,6 +2085,7 @@ Miew.prototype.load = function (source, opts) {
   };
 
   return _fetchData(source, opts, job)
+    .then((data) => _decompressData(data, opts, job))
     .then((data) => _parseData(data, opts, job))
     .then((object) => {
       const name = this._onLoad(object, opts);
