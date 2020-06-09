@@ -4,106 +4,93 @@ import palettes from '../palettes';
 import ChainColorer from './ChainColorer';
 
 describe('ChainColorer', () => {
-  describe('.id', () => {
-    const uc = new ChainColorer();
-    it('have property called id', () => {
-      expect(uc).to.have.property('id');
-    });
-
-    it('have .id property type \'string\'', () => {
-      expect(uc.id).to.be.a('string');
-    });
-
-    it('have .id property different from such in parent class', () => {
-      const colorer = Object.getPrototypeOf(Object.getPrototypeOf(uc));
-      expect(uc.id).to.not.equal(colorer.id);
-    });
-  });
-
-  describe('.name', () => {
-    const uc = new ChainColorer();
-    it('have property called name', () => {
-      expect(uc).to.have.property('name');
-    });
-
-    it('have .name property type \'string\'', () => {
-      expect(uc.name).to.be.a('string');
-    });
-  });
-
-  describe('.shortName', () => {
-    const uc = new ChainColorer();
-    it('have property called shortName', () => {
-      expect(uc).to.have.property('shortName');
-    });
-
-    it('have .shortName property type \'string\'', () => {
-      expect(uc.shortName).to.be.a('string');
-    });
-  });
-
-  const chainColor = 'chainColor';
+  const chainName = 'A';
+  const chainColor = 0xFFFFFF;
 
   class FirstPalette {
-    getChainColor() {
-      return chainColor;
+    getChainColor(name) {
+      if (name === chainName) {
+        return chainColor;
+      }
+      return 0x000000;
     }
   }
 
   class Residue {
+    constructor(chain) {
+      this._chainName = chain;
+    }
+
     getChain() {
-      return { _name: 'chaiName' };
+      return { _name: this._chainName };
     }
   }
-  const residue = new Residue();
   const palette = new FirstPalette();
 
   describe('#getAtomColor', () => {
     let paletteStub;
-    const atom = { residue };
+    let cColorer;
 
-    beforeEach(() => {
+    before(() => {
       paletteStub = sinon.stub(palettes, 'first').value(palette);
+      cColorer = new ChainColorer();
     });
-    afterEach(() => {
+    after(() => {
       paletteStub.restore();
     });
 
-    it('returns the same color with set for atom\'s chain', () => {
-      const uc = new ChainColorer();
-      expect(uc.getAtomColor(atom)).to.equal(chainColor);
-    });
-
-    it('calls getResidueColor() with atom\'s residue', () => {
-      const uc = new ChainColorer();
-      const getResidueColor = sinon.spy(uc, 'getResidueColor');
-      uc.getAtomColor(atom);
-      expect(getResidueColor).to.be.calledOnce().and.calledWith(atom.residue);
-      getResidueColor.restore();
+    it('returns color which is set for atom\'s residue\'s chain name', () => {
+      const residue = new Residue(chainName);
+      const atom = { residue };
+      expect(cColorer.getAtomColor(atom)).to.equal(chainColor);
     });
   });
 
   describe('#getResidueColor', () => {
     let paletteStub;
+    let cColorer;
 
-    beforeEach(() => {
+    before(() => {
       paletteStub = sinon.stub(palettes, 'first').value(palette);
+      cColorer = new ChainColorer();
     });
-    afterEach(() => {
+    after(() => {
       paletteStub.restore();
     });
 
-    it('returns the same color with set for residue\'s chain', () => {
-      const uc = new ChainColorer();
-      expect(uc.getResidueColor(residue)).to.equal(chainColor);
+    it('returns color which is set for residue\'s chain name', () => {
+      const residue = new Residue(chainName);
+      expect(cColorer.getResidueColor(residue)).to.equal(chainColor);
+    });
+  });
+
+  describe('.id', () => {
+    const cColorer = new ChainColorer();
+
+    it('have .id property type \'string\'', () => {
+      expect(cColorer).to.have.property('id');
+      expect(cColorer.id).to.be.a('string');
     });
 
-    it('calls getChainColor with exactly residue\'s chain name', () => {
-      const uc = new ChainColorer();
-      const getChainColor = sinon.spy(uc.palette, 'getChainColor');
-      uc.getResidueColor(residue);
-      expect(getChainColor).to.be.calledOnce().and.calledWithExactly(residue.getChain()._name);
-      getChainColor.restore();
+    it('have .id property different from such in parent class', () => {
+      const colorer = Object.getPrototypeOf(Object.getPrototypeOf(cColorer));
+      expect(cColorer.id).to.not.equal(colorer.id);
+    });
+  });
+
+  describe('.name', () => {
+    it('have .name property type \'string\'', () => {
+      const cColorer = new ChainColorer();
+      expect(cColorer).to.have.property('name');
+      expect(cColorer.name).to.be.a('string');
+    });
+  });
+
+  describe('.shortName', () => {
+    it('have .shortName property type \'string\'', () => {
+      const cColorer = new ChainColorer();
+      expect(cColorer).to.have.property('shortName');
+      expect(cColorer.shortName).to.be.a('string');
     });
   });
 });

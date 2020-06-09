@@ -4,92 +4,84 @@ import palettes from '../palettes';
 import ConformationColorer from './ConformationColorer';
 
 describe('ConformationColorer', () => {
-  describe('.id', () => {
-    const cc = new ConformationColorer();
-    it('have property called id', () => {
-      expect(cc).to.have.property('id');
-    });
-
-    it('have .id property type \'string\'', () => {
-      expect(cc.id).to.be.a('string');
-    });
-
-    it('have .id property different from such in parent class', () => {
-      const colorer = Object.getPrototypeOf(Object.getPrototypeOf(cc));
-      expect(cc.id).to.not.equal(colorer.id);
-    });
-  });
-
-  describe('.name', () => {
-    const cc = new ConformationColorer();
-    it('have property called name', () => {
-      expect(cc).to.have.property('name');
-    });
-
-    it('have .name property type \'string\'', () => {
-      expect(cc.name).to.be.a('string');
-    });
-  });
-
-  describe('.shortName', () => {
-    const cc = new ConformationColorer();
-    it('have property called shortName', () => {
-      expect(cc).to.have.property('shortName');
-    });
-
-    it('have .shortName property type \'string\'', () => {
-      expect(cc.shortName).to.be.a('string');
-    });
-  });
-
-  const chainColor = 'chainColor';
+  const chainName = 'A';
+  const chainColor = 0xFFFFFF;
 
   class FirstPalette {
-    static defaultResidueColor = 'defColor';
+    defaultResidueColor = 0x00ffff;
 
-    getChainColor() {
-      return chainColor;
+    getChainColor(name) {
+      if (name === chainName) {
+        return chainColor;
+      }
+      return 0x000000;
     }
   }
-
   const palette = new FirstPalette();
 
   describe('#getAtomColor', () => {
     let paletteStub;
-    const atom = { location: 'loc' };
+    let cColorer;
 
-    beforeEach(() => {
+    before(() => {
       paletteStub = sinon.stub(palettes, 'first').value(palette);
+      cColorer = new ConformationColorer();
     });
-    afterEach(() => {
+    after(() => {
       paletteStub.restore();
     });
 
-    it('returns color corresponded to chain detected via atom location', () => {
-      const cc = new ConformationColorer();
-      expect(cc.getAtomColor(atom)).to.equal(chainColor);
-    });
-
-    it('checks sequence of calls and their arguments', () => {
-      const cc = new ConformationColorer();
-      const fromCharCode = sinon.spy(String, 'fromCharCode');
-      const getChainColor = sinon.spy(cc.palette, 'getChainColor');
-      cc.getAtomColor(atom);
-      expect(fromCharCode).to.be.calledOnce().and.calledWithExactly(atom.location);
-      expect(getChainColor).to.be.calledOnce().and.calledWithExactly(fromCharCode.returnValues[0]);
-      fromCharCode.restore();
-      getChainColor.restore();
+    it('returns color which is set for name of atom located chain', () => {
+      const atom = { location: chainName.charCodeAt(0) };
+      expect(cColorer.getAtomColor(atom)).to.equal(chainColor);
     });
   });
 
   describe('#getResidueColor', () => {
-    it('returns default color which is set for object\'s palette', () => {
-      const paletteStub = sinon.stub(palettes, 'first').value(palette);
+    let paletteStub;
+    let cColorer;
 
-      const cc = new ConformationColorer();
-      expect(cc.getResidueColor()).to.equal(palette.defaultResidueColor);
-
+    before(() => {
+      paletteStub = sinon.stub(palettes, 'first').value(palette);
+      cColorer = new ConformationColorer();
+    });
+    after(() => {
       paletteStub.restore();
+    });
+
+    it('returns default color which is set for all residues', () => {
+      const color = cColorer.getResidueColor();
+      expect(color).to.equal(palette.defaultResidueColor);
+    });
+  });
+
+  describe('.id', () => {
+    const cColorer = new ConformationColorer();
+
+    it('have .id property type \'string\'', () => {
+      expect(cColorer).to.have.property('id');
+      expect(cColorer.id).to.be.a('string');
+    });
+
+    it('have .id property different from such in parent class', () => {
+      const colorer = Object.getPrototypeOf(Object.getPrototypeOf(cColorer));
+      expect(cColorer.id).to.not.equal(colorer.id);
+    });
+  });
+
+  describe('.name', () => {
+    it('have .name property type \'string\'', () => {
+      const cColorer = new ConformationColorer();
+      expect(cColorer).to.have.property('name');
+      expect(cColorer.name).to.be.a('string');
+    });
+  });
+
+  describe('.shortName', () => {
+    it('have .shortName property type \'string\'', () => {
+      const cColorer = new ConformationColorer();
+      expect(cColorer).to.have.property('shortName');
+      expect(cColorer.shortName).to.be.a('string');
     });
   });
 });

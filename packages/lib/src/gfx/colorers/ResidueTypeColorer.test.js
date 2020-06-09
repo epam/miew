@@ -4,101 +4,83 @@ import palettes from '../palettes';
 import ResidueTypeColorer from './ResidueTypeColorer';
 
 describe('ResidueTypeColorer', () => {
-  describe('.id', () => {
-    const rtc = new ResidueTypeColorer();
-    it('have property called id', () => {
-      expect(rtc).to.have.property('id');
-    });
-
-    it('have .id property type \'string\'', () => {
-      expect(rtc.id).to.be.a('string');
-    });
-
-    it('have .id property different from such in parent class', () => {
-      const colorer = Object.getPrototypeOf(Object.getPrototypeOf(rtc));
-      expect(rtc.id).to.not.equal(colorer.id);
-    });
-  });
-
-  describe('.name', () => {
-    const rtc = new ResidueTypeColorer();
-    it('have property called name', () => {
-      expect(rtc).to.have.property('name');
-    });
-
-    it('have .name property type \'string\'', () => {
-      expect(rtc.name).to.be.a('string');
-    });
-  });
-
-  describe('.shortName', () => {
-    const rtc = new ResidueTypeColorer();
-    it('have property called shortName', () => {
-      expect(rtc).to.have.property('shortName');
-    });
-
-    it('have .shortName property type \'string\'', () => {
-      expect(rtc.shortName).to.be.a('string');
-    });
-  });
-
-  const residueColor = 'residueColor';
+  const resTypeName = 'HET';
+  const resColor = 0xFFFFFF;
 
   class FirstPalette {
-    getResidueColor() {
-      return residueColor;
+    getResidueColor(name) {
+      if (name === resTypeName) {
+        return resColor;
+      }
+      return 0x000000;
     }
   }
-
-  const residue = { _type: { _name: 'resTypeName' } };
   const palette = new FirstPalette();
 
   describe('#getAtomColor', () => {
     let paletteStub;
-    const atom = { residue };
+    let rtColorer;
 
-    beforeEach(() => {
+    before(() => {
       paletteStub = sinon.stub(palettes, 'first').value(palette);
+      rtColorer = new ResidueTypeColorer();
     });
-    afterEach(() => {
+    after(() => {
       paletteStub.restore();
     });
 
-    it('returns the same color with set for atom\'s residue type', () => {
-      const rtc = new ResidueTypeColorer();
-      expect(rtc.getAtomColor(atom)).to.equal(residueColor);
-    });
-
-    it('calls getResidueColor() with atom\'s residue', () => {
-      const rtc = new ResidueTypeColorer();
-      const getResidueColor = sinon.spy(rtc, 'getResidueColor');
-      rtc.getAtomColor(atom);
-      expect(getResidueColor).to.be.calledOnce().and.calledWith(atom.residue);
-      getResidueColor.restore();
+    it('returns color which is set for atom\'s residue\'s type', () => {
+      const residue = { _type: { _name: resTypeName } };
+      const atom = { residue };
+      expect(rtColorer.getAtomColor(atom)).to.equal(resColor);
     });
   });
 
   describe('#getResidueColor', () => {
     let paletteStub;
+    let rtColorer;
 
-    beforeEach(() => {
+    before(() => {
       paletteStub = sinon.stub(palettes, 'first').value(palette);
+      rtColorer = new ResidueTypeColorer();
     });
-    afterEach(() => {
+    after(() => {
       paletteStub.restore();
     });
 
-    it('returns the same color with set for residue type', () => {
-      const rtc = new ResidueTypeColorer();
-      expect(rtc.getResidueColor(residue)).to.equal(residueColor);
+    it('returns color which is set for residue\'s type', () => {
+      const residue = { _type: { _name: resTypeName } };
+      expect(rtColorer.getResidueColor(residue)).to.equal(resColor);
+    });
+  });
+
+  describe('.id', () => {
+    const rtColorer = new ResidueTypeColorer();
+
+    it('have .id property type \'string\'', () => {
+      expect(rtColorer).to.have.property('id');
+      expect(rtColorer.id).to.be.a('string');
     });
 
-    it('calls getResidueColor with exactly residue\'s type name', () => {
-      const rtc = new ResidueTypeColorer();
-      const getResidueColor = sinon.spy(rtc.palette, 'getResidueColor');
-      rtc.getResidueColor(residue);
-      expect(getResidueColor).to.be.calledOnce().and.calledWithExactly(residue._type._name);
-      getResidueColor.restore();
+    it('have .id property different from such in parent class', () => {
+      const colorer = Object.getPrototypeOf(Object.getPrototypeOf(rtColorer));
+      expect(rtColorer.id).to.not.equal(colorer.id);
+    });
+  });
+
+  describe('.name', () => {
+    it('have .name property type \'string\'', () => {
+      const rtColorer = new ResidueTypeColorer();
+      expect(rtColorer).to.have.property('name');
+      expect(rtColorer.name).to.be.a('string');
+    });
+  });
+
+  describe('.shortName', () => {
+    it('have .shortName property type \'string\'', () => {
+      const rtColorer = new ResidueTypeColorer();
+      expect(rtColorer).to.have.property('shortName');
+      expect(rtColorer.shortName).to.be.a('string');
     });
   });
 });
