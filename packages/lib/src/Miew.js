@@ -1905,6 +1905,16 @@ function _saveLoadOptions(opts) {
     }
   }
 }
+function _fetchingErrorCallback(error, opts, job) {
+  console.timeEnd('fetch');
+  opts.context.logger.debug(error.message);
+  if (error.stack) {
+    opts.context.logger.debug(error.stack);
+  }
+  opts.context.logger.error('Fetching failed');
+  job.notify({ type: 'fetchingDone', error });
+  throw error;
+}
 
 function _fetchData(sources, opts, job) {
   return new Promise(((resolve) => {
@@ -1961,16 +1971,7 @@ function _fetchData(sources, opts, job) {
         job.notify({ type: 'fetchingDone', data });
         return data;
       })
-      .catch((error) => {
-        console.timeEnd('fetch');
-        opts.context.logger.debug(error.message);
-        if (error.stack) {
-          opts.context.logger.debug(error.stack);
-        }
-        opts.context.logger.error('Fetching failed');
-        job.notify({ type: 'fetchingDone', error });
-        throw error;
-      });
+      .catch((error) => _fetchingErrorCallback(error, opts, job));
 
     resolve(fetchPromise);
   }));
