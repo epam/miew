@@ -16,22 +16,23 @@ describe('SecondaryStructureColorer', () => {
     defaultSecondaryColor = 0xffffff;
 
     getSecondaryColor(type) {
+      let color = 0x000000;
       if (type === 'dna') {
-        return dnaColor;
+        color = dnaColor;
       }
       if (type === 'rna') {
-        return rnaColor;
+        color = rnaColor;
       }
       if (type === 'H') {
-        return undefined;
+        color = undefined;
       }
       if (type === 'helix') {
-        return helixColor;
+        color = helixColor;
       }
       if (type === 'E') {
-        return eColor;
+        color = eColor;
       }
-      return 0x000000;
+      return color;
     }
   }
 
