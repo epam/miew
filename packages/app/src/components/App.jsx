@@ -1,8 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 
+import theme from './theme';
 import Menu from './menu/Menu.jsx';
-import ViewerContainer from './viewer/ViewerContainer.jsx';
+import Viewer from '../containers/ControlViewer.jsx';
 
 const DivStyled = styled.div`
   overflow: hidden;
@@ -25,8 +26,10 @@ export default class App extends React.Component {
 
   render() {
     return <DivStyled>
-      <ViewerContainer onChange={ this._onViewerChange } />
-      <Menu/>
+      <Viewer onChange={ this._onViewerChange } />
+      <ThemeProvider theme={theme}>
+        <Menu/>
+      </ThemeProvider>
     </DivStyled>;
   }
 }

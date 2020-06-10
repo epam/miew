@@ -6,10 +6,10 @@ import rootReducer from './store';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './components/App.jsx';
 
-const store = createStore(rootReducer);
-
-// const root = document.getElementById('miew-react-app');
-// ReactDOM.render(<App/>, root);
+const store = createStore(
+  rootReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+);
 
 ReactDOM.render(
   <Provider store={store}>

@@ -4,17 +4,12 @@ import Tab from 'react-bootstrap/Tab';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import styled from 'styled-components';
-
-const StyledRow = styled(Row)`
-  visibility: ${(props) => (props.visibility ? 'visible' : 'hidden')};
-`;
+import UpdateInfoPanel from '../../../containers/UpdateInfoPanel.jsx';
 
 export default class PanelsList extends React.Component {
   render() {
-    // return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1" style={{ visibility: this.props.visibility ? 'visible' : 'hidden' }}>
     return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1">
-      <StyledRow visibility={ this.props.visibility }>
+      <Row style={{ visibility: this.props.visibility }}>
         <Col sm={4}>
           <ListGroup.Item action variant="light" href="#link1">Info</ListGroup.Item>
           <ListGroup.Item action disabled variant="light">Gallery</ListGroup.Item>
@@ -23,14 +18,18 @@ export default class PanelsList extends React.Component {
         <Col sm={8}>
           <Tab.Content>
             <Tab.Pane eventKey="#link1" >
-              <span style={{ color: 'silver' }}> Info panel</span>
+              <UpdateInfoPanel/>
             </Tab.Pane>
             <Tab.Pane eventKey="#link2">
               <span style={{ color: 'silver' }}> About panel</span>
             </Tab.Pane>
           </Tab.Content>
         </Col>
-      </StyledRow>
+      </Row>
     </Tab.Container>;
   }
 }
+
+PanelsList.defaultProps = {
+  visibility: 'hidden',
+};

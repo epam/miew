@@ -9,7 +9,7 @@
   "scripts": {
     "ci": "run-s clean lint build",
     "clean": "rimraf build/*",
-    "lint": "eslint -f unix *.js src/ ",
+    "lint": "eslint -f unix --ext .js,.jsx src/ ",
     "build": "webpack --mode production",
     "start": "webpack-dev-server --mode development --open",
     "test": "jest",
