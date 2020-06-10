@@ -30,12 +30,12 @@ describe('ElementColorer', () => {
     let eColorerWithCarbon;
     let eColorerWithoutCarbon;
 
-    before(() => {
+    beforeEach(() => {
       paletteStub = sinon.stub(palettes, 'first').value(palette);
       eColorerWithCarbon = new ElementColorer({ carbon: optsCarbonColor });
       eColorerWithoutCarbon = new ElementColorer({ carbon: -1 });
     });
-    after(() => {
+    afterEach(() => {
       paletteStub.restore();
     });
 
