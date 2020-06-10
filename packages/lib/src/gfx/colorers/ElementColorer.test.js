@@ -39,18 +39,18 @@ describe('ElementColorer', () => {
       paletteStub.restore();
     });
 
-    it('always returns color which is set for Oxygen for atom of Oxygen element', () => {
+    it('always returns proper color for Oxygen', () => {
       const oxygenAtom = { element: { name: 'O' } };
       expect(eColorerWithCarbon.getAtomColor(oxygenAtom)).to.equal(oxygenColor);
       expect(eColorerWithoutCarbon.getAtomColor(oxygenAtom)).to.equal(oxygenColor);
     });
 
-    it('returns color which is set for Carbon for atom of Carbon element if colorer options does not have another carbon color', () => {
+    it('returns proper color for Carbon element if colorer options does not have another carbon color', () => {
       const carbonAtom = { element: { name: 'C' } };
       expect(eColorerWithoutCarbon.getAtomColor(carbonAtom)).to.equal(carbonColor);
     });
 
-    it('returns color which is set in colorer options for Carbon for atom of Carbon element', () => {
+    it('returns color which is set in colorer options for Carbon instead of proper color for Carbon', () => {
       const carbonAtom = { element: { name: 'C' } };
       expect(eColorerWithCarbon.getAtomColor(carbonAtom)).to.equal(optsCarbonColor);
     });
