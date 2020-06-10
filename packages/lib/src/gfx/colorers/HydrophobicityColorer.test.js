@@ -67,12 +67,11 @@ describe('HydrophobicityColorer', () => {
       expect(color).to.equal(lGradientColor);
     });
 
-    // Fail because hydrophobicity: 0.0 chose else branch in "if (residue._type.hydrophobicity)"
-    /* it('returns middle color of gradient for residue with the middle hydrophobicity', () => {
+    it('returns middle color of gradient for residue with the middle hydrophobicity', () => {
       const residueH = { _type: { hydrophobicity: 0.0 } };
       const color = hColorer.getResidueColor(residueH);
       expect(color).to.equal(cGradientColor);
-    }); */
+    });
 
     it('returns right color of gradient for residue with the highest hydrophobicity', () => {
       const residueH = { _type: { hydrophobicity: 4.5 } };
