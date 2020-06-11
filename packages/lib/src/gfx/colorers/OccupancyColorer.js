@@ -15,25 +15,22 @@ import Colorer from './Colorer';
 class OccupancyColorer extends Colorer {
   static id = 'OC';
 
-  getAtomColor(atom, _complex) {
-    const { opts } = this;
-    if (atom.occupancy && opts) {
-      const factor = 1 - atom.occupancy;
+  _getColorByOccupancy(occupancy, opts) {
+    if (occupancy && opts && opts.gradient) {
+      const factor = 1 - occupancy;
       return this.palette.getGradientColor(factor, opts.gradient);
     }
     return this.palette.defaultGradientColor;
   }
 
+  getAtomColor(atom, _complex) {
+    const { opts } = this;
+    return this._getColorByOccupancy(atom.occupancy, opts);
+  }
+
   getResidueColor(residue, _complex) {
     const { opts } = this;
-    if (!opts) {
-      return this.palette.defaultGradientColor;
-    }
-    if (residue.occupancy > 0) {
-      const factor = 1 - residue.occupancy;
-      return this.palette.getGradientColor(factor, opts.gradient);
-    }
-    return this.palette.defaultGradientColor;
+    return this._getColorByOccupancy(residue.occupancy, opts);
   }
 }
 
