@@ -16,7 +16,7 @@ class OccupancyColorer extends Colorer {
   static id = 'OC';
 
   _getColorByOccupancy(occupancy, opts) {
-    if (occupancy && opts && opts.gradient) {
+    if (occupancy !== undefined) {
       const factor = 1 - occupancy;
       return this.palette.getGradientColor(factor, opts.gradient);
     }

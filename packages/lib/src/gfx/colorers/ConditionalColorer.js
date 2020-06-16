@@ -27,12 +27,13 @@ class ConditionalColorer extends Colorer {
 
   getResidueColor(residue, _complex) {
     const subset = this._subsetCached;
-    let includes = true;
     const atoms = residue._atoms;
     for (let i = 0, n = atoms.length; i < n; ++i) {
-      includes = includes && subset.includesAtom(atoms[i]);
+      if (!subset.includesAtom(atoms[i])) {
+        return this.opts.baseColor;
+      }
     }
-    return includes ? this.opts.color : this.opts.baseColor;
+    return this.opts.color;
   }
 }
 
