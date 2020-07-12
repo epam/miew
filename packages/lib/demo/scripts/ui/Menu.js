@@ -744,6 +744,7 @@ Menu.prototype._fillSourceList = function () {
     return function (e) {
       self._viewer.setCurrentVisual(name);
       self._fillSourceList();
+      self._updateInfo(self._viewer._visuals[name].getComplex());
       self._initReprList();
       e.preventDefault();
     };
