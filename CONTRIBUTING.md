@@ -76,10 +76,11 @@ cd miew
 yarn
 
 # execute the full build pipeline
-npm run ci
+cd packages/lib
+yarn run ci
 
 # run the demo application
-npm run demo
+yarn run demo
 ```
 
 
@@ -125,14 +126,15 @@ git checkout -b hotfix/great-fix-whatever -t origin/master
 yarn
 
 # start development server, with in-memory builds and live reload
-npm start
+cd packages/lib
+yarn start
 ```
 
 Before you commit and push, please ensure that the build is not broken:
-  - Run the full build pipeline using `npm run ci` command, it includes code linting and unit tests.
-  - Verify that the demo application is working as expected (`npm run demo`).
+  - Run the full build pipeline using `yarn run ci` command, it includes code linting and unit tests.
+  - Verify that the demo application is working as expected (`yarn run demo`).
   - Check that examples for the library are working (see `build/examples/`).
-  - It is also a good idea to run the graphics regression tests (`npm run test:e2e`, `npm run show:e2e`).
+  - It is also a good idea to run the graphics regression tests (`yarn run test:e2e`, `yarn run show:e2e`).
     Unfortunately, some tests fail yet.
 
 
