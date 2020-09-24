@@ -18,7 +18,6 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
     const thetaStart = 0;
     const thetaLength = 2 * Math.PI;
 
-
     this.type = 'CylinderBufferGeometry';
 
     this.parameters = {
@@ -108,7 +107,6 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
         normals.setXYZ(currVtxIdx, 0, 1, 0);
         uvs.setXY(currVtxIdx, 1, 1);
 
-
         const nextTVtx = startTIdx + ((fTIdx + 1) % radialSegments);
         indices.setXYZ(currFaceIdx * PTS_PER_TRIANGLE, currVtxIdx, nextTVtx, lastIdx);
         currFaceIdx++;
@@ -133,7 +131,6 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
         );
         normals.setXYZ(currVtxIdx, 0, -1, 0);
         uvs.setXY(currVtxIdx, 0, 0);
-
 
         const nextBVtx = startBIdx + ((fBIdx + 1) % radialSegments);
         indices.setXYZ(currFaceIdx * PTS_PER_TRIANGLE, nextBVtx, currVtxIdx, lastBIdx);

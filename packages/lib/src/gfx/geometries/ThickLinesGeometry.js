@@ -167,5 +167,4 @@ class ThickLinesGeometry extends THREE.BufferGeometry {
   }
 }
 
-
 export default ThickLinesGeometry;

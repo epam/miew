@@ -186,7 +186,6 @@ class CIFParser extends Parser {
     return complex;
   }
 
-
   /**
    * Extract metadata
    * @param complex structure to fill
@@ -469,7 +468,6 @@ class CIFParser extends Parser {
       }
     }
   }
-
 
   /**
    * Extract biological assemblies information from CIF structure and fill complex

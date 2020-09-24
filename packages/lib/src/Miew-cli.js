@@ -76,7 +76,6 @@ class RepresentationMap {
   }
 }
 
-
 const representationsStorage = new RepresentationMap();
 
 function keyRemap(key) {
@@ -269,7 +268,6 @@ class CLIUtils {
   }
 }
 // repIndexOrRepMap could be RepresentationMap or index
-
 
 const utilFunctions = new CLIUtils();
 

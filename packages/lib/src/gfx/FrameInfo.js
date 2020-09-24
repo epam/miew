@@ -308,7 +308,6 @@ class FrameInfo {
     return vec;
   }
 
-
   getResidues() {
     if (this._cachedResidues) {
       return this._residues;

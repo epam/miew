@@ -67,7 +67,6 @@ THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
   const _camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000);
   _camera.position.z = 100;
 
-
   return function (material) {
     _quad.material = material;
     this.render(_scene, _camera);
@@ -122,7 +121,6 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
     transparent: true,
   });
 
-
   return function (srcTex, opacity) {
     _material.uniforms.srcTex.value = srcTex;
     _material.transparent = (opacity < 1.0);
@@ -136,7 +134,6 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function 
     uniforms: { coef: { type: 'f', value: 1.0 } },
     fragmentShader: fragmentScreenQuadFromTexWithDistortion,
   });
-
 
   return function (srcTex, coef) {
     _material.uniforms.srcTex.value = srcTex;

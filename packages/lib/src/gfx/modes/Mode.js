@@ -30,7 +30,6 @@ class Mode {
     this.opts = _.merge(utils.deriveDeep(this.settings.now.modes[this.id], true), opts);
   }
 
-
   /**
    * Get mode identification, probably with options.
    * @returns {string|Array} Mode identifier string ({@link Mode#id}) or two-element array containing both mode

@@ -1005,5 +1005,4 @@ utils.deriveClass(Settings, EventDispatcher, {
   },
 });
 
-
 export default new Settings();

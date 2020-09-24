@@ -11,7 +11,6 @@ const cAromaticAtoms = [
   // Element.ByName.S.number,
 ];
 
-
 /** Conditions for bonds:
    *   - Cross product with each subsequent bond to add is collinear and point to the same direction
    *   - Each pair of a adjacent bonds belong to not more than one cycle

@@ -314,7 +314,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
           cube.pointsValuesLinear[indPointValues + 6 * 3 + 1] += vCellStep.y;
           cube.pointsValuesLinear[indPointValues + 7 * 3 + 1] += vCellStep.y;
 
-
           // now current cell has intersections (from -x to +x) on some cube edges
           const indValues = indPointValues + 24;
           for (let i = 0; i < cNumVerts; ++i) {
@@ -436,7 +435,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     }
     return atomT[letter * 2];
   }
-
 
   /**
    * Calculate values for marching cube grid points

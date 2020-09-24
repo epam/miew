@@ -401,7 +401,6 @@ class VolumeMesh extends THREE.Mesh {
     const matrixWorldToLocal = VolumeMesh._matrixWorldToLocal;
     const clipPlane = VolumeMesh._clipPlane;
 
-
     this._updateIsoLevel();
 
     // get clip plane in local space
@@ -428,6 +427,5 @@ class VolumeMesh extends THREE.Mesh {
     }
   }
 }
-
 
 export default VolumeMesh;

@@ -76,7 +76,6 @@ class PubChemParser extends Parser {
   }
 }
 
-
 PubChemParser.formats = ['pubchem', 'pubchem+json', 'pc'];
 PubChemParser.extensions = ['.json'];
 

@@ -5,7 +5,6 @@ import Simple2CCylindersGeometry from './Simple2CCylindersGeometry';
 const COLLISION_RAD = 0.3;
 const tmpVector = new THREE.Vector3();
 
-
 class TwoColorLinesGeometry extends LinesGeometry {
   constructor(segmentsCount) {
     super(segmentsCount * 2);

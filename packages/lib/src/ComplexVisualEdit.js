@@ -184,7 +184,6 @@ class ComplexComponentEditor extends ComplexEditor {
   }
 }
 
-
 class ComplexFragmentEditor extends ComplexEditor {
   constructor(complexVisual) {
     super();
@@ -378,7 +377,6 @@ class ComplexFragmentEditor extends ComplexEditor {
     });
   }
 }
-
 
 export default {
   ComponentEditor: ComplexComponentEditor,

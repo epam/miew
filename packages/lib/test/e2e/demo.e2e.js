@@ -17,7 +17,6 @@ const cfg = {
 let driver;
 let page;
 
-
 describe('As a power user, I want to', function () {
   this.timeout(0);
   this.slow(1000);

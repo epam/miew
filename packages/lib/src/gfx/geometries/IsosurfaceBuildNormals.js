@@ -89,7 +89,6 @@ class IsosurfaceBuildNormals {
     } // for (i)
     // maxAtomsRefs = numAtoms * MAX_ATOMS_IN_SINGLE_VOXEL;
 
-
     this._voxelList = utils.allocateTyped(Int32Array, side3);
     const atomsList = [];
     atomsList.length = maxAtomsRefs;

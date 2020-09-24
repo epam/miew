@@ -8,7 +8,6 @@ const centerPos = new THREE.Vector3();
 const tmpVector = new THREE.Vector3();
 const normMtx = new THREE.Matrix3();
 
-
 class Simple2CCylindersGeometry extends ChunkedObjectsGeometry {
   constructor(instanceCount, polyComplexity) {
     const cylGeometry = new THREE.CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, true);
@@ -19,7 +18,6 @@ class Simple2CCylindersGeometry extends ChunkedObjectsGeometry {
     this._chunkNorms = this._chunkGeo.attributes.normal.array;
     this._tmpVector = utils.allocateTyped(Float32Array, chunkSize * VEC_SIZE);
   }
-
 
   setItem(itemIdx, botPos, topPos, itemRad) {
     const chunkSize = this._chunkSize;
@@ -62,7 +60,6 @@ class Simple2CCylindersGeometry extends ChunkedObjectsGeometry {
     this._normals.set(tmpArray, firstOffset);
     this._normals.set(tmpArray, secondOffset);
   }
-
 
   setColor(itemIdx, colorVal1, colorVal2) {
     const first = 2 * itemIdx;

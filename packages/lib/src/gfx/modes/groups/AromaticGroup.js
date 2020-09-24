@@ -35,7 +35,6 @@ class AromaticGroup extends AtomsGroup {
       currVector.subVectors(currPos, center);
       const upDir = currVector.clone().cross(prevVector).normalize();
 
-
       for (; i < n; ++i) {
         const omega = prevVector.angleTo(currVector);
         tmpDir[i] = _slerp(omega, prevVector, currVector, 0.5).normalize();

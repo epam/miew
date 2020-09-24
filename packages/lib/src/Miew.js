@@ -2255,7 +2255,6 @@ Miew.prototype._onLoad = function (dataSource, opts) {
     this._opts._objects = null;
   }
 
-
   if (dataSource.id === 'Complex') {
     const complex = dataSource;
 
@@ -2486,7 +2485,6 @@ Miew.prototype.rebuild = function () {
   this._spinner.spin(this._container);
   Promise.all(rebuildActions).then(() => {
     self._spinner.stop();
-
 
     self._needRender = true;
 

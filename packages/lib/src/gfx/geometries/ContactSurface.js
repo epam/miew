@@ -40,12 +40,10 @@ function AVHash(posRad, min, max, maxDistance) {
 
   const jkDim = jDim * kDim;
 
-
   /* Get cellID for cartesian x,y,z */
   const cellID = function (x, y, z) {
     return (((hashFunc(x, minX) * jDim) + hashFunc(y, minY)) * kDim) + hashFunc(z, minZ);
   };
-
 
   /* Initial building, could probably be optimized further */
   const preHash = [];
@@ -188,7 +186,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   let atomMap = null;
   let visibilitySelector = null;
 
-
   // grid indices -> xyz coords
   let gridx;
   let gridy;
@@ -240,7 +237,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
       weightsMap = utils.allocateTyped(Float32Array, gridSize);
       atomMap = [];
     }
-
 
     gridx = utils.allocateTyped(Float32Array, dim[0]);
     gridy = utils.allocateTyped(Float32Array, dim[1]);
@@ -401,7 +397,6 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
             const idx = ix + zyOffset;
             const dx = gridx[ix] - ax;
             const d2 = dzy2 + dx * dx;
-
 
             if (d2 < ar2) {
               const w = Math.exp(-d2 * sigma2Inv);

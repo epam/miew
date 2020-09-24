@@ -15,16 +15,13 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
 
   static _vC = new THREE.Vector3();
 
-
   static _uvA = new THREE.Vector2();
 
   static _uvB = new THREE.Vector2();
 
   static _uvC = new THREE.Vector2();
 
-
   static _barycoord = new THREE.Vector3();
-
 
   static _intersectionPoint = new THREE.Vector3();
 

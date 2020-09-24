@@ -135,6 +135,7 @@
     "jquery": "3.4.1",
     "jquery.terminal": "=2.1.0",
     "jsdoc": "^3.6.3",
+    "lerna": "^3.21.0",
     "mini-css-extract-plugin": "^0.9.0",
     "mkdirp": "^1.0.3",
     "mocha": "^7.1.2",

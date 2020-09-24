@@ -4,7 +4,6 @@ import Parser from './Parser';
 import chem from '../../chem';
 import GROReader from './GROReader';
 
-
 const {
   Complex,
   Element,

@@ -50,5 +50,4 @@ class CSS2DObject extends THREE.Object3D {
   }
 }
 
-
 export default CSS2DObject;

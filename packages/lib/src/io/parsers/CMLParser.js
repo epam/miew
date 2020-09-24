@@ -98,10 +98,8 @@ class CMLParser extends Parser {
     return moleculeArr;
   }
 
-
   _extractSGroups(molecule, atoms) {
     const moleculeArr = this._extractSGroup(molecule);
-
 
     const count = atoms.length;
     let i;
@@ -181,7 +179,6 @@ class CMLParser extends Parser {
     }
     atomMap = null;
   }
-
 
   _traverseData(dom) {
     function isArray(o) {
@@ -646,7 +643,6 @@ class CMLParser extends Parser {
     return new Complex();
   }
 }
-
 
 CMLParser.formats = ['cml'];
 CMLParser.extensions = ['.cml'];

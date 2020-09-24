@@ -808,7 +808,6 @@ ObjectControls.prototype.getKeyBindObject = function () {
   return window.top;
 };
 
-
 ObjectControls.prototype.dispose = function () {
   for (let i = 0; i < this._listeners.length; i++) {
     const l = this._listeners[i];

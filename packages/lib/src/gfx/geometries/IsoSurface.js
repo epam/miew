@@ -249,7 +249,6 @@ class IsoSurface {
       triangles[j] = new Triangle();
     }
 
-
     let appendVertex;
     const self = this;
     const positions = this._position;

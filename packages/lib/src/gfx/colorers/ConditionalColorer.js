@@ -1,7 +1,6 @@
 import Colorer from './Colorer';
 import selectors from '../../chem/selectors';
 
-
 /**
  * Create new colorer.
  *

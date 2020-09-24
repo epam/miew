@@ -28,5 +28,4 @@ class Visual extends gfxutils.RCGroup {
   }
 }
 
-
 export default Visual;

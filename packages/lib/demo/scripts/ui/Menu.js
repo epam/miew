@@ -218,7 +218,6 @@ Menu.prototype._fillSelectionColorCombo = function (paletteID) {
   });
 };
 
-
 Menu.prototype._fillCombo = function (type, name, path, entityList) {
   const self = this;
   const frag = document.createDocumentFragment();
@@ -315,7 +314,6 @@ Menu.prototype._initReprListItemListeners = function (index) {
   reprList.find(`.panel:eq(${index}) .panel-heading`).on('click', onActiveReprChanged);
 
   reprList.find(`.panel:eq(${index}) input[type=checkbox]`).bootstrapSwitch();
-
 
   reprList.find(`.panel:eq(${index}) .panel-heading .btn-visible`).on('click', () => {
     reprList.find(`.panel:eq(${index}) .panel-heading .btn-visible`).hide();
@@ -867,7 +865,6 @@ Menu.prototype._init = function () {
 
   self._xs = self._isXS();
   $(`${self._menuId} [data-value="${self._curPanelID}"]`).toggleClass('active');
-
 
   $(`${self._menuId} [data-toggle=miew-main-menu]`).on('click', function () {
     const state = this.getAttribute('data-state');
@@ -1569,7 +1566,6 @@ function getAltLocNames(viewer) {
   const visual = viewer._getComplexVisual();
   return visual ? visual.getComplex().getAltLocNames() : 0;
 }
-
 
 Menu.prototype._initSelectionPanel = function () {
   const self = this;

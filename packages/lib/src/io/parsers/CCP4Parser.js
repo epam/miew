@@ -63,7 +63,6 @@ class Ccp4Model extends VolumeModel {
     xyz2crs[crs2xyz[2] - 1] = 2; // section
   }
 
-
   _setOrigins() {
     const [xaxis, yaxis, zaxis] = this._getAxis();
     this._setAxisIndices();

@@ -18,7 +18,6 @@ function lerpColor(c1, c2, alpha) {
   return (r << 16) | (g << 8) | b;
 }
 
-
 class Palette {
   constructor(name, id) {
     this.name = name || 'Custom';
@@ -282,7 +281,6 @@ _.assign(Palette.prototype, {
     ],
   },
 });
-
 
 const { namedColorsArray, namedColors } = Palette.prototype;
 

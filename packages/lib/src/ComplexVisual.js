@@ -214,7 +214,6 @@ class ComplexVisual extends Visual {
     return { desc, index, status: '' };
   }
 
-
   /**
    * Get representation (not just description) by index.
    * @param {number=} index - Zero-based index, up to {@link Miew#repCount()}. Defaults to the current one.

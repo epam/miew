@@ -34,7 +34,6 @@ class Representation {
     this.setMode(mode);
   }
 
-
   markAtoms(complex) {
     this.count = complex.markAtoms(this.selector, 1 << this.index);
     this.needsRebuild = true;
