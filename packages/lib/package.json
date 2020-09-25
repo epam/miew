@@ -132,7 +132,7 @@
     "handlebars": "^4.7.5",
     "html-webpack-plugin": "^4.3.0",
     "jison": "^0.4.18",
-    "jquery": "3.4.1",
+    "jquery": "3.5.1",
     "jquery.terminal": "=2.1.0",
     "jsdoc": "^3.6.3",
     "lerna": "^3.21.0",
