@@ -26,11 +26,6 @@ describe('XHRLoader', () => {
       return buf;
     })();
 
-    const fakeOptsString = {
-      binary: false,
-      compressType: '',
-    };
-
     let loader;
     let xhrStub;
     let OldXMLHttpRequest;
@@ -94,7 +89,7 @@ describe('XHRLoader', () => {
       };
       OldXMLHttpRequest = global.XMLHttpRequest;
       global.XMLHttpRequest = sinon.stub().returns(xhrStub);
-      loader = new XHRLoader(fakeSource, fakeOptsString);
+      loader = new XHRLoader(fakeSource);
     });
 
     afterEach(() => {

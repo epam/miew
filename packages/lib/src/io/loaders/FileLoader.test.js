@@ -44,11 +44,6 @@ describe('FileLoader', () => {
       return buf;
     })();
 
-    const fakeOptsString = {
-      binary: false,
-      compressType: '',
-    };
-
     let loader;
     let fileReaderStub;
 
@@ -105,7 +100,7 @@ describe('FileLoader', () => {
         },
       };
       global.FileReader = sinon.stub().returns(fileReaderStub);
-      loader = new FileLoader(fakeSource, fakeOptsString);
+      loader = new FileLoader(fakeSource);
     });
 
     afterEach(() => {

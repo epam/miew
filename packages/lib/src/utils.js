@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import pako from 'pako';
 import logger from './utils/logger';
+
 
 const browserType = {
   DEFAULT: 0,
@@ -383,9 +383,9 @@ function getFileExtension(fileName) {
 }
 
 function splitFileName(fileName) {
-  const reNameExtCompress = /^([\w-]+)(?:(\.pdb|\.cif|\.mmtf|\.ccp4|\.dsn6|\.map))\.?(?:(gz))?$/i;
-  const matchName = reNameExtCompress.exec(fileName);
-  return [matchName[1], matchName[2], matchName[3] || ''];
+  const ext = getFileExtension(fileName);
+  const name = fileName.slice(0, fileName.length - ext.length);
+  return [name, ext];
 }
 
 function dataUrlToBlob(url) {
@@ -523,60 +523,6 @@ function mergeTypedArraysUnsafe(array) {
   return result;
 }
 
-/**
- * Decompress input data, if it compressed, used in load conveyor
- * @param{array} compressedData  - byte array data
- * @param{object} opts  - data description
- * @returns{array} binary or string decompressed array
- */
-function decompress(compressedData, opts) {
-  if (opts.compressType === 'gz') {
-    let typeDecompressedData = 'string';
-    if (opts.binary) {
-      typeDecompressedData = 'Uint8Array';
-    }
-    return pako.inflate(compressedData, { to: typeDecompressedData });
-  }
-  return compressedData;
-}
-
-/**
- * Find in RSCB PDB EMD-ID with pdb id. It is needed for volume density: some maps have not pdb id, but EMD id
- * @param{string} pdbID  - pdb id in RSCB PDB
- * @returns{Promise} resolve string EMD ID, or null if this pdb has no map in EMD
- */
-function getEmdFromPdbId(pdbID) {
-  return new Promise((resolve, reject) => {
-    const request = new XMLHttpRequest();
-
-    request.addEventListener('load', () => {
-      if (request.status === 200) {
-        const headerFile = request.response;
-        const indEmd = headerFile.indexOf('EMD-');
-        if (indEmd !== -1) {
-          const strEmd = headerFile.substring(indEmd + 4, indEmd + 10);
-          const expNumber = /\d+/g;
-          resolve(expNumber.exec(strEmd)[0]);
-        }
-      }
-      resolve(null);
-    });
-
-    request.addEventListener('error', () => {
-      reject(new Error('HTTP request failed'));
-    });
-
-    request.addEventListener('abort', () => {
-      reject(new Error('Loading aborted'));
-    });
-
-    const url = `https://files.rcsb.org/header/${pdbID}.pdb`;
-    request.open('GET', url);
-    request.responseType = 'text';
-    request.send();
-  });
-}
-
 //----------------------------------------------------------------------------
 // Exports
 
@@ -615,6 +561,4 @@ export default {
   download,
   concatTypedArraysUnsafe,
   mergeTypedArraysUnsafe,
-  decompress,
-  getEmdFromPdbId,
 };

@@ -1,6 +1,13 @@
 import Loader from './Loader';
 
 export default class FileLoader extends Loader {
+  constructor(source, options) {
+    super(source, options);
+
+    options = this._options;
+    this._binary = options.binary === true;
+  }
+
   load() {
     return new Promise((resolve, reject) => {
       if (this._abort) {
