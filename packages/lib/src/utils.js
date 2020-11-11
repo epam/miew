@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import logger from './utils/logger';
 
-
 const browserType = {
   DEFAULT: 0,
   SAFARI: 1,
