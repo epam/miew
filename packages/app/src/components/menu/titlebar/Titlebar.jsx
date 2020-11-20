@@ -8,7 +8,7 @@ import { AiOutlinePicture } from 'react-icons/ai';
 import { GiDrop } from 'react-icons/gi';
 
 import TitleButton from './titlebutton/TitleButton.jsx';
-import ShowPanelsButton from '../../../containers/ShowPanelsButton.jsx';
+import TitlebarButton from '../../../containers/TitlebarButtonContainer';
 
 const Toolbar = styled(ButtonToolbar)`
   color: ${(props) => props.theme.titlebarColor};
@@ -21,20 +21,18 @@ const Toolbar = styled(ButtonToolbar)`
 // TODO move title to separate componen
 // TODO solve the font for the whole app
 
-export default class Titlebar extends React.Component {
-  render() {
-    return <Toolbar>
-      <ButtonGroup>
-        <ShowPanelsButton content={<FiMenu/>} tip="Menu"/>
-        <TitleButton content={<FiChevronRight/>} tip="Terminal"></TitleButton>
-      </ButtonGroup>
+const Titlebar = ({ loadingStage }) => <Toolbar>
+    <ButtonGroup>
+      <TitlebarButton content={<FiMenu/>} tip="Menu"/>
+      <TitleButton content={<FiChevronRight/>} tip="Terminal"></TitleButton>
+    </ButtonGroup>
 
-      <span data-field="title" style={{ margin: '10px' }}>3D Molecular Viewer</span>
+<span data-field="title" style={{ margin: '10px' }}>{loadingStage}</span>
 
-      <ButtonGroup>
-        <TitleButton content={<AiOutlinePicture/>} tip="Display mode"/>
-        <TitleButton content={<GiDrop/>} tip="Display color"></TitleButton>
-      </ButtonGroup>
-   </Toolbar>;
-  }
-}
+    <ButtonGroup>
+      <TitleButton content={<AiOutlinePicture/>} tip="Display mode"/>
+      <TitleButton content={<GiDrop/>} tip="Display color"></TitleButton>
+    </ButtonGroup>
+  </Toolbar>;
+
+export default Titlebar;
