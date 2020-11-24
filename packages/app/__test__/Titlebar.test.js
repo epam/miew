@@ -11,6 +11,6 @@ describe('<Titlebar>', () => {
     const store = createStore(rootReducer);
     const Wrapper = ({ children }) => <Provider store={store}>{children}</Provider>;
     render(<Titlebar loadingStage='test'/>, { wrapper: Wrapper });
-    screen.getByText('test');
+    expect(screen.getByText('test')).toBeDefined();
   });
 });

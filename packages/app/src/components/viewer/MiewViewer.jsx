@@ -4,9 +4,9 @@ import 'MiewStyles'; // eslint-disable-line import/no-unresolved
 
 import Miew from 'MiewModule'; // eslint-disable-line import/no-unresolved
 
-const MiewViewer = ({
+export default function MiewViewer({
   frozen, onChange, updateLoadingStage, sendInfo,
-}) => {
+}) {
   let viewer = null;
   const domElement = useRef();
   const _onChange = (prefs) => {
@@ -62,9 +62,7 @@ const MiewViewer = ({
   }, [frozen]);
 
   return <div className='miew-container' ref={domElement}/>;
-};
-
-export default MiewViewer;
+}
 
 MiewViewer.defaultProps = {
   frozen: false,
