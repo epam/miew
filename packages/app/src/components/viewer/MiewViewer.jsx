@@ -4,14 +4,22 @@ import 'MiewStyles'; // eslint-disable-line import/no-unresolved
 
 import Miew from 'MiewModule'; // eslint-disable-line import/no-unresolved
 
+let viewer = null;
+
 export default function MiewViewer({
   frozen, onChange, updateLoadingStage, sendInfo,
 }) {
-  let viewer = null;
   const domElement = useRef();
   const _onChange = (prefs) => {
     onChange({ prefs });
   };
+
+  function removeViewer() {
+    // viewer.settings.now.removeEventListener(_onChange);
+    viewer.term();
+    viewer = null;
+    onChange({ viewer });
+  }
 
   useEffect(() => {
     viewer = window.miew = new Miew({ container: domElement.current, load: '1crn' });
@@ -24,7 +32,6 @@ export default function MiewViewer({
     viewer.addEventListener('rebuilding', () => {
       updateLoadingStage('Building geometry…');
     });
-
     viewer.addEventListener('titleChanged', (e) => {
       updateLoadingStage(e.data);
     });
@@ -43,14 +50,8 @@ export default function MiewViewer({
       }
       sendInfo(ids);
     });
+    return removeViewer;
   }, []);
-
-  function removeViewer() {
-    // viewer.settings.now.removeEventListener(_onChange);
-    viewer.dispose();
-    viewer = null;
-    onChange({ viewer });
-  }
 
   useEffect(() => {
     if (frozen) {
@@ -58,7 +59,6 @@ export default function MiewViewer({
     } else {
       viewer.run();
     }
-    return removeViewer;
   }, [frozen]);
 
   return <div className='miew-container' ref={domElement}/>;
