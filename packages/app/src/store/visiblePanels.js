@@ -1,7 +1,9 @@
-const visiblePanels = (state = [], action) => {
+import ACTIONS from '../constants';
+
+const visiblePanels = (state = {}, action) => {
   switch (action.type) {
-    case 'SHOW_NAV': // TODO rename?
-      return { visibility: !state.visibility };
+    case ACTIONS.SHOW_NAV:
+      return { ...state, visibility: !state.visibility };
     default:
       return state;
   }

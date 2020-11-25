@@ -3,7 +3,7 @@ import styled, { ThemeProvider } from 'styled-components';
 
 import theme from './theme';
 import Menu from './menu/Menu.jsx';
-import Viewer from '../containers/ControlViewer.jsx';
+import Viewer from '../containers/MiewViewerContainer';
 
 const DivStyled = styled.div`
   overflow: hidden;

@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Titlebar from './titlebar/Titlebar.jsx';
-import VisiblePanelsList from '../../containers/VisiblePanelsList.jsx';
+import Titlebar from '../../containers/TitlebarContainer';
+import PanelList from '../../containers/PanelListContainer';
 
 const StyledMenu = styled.div`
   position: absolute;
@@ -15,7 +15,7 @@ export default class Menu extends React.Component {
   render() {
     return <StyledMenu id="miew-menu">
       <Titlebar/>
-      <VisiblePanelsList/>
+      <PanelList/>
     </StyledMenu>;
   }
 }
