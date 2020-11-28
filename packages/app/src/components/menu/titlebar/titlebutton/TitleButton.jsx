@@ -41,7 +41,7 @@ export default class TitleButton extends React.Component {
       <StyledButton onClick={ (e) => {
         e.preventDefault();
         if (this.props.onClick) {
-          this.props.onClick();
+          this.props.onClick(this.props.dispatchFunction);
         }
       }}>{this.props.content}</StyledButton>
     </OverlayTrigger>;

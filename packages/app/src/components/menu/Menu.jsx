@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import Titlebar from '../../containers/TitlebarContainer';
 import PanelList from '../../containers/PanelListContainer';
+import DisplayColor from '../../containers/DisplayColorContainer';
 
 const StyledMenu = styled.div`
   position: absolute;
@@ -11,11 +12,9 @@ const StyledMenu = styled.div`
   width: 100%;
 `;
 
-export default class Menu extends React.Component {
-  render() {
-    return <StyledMenu id="miew-menu">
+const Menu = ({ isPanelListVisible, isDisplayColorVisible }) => <StyledMenu id="miew-menu">
       <Titlebar/>
-      <PanelList/>
+      {isPanelListVisible && <PanelList/>}
+      {isDisplayColorVisible && <DisplayColor/>}
     </StyledMenu>;
-  }
-}
+export default Menu;

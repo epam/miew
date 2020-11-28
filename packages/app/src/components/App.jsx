@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 
 import theme from './theme';
-import Menu from './menu/Menu.jsx';
+import Menu from '../containers/MenuContainer';
 import Viewer from '../containers/MiewViewerContainer';
 
 const DivStyled = styled.div`

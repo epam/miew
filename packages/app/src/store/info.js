@@ -6,6 +6,10 @@ const info = (state = {}, action) => {
       return { ...state, complexes: action.payload };
     case ACTIONS.UPDATE_LOADING_STAGE:
       return { ...state, loadingStage: action.payload };
+    case ACTIONS.SAVE_COLORERS:
+      return { ...state, colorers: action.payload };
+    case ACTIONS.SAVE_VIEWER:
+      return { ...state, viewer: action.payload };
     default:
       return state;
   }
