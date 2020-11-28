@@ -9,7 +9,7 @@ import InfoPanel from '../../../containers/InfoPanelContainer';
 export default class PanelsList extends React.Component {
   render() {
     return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1">
-      <Row style={{ visibility: this.props.visibility }}>
+      <Row>
         <Col sm={4}>
           <ListGroup.Item action variant="light" href="#link1">Info</ListGroup.Item>
           <ListGroup.Item action disabled variant="light">Gallery</ListGroup.Item>
