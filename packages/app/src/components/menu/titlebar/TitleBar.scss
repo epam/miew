@@ -1,0 +1,30 @@
+@import '../../App.scss';
+
+.titlebar {
+	color: $titlebarColor;
+	height: $titlebarHeight;
+	background-color: $titlebarBkg; 
+	justify-content: space-between;
+	font-size: smaller; 
+
+	.titlebar-button {
+		color: $titlebarColor;
+		background-color: transparent;
+		border: none; 
+		border-radius: 0;
+	
+			&:hover,
+			&.hover,
+			&:focus,
+			&.active,
+			&.active:hover,
+			&.active.hover,
+			&.active:focus,
+			&:active:focus:not(:disabled):not(.disabled){
+			background-color: $titlebarBkg;
+			outline: 0;
+			border: none;
+			box-shadow: none; 
+		}
+	}
+}

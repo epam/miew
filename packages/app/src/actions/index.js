@@ -1,6 +1,6 @@
 import ACTIONS from '../constants';
 
-export const showNav = () => ({ // TODO rename to toggle
+export const showNav = () => ({
   type: ACTIONS.SHOW_NAV,
 });
 
