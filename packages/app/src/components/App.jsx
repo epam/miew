@@ -1,14 +1,8 @@
 import React from 'react';
-import styled, { ThemeProvider } from 'styled-components';
 
-import theme from './theme';
 import Menu from '../containers/MenuContainer';
 import Viewer from '../containers/MiewViewerContainer';
-
-const DivStyled = styled.div`
-  overflow: hidden;
-  position: relative;
-`;
+import './App.scss';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -25,11 +19,9 @@ export default class App extends React.Component {
   }
 
   render() {
-    return <DivStyled>
+    return <div className="root">
       <Viewer onChange={ this._onViewerChange } />
-      <ThemeProvider theme={theme}>
         <Menu/>
-      </ThemeProvider>
-    </DivStyled>;
+    </div>;
   }
 }

@@ -1,11 +1,11 @@
 import React from 'react';
+import classNames from 'classnames';
 
 const ColorThumbnail = ({
   shortName, id, onClick, selected,
 }) => <div onClick={onClick} className="colorer-thumbnail small" >
-    <img src={`images/colorer/${id}.png`}/>
-    {/* I think classnames https://www.npmjs.com/package/classnames should be used here */}
-    <p className={selected ? 'colorer-thumbnail-name selected' : 'colorer-thumbnail-name'}>{shortName}</p>
+    <img src={`../images/colorer/${id}.png`}/>
+    <p className={classNames('colorer-thumbnail-name', { selected })}>{shortName}</p>
     </div>;
 
 export default ColorThumbnail;

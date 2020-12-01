@@ -5,30 +5,31 @@
 	right: 0;
 	background-color: #eee;
 	padding: 5px;
+
+	.colorer-thumbnail-group {
+		width: 626px;
+		display: flex;
+		flex-wrap: wrap;
+
+		.colorer-thumbnail {
+			flex-direction: column;
+			margin: 3px;
+			align-items: center;
+			cursor: pointer;
+
+			.colorer-thumbnail-name {
+				margin-top: 5px;
+				width: 100%;
+				text-align: center;
+			
+				&.selected {
+					background: #337ab7;
+					color: #fff;
+					text-align: center;
+				}
+			}
+		}
+	}
 }
 
-.colorer-thumbnail-group {
-	width: 626px;
-	display: flex;
-	flex-wrap: wrap;
-}
 
-.colorer-thumbnail {
-	display: flex; 
-	flex-direction: column;
-	margin: 3px;
-	align-items: center;
-	cursor: pointer;
-}
-
-.colorer-thumbnail-name {
-	margin: 5px;
-	width: 100%;
-	text-align: center;
-}
-
-.selected {
-	background: #337ab7;
-	color: #fff;
-	text-align: center;
-}

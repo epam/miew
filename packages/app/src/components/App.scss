@@ -1,0 +1,16 @@
+$tGray: 64;
+$tAlpha: 0.75;
+$bGray: 32;
+$titlebarColor: silver;
+$titlebarGray: $tGray;
+$titlebarBkg: rgba($tGray, $tGray, $tGray, $tAlpha);
+$titlebarHeight: 40px;
+$titlebarAlpha: $tAlpha;
+$backGray: $bGray;
+$menuGray: $tAlpha * $tGray + (1 - $tAlpha) * $bGray;
+$selectionPanelRowHeight: 42px;
+
+.root {
+	overflow: hidden;
+	position: relative;
+}
