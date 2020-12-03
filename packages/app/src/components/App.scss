@@ -11,6 +11,6 @@ $menuGray: $tAlpha * $tGray + (1 - $tAlpha) * $bGray;
 $selectionPanelRowHeight: 42px;
 
 .root {
-	overflow: hidden;
-	position: relative;
+  overflow: hidden;
+  position: relative;
 }
