@@ -1,0 +1,13 @@
+.git/
+.github/
+.idea/
+.vscode
+.sonar/
+**/.nyc_output/
+**/build/
+**/coverage/
+**/node_modules/
+packages/lib/test/e2e/mismatch/*.png
+packages/lib/test/e2e/mismatch/*.html
+!*.pdb
+*.pyc
