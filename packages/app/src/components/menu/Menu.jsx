@@ -3,7 +3,6 @@ import React from 'react';
 import Titlebar from '../../containers/TitlebarContainer';
 import PanelList from '../../containers/PanelListContainer';
 import DisplayColor from '../../containers/DisplayColorContainer';
-import './Menu.scss';
 
 const Menu = ({ isPanelListVisible, isDisplayColorVisible }) => <div id="miew-menu">
       <Titlebar/>
