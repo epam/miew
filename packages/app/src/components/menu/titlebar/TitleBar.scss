@@ -6,6 +6,9 @@
   background-color: $titlebarBkg;
   justify-content: space-between;
   font-size: smaller;
+  position: absolute;
+  top: 0;
+  width: 100%;
 
   .titlebar-button {
     color: $titlebarColor;

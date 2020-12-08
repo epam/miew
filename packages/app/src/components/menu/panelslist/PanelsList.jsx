@@ -5,11 +5,13 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 import InfoPanel from '../../../containers/InfoPanelContainer';
+import './PanelsList.scss';
 
 export default class PanelsList extends React.Component {
   render() {
-    return <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1">
-      <Row>
+    return <div className="panels-list">
+    <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1">
+      <Row >
         <Col sm={4}>
           <ListGroup.Item action variant="light" href="#link1">Info</ListGroup.Item>
           <ListGroup.Item action disabled variant="light">Gallery</ListGroup.Item>
@@ -26,7 +28,8 @@ export default class PanelsList extends React.Component {
           </Tab.Content>
         </Col>
       </Row>
-    </Tab.Container>;
+    </Tab.Container>
+    </div>;
   }
 }
 

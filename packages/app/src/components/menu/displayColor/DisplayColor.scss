@@ -3,10 +3,12 @@
   position: absolute;
   right: 0;
   background-color: #eee;
-  padding: 5px;
+  max-width: 633px;
+  top: 40;
+  overflow: auto;
+  max-height: calc(100% - 40px);
 
   .colorer-thumbnail-group {
-    width: 626px;
     display: flex;
     flex-wrap: wrap;
 

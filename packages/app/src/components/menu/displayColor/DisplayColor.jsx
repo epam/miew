@@ -4,7 +4,7 @@ import ColorerThumbnail from './colorerThumbnail/ColorerThumbnail.jsx';
 
 import './DisplayColor.scss';
 
-const DisplayColor = ({ colorers, viewer, showDisplayColor }) => {
+function DisplayColor({ colorers, viewer, showDisplayColor }) {
   const ref = useRef();
   const { colorer } = viewer.rep(viewer.repCurrent());
   const [currentColorer, setCurrentColorer] = useState(colorer);
@@ -19,7 +19,7 @@ const DisplayColor = ({ colorers, viewer, showDisplayColor }) => {
       onClick={() => {
         viewer.rep({ colorer: id });
         setCurrentColorer(id);
-        // showDisplayColor();
+        showDisplayColor();
       }}
     />
   ));
@@ -41,6 +41,6 @@ const DisplayColor = ({ colorers, viewer, showDisplayColor }) => {
       <div className="colorer-thumbnail-group">{colorerThumbnails}</div>
     </div>
   );
-};
+}
 
 export default DisplayColor;
