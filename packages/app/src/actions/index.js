@@ -35,3 +35,8 @@ export const saveViewer = (viewer) => ({
   type: ACTIONS.SAVE_VIEWER,
   payload: viewer,
 });
+
+export const changeTheme = (theme) => ({
+  type: ACTIONS.CHANGE_THEME,
+  payload: theme,
+});

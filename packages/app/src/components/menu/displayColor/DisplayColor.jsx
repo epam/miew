@@ -36,9 +36,11 @@ function DisplayColor({ colorers, viewer, showDisplayColor }) {
   }, []);
 
   return (
-    <div className="display-color" ref={ref}>
-      <strong>Display color</strong>
-      <div className="colorer-thumbnail-group">{colorerThumbnails}</div>
+    <div className="display-color-container" ref={ref}>
+      <div className="display-color">
+        <h5>Display color</h5>
+        <div className="colorer-thumbnail-group">{colorerThumbnails}</div>
+      </div>
     </div>
   );
 }

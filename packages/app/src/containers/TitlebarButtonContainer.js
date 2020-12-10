@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import TitlebarButton from '../components/menu/titlebar/titlebutton/TitleButton.jsx';
+import TitlebarButton from '../components/menu/titlebar/titlebarButton/TitlebarButton.jsx';
 
 const mapDispatchToProps = (dispatch) => ({
   onClick: (dispatchFunction) => {

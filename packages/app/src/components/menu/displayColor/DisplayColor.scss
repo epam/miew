@@ -1,32 +1,43 @@
 
-.display-color {
+.display-color-container {
   position: absolute;
   right: 0;
   background-color: #eee;
-  max-width: 633px;
   top: 40;
   overflow: auto;
   max-height: calc(100% - 40px);
 
-  .colorer-thumbnail-group {
-    display: flex;
-    flex-wrap: wrap;
+  .display-color {
+    max-width: 626px;
 
-    .colorer-thumbnail {
-      flex-direction: column;
-      margin: 3px;
-      align-items: center;
-      cursor: pointer;
+    h5 {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
 
-      .colorer-thumbnail-name {
-        margin-top: 5px;
-        width: 100%;
-        text-align: center;
+    .colorer-thumbnail-group {
+      display: flex;
+      flex-wrap: wrap;
 
-        &.selected {
-          background: #337ab7;
-          color: #fff;
+      .colorer-thumbnail {
+        flex-direction: column;
+        padding: 4px;
+        align-items: center;
+        cursor: pointer;
+        margin-bottom: 20px;
+
+        .colorer-thumbnail-name {
+          height: 20px;
+          margin-top: 5px;
+          width: 100%;
           text-align: center;
+          line-height: 20px;
+
+          &.selected {
+            background: #337ab7;
+            color: #fff;
+            text-align: center;
+          }
         }
       }
     }

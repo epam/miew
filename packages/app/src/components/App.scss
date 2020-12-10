@@ -10,6 +10,18 @@ $backGray: $bGray;
 $menuGray: $tAlpha * $tGray + (1 - $tAlpha) * $bGray;
 $selectionPanelRowHeight: 42px;
 
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+h5 {
+  font-weight: 700;
+  margin-left: 5px;
+  font-size: 14px;
+}
+
 .root {
   overflow: hidden;
   position: relative;
