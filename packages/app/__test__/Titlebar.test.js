@@ -4,7 +4,7 @@ import { createStore } from 'redux';
 
 import { render, screen } from '@testing-library/react';
 import Titlebar from '../src/components/menu/titlebar/Titlebar.jsx';
-import rootReducer from '../src/store';
+import rootReducer from '../src/reducers';
 
 describe('<Titlebar>', () => {
   it('should render loading stage from prop', () => {

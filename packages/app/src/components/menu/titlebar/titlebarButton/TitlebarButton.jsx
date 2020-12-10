@@ -4,7 +4,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import Button from 'react-bootstrap/Button';
 
-const TitleButton = ({
+const TitlebarButton = ({
   onClick, dispatchFunction, content, tip,
 }) => <OverlayTrigger
       placement="bottom"
@@ -23,4 +23,4 @@ const TitleButton = ({
       }}>{content}</Button>
     </OverlayTrigger>;
 
-export default TitleButton;
+export default TitlebarButton;
