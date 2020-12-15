@@ -31,6 +31,11 @@ export const saveColorers = (colorers) => ({
   payload: colorers,
 });
 
+export const saveModes = (modes) => ({
+  type: ACTIONS.SAVE_MODES,
+  payload: modes,
+});
+
 export const saveViewer = (viewer) => ({
   type: ACTIONS.SAVE_VIEWER,
   payload: viewer,

@@ -6,7 +6,7 @@ import Miew from 'MiewModule'; // eslint-disable-line import/no-unresolved
 
 let viewer = null;
 export default function MiewViewer({
-  frozen, onChange, updateLoadingStage, sendInfo, saveColorers, saveViewer,
+  frozen, onChange, updateLoadingStage, sendInfo, saveColorers, saveViewer, saveModes,
 }) {
   const domElement = useRef();
   const _onChange = (prefs) => {
@@ -34,8 +34,12 @@ export default function MiewViewer({
     viewer.addEventListener('titleChanged', (e) => {
       updateLoadingStage(e.data);
     });
+
     const { colorers } = Miew;
     saveColorers(colorers);
+    const { modes } = Miew;
+    saveModes(modes);
+
     viewer.settings.addEventListener('change:axes', _onChange);
     viewer.settings.addEventListener('change:autoRotation', _onChange);
     onChange({ viewer });
