@@ -1,5 +1,5 @@
 
-.display-color-container {
+.display-preference-container {
   position: absolute;
   right: 0;
   background-color: #eee;
@@ -7,7 +7,7 @@
   overflow: auto;
   max-height: calc(100% - 40px);
 
-  .display-color {
+  .display-preference {
     max-width: 626px;
 
     h5 {
@@ -15,18 +15,18 @@
       margin-bottom: 10px;
     }
 
-    .colorer-thumbnail-group {
+    .thumbnail-group {
       display: flex;
       flex-wrap: wrap;
 
-      .colorer-thumbnail {
+      .thumbnail {
         flex-direction: column;
         padding: 4px;
         align-items: center;
         cursor: pointer;
         margin-bottom: 20px;
 
-        .colorer-thumbnail-name {
+        .thumbnail-name {
           height: 20px;
           margin-top: 5px;
           width: 100%;

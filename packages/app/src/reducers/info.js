@@ -8,6 +8,8 @@ const info = (state = {}, action) => {
       return { ...state, loadingStage: action.payload };
     case ACTIONS.SAVE_COLORERS:
       return { ...state, colorers: action.payload };
+    case ACTIONS.SAVE_MODES:
+      return { ...state, modes: action.payload };
     case ACTIONS.SAVE_VIEWER:
       return { ...state, viewer: action.payload };
     case ACTIONS.CHANGE_THEME:
