@@ -22,6 +22,7 @@ export default function MiewViewer({
 
   useEffect(() => {
     viewer = window.miew = new Miew({ container: domElement.current, load: '1crn' });
+    saveViewer(viewer);
     viewer.addEventListener('fetching', () => {
       updateLoadingStage('Fetching...');
     });
@@ -34,7 +35,7 @@ export default function MiewViewer({
     viewer.addEventListener('titleChanged', (e) => {
       updateLoadingStage(e.data);
     });
-
+    viewer.logger.level = 'debug';
     const { colorers } = Miew;
     saveColorers(colorers);
     const { modes } = Miew;
@@ -54,7 +55,6 @@ export default function MiewViewer({
         ids.push(complex.name);
       }
       sendInfo(ids);
-      saveViewer(viewer);
     });
     return removeViewer;
   }, []);
