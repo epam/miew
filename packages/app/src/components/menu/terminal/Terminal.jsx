@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import './Terminal.scss';
 
-const Terminal = ({ viewer, isTerminalVisible }) => {
+function Terminal({ viewer, isTerminalVisible }) {
   const ref = useRef();
   let terminal;
 
@@ -83,6 +83,6 @@ const Terminal = ({ viewer, isTerminalVisible }) => {
   }, [viewer]);
 
   return <div ref={ref} className={classNames('terminal', { 'terminal-hidden': !isTerminalVisible })}/>;
-};
+}
 
 export default Terminal;
