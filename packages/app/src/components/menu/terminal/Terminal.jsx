@@ -9,6 +9,12 @@ function Terminal({ viewer, isTerminalVisible }) {
   const ref = useRef();
   let terminal;
 
+  useEffect(() => {
+    if (viewer) {
+      viewer.enableHotKeys(!isTerminalVisible);
+    }
+  }, [isTerminalVisible]);
+
   function onInit(term) {
     if (viewer) {
       const colors = {
@@ -39,33 +45,13 @@ function Terminal({ viewer, isTerminalVisible }) {
     onInit,
   };
 
-  function onLoad(command, term) {
-    const urlSubString = command.substr(command.indexOf('-f') + 2);
-    const res = urlSubString.match(/(?:"([^"]*)"|'([^']*)')/);
-    if (urlSubString !== '') {
-      if (res !== null && res[0] === urlSubString.trim() && res[1].indexOf('.nc') === (res[1].length - 3)) {
-      // element.click();
-      } else {
-        term.error('You can use only URL string to *.nc file to determine trajectory');
-      }
-    } else {
-      // res = null;
-      // element.click();
-    }
-  }
-
   function handleCommand(command, term) {
     command = command.trim();
-    const loadStr = command.split(/\s+/);
-    if (loadStr[0] === 'load' && loadStr[1] === '-f') {
-      onLoad(command, term);
-    } else {
-      viewer.script(command, (str) => {
-        term.echo(str);
-      }, (str) => {
-        term.error(str);
-      });
-    }
+    viewer.script(command, (str) => {
+      term.echo(str);
+    }, (str) => {
+      term.error(str);
+    });
   }
 
   useEffect(() => {
