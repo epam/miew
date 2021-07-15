@@ -3,6 +3,7 @@ import React from 'react';
 import Menu from '../containers/MenuContainer';
 import Viewer from '../containers/MiewViewerContainer';
 import './App.scss';
+import '../../../lib/demo/styles/main.scss';
 
 export default class App extends React.Component {
   constructor(props) {

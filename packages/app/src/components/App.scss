@@ -9,6 +9,7 @@ $titlebarAlpha: $tAlpha;
 $backGray: $bGray;
 $menuGray: $tAlpha * $tGray + (1 - $tAlpha) * $bGray;
 $selectionPanelRowHeight: 42px;
+$selectedPanelColor: #eee;
 
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -20,6 +21,10 @@ h5 {
   font-weight: 700;
   margin-left: 5px;
   font-size: 14px;
+}
+
+h3 {
+  font-size: 24px;
 }
 
 .root {

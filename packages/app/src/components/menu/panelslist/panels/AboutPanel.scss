@@ -1,0 +1,24 @@
+.about-panel {
+  padding: 15px;
+
+  .miew-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .miew-name {
+      margin-top: 20px;
+    }
+  }
+
+  .table {
+    font: inherit !important;
+  }
+
+  .git-hub {
+    position: absolute;
+    top: 40;
+    left: 0;
+    border: 0;
+  }
+}

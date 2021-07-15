@@ -1,13 +1,19 @@
 import React from 'react';
 
-export default class InfoPanel extends React.Component {
-  render() {
-    return <div>
-      <span style={{ color: 'red' }}>{this.props.id}</span>
-    </div>;
-  }
-}
+const InfoPanel = ({ complex }) => {
+  const { name, metadata } = complex[0];
+  const { classification, title, id } = metadata;
+  return (
+    <>
+      <h1> {id || name || 'Unknown data'}
+        <small> / {classification}</small>
+      </h1>
+      <p>{title.join(' ')}</p>
+    </>);
+};
 
 InfoPanel.defaultProps = {
   id: 'none',
 };
+
+export default InfoPanel;
