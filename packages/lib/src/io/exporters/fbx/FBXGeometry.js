@@ -14,7 +14,7 @@ export default class FBXGeometry {
 
   /**
    * Initialize base geo storing items info from attributes.
-   * @param {Object} geo - THREE.Geometry.
+   * @param {Object} geo - THREE.BufferGeometry.
    */
   init(geo, _info) {
     const { attributes } = geo;

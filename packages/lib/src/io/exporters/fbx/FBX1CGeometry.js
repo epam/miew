@@ -7,7 +7,7 @@ import FBXGeometry from './FBXGeometry';
 export default class FBX1CGeometry extends FBXGeometry {
   /**
    * Initialize geo storing positions, normals, indices and create colors.
-   * @param {Object} geo - THREE.Geometry.
+   * @param {Object} geo - THREE.BufferGeometry.
    */
   init(geo, _info) {
     super.init(geo, _info);

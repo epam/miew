@@ -24,13 +24,18 @@ class LinesObj extends SceneObject {
   }
 
   build(complex) {
-    const geom = new THREE.Geometry();
+    const geom = new THREE.BufferGeometry();
     this._atom1 = this._getAtomFromName(complex, this._id1);
     this._atom2 = this._getAtomFromName(complex, this._id2);
 
-    geom.vertices[0] = this._atom1.position.clone();
-    geom.vertices[1] = this._atom2.position.clone();
-    geom.dynamic = true;
+    const p1 = this._atom1.position;
+    const p2 = this._atom2.position;
+    const vertices = new Float32Array([
+      p1.x, p1.y, p1.z,
+      p2.x, p2.y, p2.z,
+    ]);
+
+    geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
     geom.computeBoundingBox();
 
     this._line = new meshes.Line(geom, new UberMaterial({

@@ -37,7 +37,7 @@ class VolumeFarPlane {
 
       // build worldToVolume matrix to transform plane into volumeCS (volumeCS coords are written to BackFaceTexture)
       const volumeMatrix = volume.matrixWorld;
-      matWorldToVolume.getInverse(volumeMatrix);
+      matWorldToVolume.copy(volumeMatrix).invert();
 
       // update material props
       material.uniforms.aspectRatio.value = camera.aspect;
@@ -51,18 +51,20 @@ class VolumeFarPlane {
   }
 
   _initPlaneGeo(width, height) {
-    const planeGeo = new THREE.Geometry();
+    const planeGeo = new THREE.BufferGeometry();
 
     width = width || 1;
     height = height || 1;
 
-    planeGeo.vertices.push(new THREE.Vector3(-0.5 * width, 0.5 * height, 0));
-    planeGeo.vertices.push(new THREE.Vector3(0.5 * width, 0.5 * height, 0));
-    planeGeo.vertices.push(new THREE.Vector3(-0.5 * width, -0.5 * height, 0));
-    planeGeo.vertices.push(new THREE.Vector3(0.5 * width, -0.5 * height, 0));
+    const vertices = new Float32Array([
+      -0.5 * width, 0.5 * height, 0,
+      0.5 * width, 0.5 * height, 0,
+      -0.5 * width, -0.5 * height, 0,
+      0.5 * width, -0.5 * height, 0,
+    ]);
 
-    planeGeo.faces.push(new THREE.Face3(0, 2, 1));
-    planeGeo.faces.push(new THREE.Face3(2, 3, 1));
+    planeGeo.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    planeGeo.setIndex([0, 2, 1, 2, 3, 1]);
 
     return planeGeo;
   }
