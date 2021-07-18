@@ -422,7 +422,7 @@ Miew.prototype._initGfx = function () {
 
   gfx.renderer2d = new CSS2DRenderer();
 
-  gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
+  gfx.renderer = new THREE.WebGL1Renderer(webGLOptions);
   gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
   gfx.renderer.shadowMap.autoUpdate = false;
   gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -481,7 +481,6 @@ Miew.prototype._initGfx = function () {
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light12.castShadow = true;
-  light12.shadow = new THREE.DirectionalLightShadow();
   light12.shadow.bias = 0.09;
   light12.shadow.radius = settings.now.shadow.radius;
   light12.shadow.camera.layers.set(gfxutils.LAYERS.SHADOWMAP);
@@ -988,7 +987,7 @@ Miew.prototype.getOBB = (function () {
     });
     _bBox.getCenter(OBB.center);
 
-    _invMatrix.getInverse(matrix);
+    _invMatrix.copy(matrix).invert();
     OBB.center.applyMatrix4(_invMatrix);
 
     const { min } = _bBox;
@@ -1529,7 +1528,7 @@ Miew.prototype._renderVolume = (function () {
     camera.layers.set(gfxutils.LAYERS.DEFAULT);
 
     // prepare texture that contains molecule positions
-    world2colorMat.getInverse(mesh.matrixWorld);
+    world2colorMat.copy(mesh.matrixWorld).invert();
     UberMaterial.prototype.uberOptions.world2colorMatrix.multiplyMatrices(cubeOffsetMat, world2colorMat);
     camera.layers.set(gfxutils.LAYERS.COLOR_FROM_POSITION);
     gfx.renderer.setRenderTarget(tmpBuf3);

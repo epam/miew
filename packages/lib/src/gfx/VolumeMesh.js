@@ -409,7 +409,7 @@ class VolumeMesh extends THREE.Mesh {
     pos.addScaledVector(norm, camera.near + nearClipPlaneOffset);
 
     // transform pos to local CS
-    matrixWorldToLocal.getInverse(this.matrixWorld);
+    matrixWorldToLocal.copy(this.matrixWorld).invert();
     pos.applyMatrix4(matrixWorldToLocal);
 
     // transform norm to local CS

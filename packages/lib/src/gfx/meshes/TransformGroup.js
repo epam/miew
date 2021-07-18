@@ -34,7 +34,7 @@ class TransformGroup extends THREE.Object3D {
 
       child.updateMatrixWorld();
       const mtx = child.matrixWorld;
-      inverseMatrix.getInverse(mtx);
+      inverseMatrix.copy(mtx).invert();
       raycaster.ray.copy(ray).applyMatrix4(inverseMatrix);
       const childIntersects = [];
       this._geometry.raycast(raycaster, childIntersects);

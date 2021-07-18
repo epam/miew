@@ -88,7 +88,7 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
     setArrayXYZW(this._matVector3, mtxOffset, me[2], me[6], me[10], me[14]);
 
     if (this._useZSprites) {
-      invMatrix.getInverse(matrix);
+      invMatrix.copy(matrix).invert();
       me = invMatrix.elements;
       setArrayXYZW(this._invmatVector1, mtxOffset, me[0], me[4], me[8], me[12]);
       setArrayXYZW(this._invmatVector2, mtxOffset, me[1], me[5], me[9], me[13]);

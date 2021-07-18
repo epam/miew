@@ -18,7 +18,7 @@ export default class FBX2CCylinder extends FBXGeometry {
    * Indices remain the same. We process open- end close-ended cylinders and consider cylinders od 2 segments
    * in height ONLY.
    * NOTE: cylinder consists of 2 height segments and stores parts in the order: tube, topCap, bottomCap
-   * @param {Object} geo - THREE.Geometry.
+   * @param {Object} geo - THREE.BufferGeometry.
    * @param {Object} info - information needed for geo extend
    */
   init(geo, info) {
