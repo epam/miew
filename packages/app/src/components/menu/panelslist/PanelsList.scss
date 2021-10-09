@@ -1,8 +1,8 @@
-@import '../../App.scss';
+@import "../../App.scss";
 
 .panels-list {
   position: absolute;
-  top: 0;
+  top: $titlebarHeight;
   left: 0;
   height: 100%;
   width: 100%;
@@ -10,7 +10,7 @@
 
   &-menu {
     position: absolute;
-    top: 40;
+    top: 0;
     width: 256px;
     height: 100%;
     overflow: auto;
@@ -21,16 +21,16 @@
     }
 
     .list-group-item {
-      background-color: $titlebarBkg;
+      background-color: transparent;
       color: $titlebarColor;
       border: none;
       height: 39.99px;
       border-radius: 0%;
+      padding-left: 12px;
 
       svg {
         fill: $titlebarColor;
-        height: 14px;
-        width: 16.3px;
+        margin-right: 7px;
       }
 
       &.active {
@@ -45,21 +45,30 @@
   }
 
   .panel {
-    background-color: #eee;
     position: absolute;
     left: 256px;
     width: 768px;
     height: calc(100% - 40px);
-    overflow: auto;
 
     &-name {
-      background-color: $titlebarBkg;
-      padding: 11.5px;
+      position: absolute;
+      top: -40;
+      background-color: transparent;
       font-weight: bold;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 16px;
-      color: white;
-      height: 40px;
+      color: silver;
+      height: $titlebarHeight;
+      width: 768px;
+    }
+
+    [class$="-panel"] {
+      overflow: auto;
+      background-color: #eee;
+      height: 100%;
+      padding: 15px;
     }
   }
 }

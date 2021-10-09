@@ -1,96 +1,112 @@
 import React, { useState } from 'react';
-import { FaInfoCircle, FaQuestionCircle } from 'react-icons/fa';
-import { BsImage } from 'react-icons/bs';
-import { ImEye } from 'react-icons/im';
+import { useDispatch } from 'react-redux';
+import { Modal, Button } from 'react-bootstrap';
+import { BiLogIn, BiLogOut, BiRefresh } from 'react-icons/bi';
+import { RiArrowUpDownFill, RiSave3Fill, RiCameraFill } from 'react-icons/ri';
+import { BsLink45Deg, BsFileText } from 'react-icons/bs';
+
+import { showNav } from '../../../../actions';
 
 import './ToolsPanel.scss';
-import ToolsPanelModal from './ToolsPanelModal.jsx';
 
 const ToolsPanel = ({ viewer }) => {
-  const [open, setOpen] = useState();
+  const dispatch = useDispatch();
+  const [modelInfo, setModelInfo] = useState({});
   const panels = [
     {
       name: 'Assign secondary structure',
       handler: () => {
+        dispatch(showNav());
         viewer.dssp();
       },
-      Icon: FaInfoCircle,
+      Icon: RiArrowUpDownFill,
     },
     {
       name: 'Reset view',
-      handler: () => viewer.resetView(),
-      Icon: FaInfoCircle,
+      handler: () => {
+        dispatch(showNav());
+        viewer.resetView();
+      },
+      Icon: BiRefresh,
     },
     {
       name: 'Screenshot',
-      handler: () => viewer.screenshotSave(),
-      Icon: FaInfoCircle,
+      handler: () => {
+        dispatch(showNav());
+        viewer.screenshotSave();
+      },
+      Icon: RiCameraFill,
     },
     {
       name: 'Get URL',
-      handler: () => setOpen('get-url'),
-      Icon: BsImage,
+      handler: () => setModelInfo({ title: 'URL', isOpen: true, body: viewer.getURL({ settings: true, view: true }) }),
+      Icon: BsLink45Deg,
     },
     {
       name: 'Get script',
-      handler: () => setOpen('get-script'),
-      Icon: BsImage,
+      handler: () => setModelInfo({ title: 'Script', isOpen: true, body: viewer.getScript() }),
+      Icon: BsFileText,
     },
     {
       name: 'Save settings',
       handler: () => {
+        dispatch(showNav());
         viewer.saveSettings();
       },
-      Icon: ImEye,
+      Icon: BiLogIn,
     },
     {
       name: 'Restore settings',
       handler: () => {
+        dispatch(showNav());
         viewer.restoreSettings();
       },
-      Icon: FaInfoCircle,
+      Icon: BiLogOut,
     },
     {
       name: 'Reset settings',
       handler: () => {
+        dispatch(showNav());
         viewer.resetSettings();
       },
-      Icon: FaQuestionCircle,
+      Icon: BiRefresh,
     },
     {
       name: 'Export FBX',
       handler: () => {
+        dispatch(showNav());
         viewer.save({ fileType: 'fbx' });
       },
-      Icon: FaQuestionCircle,
+      Icon: RiSave3Fill,
     },
   ];
 
+  const renderToolsPanelModal = () => (
+    <Modal show={modelInfo.isOpen} onHide={() => setModelInfo({})}>
+      <Modal.Header closeButton>
+        <Modal.Title>{modelInfo.title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{modelInfo.body}</Modal.Body>
+      <Modal.Footer>
+        <Button variant="outline-secondary" onClick={() => setModelInfo({})}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+
   const menu = panels.map(({ name, handler, Icon }, index) => (
-    <li key={index} onClick={handler} className='list-group-item'>
-      {name}
+    <li key={index} onClick={handler} className="list-group-item">
       <Icon />
+      {name}
     </li>
   ));
 
   return (
-    <>
-      <ul className='list-group tools'>{menu}</ul>
-      {open === 'get-url' && (
-        <ToolsPanelModal
-          title={'URL'}
-          body={viewer.getURL()}
-          onClose={() => setOpen('')}
-        />
-      )}
-      {open === 'get-script' && (
-        <ToolsPanelModal
-          title={'Script'}
-          body={viewer.getScript()}
-          onClose={() => setOpen('')}
-        />
-      )}
-    </>
+    <div className="tools-panel">
+      <ul className="list-group tools">{menu}</ul>
+      {renderToolsPanelModal()}
+    </div>
   );
 };
 export default ToolsPanel;

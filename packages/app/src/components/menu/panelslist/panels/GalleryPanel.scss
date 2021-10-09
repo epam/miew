@@ -1,0 +1,32 @@
+.gallery-panel {
+  .gallery-images {
+    height: fit-content;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+
+  &-button {
+    display: flex;
+    flex-direction: column;
+    width: 226px;
+    height: 264px;
+    padding: 4px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border 0.2s ease-in-out;
+    margin-bottom: 20px;
+
+    &-label {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      small {
+        padding-left: 5px;
+      }
+    }
+  }
+}

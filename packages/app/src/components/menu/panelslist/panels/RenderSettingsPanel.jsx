@@ -26,13 +26,13 @@ const RenderSettingsPanel = () => {
   ];
 
   return (
-    <>
+    <div className="render-setting-panel">
       {options.map(({ name }, index) => (
         <li key={index} className="list-group-item">
           {name}
         </li>
       ))}
-    </>
+    </div>
   );
 };
 export default RenderSettingsPanel;

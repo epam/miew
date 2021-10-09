@@ -1,13 +1,18 @@
 import React, { useState, useMemo } from 'react';
-import { FaInfoCircle, FaFolderOpen, FaQuestionCircle } from 'react-icons/fa';
+import {
+  FaInfoCircle, FaFolderOpen, FaQuestionCircle, FaWrench,
+} from 'react-icons/fa';
 import { BsImage } from 'react-icons/bs';
-import { ImEye } from 'react-icons/im';
+import { ImEye, ImStarFull } from 'react-icons/im';
 
 import InfoPanel from '../../../containers/InfoPanelContainer';
 import AboutPanel from '../../../containers/AboutPanelContainer';
 import ToolsPanel from '../../../containers/ToolsPanelContainer';
+import GalleryPanel from '../../../containers/GalleryPanelContainer';
 import RenderSettingsPanel from '../../../containers/RenderSettingsPanelContainer';
+import LoadPanel from './panels/LoadPanel.jsx';
 import PanelsListButton from './PanelsListButton.jsx';
+
 import './PanelsList.scss';
 
 const panels = [
@@ -21,7 +26,7 @@ const panels = [
   },
   {
     name: 'Gallery',
-    Icon: FaFolderOpen,
+    Icon: ImStarFull,
   },
   {
     name: 'Representations',
@@ -33,7 +38,7 @@ const panels = [
   },
   {
     name: 'Tools',
-    Icon: FaInfoCircle,
+    Icon: FaWrench,
   },
   {
     name: 'About',
@@ -58,6 +63,10 @@ function PanelsList() {
         return <ToolsPanel />;
       case 'About':
         return <AboutPanel />;
+      case 'Gallery':
+        return <GalleryPanel />;
+      case 'Load':
+        return <LoadPanel />;
       default:
         return <></>;
     }

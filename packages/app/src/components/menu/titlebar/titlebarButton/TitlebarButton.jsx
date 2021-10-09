@@ -15,7 +15,7 @@ const TitlebarButton = ({
         </Tooltip>
       }
     >
-      <Button className="titlebar-button" onClick={ (e) => {
+      <Button className="titlebar-button" onClick={(e) => {
         e.preventDefault();
         if (onClick) {
           onClick(dispatchFunction);

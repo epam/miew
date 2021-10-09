@@ -1,5 +1,6 @@
 .about-panel {
   padding: 15px;
+  height: calc(100% - 40px);
 
   .miew-info {
     display: flex;
@@ -15,9 +16,10 @@
     font: inherit !important;
   }
 
-  .git-hub {
+  .git-hub,
+  .git-hub-container {
     position: absolute;
-    top: 40;
+    top: 0;
     left: 0;
     border: 0;
   }

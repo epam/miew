@@ -1,15 +1,36 @@
+@import '../../../App.scss';
+
 .tools {
   color: #555;
-  padding: 15px;
 
   .list-group-item {
     background-color: #fff !important;
     height: 42px;
     margin-bottom: -1px;
     border: 1px solid #ddd;
+    cursor: pointer;
+    padding-left: 12px;
+
+    svg {
+      fill: $titlebarBkg;
+      margin-right: 7px;
+      font-size: 18px;
+    }
+
+    &:hover {
+      background-color: $selectedPanelColor !important;
+    }
   }
 }
 
-.modal {
-  display: block !important;
+.modal-dialog {
+  max-width: fit-content !important;
+
+  .modal-body {
+    white-space: pre-line;
+  }
+
+  .btn-outline-secondary {
+    border-color: #ccc;
+  }
 }

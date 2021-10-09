@@ -12,7 +12,7 @@ const PanelsListButton = ({
     })}
   >
     <Icon />
-    {name}
+     {name}
   </button>
 );
 
