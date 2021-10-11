@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   FaInfoCircle, FaFolderOpen, FaQuestionCircle, FaWrench,
 } from 'react-icons/fa';
@@ -46,8 +46,17 @@ const panels = [
   },
 ];
 
-function PanelsList() {
+function PanelsList({ viewer }) {
   const [selectedPanel, setSelectedPanel] = useState('Info');
+
+  useEffect(() => {
+    viewer.halt();
+    document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
+    return () => {
+      viewer.run();
+      document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
+    };
+  });
 
   const handlePanelClick = (panel) => () => {
     setSelectedPanel(panel);

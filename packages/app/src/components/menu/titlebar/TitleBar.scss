@@ -11,6 +11,10 @@
   width: 100%;
   padding: 0 !important;
 
+  &-panels-list {
+    width: 1024px !important;
+  }
+
   .titlebar-button {
     color: $titlebarColor;
     background-color: transparent;

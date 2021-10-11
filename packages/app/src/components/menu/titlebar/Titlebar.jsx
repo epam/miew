@@ -20,22 +20,20 @@ import './TitleBar.scss';
 // TODO solve the font for the whole app
 
 const Titlebar = ({ loadingStage, isPanelListVisible }) => {
-  const MenuButton = (
-    <ButtonToolbar className="titlebar">
-      <TitlebarButton
-        content={<FiMenu />}
-        tip="Menu"
-        dispatchFunction={showNav}
-      />
-    </ButtonToolbar>
+  const menuButton = (
+    <TitlebarButton
+      content={<FiMenu />}
+      tip="Menu"
+      dispatchFunction={showNav}
+    />
   );
 
   return isPanelListVisible ? (
-    <MenuButton />
+    <ButtonToolbar className="titlebar titlebar-panels-list">{menuButton}</ButtonToolbar>
   ) : (
     <ButtonToolbar className="titlebar">
       <ButtonGroup>
-        <MenuButton />
+        {menuButton}
         <TitlebarButton
           content={<FiChevronRight />}
           dispatchFunction={showTerminal}
