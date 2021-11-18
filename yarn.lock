@@ -3424,6 +3424,18 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
+bootstrap-icons@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-icons/-/bootstrap-icons-1.3.0.tgz#fb9d704622fcb30a0329695d5033d97171947d04"
+  integrity sha512-w6zQ93p626zmPDqDtET7VdB9EkoDtfmCBV53hunjntoCke6X5LafXf6TxPAP+ImjRAhhxAyA/sjzQnHBY0uoiQ==
+
+bootstrap-switch-button-react@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-switch-button-react/-/bootstrap-switch-button-react-1.2.0.tgz#cbb3d8f208b4f2548500b907ce489713641ea3f5"
+  integrity sha512-p/l+Rp69VtXpK0Y2PR9XYE1TPuypxF+1CpBPmvLUpwXjCisuxtl2S8AF6PqeLDxizFeHuW5nUE6qnqrZY/9ZQA==
+  dependencies:
+    react "^16.11.0"
+
 bootstrap-switch@=3.3.4:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/bootstrap-switch/-/bootstrap-switch-3.3.4.tgz#70e0aeb2a877c0dc766991de108e2170fc29a2ff"
@@ -11566,7 +11578,7 @@ react-transition-group@^4.4.1:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react@^16.13.0, react@^16.13.1:
+react@^16.11.0, react@^16.13.0, react@^16.13.1:
   version "16.14.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
   integrity sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==

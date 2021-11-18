@@ -1,38 +1,112 @@
-import React from 'react';
-import ListGroup from 'react-bootstrap/ListGroup';
-import Tab from 'react-bootstrap/Tab';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+  FaInfoCircle, FaFolderOpen, FaQuestionCircle, FaWrench,
+} from 'react-icons/fa';
+import { BsImage } from 'react-icons/bs';
+import { ImEye, ImStarFull } from 'react-icons/im';
 
 import InfoPanel from '../../../containers/InfoPanelContainer';
+import AboutPanel from '../../../containers/AboutPanelContainer';
+import ToolsPanel from '../../../containers/ToolsPanelContainer';
+import GalleryPanel from '../../../containers/GalleryPanelContainer';
+import RenderSettingsPanel from '../../../containers/RenderSettingsPanelContainer';
+import LoadPanel from './panels/LoadPanel.jsx';
+import PanelsListButton from './PanelsListButton.jsx';
+
 import './PanelsList.scss';
 
-export default class PanelsList extends React.Component {
-  render() {
-    return <div className="panels-list">
-    <Tab.Container id="list-group-tabs-example" defaultActiveKey="#link1">
-      <Row >
-        <Col sm={4}>
-          <ListGroup.Item action variant="light" href="#link1">Info</ListGroup.Item>
-          <ListGroup.Item action disabled variant="light">Gallery</ListGroup.Item>
-          <ListGroup.Item action variant="light" href="#link2">About</ListGroup.Item>
-        </Col>
-        <Col sm={8}>
-          <Tab.Content>
-            <Tab.Pane eventKey="#link1" >
-              <InfoPanel/>
-            </Tab.Pane>
-            <Tab.Pane eventKey="#link2">
-              <span style={{ color: 'silver' }}> About panel</span>
-            </Tab.Pane>
-          </Tab.Content>
-        </Col>
-      </Row>
-    </Tab.Container>
-    </div>;
-  }
+const panels = [
+  {
+    name: 'Info',
+    Icon: FaInfoCircle,
+  },
+  {
+    name: 'Load',
+    Icon: FaFolderOpen,
+  },
+  {
+    name: 'Gallery',
+    Icon: ImStarFull,
+  },
+  {
+    name: 'Representations',
+    Icon: BsImage,
+  },
+  {
+    name: 'Render settings',
+    Icon: ImEye,
+  },
+  {
+    name: 'Tools',
+    Icon: FaWrench,
+  },
+  {
+    name: 'About',
+    Icon: FaQuestionCircle,
+  },
+];
+
+function PanelsList({ viewer }) {
+  const [selectedPanel, setSelectedPanel] = useState('Info');
+
+  useEffect(() => {
+    viewer.halt();
+    document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
+    return () => {
+      viewer.run();
+      document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
+    };
+  });
+
+  const handlePanelClick = (panel) => () => {
+    setSelectedPanel(panel);
+  };
+
+  const getPanelComponent = () => {
+    switch (selectedPanel) {
+      case 'Info':
+        return <InfoPanel />;
+      case 'Render settings':
+        return <RenderSettingsPanel />;
+      case 'Tools':
+        return <ToolsPanel />;
+      case 'About':
+        return <AboutPanel />;
+      case 'Gallery':
+        return <GalleryPanel />;
+      case 'Load':
+        return <LoadPanel />;
+      default:
+        return <></>;
+    }
+  };
+
+  const panelsButtons = useMemo(() => panels.map(({ name, Icon }, index) => {
+    const active = name === selectedPanel;
+    return (
+      <PanelsListButton
+        active={active}
+        name={name}
+        key={index}
+        Icon={Icon}
+        handlePanelClick={handlePanelClick(name)}
+      />
+    );
+  }), [selectedPanel]);
+
+  return (
+    <div className="panels-list">
+      <div className="list-group panels-list-menu">{panelsButtons}</div>
+      <div className="panel">
+        <div className="panel-name">{selectedPanel}</div>
+        {getPanelComponent()}
+      </div>
+    </div>
+  );
 }
 
 PanelsList.defaultProps = {
   visibility: 'hidden',
 };
+
+export default PanelsList;

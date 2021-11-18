@@ -4,9 +4,9 @@ export const showNav = () => ({
   type: ACTIONS.SHOW_NAV,
 });
 
-export const sendInfo = (ids) => ({
+export const sendInfo = (complex) => ({
   type: ACTIONS.SEND_INFO,
-  payload: ids,
+  payload: complex,
 });
 
 export const updateLoadingStage = (stage) => ({

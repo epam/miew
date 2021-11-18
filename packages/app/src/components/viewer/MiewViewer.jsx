@@ -52,7 +52,7 @@ export default function MiewViewer({
       const ids = [];
       for (let i = 0; i < names.length; i++) {
         const complex = viewer._getComplexVisual(names[i]).getComplex();
-        ids.push(complex.name);
+        ids.push(complex);
       }
       sendInfo(ids);
     });

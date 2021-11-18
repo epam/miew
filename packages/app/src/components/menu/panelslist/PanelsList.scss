@@ -1,5 +1,74 @@
+@import "../../App.scss";
+
 .panels-list {
   position: absolute;
-  top: 40;
+  top: $titlebarHeight;
+  left: 0;
+  height: 100%;
   width: 100%;
+
+  &-menu {
+    position: absolute;
+    top: 0;
+    width: 256px;
+    height: 100%;
+    overflow: auto;
+    border-radius: 0%;
+    background-color: $titlebarBkg;
+
+    :focus {
+      outline: none !important;
+    }
+
+    .list-group-item {
+      background-color: transparent;
+      color: $titlebarColor;
+      border: none;
+      height: 39.99px;
+      border-radius: 0%;
+      padding-left: 12px;
+
+      svg {
+        fill: $titlebarColor;
+        margin-right: 7px;
+      }
+
+      &.active {
+        background-color: #eee;
+        color: $titlebarBkg;
+
+        svg {
+          fill: $titlebarBkg;
+        }
+      }
+    }
+  }
+
+  .panel {
+    position: absolute;
+    left: 256px;
+    width: 768px;
+    height: calc(100% - 40px);
+
+    &-name {
+      position: absolute;
+      top: -40;
+      background-color: transparent;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: silver;
+      height: $titlebarHeight;
+      width: 768px;
+    }
+
+    [class$="-panel"] {
+      overflow: auto;
+      background-color: #eee;
+      height: 100%;
+      padding: 15px;
+    }
+  }
 }

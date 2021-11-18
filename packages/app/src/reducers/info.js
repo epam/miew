@@ -3,7 +3,7 @@ import ACTIONS from '../constants';
 const info = (state = {}, action) => {
   switch (action.type) {
     case ACTIONS.SEND_INFO:
-      return { ...state, complexes: action.payload };
+      return { ...state, complex: action.payload };
     case ACTIONS.UPDATE_LOADING_STAGE:
       return { ...state, loadingStage: action.payload };
     case ACTIONS.SAVE_COLORERS:
