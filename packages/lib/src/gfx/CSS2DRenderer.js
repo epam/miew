@@ -116,9 +116,9 @@ class CSS2DRenderer {
       camera.updateMatrixWorld();
     }
 
-    camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+    camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 
-    this._viewMatrix.copy(camera.matrixWorldInverse.getInverse(camera.matrixWorld));
+    this._viewMatrix.copy(camera.matrixWorldInverse);
     this._projectionMatrix.copy(camera.projectionMatrix);
 
     this._renderObject(scene, camera, scene);

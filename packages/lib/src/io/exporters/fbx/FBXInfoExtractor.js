@@ -179,7 +179,7 @@ export default class FBXInfoExtractor {
     } = mesh;
 
     const model = new FBXModel();
-    const instCount = mesh.geometry.maxInstancedCount;
+    const instCount = mesh.geometry.instanceCount;
     const vertCount = position.count;
     const indsCount = index.count;
     model.init(instCount * vertCount, instCount * indsCount);
@@ -221,7 +221,7 @@ export default class FBXInfoExtractor {
     } = mesh;
 
     const model = new FBXModel();
-    const instCount = mesh.geometry.maxInstancedCount;
+    const instCount = mesh.geometry.instanceCount;
     const oneCCylinder = new FBX1CGeometry();
     oneCCylinder.init(mesh.geometry);
     const splittingInfo = this._gatherCylindersColoringInfo(mesh.geometry);
@@ -291,7 +291,7 @@ export default class FBXInfoExtractor {
   }
 
   _gatherCylindersColoringInfo(geo) {
-    const instCount = geo.maxInstancedCount;
+    const instCount = geo.instanceCount;
     const color1 = geo.attributes.color.array;
     const color2 = geo.attributes.color2.array;
     const stride = geo.attributes.color.itemSize;

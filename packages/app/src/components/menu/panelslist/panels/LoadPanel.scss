@@ -1,0 +1,55 @@
+@import "../../../App.scss";
+
+.load-panel {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+
+  .data-load-label {
+    font-weight: 700;
+    padding-bottom: 5px;
+  }
+
+  input {
+    height: 34px;
+  }
+
+  .load-button {
+    border-radius: 0 !important;
+    background-color: $buttonPrimary;
+    border: 1px solid transparent;
+    color: #fff;
+
+    input {
+      position: absolute;
+      cursor: pointer;
+      opacity: 0;
+      right: 0;
+      top: 0;
+    }
+  }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 42px;
+
+    .switch {
+      max-height: 23px !important;
+      width: 70px;
+
+      .switch-on {
+        background-color: $buttonPrimary !important;
+      }
+    }
+  }
+
+  button {
+    background-color: $buttonPrimary;
+    margin-bottom: 20px;
+    align-self: end;
+    width: 150px;
+    height: 34px;
+  }
+}

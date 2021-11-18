@@ -34,7 +34,7 @@ THREE.Object3D.prototype.addSavingWorldTransform = (function () {
 
   return function (object) {
     if (object instanceof THREE.Object3D) {
-      _worldMatrixInverse.getInverse(this.matrixWorld);
+      _worldMatrixInverse.copy(this.matrixWorld).invert();
       _worldMatrixInverse.multiply(object.matrixWorld);
       object.matrix.copy(_worldMatrixInverse);
       object.matrix.decompose(object.position, object.quaternion, object.scale);
@@ -410,6 +410,17 @@ function getMiddlePoint(point1, point2, optionalTarget) {
 
   return result;
 }
+
+// Monkey-patch for "InstancedBufferGeometry.instanceCount becomes undefined after copy()"
+// https://github.com/mrdoob/three.js/issues/22151
+const _oldInstancedBufferGeometryCopy = THREE.InstancedBufferGeometry.prototype.copy;
+
+THREE.InstancedBufferGeometry.prototype.copy = function (source) {
+  _oldInstancedBufferGeometryCopy.call(this, source);
+  if (this.instanceCount === undefined) {
+    this.instanceCount = Infinity;
+  }
+};
 
 export default {
   calcCylinderMatrix: _calcCylinderMatrix,

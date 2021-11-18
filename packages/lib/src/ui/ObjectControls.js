@@ -106,7 +106,7 @@ ObjectHandler.prototype.translate = (function () {
     dir.normalize();
 
     // transform movement direction to object local coords
-    dir.transformDirection(matrix4.getInverse(this.object.matrixWorld));
+    dir.transformDirection(matrix4.copy(this.object.matrixWorld).invert());
 
     // visible translate distance shouldn't depend on camera-to-object distance
     pivot.copy(this.pivot);
@@ -134,7 +134,7 @@ ObjectHandler.prototype.update = (function () {
       // if rotation axis is fixed or hasn't been defined yet
       if (settings.now.autoRotationAxisFixed || this.lastRotation.axis.length() === 0.0) {
         // use Y-axis (transformed to local object coords)
-        axis.set(0, 1, 0).transformDirection(matrix4.getInverse(this.object.matrixWorld));
+        axis.set(0, 1, 0).transformDirection(matrix4.copy(this.object.matrixWorld).invert());
       } else {
         // use axis defined by last user rotation
         axis.copy(this.lastRotation.axis);
@@ -229,7 +229,7 @@ ObjectHandler.prototype.mouse2rotation = (function () {
       rot.angle = -angle * this.options.rotateFactor;
     }
 
-    rot.axis.transformDirection(matrix4.getInverse(this.object.matrixWorld));
+    rot.axis.transformDirection(matrix4.copy(this.object.matrixWorld).invert());
 
     // make sure angle is always positive (thus 'axis' defines both axis and direction of rotation)
     if (rot.angle < 0.0) {
@@ -830,7 +830,7 @@ ObjectControls.prototype.translatePivotInWorld = function (x, y, z) {
   pos.setX(pos.x + x);
   pos.setY(pos.y + y);
   pos.setZ(pos.z + z);
-  pos.applyMatrix4(matrix4.getInverse(this.object.matrixWorld));
+  pos.applyMatrix4(matrix4.copy(this.object.matrixWorld).invert());
 
   this.dispatchEvent({ type: 'change', action: 'translatePivot' });
 };

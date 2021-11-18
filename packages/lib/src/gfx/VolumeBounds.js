@@ -1,6 +1,19 @@
 import * as THREE from 'three';
 import gfxutils from './gfxutils';
 
+function _flattenArray(input) {
+  const n = input.length;
+  const output = new Float32Array(n * 3);
+  for (let i = 0; i < n; ++i) {
+    const j = 3 * i;
+    const v = input[i];
+    output[j] = v.x;
+    output[j + 1] = v.y;
+    output[j + 2] = v.z;
+  }
+  return output;
+}
+
 class VolumeBounds {
   static _projectionTable = { // corresponds between (origin axes and angles between them) and between saving vector coordinates
     XY: ['x', 2],
@@ -18,23 +31,27 @@ class VolumeBounds {
 
     const offsetVert = this._getBaseVertices(delta, obtuseAngle);
 
-    const geometry = new THREE.Geometry();
+    const geometry = new THREE.BufferGeometry();
+    const vertices = [];
 
     for (let i = 0; i < 4; i++) {
-      geometry.vertices.push(offsetVert[i].clone().multiply(bSize));
-      geometry.vertices.push(offsetVert[(i + 1) % 4].clone().multiply(bSize));
+      vertices.push(offsetVert[i].clone().multiply(bSize));
+      vertices.push(offsetVert[(i + 1) % 4].clone().multiply(bSize));
     }
     const translation = new THREE.Vector3(2 * bSize.x * (1 - delta.x - delta.y), 0, 0);
     for (let i = 0; i < 8; i++) {
-      geometry.vertices.push(geometry.vertices[i].clone().add(translation));
+      vertices.push(vertices[i].clone().add(translation));
     }
     for (let i = 0; i < 4; i++) {
-      geometry.vertices.push(geometry.vertices[i * 2].clone());
-      geometry.vertices.push(geometry.vertices[i * 2 + 8].clone());
+      vertices.push(vertices[i * 2].clone());
+      vertices.push(vertices[i * 2 + 8].clone());
     }
     const center = new THREE.Vector3();
     bBox.getCenter(center);
-    geometry.vertices.forEach((vertex) => vertex.add(center)); // pivot shift
+    vertices.forEach((vertex) => vertex.add(center)); // pivot shift
+
+    const flatVertices = _flattenArray(vertices);
+    geometry.setAttribute('position', new THREE.BufferAttribute(flatVertices, 3));
 
     this._lines = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0xFFFFFF }));
     this._lines.layers.set(gfxutils.LAYERS.VOLUME);
