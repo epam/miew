@@ -37,13 +37,15 @@ class LinesObj extends SceneObject {
 
     geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
     geom.computeBoundingBox();
-
-    this._line = new meshes.Line(geom, new UberMaterial({
+    const material = new UberMaterial();
+    material.setValues({
       lights: false,
       overrideColor: true,
       dashedLine: true,
       fogTransparent: settings.now.bg.transparent,
-    }));
+    });
+
+    this._line = new meshes.Line(geom, material);
     this._line.computeLineDistances();
     this._line.material.setUberOptions({
       fixedColor: new THREE.Color(this.opts.color),

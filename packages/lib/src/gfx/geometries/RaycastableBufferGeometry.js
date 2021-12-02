@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Face3 } from 'three/examples/jsm/deprecated/Geometry';
 
 /**
  * This class adds raycasting interface to indexed
@@ -77,7 +78,7 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
       }
       const normal = new THREE.Vector3();
       THREE.Triangle.getNormal(vA, vB, vC, normal);
-      intersection.face = new THREE.Face3(a, b, c, normal);
+      intersection.face = new Face3(a, b, c, normal);
       intersection.faceIndex = a;
     }
 
