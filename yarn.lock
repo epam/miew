@@ -12694,7 +12694,7 @@ __metadata:
     style-loader: ^1.2.1
     stylelint: ^13.3.3
     stylelint-config-standard: ^20.0.0
-    three: 0.129.0
+    three: 0.134.0
     toastr: ^2.1.4
     uglify-js: ^3.9.3
     url-loader: ^4.1.0
@@ -18275,10 +18275,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"three@npm:0.129.0":
-  version: 0.129.0
-  resolution: "three@npm:0.129.0"
-  checksum: 1fbe60ee56a3f1ff0d715f078364f3f521907e15d632e52a786ffd493e400fbcdab71e04150523bf15e69b310dd5267cd8dd3f97c5f3e2b3abfa5522b954fb5b
+"three@npm:0.134.0":
+  version: 0.134.0
+  resolution: "three@npm:0.134.0"
+  checksum: 1b4e64f75b46666985db15ff3379ac9b6b21bb0e06d90748e4d4a2bc2a9374a2133bd27b28c54797bb368d2efb2806c48388c1b0ae88160f8ec57e116e351cf2
   languageName: node
   linkType: hard
 
