@@ -9,7 +9,7 @@ init:
   - git config --global core.autocrlf true
 install:
   - ps: Install-Product node $env:nodejs_version
-  - yarn dlx lerna jest now
+  - yarn dlx -p lerna -p jest -p now
   - lerna bootstrap
 test_script:
   - node --version
