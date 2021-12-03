@@ -73,6 +73,54 @@ const uberOptionNames = [
   'srcTexelSize',
 ];
 
+// properties that convert to uniforms
+const uberOptions = {
+  diffuse: new THREE.Color(0xffffff), // used in phong lighting
+  specular: new THREE.Color(0x111111), // used in phong lighting
+  shininess: 30, // used in phong lighting
+  opacity: 1, // set mesh opacity
+  fixedColor: new THREE.Color(0xffffff), // color to override (see OVERRIDE_COLOR)
+  zOffset: 0.0, // used fo zsprites (see SPHERE_SPRITE CYLINDER_SPRITE)
+  zClipCoef: 2.0, // use for Surfs clipping (mesh param, isn't used in shader)  FIXME move to representation param
+  zClipValue: 0.0, //  value to clip Surfs in shader  (see ZCLIP)
+  clipPlaneValue: 0.0, // value to clip scene globally (see CLIPPLANE)
+  world2colorMatrix: new THREE.Matrix4(),
+  dashedLineSize: 0.1,
+  dashedLinePeriod: 0.3,
+  projMatrixInv: new THREE.Matrix4(),
+  viewport: new THREE.Vector2(800, 600),
+  lineWidth: 2.0,
+  fogAlpha: 1.0,
+  samplesKernel: _samplesKernel,
+  noiseTex: noise.noiseTexture,
+  noiseTexelSize: new THREE.Vector2(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight),
+  srcTexelSize: new THREE.Vector2(1.0 / 800.0, 1.0 / 600.0),
+
+  copy(source) {
+    this.diffuse.copy(source.diffuse);
+    this.specular.copy(source.specular);
+    this.shininess = source.shininess;
+    this.opacity = source.opacity;
+    this.fixedColor.copy(source.fixedColor);
+    this.zOffset = source.zOffset;
+    this.zClipCoef = source.zClipCoef;
+    this.zClipValue = source.zClipValue;
+    this.clipPlaneValue = source.clipPlaneValue;
+    this.world2colorMatrix.copy(source.world2colorMatrix);
+    this.dashedLineSize = source.dashedLineSize;
+    this.dashedLinePeriod = source.dashedLinePeriod;
+    this.projMatrixInv = source.projMatrixInv;
+    this.viewport = source.viewport;
+    this.lineWidth = source.lineWidth; // used for thick lines only
+    this.toonShading = source.toonShading;
+    this.fogAlpha = source.fogAlpha;
+    this.samplesKernel = source.samplesKernel;
+    this.noiseTex = source.noiseTex;
+    this.noiseTexelSize = source.noiseTexelSize;
+    this.srcTexelSize = source.srcTexelSize;
+  },
+};
+
 class UberMaterial extends THREE.RawShaderMaterial {
   constructor(params) {
     super(params);
@@ -131,54 +179,8 @@ class UberMaterial extends THREE.RawShaderMaterial {
       fog: true,
       side: THREE.DoubleSide,
     });
+    this.uberOptions = uberOptions;
     this.setValues(params);
-    // properties that convert to uniforms
-    this.uberOptions = {
-      diffuse: new THREE.Color(0xffffff), // used in phong lighting
-      specular: new THREE.Color(0x111111), // used in phong lighting
-      shininess: 30, // used in phong lighting
-      opacity: 1, // set mesh opacity
-      fixedColor: new THREE.Color(0xffffff), // color to override (see OVERRIDE_COLOR)
-      zOffset: 0.0, // used fo zsprites (see SPHERE_SPRITE CYLINDER_SPRITE)
-      zClipCoef: 2.0, // use for Surfs clipping (mesh param, isn't used in shader)  FIXME move to representation param
-      zClipValue: 0.0, //  value to clip Surfs in shader  (see ZCLIP)
-      clipPlaneValue: 0.0, // value to clip scene globally (see CLIPPLANE)
-      world2colorMatrix: new THREE.Matrix4(),
-      dashedLineSize: 0.1,
-      dashedLinePeriod: 0.3,
-      projMatrixInv: new THREE.Matrix4(),
-      viewport: new THREE.Vector2(800, 600),
-      lineWidth: 2.0,
-      fogAlpha: 1.0,
-      samplesKernel: _samplesKernel,
-      noiseTex: noise.noiseTexture,
-      noiseTexelSize: new THREE.Vector2(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight),
-      srcTexelSize: new THREE.Vector2(1.0 / 800.0, 1.0 / 600.0),
-
-      copy(source) {
-        this.diffuse.copy(source.diffuse);
-        this.specular.copy(source.specular);
-        this.shininess = source.shininess;
-        this.opacity = source.opacity;
-        this.fixedColor.copy(source.fixedColor);
-        this.zOffset = source.zOffset;
-        this.zClipCoef = source.zClipCoef;
-        this.zClipValue = source.zClipValue;
-        this.clipPlaneValue = source.clipPlaneValue;
-        this.world2colorMatrix.copy(source.world2colorMatrix);
-        this.dashedLineSize = source.dashedLineSize;
-        this.dashedLinePeriod = source.dashedLinePeriod;
-        this.projMatrixInv = source.projMatrixInv;
-        this.viewport = source.viewport;
-        this.lineWidth = source.lineWidth; // used for thick lines only
-        this.toonShading = source.toonShading;
-        this.fogAlpha = source.fogAlpha;
-        this.samplesKernel = source.samplesKernel;
-        this.noiseTex = source.noiseTex;
-        this.noiseTexelSize = source.noiseTexelSize;
-        this.srcTexelSize = source.srcTexelSize;
-      },
-    };
   }
 
   precisionString() {
