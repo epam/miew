@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
-    "coveralls": "cat coverage/general.info | coveralls"
+    "coveralls": "cat coverage/general.info | coveralls",
+    "build:ci": "yarn workspaces foreach -ptv run ci"
   },
   "devDependencies": {
     "coveralls": "^3.1.0",

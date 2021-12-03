@@ -21,7 +21,7 @@ before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > /tmp/cc-test-reporter
   - chmod +x /tmp/cc-test-reporter
 script:
-  - yarn workspaces foreach run ci
+  - yarn build:ci
 after_success:
   - mkdir coverage
   # merge coverage report from lib, app projects
