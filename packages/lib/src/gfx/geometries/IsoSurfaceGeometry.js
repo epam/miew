@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import utils from '../../utils';
-import RaycastableBufferGeometry from './RaycastableBufferGeometry';
 
 const POS_RAD_SIZE = 4;
 const COLOR_SIZE = 3;
@@ -12,7 +11,7 @@ const tmpColor = new THREE.Color();
  * @param opts - geometry specific options
  * @constructor
  */
-class IsoSurfaceGeometry extends RaycastableBufferGeometry {
+class IsoSurfaceGeometry extends THREE.BufferGeometry {
   constructor(spheresCount, opts) {
     super();
 
