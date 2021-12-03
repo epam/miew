@@ -5,7 +5,7 @@ node_js:
 cache:
   yarn: true
   directories:
-    - "node_modules"
+   # - "node_modules"
     - "$HOME/.sonar/cache"
 addons:
   sonarcloud:
