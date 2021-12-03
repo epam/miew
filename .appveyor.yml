@@ -12,7 +12,7 @@ install:
   - yarn install
 test_script:
   - node --version
-  - yarn run ci
+  - yarn workspaces foreach run ci
 build: off
 notifications:
   - provider: Slack
