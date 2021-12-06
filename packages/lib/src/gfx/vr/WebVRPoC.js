@@ -199,7 +199,8 @@ export default class WebVRPoC {
   _createControllerMesh() {
     // visualize controllers with cylinders
     const geometry = new THREE.CylinderGeometry(0.04, 0.04, 0.3);
-    const material = new UberMaterial({ lights: false, overrideColor: true });
+    const material = new UberMaterial();
+    material.setValues({ lights: false, overrideColor: true });
     material.setUberOptions({ fixedColor: new THREE.Color(0x4444ff) });
     material.updateUniforms();
     const cylinder = new THREE.Mesh(geometry, material);
