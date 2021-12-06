@@ -170,17 +170,17 @@ class UberMaterial extends THREE.RawShaderMaterial {
     this.normalsToGBuffer = false;
     // used for toon material
     this.toonShading = false;
+    this.uberOptions = uberOptions;
     // set default values
-    this.setValues.call(this, {
+    this.setValues({
       uniforms: THREE.UniformsUtils.clone(defaultUniforms),
       vertexShader: this.precisionString() + vertexShader,
       fragmentShader: this.precisionString() + fragmentShader,
       lights: true,
       fog: true,
       side: THREE.DoubleSide,
+      ...params,
     });
-    this.uberOptions = uberOptions;
-    this.setValues(params);
   }
 
   precisionString() {
@@ -192,7 +192,7 @@ class UberMaterial extends THREE.RawShaderMaterial {
 
   // create copy of this material
   copy(source) {
-    THREE.RawShaderMaterial.prototype.copy.call(this, source);
+    super.copy(source);
 
     this.fragmentShader = source.fragmentShader;
     this.vertexShader = source.vertexShader;
@@ -244,7 +244,7 @@ class UberMaterial extends THREE.RawShaderMaterial {
     }
 
     // set direct values
-    THREE.RawShaderMaterial.prototype.setValues.call(this, values);
+    super.setValues(values);
 
     const defines = {};
     const extensions = {};
