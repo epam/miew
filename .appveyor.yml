@@ -4,7 +4,6 @@ environment:
     - nodejs_version: "14"
 cache:
   - "%LOCALAPPDATA%\\Yarn"
-  #- node_modules
 init:
   - git config --global core.autocrlf true
 install:
