@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import * as THREE from 'three';
 import utils from '../../utils';
-import RaycastableBufferGeometry from './RaycastableBufferGeometry';
 
 const MAX_IDC_16BIT = 65535;
 const VEC_SIZE = 3;
@@ -14,7 +13,7 @@ const tmpColor = new THREE.Color();
  * @constructor
  */
 
-class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
+class ChunkedObjectsGeometry extends THREE.BufferGeometry {
   constructor(chunkGeo, chunksCount) {
     super();
 
@@ -66,7 +65,9 @@ class ChunkedObjectsGeometry extends RaycastableBufferGeometry {
 
   raycast(raycaster, intersects) {
     const inters = [];
-    super.raycast(raycaster, inters);
+    const mesh = new THREE.Mesh();
+    mesh.geometry = this;
+    mesh.raycast(raycaster, inters);
     const facesPerChunk = this._chunkGeo.index.count / 3;
     for (let i = 0, n = inters.length; i < n; ++i) {
       if (!inters[i].hasOwnProperty('faceIndex')) {

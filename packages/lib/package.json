@@ -97,7 +97,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.15",
-    "three": "0.134.0"
+    "three": "0.135.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
