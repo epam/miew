@@ -1,19 +1,17 @@
 version: "{build}"
 environment:
   matrix:
-    - nodejs_version: "10"
+    - nodejs_version: "14"
 cache:
   - "%LOCALAPPDATA%\\Yarn"
-  - node_modules
 init:
   - git config --global core.autocrlf true
 install:
   - ps: Install-Product node $env:nodejs_version
-  - yarn global add lerna jest now
-  - lerna bootstrap
+  - yarn install
 test_script:
   - node --version
-  - lerna run ci
+  - yarn build:ci
 build: off
 notifications:
   - provider: Slack
