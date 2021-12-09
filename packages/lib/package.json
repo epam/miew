@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "ci": "run-s clean lint test-cover build",
+    "ci": "run-s clean test-cover build",
     "ci-fast": "run-s lint:js test:unit build:demo",
     "eslint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "eslint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",

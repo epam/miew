@@ -7,7 +7,7 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "ci": "run-s clean lint build",
+    "ci": "run-s clean build",
     "clean": "rimraf 'build/*'",
     "lint": "eslint -f unix --ext .js,.jsx src/ ",
     "lint:css": "stylelint '**/*.scss'",
