@@ -1,19 +1,19 @@
-import AtomsProcessor from './AtomsProcessor';
+import AtomsProcessor from './AtomsProcessor'
 
 class OrphanAtomsProcessor extends AtomsProcessor {
   _checkAtom(atom, mask) {
     if (!(atom.mask & mask)) {
-      return false;
+      return false
     }
 
-    const { bonds } = atom;
+    const { bonds } = atom
     for (let i = 0, n = bonds.length; i < n; ++i) {
-      if ((bonds[i]._left.mask & mask) && (bonds[i]._right.mask & mask)) {
-        return false;
+      if (bonds[i]._left.mask & mask && bonds[i]._right.mask & mask) {
+        return false
       }
     }
-    return true;
+    return true
   }
 }
 
-export default OrphanAtomsProcessor;
+export default OrphanAtomsProcessor

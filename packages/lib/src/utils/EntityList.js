@@ -1,8 +1,8 @@
 function _ensureArray(x) {
   if (x === null || x === undefined || Array.isArray(x)) {
-    return x;
+    return x
   }
-  return [x];
+  return [x]
 }
 
 /** An indexed list of objects or classes. */
@@ -17,14 +17,14 @@ class EntityList {
    * @see EntityList#register
    */
   constructor(entities = [], indices = ['id']) {
-    this._list = [];
-    this._dict = {};
-    this._indices = [...indices];
+    this._list = []
+    this._dict = {}
+    this._indices = [...indices]
     this._indices.forEach((index) => {
-      this._dict[index] = {};
-    });
+      this._dict[index] = {}
+    })
 
-    entities.forEach((entity) => this.register(entity));
+    entities.forEach((entity) => this.register(entity))
   }
 
   /**
@@ -38,7 +38,7 @@ class EntityList {
    */
   static registerInList(list, value) {
     if (!list.includes(value)) {
-      list.push(value);
+      list.push(value)
     }
   }
 
@@ -50,9 +50,9 @@ class EntityList {
    * @see EntityList.registerInList
    */
   static unregisterFromList(list, value) {
-    const pos = list.indexOf(value);
+    const pos = list.indexOf(value)
     if (pos !== -1) {
-      list.splice(pos, 1);
+      list.splice(pos, 1)
     }
   }
 
@@ -69,12 +69,12 @@ class EntityList {
    */
   static registerInDict(dict, keys, value) {
     keys.forEach((key) => {
-      key = key.toLowerCase();
-      const list = dict[key] = dict[key] || [];
+      key = key.toLowerCase()
+      const list = (dict[key] = dict[key] || [])
       if (!list.includes(value)) {
-        list.push(value);
+        list.push(value)
       }
-    });
+    })
   }
 
   /**
@@ -89,18 +89,18 @@ class EntityList {
    */
   static unregisterFromDict(dict, keys, value) {
     keys.forEach((key) => {
-      key = key.toLowerCase();
-      const list = dict[key];
+      key = key.toLowerCase()
+      const list = dict[key]
       if (list) {
-        const pos = list.indexOf(value);
+        const pos = list.indexOf(value)
         if (pos !== -1) {
-          list.splice(pos, 1);
+          list.splice(pos, 1)
         }
         if (list.length === 0) {
-          delete dict[key];
+          delete dict[key]
         }
       }
-    });
+    })
   }
 
   /**
@@ -111,10 +111,14 @@ class EntityList {
    * @see EntityList#unregister
    */
   register(entity) {
-    EntityList.registerInList(this._list, entity);
+    EntityList.registerInList(this._list, entity)
     this._indices.forEach((index) => {
-      EntityList.registerInDict(this._dict[index], _ensureArray(entity[index]), entity);
-    });
+      EntityList.registerInDict(
+        this._dict[index],
+        _ensureArray(entity[index]),
+        entity
+      )
+    })
   }
 
   /**
@@ -126,10 +130,14 @@ class EntityList {
    * @see EntityList#register
    */
   unregister(entity) {
-    EntityList.unregisterFromList(this._list, entity);
+    EntityList.unregisterFromList(this._list, entity)
     this._indices.forEach((index) => {
-      EntityList.unregisterFromDict(this._dict[index], _ensureArray(entity[index]), entity);
-    });
+      EntityList.unregisterFromDict(
+        this._dict[index],
+        _ensureArray(entity[index]),
+        entity
+      )
+    })
   }
 
   /**
@@ -140,7 +148,7 @@ class EntityList {
    * @type {!Array<Object>}
    */
   get all() {
-    return [...this._list];
+    return [...this._list]
   }
 
   /**
@@ -150,7 +158,7 @@ class EntityList {
    * @type {Object=}
    */
   get first() {
-    return this._list[0];
+    return this._list[0]
   }
 
   /**
@@ -162,7 +170,7 @@ class EntityList {
    *   values for all registered entities.
    */
   keys(index) {
-    return Object.keys(this._dict[index || this._indices[0]]);
+    return Object.keys(this._dict[index || this._indices[0]])
   }
 
   /**
@@ -175,13 +183,13 @@ class EntityList {
    *   objects under the same key, the first one is returned.
    */
   get(key, index) {
-    const dict = this._dict[index || this._indices[0]];
+    const dict = this._dict[index || this._indices[0]]
     if (dict) {
-      const values = dict[key && key.toLowerCase()];
-      return values && values.length > 0 ? values[0] : undefined;
+      const values = dict[key && key.toLowerCase()]
+      return values && values.length > 0 ? values[0] : undefined
     }
-    return undefined;
+    return undefined
   }
 }
 
-export default EntityList;
+export default EntityList

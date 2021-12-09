@@ -1,31 +1,30 @@
-import UberMaterial from '../shaders/UberMaterial';
+import UberMaterial from '../shaders/UberMaterial'
 
 export default function (SuperClass) {
   class NewObjectType extends SuperClass {
     constructor(...rest) {
-      super(...rest);
-      this.onBeforeRender = NewObjectType.prototype.onBeforeRender;
+      super(...rest)
+      this.onBeforeRender = NewObjectType.prototype.onBeforeRender
     }
 
     onBeforeRender(renderer, scene, camera, geometry, material, group) {
-      this._onBeforeRender(renderer, scene, camera, geometry, material, group);
-      this._update();
+      this._onBeforeRender(renderer, scene, camera, geometry, material, group)
+      this._update()
     }
 
-    _onBeforeRender() {
-    }
+    _onBeforeRender() {}
 
     _update() {
-      const { material } = this;
+      const { material } = this
       if (!material) {
-        return;
+        return
       }
 
       if (material instanceof UberMaterial) {
-        material.updateUniforms();
+        material.updateUniforms()
       }
     }
   }
 
-  return NewObjectType;
+  return NewObjectType
 }

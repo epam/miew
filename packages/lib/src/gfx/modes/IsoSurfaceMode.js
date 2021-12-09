@@ -1,13 +1,13 @@
-import SurfaceMode from './SurfaceMode';
+import SurfaceMode from './SurfaceMode'
 
 class IsoSurfaceMode extends SurfaceMode {
   constructor(excludeProbe, opts) {
-    super(opts);
-    this._excludeProbe = excludeProbe;
+    super(opts)
+    this._excludeProbe = excludeProbe
   }
 
   calcAtomRadius(atom) {
-    return atom.element.radius;
+    return atom.element.radius
   }
 
   getSurfaceOpts() {
@@ -17,17 +17,17 @@ class IsoSurfaceMode extends SurfaceMode {
       zClip: this.opts.zClip,
       visibilitySelector: this.getVisibilitySelector(),
       probeRadius: this.opts.probeRadius,
-      excludeProbe: this._excludeProbe,
-    };
+      excludeProbe: this._excludeProbe
+    }
   }
 }
 
-IsoSurfaceMode.prototype.id = 'SU';
-IsoSurfaceMode.prototype.name = 'Surface';
-IsoSurfaceMode.prototype.shortName = 'Surface';
-IsoSurfaceMode.prototype.surfaceNames = ['SASSESSurfaceGeo'];
+IsoSurfaceMode.prototype.id = 'SU'
+IsoSurfaceMode.prototype.name = 'Surface'
+IsoSurfaceMode.prototype.shortName = 'Surface'
+IsoSurfaceMode.prototype.surfaceNames = ['SASSESSurfaceGeo']
 
-IsoSurfaceMode.prototype._radScale = 1;
-IsoSurfaceMode.prototype._excludeProbe = false;
+IsoSurfaceMode.prototype._radScale = 1
+IsoSurfaceMode.prototype._excludeProbe = false
 
-export default IsoSurfaceMode;
+export default IsoSurfaceMode

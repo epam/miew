@@ -1,16 +1,16 @@
-import Mode from './Mode';
+import Mode from './Mode'
 
 class VanDerWaalsMode extends Mode {
-  static id = 'VW';
+  static id = 'VW'
 
   calcAtomRadius(atom) {
-    return atom.element.radius;
+    return atom.element.radius
   }
 }
 
-VanDerWaalsMode.prototype.id = 'VW';
-VanDerWaalsMode.prototype.name = 'Van der Waals';
-VanDerWaalsMode.prototype.shortName = 'VDW';
-VanDerWaalsMode.prototype.depGroups = ['AtomsSpheres'];
+VanDerWaalsMode.prototype.id = 'VW'
+VanDerWaalsMode.prototype.name = 'Van der Waals'
+VanDerWaalsMode.prototype.shortName = 'VDW'
+VanDerWaalsMode.prototype.depGroups = ['AtomsSpheres']
 
-export default VanDerWaalsMode;
+export default VanDerWaalsMode

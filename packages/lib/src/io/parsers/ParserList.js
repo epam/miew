@@ -1,4 +1,4 @@
-import EntityList from '../../utils/EntityList';
+import EntityList from '../../utils/EntityList'
 
 /**
  * A list of available parsers.
@@ -16,7 +16,7 @@ class ParserList extends EntityList {
    * @see ParserList#register
    */
   constructor(someParsers = []) {
-    super(someParsers, ['formats', 'extensions']);
+    super(someParsers, ['formats', 'extensions'])
   }
 
   /**
@@ -28,18 +28,21 @@ class ParserList extends EntityList {
    * @param {*=} specs.data Data to parse.
    */
   find(specs) {
-    let list = [];
+    let list = []
     if (specs.format) {
-      list = this._dict.formats[specs.format.toLowerCase()] || [];
+      list = this._dict.formats[specs.format.toLowerCase()] || []
     } else if (specs.ext) {
-      list = this._dict.extensions[specs.ext.toLowerCase()] || [];
+      list = this._dict.extensions[specs.ext.toLowerCase()] || []
     }
     // autodetect only if no format is forced
     if (list.length === 0 && !specs.format && specs.data) {
-      return this._list.filter((SomeParser) => SomeParser.canProbablyParse && SomeParser.canProbablyParse(specs.data));
+      return this._list.filter(
+        (SomeParser) =>
+          SomeParser.canProbablyParse && SomeParser.canProbablyParse(specs.data)
+      )
     }
-    return [...list];
+    return [...list]
   }
 }
 
-export default ParserList;
+export default ParserList

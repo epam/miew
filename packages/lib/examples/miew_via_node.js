@@ -1,3 +1,3 @@
-var Miew = require('../dist/Miew.min');
+const Miew = require('../dist/Miew.min')
 
-console.log(Miew.VERSION);
+console.log(Miew.VERSION)

@@ -2,10 +2,10 @@
  * This class introduces the simplest event system.
  */
 
-import _ from 'lodash';
+import _ from 'lodash'
 
 function isUndefOrEqual(param, value) {
-  return !param || param === value;
+  return !param || param === value
 }
 
 /**
@@ -15,7 +15,7 @@ function isUndefOrEqual(param, value) {
  * @constructor
  */
 function EventDispatcher() {
-  this._handlers = {};
+  this._handlers = {}
 }
 
 /**
@@ -25,23 +25,27 @@ function EventDispatcher() {
  * @param {function} callback   Callback function.
  * @param {Object}   [context] 'This' object for the callback.
  */
-EventDispatcher.prototype.addEventListener = function (type, callback, context) {
-  let handlers = this._handlers[type];
+EventDispatcher.prototype.addEventListener = function (
+  type,
+  callback,
+  context
+) {
+  let handlers = this._handlers[type]
 
   if (!handlers) {
-    this._handlers[type] = [];
-    handlers = this._handlers[type];
+    this._handlers[type] = []
+    handlers = this._handlers[type]
   }
 
-  const params = [callback, context];
+  const params = [callback, context]
   function _checkPar(par) {
-    return par[0] === params[0] && par[1] === params[1];
+    return par[0] === params[0] && par[1] === params[1]
   }
 
   if (_.find(handlers, _checkPar) === undefined) {
-    handlers.push(params);
+    handlers.push(params)
   }
-};
+}
 
 /**
  * Removes a previously-bound callback function from an object.
@@ -53,16 +57,24 @@ EventDispatcher.prototype.addEventListener = function (type, callback, context) 
  * @param {function} [callback]  Callback function.
  * @param {Object}   [context]  'This' object for the callback.
  */
-EventDispatcher.prototype.removeEventListener = function (type, callback, context) {
-  const self = this;
+EventDispatcher.prototype.removeEventListener = function (
+  type,
+  callback,
+  context
+) {
+  const self = this
   _.forEach(self._handlers, (handler, ev) => {
-    _.remove(handler, (values) => isUndefOrEqual(type, ev)
-          && isUndefOrEqual(callback, values[0])
-          && isUndefOrEqual(context, values[1] || self));
-  });
+    _.remove(
+      handler,
+      (values) =>
+        isUndefOrEqual(type, ev) &&
+        isUndefOrEqual(callback, values[0]) &&
+        isUndefOrEqual(context, values[1] || self)
+    )
+  })
 
-  this._handlers = _.omitBy(self._handlers, (handler) => handler.length === 0);
-};
+  this._handlers = _.omitBy(self._handlers, (handler) => handler.length === 0)
+}
 
 /**
  * Makes all the callbacks for the specific `event` to trigger.
@@ -70,12 +82,12 @@ EventDispatcher.prototype.removeEventListener = function (type, callback, contex
  * @param {string} event.type Type of the event.
  */
 EventDispatcher.prototype.dispatchEvent = function (event) {
-  const self = this;
+  const self = this
 
   _.forEach(this._handlers[event.type], (callback) => {
-    const context = callback[1] || self;
-    callback[0].apply(context, [event]);
-  });
-};
+    const context = callback[1] || self
+    callback[0].apply(context, [event])
+  })
+}
 
-export default EventDispatcher;
+export default EventDispatcher

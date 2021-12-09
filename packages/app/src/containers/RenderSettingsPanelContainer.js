@@ -1,9 +1,9 @@
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 
-import RenderSettingsPanel from '../components/menu/panelslist/panels/RenderSettingsPanel.jsx';
+import RenderSettingsPanel from '../components/menu/panelslist/panels/RenderSettingsPanel.jsx'
 
 const mapStateToProps = (state) => ({
-  viewer: state.info.viewer,
-});
+  viewer: state.info.viewer
+})
 
-export default connect(mapStateToProps)(RenderSettingsPanel);
+export default connect(mapStateToProps)(RenderSettingsPanel)

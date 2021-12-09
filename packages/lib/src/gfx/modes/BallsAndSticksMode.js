@@ -1,41 +1,41 @@
 /* eslint-disable no-magic-numbers */
-import Mode from './Mode';
+import Mode from './Mode'
 
 class BallsAndSticksMode extends Mode {
-  static id = 'BS';
+  static id = 'BS'
 
   calcAtomRadius(atom) {
-    return atom.element.radius * this.opts.atom;
+    return atom.element.radius * this.opts.atom
   }
 
   calcStickRadius() {
-    return this.opts.bond;
+    return this.opts.bond
   }
 
   getAromRadius() {
-    return this.opts.aromrad;
+    return this.opts.aromrad
   }
 
   showAromaticLoops() {
-    return this.opts.showarom;
+    return this.opts.showarom
   }
 
   calcSpaceFraction() {
-    return this.opts.space;
+    return this.opts.space
   }
 
   drawMultiorderBonds() {
-    return this.opts.multibond;
+    return this.opts.multibond
   }
 }
 
-BallsAndSticksMode.prototype.id = 'BS';
-BallsAndSticksMode.prototype.name = 'Balls and Sticks';
-BallsAndSticksMode.prototype.shortName = 'Balls';
+BallsAndSticksMode.prototype.id = 'BS'
+BallsAndSticksMode.prototype.name = 'Balls and Sticks'
+BallsAndSticksMode.prototype.shortName = 'Balls'
 BallsAndSticksMode.prototype.depGroups = [
   'AtomsSpheres',
   'BondsCylinders',
-  'ALoopsTorus',
-];
+  'ALoopsTorus'
+]
 
-export default BallsAndSticksMode;
+export default BallsAndSticksMode

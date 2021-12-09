@@ -1,14 +1,14 @@
-import React from 'react';
-import Switch from 'bootstrap-switch-button-react';
-import { InputGroup, FormControl, Button } from 'react-bootstrap';
-import { FaFolderOpen } from 'react-icons/fa';
+import React from 'react'
+import Switch from 'bootstrap-switch-button-react'
+import { InputGroup, FormControl, Button } from 'react-bootstrap'
+import { FaFolderOpen } from 'react-icons/fa'
 
-import './LoadPanel.scss';
+import './LoadPanel.scss'
 
 function LoadPanel() {
   return (
     <div className="load-panel">
-     <div className="data-load-label">Data to load</div>
+      <div className="data-load-label">Data to load</div>
       <InputGroup className="mb-3">
         <FormControl size="sm" placeholder="PDB ID or URL..." />
         <InputGroup.Text className="load-button">
@@ -24,7 +24,7 @@ function LoadPanel() {
         </li>
       </ul>
     </div>
-  );
+  )
 }
 
-export default LoadPanel;
+export default LoadPanel

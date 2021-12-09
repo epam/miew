@@ -1,17 +1,17 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react'
 
-import './DisplayPreference.scss';
-import Thumbnail from './thumbnail/Thumbnail.jsx';
+import './DisplayPreference.scss'
+import Thumbnail from './thumbnail/Thumbnail.jsx'
 
 function DisplayPreferences({
   options,
   viewer,
   showDisplayPreference,
-  preferenceName,
+  preferenceName
 }) {
-  const ref = useRef();
-  const repr = viewer.rep(viewer.repCurrent());
-  const instances = options.all.map((E) => new E());
+  const ref = useRef()
+  const repr = viewer.rep(viewer.repCurrent())
+  const instances = options.all.map((E) => new E())
 
   const Thumbnails = instances.map(({ shortName, id }, index) => (
     <Thumbnail
@@ -21,22 +21,22 @@ function DisplayPreferences({
       selected={repr[preferenceName] === id}
       preferenceName={preferenceName}
       onClick={() => {
-        viewer.rep({ [preferenceName]: id });
-        showDisplayPreference();
+        viewer.rep({ [preferenceName]: id })
+        showDisplayPreference()
       }}
     />
-  ));
+  ))
 
   const handleClickOutside = ({ target }) => {
     if (!ref.current.contains(target)) {
-      showDisplayPreference();
+      showDisplayPreference()
     }
-  };
+  }
 
   useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
 
   return (
     <div className="display-preference-container" ref={ref}>
@@ -45,7 +45,7 @@ function DisplayPreferences({
         <div className="thumbnail-group">{Thumbnails}</div>
       </div>
     </div>
-  );
+  )
 }
 
-export default DisplayPreferences;
+export default DisplayPreferences

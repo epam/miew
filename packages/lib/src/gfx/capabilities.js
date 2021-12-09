@@ -1,5 +1,4 @@
 export default {
-
   precision: 'mediump',
 
   /**
@@ -7,6 +6,6 @@ export default {
    * @param {THREE.WebGLRenderer} renderer
    */
   init(renderer) {
-    this.precision = renderer.capabilities.getMaxPrecision('highp');
-  },
-};
+    this.precision = renderer.capabilities.getMaxPrecision('highp')
+  }
+}

@@ -3,15 +3,17 @@ module.exports = {
   output: {
     path: __dirname,
     chunkFilename: '[name].bundle.js',
-    filename: 'miew_via_webpack.bundle.js',
+    filename: 'miew_via_webpack.bundle.js'
   },
   module: {
-    rules: [{
-      test: /\.css$/,
-      use: ['style-loader', 'css-loader'],
-    }],
+    rules: [
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
   },
   performance: {
-    hints: false,
-  },
-};
+    hints: false
+  }
+}

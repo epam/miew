@@ -1,4 +1,4 @@
-import StructuralElement from './StructuralElement';
+import StructuralElement from './StructuralElement'
 
 /**
  * A single strand of a sheet in a protein secondary structure.
@@ -19,13 +19,13 @@ class Strand extends StructuralElement {
    * @param {Atom} atomPrev Atom in previous strand (see PDB Format).
    */
   constructor(sheet, init, term, sense, atomCur, atomPrev) {
-    super(StructuralElement.Type.STRAND, init, term);
+    super(StructuralElement.Type.STRAND, init, term)
 
     /**
      * Parent sheet this strand belongs to.
      * @type {Sheet}
      */
-    this.sheet = sheet;
+    this.sheet = sheet
     /**
      * Sense of strand with respect to previous strand in the sheet.
      * - 0 if the first strand,
@@ -33,17 +33,17 @@ class Strand extends StructuralElement {
      * - -1 if anti-parallel.
      * @type {number}
      */
-    this.sense = sense;
+    this.sense = sense
     /**
      * Atom in current strand (see PDB Format).
      * @type {Atom}
      */
-    this.atomCur = atomCur;
+    this.atomCur = atomCur
     /**
      * Atom in previous strand (see PDB Format).
      * @type {Atom}
      */
-    this.atomPrev = atomPrev;
+    this.atomPrev = atomPrev
   }
 
   /**
@@ -59,17 +59,17 @@ class Strand extends StructuralElement {
    * @override
    */
   _finalize(serialAtomMap, residueHash, complex) {
-    super._finalize(serialAtomMap, residueHash, complex);
+    super._finalize(serialAtomMap, residueHash, complex)
 
-    let as = this.atomCur;
+    let as = this.atomCur
     if (as !== null && !Number.isNaN(as)) {
-      this.atomCur = serialAtomMap[as];
+      this.atomCur = serialAtomMap[as]
     }
-    as = this.atomPrev;
+    as = this.atomPrev
     if (as !== null && !Number.isNaN(as)) {
-      this.atomPrev = serialAtomMap[as];
+      this.atomPrev = serialAtomMap[as]
     }
   }
 }
 
-export default Strand;
+export default Strand

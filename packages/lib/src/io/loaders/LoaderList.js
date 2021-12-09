@@ -1,4 +1,4 @@
-import EntityList from '../../utils/EntityList';
+import EntityList from '../../utils/EntityList'
 
 /**
  * A list of available loaders.
@@ -16,7 +16,7 @@ class LoaderList extends EntityList {
    * @see LoaderList#register
    */
   constructor(someLoaders = []) {
-    super(someLoaders, ['types']);
+    super(someLoaders, ['types'])
   }
 
   /**
@@ -27,14 +27,17 @@ class LoaderList extends EntityList {
    * @param {*=} specs.source Source to load from.
    */
   find(specs) {
-    let list = [];
+    let list = []
     if (specs.type) {
-      list = this._dict.types[specs.type.toLowerCase()] || [];
+      list = this._dict.types[specs.type.toLowerCase()] || []
     } else if (specs.source) {
-      return this._list.filter((SomeLoader) => SomeLoader.canProbablyLoad && SomeLoader.canProbablyLoad(specs.source));
+      return this._list.filter(
+        (SomeLoader) =>
+          SomeLoader.canProbablyLoad && SomeLoader.canProbablyLoad(specs.source)
+      )
     }
-    return [...list];
+    return [...list]
   }
 }
 
-export default LoaderList;
+export default LoaderList

@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import settings from '../../settings';
-import utils from '../../utils';
-import palettes from '../palettes';
+import _ from 'lodash'
+import settings from '../../settings'
+import utils from '../../utils'
+import palettes from '../palettes'
 
 /**
  * Create new colorer.
@@ -20,18 +20,21 @@ import palettes from '../palettes';
 class Colorer {
   constructor(opts) {
     if (this.constructor === Colorer) {
-      throw new Error('Can not instantiate abstract class!');
+      throw new Error('Can not instantiate abstract class!')
     }
     /**
      * Colorer options inherited (prototyped) from defaults.
      * @type {object}
      */
-    this.opts = _.merge(utils.deriveDeep(settings.now.colorers[this.id], true), opts);
+    this.opts = _.merge(
+      utils.deriveDeep(settings.now.colorers[this.id], true),
+      opts
+    )
     /**
      * Palette in use.
      * @type {Palette}
      */
-    this.palette = palettes.first;
+    this.palette = palettes.first
   }
 
   /**
@@ -41,11 +44,11 @@ class Colorer {
    * Options are returned if they were changed during or after colorer creation.
    */
   identify() {
-    const diff = utils.objectsDiff(this.opts, settings.now.colorers[this.id]);
+    const diff = utils.objectsDiff(this.opts, settings.now.colorers[this.id])
     if (!_.isEmpty(diff)) {
-      return [this.id, diff];
+      return [this.id, diff]
     }
-    return this.id;
+    return this.id
   }
 }
 
@@ -54,6 +57,6 @@ class Colorer {
  * @type {string}
  */
 
-Colorer.prototype.id = '__';
+Colorer.prototype.id = '__'
 
-export default Colorer;
+export default Colorer

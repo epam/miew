@@ -1,4 +1,4 @@
-import Residue from './Residue';
+import Residue from './Residue'
 
 /** An element of protein secondary structure. */
 class StructuralElement {
@@ -14,22 +14,22 @@ class StructuralElement {
      * Secondary structure type.
      * @type {StructuralElement.Type}
      */
-    this.type = type;
+    this.type = type
     /**
      * Generic secondary structure type.
      * @type {StructuralElement.Generic}
      */
-    this.generic = StructuralElement.genericByType[this.type] || 'loop';
+    this.generic = StructuralElement.genericByType[this.type] || 'loop'
     /**
      * Initial residue.
      * @type Residue
      */
-    this.init = init;
+    this.init = init
     /**
      * Terminal residue.
      * @type Residue
      */
-    this.term = term;
+    this.term = term
   }
 
   /**
@@ -44,26 +44,26 @@ class StructuralElement {
    */
   _finalize(serialAtomMap, residueHash, complex) {
     if (this.init instanceof Residue && this.term instanceof Residue) {
-      return;
+      return
     }
 
     // Link all intermediate residues to this structural element
-    const start = complex.splitUnifiedSerial(this.init);
-    const end = complex.splitUnifiedSerial(this.term);
+    const start = complex.splitUnifiedSerial(this.init)
+    const end = complex.splitUnifiedSerial(this.term)
     for (let chainId = start.chain; chainId <= end.chain; chainId++) {
       for (let serialId = start.serial; serialId <= end.serial; serialId++) {
         for (let { iCode } = start; iCode <= end.iCode; iCode++) {
-          const hashCode = complex.getUnifiedSerial(chainId, serialId, iCode);
+          const hashCode = complex.getUnifiedSerial(chainId, serialId, iCode)
           if (residueHash[hashCode]) {
-            residueHash[hashCode]._secondary = this;
+            residueHash[hashCode]._secondary = this
           }
         }
       }
     }
 
     // Replace unfined serials by objects
-    this.init = residueHash[this.init];
-    this.term = residueHash[this.term];
+    this.init = residueHash[this.init]
+    this.term = residueHash[this.term]
   }
 }
 
@@ -99,8 +99,8 @@ StructuralElement.Type = {
   /** A bend (a region of high curvature). */
   BEND: 'S',
   /** Just a protein section with no particular conformation. */
-  COIL: 'C',
-};
+  COIL: 'C'
+}
 
 /**
  * Generic type of a secondary structural element.
@@ -113,11 +113,11 @@ StructuralElement.Generic = {
   /** A helix. */
   HELIX: 'helix',
   /** Just a protein section with no particular conformation. */
-  LOOP: 'loop',
-};
+  LOOP: 'loop'
+}
 
-const StructuralElementType = StructuralElement.Type;
-const StructuralElementGeneric = StructuralElement.Generic;
+const StructuralElementType = StructuralElement.Type
+const StructuralElementGeneric = StructuralElement.Generic
 
 /**
  * A mapping from specific types to generic ones.
@@ -128,7 +128,7 @@ StructuralElement.genericByType = {
   [StructuralElementType.HELIX_310]: StructuralElementGeneric.HELIX,
   [StructuralElementType.HELIX_ALPHA]: StructuralElementGeneric.HELIX,
   [StructuralElementType.HELIX_PI]: StructuralElementGeneric.HELIX,
-  [StructuralElementType.HELIX]: StructuralElementGeneric.HELIX,
-};
+  [StructuralElementType.HELIX]: StructuralElementGeneric.HELIX
+}
 
-export default StructuralElement;
+export default StructuralElement

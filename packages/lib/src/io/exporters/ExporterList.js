@@ -1,4 +1,4 @@
-import EntityList from '../../utils/EntityList';
+import EntityList from '../../utils/EntityList'
 
 /**
  * A list of available exporters.
@@ -16,7 +16,7 @@ class ExporterList extends EntityList {
    * @see ExporterList#register
    */
   constructor(someExporters = []) {
-    super(someExporters, ['formats']);
+    super(someExporters, ['formats'])
   }
 
   /**
@@ -27,12 +27,12 @@ class ExporterList extends EntityList {
    * @param {*=} specs.data Data to export.
    */
   find(specs) {
-    let list = [];
+    let list = []
     if (specs.format) {
-      list = this._dict.formats[specs.format.toLowerCase()] || [];
+      list = this._dict.formats[specs.format.toLowerCase()] || []
     }
-    return [...list];
+    return [...list]
   }
 }
 
-export default ExporterList;
+export default ExporterList

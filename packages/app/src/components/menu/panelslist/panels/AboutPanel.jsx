@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 
-import './AboutPanel.scss';
+import './AboutPanel.scss'
 
 const AboutPanel = ({ version }) => (
   <div className="about-panel">
@@ -119,6 +119,6 @@ const AboutPanel = ({ version }) => (
       </tbody>
     </table>
   </div>
-);
+)
 
-export default AboutPanel;
+export default AboutPanel

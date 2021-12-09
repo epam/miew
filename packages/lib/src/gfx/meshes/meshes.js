@@ -1,11 +1,11 @@
-import * as THREE from 'three';
-import UberObject from './UberObject';
-import ZSpriteMesh from './ZSpriteMesh';
-import ZClippedMesh from './ZClippedMesh';
-import TextMesh from './TextMesh';
-import SimpleMesh from './SimpleMesh';
-import ThickLineMesh from './ThickLineMesh';
-import InstancedMesh from './InstancedMesh';
+import * as THREE from 'three'
+import UberObject from './UberObject'
+import ZSpriteMesh from './ZSpriteMesh'
+import ZClippedMesh from './ZClippedMesh'
+import TextMesh from './TextMesh'
+import SimpleMesh from './SimpleMesh'
+import ThickLineMesh from './ThickLineMesh'
+import InstancedMesh from './InstancedMesh'
 
 export default {
   ZClipped: ZClippedMesh,
@@ -15,5 +15,5 @@ export default {
   LineSegments: UberObject(THREE.LineSegments),
   Mesh: SimpleMesh,
   ThickLineMesh,
-  Instanced: InstancedMesh,
-};
+  Instanced: InstancedMesh
+}

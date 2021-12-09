@@ -1,15 +1,15 @@
-import IsoSurfaceMode from './IsoSurfaceMode';
+import IsoSurfaceMode from './IsoSurfaceMode'
 
 class IsoSurfaceSASMode extends IsoSurfaceMode {
-  static id = 'SA';
+  static id = 'SA'
 
   constructor(opts) {
-    super(false, opts);
+    super(false, opts)
   }
 }
 
-IsoSurfaceSASMode.prototype.id = 'SA';
-IsoSurfaceSASMode.prototype.name = 'Solvent Accessible Surface';
-IsoSurfaceSASMode.prototype.shortName = 'SAS';
+IsoSurfaceSASMode.prototype.id = 'SA'
+IsoSurfaceSASMode.prototype.name = 'Solvent Accessible Surface'
+IsoSurfaceSASMode.prototype.shortName = 'SAS'
 
-export default IsoSurfaceSASMode;
+export default IsoSurfaceSASMode

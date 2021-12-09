@@ -1,4 +1,4 @@
-import Colorer from './Colorer';
+import Colorer from './Colorer'
 
 /**
  * Create new colorer.
@@ -13,23 +13,23 @@ import Colorer from './Colorer';
  * @classdesc Coloring algorithm based on chemical element.
  */
 class ElementColorer extends Colorer {
-  static id = 'EL';
+  static id = 'EL'
 
   getAtomColor(atom, _complex) {
-    const type = atom.element.name;
+    const type = atom.element.name
     if (type === 'C' && this.opts.carbon >= 0) {
-      return this.opts.carbon;
+      return this.opts.carbon
     }
-    return this.palette.getElementColor(type);
+    return this.palette.getElementColor(type)
   }
 
   getResidueColor(_residue, _complex) {
-    return this.palette.defaultResidueColor;
+    return this.palette.defaultResidueColor
   }
 }
 
-ElementColorer.prototype.id = 'EL';
-ElementColorer.prototype.name = 'Element';
-ElementColorer.prototype.shortName = 'Element';
+ElementColorer.prototype.id = 'EL'
+ElementColorer.prototype.name = 'Element'
+ElementColorer.prototype.shortName = 'Element'
 
-export default ElementColorer;
+export default ElementColorer

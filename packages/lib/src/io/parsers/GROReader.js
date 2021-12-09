@@ -1,4 +1,4 @@
-import PDBStream from './PDBStream';
+import PDBStream from './PDBStream'
 
 /**
  * Little helper class for GRO Parser usage.
@@ -6,10 +6,10 @@ import PDBStream from './PDBStream';
  */
 class GROReader extends PDBStream {
   constructor(data) {
-    super(data);
+    super(data)
     /** @type Number */
-    this._next = -1; // End position of line
-    this.next();
+    this._next = -1 // End position of line
+    this.next()
   }
 
   /**
@@ -17,8 +17,8 @@ class GROReader extends PDBStream {
    * @returns {Number} Pointer to end of string
    */
   getNext() {
-    return this._next;
+    return this._next
   }
 }
 
-export default GROReader;
+export default GROReader

@@ -1,7 +1,7 @@
-import SurfaceMode from './SurfaceMode';
+import SurfaceMode from './SurfaceMode'
 
 class ContactSurfaceMode extends SurfaceMode {
-  static id = 'CS';
+  static id = 'CS'
 
   getSurfaceOpts() {
     return {
@@ -12,15 +12,15 @@ class ContactSurfaceMode extends SurfaceMode {
       isoValue: this.opts.isoValue,
       probePositions: this.opts.probePositions,
       zClip: this.opts.zClip,
-      visibilitySelector: this.getVisibilitySelector(),
-    };
+      visibilitySelector: this.getVisibilitySelector()
+    }
   }
 }
 
-ContactSurfaceMode.prototype.id = 'CS';
-ContactSurfaceMode.prototype.name = 'Contact Surface';
-ContactSurfaceMode.prototype.shortName = 'Contact Surf';
-ContactSurfaceMode.prototype.isSurface = true;
-ContactSurfaceMode.prototype.surfaceNames = ['ContactSurfaceGeo'];
+ContactSurfaceMode.prototype.id = 'CS'
+ContactSurfaceMode.prototype.name = 'Contact Surface'
+ContactSurfaceMode.prototype.shortName = 'Contact Surf'
+ContactSurfaceMode.prototype.isSurface = true
+ContactSurfaceMode.prototype.surfaceNames = ['ContactSurfaceGeo']
 
-export default ContactSurfaceMode;
+export default ContactSurfaceMode

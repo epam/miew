@@ -1,20 +1,20 @@
-import React from 'react';
+import React from 'react'
 
-import ButtonToolbar from 'react-bootstrap/ButtonToolbar';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import { FiMenu, FiChevronRight } from 'react-icons/fi';
-import { AiOutlinePicture } from 'react-icons/ai';
-import { GiDrop } from 'react-icons/gi';
+import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import { FiMenu, FiChevronRight } from 'react-icons/fi'
+import { AiOutlinePicture } from 'react-icons/ai'
+import { GiDrop } from 'react-icons/gi'
 
-import TitlebarButton from '../../../containers/TitlebarButtonContainer';
+import TitlebarButton from '../../../containers/TitlebarButtonContainer'
 import {
   showDisplayColor,
   showDisplayMode,
   showTerminal,
-  showNav,
-} from '../../../actions';
+  showNav
+} from '../../../actions'
 
-import './TitleBar.scss';
+import './TitleBar.scss'
 
 // TODO move title to separate componen
 // TODO solve the font for the whole app
@@ -26,10 +26,12 @@ const Titlebar = ({ loadingStage, isPanelListVisible }) => {
       tip="Menu"
       dispatchFunction={showNav}
     />
-  );
+  )
 
   return isPanelListVisible ? (
-    <ButtonToolbar className="titlebar titlebar-panels-list">{menuButton}</ButtonToolbar>
+    <ButtonToolbar className="titlebar titlebar-panels-list">
+      {menuButton}
+    </ButtonToolbar>
   ) : (
     <ButtonToolbar className="titlebar">
       <ButtonGroup>
@@ -58,7 +60,7 @@ const Titlebar = ({ loadingStage, isPanelListVisible }) => {
         />
       </ButtonGroup>
     </ButtonToolbar>
-  );
-};
+  )
+}
 
-export default Titlebar;
+export default Titlebar
