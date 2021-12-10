@@ -19,6 +19,7 @@
     "react/prop-types": "off",
     "no-prototype-builtins": "warn",
     "no-undef": "warn",
+    "workspaces/no-absolute-imports": "warn",
     "@typescript-eslint/no-unused-vars": [
       "off", {
         "argsIgnorePattern": "^_",

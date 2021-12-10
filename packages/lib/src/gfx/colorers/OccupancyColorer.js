@@ -8,7 +8,7 @@ import Colorer from './Colorer'
  * @see Occupancy
  *
  * @exports OccupancyColorer
- * @augments Occupancy
+ * @arugments Occupancy
  * @constructor
  * @classdesc Coloring algorithm based on occupancy of chemical element.
  */
