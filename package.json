@@ -8,21 +8,18 @@
     "packages/*"
   ],
   "scripts": {
+    "prepare": "husky install",
+    "precommit": "lint-staged --allow-empty",
+    "build": "yarn workspaces foreach -ptv run build",
+    "test": "yarn workspaces foreach -v run test",
+    "serve": "cd packages/lib && yarn serve",
     "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
     "coveralls": "cat coverage/general.info | coveralls",
     "build:ci": "yarn workspaces foreach -ptv run ci"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
-    "@babel/plugin-transform-runtime": "^7.12.1",
-    "@babel/preset-env": "^7.12.1",
-    "@babel/preset-react": "^7.12.5",
-    "@babel/preset-typescript": "^7.12.1",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
-    "babel-eslint": "^10.0.0",
     "coveralls": "^3.1.0",
     "eslint": "^8.4.1",
     "eslint-config-prettier": "^8.3.0",
@@ -31,7 +28,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
     "eslint-plugin-react": "^7.27.1",
-    "husky": "4.3.8",
+    "eslint-plugin-workspaces": "^0.7.0",
+    "husky": "7.0.4",
     "lcov-result-merger": "^3.1.0",
     "lint-staged": "^12.1.2",
     "npm-run-all": "^4.1.5",
@@ -43,25 +41,7 @@
     "stylelint-config-recommended-scss": "^4.3.0",
     "stylelint-config-standard": "^22.0.0",
     "stylelint-prettier": "^2.0.0",
-    "stylelint-scss": "^4.0.0",
-    "typescript": "^4.5.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged --allow-empty"
-    }
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "*.{json}": [
-      "prettier --write"
-    ],
-    "*.{css,less,scss}": [
-      "stylelint --formatter verbose --fix --allow-empty-input"
-    ]
+    "stylelint-scss": "^4.0.0"
   },
   "packageManager": "yarn@3.1.1"
 }
