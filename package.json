@@ -10,7 +10,7 @@
   "scripts": {
     "prepare": "husky install",
     "precommit": "lint-staged --allow-empty",
-    "prepush": "workspaces foreach -pv run eslint",
+    "prepush": "yarn workspaces foreach -pv run eslint",
     "build": "yarn workspaces foreach -ptv run build",
     "test": "yarn workspaces foreach -v run test",
     "serve": "cd packages/lib && yarn serve",
