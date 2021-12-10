@@ -5,7 +5,6 @@ import commonjs from '@rollup/plugin-commonjs'
 import copy from 'rollup-plugin-copy'
 import del from 'rollup-plugin-delete'
 import json from '@rollup/plugin-json'
-import path from 'path'
 import peerDepsExternal from 'rollup-plugin-peer-deps-external'
 import pkg from './package.json'
 import postcss from 'rollup-plugin-postcss'
@@ -14,7 +13,6 @@ import resolve from '@rollup/plugin-node-resolve'
 import strip from '@rollup/plugin-strip'
 import svgr from '@svgr/rollup'
 import typescript from 'rollup-plugin-typescript2'
-import branchName from 'current-git-branch'
 
 const mode = {
   PRODUCTION: 'production',
@@ -23,13 +21,6 @@ const mode = {
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx']
 const isProduction = process.env.NODE_ENV === mode.PRODUCTION
-
-const initLink = branchName => {
-  if (branchName && branchName.substring(0, 7) === 'release') {
-    return branchName
-  }
-  return 'master'
-}
 
 const config = {
   input: pkg.source,
@@ -62,8 +53,7 @@ const config = {
         'process.env.BUILD_DATE': JSON.stringify(
           new Date().toISOString().slice(0, 19)
         ),
-        'process.env.BUILD_NUMBER': JSON.stringify(undefined),
-        'process.env.HELP_LINK': JSON.stringify(initLink(branchName()))
+        'process.env.BUILD_NUMBER': JSON.stringify(undefined)
       },
       {
         include: 'src/**/*.{js,jsx,ts,tsx}'
