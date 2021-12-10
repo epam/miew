@@ -863,7 +863,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-syntax-dynamic-import@npm:^7.2.0, @babel/plugin-syntax-dynamic-import@npm:^7.8.3":
+"@babel/plugin-syntax-dynamic-import@npm:^7.8.3":
   version: 7.8.3
   resolution: "@babel/plugin-syntax-dynamic-import@npm:7.8.3"
   dependencies:
@@ -11543,7 +11543,6 @@ __metadata:
     "@babel/plugin-external-helpers": ^7.2.0
     "@babel/plugin-proposal-class-properties": ^7.12.1
     "@babel/plugin-proposal-object-rest-spread": ^7.12.1
-    "@babel/plugin-syntax-dynamic-import": ^7.2.0
     "@babel/plugin-transform-runtime": ^7.12.1
     "@babel/polyfill": ^7.8.7
     "@babel/preset-env": ^7.12.1
