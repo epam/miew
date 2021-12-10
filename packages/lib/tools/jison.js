@@ -1,18 +1,18 @@
-const fs = require('fs');
-const os = require('os');
-const jison = require('jison');
-const glob = require('glob');
+const fs = require('fs')
+const os = require('os')
+const jison = require('jison')
+const glob = require('glob')
 
 function endsWith(str, sub) {
-  return str.substr(-sub.length) === sub;
+  return str.substr(-sub.length) === sub
 }
 
 function replaceNewlines(text) {
-  text = text.replace(/\r\n?|\n/g, os.EOL);
+  text = text.replace(/\r\n?|\n/g, os.EOL)
   if (!endsWith(text, os.EOL)) {
-    text += os.EOL;
+    text += os.EOL
   }
-  return text;
+  return text
 }
 
 function wrapModule(text) {
@@ -21,42 +21,42 @@ function wrapModule(text) {
     '// DO NOT EDIT! Automatically generated from .jison',
     text,
     'module.exports = {parser: parser};',
-    '',
-  ].join(os.EOL);
+    ''
+  ].join(os.EOL)
 }
 
 function convertFile(src, dst) {
   fs.readFile(src, { encoding: 'utf8' }, (readError, grammar) => {
     if (readError) {
-      throw readError;
+      throw readError
     }
     const generator = new jison.Generator(grammar, {
       moduleType: 'js',
-      'token-stack': true, // workaround for https://github.com/zaach/jison/issues/351
-    });
-    let parserSource = generator.generate();
+      'token-stack': true // workaround for https://github.com/zaach/jison/issues/351
+    })
+    let parserSource = generator.generate()
 
-    parserSource = replaceNewlines(parserSource);
-    parserSource = wrapModule(parserSource);
+    parserSource = replaceNewlines(parserSource)
+    parserSource = wrapModule(parserSource)
 
     fs.writeFile(dst, parserSource, (writeError) => {
       if (writeError) {
-        throw writeError;
+        throw writeError
       }
-    });
-  });
+    })
+  })
 }
 
-const sources = process.argv.slice(2);
+const sources = process.argv.slice(2)
 sources.forEach((arg) => {
   glob(arg, (matchError, filenames) => {
     if (matchError) {
-      throw matchError;
+      throw matchError
     }
     filenames.forEach((src) => {
-      const dst = `${src.replace(/\.jison$/i, '')}.js`;
-      console.log(src);
-      convertFile(src, dst);
-    });
-  });
-});
+      const dst = `${src.replace(/\.jison$/i, '')}.js`
+      console.log(src)
+      convertFile(src, dst)
+    })
+  })
+})

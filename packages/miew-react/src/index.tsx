@@ -1,3 +1,3 @@
-import { Miew } from "./Miew";
+import { Miew } from './Miew'
 
-export default Miew;
+export default Miew

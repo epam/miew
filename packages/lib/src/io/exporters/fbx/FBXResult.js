@@ -18,7 +18,7 @@ Definitions:  {
   ObjectType: "GlobalSettings" {
     Count: 1
   }
-} `;
+} `
 
 // Default model properties
 const defaultProperties = `Properties60: {
@@ -93,7 +93,7 @@ const defaultProperties = `Properties60: {
       Property: "Color", "Color", "A+",0,0,0
       Property: "Size", "double", "",100
       Property: "Look", "enum", "",1
-    }`;
+    }`
 
 // Default materials layer
 const defaultMaterialLayer = `
@@ -103,7 +103,7 @@ const defaultMaterialLayer = `
       MappingInformationType: "AllSame"
       ReferenceInformationType: "Direct"
       Materials: 0
-    }`;
+    }`
 
 // Default layers block
 const defaultLayerBlock = `
@@ -121,7 +121,7 @@ const defaultLayerBlock = `
         Type: "LayerElementMaterial"
         TypedIndex: 0
       }
-    }`;
+    }`
 
 /**
  * globalSettings info in output file.
@@ -137,23 +137,23 @@ const globalSettings = `GlobalSettings: {
       Property: "CoordAxisSign", "int", "",1
       Property: "UnitScaleFactor", "double", "",1
     }
-  }`;
+  }`
 
 export default class FBXResult {
   constructor() {
-    this._resultArray = [];
-    this._info = null;
+    this._resultArray = []
+    this._info = null
   }
 
   getResult(info) {
-    this._info = info;
-    this._resultArray.push(this._writeHeader());
-    this._resultArray.push(this._writeDefinitions());
-    this._resultArray.push(this._writeObjects(info.models, info.materials));
-    this._resultArray.push(this._writeRelations());
-    this._resultArray.push(this._writeConnections()); // connections between models and materials)
-    this._info = null;
-    return this._resultArray.join('');
+    this._info = info
+    this._resultArray.push(this._writeHeader())
+    this._resultArray.push(this._writeDefinitions())
+    this._resultArray.push(this._writeObjects(info.models, info.materials))
+    this._resultArray.push(this._writeRelations())
+    this._resultArray.push(this._writeConnections()) // connections between models and materials)
+    this._info = null
+    return this._resultArray.join('')
   }
 
   /**
@@ -161,11 +161,11 @@ export default class FBXResult {
    * Some fields are really confusing, but it seems that all listed fields are very informative
    */
   _writeHeader() {
-    const FBXHeaderVersion = 1003; // 1003 is some number which appears to present in many 6.1 ASCII files
-    const FBXVersion = 6100; // Mandatory and only supported version
-    const date = new Date();
-    const timeStampVersion = 1000;
-    const creator = `Miew FBX Exporter v${this._info.version}`; // Supposed to be an engine
+    const FBXHeaderVersion = 1003 // 1003 is some number which appears to present in many 6.1 ASCII files
+    const FBXVersion = 6100 // Mandatory and only supported version
+    const date = new Date()
+    const timeStampVersion = 1000
+    const creator = `Miew FBX Exporter v${this._info.version}` // Supposed to be an engine
 
     return `; FBX 6.1.0 project file
 ; Created by ${creator} Copyright (c) 2015-2020 EPAM Systems, Inc.
@@ -192,7 +192,7 @@ FBXHeaderExtension:  {
 }
 CreationTime: "${date}"
 Creator: "${creator}"  
-`;
+`
   }
 
   /**
@@ -205,7 +205,7 @@ Creator: "${creator}"
 ;------------------------------------------------------------------
 
 ${defaultDefinitions}
-`;
+`
   }
 
   /**
@@ -214,12 +214,12 @@ ${defaultDefinitions}
    * @returns {string} string containing all models (vertices, indices, colors, normals etc)
    */
   _models() {
-    const modelVersion = 232;
-    let allModels = '';
-    const { models } = this._info;
+    const modelVersion = 232
+    let allModels = ''
+    const { models } = this._info
     for (let i = 0; i < models.length; ++i) {
-      const model = models[i];
-      const vertCount = model.verticesCount;
+      const model = models[i]
+      const vertCount = model.verticesCount
       allModels += `
   Model: "Model::${this._info.name}_${i}", "Mesh" {
     Version: ${modelVersion} 
@@ -229,29 +229,29 @@ ${defaultDefinitions}
     ${this._colorLayer(model.colors, vertCount)} 
     ${defaultMaterialLayer}  
     ${defaultLayerBlock}
-  }`;
+  }`
     }
-    return allModels;
+    return allModels
   }
 
   /**
    * Add Material info to result
    */
   _materials() {
-    const materialVersion = 102;
-    let allMaterials = '';
-    const { materials } = this._info;
+    const materialVersion = 102
+    let allMaterials = ''
+    const { materials } = this._info
     for (let i = 0; i < materials.length; ++i) {
-      const material = materials[i];
+      const material = materials[i]
       allMaterials += `
   Material: "Material::${this._info.name}_${i}_default", "" {
     Version: ${materialVersion}
     ShadingModel: "lambert"
     MultiLayer: 0
     ${this._materialProperties(material)}
-  }`;
+  }`
     }
-    return allMaterials;
+    return allMaterials
   }
 
   /**
@@ -267,24 +267,24 @@ Objects:  {
   ${this._materials()}
   ${globalSettings}
 }
-`;
+`
   }
 
   /**
    * Add Relations info to output file.
    */
   _writeRelations() {
-    let modelsList = '';
+    let modelsList = ''
     for (let i = 0; i < this._info.models.length; ++i) {
       modelsList += `
   Model: "Model::${this._info.name}_${i}", "Mesh" {
-  }`;
+  }`
     }
-    let materialList = '';
+    let materialList = ''
     for (let i = 0; i < this._info.materials.length; ++i) {
       materialList += `
   Material: "Material::${this._info.name}_${i}_default", "" {
-  }`;
+  }`
     }
 
     return `
@@ -310,24 +310,24 @@ Relations:  {
   Model: "Model::Camera Switcher", "CameraSwitcher" {
   }
   ${materialList}
-}`;
+}`
   }
 
   /**
    * Add Connections info to output file.
    */
   _writeConnections() {
-    let modelsList = '';
-    const { name } = this._info;
+    let modelsList = ''
+    const { name } = this._info
     for (let i = 0; i < this._info.models.length; ++i) {
       modelsList += `
-  Connect: "OO", "Model::${name}_${i}", "Model::Scene"`;
+  Connect: "OO", "Model::${name}_${i}", "Model::Scene"`
     }
 
-    let materialList = '';
+    let materialList = ''
     for (let i = 0; i < this._info.materials.length; ++i) {
       materialList += `
-  Connect: "OO", "Material::${name}_${i}_default", "Model::${name}_${i}"`;
+  Connect: "OO", "Material::${name}_${i}_default", "Model::${name}_${i}"`
     }
 
     return `
@@ -337,7 +337,7 @@ Relations:  {
 Connections:  {
   ${modelsList}
   ${materialList}
-}`;
+}`
   }
 
   /**
@@ -346,11 +346,11 @@ Connections:  {
    * @returns {String} String with fixed floats
    */
   _floatArrayToString(array) {
-    const str = [];
+    const str = []
     for (let i = 0; i < array.length; ++i) {
-      str[i] = array[i].toFixed(6);
+      str[i] = array[i].toFixed(6)
     }
-    return str.join(',');
+    return str.join(',')
   }
 
   /**
@@ -360,13 +360,13 @@ Connections:  {
    * @returns {string} color layer info
    */
   _colorLayer(colorArray, vertCount) {
-    const layerElementColorNumber = 0;
-    const layerElementColorVersion = 101;
-    const layerElementColorName = '';
-    const colorsStr = this._floatArrayToString(colorArray);
+    const layerElementColorNumber = 0
+    const layerElementColorVersion = 101
+    const layerElementColorName = ''
+    const colorsStr = this._floatArrayToString(colorArray)
     // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
     // As said [..Array(...)] - fastest and easiest way to produce [0, 1, .....] array
-    const colorIndices = [...Array(vertCount).keys()];
+    const colorIndices = [...Array(vertCount).keys()]
     return `
     LayerElementColor: ${layerElementColorNumber} {
       Version: ${layerElementColorVersion}
@@ -375,7 +375,7 @@ Connections:  {
       ReferenceInformationType: "Direct"
       Colors: ${colorsStr}
       ColorIndex: ${colorIndices}
-    }`;
+    }`
   }
 
   /**
@@ -384,10 +384,10 @@ Connections:  {
    * @returns {string} normal layer info
    */
   _normalLayer(normalArray) {
-    const layerElementNormalNumber = 0;
-    const layerElementNormalVersion = 101;
-    const layerElementNormalName = '';
-    const normalsStr = this._floatArrayToString(normalArray);
+    const layerElementNormalNumber = 0
+    const layerElementNormalVersion = 101
+    const layerElementNormalName = ''
+    const normalsStr = this._floatArrayToString(normalArray)
     // Mapping Information type and Reference Information type are mandatory for our Miew! Must not be changed
     return `
     LayerElementNormal: ${layerElementNormalNumber} {
@@ -396,7 +396,7 @@ Connections:  {
       MappingInformationType: "ByVertice"
       ReferenceInformationType: "Direct" 
       Normals: ${normalsStr}
-    }`;
+    }`
   }
 
   /**
@@ -404,22 +404,22 @@ Connections:  {
    * @return {string} resulting string in FBX notation
    */
   _verticesIndices(positions, indices) {
-    const multiLayer = 0;
-    const multiTake = 1;
-    const shading = 'Y';
-    const culling = 'CullingOff';
-    const geometryVersion = 124;
-    const vertStr = this._floatArrayToString(positions);
+    const multiLayer = 0
+    const multiTake = 1
+    const shading = 'Y'
+    const culling = 'CullingOff'
+    const geometryVersion = 124
+    const vertStr = this._floatArrayToString(positions)
     /* About _correctArrayNotation: Float32Arrays will contains only Float32 numbers, which implies that it will be floating points with 17 numbers after point.
-    * We cannot (and it's logically incorrect) save all this information, so we convert this Float32Array into Array-like object with numbers with only 6 numbers after point
-    * Reminder - this is big memory loss (as we must save at one moment two arrays with similar information) */
+     * We cannot (and it's logically incorrect) save all this information, so we convert this Float32Array into Array-like object with numbers with only 6 numbers after point
+     * Reminder - this is big memory loss (as we must save at one moment two arrays with similar information) */
     return `MultiLayer: ${multiLayer}
     MultiTake: ${multiTake}
     Shading: ${shading}
     Culling: "${culling}"
     Vertices: ${vertStr}
     PolygonVertexIndex: ${indices}
-    GeometryVersion: ${geometryVersion}`;
+    GeometryVersion: ${geometryVersion}`
   }
 
   /**
@@ -451,6 +451,6 @@ Connections:  {
       Property: "Shininess", "double", "",${material.shininess}
       Property: "Opacity", "double", "",${material.opacity}
       Property: "Reflectivity", "double", "",0
-    }`;
+    }`
   }
 }

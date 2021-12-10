@@ -1,11 +1,11 @@
-import _ from 'lodash';
-import logger from './utils/logger';
+import _ from 'lodash'
+import logger from './utils/logger'
 
 const browserType = {
   DEFAULT: 0,
-  SAFARI: 1,
-};
-//----------------------------------------------------------------------------
+  SAFARI: 1
+}
+// ----------------------------------------------------------------------------
 // Query string
 
 /**
@@ -25,8 +25,10 @@ const browserType = {
  * @returns {string} encoded string
  */
 function encodeQueryComponent(text, excludeExp) {
-  const encode = (code) => String.fromCharCode(parseInt(code.substr(1), 16));
-  return encodeURIComponent(text).replace(excludeExp, encode).replace(/%20/g, '+');
+  const encode = (code) => String.fromCharCode(parseInt(code.substr(1), 16))
+  return encodeURIComponent(text)
+    .replace(excludeExp, encode)
+    .replace(/%20/g, '+')
 }
 
 /**
@@ -37,7 +39,7 @@ function encodeQueryComponent(text, excludeExp) {
  * @see {@link encodeQueryComponent}
  */
 function decodeQueryComponent(text) {
-  return decodeURIComponent(text.replace(/\+/g, ' '));
+  return decodeURIComponent(text.replace(/\+/g, ' '))
 }
 
 /**
@@ -46,18 +48,22 @@ function decodeQueryComponent(text) {
  * @returns {Array} array of (key, value) pairs.
  */
 function getUrlParameters(url) {
-  url = url || window.location.search;
+  url = url || window.location.search
 
-  const query = url.substring(url.indexOf('?') + 1);
-  const search = /([^&=]+)=?([^&]*)/g;
-  const result = [];
-  let match;
+  const query = url.substring(url.indexOf('?') + 1)
+  const search = /([^&=]+)=?([^&]*)/g
+  const result = []
+  let match
 
-  while ((match = search.exec(query)) !== null) { // eslint-disable-line no-cond-assign
-    result.push([decodeQueryComponent(match[1]), decodeQueryComponent(match[2])]);
+  while ((match = search.exec(query)) !== null) {
+    // eslint-disable-line no-cond-assign
+    result.push([
+      decodeQueryComponent(match[1]),
+      decodeQueryComponent(match[2])
+    ])
   }
 
-  return result;
+  return result
 }
 
 /**
@@ -66,32 +72,32 @@ function getUrlParameters(url) {
  * @returns {Object}
  */
 function getUrlParametersAsDict(url) {
-  const result = {};
-  const a = getUrlParameters(url);
+  const result = {}
+  const a = getUrlParameters(url)
   for (let i = 0; i < a.length; ++i) {
-    const [key, value] = a[i];
-    result[key] = value;
+    const [key, value] = a[i]
+    result[key] = value
   }
-  return result;
+  return result
 }
 
 function resolveURL(str) {
   if (typeof URL !== 'undefined') {
     try {
       if (typeof window !== 'undefined') {
-        return new URL(str, window.location).href;
+        return new URL(str, window.location).href
       }
-      return new URL(str).href;
+      return new URL(str).href
     } catch (error) {
       // IE 11 has a URL object with no constructor available so just try a different approach instead
     }
   }
   if (typeof document !== 'undefined') {
-    const anchor = document.createElement('a');
-    anchor.href = str;
-    return anchor.href;
+    const anchor = document.createElement('a')
+    anchor.href = str
+    return anchor.href
   }
-  return str;
+  return str
 }
 
 /**
@@ -101,48 +107,48 @@ function resolveURL(str) {
  * @returns {RegExp} - Regular expression.
  */
 function generateRegExp(symbolStr) {
-  const symbolList = [];
+  const symbolList = []
 
   for (let i = 0, n = symbolStr.length; i < n; ++i) {
-    symbolList[symbolList.length] = symbolStr[i].charCodeAt(0).toString(16);
+    symbolList[symbolList.length] = symbolStr[i].charCodeAt(0).toString(16)
   }
 
-  const listStr = symbolList.join('|');
+  const listStr = symbolList.join('|')
 
-  return new RegExp(`%(?:${listStr})`, 'gi');
+  return new RegExp(`%(?:${listStr})`, 'gi')
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Create HTML element
 
 function createElement(tag, attrs, content) {
-  const element = document.createElement(tag);
-  let i;
-  let n;
+  const element = document.createElement(tag)
+  let i
+  let n
   if (attrs) {
-    const keys = Object.keys(attrs);
+    const keys = Object.keys(attrs)
     for (i = 0, n = keys.length; i < n; ++i) {
-      const key = keys[i];
-      element.setAttribute(key, attrs[key]);
+      const key = keys[i]
+      element.setAttribute(key, attrs[key])
     }
   }
   if (content) {
     if (!(content instanceof Array)) {
-      content = [content];
+      content = [content]
     }
     for (i = 0, n = content.length; i < n; ++i) {
-      const child = content[i];
+      const child = content[i]
       if (typeof child === 'string') {
-        element.appendChild(document.createTextNode(child));
+        element.appendChild(document.createTextNode(child))
       } else if (child instanceof HTMLElement) {
-        element.appendChild(child);
+        element.appendChild(child)
       }
     }
   }
-  return element;
+  return element
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Easy inheritance
 
 /**
@@ -154,168 +160,181 @@ function createElement(tag, attrs, content) {
  * @returns {function} Original class.
  */
 function deriveClass(cls, base, members, statics) {
-  cls.prototype = _.assign(Object.create(base.prototype), { constructor: cls }, members);
+  cls.prototype = _.assign(
+    Object.create(base.prototype),
+    { constructor: cls },
+    members
+  )
   if (statics) {
-    _.assign(cls, statics);
+    _.assign(cls, statics)
   }
-  return cls;
+  return cls
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Deep prototyping
 
 function deriveDeep(obj, needZeroOwnProperties) {
-  let res = obj;
-  let i;
-  let n;
+  let res = obj
+  let i
+  let n
   if (obj instanceof Array) {
-    res = new Array(obj.length);
+    res = new Array(obj.length)
     for (i = 0, n = obj.length; i < n; ++i) {
-      res[i] = deriveDeep(obj[i]);
+      res[i] = deriveDeep(obj[i])
     }
   } else if (obj instanceof Object) {
-    res = Object.create(obj);
-    const keys = Object.keys(obj);
+    res = Object.create(obj)
+    const keys = Object.keys(obj)
     for (i = 0, n = keys.length; i < n; ++i) {
-      const key = keys[i];
-      const value = obj[key];
-      const copy = deriveDeep(value);
+      const key = keys[i]
+      const value = obj[key]
+      const copy = deriveDeep(value)
       if (copy !== value) {
-        res[key] = copy;
+        res[key] = copy
       }
     }
     if (needZeroOwnProperties && Object.keys(res).length > 0) {
-      res = Object.create(res);
+      res = Object.create(res)
     }
   }
-  return res;
+  return res
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Colors
 
 function hexColor(color) {
-  const hex = (`0000000${color.toString(16)}`).substr(-6);
-  return `#${hex}`;
+  const hex = `0000000${color.toString(16)}`.substr(-6)
+  return `#${hex}`
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Debug tracing
 
 function DebugTracer(namespace) {
-  let enabled = false;
+  let enabled = false
 
   this.enable = function (on) {
-    enabled = on;
-  };
+    enabled = on
+  }
 
-  let indent = 0;
-  const methods = Object.keys(namespace);
+  let indent = 0
+  const methods = Object.keys(namespace)
 
   function wrap(method_, name_) {
     return function (...args) {
-      const spaces = DebugTracer.spaces.substr(0, indent * 2);
+      const spaces = DebugTracer.spaces.substr(0, indent * 2)
       if (enabled) {
-        logger.debug(`${spaces + name_} {`);
+        logger.debug(`${spaces + name_} {`)
       }
-      indent++;
-      const result = method_.apply(this, args); // eslint-disable-line no-invalid-this
-      indent--;
+      indent++
+      const result = method_.apply(this, args) // eslint-disable-line no-invalid-this
+      indent--
       if (enabled) {
-        logger.debug(`${spaces}} // ${name_}`);
+        logger.debug(`${spaces}} // ${name_}`)
       }
-      return result;
-    };
+      return result
+    }
   }
 
   for (let i = 0, n = methods.length; i < n; ++i) {
-    const name = methods[i];
-    const method = namespace[name];
+    const name = methods[i]
+    const method = namespace[name]
     if (method instanceof Function && name !== 'constructor') {
-      namespace[name] = wrap(method, name);
+      namespace[name] = wrap(method, name)
     }
   }
 }
 
-DebugTracer.spaces = '                                                                                          ';
+DebugTracer.spaces =
+  '                                                                                          '
 
 class OutOfMemoryError extends Error {
   constructor(message) {
-    super();
-    this.name = 'OutOfMemoryError';
-    this.message = message;
+    super()
+    this.name = 'OutOfMemoryError'
+    this.message = message
   }
 }
 
 function allocateTyped(TypedArrayName, size) {
-  let result = null;
+  let result = null
   try {
-    result = new TypedArrayName(size);
+    result = new TypedArrayName(size)
   } catch (e) {
     if (e instanceof RangeError) {
-      throw new OutOfMemoryError(e.message);
+      throw new OutOfMemoryError(e.message)
     } else {
-      throw e;
+      throw e
     }
   }
-  return result;
+  return result
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Float array conversion
 
 function bytesToBase64(/** ArrayBuffer */ buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
+  const bytes = new Uint8Array(buffer)
+  let binary = ''
   for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    binary += String.fromCharCode(bytes[i])
   }
-  return window.btoa(binary);
+  return window.btoa(binary)
 }
 
 function bytesFromBase64(/** string */ str) {
-  const binary = window.atob(str);
-  const bytes = new Uint8Array(binary.length);
+  const binary = window.atob(str)
+  const bytes = new Uint8Array(binary.length)
   for (let i = 0; i < bytes.length; ++i) {
-    bytes[i] = binary[i].charCodeAt(0);
+    bytes[i] = binary[i].charCodeAt(0)
   }
-  return bytes.buffer;
+  return bytes.buffer
 }
 
 function arrayToBase64(/** number[] */ array, /** function */ TypedArrayClass) {
-  return bytesToBase64(new TypedArrayClass(array).buffer);
+  return bytesToBase64(new TypedArrayClass(array).buffer)
 }
 
 function arrayFromBase64(/** string */ str, /** function */ TypedArrayClass) {
-  return Array.prototype.slice.call(new TypedArrayClass(bytesFromBase64(str)));
+  return Array.prototype.slice.call(new TypedArrayClass(bytesFromBase64(str)))
 }
 
 // NOTE: this is 1-level comparison
 function compareOptionsWithDefaults(opts, defOpts) {
-  const optsStr = [];
+  const optsStr = []
   if (defOpts && opts) {
-    const keys = Object.keys(opts);
+    const keys = Object.keys(opts)
     for (let p = 0; p < keys.length; ++p) {
-      const key = keys[p];
-      const value = opts[key];
+      const key = keys[p]
+      const value = opts[key]
       // TODO add processing for tree structure
-      if (!(value instanceof Object) && typeof defOpts[key] !== 'undefined' && defOpts[key] !== value) {
-        optsStr.push(`${key}:${value}`);
+      if (
+        !(value instanceof Object) &&
+        typeof defOpts[key] !== 'undefined' &&
+        defOpts[key] !== value
+      ) {
+        optsStr.push(`${key}:${value}`)
       }
     }
     if (optsStr.length > 0) {
-      return `!${optsStr.join()}`;
+      return `!${optsStr.join()}`
     }
   }
-  return '';
+  return ''
 }
 
 function isAlmostPlainObject(o) {
   if (_.isPlainObject(o)) {
-    return true;
+    return true
   }
-  const proto = o && Object.getPrototypeOf(o);
-  return !!proto && !proto.hasOwnProperty('constructor') && isAlmostPlainObject(proto);
+  const proto = o && Object.getPrototypeOf(o)
+  return (
+    !!proto &&
+    !proto.hasOwnProperty('constructor') &&
+    isAlmostPlainObject(proto)
+  )
 }
 
 /**
@@ -326,164 +345,177 @@ function isAlmostPlainObject(o) {
  * @param {!object} dst - an old reference object
  */
 function objectsDiff(src, dst) {
-  const diff = {};
+  const diff = {}
   _.forIn(src, (srcValue, key) => {
-    const dstValue = dst[key];
+    const dstValue = dst[key]
     if (isAlmostPlainObject(srcValue) && isAlmostPlainObject(dstValue)) {
-      const deepDiff = objectsDiff(srcValue, dstValue);
+      const deepDiff = objectsDiff(srcValue, dstValue)
       if (!_.isEmpty(deepDiff)) {
-        diff[key] = deepDiff;
+        diff[key] = deepDiff
       }
     } else if (!_.isEqual(srcValue, dstValue)) {
-      diff[key] = srcValue;
+      diff[key] = srcValue
     }
-  });
-  return diff;
+  })
+  return diff
 }
 
 function forInRecursive(object, callback) {
   function iterateThrough(obj, prefix) {
     _.forIn(obj, (value, key) => {
-      const newPref = prefix + (prefix.length > 0 ? '.' : '');
+      const newPref = prefix + (prefix.length > 0 ? '.' : '')
       if (value instanceof Object) {
-        iterateThrough(value, newPref + key);
+        iterateThrough(value, newPref + key)
       } else if (value !== undefined) {
-        callback(value, newPref + key);
+        callback(value, newPref + key)
       }
-    });
+    })
   }
-  iterateThrough(object, '');
+  iterateThrough(object, '')
 }
 
 function enquoteString(value) {
   if (_.isString(value)) {
-    return `"${value.replace(/"/g, '\\"')}"`;
+    return `"${value.replace(/"/g, '\\"')}"`
   }
-  return value;
+  return value
 }
 
 function unquoteString(value) {
   if (!_.isString(value)) {
-    return value;
+    return value
   }
   if (value[0] === '"' && value[value.length - 1] === '"') {
-    value = value.slice(1, value.length - 1);
-    return value.replace(/\\"/g, '"');
+    value = value.slice(1, value.length - 1)
+    return value.replace(/\\"/g, '"')
   }
   if (value[0] === "'" && value[value.length - 1] === "'") {
-    value = value.slice(1, value.length - 1);
-    return value.replace(/\\'/g, "'");
+    value = value.slice(1, value.length - 1)
+    return value.replace(/\\'/g, "'")
   }
-  throw new SyntaxError('Incorrect string format, can\'t unqute it');
+  throw new SyntaxError("Incorrect string format, can't unqute it")
 }
 
 function getFileExtension(fileName) {
-  return fileName.slice((Math.max(0, fileName.lastIndexOf('.')) || Infinity));
+  return fileName.slice(Math.max(0, fileName.lastIndexOf('.')) || Infinity)
 }
 
 function splitFileName(fileName) {
-  const ext = getFileExtension(fileName);
-  const name = fileName.slice(0, fileName.length - ext.length);
-  return [name, ext];
+  const ext = getFileExtension(fileName)
+  const name = fileName.slice(0, fileName.length - ext.length)
+  return [name, ext]
 }
 
 function dataUrlToBlob(url) {
-  const parts = url.split(/[:;,]/);
-  const partsCount = parts.length;
+  const parts = url.split(/[:;,]/)
+  const partsCount = parts.length
   if (partsCount >= 3 && parts[partsCount - 2] === 'base64') {
-    return new Blob([bytesFromBase64(parts[partsCount - 1])]);
+    return new Blob([bytesFromBase64(parts[partsCount - 1])])
   }
-  return null;
+  return null
 }
 
 function getBrowser() {
-  if (navigator.vendor && navigator.vendor.indexOf('Apple') > -1
-    && navigator.userAgent
-    && navigator.userAgent.indexOf('CriOS') === -1
-    && navigator.userAgent.indexOf('FxiOS') === -1) {
-    return browserType.SAFARI;
+  if (
+    navigator.vendor &&
+    navigator.vendor.indexOf('Apple') > -1 &&
+    navigator.userAgent &&
+    navigator.userAgent.indexOf('CriOS') === -1 &&
+    navigator.userAgent.indexOf('FxiOS') === -1
+  ) {
+    return browserType.SAFARI
   }
-  return browserType.DEFAULT;
+  return browserType.DEFAULT
 }
 
 function shotOpen(url) {
   if (typeof window !== 'undefined') {
-    window.open().document.write(`<body style="margin:0"><img src="${url}" /></body>`);
+    window
+      .open()
+      .document.write(`<body style="margin:0"><img src="${url}" /></body>`)
   }
 }
 
 function shotDownload(dataUrl, filename) {
   if (!dataUrl || dataUrl.substr(0, 5) !== 'data:') {
-    return;
+    return
   }
   if (!filename) {
-    filename = ['screenshot-', +new Date(), '.png'].join('');
+    filename = ['screenshot-', +new Date(), '.png'].join('')
   }
-  if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveBlob) {
-    window.navigator.msSaveBlob(dataUrlToBlob(dataUrl), filename);
+  if (
+    typeof window !== 'undefined' &&
+    window.navigator &&
+    window.navigator.msSaveBlob
+  ) {
+    window.navigator.msSaveBlob(dataUrlToBlob(dataUrl), filename)
   } else if (typeof document !== 'undefined') {
-    const link = document.createElement('a');
-    link.download = filename;
-    link.innerHTML = 'download';
-    link.href = window.URL.createObjectURL(dataUrlToBlob(dataUrl));
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const link = document.createElement('a')
+    link.download = filename
+    link.innerHTML = 'download'
+    link.href = window.URL.createObjectURL(dataUrlToBlob(dataUrl))
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 }
 
 function download(data, filename, type) {
-  const blobData = new Blob([data]);
+  const blobData = new Blob([data])
 
   if (!filename) {
-    filename = ['data', +new Date()].join('');
+    filename = ['data', +new Date()].join('')
   }
 
   if (!type) {
-    filename += blobData.type || '.bin';
+    filename += blobData.type || '.bin'
   } else {
-    filename += `.${type}`;
+    filename += `.${type}`
   }
 
-  if (typeof window !== 'undefined' && window.navigator && window.navigator.msSaveBlob) {
-    window.navigator.msSaveBlob(blobData, filename);
+  if (
+    typeof window !== 'undefined' &&
+    window.navigator &&
+    window.navigator.msSaveBlob
+  ) {
+    window.navigator.msSaveBlob(blobData, filename)
   } else if (typeof document !== 'undefined') {
-    const link = document.createElement('a');
-    link.download = filename;
-    link.innerHTML = 'download';
-    link.href = window.URL.createObjectURL(blobData);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const link = document.createElement('a')
+    link.download = filename
+    link.innerHTML = 'download'
+    link.href = window.URL.createObjectURL(blobData)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 }
 
 function copySubArrays(src, dst, indices, itemSize) {
   for (let i = 0, n = indices.length; i < n; ++i) {
     for (let j = 0; j < itemSize; ++j) {
-      dst[i * itemSize + j] = src[indices[i] * itemSize + j];
+      dst[i * itemSize + j] = src[indices[i] * itemSize + j]
     }
   }
 }
 
 function shallowCloneNode(node) {
-  const newNode = node.cloneNode(true);
-  newNode.worldPos = node.worldPos;
+  const newNode = node.cloneNode(true)
+  newNode.worldPos = node.worldPos
   // .style property is readonly, so "newNode.style = node.style;" won't work (and we don't need it, right?)
-  return newNode;
+  return newNode
 }
 
-const unquotedStringRE = /^[a-zA-Z0-9_]*$/;
-const enquoteHelper = ['"', '', '"'];
+const unquotedStringRE = /^[a-zA-Z0-9_]*$/
+const enquoteHelper = ['"', '', '"']
 
 // verify and correct if needed selctor identifier
 function correctSelectorIdentifier(value) {
   if (unquotedStringRE.test(value)) {
-    return value;
+    return value
   }
   // quote incorrect identifier
-  enquoteHelper[1] = value;
-  return enquoteHelper.join('');
+  enquoteHelper[1] = value
+  return enquoteHelper.join('')
 }
 
 /**
@@ -495,10 +527,10 @@ function correctSelectorIdentifier(value) {
  * @returns{TypedArray} resulting concatenated array
  */
 function concatTypedArraysUnsafe(first, second) {
-  const result = new first.constructor(first.length + second.length);
-  result.set(first);
-  result.set(second, first.length);
-  return result;
+  const result = new first.constructor(first.length + second.length)
+  result.set(first)
+  result.set(second, first.length)
+  return result
 }
 
 /**
@@ -508,21 +540,21 @@ function concatTypedArraysUnsafe(first, second) {
  */
 function mergeTypedArraysUnsafe(array) {
   if (array.length <= 0) {
-    return null;
+    return null
   }
   // count the size
-  const size = array.reduce((acc, cur) => acc + cur.length, 0);
+  const size = array.reduce((acc, cur) => acc + cur.length, 0)
   // create combined array
-  const result = new array[0].constructor(size);
+  const result = new array[0].constructor(size)
   for (let i = 0, start = 0; i < array.length; i++) {
-    const count = array[i].length;
-    result.set(array[i], start);
-    start += count;
+    const count = array[i].length
+    result.set(array[i], start)
+    start += count
   }
-  return result;
+  return result
 }
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Exports
 
 export default {
@@ -559,5 +591,5 @@ export default {
   splitFileName,
   download,
   concatTypedArraysUnsafe,
-  mergeTypedArraysUnsafe,
-};
+  mergeTypedArraysUnsafe
+}

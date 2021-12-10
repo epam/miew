@@ -1,29 +1,29 @@
-import React from 'react';
+import React from 'react'
 
 const RenderSettingsPanel = () => {
   const options = [
     {
-      name: 'Resolution',
+      name: 'Resolution'
     },
     {
-      name: 'Resolution autodetection',
+      name: 'Resolution autodetection'
     },
     {
-      name: 'Fog',
+      name: 'Fog'
     },
     {
-      name: 'Axes',
+      name: 'Axes'
     },
     {
-      name: 'FPS counter',
+      name: 'FPS counter'
     },
     {
-      name: 'FPS counter',
+      name: 'FPS counter'
     },
     {
-      name: 'Background color',
-    },
-  ];
+      name: 'Background color'
+    }
+  ]
 
   return (
     <div className="render-setting-panel">
@@ -33,6 +33,6 @@ const RenderSettingsPanel = () => {
         </li>
       ))}
     </div>
-  );
-};
-export default RenderSettingsPanel;
+  )
+}
+export default RenderSettingsPanel

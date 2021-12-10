@@ -1,4 +1,4 @@
-@import "../../App.scss";
+@import '../../App.scss';
 
 .panels-list {
   position: absolute;
@@ -64,7 +64,7 @@
       width: 768px;
     }
 
-    [class$="-panel"] {
+    [class$='-panel'] {
       overflow: auto;
       background-color: #eee;
       height: 100%;

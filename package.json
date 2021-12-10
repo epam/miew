@@ -13,8 +13,55 @@
     "build:ci": "yarn workspaces foreach -ptv run ci"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.5",
+    "@babel/preset-typescript": "^7.12.1",
+    "@typescript-eslint/eslint-plugin": "^5.6.0",
+    "@typescript-eslint/parser": "^5.6.0",
+    "babel-eslint": "^10.0.0",
     "coveralls": "^3.1.0",
-    "lcov-result-merger": "^3.1.0"
+    "eslint": "^8.4.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "eslint-plugin-react": "^7.27.1",
+    "husky": "4.3.8",
+    "lcov-result-merger": "^3.1.0",
+    "lint-staged": "^12.1.2",
+    "npm-run-all": "^4.1.5",
+    "postcss-scss": "^4.0.2",
+    "prettier": "^2.5.1",
+    "prettier-config-standard": "^4.0.0",
+    "stylelint": "^13.13.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-recommended-scss": "^4.3.0",
+    "stylelint-config-standard": "^22.0.0",
+    "stylelint-prettier": "^2.0.0",
+    "stylelint-scss": "^4.0.0",
+    "typescript": "^4.5.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged --allow-empty"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json}": [
+      "prettier --write"
+    ],
+    "*.{css,less,scss}": [
+      "stylelint --formatter verbose --fix --allow-empty-input"
+    ]
   },
   "packageManager": "yarn@3.1.1"
 }

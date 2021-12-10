@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import settings from '../../settings';
-import utils from '../../utils';
-import gfxutils from '../gfxutils';
+import _ from 'lodash'
+import settings from '../../settings'
+import utils from '../../utils'
+import gfxutils from '../gfxutils'
 
 /**
  * Create new scene object.
@@ -21,17 +21,20 @@ import gfxutils from '../gfxutils';
 class SceneObject {
   constructor(params, opts) {
     if (this.constructor === SceneObject) {
-      throw new Error('Can not instantiate abstract class!');
+      throw new Error('Can not instantiate abstract class!')
     }
     /**
      * Object's options inherited (prototyped) from defaults.
      * @type {object}
      */
-    this.params = params;
-    this.opts = _.merge(utils.deriveDeep(settings.now.objects[this.type], true), opts);
-    this.needsRebuild = false;
-    this._mesh = null;
-    this.id = null;
+    this.params = params
+    this.opts = _.merge(
+      utils.deriveDeep(settings.now.objects[this.type], true),
+      opts
+    )
+    this.needsRebuild = false
+    this._mesh = null
+    this.id = null
   }
 
   /**
@@ -43,28 +46,31 @@ class SceneObject {
   identify() {
     const result = {
       type: this.type,
-      params: this.params,
-    };
-    const diff = utils.objectsDiff(this.opts, settings.now.modes[this.id]);
-    if (!_.isEmpty(diff)) {
-      result.opts = diff;
+      params: this.params
     }
-    return result;
+    const diff = utils.objectsDiff(this.opts, settings.now.modes[this.id])
+    if (!_.isEmpty(diff)) {
+      result.opts = diff
+    }
+    return result
   }
 
   toString() {
-    const paramsStr = `o=${this.type},${this.params.join(',')}`;
-    const optsStr = utils.compareOptionsWithDefaults(this.opts, settings.defaults.objects[this.type]);
-    return paramsStr + optsStr;
+    const paramsStr = `o=${this.type},${this.params.join(',')}`
+    const optsStr = utils.compareOptionsWithDefaults(
+      this.opts,
+      settings.defaults.objects[this.type]
+    )
+    return paramsStr + optsStr
   }
 
   getGeometry() {
-    return this._mesh;
+    return this._mesh
   }
 
   destroy() {
     if (this._mesh) {
-      gfxutils.destroyObject(this._mesh);
+      gfxutils.destroyObject(this._mesh)
     }
   }
 }
@@ -73,6 +79,6 @@ class SceneObject {
  * Scene object identifier.
  * @type {string}
  */
-SceneObject.prototype.type = '__';
+SceneObject.prototype.type = '__'
 
-export default SceneObject;
+export default SceneObject

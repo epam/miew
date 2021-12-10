@@ -7,13 +7,19 @@
   "main": "dist/main.js",
   "license": "MIT",
   "scripts": {
-    "ci": "run-s clean lint build",
+    "ci": "run-s clean build",
     "clean": "rimraf 'build/*'",
     "lint": "eslint -f unix --ext .js,.jsx src/ ",
     "lint:css": "stylelint '**/*.scss'",
     "build": "webpack --mode production",
     "start": "webpack-dev-server --mode development --open",
     "test": "jest",
+    "eslint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "eslint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "prettier": "prettier --check \"./**/*.{js,jsx,json,ts,tsx}\"",
+    "prettier:write": "prettier --write \"./**/*.{js,jsx,json,ts,tsx}\"",
+    "stylelint": "stylelint \"./**/*.{css,less,scss}\" --formatter verbose",
+    "stylelint:fix": "stylelint \"./**/*.{css,less,scss}\" --formatter verbose --fix",
     "test-cover": "jest --coverage",
     "show:cover": "node tools/open.js coverage/lcov-report/index.html"
   },
@@ -41,15 +47,6 @@
     "node_modules",
     "src"
   ],
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-class-properties"
-    ]
-  },
   "css": {
     "includePaths": [
       "./node_modules"
@@ -61,7 +58,7 @@
     "bootstrap-switch-button-react": "^1.2.0",
     "classnames": "^2.2.6",
     "jquery": "^3.5.1",
-    "jquery.terminal": "^2.20.1",
+    "jquery.terminal": "2.20.1",
     "lodash": "^4.17.20",
     "miew": "0.9.0",
     "miew-react": "workspace:*",
@@ -73,13 +70,16 @@
     "styled-components": "^5.1.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.6",
+    "@babel/core": "^7.12.3",
     "@babel/plugin-external-helpers": "^7.2.0",
-    "@babel/plugin-proposal-class-properties": "^7.7.0",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/polyfill": "^7.8.7",
-    "@babel/preset-env": "^7.9.6",
-    "@babel/preset-react": "^7.9.4",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.5",
+    "@babel/preset-typescript": "^7.12.1",
     "@babel/register": "^7.9.0",
     "@babel/runtime": "^7.9.6",
     "@testing-library/react": "^11.2.0",
@@ -87,9 +87,7 @@
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.5.3",
-    "eslint": "^7.0.0",
-    "eslint-plugin-jest": "^23.11.0",
-    "eslint-plugin-react": "^7.20.0",
+    "eslint": "^8.4.1",
     "html-loader": "^1.0.0",
     "html-webpack-plugin": "^4.3.0",
     "jest": "^26.0.1",
@@ -99,11 +97,17 @@
     "npm-run-all": "^4.1.5",
     "postcss-loader": "^3.0.0",
     "postcss-scss": "^2.0.0",
+    "prettier": "^2.5.1",
     "redux": "^4.0.5",
     "rimraf": "^3.0.2",
     "style-loader": "^1.2.1",
-    "stylelint": "^13.3.3",
-    "three": "0.125.0",
+    "stylelint": "^13.13.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-recommended-scss": "^4.3.0",
+    "stylelint-config-standard": "^22.0.0",
+    "stylelint-prettier": "^2.0.0",
+    "stylelint-scss": "^4.0.0",
+    "three": "0.131.3",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.11.0"

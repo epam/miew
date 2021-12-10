@@ -1,12 +1,12 @@
-import _ from 'lodash';
-import utils from './utils';
-import EventDispatcher from './utils/EventDispatcher';
+import _ from 'lodash'
+import utils from './utils'
+import EventDispatcher from './utils/EventDispatcher'
 
-const VERSION = 0;
+const VERSION = 0
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // DEFAULT SETTINGS
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 /**
  * Polygonal complexity settings.
@@ -49,9 +49,9 @@ const defaults = {
    * @property {VolumeDensityModeOptions} VD - Volume Density mode options.
    */
   modes: {
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // BALLS AND STICKS
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Balls and Sticks mode options.
@@ -79,13 +79,13 @@ const defaults = {
         low: 4,
         medium: 6,
         high: 12,
-        ultra: 32,
-      },
+        ultra: 32
+      }
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // VAN DER WAALS
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Van der Waals mode options.
@@ -100,13 +100,13 @@ const defaults = {
         low: 6,
         medium: 8,
         high: 16,
-        ultra: 32,
-      },
+        ultra: 32
+      }
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // LINES
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Lines mode options.
@@ -126,12 +126,12 @@ const defaults = {
       offsarom: 0.2,
       chunkarom: 10,
       atom: 0.23,
-      lineWidth: 2,
+      lineWidth: 2
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // LICORICE
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Licorice mode options.
@@ -147,7 +147,7 @@ const defaults = {
      * @property {PolyComplexity} polyComplexity - Poly complexity values for render modes.
      */
     LC: {
-      bond: 0.20,
+      bond: 0.2,
       space: 0.0,
       multibond: true,
       aromrad: 0.1,
@@ -157,13 +157,13 @@ const defaults = {
         low: 4,
         medium: 6,
         high: 12,
-        ultra: 32,
-      },
+        ultra: 32
+      }
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // SURFACE SAS
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Solvent Accessible Surface mode options.
@@ -187,13 +187,13 @@ const defaults = {
         low: 8,
         medium: 16,
         high: 30,
-        ultra: 60,
-      },
+        ultra: 60
+      }
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // SURFACE SES
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Solvent Excluded Surface mode options.
@@ -217,13 +217,13 @@ const defaults = {
         low: 8,
         medium: 16,
         high: 30,
-        ultra: 60,
-      },
+        ultra: 60
+      }
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // QUICK SURFACE
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Quick Surface mode options.
@@ -247,7 +247,7 @@ const defaults = {
         low: 2.0,
         medium: 2.5,
         high: 3.0,
-        ultra: 4.0,
+        ultra: 4.0
       },
       scale: 1.0,
       wireframe: false,
@@ -256,15 +256,15 @@ const defaults = {
         low: 1.5,
         medium: 1,
         high: 0.5,
-        ultra: 0.25,
+        ultra: 0.25
       },
       subset: '',
-      zClip: false,
+      zClip: false
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // CONTACT SURFACE
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Contact Surface mode options.
@@ -291,15 +291,15 @@ const defaults = {
         low: 1.0,
         medium: 1.5,
         high: 1.75,
-        ultra: 2.0,
+        ultra: 2.0
       },
       subset: '',
-      zClip: false,
+      zClip: false
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // TRACE
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Trace mode options.
@@ -310,19 +310,19 @@ const defaults = {
      * @property {PolyComplexity} polyComplexity - Polygonal complexity settings for different resolutions.
      */
     TR: {
-      radius: 0.30,
+      radius: 0.3,
       polyComplexity: {
         poor: 12,
         low: 16,
         medium: 32,
         high: 64,
-        ultra: 64,
-      },
+        ultra: 64
+      }
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // TUBE
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Tube mode options.
@@ -335,7 +335,7 @@ const defaults = {
      * @property {number} heightSegmentsRatio - Poly complexity multiplier for height segments.
      */
     TU: {
-      radius: 0.30,
+      radius: 0.3,
       heightSegmentsRatio: 1.5,
       tension: -0.7,
       polyComplexity: {
@@ -343,13 +343,13 @@ const defaults = {
         low: 6,
         medium: 10,
         high: 18,
-        ultra: 34,
-      },
+        ultra: 34
+      }
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // CARTOON
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Cartoon mode options.
@@ -369,17 +369,17 @@ const defaults = {
      * @property {number} heightSegmentsRatio - Poly complexity multiplier for height segments.
      */
     CA: {
-      radius: 0.30,
+      radius: 0.3,
       depth: 0.25,
       ss: {
         helix: {
           width: 1.0,
-          arrow: 2.0,
+          arrow: 2.0
         },
         strand: {
           width: 1.0,
-          arrow: 2.0,
-        },
+          arrow: 2.0
+        }
       },
       heightSegmentsRatio: 1.5,
       tension: -0.7,
@@ -388,13 +388,13 @@ const defaults = {
         low: 6,
         medium: 10,
         high: 18,
-        ultra: 34,
-      },
+        ultra: 34
+      }
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // TEXT
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Text mode options.
@@ -421,12 +421,12 @@ const defaults = {
       dz: 1,
       fg: 'none',
       bg: '0x202020',
-      showBg: true,
+      showBg: true
     },
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // VOLUME DENSITY
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
     /**
      * Volume density mode options.
@@ -449,9 +449,9 @@ const defaults = {
         low: 3,
         medium: 4,
         high: 8,
-        ultra: 10,
-      },
-    },
+        ultra: 10
+      }
+    }
   },
 
   /**
@@ -484,7 +484,7 @@ const defaults = {
      * @property {number} carbon - Carbon color or -1 to use default.
      */
     EL: {
-      carbon: -1,
+      carbon: -1
     },
 
     /**
@@ -495,7 +495,7 @@ const defaults = {
      * @property {number} color - Single color to paint with.
      */
     UN: {
-      color: 0xFFFFFF,
+      color: 0xffffff
     },
 
     /**
@@ -509,8 +509,8 @@ const defaults = {
      */
     CO: {
       subset: 'charged',
-      color: 0xFF0000,
-      baseColor: 0xFFFFFF,
+      color: 0xff0000,
+      baseColor: 0xffffff
     },
 
     /**
@@ -523,7 +523,7 @@ const defaults = {
      */
     CB: {
       color: 0x909090,
-      factor: 0.6,
+      factor: 0.6
     },
 
     /**
@@ -534,7 +534,7 @@ const defaults = {
      * @property {string} gradient - Name of gradient to use.
      */
     SQ: {
-      gradient: 'rainbow',
+      gradient: 'rainbow'
     },
 
     /**
@@ -549,7 +549,7 @@ const defaults = {
     TM: {
       gradient: 'temp',
       min: 5,
-      max: 40,
+      max: 40
     },
 
     /**
@@ -560,7 +560,7 @@ const defaults = {
      * @property {string} gradient - Name of gradient to use.
      */
     OC: {
-      gradient: 'reds',
+      gradient: 'reds'
     },
 
     /**
@@ -571,7 +571,7 @@ const defaults = {
      * @property {string} gradient - Name of gradient to use.
      */
     HY: {
-      gradient: 'blue-red',
+      gradient: 'blue-red'
     },
 
     /**
@@ -582,8 +582,8 @@ const defaults = {
      * @property {string} gradient - Name of gradient to use.
      */
     MO: {
-      gradient: 'rainbow',
-    },
+      gradient: 'rainbow'
+    }
   },
 
   /*
@@ -641,7 +641,7 @@ const defaults = {
    */
   resolution: 'medium',
 
-  autoResolution: false/* true */,
+  autoResolution: false /* true */,
 
   autoPreset: true,
 
@@ -649,73 +649,80 @@ const defaults = {
 
   presets: {
     // Default
-    default: [{
-      mode: 'BS',
-      colorer: 'EL',
-      selector: 'all',
-      material: 'SF',
-    }],
+    default: [
+      {
+        mode: 'BS',
+        colorer: 'EL',
+        selector: 'all',
+        material: 'SF'
+      }
+    ],
 
     empty: [],
 
     // Wireframe
-    wire: [{
-      mode: 'LN',
-      colorer: 'EL',
-      selector: 'all',
-      material: 'SF',
-    }],
+    wire: [
+      {
+        mode: 'LN',
+        colorer: 'EL',
+        selector: 'all',
+        material: 'SF'
+      }
+    ],
 
     // Small molecules
-    small: [{
-      mode: 'BS',
-      colorer: 'EL',
-      selector: 'all',
-      material: 'SF',
-    }],
+    small: [
+      {
+        mode: 'BS',
+        colorer: 'EL',
+        selector: 'all',
+        material: 'SF'
+      }
+    ],
 
     // Proteins, nucleic acids etc.
-    macro: [{
-      mode: 'CA',
-      colorer: 'SS',
-      selector: 'not hetatm',
-      material: 'SF',
-    }, {
-      mode: 'BS',
-      colorer: 'EL',
-      selector: 'hetatm and not water',
-      material: 'SF',
-    }],
+    macro: [
+      {
+        mode: 'CA',
+        colorer: 'SS',
+        selector: 'not hetatm',
+        material: 'SF'
+      },
+      {
+        mode: 'BS',
+        colorer: 'EL',
+        selector: 'hetatm and not water',
+        material: 'SF'
+      }
+    ]
   },
 
   objects: {
     line: {
-      color: 0xFFFFFFFF,
+      color: 0xffffffff,
       dashSize: 0.3,
-      gapSize: 0.05,
-    },
+      gapSize: 0.05
+    }
   },
 
-  //----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
 
   bg: {
     color: 0x202020,
-    transparent: false,
+    transparent: false
   },
 
   draft: {
     clipPlane: false,
     clipPlaneFactor: 0.5,
-    clipPlaneSpeed: 0.00003,
+    clipPlaneSpeed: 0.00003
   },
 
   /*
-     * Separate group for plugins.
-     * Each plugin handles its field by itself.
-     */
-  plugins: {
-
-  },
+   * Separate group for plugins.
+   * Each plugin handles its field by itself.
+   */
+  plugins: {},
 
   /**
    * @type {boolean}
@@ -773,7 +780,7 @@ const defaults = {
     on: false,
     color: 0x000000,
     threshold: 0.1,
-    thickness: 1,
+    thickness: 1
   },
 
   /**
@@ -792,8 +799,8 @@ const defaults = {
    */
   shadow: {
     on: false,
-    type: 'random'/* basic, pcf, random */,
-    radius: 1.0,
+    type: 'random' /* basic, pcf, random */,
+    radius: 1.0
   },
 
   /**
@@ -904,25 +911,25 @@ const defaults = {
     good: true,
     ssaoKernelRadius: 0.7,
     ssaoFactor: 0.7,
-    stereoBarrel: 0.25,
+    stereoBarrel: 0.25
   },
   use: {
-    multiFile: false,
-  },
-};
+    multiFile: false
+  }
+}
 
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // SETTINGS CLASS
-//----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 function Settings() {
-  EventDispatcher.call(this);
+  EventDispatcher.call(this)
 
-  this.old = null;
-  this.now = {};
-  this._changed = {};
+  this.old = null
+  this.now = {}
+  this._changed = {}
 
-  this.reset();
+  this.reset()
 }
 
 utils.deriveClass(Settings, EventDispatcher, {
@@ -930,79 +937,82 @@ utils.deriveClass(Settings, EventDispatcher, {
 
   set(path, value) {
     if (_.isString(path)) {
-      const oldValue = _.get(this.now, path);
+      const oldValue = _.get(this.now, path)
       if (oldValue !== value) {
-        _.set(this.now, path, value);
-        this._notifyChange(path, value);
+        _.set(this.now, path, value)
+        this._notifyChange(path, value)
       }
     } else {
-      const diff = utils.objectsDiff(path, this.now);
+      const diff = utils.objectsDiff(path, this.now)
       if (!_.isEmpty(diff)) {
-        _.merge(this.now, diff);
-        this._notifyChanges(diff);
+        _.merge(this.now, diff)
+        this._notifyChanges(diff)
       }
     }
   },
 
   get(path, defaultValue) {
-    return _.get(this.now, path, defaultValue);
+    return _.get(this.now, path, defaultValue)
   },
 
   reset() {
-    const diff = utils.objectsDiff(defaults, this.now);
-    this.now = _.cloneDeep(defaults);
-    this.old = null;
-    this._notifyChanges(diff);
-    this._changed = {};
+    const diff = utils.objectsDiff(defaults, this.now)
+    this.now = _.cloneDeep(defaults)
+    this.old = null
+    this._notifyChanges(diff)
+    this._changed = {}
   },
 
   checkpoint() {
-    this.old = _.cloneDeep(this.now);
-    this._changed = {};
+    this.old = _.cloneDeep(this.now)
+    this._changed = {}
   },
 
   _notifyChange(path, value) {
-    this._changed[path] = true;
-    this.dispatchEvent({ type: `change:${path}`, value });
+    this._changed[path] = true
+    this.dispatchEvent({ type: `change:${path}`, value })
   },
 
   _notifyChanges(diff) {
     utils.forInRecursive(diff, (deepValue, deepPath) => {
-      this._notifyChange(deepPath, deepValue);
-    });
+      this._notifyChange(deepPath, deepValue)
+    })
   },
 
   changed() {
     if (!this.old) {
-      return [];
+      return []
     }
-    const { old, now } = this;
-    const keys = _.filter(Object.keys(this._changed), (key) => _.get(old, key) !== _.get(now, key));
-    return keys;
+    const { old, now } = this
+    const keys = _.filter(
+      Object.keys(this._changed),
+      (key) => _.get(old, key) !== _.get(now, key)
+    )
+    return keys
   },
 
   applyDiffs(diffs) {
     if (diffs.hasOwnProperty('VERSION') && diffs.VERSION !== VERSION) {
-      throw new Error('Settings version does not match!');
+      throw new Error('Settings version does not match!')
     }
     // VERSION shouldn't be presented inside settings structure
-    delete diffs.VERSION;
-    this.reset();
-    this.set(diffs);
+    delete diffs.VERSION
+    this.reset()
+    this.set(diffs)
   },
 
   getDiffs(versioned) {
-    const diffs = utils.objectsDiff(this.now, defaults);
+    const diffs = utils.objectsDiff(this.now, defaults)
     if (versioned) {
-      diffs.VERSION = VERSION;
+      diffs.VERSION = VERSION
     }
-    return diffs;
+    return diffs
   },
 
   setPluginOpts(plugin, opts) {
-    defaults.plugins[plugin] = _.cloneDeep(opts);
-    this.now.plugins[plugin] = _.cloneDeep(opts);
-  },
-});
+    defaults.plugins[plugin] = _.cloneDeep(opts)
+    this.now.plugins[plugin] = _.cloneDeep(opts)
+  }
+})
 
-export default new Settings();
+export default new Settings()

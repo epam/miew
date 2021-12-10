@@ -1,6 +1,6 @@
-import { By, Key, until } from 'selenium-webdriver';
+import { By, Key, until } from 'selenium-webdriver'
 
-const timeout = 10000;
+const timeout = 10000
 
 const dom = {
   canvas: By.css('.miew-canvas canvas'),
@@ -9,9 +9,9 @@ const dom = {
     window: By.css('.terminal-window'),
     button: By.id('miew-terminal-btn'),
     clipboard: By.css('.terminal-wrapper textarea.clipboard'),
-    command: By.css('.terminal-output .command'),
-  },
-};
+    command: By.css('.terminal-output .command')
+  }
+}
 
 /** Class representing a Page Object for the Miew demo website. */
 export default class MiewPage {
@@ -23,9 +23,9 @@ export default class MiewPage {
    */
   constructor(driver, url) {
     /** @type {ThenableWebDriver} */
-    this.driver = driver;
+    this.driver = driver
     if (url !== null) {
-      this.driver.get(url || 'https://miew.opensource.epam.com/');
+      this.driver.get(url || 'https://miew.opensource.epam.com/')
     }
   }
 
@@ -34,14 +34,14 @@ export default class MiewPage {
    * @returns {promise.Thenable|Promise} A promise.
    */
   openTerminal() {
-    const terminal = this.driver.findElement(dom.terminal.window);
+    const terminal = this.driver.findElement(dom.terminal.window)
     return terminal.isDisplayed().then((visible) => {
       if (!visible) {
-        this.driver.findElement(dom.terminal.button).click();
-        return this.driver.wait(until.elementIsVisible(terminal), timeout);
+        this.driver.findElement(dom.terminal.button).click()
+        return this.driver.wait(until.elementIsVisible(terminal), timeout)
       }
-      return Promise.resolve();
-    });
+      return Promise.resolve()
+    })
   }
 
   /**
@@ -50,8 +50,8 @@ export default class MiewPage {
    * @returns {promise.Thenable} A promise.
    */
   runScript(script) {
-    const keys = script.replace(/[\r\n]+/g, Key.ENTER) + Key.ENTER;
-    return this.driver.findElement(dom.terminal.clipboard).sendKeys(keys);
+    const keys = script.replace(/[\r\n]+/g, Key.ENTER) + Key.ENTER
+    return this.driver.findElement(dom.terminal.clipboard).sendKeys(keys)
   }
 
   /**
@@ -59,7 +59,9 @@ export default class MiewPage {
    * @returns {promise.Thenable<string>} A promise which resolves with the command text.
    */
   getFirstCommand() {
-    return this.driver.wait(until.elementLocated(dom.terminal.command), timeout).getText();
+    return this.driver
+      .wait(until.elementLocated(dom.terminal.command), timeout)
+      .getText()
   }
 
   /**
@@ -68,11 +70,14 @@ export default class MiewPage {
    * @returns {promise.Thenable<*>} A promise which resolves with the expression value.
    */
   getValueFor(expression) {
-    return this.driver.executeScript(`\
+    return this.driver
+      .executeScript(
+        `\
 var miew = window && window.miew;
 var Miew = miew && miew.constructor;
-return miew && Miew && JSON.stringify(${expression});`)
-      .then((json) => JSON.parse(json));
+return miew && Miew && JSON.stringify(${expression});`
+      )
+      .then((json) => JSON.parse(json))
   }
 
   /**
@@ -80,7 +85,7 @@ return miew && Miew && JSON.stringify(${expression});`)
    * @returns {promise.Thenable<string>} A promise which resolves with the miew version string, e.g. "v0.1.0".
    */
   waitForMiew() {
-    return this.driver.wait(() => this.getValueFor('Miew.VERSION'), timeout);
+    return this.driver.wait(() => this.getValueFor('Miew.VERSION'), timeout)
   }
 
   /**
@@ -89,8 +94,8 @@ return miew && Miew && JSON.stringify(${expression});`)
    * @returns {promise.Thenable} A promise.
    */
   waitUntilTitleContains(str) {
-    const title = this.driver.findElement(dom.title);
-    return this.driver.wait(until.elementTextContains(title, str), timeout);
+    const title = this.driver.findElement(dom.title)
+    return this.driver.wait(until.elementTextContains(title, str), timeout)
   }
 
   /**
@@ -98,10 +103,14 @@ return miew && Miew && JSON.stringify(${expression});`)
    * @returns {promise.Thenable} A promise.
    */
   waitUntilRebuildIsDone() {
-    return this.driver.wait(() => this.driver.executeScript(`\
+    return this.driver.wait(
+      () =>
+        this.driver.executeScript(`\
 var miew = window.miew;
 var rep = miew && miew.repGet(0);
-return rep && !miew._loading.length && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
+return rep && !miew._loading.length && !miew._building && !miew._needRebuild() && !miew._needRender;`),
+      timeout
+    )
   }
 
   /**
@@ -112,11 +121,15 @@ return rep && !miew._loading.length && !miew._building && !miew._needRebuild() &
    * @returns {promise.Thenable} A promise.
    */
   waitUntilRepresentationIs(index, mode, colorer) {
-    return this.driver.wait(() => this.driver.executeScript(`\
+    return this.driver.wait(
+      () =>
+        this.driver.executeScript(`\
 var miew = window && window.miew;
 var rep = miew && !miew._loading.length && miew.repGet(${index});
 var modeOk = rep && (rep.mode.id === '${mode.toUpperCase()}');
 var colorerOk = rep && (rep.colorer.id === '${colorer.toUpperCase()}');
-return modeOk && colorerOk && !miew._building && !miew._needRebuild() && !miew._needRender;`), timeout);
+return modeOk && colorerOk && !miew._building && !miew._needRebuild() && !miew._needRender;`),
+      timeout
+    )
   }
 }

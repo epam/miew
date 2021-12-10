@@ -19,14 +19,14 @@ module.exports = {
       'src/utils/logger.js',
       'src/io/parsers/PDBStream.js',
       'src/io/parsers/GROReader.js',
-      'src/io/parsers/GROParser.js',
-    ],
+      'src/io/parsers/GROParser.js'
+    ]
   },
   opts: {
     template: 'docs/template',
     tutorials: 'docs/tutorials',
     destination: 'build/docs',
-    private: false,
+    private: false
   },
   templates: {
     cleverLinks: true,
@@ -38,13 +38,10 @@ module.exports = {
         include: [
           'README.png',
           '../../node_modules/jsdoc/templates/default/static',
-          'docs/template/static',
-        ],
-      },
-    },
+          'docs/template/static'
+        ]
+      }
+    }
   },
-  plugins: [
-    'plugins/underscore',
-    'plugins/markdown',
-  ],
-};
+  plugins: ['plugins/underscore', 'plugins/markdown']
+}

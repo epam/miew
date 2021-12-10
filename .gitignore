@@ -8,6 +8,7 @@ coverage/
 .idea/tasks.xml
 .pnp.*
 .yarn/*
+.idea/
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases

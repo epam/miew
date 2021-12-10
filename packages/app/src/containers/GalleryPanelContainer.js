@@ -1,9 +1,9 @@
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 
-import GalleryPanel from '../components/menu/panelslist/panels/GalleryPanel.jsx';
+import GalleryPanel from '../components/menu/panelslist/panels/GalleryPanel.jsx'
 
 const mapStateToProps = (state) => ({
-  viewer: state.info.viewer,
-});
+  viewer: state.info.viewer
+})
 
-export default connect(mapStateToProps)(GalleryPanel);
+export default connect(mapStateToProps)(GalleryPanel)
