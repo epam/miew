@@ -1,31 +1,28 @@
-import chai, { expect } from 'chai';
-import dirtyChai from 'dirty-chai';
-import GROReader from './GROReader';
+import chai, { expect } from 'chai'
+import dirtyChai from 'dirty-chai'
+import GROReader from './GROReader'
 
-chai.use(dirtyChai);
+chai.use(dirtyChai)
 
-const sourceLines = [
-  'the 1st line contains 42 and -12.75',
-  '',
-];
+const sourceLines = ['the 1st line contains 42 and -12.75', '']
 
-const source = sourceLines.join('\n');
+const source = sourceLines.join('\n')
 
 describe('GROReader', () => {
-  let stream = null;
+  let stream = null
 
   beforeEach(() => {
-    stream = new GROReader(source);
-  });
+    stream = new GROReader(source)
+  })
 
   describe('.getNext()', () => {
     it('returns exact end position of line', () => {
-      expect(stream.getNext()).to.equal(35);
-    });
+      expect(stream.getNext()).to.equal(35)
+    })
 
     it('returns zero number for empty line', () => {
-      const emptyStream = new GROReader('');
-      expect(emptyStream.getNext()).to.equal(0);
-    });
-  });
-});
+      const emptyStream = new GROReader('')
+      expect(emptyStream.getNext()).to.equal(0)
+    })
+  })
+})

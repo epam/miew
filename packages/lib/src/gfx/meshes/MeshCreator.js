@@ -1,18 +1,23 @@
-import geometries from '../geometries/geometries';
-import meshes from './meshes';
-import ThickLinesGeometry from '../geometries/ThickLinesGeometry';
+import geometries from '../geometries/geometries'
+import meshes from './meshes'
+import ThickLinesGeometry from '../geometries/ThickLinesGeometry'
 
 function setMatParams(params, uniforms) {
   return function (material) {
-    material.setValues(params);
-    material.setUberOptions(uniforms);
-  };
+    material.setValues(params)
+    material.setUberOptions(uniforms)
+  }
 }
 
 function _createInstancedCylinders(useZSprites, openEnded) {
   return {
     Geometry(a, b) {
-      return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
+      return new geometries.Instanced2CCylindersGeometry(
+        a,
+        b,
+        useZSprites,
+        openEnded
+      )
     },
     Object: useZSprites ? meshes.ZSprite : meshes.Instanced,
     initMaterial: setMatParams({
@@ -20,26 +25,29 @@ function _createInstancedCylinders(useZSprites, openEnded) {
       attrColor: true,
       attrColor2: true,
       attrAlphaColor: true,
-      cylinderSprite: useZSprites,
-    }),
-  };
+      cylinderSprite: useZSprites
+    })
+  }
 }
 
 function _createLineSegmentsGeoTriplet(geo, renderParams) {
-  const thickLines = geo.prototype instanceof ThickLinesGeometry;
-  const lineWidth = renderParams.lineWidth || 0;
+  const thickLines = geo.prototype instanceof ThickLinesGeometry
+  const lineWidth = renderParams.lineWidth || 0
   return {
     Geometry: geo,
     Object: thickLines ? meshes.ThickLineMesh : meshes.LineSegments,
-    initMaterial: setMatParams({
-      lights: false,
-      attrColor: true,
-      attrAlphaColor: true,
-      thickLine: thickLines,
-    }, {
-      lineWidth,
-    }),
-  };
+    initMaterial: setMatParams(
+      {
+        lights: false,
+        attrColor: true,
+        attrAlphaColor: true,
+        thickLine: thickLines
+      },
+      {
+        lineWidth
+      }
+    )
+  }
 }
 
 function _createSimpleGeoTriplet(geoClass) {
@@ -48,17 +56,17 @@ function _createSimpleGeoTriplet(geoClass) {
     Object: meshes.Mesh,
     initMaterial: setMatParams({
       attrColor: true,
-      attrAlphaColor: true,
-    }),
-  };
+      attrAlphaColor: true
+    })
+  }
 }
 
 function _createIsoSurfaceGeoTriplet(geoClass, caps, settings, renderParams) {
   const surfaceOpts = {
     wireframe: !!renderParams.wireframe,
     fakeOpacity: settings.now.isoSurfaceFakeOpacity,
-    zClip: renderParams.zClip,
-  };
+    zClip: renderParams.zClip
+  }
   return {
     Geometry: geoClass,
     Object: meshes.ZClipped,
@@ -67,72 +75,92 @@ function _createIsoSurfaceGeoTriplet(geoClass, caps, settings, renderParams) {
       attrAlphaColor: false,
       wireframe: surfaceOpts.wireframe,
       fakeOpacity: surfaceOpts.fakeOpacity,
-      zClip: surfaceOpts.zClip,
-    }),
-  };
+      zClip: surfaceOpts.zClip
+    })
+  }
 }
 
 class MeshCreator {
   static createSpheres(caps, settings) {
-    const useZSprites = settings.now.zSprites;
+    const useZSprites = settings.now.zSprites
     return {
       Geometry(a, b) {
-        return new geometries.InstancedSpheresGeometry(a, b, useZSprites);
+        return new geometries.InstancedSpheresGeometry(a, b, useZSprites)
       },
       Object: useZSprites ? meshes.ZSprite : meshes.Instanced,
       initMaterial: setMatParams({
         instancedPos: true,
         attrColor: true,
         attrAlphaColor: true,
-        sphereSprite: useZSprites,
-      }),
-    };
+        sphereSprite: useZSprites
+      })
+    }
   }
 
   static create2CClosedCylinders(_caps, _settings) {
-    return _createInstancedCylinders(false, false);
+    return _createInstancedCylinders(false, false)
   }
 
   static create2CCylinders(caps, settings) {
-    return _createInstancedCylinders(settings.now.zSprites, true);
+    return _createInstancedCylinders(settings.now.zSprites, true)
   }
 
   static create2CLines(_caps, _settings, renderParams) {
-    return _createLineSegmentsGeoTriplet(geometries.TwoColorLinesGeometry, renderParams);
+    return _createLineSegmentsGeoTriplet(
+      geometries.TwoColorLinesGeometry,
+      renderParams
+    )
   }
 
   static createCrosses(_caps, _settings, renderParams) {
-    return _createLineSegmentsGeoTriplet(geometries.CrossGeometry, renderParams);
+    return _createLineSegmentsGeoTriplet(geometries.CrossGeometry, renderParams)
   }
 
   static createExtrudedChains(_caps, _settings) {
-    return _createSimpleGeoTriplet(geometries.ExtrudedObjectsGeometry);
+    return _createSimpleGeoTriplet(geometries.ExtrudedObjectsGeometry)
   }
 
   static createChunkedLines(_caps, _settings, renderParams) {
-    return _createLineSegmentsGeoTriplet(geometries.ChunkedLinesGeometry, renderParams);
+    return _createLineSegmentsGeoTriplet(
+      geometries.ChunkedLinesGeometry,
+      renderParams
+    )
   }
 
   static createQuickSurface(caps, settings, renderParams) {
-    return _createIsoSurfaceGeoTriplet(geometries.QuickSurfGeometry, caps, settings, renderParams);
+    return _createIsoSurfaceGeoTriplet(
+      geometries.QuickSurfGeometry,
+      caps,
+      settings,
+      renderParams
+    )
   }
 
   static createContactSurface(caps, settings, renderParams) {
-    return _createIsoSurfaceGeoTriplet(geometries.ContactSurfaceGeometry, caps, settings, renderParams);
+    return _createIsoSurfaceGeoTriplet(
+      geometries.ContactSurfaceGeometry,
+      caps,
+      settings,
+      renderParams
+    )
   }
 
   static createSASSES(caps, settings, renderParams) {
-    return _createIsoSurfaceGeoTriplet(geometries.SSIsosurfaceGeometry, caps, settings, renderParams);
+    return _createIsoSurfaceGeoTriplet(
+      geometries.SSIsosurfaceGeometry,
+      caps,
+      settings,
+      renderParams
+    )
   }
 
   static createLabels(_caps, _settings) {
     return {
       Geometry: geometries.LabelsGeometry,
       Object: meshes.Text,
-      initMaterial() {
-      },
-    };
+      initMaterial() {}
+    }
   }
 }
 
-export default MeshCreator;
+export default MeshCreator

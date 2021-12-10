@@ -1,12 +1,12 @@
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 
-import Menu from '../components/menu/Menu.jsx';
+import Menu from '../components/menu/Menu.jsx'
 
 const mapStateToProps = (state) => ({
   isPanelListVisible: state.visiblePanels.isPanelListVisible,
   isDisplayColorVisible: state.visiblePanels.isDisplayColorVisible,
   isDisplayModeVisible: state.visiblePanels.isDisplayModeVisible,
-  isTerminalVisible: state.visiblePanels.isTerminalVisible,
-});
+  isTerminalVisible: state.visiblePanels.isTerminalVisible
+})
 
-export default connect(mapStateToProps)(Menu);
+export default connect(mapStateToProps)(Menu)

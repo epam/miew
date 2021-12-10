@@ -1,0 +1,30 @@
+{
+  "root": true,
+  "extends": [
+    "standard",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "eslint:recommended",
+    "eslint-config-prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "react/prop-types": "off",
+    "no-prototype-builtins": "warn",
+    "no-undef": "warn",
+    "@typescript-eslint/no-unused-vars": [
+      "off", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-var-requires": "off"
+  },
+  "env": {
+    "jest": true,
+    "mocha": true
+  }
+}

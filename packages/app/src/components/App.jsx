@@ -1,28 +1,30 @@
-import React from 'react';
+import React from 'react'
 
-import Menu from '../containers/MenuContainer';
-import Viewer from '../containers/MiewViewerContainer';
-import './App.scss';
-import '../../../lib/demo/styles/main.scss';
+import Menu from '../containers/MenuContainer'
+import Viewer from '../containers/MiewViewerContainer'
+import './App.scss'
+import '../../../lib/demo/styles/main.scss'
 
 export default class App extends React.Component {
   constructor(props) {
-    super(props);
-    this._viewer = null;
-    this._onViewerChange = this._onViewerChange.bind(this);
+    super(props)
+    this._viewer = null
+    this._onViewerChange = this._onViewerChange.bind(this)
   }
 
   _onViewerChange(changed) {
     if (changed.viewer !== undefined) {
-      this._viewer = changed.viewer;
+      this._viewer = changed.viewer
     }
-    this.forceUpdate();
+    this.forceUpdate()
   }
 
   render() {
-    return <div className="root">
-      <Viewer onChange={ this._onViewerChange } />
-        <Menu/>
-    </div>;
+    return (
+      <div className="root">
+        <Viewer onChange={this._onViewerChange} />
+        <Menu />
+      </div>
+    )
   }
 }

@@ -1,10 +1,10 @@
-import AtomsProcessor from './AtomsProcessor';
-import OrphanAtomsProcessor from './OrphanAtomsProcessor';
-import ResiduesProcessor from './ResiduesProcessor';
-import NucleicProcessor from './NucleicProcessor';
-import SubseqsProcessor from './SubseqsProcessor';
-import BondsProcessor from './BondsProcessor';
-import AromaticProcessor from './AromaticProcessor';
+import AtomsProcessor from './AtomsProcessor'
+import OrphanAtomsProcessor from './OrphanAtomsProcessor'
+import ResiduesProcessor from './ResiduesProcessor'
+import NucleicProcessor from './NucleicProcessor'
+import SubseqsProcessor from './SubseqsProcessor'
+import BondsProcessor from './BondsProcessor'
+import AromaticProcessor from './AromaticProcessor'
 
 export default {
   Atoms: AtomsProcessor,
@@ -13,5 +13,5 @@ export default {
   Nucleic: NucleicProcessor,
   Subseqs: SubseqsProcessor,
   Bonds: BondsProcessor,
-  Aromatic: AromaticProcessor,
-};
+  Aromatic: AromaticProcessor
+}

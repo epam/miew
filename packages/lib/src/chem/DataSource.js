@@ -10,7 +10,7 @@
 class DataSource {
   constructor() {
     if (this.constructor === DataSource) {
-      throw new Error('Can not instantiate abstract class!');
+      throw new Error('Can not instantiate abstract class!')
     }
   }
 }
@@ -19,6 +19,6 @@ class DataSource {
  * Mode identifier.
  * @type {string}
  */
-DataSource.prototype.id = '__';
+DataSource.prototype.id = '__'
 
-export default DataSource;
+export default DataSource

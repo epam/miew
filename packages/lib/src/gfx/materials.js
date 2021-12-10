@@ -1,8 +1,8 @@
-import * as THREE from 'three';
-import EntityList from '../utils/EntityList';
+import * as THREE from 'three'
+import EntityList from '../utils/EntityList'
 
 function neutralColor(intensity) {
-  return new THREE.Color(intensity, intensity, intensity);
+  return new THREE.Color(intensity, intensity, intensity)
 }
 
 const materialList = [
@@ -14,16 +14,17 @@ const materialList = [
       diffuse: neutralColor(1.0),
       specular: neutralColor(0.0),
       shininess: 1,
-      opacity: 1.0,
+      opacity: 1.0
     },
     values: {
       lights: true,
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: false,
-    },
-  }, {
+      toonShading: false
+    }
+  },
+  {
     id: 'SF',
     name: 'Soft Plastic',
     shortName: 'Soft',
@@ -31,16 +32,17 @@ const materialList = [
       diffuse: neutralColor(1.0),
       specular: neutralColor(0.1),
       shininess: 30,
-      opacity: 1.0,
+      opacity: 1.0
     },
     values: {
       lights: true,
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: false,
-    },
-  }, {
+      toonShading: false
+    }
+  },
+  {
     id: 'PL',
     name: 'Glossy Plastic',
     shortName: 'Glossy',
@@ -48,16 +50,17 @@ const materialList = [
       diffuse: neutralColor(0.56),
       specular: neutralColor(0.28),
       shininess: 100,
-      opacity: 1.0,
+      opacity: 1.0
     },
     values: {
       lights: true,
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: false,
-    },
-  }, {
+      toonShading: false
+    }
+  },
+  {
     id: 'ME',
     name: 'Metal',
     shortName: 'Metal',
@@ -65,16 +68,17 @@ const materialList = [
       diffuse: neutralColor(0.56),
       specular: neutralColor(0.55),
       shininess: 30,
-      opacity: 1.0,
+      opacity: 1.0
     },
     values: {
       lights: true,
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: false,
-    },
-  }, {
+      toonShading: false
+    }
+  },
+  {
     id: 'TR',
     name: 'Transparent',
     shortName: 'Transparent',
@@ -82,33 +86,35 @@ const materialList = [
       diffuse: neutralColor(1.0),
       specular: neutralColor(0.0),
       shininess: 1,
-      opacity: 0.5,
+      opacity: 0.5
     },
     values: {
       lights: true,
       fog: true,
       depthWrite: true,
       transparent: true,
-      toonShading: false,
-    },
-  }, {
+      toonShading: false
+    }
+  },
+  {
     id: 'GL',
     name: 'Glass',
     shortName: 'Glass',
     uberOptions: {
-      diffuse: neutralColor(0.50),
+      diffuse: neutralColor(0.5),
       specular: neutralColor(0.65),
       shininess: 100,
-      opacity: 0.5,
+      opacity: 0.5
     },
     values: {
       lights: true,
       fog: true,
       depthWrite: true,
       transparent: true,
-      toonShading: false,
-    },
-  }, {
+      toonShading: false
+    }
+  },
+  {
     id: 'BA',
     name: 'Backdrop',
     shortName: 'Backdrop',
@@ -116,16 +122,17 @@ const materialList = [
       diffuse: neutralColor(1.0),
       specular: neutralColor(0.0),
       shininess: 1,
-      opacity: 1.0,
+      opacity: 1.0
     },
     values: {
       lights: false,
       fog: false,
       depthWrite: false,
       transparent: false,
-      toonShading: false,
-    },
-  }, {
+      toonShading: false
+    }
+  },
+  {
     id: 'TN',
     name: 'Toon',
     shortName: 'Toon',
@@ -133,16 +140,17 @@ const materialList = [
       diffuse: neutralColor(1.0),
       specular: neutralColor(0.0),
       shininess: 1,
-      opacity: 1.0,
+      opacity: 1.0
     },
     values: {
       lights: true,
       fog: true,
       depthWrite: true,
       transparent: false,
-      toonShading: true,
-    },
-  }, {
+      toonShading: true
+    }
+  },
+  {
     id: 'FL',
     name: 'Flat',
     shortName: 'Flat',
@@ -150,17 +158,17 @@ const materialList = [
       diffuse: neutralColor(1.0),
       specular: neutralColor(0.0),
       shininess: 0,
-      opacity: 1.0,
+      opacity: 1.0
     },
     values: {
       lights: false,
       fog: true,
       depthWrite: true,
-      transparent: false,
-    },
-  },
-];
+      transparent: false
+    }
+  }
+]
 
-const materials = new EntityList(materialList);
+const materials = new EntityList(materialList)
 
-export default materials;
+export default materials

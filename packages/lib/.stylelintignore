@@ -1,0 +1,8 @@
+/dist
+/vendor
+/docs
+/build
+/node_modules
+!.eslintrc.js
+!.mocharc.js
+!.stylelintrc.js

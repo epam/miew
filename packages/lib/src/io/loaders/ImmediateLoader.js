@@ -1,18 +1,18 @@
-import Loader from './Loader';
+import Loader from './Loader'
 
 export default class ImmediateLoader extends Loader {
   load() {
     return new Promise((resolve) => {
       if (this._abort) {
-        throw new Error('Loading aborted');
+        throw new Error('Loading aborted')
       }
-      resolve(this._source);
-    });
+      resolve(this._source)
+    })
   }
 
   static canProbablyLoad(_source) {
-    return false;
+    return false
   }
 }
 
-ImmediateLoader.types = ['immediate'];
+ImmediateLoader.types = ['immediate']

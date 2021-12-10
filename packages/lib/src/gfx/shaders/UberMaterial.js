@@ -1,10 +1,10 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
-import * as THREE from 'three';
-import vertexShader from './Uber.vert';
-import fragmentShader from './Uber.frag';
-import capabilities from '../capabilities';
-import noise from '../noiseTexture';
+import * as THREE from 'three'
+import vertexShader from './Uber.vert'
+import fragmentShader from './Uber.frag'
+import capabilities from '../capabilities'
+import noise from '../noiseTexture'
 
 // Length of _samplesKernel is used in Uber.frag
 // If you want to change length of _samplesKernel, please, remember change it in Uber.frag too.
@@ -13,11 +13,10 @@ const _samplesKernel = [
   new THREE.Vector2(-0.541978, 0.840393),
   new THREE.Vector2(0.125533, -0.992089),
   new THREE.Vector2(0.374329, 0.927296),
-  new THREE.Vector2(-0.105475, 0.994422),
-];
+  new THREE.Vector2(-0.105475, 0.994422)
+]
 
 const defaultUniforms = THREE.UniformsUtils.merge([
-
   THREE.UniformsLib.fog,
   THREE.UniformsLib.lights,
 
@@ -45,10 +44,9 @@ const defaultUniforms = THREE.UniformsUtils.merge([
     samplesKernel: { type: 'v2v', value: null },
     noiseTex: { type: 't', value: null },
     noiseTexelSize: { type: 'v2', value: null },
-    srcTexelSize: { type: 'v2', value: null },
-  },
-
-]);
+    srcTexelSize: { type: 'v2', value: null }
+  }
+])
 
 const uberOptionNames = [
   'shininess',
@@ -70,8 +68,8 @@ const uberOptionNames = [
   'samplesKernel',
   'noiseTex',
   'noiseTexelSize',
-  'srcTexelSize',
-];
+  'srcTexelSize'
+]
 
 // properties that convert to uniforms
 const uberOptions = {
@@ -93,84 +91,87 @@ const uberOptions = {
   fogAlpha: 1.0,
   samplesKernel: _samplesKernel,
   noiseTex: noise.noiseTexture,
-  noiseTexelSize: new THREE.Vector2(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight),
+  noiseTexelSize: new THREE.Vector2(
+    1.0 / noise.noiseWidth,
+    1.0 / noise.noiseHeight
+  ),
   srcTexelSize: new THREE.Vector2(1.0 / 800.0, 1.0 / 600.0),
 
   copy(source) {
-    this.diffuse.copy(source.diffuse);
-    this.specular.copy(source.specular);
-    this.shininess = source.shininess;
-    this.opacity = source.opacity;
-    this.fixedColor.copy(source.fixedColor);
-    this.zOffset = source.zOffset;
-    this.zClipCoef = source.zClipCoef;
-    this.zClipValue = source.zClipValue;
-    this.clipPlaneValue = source.clipPlaneValue;
-    this.world2colorMatrix.copy(source.world2colorMatrix);
-    this.dashedLineSize = source.dashedLineSize;
-    this.dashedLinePeriod = source.dashedLinePeriod;
-    this.projMatrixInv = source.projMatrixInv;
-    this.viewport = source.viewport;
-    this.lineWidth = source.lineWidth; // used for thick lines only
-    this.toonShading = source.toonShading;
-    this.fogAlpha = source.fogAlpha;
-    this.samplesKernel = source.samplesKernel;
-    this.noiseTex = source.noiseTex;
-    this.noiseTexelSize = source.noiseTexelSize;
-    this.srcTexelSize = source.srcTexelSize;
-  },
-};
+    this.diffuse.copy(source.diffuse)
+    this.specular.copy(source.specular)
+    this.shininess = source.shininess
+    this.opacity = source.opacity
+    this.fixedColor.copy(source.fixedColor)
+    this.zOffset = source.zOffset
+    this.zClipCoef = source.zClipCoef
+    this.zClipValue = source.zClipValue
+    this.clipPlaneValue = source.clipPlaneValue
+    this.world2colorMatrix.copy(source.world2colorMatrix)
+    this.dashedLineSize = source.dashedLineSize
+    this.dashedLinePeriod = source.dashedLinePeriod
+    this.projMatrixInv = source.projMatrixInv
+    this.viewport = source.viewport
+    this.lineWidth = source.lineWidth // used for thick lines only
+    this.toonShading = source.toonShading
+    this.fogAlpha = source.fogAlpha
+    this.samplesKernel = source.samplesKernel
+    this.noiseTex = source.noiseTex
+    this.noiseTexelSize = source.noiseTexelSize
+    this.srcTexelSize = source.srcTexelSize
+  }
+}
 
 class UberMaterial extends THREE.RawShaderMaterial {
   constructor(params) {
-    super(params);
+    super(params)
     // add fog
-    this.fog = true;
+    this.fog = true
     // used for instanced geometry
-    this.instancedPos = false;
-    this.instancedMatrix = false;
+    this.instancedPos = false
+    this.instancedMatrix = false
     // atoms and links color
-    this.attrColor = false;
+    this.attrColor = false
     // second link color for cylinders
-    this.attrColor2 = false;
+    this.attrColor2 = false
     //
-    this.attrAlphaColor = false;
+    this.attrAlphaColor = false
     // overrides color for all vertices (used in selection)
-    this.overrideColor = false;
+    this.overrideColor = false
     // zsrpites
-    this.sphereSprite = false;
-    this.cylinderSprite = false;
+    this.sphereSprite = false
+    this.cylinderSprite = false
     // clip Surfs individually
-    this.zClip = false;
+    this.zClip = false
     // clip scene with global clip plane
-    this.clipPlane = false;
+    this.clipPlane = false
     // enable fake (chess-like) opacity
-    this.fakeOpacity = false;
+    this.fakeOpacity = false
     // render only depth, don't take care about the pixel color (used for transparency depth prepass)
-    this.prepassTransparancy = false;
+    this.prepassTransparancy = false
     // used to render pixel positions
-    this.colorFromPos = false;
+    this.colorFromPos = false
     // used to render shadowmap
-    this.shadowmap = false;
+    this.shadowmap = false
     // used to describe shadowmap type
-    this.shadowmapType = 'random';
+    this.shadowmapType = 'random'
     // used to render pixel view deph
-    this.colorFromDepth = false;
+    this.colorFromDepth = false
     // mark that rendering is for orthographic camera
-    this.orthoCam = false;
+    this.orthoCam = false
     // used to render dashed line
-    this.dashedLine = false;
+    this.dashedLine = false
     // mark as transparent
-    this.transparent = true;
+    this.transparent = true
     // mark as thick lines
-    this.thickLine = false;
+    this.thickLine = false
     // makes fog begin transparency (required for transparent background)
-    this.fogTransparent = false;
+    this.fogTransparent = false
     // used to render surface normals to G buffer for ssao effect
-    this.normalsToGBuffer = false;
+    this.normalsToGBuffer = false
     // used for toon material
-    this.toonShading = false;
-    this.uberOptions = uberOptions;
+    this.toonShading = false
+    this.uberOptions = uberOptions
     // set default values
     this.setValues({
       uniforms: THREE.UniformsUtils.clone(defaultUniforms),
@@ -179,199 +180,201 @@ class UberMaterial extends THREE.RawShaderMaterial {
       lights: true,
       fog: true,
       side: THREE.DoubleSide,
-      ...params,
-    });
+      ...params
+    })
   }
 
   precisionString() {
-    const { precision } = capabilities;
-    const str = `precision ${precision} float;\n`
-      + `precision ${precision} int;\n\n`;
-    return str;
+    const { precision } = capabilities
+    const str =
+      `precision ${precision} float;\n` + `precision ${precision} int;\n\n`
+    return str
   }
 
   // create copy of this material
   copy(source) {
-    super.copy(source);
+    super.copy(source)
 
-    this.fragmentShader = source.fragmentShader;
-    this.vertexShader = source.vertexShader;
+    this.fragmentShader = source.fragmentShader
+    this.vertexShader = source.vertexShader
 
-    this.uniforms = THREE.UniformsUtils.clone(source.uniforms);
-    this.defines = { ...source.defines };
-    this.extensions = source.extensions;
+    this.uniforms = THREE.UniformsUtils.clone(source.uniforms)
+    this.defines = { ...source.defines }
+    this.extensions = source.extensions
 
-    this.fog = source.fog;
-    this.instancedPos = source.instancedPos;
-    this.instancedMatrix = source.instancedMatrix;
-    this.attrColor = source.attrColor;
-    this.attrColor2 = source.attrColor2;
-    this.attrAlphaColor = source.attrAlphaColor;
-    this.overrideColor = source.overrideColor;
-    this.sphereSprite = source.sphereSprite;
-    this.cylinderSprite = source.cylinderSprite;
-    this.zClip = source.zClip;
-    this.clipPlane = source.clipPlane;
-    this.fakeOpacity = source.fakeOpacity;
-    this.colorFromPos = source.colorFromPos;
-    this.shadowmap = source.shadowmap;
-    this.shadowmapType = source.shadowmapType;
-    this.colorFromDepth = source.colorFromDepth;
-    this.orthoCam = source.orthoCam;
-    this.prepassTransparancy = source.prepassTransparancy;
-    this.dashedLine = source.dashedLine;
-    this.thickLine = source.thickLine;
-    this.fogTransparent = source.fogTransparent;
-    this.normalsToGBuffer = source.normalsToGBuffer;
-    this.toonShading = source.toonShading;
+    this.fog = source.fog
+    this.instancedPos = source.instancedPos
+    this.instancedMatrix = source.instancedMatrix
+    this.attrColor = source.attrColor
+    this.attrColor2 = source.attrColor2
+    this.attrAlphaColor = source.attrAlphaColor
+    this.overrideColor = source.overrideColor
+    this.sphereSprite = source.sphereSprite
+    this.cylinderSprite = source.cylinderSprite
+    this.zClip = source.zClip
+    this.clipPlane = source.clipPlane
+    this.fakeOpacity = source.fakeOpacity
+    this.colorFromPos = source.colorFromPos
+    this.shadowmap = source.shadowmap
+    this.shadowmapType = source.shadowmapType
+    this.colorFromDepth = source.colorFromDepth
+    this.orthoCam = source.orthoCam
+    this.prepassTransparancy = source.prepassTransparancy
+    this.dashedLine = source.dashedLine
+    this.thickLine = source.thickLine
+    this.fogTransparent = source.fogTransparent
+    this.normalsToGBuffer = source.normalsToGBuffer
+    this.toonShading = source.toonShading
 
-    this.uberOptions.copy(source.uberOptions);
+    this.uberOptions.copy(source.uberOptions)
 
-    return this;
+    return this
   }
 
   // its options are prototyped after this material's options
   createInstance() {
-    const inst = new UberMaterial();
-    inst.copy(this);
-    inst.uberOptions = Object.create(this.uberOptions);
-    return inst;
+    const inst = new UberMaterial()
+    inst.copy(this)
+    inst.uberOptions = Object.create(this.uberOptions)
+    return inst
   }
 
   setValues(values) {
     if (typeof values === 'undefined') {
-      return;
+      return
     }
 
     // set direct values
-    super.setValues(values);
+    super.setValues(values)
 
-    const defines = {};
-    const extensions = {};
+    const defines = {}
+    const extensions = {}
 
     if (this.fog) {
-      defines.USE_FOG = 1;
+      defines.USE_FOG = 1
     }
     if (this.instancedPos) {
-      defines.INSTANCED_POS = 1;
+      defines.INSTANCED_POS = 1
     }
     if (this.instancedMatrix) {
-      defines.INSTANCED_MATRIX = 1;
+      defines.INSTANCED_MATRIX = 1
     }
     if (this.attrColor) {
-      defines.ATTR_COLOR = 1;
+      defines.ATTR_COLOR = 1
     }
     if (this.attrColor2) {
-      defines.ATTR_COLOR2 = 1;
+      defines.ATTR_COLOR2 = 1
     }
     if (this.attrAlphaColor) {
-      defines.ATTR_ALPHA_COLOR = 1;
+      defines.ATTR_ALPHA_COLOR = 1
     }
     if (this.overrideColor) {
-      defines.OVERRIDE_COLOR = 1;
+      defines.OVERRIDE_COLOR = 1
     }
     if (this.sphereSprite) {
-      defines.SPHERE_SPRITE = 1;
-      extensions.fragDepth = 1;
+      defines.SPHERE_SPRITE = 1
+      extensions.fragDepth = 1
     }
     if (this.cylinderSprite) {
-      defines.CYLINDER_SPRITE = 1;
-      extensions.fragDepth = 1;
+      defines.CYLINDER_SPRITE = 1
+      extensions.fragDepth = 1
     }
     if (this.zClip) {
-      defines.ZCLIP = 1;
+      defines.ZCLIP = 1
     }
     if (this.clipPlane) {
-      defines.CLIP_PLANE = 1;
+      defines.CLIP_PLANE = 1
     }
     if (this.fakeOpacity) {
-      defines.FAKE_OPACITY = 1;
+      defines.FAKE_OPACITY = 1
     }
     if (this.lights) {
-      defines.USE_LIGHTS = 1;
+      defines.USE_LIGHTS = 1
     }
     if (this.colorFromPos) {
-      defines.COLOR_FROM_POS = 1;
+      defines.COLOR_FROM_POS = 1
     }
     if (this.shadowmap) {
-      defines.SHADOWMAP = 1;
+      defines.SHADOWMAP = 1
       if (this.shadowmapType === 'pcf') {
-        defines.SHADOWMAP_PCF_SHARP = 1;
+        defines.SHADOWMAP_PCF_SHARP = 1
       } else if (this.shadowmapType === 'random') {
-        defines.SHADOWMAP_PCF_RAND = 1;
+        defines.SHADOWMAP_PCF_RAND = 1
       } else {
-        defines.SHADOWMAP_BASIC = 1;
+        defines.SHADOWMAP_BASIC = 1
       }
     }
     if (this.colorFromDepth) {
-      defines.COLOR_FROM_DEPTH = 1;
+      defines.COLOR_FROM_DEPTH = 1
     }
     if (this.orthoCam) {
-      defines.ORTHOGRAPHIC_CAMERA = 1;
+      defines.ORTHOGRAPHIC_CAMERA = 1
     }
     if (this.prepassTransparancy) {
-      defines.PREPASS_TRANSP = 1;
+      defines.PREPASS_TRANSP = 1
     }
     if (this.dashedLine) {
-      defines.DASHED_LINE = 1;
+      defines.DASHED_LINE = 1
     }
     if (this.thickLine) {
-      defines.THICK_LINE = 1;
+      defines.THICK_LINE = 1
     }
     if (this.fogTransparent) {
-      defines.FOG_TRANSPARENT = 1;
+      defines.FOG_TRANSPARENT = 1
     }
     if (this.normalsToGBuffer) {
-      extensions.drawBuffers = 1;
-      defines.NORMALS_TO_G_BUFFER = 1;
+      extensions.drawBuffers = 1
+      defines.NORMALS_TO_G_BUFFER = 1
     }
     if (this.toonShading) {
-      defines.TOON_SHADING = 1;
+      defines.TOON_SHADING = 1
     }
     // set dependent values
-    this.defines = defines;
-    this.extensions = extensions;
+    this.defines = defines
+    this.extensions = extensions
   }
 
   setUberOptions(values) {
     if (typeof values === 'undefined') {
-      return;
+      return
     }
 
     for (const key in values) {
       if (!values.hasOwnProperty(key)) {
-        continue;
+        continue
       }
 
       if (this.uberOptions[key] instanceof THREE.Color) {
-        this.uberOptions[key] = values[key].clone();
+        this.uberOptions[key] = values[key].clone()
       } else {
-        this.uberOptions[key] = values[key];
+        this.uberOptions[key] = values[key]
       }
     }
   }
 
   clone(shallow) {
     if (!shallow) {
-      return THREE.Material.prototype.clone.call(this);
+      return THREE.Material.prototype.clone.call(this)
     }
-    return this.createInstance();
+    return this.createInstance()
   }
 
   updateUniforms() {
-    const self = this;
+    const self = this
 
     uberOptionNames.forEach((p) => {
       if (self.uniforms.hasOwnProperty(p)) {
-        if (self.uberOptions[p] instanceof THREE.Color
-          || self.uberOptions[p] instanceof THREE.Matrix4) {
-          self.uniforms[p].value = self.uberOptions[p].clone();
+        if (
+          self.uberOptions[p] instanceof THREE.Color ||
+          self.uberOptions[p] instanceof THREE.Matrix4
+        ) {
+          self.uniforms[p].value = self.uberOptions[p].clone()
         } else {
-          self.uniforms[p].value = self.uberOptions[p];
+          self.uniforms[p].value = self.uberOptions[p]
         }
       }
-    });
+    })
   }
 }
 
-export default UberMaterial;
+export default UberMaterial

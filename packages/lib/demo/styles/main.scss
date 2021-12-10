@@ -1,6 +1,6 @@
 /* stylelint-disable no-descending-specificity */
 
-@import "../../src/Miew.scss";
+@import '../../src/Miew.scss';
 
 //////////////////////////////////////////////////////////////////////////////
 // Full-page web application
@@ -22,7 +22,9 @@ $titlebar-gray: 64;
 $titlebar-alpha: 0.75;
 $titlebar-height: 40px;
 $back-gray: 32;
-$menu-gray: calc(#{$titlebar-alpha} * #{$titlebar-gray} + (1 - #{$titlebar-alpha}) * #{$back-gray});
+$menu-gray: calc(
+  #{$titlebar-alpha} * #{$titlebar-gray} + (1 - #{$titlebar-alpha}) * #{$back-gray}
+);
 $selection-panel-row-height: 42px;
 
 .mode-message {
@@ -30,7 +32,12 @@ $selection-panel-row-height: 42px;
   width: 200px;
   height: 50px;
   color: $titlebar-color;
-  background-color: rgba($titlebar-gray, $titlebar-gray, $titlebar-gray, $titlebar-alpha);
+  background-color: rgba(
+    $titlebar-gray,
+    $titlebar-gray,
+    $titlebar-gray,
+    $titlebar-alpha
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,7 +81,12 @@ $selection-panel-row-height: 42px;
   right: 10px;
   border-radius: 4px;
   color: $titlebar-color;
-  background-color: rgba($titlebar-gray, $titlebar-gray, $titlebar-gray, $titlebar-alpha);
+  background-color: rgba(
+    $titlebar-gray,
+    $titlebar-gray,
+    $titlebar-gray,
+    $titlebar-alpha
+  );
   display: flex;
   justify-content: left;
   opacity: 0;
@@ -120,7 +132,12 @@ $selection-panel-row-height: 42px;
     border-radius: 0;
     width: $titlebar-height;
     height: $titlebar-height;
-    outline-color: rgba($titlebar-gray, $titlebar-gray, $titlebar-gray, $titlebar-alpha);
+    outline-color: rgba(
+      $titlebar-gray,
+      $titlebar-gray,
+      $titlebar-gray,
+      $titlebar-alpha
+    );
     // font-size: larger;
   }
 
@@ -145,7 +162,12 @@ $selection-panel-row-height: 42px;
     height: $titlebar-height;
     text-align: center;
     color: $titlebar-color;
-    background-color: rgba($titlebar-gray, $titlebar-gray, $titlebar-gray, $titlebar-alpha);
+    background-color: rgba(
+      $titlebar-gray,
+      $titlebar-gray,
+      $titlebar-gray,
+      $titlebar-alpha
+    );
 
     .tooltip-inner {
       color: #383838;
@@ -157,9 +179,9 @@ $selection-panel-row-height: 42px;
     }
   }
 
-  [data-toolbar-type=miew-menu-toolbar-mode],
-  [data-toolbar-type=miew-menu-toolbar-colorer],
-  [data-toolbar-type=miew-menu-toolbar-resolution] {
+  [data-toolbar-type='miew-menu-toolbar-mode'],
+  [data-toolbar-type='miew-menu-toolbar-colorer'],
+  [data-toolbar-type='miew-menu-toolbar-resolution'] {
     position: absolute;
     right: 0;
     top: $titlebar-height;
@@ -235,7 +257,7 @@ $selection-panel-row-height: 42px;
     height: 0;
     margin-left: -5px;
     vertical-align: middle;
-    content: " ";
+    content: ' ';
     border-right: 5px solid transparent;
     border-bottom: 5px solid;
     border-left: 5px solid transparent;
@@ -249,7 +271,12 @@ $selection-panel-row-height: 42px;
     width: 100%;
     height: 100%;
     padding: 0;
-    background-color: rgba($titlebar-gray, $titlebar-gray, $titlebar-gray, $titlebar-alpha);
+    background-color: rgba(
+      $titlebar-gray,
+      $titlebar-gray,
+      $titlebar-gray,
+      $titlebar-alpha
+    );
 
     // full-height menus
     .row {
@@ -267,12 +294,12 @@ $selection-panel-row-height: 42px;
       display: none;
     }
 
-    input[type=number]::-webkit-outer-spin-button,
-    input[type=number]::-webkit-inner-spin-button {
+    input[type='number']::-webkit-outer-spin-button,
+    input[type='number']::-webkit-inner-spin-button {
       -webkit-appearance: none;
     }
 
-    input[type=number] {
+    input[type='number'] {
       -moz-appearance: textfield;
     }
   }
@@ -326,12 +353,12 @@ $selection-panel-row-height: 42px;
       padding: 0;
     }
 
-    [data-toggle=selectcolor] {
+    [data-toggle='selectcolor'] {
       padding-left: 5px;
       padding-right: 5px;
     }
 
-    [data-toggle=selectcolor].active {
+    [data-toggle='selectcolor'].active {
       a {
         border-width: 2px;
         border-color: #337ab7;
@@ -367,11 +394,11 @@ $selection-panel-row-height: 42px;
     display: none;
   }
 
-  .panel-menu[data-panel-type=miew-menu-panel-select-color] .row {
+  .panel-menu[data-panel-type='miew-menu-panel-select-color'] .row {
     align-content: flex-start;
   }
 
-  .panel-menu[data-panel-type=miew-menu-panel-selection] {
+  .panel-menu[data-panel-type='miew-menu-panel-selection'] {
     .row {
       display: flex;
       margin: 0;
@@ -420,13 +447,13 @@ $selection-panel-row-height: 42px;
     }
   }
 
-  [data-modal-type=miew-menu-modal-rename-preset] {
-    input[type=text] {
+  [data-modal-type='miew-menu-modal-rename-preset'] {
+    input[type='text'] {
       border-width: 0;
       width: 100%;
     }
 
-    input[type=text]:focus {
+    input[type='text']:focus {
       outline: none;
       border-width: 0;
     }
@@ -497,7 +524,7 @@ $selection-panel-row-height: 42px;
       padding: 1px 2px;
     }
 
-    input[type=number] {
+    input[type='number'] {
       width: 32px;
       height: auto;
       padding: 1px 2px;
@@ -516,13 +543,13 @@ $selection-panel-row-height: 42px;
       }
     }
 
-    [data-value=miew-menu-panel-select-color] {
+    [data-value='miew-menu-panel-select-color'] {
       span.pull-right {
         display: flex;
       }
     }
 
-    [data-value=miew-menu-panel-selection] {
+    [data-value='miew-menu-panel-selection'] {
       display: flex;
       flex-wrap: nowrap;
       justify-content: space-between;
@@ -533,7 +560,7 @@ $selection-panel-row-height: 42px;
         flex-wrap: nowrap;
         justify-content: flex-end;
 
-        [data-type=selection-target] {
+        [data-type='selection-target'] {
           text-align: right;
           white-space: pre-wrap;
           overflow: hidden;
@@ -543,10 +570,10 @@ $selection-panel-row-height: 42px;
     }
   }
 
-  [data-form-type=miew-menu-form-load-pdb] {
+  [data-form-type='miew-menu-form-load-pdb'] {
     overflow: hidden;
 
-    input[type=file] {
+    input[type='file'] {
       position: absolute;
       top: 0;
       right: 0;

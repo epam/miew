@@ -1,98 +1,105 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react'
 import {
-  FaInfoCircle, FaFolderOpen, FaQuestionCircle, FaWrench,
-} from 'react-icons/fa';
-import { BsImage } from 'react-icons/bs';
-import { ImEye, ImStarFull } from 'react-icons/im';
+  FaInfoCircle,
+  FaFolderOpen,
+  FaQuestionCircle,
+  FaWrench
+} from 'react-icons/fa'
+import { BsImage } from 'react-icons/bs'
+import { ImEye, ImStarFull } from 'react-icons/im'
 
-import InfoPanel from '../../../containers/InfoPanelContainer';
-import AboutPanel from '../../../containers/AboutPanelContainer';
-import ToolsPanel from '../../../containers/ToolsPanelContainer';
-import GalleryPanel from '../../../containers/GalleryPanelContainer';
-import RenderSettingsPanel from '../../../containers/RenderSettingsPanelContainer';
-import LoadPanel from './panels/LoadPanel.jsx';
-import PanelsListButton from './PanelsListButton.jsx';
+import InfoPanel from '../../../containers/InfoPanelContainer'
+import AboutPanel from '../../../containers/AboutPanelContainer'
+import ToolsPanel from '../../../containers/ToolsPanelContainer'
+import GalleryPanel from '../../../containers/GalleryPanelContainer'
+import RenderSettingsPanel from '../../../containers/RenderSettingsPanelContainer'
+import LoadPanel from './panels/LoadPanel.jsx'
+import PanelsListButton from './PanelsListButton.jsx'
 
-import './PanelsList.scss';
+import './PanelsList.scss'
 
 const panels = [
   {
     name: 'Info',
-    Icon: FaInfoCircle,
+    Icon: FaInfoCircle
   },
   {
     name: 'Load',
-    Icon: FaFolderOpen,
+    Icon: FaFolderOpen
   },
   {
     name: 'Gallery',
-    Icon: ImStarFull,
+    Icon: ImStarFull
   },
   {
     name: 'Representations',
-    Icon: BsImage,
+    Icon: BsImage
   },
   {
     name: 'Render settings',
-    Icon: ImEye,
+    Icon: ImEye
   },
   {
     name: 'Tools',
-    Icon: FaWrench,
+    Icon: FaWrench
   },
   {
     name: 'About',
-    Icon: FaQuestionCircle,
-  },
-];
+    Icon: FaQuestionCircle
+  }
+]
 
 function PanelsList({ viewer }) {
-  const [selectedPanel, setSelectedPanel] = useState('Info');
+  const [selectedPanel, setSelectedPanel] = useState('Info')
 
   useEffect(() => {
-    viewer.halt();
-    document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
+    viewer.halt()
+    document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur')
     return () => {
-      viewer.run();
-      document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
-    };
-  });
+      viewer.run()
+      document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur')
+    }
+  })
 
   const handlePanelClick = (panel) => () => {
-    setSelectedPanel(panel);
-  };
+    setSelectedPanel(panel)
+  }
 
   const getPanelComponent = () => {
     switch (selectedPanel) {
       case 'Info':
-        return <InfoPanel />;
+        return <InfoPanel />
       case 'Render settings':
-        return <RenderSettingsPanel />;
+        return <RenderSettingsPanel />
       case 'Tools':
-        return <ToolsPanel />;
+        return <ToolsPanel />
       case 'About':
-        return <AboutPanel />;
+        return <AboutPanel />
       case 'Gallery':
-        return <GalleryPanel />;
+        return <GalleryPanel />
       case 'Load':
-        return <LoadPanel />;
+        return <LoadPanel />
       default:
-        return <></>;
+        return <></>
     }
-  };
+  }
 
-  const panelsButtons = useMemo(() => panels.map(({ name, Icon }, index) => {
-    const active = name === selectedPanel;
-    return (
-      <PanelsListButton
-        active={active}
-        name={name}
-        key={index}
-        Icon={Icon}
-        handlePanelClick={handlePanelClick(name)}
-      />
-    );
-  }), [selectedPanel]);
+  const panelsButtons = useMemo(
+    () =>
+      panels.map(({ name, Icon }, index) => {
+        const active = name === selectedPanel
+        return (
+          <PanelsListButton
+            active={active}
+            name={name}
+            key={index}
+            Icon={Icon}
+            handlePanelClick={handlePanelClick(name)}
+          />
+        )
+      }),
+    [selectedPanel]
+  )
 
   return (
     <div className="panels-list">
@@ -102,11 +109,11 @@ function PanelsList({ viewer }) {
         {getPanelComponent()}
       </div>
     </div>
-  );
+  )
 }
 
 PanelsList.defaultProps = {
-  visibility: 'hidden',
-};
+  visibility: 'hidden'
+}
 
-export default PanelsList;
+export default PanelsList

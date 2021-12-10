@@ -1,5 +1,3 @@
-@import "spin.js/spin.css";
-
 .miew-canvas > canvas {
   display: block;
   width: 100%;
@@ -43,7 +41,7 @@ $light-color: #ccc;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: stretch;
-  align-items: left;
+  align-items: flex-start;
   -ms-flex-pack: initial;
   justify-content: left;
   opacity: 0;

@@ -1,46 +1,48 @@
-import React from 'react';
-import Table from 'react-bootstrap/Table';
+import React from 'react'
+import Table from 'react-bootstrap/Table'
 
-import './InfoPanel.scss';
+import './InfoPanel.scss'
 
 const InfoPanel = ({ complex }) => {
-  const { name, metadata } = complex[0];
-  const { classification, title, id } = metadata;
-  const molecules = complex[0].getMolecules();
+  const { name, metadata } = complex[0]
+  const { classification, title, id } = metadata
+  const molecules = complex[0].getMolecules()
 
   const statistics = [
     {
       label: 'Atoms',
-      value: complex[0].getAtomCount(),
+      value: complex[0].getAtomCount()
     },
     {
       label: 'Bonds',
-      value: complex[0].getBondCount(),
+      value: complex[0].getBondCount()
     },
     {
       label: 'Residues',
-      value: complex[0].getResidueCount(),
+      value: complex[0].getResidueCount()
     },
     {
       label: 'Chains',
-      value: complex[0].getChainCount(),
+      value: complex[0].getChainCount()
     },
     {
       label: 'Molecules',
-      value: complex[0].getMoleculeCount(),
-    },
-  ];
+      value: complex[0].getMoleculeCount()
+    }
+  ]
 
-  const rendeStatistics = () => statistics.map(({ label, value }, index) => (
+  const rendeStatistics = () =>
+    statistics.map(({ label, value }, index) => (
       <tr key={index}>
         <td>{label}</td>
         <td className="text-center">{value}</td>
       </tr>
-  ));
+    ))
 
-  const renderMolecules = () => molecules.map(({ name: moleculeName }, index) => (
+  const renderMolecules = () =>
+    molecules.map(({ name: moleculeName }, index) => (
       <li key={index}>{moleculeName}</li>
-  ));
+    ))
 
   return (
     <div className="info-panel">
@@ -73,11 +75,11 @@ const InfoPanel = ({ complex }) => {
         </tbody>
       </Table>
     </div>
-  );
-};
+  )
+}
 
 InfoPanel.defaultProps = {
-  id: 'none',
-};
+  id: 'none'
+}
 
-export default InfoPanel;
+export default InfoPanel

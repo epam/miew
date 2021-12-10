@@ -1,9 +1,6 @@
-import ExporterList from './exporters/ExporterList';
+import ExporterList from './exporters/ExporterList'
 
-import PDBExporter from './exporters/PDBExporter';
-import FBXExporter from './exporters/FBXExporter';
+import PDBExporter from './exporters/PDBExporter'
+import FBXExporter from './exporters/FBXExporter'
 
-export default new ExporterList([
-  PDBExporter,
-  FBXExporter,
-]);
+export default new ExporterList([PDBExporter, FBXExporter])
