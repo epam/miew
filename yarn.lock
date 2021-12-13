@@ -11486,7 +11486,7 @@ __metadata:
     jest-simple-dot-reporter: ^1.0.5
     jquery: ^3.5.1
     jquery.terminal: 2.20.1
-    lodash: ^4.17.20
+    lodash: ^4.17.21
     miew: 0.9.0
     mini-css-extract-plugin: ^0.9.0
     npm-run-all: ^4.1.5
@@ -11554,7 +11554,7 @@ __metadata:
     jquery: 3.5.1
     jquery.terminal: 2.20.1
     jsdoc: ^3.6.3
-    lodash: ^4.17.15
+    lodash: ^4.17.21
     mini-css-extract-plugin: ^0.9.0
     mkdirp: ^1.0.3
     mocha: ^7.1.2
