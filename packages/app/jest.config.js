@@ -4,5 +4,6 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.jsx'],
   moduleDirectories: ['node_modules'],
   coverageReporters: ['lcov', 'text-summary'],
-  coverageDirectory: 'coverage'
+  coverageDirectory: 'coverage',
+  moduleNameMapper: { '\\.(css|scss)$': 'identity-obj-proxy' }
 }

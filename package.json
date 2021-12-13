@@ -10,7 +10,8 @@
   "scripts": {
     "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
     "coveralls": "cat coverage/general.info | coveralls",
-    "build:ci": "yarn workspaces foreach -ptv run ci"
+    "build:ci": "yarn workspaces foreach -ptv run ci",
+    "test": "yarn workspaces foreach -ptv run test "
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
