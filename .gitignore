@@ -8,6 +8,7 @@ coverage/
 .pnp.*
 .yarn/*
 .idea/
+.vscode/
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
