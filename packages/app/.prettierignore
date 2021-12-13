@@ -2,6 +2,7 @@
 /vendor
 /docs
 /build
+/tools
 /node_modules
 !.eslintrc.js
 !.mocharc.js
