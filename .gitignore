@@ -12,15 +12,5 @@ coverage/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-!.yarn/cache
-!.idea/codeStyles/Project.xml
-.idea
-.vscode
-
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-.idea/**/dbnavigator.xml
+.idea/*
+.vscode/*
