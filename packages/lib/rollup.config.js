@@ -58,7 +58,7 @@ const config = {
       PACKAGE_VERSION: JSON.stringify(version.combined),
       DEBUG: false
     }),
-    peerDepsExternal({ includeDependencies: true}),
+    peerDepsExternal({ includeDependencies: true }),
     string({
       include: ['**/*.vert', '**/*.frag']
     }),
