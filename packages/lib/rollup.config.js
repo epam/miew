@@ -1,63 +1,33 @@
 /* eslint-env node */
-
-import rollupPluginBabel from 'rollup-plugin-babel'
-import rollupPluginCommonJS from 'rollup-plugin-commonjs'
-import rollupPluginReplace from 'rollup-plugin-replace'
-import rollupPluginNodeResolve from 'rollup-plugin-node-resolve'
+import peerDepsExternal from 'rollup-plugin-peer-deps-external'
+import babel from '@rollup/plugin-babel'
+import commonjs from '@rollup/plugin-commonjs'
+import replace from '@rollup/plugin-replace'
+import nodeResolve from '@rollup/plugin-node-resolve'
+import cleanup from 'rollup-plugin-cleanup'
 import { string } from 'rollup-plugin-string'
-
 import path from 'path'
 import version from './tools/version'
 import packageJson from './package.json'
+import strip from "@rollup/plugin-strip";
+
+const mode = {
+  PRODUCTION: 'production',
+  DEVELOPMENT: 'development'
+}
 
 const banner = `/** ${version.copyright} */\n`
-
+const extensions = ['.js', '.jsx', '.ts', '.tsx']
+const isProduction = process.env.NODE_ENV === mode.PRODUCTION
+const includePattern = 'src/**/*'
 const warnExceptions = {
   THIS_IS_UNDEFINED: [
     'spin.js' // https://github.com/fgnass/spin.js/issues/351
   ]
 }
 
-export default {
-  external: ['three', 'lodash'],
+const config = {
   input: './src/index.js',
-  onwarn(warning, warn) {
-    const exceptions = (warning.loc && warnExceptions[warning.code]) || []
-    if (!exceptions.some((name) => warning.loc.file.endsWith(name))) {
-      warn(warning)
-    }
-  },
-  plugins: [
-    rollupPluginReplace({
-      PACKAGE_VERSION: JSON.stringify(version.combined),
-      DEBUG: false
-    }),
-    string({
-      include: ['**/*.vert', '**/*.frag']
-    }),
-    rollupPluginNodeResolve(),
-    rollupPluginCommonJS({
-      include: [
-        /node_modules/,
-        './vendor/js/**',
-        './src/utils/SelectionParser.js',
-        './src/utils/MiewCLIParser.js'
-      ],
-      namedExports: {
-        'vendor/js/Smooth.js': ['Smooth']
-      }
-    }),
-    rollupPluginBabel({
-      runtimeHelpers: true,
-      exclude: [
-        /node_modules[\\/](?!three)/,
-        './vendor/js/**',
-        './src/utils/SelectionParser',
-        './src/utils/MiewCLIParser.js'
-      ],
-      extends: path.join(__dirname, '/.babelrc')
-    })
-  ],
   output: [
     {
       format: 'umd',
@@ -76,5 +46,51 @@ export default {
       banner,
       sourcemap: true
     }
-  ]
+  ],
+  onwarn(warning, warn) {
+    const exceptions = (warning.loc && warnExceptions[warning.code]) || []
+    if (!exceptions.some((name) => warning.loc.file.endsWith(name))) {
+      warn(warning)
+    }
+  },
+  plugins: [
+    replace({
+      PACKAGE_VERSION: JSON.stringify(version.combined),
+      DEBUG: false
+    }),
+    peerDepsExternal({ includeDependencies: true}),
+    string({
+      include: ['**/*.vert', '**/*.frag']
+    }),
+    nodeResolve(),
+    commonjs({
+      include: [
+        /node_modules/,
+        './vendor/js/**',
+        './src/utils/SelectionParser.js',
+        './src/utils/MiewCLIParser.js'
+      ],
+      namedExports: {
+        'vendor/js/Smooth.js': ['Smooth']
+      }
+    }),
+    cleanup({
+      extensions: extensions.map((ext) => ext.trimStart('.')),
+      comments: 'none',
+      include: includePattern
+    }),
+    ...(isProduction ? [strip({ include: includePattern })] : []),
+    babel({
+      babelHelpers: 'runtime',
+      exclude: [
+        /node_modules[\\/](?!three)/,
+        './vendor/js/**',
+        './src/utils/SelectionParser',
+        './src/utils/MiewCLIParser.js'
+      ],
+      extends: path.join(__dirname, '/.babelrc')
+    })
+  ],
 }
+
+export default config
