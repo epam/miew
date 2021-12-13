@@ -69,10 +69,7 @@ const config = {
         './vendor/js/**',
         './src/utils/SelectionParser.js',
         './src/utils/MiewCLIParser.js'
-      ],
-      namedExports: {
-        'vendor/js/Smooth.js': ['Smooth']
-      }
+      ]
     }),
     cleanup({
       extensions: extensions.map((ext) => ext.trimStart('.')),
