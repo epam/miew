@@ -41,13 +41,6 @@
     "build:css": "run-s 'build:css:*'",
     "build:css:bundle": "postcss src/Miew.scss -o build/dist/Miew.css",
     "build:css:minify": "postcss build/dist/Miew.css -o build/dist/Miew.min.css --use cssnano --map",
-    "build:demo": "webpack --mode production",
-    "build:examples": "ncp examples/ build/examples/ && run-s 'build:examples:*'",
-    "build:examples:viewer": "mkdirp build/v && ncp examples/fullscreen.html build/v/index.html",
-    "build:examples:webpack": "cd build/examples/ && webpack --mode production --config miew_via_webpack.config.js",
-    "build:examples:browserify": "cd build/examples/ && browserify -e miew_via_browserify.js -o miew_via_browserify.bundle.js",
-    "build:examples:react": "cd build/examples/ && webpack --mode production --config miew_via_react.config.js",
-    "build:docs": "jsdoc -c jsdoc.config.js",
     "demo": "node tools/serve.js",
     "show:cover": "node tools/open.js coverage/lcov-report/index.html",
     "show:docs": "node tools/open.js build/docs/index.html",
@@ -56,8 +49,7 @@
     "preversion": "run-s lint test",
     "version": "cross-env NODE_ENV=production run-s build:js build:css dist",
     "jison": "node tools/jison.js src/utils/*.jison",
-    "jison:one": "node ./tools/jison.js",
-    "serve": "serve -s build -l 4001"
+    "jison:one": "node ./tools/jison.js"
   },
   "bugs": {
     "url": "https://github.com/epam/miew/issues"
