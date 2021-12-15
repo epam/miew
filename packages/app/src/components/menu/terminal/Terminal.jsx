@@ -23,7 +23,7 @@ function Terminal({ viewer, isTerminalVisible }) {
         report: '#1a9cb0'
       }
       const onLogMessage = function (e) {
-        const msg = e.message.replace('[', '(').replace(']', ')') // temp workaround for https://github.com/jcubic/jquery.terminal/issues/470
+        const msg = e.message.replaceAll('[', '(').replaceAll(']', ')') // temp workaround for https://github.com/jcubic/jquery.terminal/issues/470
         term.echo(`[[b;${colors[e.level] || '#666'};]${msg}]`)
       }
       viewer.logger.addEventListener('message', onLogMessage)

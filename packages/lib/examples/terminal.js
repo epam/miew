@@ -31,8 +31,8 @@ function initializeTerminal(viewer) {
             report: '#1a9cb0'
           }
           viewer.logger.addEventListener('message', function (e) {
-            const msg = e.message.replace(/]/g, '\\]')
-            term.echo('[[b;' + (colors[e.level] || '#666') + ';]' + msg + ']')
+            const msg = e.message.replaceAll('[', '(').replaceAll(']', ')') // temp workaround for https://github.com/jcubic/jquery.terminal/issues/470
+            term.echo(`[[b;${colors[e.level] || '#666'};]${msg}]`)
           })
         }
       }
