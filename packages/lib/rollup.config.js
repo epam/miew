@@ -9,7 +9,7 @@ import { string } from 'rollup-plugin-string'
 import path from 'path'
 import version from './tools/version'
 import packageJson from './package.json'
-import strip from "@rollup/plugin-strip";
+import strip from '@rollup/plugin-strip'
 
 const mode = {
   PRODUCTION: 'production',
@@ -87,7 +87,7 @@ const config = {
       ],
       extends: path.join(__dirname, '/.babelrc')
     })
-  ],
+  ]
 }
 
 export default config

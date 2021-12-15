@@ -15,4 +15,3 @@ declare module '*.svg' {
   const svgComponent: SvgrComponent
   export default svgComponent
 }
-
