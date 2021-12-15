@@ -15,5 +15,7 @@ coverage/
 !.yarn/versions
 .idea/*
 .vscode/*
+**/**.bundle.js
+examples/v
 documentation/*
 !documentation/jsdoc-templates
