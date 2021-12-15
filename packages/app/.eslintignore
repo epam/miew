@@ -1,6 +1,7 @@
 /images
 /node_modules
 /build
+/tools
 !.webpack.config.js
 !.eslintrc.js
 !.mocharc.js

@@ -1,5 +1,6 @@
 node_modules/
 build/
+dist/
 coverage/
 .nyc_output/
 .sonar/
@@ -7,10 +8,10 @@ coverage/
 .idea/tasks.xml
 .pnp.*
 .yarn/*
-.idea/
-.vscode/
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.idea/*
+.vscode/*
