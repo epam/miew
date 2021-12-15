@@ -33,8 +33,5 @@
   "env": {
     "jest": true,
     "mocha": true
-  },
-  "globals": {
-    "env": true
   }
 }
