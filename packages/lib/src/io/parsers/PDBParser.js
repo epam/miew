@@ -295,7 +295,7 @@ class PDBParser extends Parser {
     let remark = this._remarks[remarkNum]
     if (_.isUndefined(remark)) {
       const RemarkParser = remarkParsers[remarkNum]
-      if (_.isFunction(RemarkParser)) {
+      if (typeof RemarkParser === 'function') {
         this._remarks[remarkNum] = remark = new RemarkParser(this._complex)
       }
     }
@@ -466,7 +466,7 @@ class PDBParser extends Parser {
     while (!stream.end()) {
       const tag = stream.readString(1, TAG_LENGTH)
       const func = PDBParser.tagParsers[tag]
-      if (_.isFunction(func)) {
+      if (typeof func === 'function') {
         func.call(this, stream)
       }
       stream.next()
