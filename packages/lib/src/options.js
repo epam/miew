@@ -253,26 +253,29 @@ function _fromArray(entries) {
     const /** string[] */ entry = entries[i]
     let /** string? */ key = entry[0]
     const /** string? */ value = entry[1]
-    let /** function|string? */ action = actions[key]
 
-    // unwind shortcuts and aliases
-    while (_.isString(action)) {
-      key = action
-      action = actions[key]
-    }
+    if (actions.hasOwnProperty(key)) {
+      let /** function|string? */ action = actions[key]
 
-    // either set a property or use specialized parser
-    if (!action) {
-      const adapter = adapters[typeof _.get(settings.defaults, key)]
-      if (adapter) {
-        _.set(opts, `settings.${key}`, adapter(value))
-      } else {
-        logger.warn(`Unknown option "${key}"`)
+      // unwind shortcuts and aliases
+      while (_.isString(action)) {
+        key = action
+        action = actions[key]
       }
-    } else if (typeof action === 'function' && actions.hasOwnProperty(key)) {
-      const result = action(value, opts)
-      if (result !== undefined) {
-        opts[key] = result
+
+      // either set a property or use specialized parser
+      if (!action) {
+        const adapter = adapters[typeof _.get(settings.defaults, key)]
+        if (adapter) {
+          _.set(opts, `settings.${key}`, adapter(value))
+        } else {
+          logger.warn(`Unknown option "${key}"`)
+        }
+      } else if (typeof action === 'function') {
+        const result = action(value, opts)
+        if (result !== undefined) {
+          opts[key] = result
+        }
       }
     }
   }
