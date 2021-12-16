@@ -252,22 +252,17 @@ function _fromArray(entries) {
     const /** string[] */ entry = entries[i]
     let /** string? */ key = entry[0]
     const /** string? */ value = entry[1]
-    const /** string[] */ splitedString = key.split('.')
+    let /** function|string? */ action = actions[key]
     if (actions.hasOwnProperty(key)) {
-      let /** function|string? */ action = actions[key]
       while (_.isString(action)) {
         key = action
         action = actions[key]
       }
       if (typeof action === 'function') {
         const result = action(value, opts)
-        if (result !== undefined) {
-          opts[key] = result
-        }
+        if (result !== undefined) opts[key] = result
       }
-    }
-    if (settings.defaults.hasOwnProperty(splitedString[0])) {
-      const /** function|string? */ action = actions[key]
+    } else {
       if (!action) {
         const adapter = adapters[typeof _.get(settings.defaults, key)]
         if (adapter) {

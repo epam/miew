@@ -1,4 +1,4 @@
-/** Miew - 3D Molecular Viewer v0.9.0+20211216.153701.b82b229 Copyright (c) 2015-2021 EPAM Systems, Inc. */
+/** Miew - 3D Molecular Viewer v0.9.0+20211216.160330.c86743d-mod Copyright (c) 2015-2021 EPAM Systems, Inc. */
 
 import _ from 'lodash'
 import * as THREE from 'three'
@@ -2118,10 +2118,11 @@ function _fromArray(entries) {
     var entry = entries[i]
     var key = entry[0]
     var value = entry[1]
+    var splitedString = key.split('.')
 
     if (
       actions.hasOwnProperty(key) ||
-      adapters[_typeof(_.get(settings$1.defaults, key))]
+      settings$1.defaults.hasOwnProperty(splitedString[0])
     ) {
       var action = actions[key]
 
@@ -45710,7 +45711,7 @@ Miew.prototype.motm = function () {
   })
 }
 
-Miew.prototype.VERSION = '0.9.0+20211216.153701.b82b229'
+Miew.prototype.VERSION = '0.9.0+20211216.160330.c86743d-mod'
 
 _.assign(Miew, {
   VERSION: Miew.prototype.VERSION,
