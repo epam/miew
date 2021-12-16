@@ -252,8 +252,8 @@ function _fromArray(entries) {
     const /** string[] */ entry = entries[i]
     let /** string? */ key = entry[0]
     const /** string? */ value = entry[1]
-    let /** function|string? */ action = actions[key]
     if (actions.hasOwnProperty(key)) {
+      let /** function|string? */ action = actions[key]
       while (_.isString(action)) {
         key = action
         action = actions[key]
@@ -263,13 +263,11 @@ function _fromArray(entries) {
         if (result !== undefined) opts[key] = result
       }
     } else {
-      if (!action) {
-        const adapter = adapters[typeof _.get(settings.defaults, key)]
-        if (adapter) {
-          _.set(opts, `settings.${key}`, adapter(value))
-        } else {
-          logger.warn(`Unknown option "${key}"`)
-        }
+      const adapter = adapters[typeof _.get(settings.defaults, key)]
+      if (adapter) {
+        _.set(opts, `settings.${key}`, adapter(value))
+      } else {
+        logger.warn(`Unknown option "${key}"`)
       }
     }
   }
