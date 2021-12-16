@@ -257,10 +257,11 @@ function _fromArray(entries) {
 
     // unwind shortcuts and aliases
     while (_.isString(action)) {
-      key = action
-      action = actions[key]
+      if (actions.hasOwnProperty(action)) {
+        key = action
+        action = actions[key]
+      }
     }
-
     // either set a property or use specialized parser
     if (!action) {
       const adapter = adapters[typeof _.get(settings.defaults, key)]
