@@ -4049,13 +4049,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap-switch@npm:3.4.0":
-  version: 3.4.0
-  resolution: "bootstrap-switch@npm:3.4.0"
+"bootstrap-switch@npm:=3.3.4":
+  version: 3.3.4
+  resolution: "bootstrap-switch@npm:3.3.4"
   peerDependencies:
-    bootstrap: ^4.3.1
-    jquery: ">=1.12.4"
-  checksum: fe2ec441486f3f646f25170644de6ea79d832284f60319d8c56390d52908e994aa6758175901a87818d036112c17434da74325ec09f802ee6ff43edc55fa0d85
+    bootstrap: ^3.1.1
+    jquery: ">=1.9.0"
+  checksum: c80109d47fe26d4299aae88cabf52bd2ad420bcd943e5f6fb9a01d1ab9598fcd13dc82bf79a9a91bcd3b99487dfd3695b61640497f038a4f1c55da9ce0300772
   languageName: node
   linkType: hard
 
@@ -6189,7 +6189,7 @@ __metadata:
     babel-eslint: ^10.1.0
     babel-loader: ^8.0.6
     bootstrap: =3.3.7
-    bootstrap-switch: 3.4.0
+    bootstrap-switch: =3.3.4
     browserify: ^16.5.1
     cross-env: ^7.0.2
     css-loader: ^3.5.3
