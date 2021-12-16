@@ -247,26 +247,27 @@ const actions = {
 
 function _fromArray(entries) {
   repIndex = 0
-
   const opts = {}
   for (let i = 0, n = entries.length; i < n; ++i) {
     const /** string[] */ entry = entries[i]
     let /** string? */ key = entry[0]
     const /** string? */ value = entry[1]
     const /** string[] */ splitedString = key.split('.')
-    if (
-      actions.hasOwnProperty(key) ||
-      settings.defaults.hasOwnProperty(splitedString[0])
-    ) {
+    if (actions.hasOwnProperty(key)) {
       let /** function|string? */ action = actions[key]
-
-      // unwind shortcuts and aliases
       while (_.isString(action)) {
         key = action
         action = actions[key]
       }
-
-      // either set a property or use specialized parser
+      if (typeof action === 'function') {
+        const result = action(value, opts)
+        if (result !== undefined) {
+          opts[key] = result
+        }
+      }
+    }
+    if (settings.defaults.hasOwnProperty(splitedString[0])) {
+      const /** function|string? */ action = actions[key]
       if (!action) {
         const adapter = adapters[typeof _.get(settings.defaults, key)]
         if (adapter) {
@@ -274,15 +275,9 @@ function _fromArray(entries) {
         } else {
           logger.warn(`Unknown option "${key}"`)
         }
-      } else if (typeof action === 'function') {
-        const result = action(value, opts)
-        if (result !== undefined) {
-          opts[key] = result
-        }
       }
     }
   }
-
   return opts
 }
 
