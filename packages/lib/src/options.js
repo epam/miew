@@ -269,7 +269,7 @@ function _fromArray(entries) {
       } else {
         logger.warn(`Unknown option "${key}"`)
       }
-    } else if (typeof action === 'function' && actions.hasOwnProperty(key)) {
+    } else if (typeof action === 'function') {
       const result = action(value, opts)
       if (result !== undefined) {
         opts[key] = result
