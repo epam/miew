@@ -52,7 +52,7 @@ export default class PDBExporter extends Exporter {
     for (let i = 0; i < this._tags.length; i++) {
       const tag = this._tags[i]
       const func = this._tagExtractors[tag]
-      if (_.isFunction(func)) {
+      if (typeof func === 'function') {
         func.call(this, result)
       }
     }

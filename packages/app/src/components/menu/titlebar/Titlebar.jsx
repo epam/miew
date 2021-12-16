@@ -5,6 +5,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import { FiMenu, FiChevronRight } from 'react-icons/fi'
 import { AiOutlinePicture } from 'react-icons/ai'
 import { GiDrop } from 'react-icons/gi'
+import './TitleBar.scss'
 
 import TitlebarButton from '../../../containers/TitlebarButtonContainer'
 import {
@@ -13,8 +14,6 @@ import {
   showTerminal,
   showNav
 } from '../../../actions'
-
-import './TitleBar.scss'
 
 // TODO move title to separate componen
 // TODO solve the font for the whole app

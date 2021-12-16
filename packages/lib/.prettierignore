@@ -2,6 +2,8 @@
 /vendor
 /docs
 /build
+/coverage
+/.nyc_output
 /node_modules
 !.eslintrc.js
 !.mocharc.js

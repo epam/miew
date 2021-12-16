@@ -13,7 +13,7 @@
     "precommit": "lint-staged --allow-empty",
     "prepush": "yarn workspaces foreach -pv run eslint",
     "build": "yarn workspaces foreach -ptv run build",
-    "test": "yarn workspaces foreach -v run test",
+    "test": "yarn workspaces foreach -ptv run test ",
     "serve": "cd demo && yarn serve",
     "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
     "coveralls": "cat coverage/general.info | coveralls",
