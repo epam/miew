@@ -253,10 +253,7 @@ function _fromArray(entries) {
     const /** string[] */ entry = entries[i]
     let /** string? */ key = entry[0]
     const /** string? */ value = entry[1]
-    if (
-      actions.hasOwnProperty(key) ||
-      adapters[typeof _.get(settings.defaults, key)]
-    ) {
+    if (actions.hasOwnProperty(key)) {
       let /** function|string? */ action = actions[key]
 
       // unwind shortcuts and aliases
