@@ -1,17 +1,15 @@
-/**
- * Default CSS definition for typescript,
- * will be overridden with file-specific definitions by rollup
- */
-declare module '*.scss' {
-  const content: { [className: string]: string }
-  export default content
+declare module '*.module.scss' {
+  const classes: { readonly [key: string]: string }
+  export default classes
 }
 
-type SvgrComponent = React.StatelessComponent<React.SVGAttributes<SVGElement>>
-
 declare module '*.svg' {
-  // eslint-disable-next-line no-unused-vars
-  const svgUrl: string
-  const svgComponent: SvgrComponent
-  export default svgComponent
+  import * as React from 'react'
+
+  export const ReactComponent: React.FunctionComponent<
+    React.SVGProps<SVGSVGElement> & { title?: string }
+  >
+
+  const src: string
+  export default src
 }
