@@ -28,7 +28,7 @@ Firefox, Safari, Opera, Edge, IE11) and mobile (iOS, Android) browsers.
 You can find details on installation and usage of Miew component in [lib readme].
 There is also a [demo application] available in the git repository.
 
-[tutorials]: docs/tutorials/embed.md
+[tutorials]: documentation/jsdoc-templates/tutorials/embed.md
 [examples]: examples/
 [lib readme]: packages/lib/README.md
 [demo application]: https://miew.opensource.epam.com/

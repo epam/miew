@@ -5,7 +5,8 @@
   "license": "MIT",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "demo"
   ],
   "scripts": {
     "prepare": "husky install",
@@ -13,10 +14,16 @@
     "prepush": "yarn workspaces foreach -pv run eslint",
     "build": "yarn workspaces foreach -ptv run build",
     "test": "yarn workspaces foreach -ptv run test ",
-    "serve": "cd packages/lib && yarn serve",
+    "serve": "cd demo && yarn serve",
     "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
     "coveralls": "cat coverage/general.info | coveralls",
-    "build:ci": "yarn workspaces foreach -ptv run ci"
+    "build:ci": "yarn workspaces foreach -ptv run ci",
+    "build:docs": "jsdoc -c jsdoc.config.js",
+    "build:examples": "run-s 'build:examples:*'",
+    "build:examples:viewer": "mkdirp examples/v && ncp examples/fullscreen.html examples/v/index.html",
+    "build:examples:webpack": "cd examples/ && webpack --mode production --config miew_via_webpack.config.js",
+    "build:examples:browserify": "cd examples/ && browserify -e miew_via_browserify.js -o miew_via_browserify.bundle.js",
+    "build:examples:react": "cd examples/ && webpack --mode production --config miew_via_react.config.js"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.6.0",
@@ -31,8 +38,11 @@
     "eslint-plugin-react": "^7.27.1",
     "eslint-plugin-workspaces": "^0.7.0",
     "husky": "7.0.4",
+    "jsdoc": "^3.6.7",
     "lcov-result-merger": "^3.1.0",
     "lint-staged": "^12.1.2",
+    "mkdirp": "^1.0.3",
+    "ncp": "^2.0.0",
     "npm-run-all": "^4.1.5",
     "postcss-scss": "^4.0.2",
     "prettier": "^2.5.1",

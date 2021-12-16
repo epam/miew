@@ -332,11 +332,11 @@ __metadata:
   linkType: hard
 
 "@babel/parser@npm:^7.1.0, @babel/parser@npm:^7.14.7, @babel/parser@npm:^7.16.0, @babel/parser@npm:^7.16.5, @babel/parser@npm:^7.7.0, @babel/parser@npm:^7.9.4":
-  version: 7.16.5
-  resolution: "@babel/parser@npm:7.16.5"
+  version: 7.16.6
+  resolution: "@babel/parser@npm:7.16.6"
   bin:
     parser: ./bin/babel-parser.js
-  checksum: 107230485fafbf215cec86ea8ae6a7e5f7f9d6ac0e63019008560f536511e7830fb2fece3052bd99a6d9e19f78fca332522beba2fde9453fffdafa37fa59baef
+  checksum: 5cbb01a7b2ba5d609945099bfadb01f54e11ef85201e1e0bf47010ee1b35c257eca6ff91606c6ce8adba82a95e180b583183e4dc076f4a70e706152075dd98ca
   languageName: node
   linkType: hard
 
@@ -2475,9 +2475,9 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*":
-  version: 16.11.12
-  resolution: "@types/node@npm:16.11.12"
-  checksum: a3feb346d61a56f5a137c29bb8c63cfa3cc02e184b9dffdc18ef1528dcce55596e570575215a2e39e6ce69343eeb2a5ba71c271938f1dc8db4cc393902855412
+  version: 16.11.13
+  resolution: "@types/node@npm:16.11.13"
+  checksum: 7c9d62c024537d7c9f2229097b9e7a93a60bc60efbc9171977f172819e229b01d0b6ed276d335996d39b0096aed2cefa58c4a34b264d712ae3595449e8d96ab7
   languageName: node
   linkType: hard
 
@@ -4031,14 +4031,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap-icons@npm:^1.3.0":
+"bootstrap-icons@npm:=1.7.2":
   version: 1.7.2
   resolution: "bootstrap-icons@npm:1.7.2"
   checksum: 34c0aaff95bbb32deb677a5365a2f9e0e1e694e69d56d951514a197d84e87e86551e7623278b62a5cd1836d39fd9a7ba4ef4861eca2bfb99b7c26a5fcdad3c6c
   languageName: node
   linkType: hard
 
-"bootstrap-switch-button-react@npm:^1.2.0":
+"bootstrap-switch-button-react@npm:=1.2.0":
   version: 1.2.0
   resolution: "bootstrap-switch-button-react@npm:1.2.0"
   dependencies:
@@ -4049,23 +4049,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap-switch@npm:=3.3.4":
-  version: 3.3.4
-  resolution: "bootstrap-switch@npm:3.3.4"
+"bootstrap-switch@npm:=3.4.0":
+  version: 3.4.0
+  resolution: "bootstrap-switch@npm:3.4.0"
   peerDependencies:
-    bootstrap: ^3.1.1
-    jquery: ">=1.9.0"
-  checksum: c80109d47fe26d4299aae88cabf52bd2ad420bcd943e5f6fb9a01d1ab9598fcd13dc82bf79a9a91bcd3b99487dfd3695b61640497f038a4f1c55da9ce0300772
-  languageName: node
-  linkType: hard
-
-"bootstrap@npm:4.5.0":
-  version: 4.5.0
-  resolution: "bootstrap@npm:4.5.0"
-  peerDependencies:
-    jquery: 1.9.1 - 3
-    popper.js: ^1.16.0
-  checksum: 55ed3bd05543a66fa016526860cb677586257d9f3c8059326c491aa4bfaef124468298078e18d3de7e6936d795310c8e9ec47b4fa9ae873e47f488331363d2fa
+    bootstrap: ^4.3.1
+    jquery: ">=1.12.4"
+  checksum: fe2ec441486f3f646f25170644de6ea79d832284f60319d8c56390d52908e994aa6758175901a87818d036112c17434da74325ec09f802ee6ff43edc55fa0d85
   languageName: node
   linkType: hard
 
@@ -4073,6 +4063,16 @@ __metadata:
   version: 3.3.7
   resolution: "bootstrap@npm:3.3.7"
   checksum: 7a31f48db010cbc3d18bcde2371ae3feed8378657463f0def3564b2efb9f630ca3318d92682f36bf031b01ae05389c844b22d5c44078b98359059012bb504021
+  languageName: node
+  linkType: hard
+
+"bootstrap@npm:=4.5.0":
+  version: 4.5.0
+  resolution: "bootstrap@npm:4.5.0"
+  peerDependencies:
+    jquery: 1.9.1 - 3
+    popper.js: ^1.16.0
+  checksum: 55ed3bd05543a66fa016526860cb677586257d9f3c8059326c491aa4bfaef124468298078e18d3de7e6936d795310c8e9ec47b4fa9ae873e47f488331363d2fa
   languageName: node
   linkType: hard
 
@@ -5644,15 +5644,15 @@ __metadata:
   linkType: hard
 
 "css-select@npm:^4.1.3":
-  version: 4.1.3
-  resolution: "css-select@npm:4.1.3"
+  version: 4.2.0
+  resolution: "css-select@npm:4.2.0"
   dependencies:
     boolbase: ^1.0.0
-    css-what: ^5.0.0
-    domhandler: ^4.2.0
-    domutils: ^2.6.0
-    nth-check: ^2.0.0
-  checksum: 40928f1aa6c71faf36430e7f26bcbb8ab51d07b98b754caacb71906400a195df5e6c7020a94f2982f02e52027b9bd57c99419220cf7020968c3415f14e4be5f8
+    css-what: ^5.1.0
+    domhandler: ^4.3.0
+    domutils: ^2.8.0
+    nth-check: ^2.0.1
+  checksum: 3847b251ca9f2722dd90c0b464b899a5a3b78b0324936a493d7b837a42120764871ad7c01e5bde6280f97710283b0b01e573e43e3076e61cc3e3a2437e0db415
   languageName: node
   linkType: hard
 
@@ -5694,7 +5694,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-what@npm:^5.0.0":
+"css-what@npm:^5.1.0":
   version: 5.1.0
   resolution: "css-what@npm:5.1.0"
   checksum: 0b75d1bac95c885c168573c85744a6c6843d8c33345f54f717218b37ea6296b0e99bb12105930ea170fd4a921990392a7c790c16c585c1d8960c49e2b7ec39f7
@@ -6170,6 +6170,67 @@ __metadata:
   languageName: node
   linkType: hard
 
+"demo@workspace:demo":
+  version: 0.0.0-use.local
+  resolution: "demo@workspace:demo"
+  dependencies:
+    "@babel/core": ^7.12.3
+    "@babel/plugin-proposal-class-properties": ^7.12.1
+    "@babel/plugin-proposal-object-rest-spread": ^7.12.1
+    "@babel/plugin-syntax-dynamic-import": ^7.8.3
+    "@babel/plugin-transform-runtime": ^7.12.1
+    "@babel/polyfill": ^7.8.7
+    "@babel/preset-env": ^7.12.1
+    "@babel/preset-react": ^7.12.5
+    "@babel/preset-typescript": ^7.12.1
+    "@babel/register": ^7.8.6
+    "@babel/runtime": ^7.9.6
+    autoprefixer: ^9.7.4
+    babel-eslint: ^10.1.0
+    babel-loader: ^8.0.6
+    bootstrap: =3.3.7
+    bootstrap-switch: =3.4.0
+    browserify: ^16.5.1
+    cross-env: ^7.0.2
+    css-loader: ^3.5.3
+    eslint: ^8.4.1
+    jquery: =3.6.0
+    jquery.terminal: =2.20.1
+    lodash: ^4.17.15
+    miew: "workspace:*"
+    npm-run-all: ^4.1.3
+    postcss-advanced-variables: ^3.0.1
+    postcss-calc: ^7.0.2
+    postcss-cli: ^7.1.1
+    postcss-import: ^12.0.1
+    postcss-loader: ^3.0.0
+    postcss-nested: ^4.2.1
+    postcss-scss: ^2.0.0
+    prettier: ^2.5.1
+    raw-loader: ^4.0.1
+    react: ^16.13.0
+    react-dom: ^16.13.0
+    rimraf: ^3.0.2
+    serve: ^13.0.2
+    sinon: ^9.0.2
+    sinon-chai: ^3.5.0
+    style-loader: ^1.2.1
+    stylelint: ^13.13.1
+    stylelint-config-prettier: ^9.0.3
+    stylelint-config-recommended-scss: ^5.0.2
+    stylelint-config-standard: ^24.0.0
+    stylelint-prettier: ^2.0.0
+    stylelint-scss: ^4.0.0
+    three: 0.131.3
+    typescript: ^4.5.3
+    uglify-js: ^3.9.3
+    webpack: ^4.43.0
+    webpack-cli: ^3.3.11
+    webpack-dev-server: ^3.11.0
+    yargs: ^15.3.0
+  languageName: unknown
+  linkType: soft
+
 "depd@npm:^1.1.2, depd@npm:~1.1.2":
   version: 1.1.2
   resolution: "depd@npm:1.1.2"
@@ -6468,7 +6529,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"domhandler@npm:^4.0.0, domhandler@npm:^4.2.0":
+"domhandler@npm:^4.0.0, domhandler@npm:^4.2.0, domhandler@npm:^4.3.0":
   version: 4.3.0
   resolution: "domhandler@npm:4.3.0"
   dependencies:
@@ -6487,7 +6548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"domutils@npm:^2.0.0, domutils@npm:^2.5.2, domutils@npm:^2.6.0":
+"domutils@npm:^2.0.0, domutils@npm:^2.5.2, domutils@npm:^2.8.0":
   version: 2.8.0
   resolution: "domutils@npm:2.8.0"
   dependencies:
@@ -6563,9 +6624,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.17":
-  version: 1.4.17
-  resolution: "electron-to-chromium@npm:1.4.17"
-  checksum: d0bafe96ea345167c1a4c5d4626a26a3bd7f75d3fe48bdc1a1dc53fad226b08245fa700f06c28d2366913ec506eba0e57f7fd9a630cc5669a08f27614c8e63a9
+  version: 1.4.18
+  resolution: "electron-to-chromium@npm:1.4.18"
+  checksum: 59d8da47d997b35fca63286cc486e84b0b84587e62c632dd22f9c2b98b5c2116fa8ff0ca3b64518f0957a7f3d6812b42459a7301f5e81607b600526e1bb55227
   languageName: node
   linkType: hard
 
@@ -10576,7 +10637,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jquery.terminal@npm:2.20.1":
+"jquery.terminal@npm:=2.20.1":
   version: 2.20.1
   resolution: "jquery.terminal@npm:2.20.1"
   dependencies:
@@ -10588,7 +10649,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jquery@npm:3.6.0, jquery@npm:>=1.12.0, jquery@npm:^3.5.0":
+"jquery@npm:=3.6.0, jquery@npm:>=1.12.0, jquery@npm:^3.5.0":
   version: 3.6.0
   resolution: "jquery@npm:3.6.0"
   checksum: 8fd5fef4aa48fd374ec716dd1c1df1af407814a228e15c1260ca140de3a697c2a77c30c54ff1d238b6a3ab4ddc445ddeef9adce6c6d28e4869d85eb9d3951c0e
@@ -10664,7 +10725,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdoc@npm:^3.6.3":
+"jsdoc@npm:^3.6.7":
   version: 3.6.7
   resolution: "jsdoc@npm:3.6.7"
   dependencies:
@@ -11762,9 +11823,9 @@ __metadata:
     "@typescript-eslint/parser": ^5.6.0
     babel-eslint: ^10.0.0
     babel-loader: ^8.1.0
-    bootstrap: 4.5.0
-    bootstrap-icons: ^1.3.0
-    bootstrap-switch-button-react: ^1.2.0
+    bootstrap: =4.5.0
+    bootstrap-icons: =1.7.2
+    bootstrap-switch-button-react: =1.2.0
     classnames: ^2.2.6
     css-loader: ^3.5.3
     eslint: ^8.4.1
@@ -11774,9 +11835,9 @@ __metadata:
     jest: ^26.0.1
     jest-canvas-mock: ^2.2.0
     jest-simple-dot-reporter: ^1.0.5
-    jquery: 3.6.0
-    jquery.terminal: 2.20.1
-    lodash: ^4.17.21
+    jquery: =3.6.0
+    jquery.terminal: =2.20.1
+    lodash: ^4.17.20
     miew: 0.9.0
     miew-react: "workspace:*"
     mini-css-extract-plugin: ^0.9.0
@@ -11884,8 +11945,6 @@ __metadata:
     babel-eslint: ^10.1.0
     babel-loader: ^8.0.6
     babel-plugin-istanbul: ^6.0.0
-    bootstrap: =3.3.7
-    bootstrap-switch: =3.3.4
     browserify: ^16.5.1
     chai: ^4.2.0
     chai-as-promised: ^7.1.1
@@ -11901,9 +11960,6 @@ __metadata:
     handlebars: ^4.7.5
     html-webpack-plugin: ^4.3.0
     jison: ^0.4.18
-    jquery: 3.6.0
-    jquery.terminal: 2.20.1
-    jsdoc: ^3.6.3
     lodash: ^4.17.21
     mini-css-extract-plugin: ^0.9.0
     mkdirp: ^1.0.3
@@ -12294,8 +12350,11 @@ __metadata:
     eslint-plugin-react: ^7.27.1
     eslint-plugin-workspaces: ^0.7.0
     husky: 7.0.4
+    jsdoc: ^3.6.7
     lcov-result-merger: ^3.1.0
     lint-staged: ^12.1.2
+    mkdirp: ^1.0.3
+    ncp: ^2.0.0
     npm-run-all: ^4.1.5
     postcss-scss: ^4.0.2
     prettier: ^2.5.1
@@ -12771,7 +12830,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nth-check@npm:^2.0.0":
+"nth-check@npm:^2.0.1":
   version: 2.0.1
   resolution: "nth-check@npm:2.0.1"
   dependencies:

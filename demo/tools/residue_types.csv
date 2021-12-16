@@ -1,0 +1,47 @@
+name,fullName,letterCode,kind,colorVmd,colorJmol
+ALA,Alanine,A,amino,0x0000FF,0xC8C8C8
+ARG,Arginine,R,amino,0xFFFFFF,0x145AFF
+ASN,Asparagine,N,amino,0x808033,0x00DCDC
+ASP,Aspartic Acid,D,amino,0xFF0000,0xE60A0A
+CYS,Cysteine,C,amino,0xFFFF00,0xE6E600
+GLN,Glutamine,Q,amino,0xFF8000,0x00DCDC
+GLU,Glutamic Acid,E,amino,0xFF9999,0xE60A0A
+GLY,Glycine,G,amino,0xFFFFFF,0xEBEBEB
+HIS,Histidine,H,amino,0x40C0C0,0x8282D2
+ILE,Isoleucine,I,amino,0x00FF00,0x0F820F
+LEU,Leucine,L,amino,0xFF9999,0x0F820F
+LYS,Lysine,K,amino,0x40C0C0,0x145AFF
+MET,Methionine,M,amino,0xFFFF00,0xE6E600
+PHE,Phenylalanine,F,amino,0xA600A6,0x3232AA
+PRO,Proline,P,amino,0x804C00,0xDC9682
+PYL,Pyrrolysine,O,amino,,
+SEC,Selenocysteine,U,amino,,
+SER,Serine,S,amino,0xFFFF00,0xFA9600
+THR,Threonine,T,amino,0xE666B3,0xFA9600
+TRP,Tryptophan,W,amino,0x999999,0xB45AB4
+TYR,Tyrosine,Y,amino,0x00FF00,0x3232AA
+VAL,Valine,V,amino,0x808033,0x0F820F
+A,Adenine,A,nucleic,0x0000FF,0xA0A0FF
+C,Cytosine,C,nucleic,0xFF8000,0xFF8C4B
+G,Guanine,G,nucleic,0xFFFF00,0xFF7070
+I,Inosine,I,nucleic,,0x80FFFF
+T,Thymine,T,nucleic,0xA600A6,0xA0FFA0
+U,Uracil,U,nucleic,0x00FF00,0xFF8080
+DA,Adenine,A,nucleic,0x0000FF,0xA0A0FF
+DC,Cytosine,C,nucleic,0xFF8000,0xFF8C4B
+DG,Guanine,G,nucleic,0xFFFF00,0xFF7070
+DI,Inosine,I,nucleic,,0x80FFFF
+DT,Thymine,T,nucleic,0xA600A6,0xA0FFA0
+DU,Uracil,U,nucleic,0x00FF00,0xFF8080
++A,Adenine,A,nucleic,0x0000FF,0xA0A0FF
++C,Cytosine,C,nucleic,0xFF8000,0xFF8C4B
++G,Guanine,G,nucleic,0xFFFF00,0xFF7070
++I,Inosine,I,nucleic,,0x80FFFF
++T,Thymine,T,nucleic,0xA600A6,0xA0FFA0
++U,Uracil,U,nucleic,0x00FF00,0xFF8080
+WAT,Water,,solvent,0x40C0C0,
+H2O,Water,,solvent,0x40C0C0,
+HOH,Water,,solvent,0x40C0C0,
+DOD,Water,,solvent,,
+UNK,Unknown,,unknown,,
+UNL,Unknown Ligand,,unknown,,
