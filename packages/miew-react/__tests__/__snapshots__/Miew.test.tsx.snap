@@ -6,7 +6,7 @@ Object {
   "baseElement": <body>
     <div>
       <div
-        class="miew"
+        class="miew small"
       >
         <p>
           HELLO, I am Miew!
@@ -16,14 +16,16 @@ Object {
         </p>
         <p>
           Width: 
+          100
            Height: 
+          100
         </p>
       </div>
     </div>
   </body>,
   "container": <div>
     <div
-      class="miew"
+      class="miew small"
     >
       <p>
         HELLO, I am Miew!
@@ -33,7 +35,9 @@ Object {
       </p>
       <p>
         Width: 
+        100
          Height: 
+        100
       </p>
     </div>
   </div>,

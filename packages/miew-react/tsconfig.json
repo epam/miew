@@ -32,8 +32,8 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
-  ],
+    "src", 
+    "__tests__/Miew.test.tsx"  ],
   "exclude": [
     "node_modules",
     "dist"

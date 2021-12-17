@@ -70,6 +70,7 @@
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
     "autoprefixer": "^10.2.5",
+    "babel-jest": "^27.4.5",
     "cross-env": "^7.0.3",
     "eslint": "^8.4.1",
     "eslint-plugin-jest": "^25.3.0",
@@ -91,12 +92,8 @@
     "rollup-plugin-typescript2": "^0.31.1",
     "sass": "^1.45.0",
     "stylelint": "13.13.1",
+    "ts-jest": "26.5.6",
     "typescript": "^4.5.2"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "\\.(css|scss)$": "identity-obj-proxy"
-    }
   },
   "files": [
     "dist"

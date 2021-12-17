@@ -1,12 +1,7 @@
-// eslint-disable-next-line no-unused-vars
-import React from 'react'
 import { render } from '@testing-library/react'
-import { Miew } from './Miew'
+import { Miew } from 'src/Miew'
 
-window.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-}
+jest.mock('use-resize-observer', () => jest.fn().mockReturnValue({ ref: null, width: 100, height: 100 }))
 
 describe('Miew component', () => {
   it('should be rendered', () => {
