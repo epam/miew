@@ -44,6 +44,7 @@ import WebVRPoC from './gfx/vr/WebVRPoC'
 import vertexScreenQuadShader from './gfx/shaders/ScreenQuad.vert'
 import fragmentScreenQuadFromDistTex from './gfx/shaders/ScreenQuadFromDistortionTex.frag'
 
+// TODO: All usage of THREE in Miew methods should be moved to Renderer
 const { selectors, Atom, Residue, Chain, Molecule } = chem
 
 const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 }
@@ -143,8 +144,8 @@ function Miew(opts) {
   /** @type {Settings} */
   this.settings = settings
   const log = logger
-  log.console = DEBUG
-  log.level = DEBUG ? 'debug' : 'info'
+  log.console = window.DEBUG
+  log.level = window.DEBUG ? 'debug' : 'info'
   /**
    * @type {Logger}
    * @example

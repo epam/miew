@@ -85,7 +85,7 @@ const config = {
         './src/utils/SelectionParser',
         './src/utils/MiewCLIParser.js'
       ],
-      extends: path.join(__dirname, '/.babelrc')
+      extends: path.join(__dirname, '/babel.config.js')
     })
   ]
 }

@@ -1,6 +1,8 @@
 /dist
 /vendor
 /docs
+.nyc_output/
+coverage/
 /build
 /node_modules
 !.eslintrc.js

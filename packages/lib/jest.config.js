@@ -3,9 +3,12 @@ module.exports = {
   testPathIgnorePatterns: ['fixtures', 'dist', 'node_modules'],
   transform: {
     '\\.js?$': 'babel-jest',
-    '^.+\\.(ts|tsx)$': 'ts-jest'
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '\\.frag$': 'jest-raw-loader',
+    '\\.vert$': 'jest-raw-loader'
   },
+  transformIgnorePatterns: ['/node_modules/(?!spin.js)'],
   moduleNameMapper: {
-    'src(.*)$': '<rootDir>/src/$1'
+    'Miew(.*)': '<rootDir>/src/Miew.js'
   }
 }

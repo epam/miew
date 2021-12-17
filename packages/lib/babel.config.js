@@ -1,0 +1,16 @@
+module.exports = {
+  presets: [
+    '@babel/env',
+    ['@babel/react', { runtime: 'automatic' }],
+    '@babel/typescript'
+  ],
+  plugins: [
+    '@babel/plugin-syntax-dynamic-import',
+    '@babel/plugin-transform-runtime'
+  ],
+  env: {
+    coverage: {
+      plugins: ['istanbul']
+    }
+  }
+}
