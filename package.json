@@ -20,9 +20,9 @@
     "build:ci": "yarn workspaces foreach -ptv run ci",
     "build:docs": "jsdoc -c jsdoc.config.js",
     "build:examples": "run-s 'build:examples:*'",
-    "build:examples:viewer": "mkdirp examples/fullscreen && ncp examples/fullscreen.html examples/fullscreen/index.html",
+    "build:examples:viewer": "mkdirp examples/build/fullscreen && ncp examples/fullscreen.html examples/build/fullscreen/index.html",
     "build:examples:webpack": "cd examples/ && webpack --mode production --config miew_via_webpack.config.js",
-    "build:examples:browserify": "cd examples/ && browserify -e miew_via_browserify.js -o miew_via_browserify.bundle.js",
+    "build:examples:browserify": "cd examples/ && browserify -e miew_via_browserify.js -o build/miew_via_browserify.bundle.js",
     "build:examples:react": "cd examples/ && webpack --mode production --config miew_via_react.config.js"
   },
   "devDependencies": {
