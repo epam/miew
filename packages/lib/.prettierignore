@@ -4,6 +4,8 @@
 .nyc_output/
 coverage/
 /build
+/coverage
+/.nyc_output
 /node_modules
 !.eslintrc.js
 !.mocharc.js
