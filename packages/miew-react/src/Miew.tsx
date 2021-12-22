@@ -1,4 +1,3 @@
-import { FC } from 'react'
 import useResizeObserver from 'use-resize-observer'
 import clsx from 'clsx'
 import classes from './Miew.module.scss'
@@ -12,7 +11,7 @@ type Props = {
   text: string
 }
 
-const Miew: FC<Props> = ({ text }) => {
+function Miew({ text }: Props) {
   const { ref, width, height } = useResizeObserver<HTMLDivElement>()
 
   return (
