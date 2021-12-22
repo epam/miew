@@ -2,30 +2,34 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface EditorState {
   isInitialized: boolean
-  data?: string
-  error?: string
+  data: string | undefined
+  error: string | undefined
 }
 
 const initialState: EditorState = {
-  isInitialized: false
+  isInitialized: false,
+  data: undefined,
+  error: undefined
 }
 
 export const InitSlice = createSlice({
   name: 'init',
   initialState,
   reducers: {
-    INIT: (state) => {
+    INIT: (state: EditorState) => {
       state.isInitialized = false
+      state.data = undefined
+      state.error = undefined
     },
-    INIT_SUCCESS: (state, action: PayloadAction<string>) => {
+    INIT_SUCCESS: (state: EditorState, action: PayloadAction<string>) => {
       state.isInitialized = true
       state.data = action.payload
-      delete state.error
+      state.error = undefined
     },
-    INIT_FAIL: (state, action: PayloadAction<string>) => {
+    INIT_FAIL: (state: EditorState, action: PayloadAction<string>) => {
       state.isInitialized = false
+      state.data = undefined
       state.error = action.payload
-      delete state.data
     }
   }
 })

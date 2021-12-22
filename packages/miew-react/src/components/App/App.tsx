@@ -12,7 +12,7 @@ export const App = () => {
 
   useEffect(() => {
     dispatch(INIT())
-  }, [])
+  }, [dispatch])
 
   return (
     <>

@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { AppContainer } from 'components/App'
 import classes from './Miew.module.scss'
 
-const mediaSizes = {
+const MEDIA_SIZES = {
   smallWidth: 800,
   smallHeight: 400
 }
@@ -15,8 +15,8 @@ const Miew = () => {
     <div
       className={clsx(classes.miew, {
         [classes.small]:
-          (height && height <= mediaSizes.smallHeight) ||
-          (width && width <= mediaSizes.smallWidth)
+          (height && height <= MEDIA_SIZES.smallHeight) ||
+          (width && width <= MEDIA_SIZES.smallWidth)
       })}
       ref={ref}
     >

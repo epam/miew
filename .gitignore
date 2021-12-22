@@ -16,6 +16,4 @@ coverage/
 .idea/*
 .vscode/*
 **/**.bundle.js
-examples/v
-documentation/*
-!documentation/jsdoc-templates
+examples/fullscreen
