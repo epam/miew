@@ -1,5 +1,6 @@
 import useResizeObserver from 'use-resize-observer'
 import clsx from 'clsx'
+import { AppContainer } from 'components/App'
 import classes from './Miew.module.scss'
 
 const mediaSizes = {
@@ -7,7 +8,7 @@ const mediaSizes = {
   smallHeight: 400
 }
 
-function Miew(props) {
+const Miew = () => {
   const { ref, width, height } = useResizeObserver<HTMLDivElement>()
 
   return (
@@ -19,11 +20,7 @@ function Miew(props) {
       })}
       ref={ref}
     >
-      <p>HELLO, I am Miew!</p>
-      <p>{props.text}</p>
-      <p>
-        Width: {width} Height: {height}
-      </p>
+      <AppContainer />
     </div>
   )
 }
