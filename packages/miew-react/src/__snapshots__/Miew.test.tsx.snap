@@ -12,14 +12,14 @@ Object {
           HELLO, I am Miew!
         </p>
         <p>
-          test
+          App is not initialized
         </p>
-        <p>
-          Width: 
-          100
-           Height: 
-          100
-        </p>
+        <button>
+          Re-initialize app
+        </button>
+        <button>
+          Simulate error
+        </button>
       </div>
     </div>
   </body>,
@@ -31,14 +31,14 @@ Object {
         HELLO, I am Miew!
       </p>
       <p>
-        test
+        App is not initialized
       </p>
-      <p>
-        Width: 
-        100
-         Height: 
-        100
-      </p>
+      <button>
+        Re-initialize app
+      </button>
+      <button>
+        Simulate error
+      </button>
     </div>
   </div>,
   "debug": [Function],

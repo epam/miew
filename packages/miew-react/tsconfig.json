@@ -29,11 +29,14 @@
     "isolatedModules": true,
     "noEmit": true,
     "baseUrl": ".",
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "components/*": ["src/components/*"],
+      "state/*": ["src/state/*"],
+      "state": ["src/state"]
+    },
   },
-  "include": [
-    "src", 
-    "__tests__/Miew.test.tsx"  ],
+  "include": [ "src" ],
   "exclude": [
     "node_modules",
     "dist"
