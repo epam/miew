@@ -1,3 +1,3 @@
-import { Miew } from './Miew'
+import { Editor } from './Editor'
 
-export default Miew
+export default Editor

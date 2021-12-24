@@ -7,7 +7,6 @@ import del from 'rollup-plugin-delete'
 import json from '@rollup/plugin-json'
 import peerDepsExternal from 'rollup-plugin-peer-deps-external'
 import pkg from './package.json'
-import postcss from 'rollup-plugin-postcss'
 import replace from '@rollup/plugin-replace'
 import resolve from '@rollup/plugin-node-resolve'
 import strip from '@rollup/plugin-strip'
@@ -65,14 +64,6 @@ const config = {
       extensions,
       babelHelpers: 'runtime',
       include: ['src/**/*']
-    }),
-    postcss({
-      plugins: [autoprefixer({ grid: 'autoplace' })],
-      // extract: path.resolve('dist/index.css'),
-      minimize: isProduction,
-      sourceMap: true,
-      modules: true,
-      use: ['sass']
     }),
     svgr(),
     copy({

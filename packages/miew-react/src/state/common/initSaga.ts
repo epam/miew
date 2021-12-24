@@ -1,5 +1,5 @@
 import { put, call, takeEvery } from 'redux-saga/effects'
-import { INIT, INIT_SUCCESS, INIT_FAIL } from '.'
+import { INIT, INIT_SUCCESS, INIT_FAIL } from './initSlice'
 
 const fetchInitData = (url: string) =>
   new Promise((resolve) =>
