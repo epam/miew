@@ -23,8 +23,8 @@ module.exports = {
     ]
   },
   opts: {
-    template: 'documentation/jsdoc-templates/template',
-    tutorials: 'documentation/jsdoc-templates/tutorials',
+    template: 'tools/templates//template',
+    tutorials: 'tools/templates//tutorials',
     destination: 'documentation/',
     private: false
   },
@@ -36,9 +36,9 @@ module.exports = {
       outputSourcePath: false,
       staticFiles: {
         include: [
-          'documentation/jsdoc-templates/template/README.png',
+          'tools/templates/template/README.png',
           'node_modules/jsdoc/templates/default/static',
-          'documentation/jsdoc-templates/template/static'
+          'tools/templates//template/static'
         ]
       }
     }

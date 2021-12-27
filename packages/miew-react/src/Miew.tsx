@@ -1,29 +1,26 @@
 import useResizeObserver from 'use-resize-observer'
 import clsx from 'clsx'
+import { AppContainer } from 'components/App'
 import classes from './Miew.module.scss'
 
-const mediaSizes = {
+const MEDIA_SIZES = {
   smallWidth: 800,
   smallHeight: 400
 }
 
-function Miew(props) {
+const Miew = () => {
   const { ref, width, height } = useResizeObserver<HTMLDivElement>()
 
   return (
     <div
       className={clsx(classes.miew, {
         [classes.small]:
-          (height && height <= mediaSizes.smallHeight) ||
-          (width && width <= mediaSizes.smallWidth)
+          (height && height <= MEDIA_SIZES.smallHeight) ||
+          (width && width <= MEDIA_SIZES.smallWidth)
       })}
       ref={ref}
     >
-      <p>HELLO, I am Miew!</p>
-      <p>{props.text}</p>
-      <p>
-        Width: {width} Height: {height}
-      </p>
+      <AppContainer />
     </div>
   )
 }
