@@ -1584,7 +1584,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/core@npm:^26.6.3":
+"@jest/core@npm:^26.6.0, @jest/core@npm:^26.6.3":
   version: 26.6.3
   resolution: "@jest/core@npm:26.6.3"
   dependencies:
@@ -1880,7 +1880,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/transform@npm:^26.6.2":
+"@jest/transform@npm:^26.6.0, @jest/transform@npm:^26.6.2":
   version: 26.6.2
   resolution: "@jest/transform@npm:26.6.2"
   dependencies:
@@ -1938,7 +1938,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jest/types@npm:^26.6.2":
+"@jest/types@npm:^26.6.0, @jest/types@npm:^26.6.2":
   version: 26.6.2
   resolution: "@jest/types@npm:26.6.2"
   dependencies:
@@ -4033,6 +4033,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-jest@npm:26.6.0":
+  version: 26.6.0
+  resolution: "babel-jest@npm:26.6.0"
+  dependencies:
+    "@jest/transform": ^26.6.0
+    "@jest/types": ^26.6.0
+    "@types/babel__core": ^7.1.7
+    babel-plugin-istanbul: ^6.0.0
+    babel-preset-jest: ^26.5.0
+    chalk: ^4.0.0
+    graceful-fs: ^4.2.4
+    slash: ^3.0.0
+  peerDependencies:
+    "@babel/core": ^7.0.0
+  checksum: 33ba79faa855431ce90316690e457dc1ef13966aa77e2c1656bdf3331bdd59f0040fa6b3599981205ad1370fc971d480587413efb733a7afdc0a726a5e19b2a4
+  languageName: node
+  linkType: hard
+
 "babel-jest@npm:^26.6.3":
   version: 26.6.3
   resolution: "babel-jest@npm:26.6.3"
@@ -4209,7 +4227,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-preset-jest@npm:^26.6.2":
+"babel-preset-jest@npm:^26.5.0, babel-preset-jest@npm:^26.6.2":
   version: 26.6.2
   resolution: "babel-preset-jest@npm:26.6.2"
   dependencies:
@@ -10578,7 +10596,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-cli@npm:^26.6.3":
+"jest-cli@npm:^26.6.0, jest-cli@npm:^26.6.3":
   version: 26.6.3
   resolution: "jest-cli@npm:26.6.3"
   dependencies:
@@ -11032,6 +11050,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jest-mock-extended@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "jest-mock-extended@npm:2.0.4"
+  dependencies:
+    ts-essentials: ^7.0.3
+  peerDependencies:
+    jest: ^24.0.0 || ^25.0.0 || ^26.0.0 || ^27.0.0
+    typescript: ^3.0.0 || ^4.0.0
+  checksum: 0e3b6ecbb0a41a4a7a45ae48ff9c42d43febd19eaf3d97a975010597ca6c6fdfaa89949b898e98e05689de32abfe6adc5ca32c253ac5b46718a0d4f49fcbb141
+  languageName: node
+  linkType: hard
+
 "jest-mock@npm:^26.6.2":
   version: 26.6.2
   resolution: "jest-mock@npm:26.6.2"
@@ -11061,6 +11091,13 @@ __metadata:
     jest-resolve:
       optional: true
   checksum: bd85dcc0e76e0eb0c3d56382ec140f08d25ff4068cda9d0e360bb78fb176cb726d0beab82dc0e8694cafd09f55fee7622b8bcb240afa5fad301f4ed3eebb4f47
+  languageName: node
+  linkType: hard
+
+"jest-raw-loader@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "jest-raw-loader@npm:1.0.1"
+  checksum: 0f1e2c650a0dd46cdb6c7b678b384170d41737cc17fca2f776a57af57827bf73bd37e6d0f6625d7912f126ea0dce09b1db2b26424cc1468f08e10e59c7ba1a70
   languageName: node
   linkType: hard
 
@@ -11451,6 +11488,19 @@ __metadata:
     merge-stream: ^2.0.0
     supports-color: ^8.0.0
   checksum: eb0b6be412103299c3d8643ad26daf862826ca841bd2a3ff47d2d931804ab7d7f0db2fcdea7dbf47ce8eacb7742b3f2586c2d6ebdaa8d0ac77c65f7b698e7683
+  languageName: node
+  linkType: hard
+
+"jest@npm:26.6.0":
+  version: 26.6.0
+  resolution: "jest@npm:26.6.0"
+  dependencies:
+    "@jest/core": ^26.6.0
+    import-local: ^3.0.2
+    jest-cli: ^26.6.0
+  bin:
+    jest: bin/jest.js
+  checksum: e0d3efff0dc2a31c453a3f7d87586e5d6c0f008c9b827bb9204edde09288f922ddfb3a8917480bf68f4ac0298be28637daef98ebaaac65ea23d3cb754a6620c4
   languageName: node
   linkType: hard
 
@@ -12841,8 +12891,10 @@ __metadata:
     "@rollup/plugin-node-resolve": ^13.0.6
     "@rollup/plugin-replace": ^3.0.0
     "@rollup/plugin-strip": ^2.1.0
+    "@types/jest": ^27.0.3
     autoprefixer: ^9.7.4
     babel-eslint: ^10.1.0
+    babel-jest: 26.6.0
     babel-loader: ^8.0.6
     babel-plugin-istanbul: ^6.0.0
     browserify: ^16.5.1
@@ -12859,6 +12911,9 @@ __metadata:
     glob: ^7.1.6
     handlebars: ^4.7.5
     html-webpack-plugin: ^4.3.0
+    jest: 26.6.0
+    jest-mock-extended: ^2.0.4
+    jest-raw-loader: ^1.0.1
     jison: ^0.4.18
     lodash: ^4.17.21
     mini-css-extract-plugin: ^0.9.0
@@ -12901,6 +12956,7 @@ __metadata:
     stylelint-scss: ^4.0.0
     three: 0.131.3
     toastr: ^2.1.4
+    ts-jest: 26.5.6
     typescript: ^4.5.3
     uglify-js: ^3.9.3
     url-loader: ^4.1.0
@@ -18897,6 +18953,15 @@ __metadata:
   version: 1.0.5
   resolution: "trough@npm:1.0.5"
   checksum: d6c8564903ed00e5258bab92134b020724dbbe83148dc72e4bf6306c03ed8843efa1bcc773fa62410dd89161ecb067432dd5916501793508a9506cacbc408e25
+  languageName: node
+  linkType: hard
+
+"ts-essentials@npm:^7.0.3":
+  version: 7.0.3
+  resolution: "ts-essentials@npm:7.0.3"
+  peerDependencies:
+    typescript: ">=3.7.0"
+  checksum: 74d75868acf7f8b95e447d8b3b7442ca21738c6894e576df9917a352423fde5eb43c5651da5f78997da6061458160ae1f6b279150b42f47ccc58b73e55acaa2f
   languageName: node
   linkType: hard
 
