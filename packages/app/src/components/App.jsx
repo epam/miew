@@ -2,6 +2,7 @@ import React from 'react'
 
 import Menu from '../containers/MenuContainer'
 import Viewer from '../containers/MiewViewerContainer'
+import Miew from 'miew-react'
 import './App.scss'
 
 export default class App extends React.Component {
@@ -20,9 +21,10 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <div className="root">
-        <Viewer onChange={this._onViewerChange} />
-        <Menu />
+      <div className="root" style={{width: '80vw', height: '80vh', margin: '0 auto'}} >
+        {/* <Viewer onChange={this._onViewerChange} />
+        <Menu /> */}
+        <Miew />
       </div>
     )
   }
