@@ -1,37 +1,18 @@
-import { useEffect } from 'react'
-import { useAppDispatch, useAppSelector, RootState } from 'state'
-import { INIT, INIT_FAIL } from 'state/common'
-import { Viewer } from 'components/Viewer/Viewer'
-// @ts-ignore
-// import Miew from 'miew'
-import Miew from 'MiewModule'
+// @ts-nocheck
+import { useEffect, useRef, forwardRef } from 'react'
+import Miew from 'miew'
 
-export const App = () => {
-  const isInitialized = useAppSelector(
-    (state: RootState) => state.init.isInitialized
-  )
-  const data = useAppSelector((state: RootState) => state.init?.data)
-  const error = useAppSelector((state: RootState) => state.init?.error)
-  const dispatch = useAppDispatch()
+export const App = forwardRef<HTMLDivElement>((props, ref) => {
+  const miewContainer = useRef<HTMLDivElement | object>(null)
 
   useEffect(() => {
-    dispatch(INIT())
-  }, [dispatch])
+    ref.current = new Miew({
+      container: miewContainer?.current,
+      ...props.options
+    })
+    if (ref.current.init()) ref.current.run()
+  }, [])
 
-  // TODO: import Miew directly in Viewer
-  return (
-    <>
-      <div>
-        <p>HELLO, I am Miew!</p>
-        {error && <p>Failed to initialize App, Error: {error}</p>}
-        {!isInitialized && !error && <p>App is not initialized</p>}
-        {isInitialized && <p>App is initialized, data recieved: {data}</p>}
-        <button onClick={() => dispatch(INIT())}>Re-initialize app</button>
-        <button onClick={() => dispatch(INIT_FAIL('ERROR'))}>
-          Simulate error
-        </button>
-      </div>
-      <Viewer Miew={Miew} />
-    </>
-  )
-}
+  // TODO: use styled when styled configuration is merged
+  return <div ref={miewContainer} style={{ width: '100%', height: '100%' }} />
+})
