@@ -7,61 +7,13 @@ Object {
     <div>
       <div
         class="viewer small"
-      >
-        <div
-          class="miew-canvas"
-        >
-          <div
-            class="miew-message"
-          >
-            <p>
-              Error creating WebGL context.
-            </p>
-          </div>
-        </div>
-        <div
-          class="mode-message overlay"
-        >
-          <p>
-            COMPONENT EDIT MODE
-          </p>
-        </div>
-        <div
-          class="atom-info overlay"
-        >
-          <p />
-        </div>
-      </div>
+      />
     </div>
   </body>,
   "container": <div>
     <div
       class="viewer small"
-    >
-      <div
-        class="miew-canvas"
-      >
-        <div
-          class="miew-message"
-        >
-          <p>
-            Error creating WebGL context.
-          </p>
-        </div>
-      </div>
-      <div
-        class="mode-message overlay"
-      >
-        <p>
-          COMPONENT EDIT MODE
-        </p>
-      </div>
-      <div
-        class="atom-info overlay"
-      >
-        <p />
-      </div>
-    </div>
+    />
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],
