@@ -99,19 +99,19 @@ class Residue {
     tempFactor,
     charge
   ) {
-    const atom = new Atom(
-      this,
+    const atom = new Atom({
+      residue: this,
       name,
       type,
-      xyz,
+      position: xyz,
       role,
       het,
       serial,
-      altLoc,
+      location: altLoc,
       occupancy,
-      tempFactor,
+      temperature: tempFactor,
       charge
-    )
+    })
     const complex = this._chain.getComplex()
     complex.addAtom(atom)
     this._atoms.push(atom)

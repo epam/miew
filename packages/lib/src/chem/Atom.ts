@@ -19,35 +19,56 @@
  * @constructor
  */
 
+interface AtomAttributes {
+  residue: any
+  name: any
+  type: any
+  position: any
+  role: any
+  het: any
+  serial: any
+  location: any
+  occupancy: any
+  temperature: any
+  charge: any
+}
+
 class Atom {
-  constructor(
-    residue,
-    name,
-    type,
-    position,
-    role,
-    het,
-    serial,
-    location,
-    occupancy,
-    temperature,
-    charge
-  ) {
+  index: any
+  residue: any
+  name: any
+  element: any
+  position: any
+  role: any
+  mask: any
+  het: any
+  serial: any
+  location: any
+  occupancy: any
+  temperature: any
+  charge: any
+  hydrogenCount: any
+  radicalCount: any
+  valence: any
+  bonds: any
+  flags: any
+
+  constructor(attributes: AtomAttributes) {
     this.index = -1
-    this.residue = residue
-    this.name = name
-    this.element = type
-    this.position = position
-    this.role = role
+    this.residue = attributes.residue
+    this.name = attributes.name
+    this.element = attributes.type
+    this.position = attributes.position
+    this.role = attributes.role
     this.mask = 1 | 0
 
-    this.het = het
+    this.het = attributes.het
 
-    this.serial = serial
-    this.location = (location || ' ').charCodeAt(0)
-    this.occupancy = occupancy || 1
-    this.temperature = temperature
-    this.charge = charge
+    this.serial = attributes.serial
+    this.location = (attributes.location || ' ').charCodeAt(0)
+    this.occupancy = attributes.occupancy || 1
+    this.temperature = attributes.temperature
+    this.charge = attributes.charge
     this.hydrogenCount = -1 // explicitly invalid
     this.radicalCount = 0
     this.valence = -1 // explicitly invalid
@@ -55,9 +76,9 @@ class Atom {
     this.bonds = []
 
     this.flags = 0x0000
-    if (type.name === 'H') {
+    if (attributes.type.name === 'H') {
       this.flags |= Atom.Flags.HYDROGEN
-    } else if (type.name === 'C') {
+    } else if (attributes.type.name === 'C') {
       this.flags |= Atom.Flags.CARBON
     }
   }
@@ -78,7 +99,7 @@ class Atom {
     return this.element.name.trim()
   }
 
-  forEachBond(process) {
+  forEachBond(process: any) {
     const { bonds } = this
     for (let i = 0, n = bonds.length; i < n; ++i) {
       process(bonds[i])
