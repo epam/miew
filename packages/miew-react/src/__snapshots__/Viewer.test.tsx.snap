@@ -6,39 +6,61 @@ Object {
   "baseElement": <body>
     <div>
       <div
-        class="miew small"
+        class="viewer small"
       >
-        <p>
-          HELLO, I am Miew!
-        </p>
-        <p>
-          App is not initialized
-        </p>
-        <button>
-          Re-initialize app
-        </button>
-        <button>
-          Simulate error
-        </button>
+        <div
+          class="miew-canvas"
+        >
+          <div
+            class="miew-message"
+          >
+            <p>
+              Error creating WebGL context.
+            </p>
+          </div>
+        </div>
+        <div
+          class="mode-message overlay"
+        >
+          <p>
+            COMPONENT EDIT MODE
+          </p>
+        </div>
+        <div
+          class="atom-info overlay"
+        >
+          <p />
+        </div>
       </div>
     </div>
   </body>,
   "container": <div>
     <div
-      class="miew small"
+      class="viewer small"
     >
-      <p>
-        HELLO, I am Miew!
-      </p>
-      <p>
-        App is not initialized
-      </p>
-      <button>
-        Re-initialize app
-      </button>
-      <button>
-        Simulate error
-      </button>
+      <div
+        class="miew-canvas"
+      >
+        <div
+          class="miew-message"
+        >
+          <p>
+            Error creating WebGL context.
+          </p>
+        </div>
+      </div>
+      <div
+        class="mode-message overlay"
+      >
+        <p>
+          COMPONENT EDIT MODE
+        </p>
+      </div>
+      <div
+        class="atom-info overlay"
+      >
+        <p />
+      </div>
     </div>
   </div>,
   "debug": [Function],

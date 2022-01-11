@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react'
-import { Miew } from 'src/Miew'
+import 'jest-canvas-mock'
+import { Viewer } from 'src/Viewer'
 
 // TODO create mock folder, and move all mocks there
 jest.mock('use-resize-observer', () =>
@@ -8,6 +9,6 @@ jest.mock('use-resize-observer', () =>
 
 describe('Miew component', () => {
   it('should be rendered', () => {
-    expect(render(<Miew />)).toMatchSnapshot()
+    expect(render(<Viewer />)).toMatchSnapshot()
   })
 })
