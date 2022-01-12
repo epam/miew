@@ -6,40 +6,14 @@ Object {
   "baseElement": <body>
     <div>
       <div
-        class="miew small"
-      >
-        <p>
-          HELLO, I am Miew!
-        </p>
-        <p>
-          App is not initialized
-        </p>
-        <button>
-          Re-initialize app
-        </button>
-        <button>
-          Simulate error
-        </button>
-      </div>
+        class="viewer small"
+      />
     </div>
   </body>,
   "container": <div>
     <div
-      class="miew small"
-    >
-      <p>
-        HELLO, I am Miew!
-      </p>
-      <p>
-        App is not initialized
-      </p>
-      <button>
-        Re-initialize app
-      </button>
-      <button>
-        Simulate error
-      </button>
-    </div>
+      class="viewer small"
+    />
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],

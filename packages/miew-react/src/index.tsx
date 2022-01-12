@@ -1,3 +1,3 @@
-import { Miew } from './Miew'
+import { ViewerContainer } from './ViewerContainer'
 
-export default Miew
+export default ViewerContainer

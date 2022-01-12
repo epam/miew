@@ -10533,7 +10533,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-canvas-mock@npm:^2.2.0":
+"jest-canvas-mock@npm:^2.2.0, jest-canvas-mock@npm:^2.3.1":
   version: 2.3.1
   resolution: "jest-canvas-mock@npm:2.3.1"
   dependencies:
@@ -12818,6 +12818,7 @@ __metadata:
     eslint-plugin-react-hooks: ^4.3.0
     eslint-plugin-testing-library: ^5.0.1
     jest: ^27.4.5
+    jest-canvas-mock: ^2.3.1
     miew: "workspace:*"
     npm-run-all: ^4.1.5
     postcss: ^8.2.10

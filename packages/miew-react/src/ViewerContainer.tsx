@@ -1,11 +1,11 @@
 import { Provider } from 'react-redux'
 import { store } from 'state'
-import { App } from 'components/App'
+import { Viewer } from './Viewer'
 
-export const AppContainer = () => {
+export const ViewerContainer = (props) => {
   return (
     <Provider store={store}>
-      <App />
+      <Viewer {...props} />
     </Provider>
   )
 }
