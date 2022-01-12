@@ -19,7 +19,7 @@ const mode = {
 }
 
 const banner = `/** ${version.copyright} */\n`
-const extensions = ['.js', '.jsx', '.ts', '.tsx']
+const extensions = ['.js', '.ts']
 const isProduction = process.env.NODE_ENV === mode.PRODUCTION
 const includePattern = 'src/**/*'
 const warnExceptions = {
