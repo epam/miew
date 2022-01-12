@@ -5,11 +5,10 @@ import Button from '@mui/material/Button'
 import styled from '@emotion/styled'
 
 export const App = () => {
-
   const StyledBtn = styled(Button)(({ theme }) => {
     return {
-    border: `1px solid ${theme.customTheme?.palette?.accent?.main}`,
-    margin: '10px'
+      border: `1px solid ${theme.customTheme?.palette?.accent?.main}`,
+      margin: '10px'
     }
   })
 
@@ -34,12 +33,8 @@ export const App = () => {
       <p>HELLO, I am Miew!</p>
       {error && <p>Failed to initialize App, Error: {error}</p>}
       {!isInitialized && !error && <p>App is not initialized</p>}
-      {isInitialized && (
-        <p>App is initialized, data recieved: {data}</p>
-      )}
-      <StyledBtn onClick={() => dispatch(INIT())}>
-        Re-initialize app
-      </StyledBtn>
+      {isInitialized && <p>App is initialized, data recieved: {data}</p>}
+      <StyledBtn onClick={() => dispatch(INIT())}>Re-initialize app</StyledBtn>
       <StyledBtn onClick={() => dispatch(INIT_FAIL('ERROR'))}>
         Simulate error
       </StyledBtn>

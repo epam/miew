@@ -16,27 +16,28 @@ declare module '*.svg' {
   export default src
 }
 
-declare module '@emotion/react' {
-  interface Theme {
-    customTheme?: {
-      palette?: {
-        accent?: {
-          main?: string,
-          dark?: string
-        },
-        primary?: {
-          main?: string,
-          light?: string,
-          dark?: string
-        }
-      },
-      typography?: {
-        htmlFontSize?: number
+// declare module '@emotion/react' {
+interface CustomTheme {
+  customTheme?: {
+    palette?: {
+      accent?: {
+        main?: string
+        dark?: string
       }
+      primary?: {
+        main?: string
+        light?: string
+        dark?: string
+      }
+    }
+    typography?: {
+      htmlFontSize?: number
     }
   }
 }
+// }
 
 declare module '@emotion/react' {
-  export interface Theme extends MuiTheme {}
+  /* eslint-disable @typescript-eslint/no-empty-interface */
+  export interface Theme extends MuiTheme, CustomTheme {}
 }
