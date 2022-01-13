@@ -1,24 +1,29 @@
 /* eslint-env node */
-import peerDepsExternal from 'rollup-plugin-peer-deps-external'
+
 import babel from '@rollup/plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
-import replace from '@rollup/plugin-replace'
+import del from 'rollup-plugin-delete'
 import nodeResolve from '@rollup/plugin-node-resolve'
-import cleanup from 'rollup-plugin-cleanup'
-import { string } from 'rollup-plugin-string'
-import path from 'path'
-import version from './tools/version'
 import packageJson from './package.json'
-import strip from '@rollup/plugin-strip'
+import peerDepsExternal from 'rollup-plugin-peer-deps-external'
+import replace from '@rollup/plugin-replace'
+import { string } from 'rollup-plugin-string'
+import ttypescript from 'ttypescript'
+import typescript from 'rollup-plugin-typescript2'
+import version from './tools/version'
 
-const mode = {
-  PRODUCTION: 'production',
-  DEVELOPMENT: 'development'
-}
+// import cleanup from 'rollup-plugin-cleanup'
+
+// import strip from '@rollup/plugin-strip'
+
+// const mode = {
+//   PRODUCTION: 'production',
+//   DEVELOPMENT: 'development'
+// }
 
 const banner = `/** ${version.copyright} */\n`
-const extensions = ['.js', '.jsx', '.ts', '.tsx']
-const isProduction = process.env.NODE_ENV === mode.PRODUCTION
+const extensions = ['.js', '.ts']
+// const isProduction = process.env.NODE_ENV === mode.PRODUCTION
 const includePattern = 'src/**/*'
 const warnExceptions = {
   THIS_IS_UNDEFINED: [
@@ -27,19 +32,15 @@ const warnExceptions = {
 }
 
 const config = {
-  input: './src/index.js',
+  input: './src/index.ts',
   output: [
-    {
-      format: 'umd',
-      name: 'Miew',
-      file: packageJson.main,
-      banner,
-      sourcemap: true,
-      globals: {
-        three: 'THREE',
-        lodash: '_'
-      }
-    },
+    // {
+    //   format: 'umd',
+    //   name: 'Miew',
+    //   file: packageJson.main,
+    //   banner,
+    //   sourcemap: true
+    // },
     {
       format: 'es',
       file: packageJson.module,
@@ -54,39 +55,40 @@ const config = {
     }
   },
   plugins: [
-    replace({
-      PACKAGE_VERSION: JSON.stringify(version.combined),
-      DEBUG: false
+    del({
+      targets: 'dist/*',
+      runOnce: true
     }),
     peerDepsExternal({ includeDependencies: true }),
+    replace({
+      preventAssignment: true,
+      values: {
+        PACKAGE_VERSION: JSON.stringify(version.combined),
+        DEBUG: false
+      }
+    }),
     string({
       include: ['**/*.vert', '**/*.frag']
     }),
-    nodeResolve(),
-    commonjs({
-      include: [
-        /node_modules/,
-        './vendor/js/**',
-        './src/utils/SelectionParser.js',
-        './src/utils/MiewCLIParser.js'
-      ]
+    nodeResolve({ extensions, preferBuiltins: false }),
+    commonjs({ sourceMap: false }),
+    typescript({
+      typescript: ttypescript,
+      tsconfigOverride: {
+        exclude: ['__tests__/**/*']
+      }
     }),
-    cleanup({
-      extensions: extensions.map((ext) => ext.trimStart('.')),
-      comments: 'none',
-      include: includePattern
-    }),
-    ...(isProduction ? [strip({ include: includePattern })] : []),
     babel({
+      extensions,
       babelHelpers: 'runtime',
-      exclude: [
-        /node_modules[\\/](?!three)/,
-        './vendor/js/**',
-        './src/utils/SelectionParser',
-        './src/utils/MiewCLIParser.js'
-      ],
-      extends: path.join(__dirname, '/.babelrc')
+      include: includePattern
     })
+    // cleanup({
+    //   extensions: extensions.map((ext) => ext.trimStart('.')),
+    //   comments: 'none',
+    //   include: includePattern
+    // }),
+    // ...(isProduction ? [strip({ include: includePattern })] : [])
   ]
 }
 
