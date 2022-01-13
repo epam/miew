@@ -32,7 +32,7 @@ const config = {
     {
       format: 'umd',
       name: 'Miew',
-      file: `build/${packageJson.main}`,
+      file: packageJson.main,
       banner,
       sourcemap: true,
       globals: {
@@ -42,7 +42,7 @@ const config = {
     },
     {
       format: 'es',
-      file: `build/${packageJson.module}`,
+      file: packageJson.module,
       banner,
       sourcemap: true
     }

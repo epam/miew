@@ -46,10 +46,10 @@ module.exports = {
     alias: {
       MiewModule: prod
         ? path.resolve(__dirname, 'node_modules/miew/dist/Miew.module.js')
-        : path.resolve(__dirname, '../lib/build/dist/Miew.module.js'),
+        : path.resolve(__dirname, '../lib/dist/Miew.module.js'),
       MiewStyles: prod
         ? path.resolve(__dirname, 'node_modules/miew/dist/Miew.css')
-        : path.resolve(__dirname, '../lib/build/dist/Miew.css')
+        : path.resolve(__dirname, '../lib/dist/Miew.css')
     }
   },
   plugins: [

@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux'
 import { store } from 'state'
-import { App } from 'components/App'
+import { Viewer } from './Viewer'
 import _ from 'lodash'
 import { Theme, ThemeProvider } from '@emotion/react'
 import { mainTheme } from 'src/theming'
@@ -9,12 +9,12 @@ import { CssBaseline } from '@mui/material'
 
 const muiTheme = createTheme()
 
-export const AppContainer = () => {
+export const ViewerContainer = (props) => {
   return (
     <Provider store={store}>
       <ThemeProvider theme={_.merge(muiTheme, mainTheme) as Theme}>
         <CssBaseline />
-        <App />
+        <Viewer {...props} />
       </ThemeProvider>
     </Provider>
   )
