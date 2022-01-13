@@ -16,7 +16,7 @@ function _chunkString(string, chunkLen) {
 /**
  * Create new context dependent Cookie holder object.
  * @param context
- * @param {Object} opts - options
+ * @param {Object?} opts - options
  * @param {string} opts.path - cookie path
  * @constructor
  */

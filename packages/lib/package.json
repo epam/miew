@@ -95,6 +95,7 @@
     "instrument": false
   },
   "dependencies": {
+    "@babel/runtime": "^7.12.5",
     "lodash": "^4.17.21",
     "three": "0.131.3"
   },

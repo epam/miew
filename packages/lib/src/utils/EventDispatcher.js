@@ -79,8 +79,8 @@ EventDispatcher.prototype.removeEventListener = function (
 /**
  * Makes all the callbacks for the specific `event` to trigger.
  * @param {Object} event      Event.
- * @param {string} event.type Type of the event.
  */
+// * @param {string} event.type Type of the event.
 EventDispatcher.prototype.dispatchEvent = function (event) {
   const self = this
 

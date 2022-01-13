@@ -375,7 +375,7 @@ interface MiewOpts {
   cookiePath: string
 }
 
-class Miew {
+class Miew extends EventDispatcher {
   _opts: any
   _gfx: any
   _interpolator: any
@@ -394,7 +394,7 @@ class Miew {
   _animInterval: any
   _visuals: any
   _curVisualName: any
-  _objects: []
+  _objects: any
   _sourceWindow: any
   _repr: any
   #shadowMatrix = new THREE.Matrix4()
@@ -450,9 +450,26 @@ class Miew {
   #center = new THREE.Vector3()
   #_centerInVisual = new THREE.Vector3(0.0, 0.0, 0.0)
   VERSION: string
+  private static registeredPlugins: any
+  private _msgMode: any
+  private _objectControls: any
+  private _picker: any
+  static VERSION: string
+  private _msgAtomInfo: any
+  private _lastPick: any
+  private _fps: any
+  private _gfxScore: any
+  private webVR: any
+  private isScriptingCommandAvailable: any
+  private _frameInfo: any
+  private _editMode: any
+  private _editors: any
+  private _isAnimating: any
+  static options: any
+  private _edLoader: any
 
   constructor(opts: MiewOpts) {
-    EventDispatcher.call(this)
+    super()
     this._opts = _.merge(
       {
         settingsCookie: 'settings',
@@ -487,8 +504,8 @@ class Miew {
     /** @type {Settings} */
     this.settings = settings
     const log = logger
-    log.console = DEBUG
-    log.level = DEBUG ? 'debug' : 'info'
+    log.console = !!process.env.DEBUG
+    log.level = process.env.DEBUG ? 'debug' : 'info'
     /**
      * @type {Logger}
      * @example
@@ -498,7 +515,7 @@ class Miew {
      */
     this.logger = log
 
-    this._cookies = new Cookies(this)
+    this._cookies = new Cookies(this, {})
     this.restoreSettings()
     if (opts && opts.settings) {
       this.settings.set(opts.settings)
@@ -539,7 +556,9 @@ class Miew {
 
     this._initOnSettingsChanged()
     this.VERSION =
-      (typeof PACKAGE_VERSION !== 'undefined' && PACKAGE_VERSION) || '0.0.0-dev'
+      (typeof process.env.PACKAGE_VERSION !== 'undefined' &&
+        process.env.PACKAGE_VERSION) ||
+      '0.0.0-dev'
   }
 
   getMaxRepresentationCount() {
@@ -627,11 +646,11 @@ class Miew {
         zIndex: 700
       })
 
-      window.top.addEventListener('keydown', (event) => {
+      window.top!.addEventListener('keydown', (event) => {
         self._onKeyDown(event)
       })
 
-      window.top.addEventListener('keyup', (event) => {
+      window.top!.addEventListener('keyup', (event) => {
         self._onKeyUp(event)
       })
 
@@ -642,7 +661,7 @@ class Miew {
         this._gfx.renderer.domElement,
         () => self._getAltObj()
       )
-      this._objectControls.addEventListener('change', (e) => {
+      this._objectControls?.addEventListener('change', (e) => {
         if (settings.now.shadow.on) {
           self._updateShadowCamera()
         }
@@ -669,7 +688,7 @@ class Miew {
       this._picker.addEventListener('dblclick', (event) => {
         self.center(event)
       })
-    } catch (error) {
+    } catch (error: any) {
       if (
         error.name === 'TypeError' &&
         error.message === "Cannot read property 'getExtension' of null"
@@ -747,13 +766,12 @@ class Miew {
     const gfx = {
       width: this._container.clientWidth,
       height: this._container.clientHeight
-    }
+    } as any
 
     const webGLOptions = {
       preserveDrawingBuffer: true,
-      alpha: true,
-      premultipliedAlpha: false
-    }
+      alpha: true
+    } as any
     if (settings.now.antialias) {
       webGLOptions.antialias = true
     }
@@ -948,7 +966,7 @@ class Miew {
     this._gfx = gfx
     this._showCanvas()
 
-    this._embedWebXR(settings.now.stereo === 'WEBVR')
+    this._embedWebXR()
 
     this._container.appendChild(gfx.renderer2d.getElement())
 
@@ -1100,10 +1118,10 @@ class Miew {
    * Returns ComplexVisual with specified name, or current (if not found), or any, or null
    * @private
    */
-  _getComplexVisual(name) {
+  _getComplexVisual(name?) {
     name = name || this._curVisualName
-    let any = null
-    let named = null
+    let any
+    let named
     this._forEachComplexVisual((visual) => {
       any = visual
       if (visual.name === name) {
@@ -1136,7 +1154,7 @@ class Miew {
       return null
     }
 
-    let found = null
+    let found
     this._forEachComplexVisual((visual) => {
       if (visual.getComplex() === complex) {
         found = visual
@@ -1371,7 +1389,7 @@ class Miew {
       this.isScriptingCommandAvailable() &&
       !this._building
     ) {
-      this.callNextCmd()
+      // this.callNextCmd() //TODO: Do something with that
     }
 
     this._objectControls.update()
@@ -1478,8 +1496,8 @@ class Miew {
         this._renderScene(this._gfx.stereoCam.cameraL, false, gfx.stereoBufL)
         this._renderScene(this._gfx.stereoCam.cameraR, false, gfx.stereoBufR)
         renderer.setRenderTarget(null)
-        _anaglyphMat.uniforms.srcL.value = gfx.stereoBufL.texture
-        _anaglyphMat.uniforms.srcR.value = gfx.stereoBufR.texture
+        this.#_anaglyphMat.uniforms.srcL.value = gfx.stereoBufL.texture
+        this.#_anaglyphMat.uniforms.srcR.value = gfx.stereoBufR.texture
         gfx.renderer.renderScreenQuad(this.#_anaglyphMat)
         break
       default:
@@ -1574,7 +1592,7 @@ class Miew {
     ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL])
   }
 
-  _renderScene(camera, distortion, target) {
+  _renderScene(camera, distortion?, target?) {
     distortion = distortion || false
     target = target || null
 
@@ -1704,7 +1722,7 @@ class Miew {
     }
   }
 
-  _renderOutline(camera, srcDepthBuffer, srcColorBuffer, targetBuffer) {
+  _renderOutline(_camera, srcDepthBuffer, srcColorBuffer, targetBuffer) {
     const self = this
     const gfx = self._gfx
 
@@ -1948,7 +1966,7 @@ class Miew {
       // reset
       if (!opts.animation) {
         // FIXME: sometimes it is set AFTERWARDS!
-        this.reset(true)
+        this.reset()
       }
     }
 
@@ -2297,7 +2315,7 @@ class Miew {
     let n
 
     // remove old object geometry
-    const toRemove = []
+    const toRemove = [] as any
     for (i = 0; i < gfx.pivot.children.length; ++i) {
       const child = gfx.pivot.children[i]
       if (!(child instanceof Visual)) {
@@ -2363,13 +2381,13 @@ class Miew {
 
     this._gfx.renderer2d.reset()
 
-    const rebuildActions = []
+    const rebuildActions = [] as any
     this._forEachComplexVisual((visual) => {
       if (visual.needsRebuild()) {
         rebuildActions.push(
           visual.rebuild().then(
             () =>
-              new Promise((resolve) => {
+              new Promise<void>((resolve) => {
                 visual.rebuildSelectionGeometry()
                 resolve()
               })
@@ -2399,7 +2417,7 @@ class Miew {
     })
   }
 
-  _refreshTitle(appendix) {
+  _refreshTitle(appendix?) {
     let title
     appendix = appendix === undefined ? '' : appendix
     const visual = this._getComplexVisual()
@@ -2420,7 +2438,7 @@ class Miew {
   }
 
   _extractRepresentation() {
-    const changed = []
+    const changed = [] as any
 
     this._forEachComplexVisual((visual) => {
       if (visual.getSelectionCount() === 0) {
@@ -2498,7 +2516,7 @@ class Miew {
    * Reset current representation list to initial values.
    * @param {string} [preset] - The source preset in case of uninitialized representation list.
    */
-  resetReps(preset) {
+  resetReps(preset?) {
     const reps = this._opts && this._opts.reps
     if (reps) {
       this._setReps(reps)
@@ -2646,7 +2664,7 @@ class Miew {
       return
     }
 
-    const editors = []
+    const editors = [] as any
     this._forEachComplexVisual((visual) => {
       const editor = visual.beginComponentEdit()
       if (editor) {
@@ -2709,7 +2727,7 @@ class Miew {
       return
     }
 
-    const selectedVisuals = []
+    const selectedVisuals = [] as any
     this._forEachComplexVisual((visual) => {
       if (visual instanceof ComplexVisual && visual.getSelectionCount() > 0) {
         selectedVisuals.push(visual)
@@ -2969,7 +2987,7 @@ class Miew {
     } else if (this._lastPick instanceof Chain) {
       secondLine = `chain ${this._lastPick._name}`
     } else if (this._lastPick instanceof Molecule) {
-      secondLine = `molecule ${this._lastPick._name}`
+      secondLine = `molecule ${this._lastPick.name}`
     }
 
     info.appendChild(document.createTextNode(firstLine))
@@ -3043,7 +3061,7 @@ class Miew {
         canvas.width = width === undefined ? deviceWidth : width
         canvas.height = height === undefined ? deviceHeight : height
 
-        canvasContext.drawImage(
+        canvasContext!.drawImage(
           gfx.renderer.domElement,
           0,
           0,
@@ -3192,7 +3210,7 @@ class Miew {
       const cookie = this._cookies.getCookie(this._opts.settingsCookie)
       const diffs = cookie ? JSON.parse(cookie) : {}
       this.settings.applyDiffs(diffs, true)
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(`Cookies parse error: ${e.message}`)
     }
   }
@@ -3252,7 +3270,7 @@ class Miew {
     }
   }
 
-  info(name) {
+  info(name?) {
     const visual = this._getComplexVisual(name)
     if (!visual) {
       return {}
@@ -3287,7 +3305,7 @@ class Miew {
     try {
       const newObj = new Ctor(objData.params, objData.opts)
       this._addSceneObject(newObj)
-    } catch (error) {
+    } catch (error: any) {
       if (!bThrow) {
         this.logger.debug(
           `Error during scene object creation: ${error.message}`
@@ -3387,7 +3405,7 @@ class Miew {
    * to preset's defaults and only diffs are generated
    */
   _compareReps(complexVisual, compareWithDefaults) {
-    const ans = {}
+    const ans = {} as any
     let repCount = 0
 
     if (complexVisual) {
@@ -3403,7 +3421,7 @@ class Miew {
       ans.preset = settings.now.preset
     }
 
-    const repsDiff = []
+    const repsDiff: any[] = []
     let emptyReps = true
     for (let i = 0, n = repCount; i < n; ++i) {
       repsDiff[i] = complexVisual
@@ -3428,7 +3446,7 @@ class Miew {
    * @returns {Object} State object.
    */
   getState(opts) {
-    const state = {}
+    const state = {} as any
 
     opts = _.defaults(opts, {
       compact: true,
@@ -3463,7 +3481,7 @@ class Miew {
 
     // objects
     const objects = this._objects
-    const objectsState = []
+    const objectsState: any[] = []
     for (let i = 0, n = objects.length; i < n; ++i) {
       objectsState[i] = objects[i].identify()
     }
@@ -3721,7 +3739,7 @@ class Miew {
     })
 
     on('stereo', () => {
-      this._embedWebXR(settings.now.stereo === 'WEBVR')
+      this._embedWebXR()
       this._needRender = true
     })
 
@@ -3762,7 +3780,7 @@ class Miew {
    * @param {string|object} params - Parameter name or path (e.g. 'modes.BS.atom') or even settings object.
    * @param {*=} value - Value.
    */
-  set(params, value) {
+  set(params, value?) {
     settings.set(params, value)
   }
 
@@ -3796,11 +3814,11 @@ class Miew {
    *
    * @param {string=} expression - Optional string encoded the view
    */
-  view(expression) {
+  view(expression?) {
     const VIEW_VERSION = '1'
     const self = this
     const { pivot } = this._gfx
-    let transform = []
+    let transform
     const eulerOrder = 'ZXY'
 
     function encode() {
@@ -4075,8 +4093,8 @@ class Miew {
       const mat = extractRotation(root.matrixWorld)
       const v4 = new THREE.Vector4(0, 0, 0, 0)
       const vCenter = new THREE.Vector4(0, 0, 0, 0)
-      let xml = null
-      let ap = null
+      let xml
+      let ap
 
       // update atoms in cml
       complex.forEachAtom((atom) => {
@@ -4143,7 +4161,7 @@ class Miew {
     })
 
     this._forEachComplexVisual((visual) => {
-      const rep = []
+      const rep = [] as any
       const complex = visual.getComplex()
       const palette = palettes.get(settings.now.palette)
       for (let i = 0; i < complex.getChainCount(); i++) {
@@ -4160,7 +4178,7 @@ class Miew {
     })
   }
 
-  setPivotSubset(selector) {
+  setPivotSubset(selector?) {
     const includesAtom = selector
       ? _includesInSelector
       : _includesInCurSelection
@@ -4386,7 +4404,7 @@ class Miew {
     })
 
     this.#boundingBox.getCenter(this.#center)
-    this._objectControls.setPivot(this.#center.negate())
+    this._objectControls?.setPivot(this.#center.negate())
     this.dispatchEvent({ type: 'transform' })
   }
 
@@ -4412,7 +4430,7 @@ class Miew {
       this.#center.set(x, y, z)
     }
     this.#center.applyMatrix4(visual.matrix).negate()
-    this._objectControls.setPivot(this.#center)
+    this._objectControls?.setPivot(this.#center)
     this.dispatchEvent({ type: 'transform' })
   }
 
@@ -4426,7 +4444,7 @@ class Miew {
 
     this.#center.copy(atom.position)
     this.#center.applyMatrix4(visual.matrix).negate()
-    this._objectControls.setPivot(this.#center)
+    this._objectControls?.setPivot(this.#center)
     this.dispatchEvent({ type: 'transform' })
   }
 
