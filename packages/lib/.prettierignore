@@ -1,5 +1,5 @@
 /dist
-/vendor
+/src/vendors
 /docs
 /build
 /coverage
