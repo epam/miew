@@ -7,5 +7,6 @@ module.exports = {
     require('postcss-nested')(),
     require('postcss-calc')(),
     require('autoprefixer')(),
-  ],
-};
+    require('cssnano')
+  ]
+}
