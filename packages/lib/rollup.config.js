@@ -66,7 +66,8 @@ const config = {
     commonjs({
       include: [
         /node_modules/,
-        './vendor/js/**',
+        './src/vendors/Smooth.js',
+        './src/vendors/mmtf.js',
         './src/utils/SelectionParser.js',
         './src/utils/MiewCLIParser.js'
       ]
