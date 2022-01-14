@@ -1,4 +1,3 @@
-import autoprefixer from 'autoprefixer'
 import babel from '@rollup/plugin-babel'
 import cleanup from 'rollup-plugin-cleanup'
 import commonjs from '@rollup/plugin-commonjs'

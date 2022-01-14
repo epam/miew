@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef } from 'react'
-// import useResizeObserver from 'use-resize-observer'
+import useResizeObserver from 'use-resize-observer'
 import Miew from 'miew'
-// import styled from '@emotion/styled'
+import { Theme } from '@emotion/react'
 
-// const MEDIA_SIZES = {
-//   smallWidth: 800,
-//   smallHeight: 400
-// }
+const MEDIA_SIZES = {
+  smallWidth: 800,
+  smallHeight: 400
+}
 
 type ViewerProps = {
   onInit?: (miew: object) => void
@@ -14,20 +14,27 @@ type ViewerProps = {
 }
 
 const Viewer = (props: ViewerProps) => {
-  const ref = useRef<HTMLDivElement>(null)
-  // const { width, height } = useResizeObserver<HTMLDivElement>({ ref })
   const { onInit, options } = props
+  const ref = useRef<HTMLDivElement>(null)
+  const { width, height } = useResizeObserver<HTMLDivElement>({ ref })
+  const isSizeSmall =
+    (height && height <= MEDIA_SIZES.smallHeight) ||
+    (width && width <= MEDIA_SIZES.smallWidth)
 
-  console.log(props)
-
-  // const ViewerArea = styled.div(({theme}) => {
-  //   const isSmallArea = (height && height <= MEDIA_SIZES.smallHeight) || (width && width <= MEDIA_SIZES.smallWidth)
-  //   return {
-  //     backgroundColor: isSmallArea ?`${theme.customTheme?.palette?.primary?.dark}` : `${theme.customTheme?.palette?.primary?.light}`,
-  //     width: '100%',
-  //     height: '100%'
-  //   }
-  // })
+  const viewerStyle = (theme: Theme) => {
+    const palette = theme?.customTheme?.palette
+    return {
+      backgroundColor: isSizeSmall
+        ? palette?.accent?.main
+        : palette?.primary?.main,
+      height: '100%',
+      width: '100%',
+      '& > .miew-canvas': {
+        height: '100%',
+        width: '100%'
+      }
+    }
+  }
 
   useLayoutEffect(() => {
     const miew = new Miew({
@@ -36,9 +43,9 @@ const Viewer = (props: ViewerProps) => {
     })
     if (miew.init()) miew.run()
     if (typeof onInit === 'function') onInit(miew)
-  }, [onInit, options])
+  }, [options, onInit])
 
-  return <div ref={ref} style={{ width: '100%', height: '100%'}}></div>
+  return <div ref={ref} css={viewerStyle} />
 }
 
 export { Viewer }

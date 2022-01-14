@@ -1,10 +1,5 @@
 import { Theme as MuiTheme } from '@mui/material'
 
-declare module '*.module.scss' {
-  const classes: { readonly [key: string]: string }
-  export default classes
-}
-
 declare module '*.svg' {
   import * as React from 'react'
 
@@ -16,7 +11,6 @@ declare module '*.svg' {
   export default src
 }
 
-// declare module '@emotion/react' {
 interface CustomTheme {
   customTheme?: {
     palette?: {
@@ -35,7 +29,6 @@ interface CustomTheme {
     }
   }
 }
-// }
 
 declare module '@emotion/react' {
   /* eslint-disable @typescript-eslint/no-empty-interface */
