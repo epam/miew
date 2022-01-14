@@ -1,5 +1,5 @@
 /dist
-/vendor
+/src/vendors
 /docs
 /build
 /coverage
@@ -9,3 +9,5 @@
 !.eslintrc.js
 !.mocharc.js
 !.stylelintrc.js
+mmtf.js
+smooth.js

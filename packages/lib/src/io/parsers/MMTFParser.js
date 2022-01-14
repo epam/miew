@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import _ from 'lodash'
 import Parser from './Parser'
 import chem from '../../chem'
-import MMTF from '../../../vendor/js/mmtf'
+import MMTF from '../../vendors/mmtf'
 import StructuralElement from '../../chem/StructuralElement'
 
 const {
