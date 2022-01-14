@@ -15,18 +15,18 @@ import version from './tools/version'
 import { terser } from 'rollup-plugin-terser'
 import postcss from 'rollup-plugin-postcss'
 
-// import cleanup from 'rollup-plugin-cleanup'
+import cleanup from 'rollup-plugin-cleanup'
 
-// import strip from '@rollup/plugin-strip'
+import strip from '@rollup/plugin-strip'
 
-// const mode = {
-//   PRODUCTION: 'production',
-//   DEVELOPMENT: 'development'
-// }
+const mode = {
+  PRODUCTION: 'production',
+  DEVELOPMENT: 'development'
+}
 
 const banner = `/** ${version.copyright} */\n`
 const extensions = ['.js', '.ts']
-// const isProduction = process.env.NODE_ENV === mode.PRODUCTION
+const isProduction = process.env.NODE_ENV === mode.PRODUCTION
 const includePattern = 'src/**/*'
 const warnExceptions = {
   THIS_IS_UNDEFINED: [
@@ -96,13 +96,13 @@ const config = {
       extensions,
       babelHelpers: 'runtime',
       include: includePattern
-    })
-    // cleanup({
-    //   extensions: extensions.map((ext) => ext.trimStart('.')),
-    //   comments: 'none',
-    //   include: includePattern
-    // }),
-    // ...(isProduction ? [strip({ include: includePattern })] : [])
+    }),
+    cleanup({
+      extensions: extensions.map((ext) => ext.trimStart('.')),
+      comments: 'none',
+      include: ['./src/**/*']
+    }),
+    ...(isProduction ? [strip({ include: includePattern })] : [])
   ]
 }
 
