@@ -11,7 +11,7 @@ jest.mock('miew', () =>
   jest.fn().mockReturnValue({ init: jest.fn(() => true), run: jest.fn() })
 )
 
-describe('Miew component', () => {
+describe('Viewer component', () => {
   it('should be rendered', () => {
     expect(render(<Viewer />)).toMatchSnapshot()
   })
