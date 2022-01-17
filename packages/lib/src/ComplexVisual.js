@@ -11,8 +11,8 @@ import Representation from './gfx/Representation'
 import Visual from './Visual'
 import ComplexVisualEdit from './ComplexVisualEdit'
 import meshutils from './gfx/meshutils'
-import { Group, Mesh } from 'three'
 import { isEmpty, merge } from 'lodash'
+import { Group, Mesh } from 'three'
 
 const { selectors } = chem
 
@@ -198,7 +198,7 @@ class ComplexVisual extends Visual {
       )
 
       // something was changed
-      if (isEmpty(diff)) {
+      if (!isEmpty(diff)) {
         target.needsRebuild = true
         for (const key in diff) {
           if (diff.hasOwnProperty(key)) {
