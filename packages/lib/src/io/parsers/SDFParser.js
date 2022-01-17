@@ -1,9 +1,9 @@
-import * as THREE from 'three'
-import _ from 'lodash'
 import Parser from './Parser'
 import chem from '../../chem'
 import SDFStream from './SDFStream'
 import Assembly from '../../chem/Assembly'
+import { Matrix4, Vector3 } from 'three'
+import { isString } from 'lodash'
 
 const { Complex, Element, Bond, Molecule } = chem
 
@@ -93,7 +93,7 @@ export default class SDFParser extends Parser {
   }
 
   canProbablyParse(data) {
-    return _.isString(data) && sdfAndMolRegexp.test(data)
+    return isString(data) && sdfAndMolRegexp.test(data)
   }
 
   _parseHeader(stream) {
@@ -125,7 +125,7 @@ export default class SDFParser extends Parser {
       const y = parseFloat(curStr.substr(10, 10))
       const z = parseFloat(curStr.substr(20, 10))
       const charge = chargeMap[parseInt(curStr.substr(36, 3), 10)]
-      const xyz = new THREE.Vector3(x, y, z)
+      const xyz = new Vector3(x, y, z)
       let name = curStr.substr(31, 3).trim().toUpperCase()
       const type = Element.getByName(name)
       if (!this._atomsIndexes[name]) {
@@ -245,7 +245,7 @@ export default class SDFParser extends Parser {
 
     for (let i = 0; i < chains.length; i++) {
       const assembly = new Assembly(this._complex)
-      const matrix = new THREE.Matrix4()
+      const matrix = new Matrix4()
       assembly.addMatrix(matrix)
       assembly.addChain(chains[i]._name)
       this._assemblies.push(assembly)

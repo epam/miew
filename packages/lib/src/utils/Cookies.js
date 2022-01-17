@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { merge } from 'lodash'
 import makeContextDependent from './makeContextDependent'
 
 const MAX_COOKIE_LEN = 4000
@@ -22,7 +22,7 @@ function _chunkString(string, chunkLen) {
  */
 function Cookies(context, opts) {
   this.context = context
-  this._opts = _.merge(
+  this._opts = merge(
     {
       path: '/'
     },

@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import Mode from './Mode'
+import { Vector2 } from 'three'
 
 class TubeMode extends Mode {
   static id = 'TU'
@@ -18,7 +18,7 @@ class TubeMode extends Mode {
 
   buildGeometry(complex, colorer, mask, material) {
     const rad = this.opts.radius
-    this.TUBE_RADIUS = new THREE.Vector2(rad, rad)
+    this.TUBE_RADIUS = new Vector2(rad, rad)
 
     return Mode.prototype.buildGeometry.call(
       this,

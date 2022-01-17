@@ -1,19 +1,25 @@
-import * as THREE from 'three'
 import createWebVRButton from './createWebVRButton'
 import gfxutils from '../gfxutils'
 import logger from '../../utils/logger'
 import settings from '../../settings'
 import UberMaterial from '../shaders/UberMaterial'
+import {
+  CylinderGeometry,
+  Mesh,
+  Object3D,
+  PerspectiveCamera,
+  Color
+} from 'three'
 
 export default class WebVRPoC {
   constructor(onToggle) {
-    this._mainCamera = new THREE.PerspectiveCamera()
+    this._mainCamera = new PerspectiveCamera()
     this._button = null
     this._onToggle = onToggle
 
     this._molContainer = new gfxutils.RCGroup()
     this._user = new gfxutils.RCGroup()
-    this._scalingPivot = new THREE.Object3D()
+    this._scalingPivot = new Object3D()
     this._user.add(this._scalingPivot)
 
     this._controller1 = null
@@ -207,12 +213,12 @@ export default class WebVRPoC {
 
   _createControllerMesh() {
     // visualize controllers with cylinders
-    const geometry = new THREE.CylinderGeometry(0.04, 0.04, 0.3)
+    const geometry = new CylinderGeometry(0.04, 0.04, 0.3)
     const material = new UberMaterial()
     material.setValues({ lights: false, overrideColor: true })
-    material.setUberOptions({ fixedColor: new THREE.Color(0x4444ff) })
+    material.setUberOptions({ fixedColor: new Color(0x4444ff) })
     material.updateUniforms()
-    const cylinder = new THREE.Mesh(geometry, material)
+    const cylinder = new Mesh(geometry, material)
     cylinder.rotateX(-Math.PI / 2)
     return cylinder
   }

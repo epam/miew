@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { merge } from 'lodash'
 import Mode from './Mode'
 
 class TextMode extends Mode {
@@ -9,7 +9,7 @@ class TextMode extends Mode {
   }
 
   getLabelOpts() {
-    return _.merge(this.opts, {
+    return merge(this.opts, {
       colors: true,
       adjustColor: true,
       transparent: true

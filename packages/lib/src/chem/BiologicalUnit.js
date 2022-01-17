@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import selectors from './selectors'
+import { Box3, Sphere, Vector3 } from 'three'
 
 /**
  * Basic biological unit class.
@@ -12,8 +12,8 @@ class BiologicalUnit {
     this._complex = complex
     this._selector = selectors.keyword('All')()
     this._boundaries = {
-      boundingBox: new THREE.Box3(),
-      boundingSphere: new THREE.Sphere()
+      boundingBox: new Box3(),
+      boundingSphere: new Sphere()
     }
   }
 
@@ -26,10 +26,10 @@ class BiologicalUnit {
     boundingBox.makeEmpty()
     if (n === 1) {
       boundingBox.expandByPoint(atoms[0].position)
-      const bbc = new THREE.Vector3()
+      const bbc = new Vector3()
       boundingBox.getCenter(bbc)
       const s = 2 * atoms[0].element.radius
-      boundingBox.setFromCenterAndSize(bbc, new THREE.Vector3(s, s, s))
+      boundingBox.setFromCenterAndSize(bbc, new Vector3(s, s, s))
     } else {
       for (let i = 0; i < n; ++i) {
         if (selector.includesAtom(atoms[i])) {
@@ -40,7 +40,7 @@ class BiologicalUnit {
 
     // Build bounding sphere
     let radiusSquared = 0.0
-    const center = new THREE.Vector3()
+    const center = new Vector3()
     boundingBox.getCenter(center)
     if (n === 1) {
       this._boundaries.boundingSphere.set(center, atoms[0].element.radius)

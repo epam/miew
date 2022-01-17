@@ -1,18 +1,18 @@
-import * as THREE from 'three'
 import ChunkedLinesGeometry from './ChunkedLinesGeometry'
 import SphereCollisionGeo from './SphereCollisionGeo'
+import { Vector3 } from 'three'
 
 const vectors = [
-  new THREE.Vector3(1, 0, 0),
-  new THREE.Vector3(-1, 0, 0),
-  new THREE.Vector3(0, 1, 0),
-  new THREE.Vector3(0, -1, 0),
-  new THREE.Vector3(0, 0, 1),
-  new THREE.Vector3(0, 0, -1)
+  new Vector3(1, 0, 0),
+  new Vector3(-1, 0, 0),
+  new Vector3(0, 1, 0),
+  new Vector3(0, -1, 0),
+  new Vector3(0, 0, 1),
+  new Vector3(0, 0, -1)
 ]
 const vecCount = vectors.length
-const tempPos1 = new THREE.Vector3()
-const tempPos2 = new THREE.Vector3()
+const tempPos1 = new Vector3()
+const tempPos2 = new Vector3()
 
 class CrossGeometry extends SphereCollisionGeo(ChunkedLinesGeometry) {
   constructor(chunksCount) {

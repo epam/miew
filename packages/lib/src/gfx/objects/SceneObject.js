@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEmpty, merge } from 'lodash'
 import settings from '../../settings'
 import utils from '../../utils'
 import gfxutils from '../gfxutils'
@@ -28,7 +28,7 @@ class SceneObject {
      * @type {object}
      */
     this.params = params
-    this.opts = _.merge(
+    this.opts = merge(
       utils.deriveDeep(settings.now.objects[this.type], true),
       opts
     )
@@ -49,7 +49,7 @@ class SceneObject {
       params: this.params
     }
     const diff = utils.objectsDiff(this.opts, settings.now.modes[this.id])
-    if (!_.isEmpty(diff)) {
+    if (!isEmpty(diff)) {
       result.opts = diff
     }
     return result

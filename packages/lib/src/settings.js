@@ -1,6 +1,6 @@
-import _ from 'lodash'
 import utils from './utils'
 import EventDispatcher from './utils/EventDispatcher'
+import { isEmpty, isString, get, set, merge, cloneDeep, filter } from 'lodash'
 
 const VERSION = 0
 
@@ -936,35 +936,35 @@ utils.deriveClass(Settings, EventDispatcher, {
   defaults,
 
   set(path, value) {
-    if (_.isString(path)) {
-      const oldValue = _.get(this.now, path)
+    if (isString(path)) {
+      const oldValue = get(this.now, path)
       if (oldValue !== value) {
-        _.set(this.now, path, value)
+        set(this.now, path, value)
         this._notifyChange(path, value)
       }
     } else {
       const diff = utils.objectsDiff(path, this.now)
-      if (!_.isEmpty(diff)) {
-        _.merge(this.now, diff)
+      if (!isEmpty(diff)) {
+        merge(this.now, diff)
         this._notifyChanges(diff)
       }
     }
   },
 
   get(path, defaultValue) {
-    return _.get(this.now, path, defaultValue)
+    return get(this.now, path, defaultValue)
   },
 
   reset() {
     const diff = utils.objectsDiff(defaults, this.now)
-    this.now = _.cloneDeep(defaults)
+    this.now = cloneDeep(defaults)
     this.old = null
     this._notifyChanges(diff)
     this._changed = {}
   },
 
   checkpoint() {
-    this.old = _.cloneDeep(this.now)
+    this.old = cloneDeep(this.now)
     this._changed = {}
   },
 
@@ -984,9 +984,9 @@ utils.deriveClass(Settings, EventDispatcher, {
       return []
     }
     const { old, now } = this
-    const keys = _.filter(
+    const keys = filter(
       Object.keys(this._changed),
-      (key) => _.get(old, key) !== _.get(now, key)
+      (key) => get(old, key) !== get(now, key)
     )
     return keys
   },
@@ -1010,8 +1010,8 @@ utils.deriveClass(Settings, EventDispatcher, {
   },
 
   setPluginOpts(plugin, opts) {
-    defaults.plugins[plugin] = _.cloneDeep(opts)
-    this.now.plugins[plugin] = _.cloneDeep(opts)
+    defaults.plugins[plugin] = cloneDeep(opts)
+    this.now.plugins[plugin] = cloneDeep(opts)
   }
 })
 

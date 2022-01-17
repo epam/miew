@@ -5,9 +5,17 @@
  * functions for traversihg tree and create auxiliary meshes for transparency/shadowmaps...
  * functions for calculating data connected with meshes
  */
-import * as THREE from 'three'
+
 import UberMaterial from './shaders/UberMaterial'
 import gfxutils from './gfxutils'
+import {
+  BufferGeometry,
+  InstancedBufferAttribute,
+  InstancedBufferGeometry,
+  Line,
+  LineSegments,
+  Mesh
+} from 'three'
 
 function _gatherObjects(root, meshTypes) {
   const meshes = []
@@ -52,7 +60,7 @@ function applyTransformsToMeshes(root, mtc) {
     return
   }
 
-  const meshTypes = [THREE.Mesh, THREE.LineSegments, THREE.Line]
+  const meshTypes = [Mesh, LineSegments, Line]
   traverseMeshes(root, meshTypes, (mesh) => {
     mesh.applyMatrix4(mtc[0])
     for (let j = 1; j < mtcCount; ++j) {
@@ -79,7 +87,7 @@ const processTransparentMaterial = (function () {
       return
     }
 
-    traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
+    traverseMeshes(root, [Mesh, LineSegments], (mesh) => {
       mesh.material.setValues({
         prepassTransparancy: false,
         fakeOpacity: false
@@ -118,7 +126,7 @@ const processColFromPosMaterial = (function () {
       return
     }
 
-    traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
+    traverseMeshes(root, [Mesh, LineSegments], (mesh) => {
       const colFromPosMesh = createDerivativeMesh(
         mesh,
         matValues,
@@ -142,7 +150,7 @@ const createShadowmapMaterial = (function () {
     if (!(material instanceof UberMaterial)) {
       return
     }
-    traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
+    traverseMeshes(root, [Mesh, LineSegments], (mesh) => {
       if (!mesh.receiveShadow && mesh.material.shadowmap) {
         // remove shadow from non-receivers
         mesh.material.setValues({ shadowmap: false })
@@ -176,7 +184,7 @@ function removeShadowmapMaterial(root, material) {
     return
   }
 
-  traverseMeshes(root, [THREE.Mesh, THREE.LineSegments], (mesh) => {
+  traverseMeshes(root, [Mesh, LineSegments], (mesh) => {
     if (mesh.isShadowmapMesh) {
       mesh.parent.remove(mesh)
     }
@@ -185,7 +193,7 @@ function removeShadowmapMaterial(root, material) {
 
 function forEachMeshInGroup(group, process) {
   function processObj(object) {
-    if (object instanceof THREE.Mesh) {
+    if (object instanceof Mesh) {
       process(object)
     }
     for (let i = 0, l = object.children.length; i < l; i++) {
@@ -197,12 +205,12 @@ function forEachMeshInGroup(group, process) {
 
 function _countMeshTriangles(mesh) {
   const geom = mesh.geometry
-  if (geom instanceof THREE.InstancedBufferGeometry) {
+  if (geom instanceof InstancedBufferGeometry) {
     const attribs = geom.attributes
     for (const property in attribs) {
       if (
         attribs.hasOwnProperty(property) &&
-        attribs[property] instanceof THREE.InstancedBufferAttribute
+        attribs[property] instanceof InstancedBufferAttribute
       ) {
         const currAttr = attribs[property]
         const indexSize = geom.index ? geom.index.array.length / 3 : 0
@@ -211,7 +219,7 @@ function _countMeshTriangles(mesh) {
     }
     return 0
   }
-  if (geom instanceof THREE.BufferGeometry) {
+  if (geom instanceof BufferGeometry) {
     return geom.index ? geom.index.array.length / 3 : 0
   }
   return geom.faces ? geom.faces.length : 0

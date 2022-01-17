@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import * as THREE from 'three'
+import { Object3D } from 'three'
 
-class CSS2DObject extends THREE.Object3D {
+class CSS2DObject extends Object3D {
   constructor(element) {
     super()
     const self = this

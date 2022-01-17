@@ -1,11 +1,11 @@
-import _ from 'lodash'
-import * as THREE from 'three'
 import UberMaterial from './shaders/UberMaterial'
 import gfxutils from './gfxutils'
 import meshutils from './meshutils'
 import settings from '../settings'
 import materials from './materials'
 import chem from '../chem'
+import { Group } from 'three'
+import { isEqual } from 'lodash'
 
 const { selectors } = chem
 
@@ -99,7 +99,7 @@ class Representation {
     if (this.geo && 'getSubset' in this.geo) {
       const meshes = this.geo.getSubset(mask)
       if (meshes && meshes.length > 0) {
-        sg = new THREE.Group()
+        sg = new Group()
         sg.matrixAutoUpdate = false
         sg.matrix = this.geo.matrix
 
@@ -179,7 +179,7 @@ class Representation {
     // modify mode
     if (repSettings.mode) {
       const newMode = repSettings.mode
-      if (!_.isEqual(this.mode.identify(), newMode)) {
+      if (!isEqual(this.mode.identify(), newMode)) {
         diff.mode = newMode
         this.setMode(mode)
       }
@@ -188,7 +188,7 @@ class Representation {
     // modify colorer
     if (repSettings.colorer) {
       const newColorer = repSettings.colorer
-      if (!_.isEqual(this.colorer.identify(), newColorer)) {
+      if (!isEqual(this.colorer.identify(), newColorer)) {
         diff.colorer = newColorer
         this.colorer = color
       }
@@ -197,7 +197,7 @@ class Representation {
     // modify material
     if (repSettings.material) {
       const newMaterial = repSettings.material
-      if (!_.isEqual(this.materialPreset.id, newMaterial)) {
+      if (!isEqual(this.materialPreset.id, newMaterial)) {
         diff.material = newMaterial
         this.setMaterialPreset(materials.get(repSettings.material))
       }

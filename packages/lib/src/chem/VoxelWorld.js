@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import utils from '../utils'
+import { Vector2, Vector3 } from 'three'
 
 /**
  * Calculate min & max radius of a sphere slice between zMin & zMax
@@ -68,13 +68,13 @@ function _getCircleSliceRadiusRange(center, radius, yMin, yMax) {
 class VoxelWorld {
   constructor(box, vCellSizeHint) {
     this._box = box.clone()
-    const size = new THREE.Vector3()
+    const size = new Vector3()
     box.getSize(size)
     this._count = size
       .clone()
       .divide(vCellSizeHint)
       .floor()
-      .max(new THREE.Vector3(1, 1, 1))
+      .max(new Vector3(1, 1, 1))
     this._last = this._count.clone().subScalar(1)
     this._cellSize = size.clone().divide(this._count)
     this._cellInnerR =
@@ -126,9 +126,9 @@ class VoxelWorld {
    * @param {Vector3} point - a point in 3D
    * @returns {number} - index of voxel
    */
-  static _zero = new THREE.Vector3(0, 0, 0)
+  static _zero = new Vector3(0, 0, 0)
 
-  static _voxel = new THREE.Vector3()
+  static _voxel = new Vector3()
 
   _findVoxel(point) {
     const zero = VoxelWorld._zero
@@ -163,11 +163,11 @@ class VoxelWorld {
    * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
    */
 
-  static _xRange = new THREE.Vector2()
+  static _xRange = new Vector2()
 
-  static _yRange = new THREE.Vector2()
+  static _yRange = new Vector2()
 
-  static _zRange = new THREE.Vector2()
+  static _zRange = new Vector2()
 
   _forEachVoxelWithinRadius(center, radius, process) {
     const xRange = VoxelWorld._xRange
@@ -265,7 +265,7 @@ class VoxelWorld {
    * @param {function(number,bool)} process - function to call that takes voxel index and boolean isInside
    */
 
-  static _vCenter = new THREE.Vector3()
+  static _vCenter = new Vector3()
 
   _forEachVoxelWithinRadiusSimple(center, radius, process) {
     const xRange = VoxelWorld._xRange

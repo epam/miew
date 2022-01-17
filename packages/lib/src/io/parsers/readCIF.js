@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { set } from 'lodash'
 import ParsingError from './ParsingError'
 
 // Implemented and being tested against: https://www.iucr.org/resources/cif/spec/version1.1/cifsyntax
@@ -240,7 +240,7 @@ export default function readCIF(source) {
           break
         }
         value = _parseValue()
-        _.set(block, key, value)
+        set(block, key, value)
         state = 1 // block
         continue
       } else if (state === 3) {
@@ -267,7 +267,7 @@ export default function readCIF(source) {
             for (let keyIndex = 0; keyIndex < keysCount; ++keyIndex) {
               value = []
               values[keyIndex] = value
-              _.set(block, keys[keyIndex], value)
+              set(block, keys[keyIndex], value)
             }
             state = 4
             continue // parse again in a different state

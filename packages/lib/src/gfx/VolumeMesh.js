@@ -1,15 +1,23 @@
-import * as THREE from 'three'
 import VolumeMaterial from './shaders/VolumeMaterial'
 import settings from '../settings'
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Matrix4,
+  Mesh,
+  Plane,
+  Vector3,
+  Vector4
+} from 'three'
 
-class VolumeMesh extends THREE.Mesh {
+class VolumeMesh extends Mesh {
   volumeInfo = {} // data for noise filter
 
   constructor() {
-    const geo = new THREE.BufferGeometry()
+    const geo = new BufferGeometry()
     super(geo)
-    this.clipPlane = new THREE.Plane()
-    const size = new THREE.Vector3(0.5, 0.5, 0.5)
+    this.clipPlane = new Plane()
+    const size = new Vector3(0.5, 0.5, 0.5)
     this.size = size
 
     this.cullFlag = [
@@ -30,35 +38,35 @@ class VolumeMesh extends THREE.Mesh {
     ]
 
     this.faces = [
-      { indices: [], norm: new THREE.Vector3(0, 0, -1) },
-      { indices: [], norm: new THREE.Vector3(0, 0, 1) },
-      { indices: [], norm: new THREE.Vector3(0, -1, 0) },
-      { indices: [], norm: new THREE.Vector3(0, 1, 0) },
-      { indices: [], norm: new THREE.Vector3(-1, 0, 0) },
-      { indices: [], norm: new THREE.Vector3(1, 0, 0) },
-      { indices: [], norm: new THREE.Vector3(0, 0, 0) }
+      { indices: [], norm: new Vector3(0, 0, -1) },
+      { indices: [], norm: new Vector3(0, 0, 1) },
+      { indices: [], norm: new Vector3(0, -1, 0) },
+      { indices: [], norm: new Vector3(0, 1, 0) },
+      { indices: [], norm: new Vector3(-1, 0, 0) },
+      { indices: [], norm: new Vector3(1, 0, 0) },
+      { indices: [], norm: new Vector3(0, 0, 0) }
     ]
 
     this.vertices = [
-      new THREE.Vector3(-size.x, -size.y, -size.z),
-      new THREE.Vector3(-size.x, size.y, -size.z),
-      new THREE.Vector3(size.x, -size.y, -size.z),
-      new THREE.Vector3(size.x, size.y, -size.z),
-      new THREE.Vector3(-size.x, -size.y, size.z),
-      new THREE.Vector3(-size.x, size.y, size.z),
-      new THREE.Vector3(size.x, -size.y, size.z),
-      new THREE.Vector3(size.x, size.y, size.z),
-      new THREE.Vector3(0.0, 0.0, 0.0), // Placeholder for section
-      new THREE.Vector3(0.0, 0.0, 0.0),
-      new THREE.Vector3(0.0, 0.0, 0.0),
-      new THREE.Vector3(0.0, 0.0, 0.0),
-      new THREE.Vector3(0.0, 0.0, 0.0),
-      new THREE.Vector3(0.0, 0.0, 0.0)
+      new Vector3(-size.x, -size.y, -size.z),
+      new Vector3(-size.x, size.y, -size.z),
+      new Vector3(size.x, -size.y, -size.z),
+      new Vector3(size.x, size.y, -size.z),
+      new Vector3(-size.x, -size.y, size.z),
+      new Vector3(-size.x, size.y, size.z),
+      new Vector3(size.x, -size.y, size.z),
+      new Vector3(size.x, size.y, size.z),
+      new Vector3(0.0, 0.0, 0.0), // Placeholder for section
+      new Vector3(0.0, 0.0, 0.0),
+      new Vector3(0.0, 0.0, 0.0),
+      new Vector3(0.0, 0.0, 0.0),
+      new Vector3(0.0, 0.0, 0.0),
+      new Vector3(0.0, 0.0, 0.0)
     ]
 
     geo.setAttribute(
       'position',
-      new THREE.BufferAttribute(new Float32Array(this.vertices.length * 3), 3)
+      new BufferAttribute(new Float32Array(this.vertices.length * 3), 3)
     )
 
     this.name = 'VolumeMesh'
@@ -95,7 +103,7 @@ class VolumeMesh extends THREE.Mesh {
   static _edgeIntersections = (function () {
     const edgeIntersections = []
     for (let j = 0; j < 12; ++j) {
-      edgeIntersections.push(new THREE.Vector3())
+      edgeIntersections.push(new Vector3())
     }
     return edgeIntersections
   })()
@@ -120,7 +128,7 @@ class VolumeMesh extends THREE.Mesh {
     const cornerMark = [0, 0, 0, 0, 0, 0, 0, 0]
     const edgeMark = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-    const curEdge = new THREE.Vector3()
+    const curEdge = new Vector3()
     let curEdgeInter = null
 
     function CheckX() {
@@ -217,8 +225,8 @@ class VolumeMesh extends THREE.Mesh {
 
     this.faces[6] = face
 
-    const diff = new THREE.Vector3()
-    const coplanarPoint = new THREE.Vector3()
+    const diff = new Vector3()
+    const coplanarPoint = new Vector3()
     this.clipPlane.coplanarPoint(coplanarPoint)
     for (i = 0; i < vert.length; ++i) {
       this.cullFlag[i] = false
@@ -260,7 +268,7 @@ class VolumeMesh extends THREE.Mesh {
     const vert = this.vertices
     const angle = []
 
-    const dir = new THREE.Vector3()
+    const dir = new Vector3()
     for (i = 1; i < face.indices.length; ++i) {
       dir.subVectors(vert[face.indices[i]], vert[face.indices[0]])
       dir.normalize()
@@ -306,9 +314,9 @@ class VolumeMesh extends THREE.Mesh {
     this._collectVertices(this.faces[4], (vertex) => vertex.x === -size.x)
     this._collectVertices(this.faces[5], (vertex) => vertex.x === size.x)
 
-    const vCenter = new THREE.Vector3()
-    const vRight = new THREE.Vector3()
-    const vDir = new THREE.Vector3()
+    const vCenter = new Vector3()
+    const vRight = new Vector3()
+    const vDir = new Vector3()
 
     for (faceIdx = 0; faceIdx < this.faces.length; ++faceIdx) {
       face = this.faces[faceIdx]
@@ -362,7 +370,7 @@ class VolumeMesh extends THREE.Mesh {
       }
     }
 
-    this.geometry.setIndex(new THREE.BufferAttribute(indices, 1))
+    this.geometry.setIndex(new BufferAttribute(indices, 1))
   }
 
   setDataSource(dataSource) {
@@ -406,15 +414,15 @@ class VolumeMesh extends THREE.Mesh {
 
   static _nearClipPlaneOffset = 0.2
 
-  static _pos = new THREE.Vector3()
+  static _pos = new Vector3()
 
-  static _norm = new THREE.Vector3()
+  static _norm = new Vector3()
 
-  static _norm4D = new THREE.Vector4()
+  static _norm4D = new Vector4()
 
-  static _matrixWorldToLocal = new THREE.Matrix4()
+  static _matrixWorldToLocal = new Matrix4()
 
-  static _clipPlane = new THREE.Plane()
+  static _clipPlane = new Plane()
 
   rebuild(camera) {
     const nearClipPlaneOffset = VolumeMesh._nearClipPlaneOffset

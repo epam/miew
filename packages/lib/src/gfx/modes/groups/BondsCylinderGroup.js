@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import BondsGroup from './BondsGroup'
+import { Vector3 } from 'three'
 
 class BondsCylinderGroup extends BondsGroup {
   _build() {
@@ -14,8 +14,8 @@ class BondsCylinderGroup extends BondsGroup {
     const stickRad = mode.calcStickRadius()
     const emptyOffset = mode.calcSpaceFraction()
     let normDir
-    const leftPos = new THREE.Vector3()
-    const rightPos = new THREE.Vector3()
+    const leftPos = new Vector3()
+    const rightPos = new Vector3()
     let currBondIdx = 0
     const chunksToIdx = []
     for (let i = 0, n = bondsIdc.length; i < n; ++i) {
@@ -71,8 +71,8 @@ class BondsCylinderGroup extends BondsGroup {
     const stickRad = mode.calcStickRadius()
     const emptyOffset = mode.calcSpaceFraction()
     let normDir
-    const leftPos = new THREE.Vector3()
-    const rightPos = new THREE.Vector3()
+    const leftPos = new Vector3()
+    const rightPos = new Vector3()
     let currBondIdx = 0
     const updateColor = frameData.needsColorUpdate(colorer)
     for (let i = 0, n = bondsIdc.length; i < n; ++i) {

@@ -4,7 +4,7 @@
  * Allows users to log messages for five different levels,
  * enable console output and catch signal on each message.
  */
-import _ from 'lodash'
+import { findKey, isNumber } from 'lodash'
 import EventDispatcher from './EventDispatcher'
 
 const priorities = {
@@ -43,7 +43,7 @@ Logger.prototype.instantiate = function () {
 }
 
 function verify(number) {
-  if (!_.isNumber(number)) {
+  if (!isNumber(number)) {
     throw new Error('Wrong log level specified!')
   }
   return number
@@ -55,7 +55,7 @@ function verify(number) {
  */
 Object.defineProperty(Logger.prototype, 'level', {
   get() {
-    return _.findKey(priorities, (value) => value === this._priority)
+    return findKey(priorities, (value) => value === this._priority)
   },
   set(level) {
     this._priority = verify(priorities[level])
@@ -131,7 +131,7 @@ Logger.prototype._message = function (priority, message) {
   if (priority < this._priority) {
     return
   }
-  const level = _.findKey(priorities, (value) => value === priority)
+  const level = findKey(priorities, (value) => value === priority)
   message = String(message)
   if (this.console) {
     const output = `miew:${level}: ${message}`

@@ -1,43 +1,53 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
-import * as THREE from 'three'
+
 import vertexShader from './Uber.vert'
 import fragmentShader from './Uber.frag'
 import capabilities from '../capabilities'
 import noise from '../noiseTexture'
+import {
+  UniformsLib,
+  UniformsUtils,
+  Vector2,
+  Color,
+  Matrix4,
+  RawShaderMaterial,
+  DoubleSide,
+  Material
+} from 'three'
 
 // Length of _samplesKernel is used in Uber.frag
 // If you want to change length of _samplesKernel, please, remember change it in Uber.frag too.
 // You can easy find places for replace using word:_samplesKernel
 const _samplesKernel = [
-  new THREE.Vector2(-0.541978, 0.840393),
-  new THREE.Vector2(0.125533, -0.992089),
-  new THREE.Vector2(0.374329, 0.927296),
-  new THREE.Vector2(-0.105475, 0.994422)
+  new Vector2(-0.541978, 0.840393),
+  new Vector2(0.125533, -0.992089),
+  new Vector2(0.374329, 0.927296),
+  new Vector2(-0.105475, 0.994422)
 ]
 
-const defaultUniforms = THREE.UniformsUtils.merge([
-  THREE.UniformsLib.fog,
-  THREE.UniformsLib.lights,
+const defaultUniforms = UniformsUtils.merge([
+  UniformsLib.fog,
+  UniformsLib.lights,
 
   {
-    // are updated automatically by three.js (see THREE.ShaderLib.common)
-    diffuse: { value: new THREE.Color(0xeeeeee) },
+    // are updated automatically by three.js (see ShaderLib.common)
+    diffuse: { value: new Color(0xeeeeee) },
     opacity: { value: 1.0 },
 
-    specular: { type: 'c', value: new THREE.Color(0x111111) },
+    specular: { type: 'c', value: new Color(0x111111) },
     shininess: { type: 'f', value: 30 },
-    fixedColor: { type: 'c', value: new THREE.Color(0xffffff) },
+    fixedColor: { type: 'c', value: new Color(0xffffff) },
     zOffset: { type: 'f', value: 0.0 },
     zClipValue: { type: 'f', value: 0.0 },
     clipPlaneValue: { type: 'f', value: 0.0 },
     nearPlaneValue: { type: 'f', value: -0.5 },
-    invModelViewMatrix: { type: '4fv', value: new THREE.Matrix4() },
-    world2colorMatrix: { type: '4fv', value: new THREE.Matrix4() },
+    invModelViewMatrix: { type: '4fv', value: new Matrix4() },
+    world2colorMatrix: { type: '4fv', value: new Matrix4() },
     dashedLineSize: { type: 'f', value: 0.1 },
     dashedLinePeriod: { type: 'f', value: 0.2 },
-    projMatrixInv: { type: '4fv', value: new THREE.Matrix4() },
-    viewport: { type: 'v2', value: new THREE.Vector2() },
+    projMatrixInv: { type: '4fv', value: new Matrix4() },
+    viewport: { type: 'v2', value: new Vector2() },
     lineWidth: { type: 'f', value: 2.0 },
     // default value must be the same as settings
     fogAlpha: { type: 'f', value: 1.0 },
@@ -73,29 +83,26 @@ const uberOptionNames = [
 
 // properties that convert to uniforms
 const uberOptions = {
-  diffuse: new THREE.Color(0xffffff), // used in phong lighting
-  specular: new THREE.Color(0x111111), // used in phong lighting
+  diffuse: new Color(0xffffff), // used in phong lighting
+  specular: new Color(0x111111), // used in phong lighting
   shininess: 30, // used in phong lighting
   opacity: 1, // set mesh opacity
-  fixedColor: new THREE.Color(0xffffff), // color to override (see OVERRIDE_COLOR)
+  fixedColor: new Color(0xffffff), // color to override (see OVERRIDE_COLOR)
   zOffset: 0.0, // used fo zsprites (see SPHERE_SPRITE CYLINDER_SPRITE)
   zClipCoef: 2.0, // use for Surfs clipping (mesh param, isn't used in shader)  FIXME move to representation param
   zClipValue: 0.0, //  value to clip Surfs in shader  (see ZCLIP)
   clipPlaneValue: 0.0, // value to clip scene globally (see CLIPPLANE)
-  world2colorMatrix: new THREE.Matrix4(),
+  world2colorMatrix: new Matrix4(),
   dashedLineSize: 0.1,
   dashedLinePeriod: 0.3,
-  projMatrixInv: new THREE.Matrix4(),
-  viewport: new THREE.Vector2(800, 600),
+  projMatrixInv: new Matrix4(),
+  viewport: new Vector2(800, 600),
   lineWidth: 2.0,
   fogAlpha: 1.0,
   samplesKernel: _samplesKernel,
   noiseTex: noise.noiseTexture,
-  noiseTexelSize: new THREE.Vector2(
-    1.0 / noise.noiseWidth,
-    1.0 / noise.noiseHeight
-  ),
-  srcTexelSize: new THREE.Vector2(1.0 / 800.0, 1.0 / 600.0),
+  noiseTexelSize: new Vector2(1.0 / noise.noiseWidth, 1.0 / noise.noiseHeight),
+  srcTexelSize: new Vector2(1.0 / 800.0, 1.0 / 600.0),
 
   copy(source) {
     this.diffuse.copy(source.diffuse)
@@ -122,7 +129,7 @@ const uberOptions = {
   }
 }
 
-class UberMaterial extends THREE.RawShaderMaterial {
+class UberMaterial extends RawShaderMaterial {
   constructor(params) {
     super(params)
     // add fog
@@ -174,12 +181,12 @@ class UberMaterial extends THREE.RawShaderMaterial {
     this.uberOptions = uberOptions
     // set default values
     this.setValues({
-      uniforms: THREE.UniformsUtils.clone(defaultUniforms),
+      uniforms: UniformsUtils.clone(defaultUniforms),
       vertexShader: this.precisionString() + vertexShader,
       fragmentShader: this.precisionString() + fragmentShader,
       lights: true,
       fog: true,
-      side: THREE.DoubleSide,
+      side: DoubleSide,
       ...params
     })
   }
@@ -198,7 +205,7 @@ class UberMaterial extends THREE.RawShaderMaterial {
     this.fragmentShader = source.fragmentShader
     this.vertexShader = source.vertexShader
 
-    this.uniforms = THREE.UniformsUtils.clone(source.uniforms)
+    this.uniforms = UniformsUtils.clone(source.uniforms)
     this.defines = { ...source.defines }
     this.extensions = source.extensions
 
@@ -344,7 +351,7 @@ class UberMaterial extends THREE.RawShaderMaterial {
         continue
       }
 
-      if (this.uberOptions[key] instanceof THREE.Color) {
+      if (this.uberOptions[key] instanceof Color) {
         this.uberOptions[key] = values[key].clone()
       } else {
         this.uberOptions[key] = values[key]
@@ -354,7 +361,7 @@ class UberMaterial extends THREE.RawShaderMaterial {
 
   clone(shallow) {
     if (!shallow) {
-      return THREE.Material.prototype.clone.call(this)
+      return Material.prototype.clone.call(this)
     }
     return this.createInstance()
   }
@@ -365,8 +372,8 @@ class UberMaterial extends THREE.RawShaderMaterial {
     uberOptionNames.forEach((p) => {
       if (self.uniforms.hasOwnProperty(p)) {
         if (
-          self.uberOptions[p] instanceof THREE.Color ||
-          self.uberOptions[p] instanceof THREE.Matrix4
+          self.uberOptions[p] instanceof Color ||
+          self.uberOptions[p] instanceof Matrix4
         ) {
           self.uniforms[p].value = self.uberOptions[p].clone()
         } else {

@@ -1,6 +1,3 @@
-import _ from 'lodash'
-import * as THREE from 'three'
-
 import utils from '../../../utils'
 import gfxutils from '../../../gfx/gfxutils'
 import logger from '../../../utils/logger'
@@ -12,6 +9,8 @@ import InstancedSpheresGeometry from '../../../gfx/geometries/InstancedSpheresGe
 import Instanced2CCylindersGeometry from '../../../gfx/geometries/Instanced2CCylindersGeometry'
 import FBX1CGeometry from './FBX1CGeometry'
 import FBX2CCylinder from './FBX2CCylinder'
+import { Layers, Matrix4, Mesh, Color } from 'three'
+import { findIndex, isEqual } from 'lodash'
 
 export default class FBXInfoExtractor {
   constructor() {
@@ -35,12 +34,12 @@ export default class FBXInfoExtractor {
    * @param {object} data - complexVisual to get geometry info from
    */
   _extractModelsAndMaterials(data) {
-    const layersOfInterest = new THREE.Layers()
+    const layersOfInterest = new Layers()
     layersOfInterest.set(gfxutils.LAYERS.DEFAULT)
     layersOfInterest.enable(gfxutils.LAYERS.TRANSPARENT)
     data.traverse((object) => {
       if (
-        object instanceof THREE.Mesh &&
+        object instanceof Mesh &&
         object.layers.test(layersOfInterest) &&
         this.checkExportAbility(object)
       ) {
@@ -196,9 +195,9 @@ export default class FBXInfoExtractor {
     model.init(instCount * vertCount, instCount * indsCount)
     const geo = new FBX1CGeometry()
     geo.init(mesh.geometry)
-    const instMatrix = new THREE.Matrix4()
-    const objMatrix = new THREE.Matrix4()
-    const sphereColor = new THREE.Color()
+    const instMatrix = new Matrix4()
+    const objMatrix = new Matrix4()
+    const sphereColor = new Color()
     for (let instanceIndex = 0; instanceIndex < instCount; ++instanceIndex) {
       // update colors in geometry
       const colorIdx = instanceIndex * color.itemSize
@@ -245,10 +244,10 @@ export default class FBXInfoExtractor {
       instCount * vertCount + additionalVertsCount,
       instCount * indsCount
     )
-    const instMatrix = new THREE.Matrix4()
-    const objMatrix = new THREE.Matrix4()
-    const colorStart = new THREE.Color()
-    const colorEnd = new THREE.Color()
+    const instMatrix = new Matrix4()
+    const objMatrix = new Matrix4()
+    const colorStart = new Color()
+    const colorEnd = new Color()
     let geo = {}
     for (let instanceIndex = 0; instanceIndex < instCount; ++instanceIndex) {
       // update colors in geometry
@@ -300,7 +299,7 @@ export default class FBXInfoExtractor {
    * @returns {number} number of model-material pair
    */
   _checkExistingMaterial(material) {
-    return _.findIndex(this._materials, (m) => _.isEqual(m, material))
+    return findIndex(this._materials, (m) => isEqual(m, material))
   }
 
   _gatherCylindersColoringInfo(geo) {

@@ -1,12 +1,12 @@
-import * as THREE from 'three'
 import gfxutils from '../../gfxutils'
 import AromaticGroup from './AromaticGroup'
+import { Vector2, Vector3 } from 'three'
 
 function _createShape(rad, parts) {
   const pts = []
   for (let i = 0; i < parts; ++i) {
     const a = ((-2 * i) / parts) * Math.PI
-    pts.push(new THREE.Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0))
+    pts.push(new Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0))
   }
   return pts
 }
@@ -16,9 +16,9 @@ class AromaticTorusGroup extends AromaticGroup {
   _build() {
     const segmentsHeight = this._segmentsHeight
     const torusRad = this._mode.getAromRadius()
-    const radiusV = new THREE.Vector2(torusRad, torusRad)
+    const radiusV = new Vector2(torusRad, torusRad)
     const radOffset = this._mode.calcStickRadius() + 2 * torusRad
-    const lookAtVector = new THREE.Vector3()
+    const lookAtVector = new Vector3()
     const mtc = []
     const geo = this._geo
     this._buildInner(radOffset, (chunkIdx, color, points, center, upDir) => {

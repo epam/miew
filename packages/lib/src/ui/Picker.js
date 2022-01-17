@@ -1,7 +1,7 @@
-import * as THREE from 'three'
 import settings from '../settings'
 import Timer from '../Timer'
 import EventDispatcher from '../utils/EventDispatcher'
+import { Raycaster, Vector2 } from 'three'
 
 function Picker(gfxObj, camera, domElement) {
   EventDispatcher.call(this)
@@ -16,10 +16,10 @@ function Picker(gfxObj, camera, domElement) {
     width: 0,
     height: 0
   }
-  this._lastMousePos = new THREE.Vector2(0, 0)
+  this._lastMousePos = new Vector2(0, 0)
   this._mouseTotalDist = 0.0
   this._lastClickBeginTime = -1000.0
-  this._lastClickPos = new THREE.Vector2(0, 0)
+  this._lastClickPos = new Vector2(0, 0)
   this._clickBeginTime = 0.0
 
   this._clock = new Timer()
@@ -111,7 +111,7 @@ Picker.prototype.pickObject = function (screenPos) {
   }
 
   const { gfxObj } = this
-  const rayCaster = new THREE.Raycaster()
+  const rayCaster = new Raycaster()
   rayCaster.ray.origin.setFromMatrixPosition(this.camera.matrixWorld)
   rayCaster.ray.direction
     .set(screenPos.x, screenPos.y, 0.5)
@@ -155,7 +155,7 @@ Picker.prototype.pickObject = function (screenPos) {
 }
 
 Picker.prototype.getMouseInViewport = function (pageX, pageY) {
-  return new THREE.Vector2(
+  return new Vector2(
     ((pageX - this.screen.left) / this.screen.width) * 2 - 1,
     (-(pageY - this.screen.top) / this.screen.height) * 2 + 1
   )
@@ -193,10 +193,7 @@ Picker.prototype.mouseup = function (event) {
 
       const timeSinceLastClickBegin = curTime - this._lastClickBeginTime
       if (timeSinceLastClickBegin < 0.7) {
-        const clickDist = new THREE.Vector2().subVectors(
-          curPos,
-          this._lastClickPos
-        )
+        const clickDist = new Vector2().subVectors(curPos, this._lastClickPos)
         if (clickDist.length() < 0.01) {
           // it's a double click
           this.dispatchEvent({ type: 'dblclick', obj: this.picked })

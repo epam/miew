@@ -1,10 +1,10 @@
-import * as THREE from 'three'
 import gfxutils from '../gfxutils'
+import { Matrix4, Object3D, Ray } from 'three'
 
-class TransformGroup extends THREE.Object3D {
-  static _inverseMatrix = new THREE.Matrix4()
+class TransformGroup extends Object3D {
+  static _inverseMatrix = new Matrix4()
 
-  static _ray = new THREE.Ray()
+  static _ray = new Ray()
 
   constructor(geometry, geoParams, material, transforms) {
     super()
@@ -13,8 +13,7 @@ class TransformGroup extends THREE.Object3D {
     const mat = material.createInstance()
     geoParams.initMaterial(mat)
     this._material = mat
-    this._transforms =
-      transforms.length > 0 ? transforms : [new THREE.Matrix4()]
+    this._transforms = transforms.length > 0 ? transforms : [new Matrix4()]
     const meshes = this._createMeshes(geometry)
     for (let i = 0, n = meshes.length; i < n; ++i) {
       this.add(meshes[i])

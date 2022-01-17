@@ -1,5 +1,12 @@
-import _ from 'lodash'
 import logger from './utils/logger'
+import {
+  assign,
+  isPlainObject,
+  forIn,
+  isEqual,
+  isEmpty,
+  isString
+} from 'lodash'
 
 const browserType = {
   DEFAULT: 0,
@@ -160,13 +167,13 @@ function createElement(tag, attrs, content) {
  * @returns {function} Original class.
  */
 function deriveClass(cls, base, members, statics) {
-  cls.prototype = _.assign(
+  cls.prototype = assign(
     Object.create(base.prototype),
     { constructor: cls },
     members
   )
   if (statics) {
-    _.assign(cls, statics)
+    assign(cls, statics)
   }
   return cls
 }
@@ -326,7 +333,7 @@ function compareOptionsWithDefaults(opts, defOpts) {
 }
 
 function isAlmostPlainObject(o) {
-  if (_.isPlainObject(o)) {
+  if (isPlainObject(o)) {
     return true
   }
   const proto = o && Object.getPrototypeOf(o)
@@ -340,20 +347,20 @@ function isAlmostPlainObject(o) {
 /**
  * Build an object that contains properties (and subproperties) of `src` different from those
  * in `dst`. Objects are parsed recursively, other values (including arrays) are compared for
- * equality using `_.isEqual()`.
+ * equality using `isEqual()`.
  * @param {!object} src - a new object to compare, may contain changed or new properties
  * @param {!object} dst - an old reference object
  */
 function objectsDiff(src, dst) {
   const diff = {}
-  _.forIn(src, (srcValue, key) => {
+  forIn(src, (srcValue, key) => {
     const dstValue = dst[key]
     if (isAlmostPlainObject(srcValue) && isAlmostPlainObject(dstValue)) {
       const deepDiff = objectsDiff(srcValue, dstValue)
-      if (!_.isEmpty(deepDiff)) {
+      if (!isEmpty(deepDiff)) {
         diff[key] = deepDiff
       }
-    } else if (!_.isEqual(srcValue, dstValue)) {
+    } else if (!isEqual(srcValue, dstValue)) {
       diff[key] = srcValue
     }
   })
@@ -362,7 +369,7 @@ function objectsDiff(src, dst) {
 
 function forInRecursive(object, callback) {
   function iterateThrough(obj, prefix) {
-    _.forIn(obj, (value, key) => {
+    forIn(obj, (value, key) => {
       const newPref = prefix + (prefix.length > 0 ? '.' : '')
       if (value instanceof Object) {
         iterateThrough(value, newPref + key)
@@ -375,14 +382,14 @@ function forInRecursive(object, callback) {
 }
 
 function enquoteString(value) {
-  if (_.isString(value)) {
+  if (isString(value)) {
     return `"${value.replace(/"/g, '\\"')}"`
   }
   return value
 }
 
 function unquoteString(value) {
-  if (!_.isString(value)) {
+  if (!isString(value)) {
     return value
   }
   if (value[0] === '"' && value[value.length - 1] === '"') {

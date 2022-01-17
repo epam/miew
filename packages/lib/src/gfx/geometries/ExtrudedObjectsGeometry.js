@@ -1,23 +1,23 @@
-import * as THREE from 'three'
 import utils from '../../utils'
 import ChunkedObjectsGeometry from './ChunkedObjectsGeometry'
+import { BufferAttribute, BufferGeometry, Vector3 } from 'three'
 
 const VEC_SIZE = 3
 const TRI_SIZE = 3
-const tmpPrev = new THREE.Vector3()
-const tmpNext = new THREE.Vector3()
-const tmpRes = new THREE.Vector3()
-const simpleNormal = new THREE.Vector3(1.0, 0.0, 0.0)
-const normalOnCut = new THREE.Vector3()
-const nearRingPt = new THREE.Vector3()
+const tmpPrev = new Vector3()
+const tmpNext = new Vector3()
+const tmpRes = new Vector3()
+const simpleNormal = new Vector3(1.0, 0.0, 0.0)
+const normalOnCut = new Vector3()
+const nearRingPt = new Vector3()
 
 function _createExtrudedChunkGeometry(shape, ringsCount) {
-  const geo = new THREE.BufferGeometry()
+  const geo = new BufferGeometry()
   const ptsCount = shape.length
   const totalPts = ptsCount * ringsCount
   const type = totalPts <= 65536 ? Uint16Array : Uint32Array
   const facesPerChunk = (ringsCount - 1) * ptsCount * 2
-  const indices = new THREE.BufferAttribute(
+  const indices = new BufferAttribute(
     utils.allocateTyped(type, facesPerChunk * TRI_SIZE),
     1
   )
@@ -45,7 +45,7 @@ function _createExtrudedChunkGeometry(shape, ringsCount) {
 
   geo.setIndex(indices)
   const pos = utils.allocateTyped(Float32Array, totalPts * VEC_SIZE)
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, VEC_SIZE))
+  geo.setAttribute('position', new BufferAttribute(pos, VEC_SIZE))
 
   geo._positions = shape
 
@@ -60,7 +60,7 @@ class ExtrudedObjectsGeometry extends ChunkedObjectsGeometry {
 
     const tmpShape = (this._tmpShape = [])
     for (let i = 0; i < shape.length; ++i) {
-      tmpShape[i] = new THREE.Vector3()
+      tmpShape[i] = new Vector3()
     }
   }
 

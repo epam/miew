@@ -1,6 +1,6 @@
-import * as THREE from 'three'
 import ResiduesGroup from './ResiduesGroup'
 import CartoonHelper from './CartoonHelper'
+import { Vector3 } from 'three'
 
 function _createShape(rad, parts) {
   const pts = []
@@ -9,7 +9,7 @@ function _createShape(rad, parts) {
     // starts from pi/2 because it's important that points are lied on the angles of arrows (visual issues if not)
     const a = Math.PI / 2.0 - (2 * Math.PI * i) / parts
 
-    pts.push(new THREE.Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0))
+    pts.push(new Vector3(Math.cos(a) * rad, Math.sin(a) * rad, 0))
   }
   return pts
 }

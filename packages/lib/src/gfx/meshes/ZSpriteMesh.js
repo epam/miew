@@ -1,9 +1,9 @@
-import * as THREE from 'three'
 import UberObject from './UberObject'
+import { Mesh } from 'three'
 
-const Mesh = UberObject(THREE.Mesh)
+const OurMesh = UberObject(Mesh)
 
-class ZSpriteMesh extends Mesh {
+class ZSpriteMesh extends OurMesh {
   constructor(...rest) {
     super(...rest)
     this.castShadow = true
@@ -11,7 +11,7 @@ class ZSpriteMesh extends Mesh {
   }
 
   _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
-    Mesh.prototype._onBeforeRender.call(this, renderer, scene, camera)
+    OurMesh.prototype._onBeforeRender.call(this, renderer, scene, camera)
     const { material } = this
     if (!material) {
       return

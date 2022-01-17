@@ -1,10 +1,11 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
-import * as THREE from 'three'
+
 import vertexShader from './ScreenQuad.vert'
 import fragmentShader from './Outline.frag'
+import { RawShaderMaterial, Vector2 } from 'three'
 
-class OutlineMaterial extends THREE.RawShaderMaterial {
+class OutlineMaterial extends RawShaderMaterial {
   constructor(params) {
     // add depth outline
     super(params)
@@ -13,11 +14,11 @@ class OutlineMaterial extends THREE.RawShaderMaterial {
       uniforms: {
         srcTex: { type: 't', value: null },
         srcDepthTex: { type: 't', value: null },
-        srcTexSize: { type: 'v2', value: new THREE.Vector2(512, 512) },
+        srcTexSize: { type: 'v2', value: new Vector2(512, 512) },
         color: { type: 'v3', value: null },
         threshold: { type: 'f', value: null },
         opacity: { type: 'f', value: 1.0 },
-        thickness: { type: 'v2', value: new THREE.Vector2(1, 1) }
+        thickness: { type: 'v2', value: new Vector2(1, 1) }
       },
       vertexShader,
       fragmentShader,

@@ -9,7 +9,7 @@ class ParserList extends EntityList {
    * Create a list of parsers.
    * The parsers are indexed by supported data formats and file extensions (`.formats` and
    * `.extensions` properties of a Parser subclass).
-   * The parsers can be retrieved later by matching against specs (see {@link ParsrerList#find}).
+   * The parsers can be retrieved later by matching against specs (see {@link ParserList#find}).
    *
    * @param {!Array<function(new:Parser)>=} someParsers A list of {@link Parser} subclasses to
    *   automatically register at creation time.

@@ -1,6 +1,6 @@
-import * as THREE from 'three'
+import { Group } from 'three'
 
-class RCGroup extends THREE.Group {
+class RCGroup extends Group {
   raycast(raycaster, intersects) {
     if (!this.visible) {
       return

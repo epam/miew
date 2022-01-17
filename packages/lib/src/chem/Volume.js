@@ -1,5 +1,13 @@
-import * as THREE from 'three'
 import utils from '../utils'
+import {
+  ClampToEdgeWrapping,
+  DataTexture,
+  LinearFilter,
+  LuminanceFormat,
+  UnsignedByteType,
+  UVMapping,
+  Vector3
+} from 'three'
 
 function pow2ceil(v) {
   let p = 2
@@ -133,9 +141,9 @@ class Volume {
   }
 
   getCellSize() {
-    const boxSize = new THREE.Vector3()
+    const boxSize = new Vector3()
     this._box.getSize(boxSize)
-    const res = new THREE.Vector3()
+    const res = new Vector3()
     res.x = this._dimX > 1 ? boxSize.x / (this._dimX - 1) : 0
     res.y = this._dimY > 1 ? boxSize.y / (this._dimY - 1) : 0
     res.z = this._dimZ > 1 ? boxSize.z / (this._dimZ - 1) : 0
@@ -161,7 +169,7 @@ class Volume {
 
     // gradient axis scaling values and averaging factors, to correctly
     // calculate the gradient for volumes with irregular cell spacing
-    const vs = new THREE.Vector3(-0.5 / vl.x, -0.5 / vl.y, -0.5 / vl.z)
+    const vs = new Vector3(-0.5 / vl.x, -0.5 / vl.y, -0.5 / vl.z)
 
     // TODO Check for intended bug in VMD (min is zero)
     function clamp(val, min, max) {
@@ -298,17 +306,17 @@ class Volume {
       }
     }
 
-    const texture = new THREE.DataTexture(
+    const texture = new DataTexture(
       data,
       width,
       height,
-      THREE.LuminanceFormat,
-      THREE.UnsignedByteType,
-      THREE.UVMapping,
-      THREE.ClampToEdgeWrapping,
-      THREE.ClampToEdgeWrapping,
-      THREE.LinearFilter,
-      THREE.LinearFilter
+      LuminanceFormat,
+      UnsignedByteType,
+      UVMapping,
+      ClampToEdgeWrapping,
+      ClampToEdgeWrapping,
+      LinearFilter,
+      LinearFilter
     )
     texture.needsUpdate = true
     return texture
