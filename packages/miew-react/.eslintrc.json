@@ -3,12 +3,19 @@
   "env": {
     "browser": true
   },
+  "plugins": ["@emotion"],
   "extends": [
     "plugin:react/jsx-runtime",
     "plugin:jsx-a11y/recommended",
     "plugin:react-hooks/recommended",
     "plugin:jest/recommended"
   ],
+  "rules": {
+    "@emotion/no-vanilla": "error",
+    "@emotion/import-from-emotion": "error",
+    "@emotion/styled-import": "error",
+    "@emotion/syntax-preference": [2, "object"]
+  },
   "overrides": [
     {
       "files": [

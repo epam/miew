@@ -1,18 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Miew component should be rendered 1`] = `
+exports[`Viewer component should be rendered 1`] = `
 Object {
   "asFragment": [Function],
-  "baseElement": <body>
+  "baseElement": .emotion-0 {
+  height: 100%;
+  width: 100%;
+}
+
+.emotion-0>.miew-canvas {
+  height: 100%;
+  width: 100%;
+}
+
+<body>
     <div>
       <div
-        class="viewer small"
+        class="emotion-0"
       />
     </div>
   </body>,
-  "container": <div>
+  "container": .emotion-0 {
+  height: 100%;
+  width: 100%;
+}
+
+.emotion-0>.miew-canvas {
+  height: 100%;
+  width: 100%;
+}
+
+<div>
     <div
-      class="viewer small"
+      class="emotion-0"
     />
   </div>,
   "debug": [Function],

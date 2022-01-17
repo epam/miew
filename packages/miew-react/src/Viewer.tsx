@@ -1,8 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import useResizeObserver from 'use-resize-observer'
-import clsx from 'clsx'
 import Miew from 'miew'
-import classes from './Viewer.module.scss'
+import { Theme } from '@emotion/react'
 
 const MEDIA_SIZES = {
   smallWidth: 800,
@@ -15,9 +14,27 @@ type ViewerProps = {
 }
 
 const Viewer = (props: ViewerProps) => {
+  const { onInit, options } = props
   const ref = useRef<HTMLDivElement>(null)
   const { width, height } = useResizeObserver<HTMLDivElement>({ ref })
-  const { onInit, options } = props
+  const isSizeSmall =
+    (height && height <= MEDIA_SIZES.smallHeight) ||
+    (width && width <= MEDIA_SIZES.smallWidth)
+
+  const viewerStyle = (theme: Theme) => {
+    const palette = theme?.customTheme?.palette
+    return {
+      backgroundColor: isSizeSmall
+        ? palette?.accent?.main
+        : palette?.primary?.main,
+      height: '100%',
+      width: '100%',
+      '& > .miew-canvas': {
+        height: '100%',
+        width: '100%'
+      }
+    }
+  }
 
   useLayoutEffect(() => {
     const miew = new Miew({
@@ -26,19 +43,9 @@ const Viewer = (props: ViewerProps) => {
     })
     if (miew.init()) miew.run()
     if (typeof onInit === 'function') onInit(miew)
-  }, [onInit, options])
+  }, [options, onInit])
 
-  // TODO: switch to styled when emotion set-up is merged
-  return (
-    <div
-      className={clsx(classes.viewer, {
-        [classes.small]:
-          (height && height <= MEDIA_SIZES.smallHeight) ||
-          (width && width <= MEDIA_SIZES.smallWidth)
-      })}
-      ref={ref}
-    ></div>
-  )
+  return <div ref={ref} css={viewerStyle} />
 }
 
 export { Viewer }
