@@ -23,9 +23,9 @@ script:
   - yarn build:ci
 after_success:
   - mkdir coverage
-  # merge coverage report from lib, app projects
+  # merge coverage report from miew, app projects
   - cat packages/app/coverage/lcov.info | sed "s/^SF:src/SF:packages\\/app\\/src/g" > coverage/lcov_app.info
-  - cat packages/lib/coverage/lcov.info | sed "s/^SF:src/SF:packages\\/lib\\/src/g" > coverage/lcov_lib.info
+  - cat packages/miew/coverage/lcov.info | sed "s/^SF:src/SF:packages\\/miew\\/src/g" > coverage/lcov_miew.info
   - yarn run merge-cover
   # upload report to online quality tools
   - sonar-scanner
@@ -34,7 +34,7 @@ after_success:
       /tmp/cc-test-reporter format-coverage -d -t lcov -o coverage/coverage.json coverage/general.info;
       /tmp/cc-test-reporter upload-coverage -i coverage/coverage.json;
     fi
-  #- cp -r coverage/* packages/lib/build #to control results in deployed directory
+  #- cp -r coverage/* packages/miew/build #to control results in deployed directory
 deploy:
   - provider: npm
     edge: true

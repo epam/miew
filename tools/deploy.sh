@@ -10,7 +10,7 @@ fi
 
 # pack the application
 echo "Packing '$DEPLOY_APP.war' app for tomcat..."
-jar cvf $DEPLOY_APP.war -C packages/lib/build .
+jar cvf $DEPLOY_APP.war -C packages/miew .
 
 # set identity
 echo "Running SSH agent..."

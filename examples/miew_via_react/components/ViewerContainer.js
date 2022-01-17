@@ -1,5 +1,5 @@
 import React from 'react'
-import Miew from '../../../packages/lib/build/dist/Miew'
+import Miew from '../../../packages/miew/dist/Miew'
 
 const style = {
   width: '640px',
