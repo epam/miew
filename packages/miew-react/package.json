@@ -4,10 +4,7 @@
   "description": "3D Molecular Viewer",
   "license": "MIT",
   "homepage": "http://lifescience.opensource.epam.com/miew",
-  "author": {
-    "name": "EPAM Life Sciences",
-    "url": "http://lifescience.opensource.epam.com"
-  },
+  "author": "EPAM Systems, Inc.",
   "repository": {
     "type": "git",
     "url": "https://github.com/epam/miew.git",
