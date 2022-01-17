@@ -13,6 +13,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import strip from '@rollup/plugin-strip'
 import svgr from '@svgr/rollup'
 import typescript from 'rollup-plugin-typescript2'
+import version from './tools/version'
 
 const mode = {
   PRODUCTION: 'production',
@@ -21,6 +22,7 @@ const mode = {
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx']
 const isProduction = process.env.NODE_ENV === mode.PRODUCTION
+const banner = `/** ${version.copyright} */\n`
 
 const config = {
   input: pkg.source,
@@ -28,12 +30,14 @@ const config = {
     {
       file: pkg.main,
       exports: 'named',
-      format: 'cjs'
+      format: 'cjs',
+      banner
     },
     {
       file: pkg.module,
       exports: 'named',
-      format: 'es'
+      format: 'es',
+      banner
     }
   ],
   plugins: [
