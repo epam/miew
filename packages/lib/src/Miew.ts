@@ -1,8 +1,5 @@
 // eslint-disable-next-line
-// @ts-nocheck
-
-import * as THREE from 'three'
-
+//@ts-nocheck
 import AOHorBlurMaterial from './gfx/shaders/AOHorBlurMaterial'
 import AOMaterial from './gfx/shaders/AOMaterial'
 import AOVertBlurWithBlendMaterial from './gfx/shaders/AOVertBlurWithBlendMaterial'
@@ -30,7 +27,6 @@ import Visual from './Visual'
 import VolumeMaterial from './gfx/shaders/VolumeMaterial'
 import VolumeVisual from './VolumeVisual'
 import WebVRPoC from './gfx/vr/WebVRPoC'
-import _ from 'lodash'
 import capabilities from './gfx/capabilities'
 import chem from './chem'
 import colorers from './gfx/colorers'
@@ -47,6 +43,52 @@ import palettes from './gfx/palettes'
 import settings from './settings'
 import utils from './utils'
 import vertexScreenQuadShader from './gfx/shaders/ScreenQuad.vert'
+import {
+  AmbientLight,
+  Box3,
+  DepthTexture,
+  DirectionalLight,
+  FloatType,
+  Fog,
+  Group,
+  Line,
+  LinearFilter,
+  LineSegments,
+  Matrix4,
+  Mesh,
+  NearestFilter,
+  PCFShadowMap,
+  PerspectiveCamera,
+  RGBAFormat,
+  Scene,
+  Sphere,
+  StereoCamera,
+  UnsignedShortType,
+  Vector2,
+  Vector3,
+  WebGL1Renderer,
+  WebGLRenderTarget,
+  Color,
+  Euler,
+  Vector4,
+  Quaternion,
+  MathUtils,
+  NoBlending,
+  RawShaderMaterial,
+  OrthographicCamera
+} from 'three'
+import {
+  assign,
+  merge,
+  isString,
+  head,
+  defaults,
+  isUndefined,
+  isNumber,
+  get,
+  isArray,
+  isEmpty
+} from 'lodash'
 
 const { selectors, Atom, Residue, Chain, Molecule } = chem
 
@@ -113,7 +155,7 @@ function chooseFogColor() {
  */
 function Miew(opts) {
   EventDispatcher.call(this)
-  this._opts = _.merge(
+  this._opts = merge(
     {
       settingsCookie: 'settings',
       cookiePath: '/'
@@ -128,7 +170,7 @@ function Miew(opts) {
   this._container =
     (opts && opts.container) ||
     document.getElementById('miew-container') ||
-    _.head(document.getElementsByClassName('miew-container')) ||
+    head(document.getElementsByClassName('miew-container')) ||
     document.body
   /** @type {HTMLElement} */
   this._containerRoot = this._container
@@ -226,9 +268,9 @@ function _setContainerContents(container, element) {
  * @private
  */
 Miew.prototype._updateShadowCamera = (function () {
-  const shadowMatrix = new THREE.Matrix4()
-  const direction = new THREE.Vector3()
-  const OBB = { center: new THREE.Vector3(), halfSize: new THREE.Vector3() }
+  const shadowMatrix = new Matrix4()
+  const direction = new Vector3()
+  const OBB = { center: new Vector3(), halfSize: new Vector3() }
 
   return function () {
     this._gfx.scene.updateMatrixWorld()
@@ -449,10 +491,10 @@ Miew.prototype._initGfx = function () {
 
   gfx.renderer2d = new CSS2DRenderer()
 
-  gfx.renderer = new THREE.WebGL1Renderer(webGLOptions)
+  gfx.renderer = new WebGL1Renderer(webGLOptions)
   gfx.renderer.shadowMap.enabled = settings.now.shadow.on
   gfx.renderer.shadowMap.autoUpdate = false
-  gfx.renderer.shadowMap.type = THREE.PCFShadowMap
+  gfx.renderer.shadowMap.type = PCFShadowMap
   capabilities.init(gfx.renderer)
 
   // z-sprites and ambient occlusion possibility
@@ -474,7 +516,7 @@ Miew.prototype._initGfx = function () {
 
   gfx.renderer2d.setSize(gfx.width, gfx.height)
 
-  gfx.camera = new THREE.PerspectiveCamera(
+  gfx.camera = new PerspectiveCamera(
     settings.now.camFov,
     gfx.width / gfx.height,
     settings.now.camNear,
@@ -487,16 +529,12 @@ Miew.prototype._initGfx = function () {
   gfx.camera.layers.enable(gfxutils.LAYERS.VOLUME)
   gfx.camera.layers.enable(gfxutils.LAYERS.VOLUME_BFPLANE)
 
-  gfx.stereoCam = new THREE.StereoCamera()
+  gfx.stereoCam = new StereoCamera()
 
-  gfx.scene = new THREE.Scene()
+  gfx.scene = new Scene()
 
   const color = chooseFogColor()
-  gfx.scene.fog = new THREE.Fog(
-    color,
-    settings.now.camNear,
-    settings.now.camFar
-  )
+  gfx.scene.fog = new Fog(color, settings.now.camNear, settings.now.camFar)
 
   gfx.root = new gfxutils.RCGroup()
   gfx.scene.add(gfx.root)
@@ -504,16 +542,16 @@ Miew.prototype._initGfx = function () {
   gfx.pivot = new gfxutils.RCGroup()
   gfx.root.add(gfx.pivot)
 
-  gfx.selectionScene = new THREE.Scene()
-  gfx.selectionRoot = new THREE.Group()
+  gfx.selectionScene = new Scene()
+  gfx.selectionRoot = new Group()
   gfx.selectionRoot.matrixAutoUpdate = false
   gfx.selectionScene.add(gfx.selectionRoot)
 
-  gfx.selectionPivot = new THREE.Group()
+  gfx.selectionPivot = new Group()
   gfx.selectionPivot.matrixAutoUpdate = false
   gfx.selectionRoot.add(gfx.selectionPivot)
 
-  const light12 = new THREE.DirectionalLight(0xffffff, 0.45)
+  const light12 = new DirectionalLight(0xffffff, 0.45)
   light12.position.set(0, 0.414, 1)
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT)
   light12.castShadow = true
@@ -529,7 +567,7 @@ Miew.prototype._initGfx = function () {
   gfx.scene.add(light12)
   gfx.scene.add(light12.target)
 
-  const light3 = new THREE.AmbientLight(0x666666)
+  const light3 = new AmbientLight(0x666666)
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT)
   gfx.scene.add(light3)
 
@@ -538,36 +576,36 @@ Miew.prototype._initGfx = function () {
   const deviceWidth = gfx.width * pixelRatio
   const deviceHeight = gfx.height * pixelRatio
 
-  gfx.offscreenBuf = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.NearestFilter,
-    format: THREE.RGBAFormat,
+  gfx.offscreenBuf = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+    minFilter: LinearFilter,
+    magFilter: NearestFilter,
+    format: RGBAFormat,
     depthBuffer: true
   })
 
   if (gfx.renderer.getContext().getExtension('WEBGL_depth_texture')) {
-    gfx.offscreenBuf.depthTexture = new THREE.DepthTexture()
-    gfx.offscreenBuf.depthTexture.type = THREE.UnsignedShortType
+    gfx.offscreenBuf.depthTexture = new DepthTexture()
+    gfx.offscreenBuf.depthTexture.type = UnsignedShortType
   }
 
-  gfx.offscreenBuf2 = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.LinearFilter,
-    format: THREE.RGBAFormat,
+  gfx.offscreenBuf2 = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+    format: RGBAFormat,
     depthBuffer: false
   })
 
-  gfx.offscreenBuf3 = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.LinearFilter,
-    format: THREE.RGBAFormat,
+  gfx.offscreenBuf3 = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+    format: RGBAFormat,
     depthBuffer: false
   })
 
-  gfx.offscreenBuf4 = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.LinearFilter,
-    format: THREE.RGBAFormat,
+  gfx.offscreenBuf4 = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+    format: RGBAFormat,
     depthBuffer: false
   })
 
@@ -577,27 +615,27 @@ Miew.prototype._initGfx = function () {
 
   // use float textures for volume rendering if possible
   if (gfx.renderer.getContext().getExtension('OES_texture_float')) {
-    gfx.offscreenBuf5 = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-      minFilter: THREE.LinearFilter,
-      magFilter: THREE.LinearFilter,
-      format: THREE.RGBAFormat,
-      type: THREE.FloatType,
+    gfx.offscreenBuf5 = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+      minFilter: LinearFilter,
+      magFilter: LinearFilter,
+      format: RGBAFormat,
+      type: FloatType,
       depthBuffer: false
     })
 
-    gfx.offscreenBuf6 = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-      minFilter: THREE.LinearFilter,
-      magFilter: THREE.LinearFilter,
-      format: THREE.RGBAFormat,
-      type: THREE.FloatType,
+    gfx.offscreenBuf6 = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+      minFilter: LinearFilter,
+      magFilter: LinearFilter,
+      format: RGBAFormat,
+      type: FloatType,
       depthBuffer: false
     })
 
-    gfx.offscreenBuf7 = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-      minFilter: THREE.LinearFilter,
-      magFilter: THREE.LinearFilter,
-      format: THREE.RGBAFormat,
-      type: THREE.FloatType,
+    gfx.offscreenBuf7 = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+      minFilter: LinearFilter,
+      magFilter: LinearFilter,
+      format: RGBAFormat,
+      type: FloatType,
       depthBuffer: true
     })
 
@@ -608,17 +646,17 @@ Miew.prototype._initGfx = function () {
     this.logger.warn("Device doesn't support OES_texture_float extension")
   }
 
-  gfx.stereoBufL = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.LinearFilter,
-    format: THREE.RGBAFormat,
+  gfx.stereoBufL = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+    format: RGBAFormat,
     depthBuffer: false
   })
 
-  gfx.stereoBufR = new THREE.WebGLRenderTarget(deviceWidth, deviceHeight, {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.LinearFilter,
-    format: THREE.RGBAFormat,
+  gfx.stereoBufR = new WebGLRenderTarget(deviceWidth, deviceHeight, {
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+    format: RGBAFormat,
     depthBuffer: false
   })
 
@@ -988,18 +1026,13 @@ Miew.prototype._getBSphereRadius = function () {
  * @param {Vector3} OBB.halfSize  - half magnitude of OBB sizes.
  */
 Miew.prototype.getOBB = (function () {
-  const _bSphereForOneVisual = new THREE.Sphere()
-  const _bBoxForOneVisual = new THREE.Box3()
-  const _bBox = new THREE.Box3()
+  const _bSphereForOneVisual = new Sphere()
+  const _bBoxForOneVisual = new Box3()
+  const _bBox = new Box3()
 
-  const _invMatrix = new THREE.Matrix4()
+  const _invMatrix = new Matrix4()
 
-  const _points = [
-    new THREE.Vector3(),
-    new THREE.Vector3(),
-    new THREE.Vector3(),
-    new THREE.Vector3()
-  ]
+  const _points = [new Vector3(), new Vector3(), new Vector3(), new Vector3()]
 
   return function (matrix, OBB) {
     _bBox.makeEmpty()
@@ -1041,7 +1074,7 @@ Miew.prototype._updateFog = function () {
   if (settings.now.fog) {
     if (typeof gfx.scene.fog === 'undefined' || gfx.scene.fog === null) {
       const color = chooseFogColor()
-      gfx.scene.fog = new THREE.Fog(color)
+      gfx.scene.fog = new Fog(color)
       this._setUberMaterialValues({ fog: settings.now.fog })
     }
     updateFogRange(
@@ -1108,7 +1141,7 @@ Miew.prototype._onRender = function () {
 
 Miew.prototype._renderFrame = (function () {
   const _anaglyphMat = new AnaglyphMaterial()
-  const _size = new THREE.Vector2()
+  const _size = new Vector2()
 
   return function (stereo) {
     const gfx = this._gfx
@@ -1204,9 +1237,9 @@ Miew.prototype._onFogColorChanged = function () {
 Miew.prototype._setUberMaterialValues = function (values) {
   this._gfx.root.traverse((obj) => {
     if (
-      (obj instanceof THREE.Mesh ||
-        obj instanceof THREE.LineSegments ||
-        obj instanceof THREE.Line) &&
+      (obj instanceof Mesh ||
+        obj instanceof LineSegments ||
+        obj instanceof Line) &&
       obj.material instanceof UberMaterial
     ) {
       obj.material.setValues(values)
@@ -1392,13 +1425,13 @@ Miew.prototype._renderScene = (function () {
 })()
 
 Miew.prototype._performDistortion = (function () {
-  const _scene = new THREE.Scene()
-  const _camera = new THREE.OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000)
+  const _scene = new Scene()
+  const _camera = new OrthographicCamera(-1.0, 1.0, 1.0, -1.0, -500, 1000)
 
-  const _material = new THREE.RawShaderMaterial({
+  const _material = new RawShaderMaterial({
     uniforms: {
       srcTex: { type: 't', value: null },
-      aberration: { type: 'fv3', value: new THREE.Vector3(1.0) }
+      aberration: { type: 'fv3', value: new Vector3(1.0) }
     },
     vertexShader: vertexScreenQuadShader,
     fragmentShader: fragmentScreenQuadFromDistTex,
@@ -1445,11 +1478,11 @@ Miew.prototype._renderOutline = (function () {
       srcDepthBuffer.width,
       srcDepthBuffer.height
     )
-    _outlineMaterial.uniforms.color.value = new THREE.Color(
+    _outlineMaterial.uniforms.color.value = new Color(
       settings.now.outline.color
     )
     _outlineMaterial.uniforms.threshold.value = settings.now.outline.threshold
-    _outlineMaterial.uniforms.thickness.value = new THREE.Vector2(
+    _outlineMaterial.uniforms.thickness.value = new Vector2(
       settings.now.outline.thickness,
       settings.now.outline.thickness
     )
@@ -1461,9 +1494,9 @@ Miew.prototype._renderOutline = (function () {
 
 Miew.prototype._renderShadowMap = (function () {
   const pars = {
-    minFilter: THREE.NearestFilter,
-    magFilter: THREE.NearestFilter,
-    format: THREE.RGBAFormat
+    minFilter: NearestFilter,
+    magFilter: NearestFilter,
+    format: RGBAFormat
   }
 
   return function () {
@@ -1479,7 +1512,7 @@ Miew.prototype._renderShadowMap = (function () {
     const _state = gfx.renderer.state
 
     // Set GL state for depth map.
-    _state.setBlending(THREE.NoBlending)
+    _state.setBlending(NoBlending)
     _state.buffers.color.setClear(1, 1, 1, 1)
     _state.buffers.depth.setTest(true)
     _state.setScissorTest(false)
@@ -1489,7 +1522,7 @@ Miew.prototype._renderShadowMap = (function () {
         const light = gfx.scene.children[i]
 
         if (light.shadow.map == null) {
-          light.shadow.map = new THREE.WebGLRenderTarget(
+          light.shadow.map = new WebGLRenderTarget(
             light.shadow.mapSize.width,
             light.shadow.mapSize.height,
             pars
@@ -1587,8 +1620,8 @@ Miew.prototype._checkVolumeRenderingSupport = function (renderTarget) {
 Miew.prototype._renderVolume = (function () {
   const volumeBFMat = new VolumeMaterial.BackFacePosMaterial()
   const volumeFFMat = new VolumeMaterial.FrontFacePosMaterial()
-  const cubeOffsetMat = new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5)
-  const world2colorMat = new THREE.Matrix4()
+  const cubeOffsetMat = new Matrix4().makeTranslation(0.5, 0.5, 0.5)
+  const world2colorMat = new Matrix4()
 
   let volumeRenderingSupported
 
@@ -1731,7 +1764,7 @@ Miew.prototype._performAO = (function () {
   const _horBlurMaterial = new AOHorBlurMaterial()
   const _vertBlurMaterial = new AOVertBlurWithBlendMaterial()
 
-  const _scale = new THREE.Vector3()
+  const _scale = new Vector3()
   return function (
     srcColorBuffer,
     normalBuffer,
@@ -1751,7 +1784,7 @@ Miew.prototype._performAO = (function () {
       return
     }
     const gfx = this._gfx
-    const tanHalfFOV = Math.tan(THREE.MathUtils.DEG2RAD * 0.5 * gfx.camera.fov)
+    const tanHalfFOV = Math.tan(MathUtils.DEG2RAD * 0.5 * gfx.camera.fov)
 
     _aoMaterial.uniforms.diffuseTexture.value = srcColorBuffer.texture
     _aoMaterial.uniforms.depthTexture.value = srcDepthTexture
@@ -1866,7 +1899,7 @@ Miew.prototype.resetView = function () {
 }
 
 Miew.prototype._export = function (format) {
-  const TheExporter = _.head(io.exporters.find({ format }))
+  const TheExporter = head(io.exporters.find({ format }))
   if (!TheExporter) {
     this.logger.error('Could not find suitable exporter for this source')
     return Promise.reject(
@@ -1898,7 +1931,7 @@ const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i
 
 function resolveSourceShortcut(source, opts) {
-  if (!_.isString(source)) {
+  if (!isString(source)) {
     return source
   }
 
@@ -1965,7 +1998,7 @@ function updateBinaryMode(opts) {
 
   // detect by format
   if (opts.fileType !== undefined) {
-    const TheParser = _.head(io.parsers.find({ format: opts.fileType }))
+    const TheParser = head(io.parsers.find({ format: opts.fileType }))
     if (TheParser) {
       binary = TheParser.binary || false
     } else {
@@ -1975,7 +2008,7 @@ function updateBinaryMode(opts) {
 
   // detect by file extension
   if (binary === undefined && opts.fileExt !== undefined) {
-    const TheParser = _.head(io.parsers.find({ ext: opts.fileExt }))
+    const TheParser = head(io.parsers.find({ ext: opts.fileExt }))
     if (TheParser) {
       binary = TheParser.binary || false
     }
@@ -2008,7 +2041,7 @@ function _fetchData(source, opts, job) {
     source = resolveSourceShortcut(source, opts)
 
     // detect a proper loader
-    const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }))
+    const TheLoader = head(io.loaders.find({ type: opts.sourceType, source }))
     if (!TheLoader) {
       throw new Error(LOADER_NOT_FOUND)
     }
@@ -2017,7 +2050,7 @@ function _fetchData(source, opts, job) {
     const fileName = opts.fileName || TheLoader.extractName(source)
     if (fileName) {
       const [name, fileExt] = utils.splitFileName(fileName)
-      _.defaults(opts, { name, fileExt, fileName })
+      defaults(opts, { name, fileExt, fileName })
     }
 
     // should it be text or binary?
@@ -2026,8 +2059,8 @@ function _fetchData(source, opts, job) {
     // FIXME: All new settings retrieved from server are applied after the loading is complete. However, we need some
     // flags to alter the loading process itself. Here we apply them in advance. Dirty hack. Kill the server, remove
     // all hacks and everybody's happy.
-    let newOptions = _.get(opts, 'preset.expression')
-    if (!_.isUndefined(newOptions)) {
+    let newOptions = get(opts, 'preset.expression')
+    if (!isUndefined(newOptions)) {
       newOptions = JSON.parse(newOptions)
       if (newOptions && newOptions.settings) {
         const keys = ['singleUnit']
@@ -2037,8 +2070,8 @@ function _fetchData(source, opts, job) {
           ++keyIndex
         ) {
           const key = keys[keyIndex]
-          const value = _.get(newOptions.settings, key)
-          if (!_.isUndefined(value)) {
+          const value = get(newOptions.settings, key)
+          if (!isUndefined(value)) {
             settings.set(key, value)
           }
         }
@@ -2088,7 +2121,7 @@ function _parseData(data, opts, job) {
 
   job.notify({ type: 'parsing' })
 
-  const TheParser = _.head(
+  const TheParser = head(
     io.parsers.find({ format: opts.fileType, ext: opts.fileExt, data })
   )
   if (!TheParser) {
@@ -2131,7 +2164,7 @@ function _parseData(data, opts, job) {
  * @returns {Promise} name of the visual that was added to the viewer
  */
 Miew.prototype.load = function (source, opts) {
-  opts = _.merge({}, opts, {
+  opts = merge({}, opts, {
     context: this
   })
 
@@ -2365,7 +2398,7 @@ Miew.prototype._onLoad = function (dataSource, opts) {
       `Parsed ${opts.fileName} (${desc.atoms} atoms, ${desc.bonds} bonds, ${desc.residues} residues, ${desc.chains} chains).`
     )
 
-    if (_.isNumber(this._opts.unit)) {
+    if (isNumber(this._opts.unit)) {
       complex.setCurrentUnit(this._opts.unit)
     }
 
@@ -2444,7 +2477,7 @@ Miew.prototype.resetEd = function () {
 Miew.prototype.loadEd = function (source) {
   this.resetEd()
 
-  const TheLoader = _.head(io.loaders.find({ source }))
+  const TheLoader = head(io.loaders.find({ source }))
   if (!TheLoader) {
     this.logger.error(LOADER_NOT_FOUND)
     return Promise.reject(new Error(LOADER_NOT_FOUND))
@@ -2455,7 +2488,7 @@ Miew.prototype.loadEd = function (source) {
   return loader
     .load()
     .then((data) => {
-      const TheParser = _.head(io.parsers.find({ format: 'ccp4' }))
+      const TheParser = head(io.parsers.find({ format: 'ccp4' }))
       if (!TheParser) {
         throw new Error(PARSER_NOT_FOUND)
       }
@@ -2537,7 +2570,7 @@ Miew.prototype.changeUnit = function (unitIdx, name) {
   if (unitIdx === undefined) {
     return currentUnitInfo()
   }
-  if (_.isString(unitIdx)) {
+  if (isString(unitIdx)) {
     unitIdx = Math.max(parseInt(unitIdx, 10), 0)
   }
   if (visual.getComplex().setCurrentUnit(unitIdx)) {
@@ -3206,13 +3239,13 @@ Miew.prototype._getAltObj = function () {
 
   return {
     objects: [],
-    pivot: new THREE.Vector3(0, 0, 0)
+    pivot: new Vector3(0, 0, 0)
   }
 }
 
 Miew.prototype.resetPivot = (function () {
-  const boundingBox = new THREE.Box3()
-  const center = new THREE.Vector3()
+  const boundingBox = new Box3()
+  const center = new Vector3()
 
   return function () {
     boundingBox.makeEmpty()
@@ -3227,7 +3260,7 @@ Miew.prototype.resetPivot = (function () {
 })()
 
 Miew.prototype.setPivotResidue = (function () {
-  const center = new THREE.Vector3()
+  const center = new Vector3()
 
   return function (residue) {
     const visual = this._getVisualForComplex(residue.getChain().getComplex())
@@ -3257,7 +3290,7 @@ Miew.prototype.setPivotResidue = (function () {
 })()
 
 Miew.prototype.setPivotAtom = (function () {
-  const center = new THREE.Vector3()
+  const center = new Vector3()
 
   return function (atom) {
     const visual = this._getVisualForComplex(
@@ -3275,7 +3308,7 @@ Miew.prototype.setPivotAtom = (function () {
 })()
 
 Miew.prototype.getSelectionCenter = (function () {
-  const _centerInVisual = new THREE.Vector3(0.0, 0.0, 0.0)
+  const _centerInVisual = new Vector3(0.0, 0.0, 0.0)
 
   return function (center, includesAtom, selector) {
     center.set(0.0, 0.0, 0.0)
@@ -3303,7 +3336,7 @@ Miew.prototype.getSelectionCenter = (function () {
 })()
 
 Miew.prototype.setPivotSubset = (function () {
-  const _center = new THREE.Vector3(0.0, 0.0, 0.0)
+  const _center = new Vector3(0.0, 0.0, 0.0)
 
   function _includesInCurSelection(atom, selectionBit) {
     return atom.mask & (1 << selectionBit)
@@ -3340,11 +3373,11 @@ Miew.prototype.screenshot = function (width, height) {
   const deviceHeight = gfx.renderer.domElement.height
 
   function fov2Tan(fov) {
-    return Math.tan(THREE.MathUtils.degToRad(0.5 * fov))
+    return Math.tan(MathUtils.degToRad(0.5 * fov))
   }
 
   function tan2Fov(tan) {
-    return THREE.MathUtils.radToDeg(Math.atan(tan)) * 2.0
+    return MathUtils.radToDeg(Math.atan(tan)) * 2.0
   }
 
   function getDataURL() {
@@ -3529,7 +3562,7 @@ Miew.prototype.setOptions = function (opts) {
   if (opts.reps) {
     this._opts.reps = null
   }
-  _.merge(this._opts, opts)
+  merge(this._opts, opts)
   if (opts.settings) {
     this.set(opts.settings)
   }
@@ -3557,7 +3590,7 @@ Miew.prototype.setOptions = function (opts) {
   const visual = this._getComplexVisual()
   if (visual) {
     visual.getComplex().resetCurrentUnit()
-    if (_.isNumber(opts.unit)) {
+    if (isNumber(opts.unit)) {
       visual.getComplex().setCurrentUnit(opts.unit)
     }
     this.resetView()
@@ -3662,7 +3695,7 @@ Miew.prototype.removeObject = function (index) {
 Miew.prototype.getURL = function (opts) {
   return options.toURL(
     this.getState(
-      _.defaults(opts, {
+      defaults(opts, {
         compact: true,
         settings: false,
         view: false
@@ -3683,7 +3716,7 @@ Miew.prototype.getURL = function (opts) {
 Miew.prototype.getScript = function (opts) {
   return options.toScript(
     this.getState(
-      _.defaults(opts, {
+      defaults(opts, {
         compact: true,
         settings: true,
         view: true
@@ -3720,7 +3753,7 @@ Miew.prototype._compareReps = function (complexVisual, compareWithDefaults) {
     repsDiff[i] = complexVisual
       .repGet(i)
       .compare(compare ? currPreset[i] : null)
-    if (!_.isEmpty(repsDiff[i])) {
+    if (!isEmpty(repsDiff[i])) {
       emptyReps = false
     }
   }
@@ -3741,7 +3774,7 @@ Miew.prototype._compareReps = function (complexVisual, compareWithDefaults) {
 Miew.prototype.getState = function (opts) {
   const state = {}
 
-  opts = _.defaults(opts, {
+  opts = defaults(opts, {
     compact: true,
     settings: false,
     view: false
@@ -3790,7 +3823,7 @@ Miew.prototype.getState = function (opts) {
   // settings
   if (opts.settings) {
     const diff = this.settings.getDiffs(false)
-    if (!_.isEmpty(diff)) {
+    if (!isEmpty(diff)) {
       state.settings = diff
     }
   }
@@ -3896,7 +3929,7 @@ Miew.prototype._embedWebXR = function () {
 
 Miew.prototype._initOnSettingsChanged = function () {
   const on = (props, func) => {
-    props = _.isArray(props) ? props : [props]
+    props = isArray(props) ? props : [props]
     props.forEach((prop) => {
       this.settings.addEventListener(`change:${prop}`, func)
     })
@@ -4093,7 +4126,7 @@ Miew.prototype.select = function (expression, append) {
   }
 
   let sel = expression
-  if (_.isString(expression)) {
+  if (isString(expression)) {
     sel = selectors.parse(expression).selector
   }
 
@@ -4122,7 +4155,7 @@ Miew.prototype.view = function (expression) {
   function encode() {
     const pos = pivot.position
     const scale = self._objectControls.getScale() / settings.now.radiusToFit
-    const euler = new THREE.Euler()
+    const euler = new Euler()
     euler.setFromQuaternion(self._objectControls.getOrientation(), eulerOrder)
     transform = [pos.x, pos.y, pos.z, scale, euler.x, euler.y, euler.z]
     return VIEW_VERSION + utils.arrayToBase64(transform, Float32Array)
@@ -4168,7 +4201,7 @@ Miew.prototype.view = function (expression) {
 
     dstView.scale = transform[3] // eslint-disable-line prefer-destructuring
     dstView.orientation.setFromEuler(
-      new THREE.Euler(transform[4], transform[5], transform[6], eulerOrder)
+      new Euler(transform[4], transform[5], transform[6], eulerOrder)
     )
 
     interpolator.setup(srcView, dstView)
@@ -4229,7 +4262,7 @@ Miew.prototype.translate = function (x, y, z) {
  */
 Miew.prototype.rotate = function (x, y, z) {
   this._objectControls.rotate(
-    new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z, 'XYZ'))
+    new Quaternion().setFromEuler(new Euler(x, y, z, 'XYZ'))
   )
   this.dispatchEvent({ type: 'transform' })
   this._needRender = true
@@ -4373,14 +4406,14 @@ Miew.prototype.exportCML = function () {
   const self = this
 
   function extractRotation(m) {
-    const xAxis = new THREE.Vector3()
-    const yAxis = new THREE.Vector3()
-    const zAxis = new THREE.Vector3()
+    const xAxis = new Vector3()
+    const yAxis = new Vector3()
+    const zAxis = new Vector3()
     m.extractBasis(xAxis, yAxis, zAxis)
     xAxis.normalize()
     yAxis.normalize()
     zAxis.normalize()
-    const retMat = new THREE.Matrix4()
+    const retMat = new Matrix4()
     retMat.identity()
     retMat.makeBasis(xAxis, yAxis, zAxis)
     return retMat
@@ -4389,8 +4422,8 @@ Miew.prototype.exportCML = function () {
   function updateCMLData(complex) {
     const { root } = self._gfx
     const mat = extractRotation(root.matrixWorld)
-    const v4 = new THREE.Vector4(0, 0, 0, 0)
-    const vCenter = new THREE.Vector4(0, 0, 0, 0)
+    const v4 = new Vector4(0, 0, 0, 0)
+    const vCenter = new Vector4(0, 0, 0, 0)
     let xml = null
     let ap = null
 
@@ -4482,7 +4515,7 @@ Miew.prototype.VERSION =
 // Uncomment this to get debug trace:
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
 
-_.assign(
+assign(
   Miew,
   /** @lends Miew */ {
     VERSION: Miew.prototype.VERSION,
@@ -4501,24 +4534,20 @@ _.assign(
     utils,
     gfx: {
       Representation
-    },
+    }
 
     /**
      * Third-party libraries packaged together with Miew.
      *
      * @property {object} lodash - [Lodash](https://lodash.com/), a modern JavaScript utility library delivering
      *   modularity, performance & extras.
-     * @property {object} three - [three.js](https://threejs.org/), JavaScript 3D library.
+     * @property {object} three - [js](https://threejs.org/), JavaScript 3D library.
      *
      * @example
      * var _ = Miew.thirdParty.lodash;
-     * var opts = _.merge({ ... }, Miew.options.fromURL(window.location.search));
+     * var opts = merge({ ... }, Miew.options.fromURL(window.location.search));
      * var miew = new Miew(opts);
      */
-    thirdParty: {
-      lodash: _,
-      three: THREE
-    }
   }
 )
 

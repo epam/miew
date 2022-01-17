@@ -1,7 +1,7 @@
-import * as THREE from 'three'
-import _ from 'lodash'
+import { fromPairs, isString, zip } from 'lodash'
 import Parser from './Parser'
 import chem from '../../chem'
+import { Vector3 } from 'three'
 
 const { Complex, Element } = chem
 
@@ -12,7 +12,7 @@ class PubChemParser extends Parser {
   }
 
   static canProbablyParse(data) {
-    return _.isString(data) && data[0] === '{'
+    return isString(data) && data[0] === '{'
   }
 
   parseSync() {
@@ -40,7 +40,7 @@ class PubChemParser extends Parser {
     if (!elements || aids.length !== elements.length) {
       throw new Error('Unable to parse atom elements')
     }
-    elements = _.fromPairs(_.zip(aids, elements))
+    elements = fromPairs(zip(aids, elements))
     const atoms = {}
 
     const coords = complexData.coords && complexData.coords[0]
@@ -59,7 +59,7 @@ class PubChemParser extends Parser {
     for (let i = 0, n = aids.length; i < n; ++i) {
       const aid = aids[i]
       const element = Element.ByAtomicNumber[elements[aid]]
-      const xyz = new THREE.Vector3(xs[i], ys[i], zs[i] || 0.0)
+      const xyz = new Vector3(xs[i], ys[i], zs[i] || 0.0)
       atoms[aid] = residue.addAtom(
         element.name,
         element,

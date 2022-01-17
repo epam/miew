@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import utils from '../../utils'
+import { Vector3 } from 'three'
 
 /**
  * Modifed from SpatialHash
@@ -204,9 +204,9 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
   let neighbours
 
   // Vectors for Torus Projection
-  const mid = new THREE.Vector3(0.0, 0.0, 0.0)
-  const n1 = new THREE.Vector3(0.0, 0.0, 0.0)
-  const n2 = new THREE.Vector3(0.0, 0.0, 0.0)
+  const mid = new Vector3(0.0, 0.0, 0.0)
+  const n1 = new Vector3(0.0, 0.0, 0.0)
+  const n2 = new Vector3(0.0, 0.0, 0.0)
 
   let ngTorus
 

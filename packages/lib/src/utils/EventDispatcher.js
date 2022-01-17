@@ -2,7 +2,7 @@
  * This class introduces the simplest event system.
  */
 
-import _ from 'lodash'
+import { remove, find, forEach, omitBy } from 'lodash'
 
 function isUndefOrEqual(param, value) {
   return !param || param === value
@@ -42,7 +42,7 @@ EventDispatcher.prototype.addEventListener = function (
     return par[0] === params[0] && par[1] === params[1]
   }
 
-  if (_.find(handlers, _checkPar) === undefined) {
+  if (find(handlers, _checkPar) === undefined) {
     handlers.push(params)
   }
 }
@@ -63,8 +63,8 @@ EventDispatcher.prototype.removeEventListener = function (
   context
 ) {
   const self = this
-  _.forEach(self._handlers, (handler, ev) => {
-    _.remove(
+  forEach(self._handlers, (handler, ev) => {
+    remove(
       handler,
       (values) =>
         isUndefOrEqual(type, ev) &&
@@ -73,7 +73,7 @@ EventDispatcher.prototype.removeEventListener = function (
     )
   })
 
-  this._handlers = _.omitBy(self._handlers, (handler) => handler.length === 0)
+  this._handlers = omitBy(self._handlers, (handler) => handler.length === 0)
 }
 
 /**
@@ -84,7 +84,7 @@ EventDispatcher.prototype.removeEventListener = function (
 EventDispatcher.prototype.dispatchEvent = function (event) {
   const self = this
 
-  _.forEach(this._handlers[event.type], (callback) => {
+  forEach(this._handlers[event.type], (callback) => {
     const context = callback[1] || self
     callback[0].apply(context, [event])
   })

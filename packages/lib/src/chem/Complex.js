@@ -1,4 +1,3 @@
-import * as THREE from 'three'
 import logger from '../utils/logger'
 import Atom from './Atom'
 import Chain from './Chain'
@@ -15,6 +14,7 @@ import selectors from './selectors'
 import VoxelWorld from './VoxelWorld'
 import SecondaryStructureMap from './SecondaryStructureMap'
 import StructuralElement from './StructuralElement'
+import { Vector3 } from 'three'
 
 const VOXEL_SIZE = 5.0
 
@@ -759,7 +759,7 @@ class Complex {
       try {
         this._voxelWorld = new VoxelWorld(
           this.getDefaultBoundaries().boundingBox,
-          new THREE.Vector3(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE)
+          new Vector3(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE)
         )
         this._voxelWorld.addAtoms(this)
       } catch (e) {

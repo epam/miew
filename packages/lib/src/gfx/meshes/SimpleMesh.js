@@ -1,9 +1,9 @@
-import * as THREE from 'three'
 import UberObject from './UberObject'
+import { Mesh } from 'three'
 
-const Mesh = UberObject(THREE.Mesh)
+const OurMesh = UberObject(Mesh)
 
-class SimpleMesh extends Mesh {
+class SimpleMesh extends OurMesh {
   constructor(geometry, material) {
     super(geometry, material)
     this.castShadow = true

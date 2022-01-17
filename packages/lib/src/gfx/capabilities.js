@@ -3,7 +3,7 @@ export default {
 
   /**
    *
-   * @param {THREE.WebGLRenderer} renderer
+   * @param {WebGLRenderer} renderer
    */
   init(renderer) {
     this.precision = renderer.capabilities.getMaxPrecision('highp')

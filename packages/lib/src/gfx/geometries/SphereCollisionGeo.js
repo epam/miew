@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { Box3, Sphere, Vector3 } from 'three'
 
 class CollisionSphere {
   constructor(position, radius) {
@@ -6,13 +6,13 @@ class CollisionSphere {
     this._radius = radius
   }
 
-  static _sphere = new THREE.Sphere()
+  static _sphere = new Sphere()
 
   raycast(raycaster) {
     const sphere = CollisionSphere._sphere
     sphere.set(this._position, this._radius)
 
-    const p = new THREE.Vector3()
+    const p = new Vector3()
     if (raycaster.ray.intersectSphere(sphere, p)) {
       return {
         distance: raycaster.ray.origin.distanceTo(p),
@@ -51,7 +51,7 @@ const SphereCollisionGeo = (base) =>
       const objects = this._objects
       let { boundingBox } = this
       if (boundingBox === null) {
-        this.boundingBox = boundingBox = new THREE.Box3()
+        this.boundingBox = boundingBox = new Box3()
       }
       boundingBox.makeEmpty()
       for (let i = 0, n = objects.length; i < n; ++i) {
@@ -65,7 +65,7 @@ const SphereCollisionGeo = (base) =>
       const { boundingBox } = this
       // Build bounding sphere
       let radiusSquared = 0.0
-      const center = new THREE.Vector3()
+      const center = new Vector3()
       boundingBox.getCenter(center)
       for (let i = 0, n = objects.length; i < n; ++i) {
         const pos = objects[i]._position
@@ -75,7 +75,7 @@ const SphereCollisionGeo = (base) =>
         }
       }
       if (this.boundingSphere === null) {
-        this.boundingSphere = new THREE.Sphere()
+        this.boundingSphere = new Sphere()
       }
       this.boundingSphere.set(center, Math.sqrt(radiusSquared))
     }

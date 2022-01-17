@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { merge, isArray, isEmpty } from 'lodash'
 import makeContextDependent from '../../utils/makeContextDependent'
 import utils from '../../utils'
 import gfxutils from '../gfxutils'
@@ -27,7 +27,7 @@ class Mode {
      * Mode options inherited (prototyped) from defaults.
      * @type {object}
      */
-    this.opts = _.merge(
+    this.opts = merge(
       utils.deriveDeep(this.settings.now.modes[this.id], true),
       opts
     )
@@ -41,7 +41,7 @@ class Mode {
    */
   identify() {
     const diff = utils.objectsDiff(this.opts, this.settings.now.modes[this.id])
-    if (!_.isEmpty(diff)) {
+    if (!isEmpty(diff)) {
       return [this.id, diff]
     }
     return this.id
@@ -58,7 +58,7 @@ class Mode {
     for (let i = 0; i < groupCount; ++i) {
       let currGroup = groupList[i]
       let renderParams = {}
-      if (_.isArray(currGroup)) {
+      if (isArray(currGroup)) {
         renderParams = currGroup[1].call(this)
         ;[currGroup] = currGroup
       }

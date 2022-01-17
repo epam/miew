@@ -1,7 +1,7 @@
-import * as THREE from 'three'
 import logger from './utils/logger'
 import gfxutils from './gfx/gfxutils'
 import './gfx/modes'
+import { Group, Matrix4, Object3D, Vector3 } from 'three'
 
 function _traverseComponentGroups(root, component, callback) {
   const { children } = root
@@ -36,7 +36,7 @@ class ComplexComponentEditor extends ComplexEditor {
     this._componentTransforms = []
     for (let i = 0; i < complex._components.length; ++i) {
       const component = complex._components[i]
-      this._componentTransforms[component._index] = new THREE.Object3D()
+      this._componentTransforms[component._index] = new Object3D()
     }
 
     this._inProgress = true
@@ -75,7 +75,7 @@ class ComplexComponentEditor extends ComplexEditor {
   getAltObj() {
     const res = {
       objects: [],
-      pivot: new THREE.Vector3(0, 0, 0)
+      pivot: new Vector3(0, 0, 0)
     }
 
     const visual = this._complexVisual
@@ -111,12 +111,12 @@ class ComplexComponentEditor extends ComplexEditor {
     // add dummy object that stores component transformation
     res.objects.push(this._componentTransforms[component._index])
 
-    const bbmin = new THREE.Vector3(
+    const bbmin = new Vector3(
       Number.MAX_VALUE,
       Number.MAX_VALUE,
       Number.MAX_VALUE
     )
-    const bbmax = new THREE.Vector3(
+    const bbmax = new Vector3(
       -Number.MAX_VALUE,
       -Number.MAX_VALUE,
       -Number.MAX_VALUE
@@ -235,11 +235,11 @@ class ComplexFragmentEditor extends ComplexEditor {
       pivotPos.lerp(atoms[1].position, 0.5)
     }
 
-    this._fragmentGeo = new THREE.Group()
+    this._fragmentGeo = new Group()
     visual.add(this._fragmentGeo)
     this._fragmentGeo.position.copy(pivotPos)
 
-    this._fragmentSelectionGeo = new THREE.Group()
+    this._fragmentSelectionGeo = new Group()
     selection.add(this._fragmentSelectionGeo)
     this._fragmentSelectionGeo.position.copy(pivotPos)
 
@@ -252,10 +252,10 @@ class ComplexFragmentEditor extends ComplexEditor {
         continue
       }
 
-      const vg = new THREE.Group()
+      const vg = new Group()
       this._fragmentGeo.add(vg)
 
-      const sg = new THREE.Group()
+      const sg = new Group()
       this._fragmentSelectionGeo.add(sg)
 
       const meshes = g.getSubset(selectionMask, true)
@@ -289,7 +289,7 @@ class ComplexFragmentEditor extends ComplexEditor {
 
     const p = this._fragmentGeo.position
     const m = this._fragmentGeo.matrix.clone()
-    m.multiply(new THREE.Matrix4().makeTranslation(-p.x, -p.y, -p.z))
+    m.multiply(new Matrix4().makeTranslation(-p.x, -p.y, -p.z))
 
     this._bakeAtomTransform(m, 1 << selectionBit)
 
@@ -334,7 +334,7 @@ class ComplexFragmentEditor extends ComplexEditor {
   getAltObj() {
     const res = {
       objects: [],
-      pivot: new THREE.Vector3(0, 0, 0)
+      pivot: new Vector3(0, 0, 0)
     }
 
     res.objects.push(this._fragmentGeo, this._fragmentSelectionGeo)
@@ -344,7 +344,7 @@ class ComplexFragmentEditor extends ComplexEditor {
       if (boundAtoms[0].bonds.length === 1) {
         // single external bond allows rotation about bond axis
         const bond = boundAtoms[0].bonds[0]
-        res.axis = new THREE.Vector3().subVectors(
+        res.axis = new Vector3().subVectors(
           bond._right.position,
           bond._left.position
         )
@@ -353,7 +353,7 @@ class ComplexFragmentEditor extends ComplexEditor {
       }
     } else if (boundAtoms.length === 2) {
       // two bound atoms allow rotation only about axis running through their centers
-      res.axis = new THREE.Vector3().subVectors(
+      res.axis = new Vector3().subVectors(
         boundAtoms[1].position,
         boundAtoms[0].position
       )

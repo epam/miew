@@ -1,9 +1,9 @@
-import * as THREE from 'three'
 import LinesGeometry from './LinesGeometry'
 import Simple2CCylindersGeometry from './Simple2CCylindersGeometry'
+import { Vector3 } from 'three'
 
 const COLLISION_RAD = 0.3
-const tmpVector = new THREE.Vector3()
+const tmpVector = new Vector3()
 
 class TwoColorLinesGeometry extends LinesGeometry {
   constructor(segmentsCount) {

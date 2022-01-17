@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import chem from '../../../chem'
+import { Matrix4 } from 'three'
 
 const { Assembly } = chem
 
@@ -18,7 +18,7 @@ class Remark350 {
 
     /** @type {?Assembly} */
     this._assembly = null
-    /** @type {?THREE.Matrix4} */
+    /** @type {?Matrix4} */
     this._matrix = null
     /** @type {number} */
     this._matrixIndex = -1
@@ -32,7 +32,7 @@ class Remark350 {
   parse(stream) {
     /** @type {?Assembly} */
     let assembly = this._assembly
-    /** @type {?THREE.Matrix4} */
+    /** @type {?Matrix4} */
     let matrix = this._matrix
 
     if (assembly && stream.readString(12, 18) === '  BIOMT') {
@@ -42,7 +42,7 @@ class Remark350 {
       if (this._matrix === null || matrixIndex !== this._matrixIndex) {
         // TODO: assert(matrixIndex === assembly.matrices.length + 1);
         this._matrixIndex = matrixIndex
-        this._matrix = matrix = new THREE.Matrix4()
+        this._matrix = matrix = new Matrix4()
         assembly.addMatrix(matrix)
       }
 

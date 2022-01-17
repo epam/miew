@@ -810,13 +810,13 @@ var parser = (function () {
           this.$ = $$[$0]
           break
         case 78:
-          this.$ = yy._.assign($$[$0 - 1], $$[$0])
+          this.$ = yy.assign($$[$0 - 1], $$[$0])
           break
         case 79:
-          this.$ = yy._.assign($$[$0 - 2], $$[$0 - 1], $$[$0])
+          this.$ = yy.assign($$[$0 - 2], $$[$0 - 1], $$[$0])
           break
         case 80:
-          this.$ = yy._.assign($$[$0 - 3], $$[$0 - 2], $$[$0 - 1], $$[$0])
+          this.$ = yy.assign($$[$0 - 3], $$[$0 - 2], $$[$0 - 1], $$[$0])
           break
         case 81:
         case 82:

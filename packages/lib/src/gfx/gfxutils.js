@@ -1,11 +1,33 @@
 /* eslint-disable no-magic-numbers */
-import * as THREE from 'three'
+
 import logger from '../utils/logger'
 import CSS2DObject from './CSS2DObject'
 import RCGroup from './RCGroup'
 import vertexScreenQuadShader from './shaders/ScreenQuad.vert'
 import fragmentScreenQuadFromTex from './shaders/ScreenQuadFromTex.frag'
 import fragmentScreenQuadFromTexWithDistortion from './shaders/ScreenQuadFromTexWithDistortion.frag'
+import {
+  BufferAttribute,
+  InstancedBufferGeometry,
+  LessEqualDepth,
+  Line,
+  LineSegments,
+  MathUtils,
+  Matrix4,
+  Mesh,
+  MeshBasicMaterial,
+  Object3D,
+  OrthographicCamera,
+  PerspectiveCamera,
+  PlaneBufferGeometry,
+  RawShaderMaterial,
+  Raycaster,
+  Scene,
+  StereoCamera,
+  Vector3,
+  WebGLRenderer,
+  Color
+} from 'three'
 
 const LAYERS = {
   DEFAULT: 0,
@@ -23,25 +45,25 @@ const SELECTION_LAYERS = [
   LAYERS.TRANSPARENT
 ]
 
-THREE.Object3D.prototype.resetTransform = function () {
+Object3D.prototype.resetTransform = function () {
   this.position.set(0, 0, 0)
   this.quaternion.set(0, 0, 0, 1)
   this.scale.set(1, 1, 1)
 }
 
 // update world matrix of this object and all its ancestors
-THREE.Object3D.prototype.updateMatrixWorldRecursive = function () {
+Object3D.prototype.updateMatrixWorldRecursive = function () {
   if (this.parent != null) {
     this.parent.updateMatrixWorldRecursive()
   }
   this.updateMatrixWorld()
 }
 // add object to parent, saving objects' world transform
-THREE.Object3D.prototype.addSavingWorldTransform = (function () {
-  const _worldMatrixInverse = new THREE.Matrix4()
+Object3D.prototype.addSavingWorldTransform = (function () {
+  const _worldMatrixInverse = new Matrix4()
 
   return function (object) {
-    if (object instanceof THREE.Object3D) {
+    if (object instanceof Object3D) {
       _worldMatrixInverse.copy(this.matrixWorld).invert()
       _worldMatrixInverse.multiply(object.matrixWorld)
       object.matrix.copy(_worldMatrixInverse)
@@ -52,28 +74,18 @@ THREE.Object3D.prototype.addSavingWorldTransform = (function () {
 })()
 
 // render a tiny transparent quad in the center of the screen
-THREE.WebGLRenderer.prototype.renderDummyQuad = (function () {
-  const _material = new THREE.MeshBasicMaterial({
+WebGLRenderer.prototype.renderDummyQuad = (function () {
+  const _material = new MeshBasicMaterial({
     transparent: true,
     opacity: 0.0,
     depthWrite: false
   })
 
-  const _scene = new THREE.Scene()
-  const _quad = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(0.01, 0.01),
-    _material
-  )
+  const _scene = new Scene()
+  const _quad = new Mesh(new PlaneBufferGeometry(0.01, 0.01), _material)
   _scene.add(_quad)
 
-  const _camera = new THREE.OrthographicCamera(
-    -0.5,
-    0.5,
-    0.5,
-    -0.5,
-    -10000,
-    10000
-  )
+  const _camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000)
   _camera.position.z = 100
 
   return function () {
@@ -81,19 +93,12 @@ THREE.WebGLRenderer.prototype.renderDummyQuad = (function () {
   }
 })()
 
-THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
-  const _scene = new THREE.Scene()
-  const _quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(1.0, 1.0))
+WebGLRenderer.prototype.renderScreenQuad = (function () {
+  const _scene = new Scene()
+  const _quad = new Mesh(new PlaneBufferGeometry(1.0, 1.0))
   _scene.add(_quad)
 
-  const _camera = new THREE.OrthographicCamera(
-    -0.5,
-    0.5,
-    0.5,
-    -0.5,
-    -10000,
-    10000
-  )
+  const _camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000)
   _camera.position.z = 100
 
   return function (material) {
@@ -102,14 +107,14 @@ THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
   }
 })()
 
-THREE.Matrix4.prototype.isIdentity = (function () {
-  const identity = new THREE.Matrix4()
+Matrix4.prototype.isIdentity = (function () {
+  const identity = new Matrix4()
   return function () {
     return identity.equals(this)
   }
 })()
 
-THREE.Matrix4.prototype.applyToPointsArray = function (array, stride, w) {
+Matrix4.prototype.applyToPointsArray = function (array, stride, w) {
   if (!array || !stride || stride < 3) {
     return array
   }
@@ -129,7 +134,7 @@ THREE.Matrix4.prototype.applyToPointsArray = function (array, stride, w) {
   return array
 }
 
-class ScreenQuadMaterial extends THREE.RawShaderMaterial {
+class ScreenQuadMaterial extends RawShaderMaterial {
   constructor(params) {
     if (params.uniforms === undefined) {
       params.uniforms = {}
@@ -143,7 +148,7 @@ class ScreenQuadMaterial extends THREE.RawShaderMaterial {
   }
 }
 
-THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
+WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
   const _material = new ScreenQuadMaterial({
     uniforms: { opacity: { type: 'f', value: 1.0 } },
     fragmentShader: fragmentScreenQuadFromTex,
@@ -158,39 +163,37 @@ THREE.WebGLRenderer.prototype.renderScreenQuadFromTex = (function () {
   }
 })()
 
-THREE.WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion =
-  (function () {
-    const _material = new ScreenQuadMaterial({
-      uniforms: { coef: { type: 'f', value: 1.0 } },
-      fragmentShader: fragmentScreenQuadFromTexWithDistortion
-    })
+WebGLRenderer.prototype.renderScreenQuadFromTexWithDistortion = (function () {
+  const _material = new ScreenQuadMaterial({
+    uniforms: { coef: { type: 'f', value: 1.0 } },
+    fragmentShader: fragmentScreenQuadFromTexWithDistortion
+  })
 
-    return function (srcTex, coef) {
-      _material.uniforms.srcTex.value = srcTex
-      _material.uniforms.coef.value = coef
-      this.renderScreenQuad(_material)
-    }
-  })()
+  return function (srcTex, coef) {
+    _material.uniforms.srcTex.value = srcTex
+    _material.uniforms.coef.value = coef
+    this.renderScreenQuad(_material)
+  }
+})()
 
 /**
  * @param {number} angle - Field of view in degrees.
  */
-THREE.PerspectiveCamera.prototype.setMinimalFov = function (angle) {
+PerspectiveCamera.prototype.setMinimalFov = function (angle) {
   if (this.aspect >= 1.0) {
     this.fov = angle
   } else {
-    this.fov = THREE.MathUtils.radToDeg(
-      2 *
-        Math.atan(Math.tan(THREE.MathUtils.degToRad(angle) * 0.5) / this.aspect)
+    this.fov = MathUtils.radToDeg(
+      2 * Math.atan(Math.tan(MathUtils.degToRad(angle) * 0.5) / this.aspect)
     )
   }
 }
 
 /**
- * @param {THREE.PerspectiveCamera} camera - Base camera for this stereo camera.
+ * @param {PerspectiveCamera} camera - Base camera for this stereo camera.
  * @param {number} angle - Field of view in degrees.
  */
-THREE.StereoCamera.prototype.updateHalfSized = function (camera, angle) {
+StereoCamera.prototype.updateHalfSized = function (camera, angle) {
   const originalAspect = camera.aspect
   const originalFov = camera.fov
 
@@ -209,17 +212,17 @@ THREE.StereoCamera.prototype.updateHalfSized = function (camera, angle) {
  * @param {number} radius - Radius of bounding sphere in angstroms to fit on screen.
  * @param {number} angle - Field of view in degrees.
  */
-THREE.PerspectiveCamera.prototype.setDistanceToFit = function (radius, angle) {
-  this.position.z = radius / Math.sin(0.5 * THREE.MathUtils.degToRad(angle))
+PerspectiveCamera.prototype.setDistanceToFit = function (radius, angle) {
+  this.position.z = radius / Math.sin(0.5 * MathUtils.degToRad(angle))
 }
 
 /**
  * @param {RCGroup} gfxObj - All objects on scene.
- * @param {THREE.PerspectiveCamera} camera - Camera used for rendering.
+ * @param {PerspectiveCamera} camera - Camera used for rendering.
  * @param {number} clipPlane - Distance to clip plane.
  * @param {number} fogFarPlane - Distance to fog far plane.
  */
-THREE.Raycaster.prototype.intersectVisibleObject = function (
+Raycaster.prototype.intersectVisibleObject = function (
   gfxObj,
   camera,
   clipPlane,
@@ -234,7 +237,7 @@ THREE.Raycaster.prototype.intersectVisibleObject = function (
   const nearPlane = Math.min(camera.near, clipPlane)
   let i
   let p = intersects[0]
-  const v = new THREE.Vector3()
+  const v = new Vector3()
   for (i = 0; i < intersects.length; ++i) {
     p = intersects[i]
     v.copy(p.point)
@@ -257,8 +260,8 @@ THREE.Raycaster.prototype.intersectVisibleObject = function (
   return p
 }
 
-THREE.Matrix4.prototype.extractScale = (function () {
-  const _v = new THREE.Vector3()
+Matrix4.prototype.extractScale = (function () {
+  const _v = new Vector3()
 
   return function (scale) {
     if (scale === undefined) {
@@ -284,14 +287,14 @@ THREE.Matrix4.prototype.extractScale = (function () {
 
 function _calcCylinderMatrix(posBegin, posEnd, radius) {
   const posCenter = posBegin.clone().lerp(posEnd, 0.5)
-  const matScale = new THREE.Matrix4()
+  const matScale = new Matrix4()
   matScale.makeScale(radius, posBegin.distanceTo(posEnd), radius)
 
-  const matRotHalf = new THREE.Matrix4()
+  const matRotHalf = new Matrix4()
   matRotHalf.makeRotationX(Math.PI / 2)
 
-  const matRotLook = new THREE.Matrix4()
-  const vUp = new THREE.Vector3(0, 1, 0)
+  const matRotLook = new Matrix4()
+  const vUp = new Vector3(0, 1, 0)
   matRotLook.lookAt(posCenter, posEnd, vUp)
 
   matRotLook.multiply(matRotHalf)
@@ -301,10 +304,10 @@ function _calcCylinderMatrix(posBegin, posEnd, radius) {
 }
 
 function _calcChunkMatrix(eye, target, up, rad) {
-  const matScale = new THREE.Matrix4()
+  const matScale = new Matrix4()
   matScale.makeScale(rad.x, rad.y, 0)
 
-  const matRotLook = new THREE.Matrix4()
+  const matRotLook = new Matrix4()
   matRotLook.lookAt(eye, target, up)
   matRotLook.multiply(matScale)
   matRotLook.setPosition(eye)
@@ -341,12 +344,7 @@ function _buildDistorionMesh(widthSegments, heightSegements, coef) {
     return 1.0 / dr
   }
 
-  const geo = new THREE.PlaneBufferGeometry(
-    2.0,
-    2.0,
-    widthSegments,
-    heightSegements
-  )
+  const geo = new PlaneBufferGeometry(2.0, 2.0, widthSegments, heightSegements)
 
   const pos = geo.getAttribute('position')
   for (let i = 0; i < pos.count; ++i) {
@@ -359,7 +357,7 @@ function _buildDistorionMesh(widthSegments, heightSegements, coef) {
   return geo
 }
 
-THREE.BufferAttribute.prototype.copyAtList = function (attribute, indexList) {
+BufferAttribute.prototype.copyAtList = function (attribute, indexList) {
   console.assert(
     this.itemSize === attribute.itemSize,
     'DEBUG: BufferAttribute.copyAtList buffers have different item size.'
@@ -382,7 +380,7 @@ function fillArray(array, value, startIndex, endIndex) {
   }
 }
 
-/** @param {THREE.Object3D} object - Parent object. */
+/** @param {Object3D} object - Parent object. */
 function removeChildren(object) {
   const { children } = object
   for (let i = 0, n = children.length; i < n; ++i) {
@@ -396,9 +394,9 @@ function removeChildren(object) {
 function clearTree(object) {
   object.traverse((obj) => {
     if (
-      obj instanceof THREE.Mesh ||
-      obj instanceof THREE.LineSegments ||
-      obj instanceof THREE.Line
+      obj instanceof Mesh ||
+      obj instanceof LineSegments ||
+      obj instanceof Line
     ) {
       obj.geometry.dispose()
     }
@@ -440,14 +438,14 @@ function applySelectionMaterial(geo) {
       node.material = node.material.clone(true)
       // using z-offset to magically fix selection rendering artifact (on z-sprites)
       node.material.setValues({
-        depthFunc: THREE.LessEqualDepth,
+        depthFunc: LessEqualDepth,
         overrideColor: true,
         fog: false,
         lights: false,
         shadowmap: false
       })
       node.material.setUberOptions({
-        fixedColor: new THREE.Color(0xffff00),
+        fixedColor: new Color(0xffff00),
         zOffset: -1e-6
       })
     }
@@ -455,7 +453,7 @@ function applySelectionMaterial(geo) {
 }
 
 function getMiddlePoint(point1, point2, optionalTarget) {
-  const result = optionalTarget || new THREE.Vector3()
+  const result = optionalTarget || new Vector3()
 
   result.set(0, 0, 0)
   result.addScaledVector(point1, 0.5)
@@ -466,10 +464,9 @@ function getMiddlePoint(point1, point2, optionalTarget) {
 
 // Monkey-patch for "InstancedBufferGeometry.instanceCount becomes undefined after copy()"
 // https://github.com/mrdoob/three.js/issues/22151
-const _oldInstancedBufferGeometryCopy =
-  THREE.InstancedBufferGeometry.prototype.copy
+const _oldInstancedBufferGeometryCopy = InstancedBufferGeometry.prototype.copy
 
-THREE.InstancedBufferGeometry.prototype.copy = function (source) {
+InstancedBufferGeometry.prototype.copy = function (source) {
   _oldInstancedBufferGeometryCopy.call(this, source)
   if (this.instanceCount === undefined) {
     this.instanceCount = Infinity

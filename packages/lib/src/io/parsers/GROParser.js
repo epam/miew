@@ -1,8 +1,8 @@
-import * as THREE from 'three'
-import _ from 'lodash'
 import Parser from './Parser'
 import chem from '../../chem'
 import GROReader from './GROReader'
+import { isString } from 'lodash'
+import { Vector3 } from 'three'
 
 const { Complex, Element, Molecule } = chem
 
@@ -52,7 +52,7 @@ class GROParser extends Parser {
    */
   canProbablyParse(data) {
     return (
-      _.isString(this._data) &&
+      isString(this._data) &&
       /^\s*[^\n]*\n\s*\d+ *\n\s*\d+[^\n\d]{3}\s*\w+\s*\d+\s*-?\d/.test(data)
     )
   }
@@ -139,7 +139,7 @@ class GROParser extends Parser {
       )
     }
     /* Lastly, add atom to that residue */
-    this._atomPosition = new THREE.Vector3(positionX, positionY, positionZ)
+    this._atomPosition = new Vector3(positionX, positionY, positionZ)
     /* Adding default constants to correct atom addition process */
     const het = true
     const altLoc = ' '

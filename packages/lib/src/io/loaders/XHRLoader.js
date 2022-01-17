@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isString } from 'lodash'
 import Loader from './Loader'
 
 // we don't need to detect all kinds of URLs, just the evident ones
@@ -49,7 +49,7 @@ export default class XHRLoader extends Loader {
   }
 
   static canProbablyLoad(source) {
-    return _.isString(source) && urlStartRegexp.test(source)
+    return isString(source) && urlStartRegexp.test(source)
   }
 
   static extractName(source) {

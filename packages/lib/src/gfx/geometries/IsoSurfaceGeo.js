@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { Vector3 } from 'three'
 
 /**
  * Class for geometry (triangle mesh) representation
@@ -24,15 +24,15 @@ class IsoSurfaceGeo {
 
     let i
     for (i = 0; i < maxNumVertices; i++) {
-      this._vertices[i] = new THREE.Vector3()
-      this._normals[i] = new THREE.Vector3()
+      this._vertices[i] = new Vector3()
+      this._normals[i] = new Vector3()
     }
     for (i = 0; i < maxNumTriangles * (1 + 2); i++) {
       this._indices[i] = -1
     }
     if (needVertexColors) {
       for (i = 0; i < maxNumVertices; i++) {
-        this._colors[i] = new THREE.Vector3()
+        this._colors[i] = new Vector3()
       }
     }
   }

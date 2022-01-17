@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { Vector3 } from 'three'
 
 /**
  * Class for colored atom. Need for atom structure clusterization
@@ -8,7 +8,7 @@ import * as THREE from 'three'
  */
 class IsoSurfaceAtomColored {
   constructor(vCenter, radiusAt) {
-    this.coord = new THREE.Vector3()
+    this.coord = new Vector3()
     this.coord.copy(vCenter)
     this.radius = radiusAt
     this.colorX = 0.99999

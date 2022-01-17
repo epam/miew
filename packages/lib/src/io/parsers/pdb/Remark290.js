@@ -1,17 +1,17 @@
-import * as THREE from 'three'
-
 /**
  * Parser helper for PDB tag "REMARK 290".
  *
  * @exports Remark290
  * @constructor
  */
+import { Matrix4 } from 'three'
+
 class Remark290 {
   constructor() {
-    /** @type {THREE.Matrix4[]} */
+    /** @type {Matrix4[]} */
     this.matrices = []
 
-    /** @type {?THREE.Matrix4} */
+    /** @type {?Matrix4} */
     this._matrix = null
     /** @type {number} */
     this._matrixIndex = -1
@@ -23,7 +23,7 @@ class Remark290 {
    */
 
   parse(stream) {
-    /** @type {?THREE.Matrix4} */
+    /** @type {?Matrix4} */
     let matrix = this._matrix
 
     if (stream.readString(12, 18) === '  SMTRY') {
@@ -33,7 +33,7 @@ class Remark290 {
       if (this._matrix === null || matrixIndex !== this._matrixIndex) {
         // TODO: assert(matrixIndex === this.matrices.length + 1);
         this._matrixIndex = matrixIndex
-        this._matrix = matrix = new THREE.Matrix4()
+        this._matrix = matrix = new Matrix4()
         this.matrices[this.matrices.length] = matrix
       }
 

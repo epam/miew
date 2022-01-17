@@ -17,7 +17,6 @@
     "serve": "cd demo && yarn serve",
     "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
     "coveralls": "cat coverage/general.info | coveralls",
-    "build:ci": "yarn workspaces foreach -ptv run ci",
     "build:docs": "jsdoc -c jsdoc.config.js",
     "build:examples": "run-s 'build:examples:*'",
     "build:examples:viewer": "mkdirp examples/build/fullscreen && ncp examples/fullscreen.html examples/build/fullscreen/index.html",

@@ -1,7 +1,7 @@
-import _ from 'lodash'
-import * as THREE from 'three'
 import Parser from './Parser'
 import chem from '../../chem'
+import { isString } from 'lodash'
+import { Vector3 } from 'three'
 
 const { Complex, Element, SGroup, Bond } = chem
 
@@ -27,7 +27,7 @@ class CMLParser extends Parser {
   }
 
   static canProbablyParse(data) {
-    return _.isString(data) && cmlStartRegexp.test(data)
+    return isString(data) && cmlStartRegexp.test(data)
   }
 
   _rebuidBondIndexes(atoms, bonds) {
@@ -53,12 +53,12 @@ class CMLParser extends Parser {
     const newGroup = new SGroup(
       molecule.id,
       molecule.fieldData,
-      new THREE.Vector3(parseFloat(molecule.x), parseFloat(molecule.y), 0),
+      new Vector3(parseFloat(molecule.x), parseFloat(molecule.y), 0),
       molecule.atomRefs,
       molecule
     )
     if (molecule.placement === 'Relative') {
-      newGroup._center = new THREE.Vector3(0, 0, 0)
+      newGroup._center = new Vector3(0, 0, 0)
     }
     if (molecule.fieldName === 'MDLBG_FRAGMENT_CHARGE') {
       newGroup._charge = parseInt(molecule.fieldData, 10) || 0
@@ -123,8 +123,8 @@ class CMLParser extends Parser {
     let atomMap = {} // sgrpmap cache
     let mapEntry = null
     const nLimon = 100000000
-    const bLow = new THREE.Vector3(nLimon, nLimon, nLimon)
-    const bHight = new THREE.Vector3(-nLimon, -nLimon, -nLimon)
+    const bLow = new Vector3(nLimon, nLimon, nLimon)
+    const bHight = new Vector3(-nLimon, -nLimon, -nLimon)
 
     function cycleFuncInner(e) {
       mapEntry = atomMap[e]
@@ -567,13 +567,13 @@ class CMLParser extends Parser {
           // _x, _y, _z, mname, mindex, atomNameFull, atomName, chainID, serial, isHet, atlLocInd, atomNameToTypeF
           let xyz = null
           if (atom.x3) {
-            xyz = new THREE.Vector3(
+            xyz = new Vector3(
               parseFloat(atom.x3),
               parseFloat(atom.y3),
               parseFloat(atom.z3)
             )
           } else if (atom.x2) {
-            xyz = new THREE.Vector3(parseFloat(atom.x2), parseFloat(atom.y2), 0)
+            xyz = new Vector3(parseFloat(atom.x2), parseFloat(atom.y2), 0)
           }
           let element = Element.ByName[atom.elementType.toUpperCase()]
           if (!element) {

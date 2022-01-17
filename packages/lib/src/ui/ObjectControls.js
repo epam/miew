@@ -1,7 +1,7 @@
-import * as THREE from 'three'
 import Timer from '../Timer'
 import settings from '../settings'
 import EventDispatcher from '../utils/EventDispatcher'
+import { Matrix4, Quaternion, Vector2, Vector3 } from 'three'
 
 const VK_LEFT = 37
 const VK_UP = 38
@@ -19,8 +19,8 @@ const STATE = {
 // pausing for this amount of time before releasing mouse button prevents inertial rotation (seconds)
 const FULL_STOP_THRESHOLD = 0.1
 
-const quaternion = new THREE.Quaternion()
-const matrix4 = new THREE.Matrix4()
+const quaternion = new Quaternion()
+const matrix4 = new Matrix4()
 
 // pivot -- local offset of the rotation pivot point
 function ObjectHandler(objects, camera, pivot, options) {
@@ -28,21 +28,21 @@ function ObjectHandler(objects, camera, pivot, options) {
   ;[this.object] = objects
   this.camera = camera
   this.pivot = pivot
-  this.axis = new THREE.Vector3(0, 0, 1)
+  this.axis = new Vector3(0, 0, 1)
   this.options = options
 
   this.lastRotation = {
-    axis: new THREE.Vector3(),
+    axis: new Vector3(),
     angle: 0.0
   }
 }
 
 ObjectHandler.prototype._rotate = (function () {
-  const p = new THREE.Vector3()
-  const q = new THREE.Quaternion()
-  const s = new THREE.Vector3()
+  const p = new Vector3()
+  const q = new Quaternion()
+  const s = new Vector3()
 
-  const m = new THREE.Matrix4()
+  const m = new Matrix4()
 
   return function (quat) {
     const zeroPivot =
@@ -85,7 +85,7 @@ ObjectHandler.prototype.setObjects = function (objects) {
 
 ObjectHandler.prototype.rotate = (function () {
   const rot = {
-    axis: new THREE.Vector3(),
+    axis: new Vector3(),
     angle: 0.0
   }
 
@@ -102,8 +102,8 @@ ObjectHandler.prototype.rotate = (function () {
 })()
 
 ObjectHandler.prototype.translate = (function () {
-  const dir = new THREE.Vector3()
-  const pivot = new THREE.Vector3()
+  const dir = new Vector3()
+  const pivot = new Vector3()
 
   return function (delta) {
     // reverse-project viewport movement to view coords (compensate for screen aspect ratio)
@@ -135,7 +135,7 @@ ObjectHandler.prototype.translate = (function () {
 })()
 
 ObjectHandler.prototype.update = (function () {
-  const axis = new THREE.Vector3()
+  const axis = new Vector3()
 
   return function (timeSinceLastUpdate, timeSinceMove) {
     if (settings.now.autoRotation !== 0.0) {
@@ -188,17 +188,17 @@ ObjectHandler.prototype.stop = function () {
 
 // calculate (axis, angle) pair from mouse/touch movement
 ObjectHandler.prototype.mouse2rotation = (function () {
-  const center = new THREE.Vector3()
+  const center = new Vector3()
 
-  const eye = new THREE.Vector3()
-  const eyeDirection = new THREE.Vector3()
+  const eye = new Vector3()
+  const eyeDirection = new Vector3()
 
-  const cameraUpDirection = new THREE.Vector3()
-  const cameraSidewaysDirection = new THREE.Vector3()
+  const cameraUpDirection = new Vector3()
+  const cameraSidewaysDirection = new Vector3()
 
-  const moveDirection = new THREE.Vector3()
+  const moveDirection = new Vector3()
 
-  const mouseDelta = new THREE.Vector2()
+  const mouseDelta = new Vector2()
 
   return function (rot, mousePrev, mouseCur, aboutAxis) {
     if (aboutAxis) {
@@ -213,9 +213,9 @@ ObjectHandler.prototype.mouse2rotation = (function () {
         this.object.localToWorld(pivot);
         pivot.project(this.camera);
 
-        var v1 = new THREE.Vector3(mousePrev.x, mousePrev.y, this.camera.position.z);
+        var v1 = new Vector3(mousePrev.x, mousePrev.y, this.camera.position.z);
         v1.sub(pivot);
-        var v2 = new THREE.Vector3(mouseCur.x, mouseCur.y, this.camera.position.z);
+        var v2 = new Vector3(mouseCur.x, mouseCur.y, this.camera.position.z);
         v2.sub(pivot);
 
         v1.sub(res.axis.clone().multiplyScalar(v1.dot(res.axis)));
@@ -297,19 +297,19 @@ function ObjectControls(object, objectPivot, camera, domElement, getAltObj) {
 
   this._state = STATE.NONE
 
-  this._mousePrevPos = new THREE.Vector2()
-  this._mouseCurPos = new THREE.Vector2()
+  this._mousePrevPos = new Vector2()
+  this._mouseCurPos = new Vector2()
 
   this._mainObj = new ObjectHandler(
     [this.object],
     this.camera,
-    new THREE.Vector3(0, 0, 0),
+    new Vector3(0, 0, 0),
     this.options
   )
   this._altObj = new ObjectHandler(
     [this.object],
     this.camera,
-    new THREE.Vector3(0, 0, 0),
+    new Vector3(0, 0, 0),
     this.options
   )
   this._affectedObj = this._mainObj
@@ -546,7 +546,7 @@ ObjectControls.prototype.stop = function () {
 
 // rotate object based on latest mouse/touch movement
 ObjectControls.prototype.rotateByMouse = (function () {
-  const quat = new THREE.Quaternion()
+  const quat = new Quaternion()
 
   return function (aboutZAxis) {
     this._affectedObj.rotate(
@@ -577,7 +577,7 @@ ObjectControls.prototype.setOrientation = function (quat) {
 
 // translate object based on latest mouse/touch movement
 ObjectControls.prototype.translate = (function () {
-  const delta = new THREE.Vector2()
+  const delta = new Vector2()
   return function () {
     delta.subVectors(this._mouseCurPos, this._mousePrevPos)
     this._affectedObj.translate(delta)
@@ -605,7 +605,7 @@ ObjectControls.prototype.scale = function (factor) {
 }
 
 ObjectControls.prototype.update = (function () {
-  const shift = new THREE.Vector2()
+  const shift = new Vector2()
 
   return function () {
     const curTime = this._clock.getElapsedTime()
@@ -903,7 +903,7 @@ ObjectControls.prototype.dispose = function () {
 }
 
 ObjectControls.prototype.translatePivotByMouse = (function () {
-  const delta = new THREE.Vector2()
+  const delta = new Vector2()
   return function () {
     delta.subVectors(this._mouseCurPos, this._mousePrevPos)
     this.translatePivotInWorld(

@@ -1,7 +1,7 @@
-import _ from 'lodash'
 import settings from './settings'
 import utils from './utils'
 import logger from './utils/logger'
+import { isString, set, get, isArray, isEmpty } from 'lodash'
 
 let repIndex = 0
 
@@ -9,7 +9,7 @@ function asBoolean(value) {
   return !(
     !value ||
     value === '0' ||
-    (_.isString(value) && value.toLowerCase() === 'false')
+    (isString(value) && value.toLowerCase() === 'false')
   )
 }
 
@@ -135,9 +135,9 @@ function extractArgs(input, defaultsDict, params) {
           const pair = arg.split(cL2Ass, 2)
           const key = decodeURIComponent(pair[0])
           const value = decodeURIComponent(pair[1])
-          const adapter = adapters[typeof _.get(defaults, key)]
+          const adapter = adapters[typeof get(defaults, key)]
           if (adapter) {
-            _.set(opts, key, adapter(value))
+            set(opts, key, adapter(value))
           } else {
             logger.warn(`Unknown argument "${key}" for option "${input}"`)
           }
@@ -254,7 +254,7 @@ function _fromArray(entries) {
     const /** string? */ value = entry[1]
     if (actions.hasOwnProperty(key)) {
       let /** function|string? */ action = actions[key]
-      while (_.isString(action)) {
+      while (isString(action)) {
         key = action
         action = actions[key]
       }
@@ -263,9 +263,9 @@ function _fromArray(entries) {
         if (result !== undefined) opts[key] = result
       }
     } else {
-      const adapter = adapters[typeof _.get(settings.defaults, key)]
+      const adapter = adapters[typeof get(settings.defaults, key)]
       if (adapter) {
-        _.set(opts, `settings.${key}`, adapter(value))
+        set(opts, `settings.${key}`, adapter(value))
       } else {
         logger.warn(`Unknown option "${key}"`)
       }
@@ -293,7 +293,7 @@ function _processOptsForURL(opts) {
 }
 
 function _processArgsForURL(args) {
-  if (!_.isArray(args)) {
+  if (!isArray(args)) {
     return args
   }
   if (args.length < 2) {
@@ -307,7 +307,7 @@ function _processObjForURL(objOpts) {
     return undefined
   }
   let res = objOpts.type
-  if (_.isArray(objOpts.params) && objOpts.params.length > 0) {
+  if (isArray(objOpts.params) && objOpts.params.length > 0) {
     res += `,${objOpts.params.join(',')}`
   }
   if (objOpts.opts) {
@@ -332,7 +332,7 @@ function toURL(opts) {
       return
     }
     for (let i = 0, n = repList.length; i < n; ++i) {
-      if (_.isEmpty(repList[i])) {
+      if (isEmpty(repList[i])) {
         continue
       }
       checkAndAdd('r', i)
@@ -391,7 +391,7 @@ function _processOptsForScript(opts) {
 }
 
 function _processArgsForScript(args) {
-  if (!_.isArray(args)) {
+  if (!isArray(args)) {
     return args
   }
   if (args.length < 2) {
@@ -405,7 +405,7 @@ function _processObjForScript(objOpts) {
     return undefined
   }
   let res = objOpts.type
-  if (_.isArray(objOpts.params) && objOpts.params.length > 0) {
+  if (isArray(objOpts.params) && objOpts.params.length > 0) {
     res += ` ${objOpts.params.map(utils.enquoteString).join(' ')}`
   }
   if (objOpts.opts) {
@@ -422,7 +422,7 @@ function _processRepsForScript(rep, index) {
       repString[strIdx++] = prefix + value
     }
   }
-  if (_.isEmpty(rep)) {
+  if (isEmpty(rep)) {
     return null
   }
   localAdd('', index)

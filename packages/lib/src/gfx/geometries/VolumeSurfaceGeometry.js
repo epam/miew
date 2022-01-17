@@ -1,7 +1,7 @@
-import * as THREE from 'three'
 import IsoSurfaceGeometry from './IsoSurfaceGeometry'
 import IsoSurface from './IsoSurface'
 import utils from '../../utils'
+import { Box3, BufferAttribute, Vector3 } from 'three'
 
 /**
  * This is a base class for volumetric maps based isosurface algorithms.
@@ -14,11 +14,11 @@ class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
   _build() {
     const params = this._opts
     this.numVoxels = [128, 128, 128]
-    this.xAxis = new THREE.Vector3(1.0, 0.0, 0.0)
-    this.yAxis = new THREE.Vector3(0.0, 1.0, 0.0)
-    this.zAxis = new THREE.Vector3(0.0, 0.0, 1.0)
+    this.xAxis = new Vector3(1.0, 0.0, 0.0)
+    this.yAxis = new Vector3(0.0, 1.0, 0.0)
+    this.zAxis = new Vector3(0.0, 0.0, 1.0)
 
-    this.origin = new THREE.Vector3(0.0, 0.0, 0.0)
+    this.origin = new Vector3(0.0, 0.0, 0.0)
     this._visibilitySelector = params.visibilitySelector
 
     this._calcSurface(params)
@@ -98,21 +98,15 @@ class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
         surface.atomWeightMap,
         this._visibilitySelector
       )
-      this.setIndex(new THREE.BufferAttribute(isoSurf._indices, 1))
-      this.setAttribute(
-        'position',
-        new THREE.BufferAttribute(isoSurf._position, 3)
-      )
-      this.setAttribute(
-        'normal',
-        new THREE.BufferAttribute(isoSurf._normals, 3)
-      )
-      this.setAttribute('color', new THREE.BufferAttribute(isoSurf._colors, 3))
+      this.setIndex(new BufferAttribute(isoSurf._indices, 1))
+      this.setAttribute('position', new BufferAttribute(isoSurf._position, 3))
+      this.setAttribute('normal', new BufferAttribute(isoSurf._normals, 3))
+      this.setAttribute('color', new BufferAttribute(isoSurf._colors, 3))
     } else {
       // geometry should have at least empty position attributes to be processed in wireframe mode by three.js
       this.setAttribute(
         'position',
-        new THREE.BufferAttribute(utils.allocateTyped(Float32Array, 0), 3)
+        new BufferAttribute(utils.allocateTyped(Float32Array, 0), 3)
       )
     }
   }
@@ -129,11 +123,9 @@ class VolumeSurfaceGeometry extends IsoSurfaceGeometry {
     }
     const boundaries = this._findNumVoxels(packedArrays.posRad, params)
 
-    const box = new THREE.Box3(
+    const box = new Box3(
       this.origin,
-      new THREE.Vector3(this.xAxis.x, this.yAxis.y, this.zAxis.z).add(
-        this.origin
-      )
+      new Vector3(this.xAxis.x, this.yAxis.y, this.zAxis.z).add(this.origin)
     )
     const surface = this._computeSurface(packedArrays, box, boundaries, params)
 

@@ -1,10 +1,10 @@
-import _ from 'lodash'
-import * as THREE from 'three'
 import utils from '../../utils'
+import { BufferAttribute, BufferGeometry, Color, Mesh } from 'three'
+import { fill } from 'lodash'
 
 const MAX_IDC_16BIT = 65535
 const VEC_SIZE = 3
-const tmpColor = new THREE.Color()
+const tmpColor = new Color()
 
 /**
  * This class represents geometry which consists of separate chunks.
@@ -13,7 +13,7 @@ const tmpColor = new THREE.Color()
  * @constructor
  */
 
-class ChunkedObjectsGeometry extends THREE.BufferGeometry {
+class ChunkedObjectsGeometry extends BufferGeometry {
   constructor(chunkGeo, chunksCount) {
     super()
 
@@ -58,14 +58,14 @@ class ChunkedObjectsGeometry extends THREE.BufferGeometry {
     const chunkSize = this._chunkSize
     for (let i = 0, n = chunkIndices.length; i < n; ++i) {
       const left = chunkIndices[i] * chunkSize
-      _.fill(alphaArr, value, left, left + chunkSize)
+      fill(alphaArr, value, left, left + chunkSize)
     }
     this.getAttribute('alphaColor').needsUpdate = true
   }
 
   raycast(raycaster, intersects) {
     const inters = []
-    const mesh = new THREE.Mesh()
+    const mesh = new Mesh()
     mesh.geometry = this
     mesh.raycast(raycaster, inters)
     const facesPerChunk = this._chunkGeo.index.count / 3
@@ -80,7 +80,7 @@ class ChunkedObjectsGeometry extends THREE.BufferGeometry {
 
   getSubset(chunkIndices) {
     const instanceCount = chunkIndices.length
-    const geom = new THREE.BufferGeometry()
+    const geom = new BufferGeometry()
     this._init.call(geom, this._chunkGeo, instanceCount)
 
     const srcPos = this._positions
@@ -122,7 +122,7 @@ class ChunkedObjectsGeometry extends THREE.BufferGeometry {
     this._normals = utils.allocateTyped(Float32Array, pointsCount * VEC_SIZE)
     this._colors = utils.allocateTyped(Float32Array, pointsCount * VEC_SIZE)
     const alpha = (this._alpha = utils.allocateTyped(Float32Array, pointsCount))
-    _.fill(alpha, 1.0)
+    fill(alpha, 1.0)
 
     for (let i = 0; i < chunksCount; ++i) {
       const offset = i * chunkIndexSize
@@ -133,20 +133,14 @@ class ChunkedObjectsGeometry extends THREE.BufferGeometry {
       }
     }
 
-    this.setIndex(new THREE.BufferAttribute(this._index, 1))
+    this.setIndex(new BufferAttribute(this._index, 1))
     this.setAttribute(
       'position',
-      new THREE.BufferAttribute(this._positions, VEC_SIZE)
+      new BufferAttribute(this._positions, VEC_SIZE)
     )
-    this.setAttribute(
-      'normal',
-      new THREE.BufferAttribute(this._normals, VEC_SIZE)
-    )
-    this.setAttribute(
-      'color',
-      new THREE.BufferAttribute(this._colors, VEC_SIZE)
-    )
-    this.setAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1))
+    this.setAttribute('normal', new BufferAttribute(this._normals, VEC_SIZE))
+    this.setAttribute('color', new BufferAttribute(this._colors, VEC_SIZE))
+    this.setAttribute('alphaColor', new BufferAttribute(alpha, 1))
   }
 }
 export default ChunkedObjectsGeometry

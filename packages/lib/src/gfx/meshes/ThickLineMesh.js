@@ -1,10 +1,10 @@
-import * as THREE from 'three'
 import UberObject from './UberObject'
+import { Mesh, Vector2 } from 'three'
 
-const Mesh = UberObject(THREE.Mesh)
-const _viewport = new THREE.Vector2()
+const OurMesh = UberObject(Mesh)
+const _viewport = new Vector2()
 
-class ThickLineMesh extends Mesh {
+class ThickLineMesh extends OurMesh {
   _onBeforeRender(renderer, scene, camera, _geometry, _material, _group) {
     const { material } = this
     if (!material.uberOptions) {
