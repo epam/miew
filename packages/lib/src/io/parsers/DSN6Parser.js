@@ -1,6 +1,6 @@
-import * as THREE from 'three'
 import Parser from './Parser'
 import VolumeModel, { valueType } from './VolumeModel'
+import { Vector3 } from 'three'
 
 // http://www.uoxray.uoregon.edu/tnt/manual/node104.html
 const DSN6Header = {
@@ -102,7 +102,7 @@ class DSN6Model extends VolumeModel {
       header.extent[0] * header.extent[1] * header.extent[2]
     )
 
-    const blocks = new THREE.Vector3(
+    const blocks = new Vector3(
       header.extent[0] / 8,
       header.extent[1] / 8,
       header.extent[2] / 8

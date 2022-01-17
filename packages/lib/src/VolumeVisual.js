@@ -1,9 +1,9 @@
-import * as THREE from 'three'
 import VolumeMesh from './gfx/VolumeMesh'
 import VolumeBounds from './gfx/VolumeBounds'
 import VolumeFarPlane from './gfx/VolumeFarPlane'
 import Visual from './Visual'
 import settings from './settings'
+import { Sphere } from 'three'
 
 class VolumeVisual extends Visual {
   constructor(name, dataSource) {
@@ -25,7 +25,7 @@ class VolumeVisual extends Visual {
 
   getBoundaries() {
     const box = this._dataSource.getBox()
-    const sphere = new THREE.Sphere()
+    const sphere = new Sphere()
     box.getBoundingSphere(sphere)
 
     return {

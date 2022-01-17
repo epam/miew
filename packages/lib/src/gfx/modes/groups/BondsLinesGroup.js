@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import BondsGroup from './BondsGroup'
+import { Vector3 } from 'three'
 
 const STEP_SIZE = 0.15
 
@@ -13,10 +13,10 @@ class BondsLinesGroup extends BondsGroup {
     const drawMultiple = mode.drawMultiorderBonds()
     const showAromatic = mode.showAromaticLoops()
 
-    const bondDir = new THREE.Vector3()
+    const bondDir = new Vector3()
 
-    const leftPos = new THREE.Vector3()
-    const rightPos = new THREE.Vector3()
+    const leftPos = new Vector3()
+    const rightPos = new Vector3()
     let currBondIdx = 0
     const chunksToIdx = []
     for (let i = 0, n = bondsIdc.length; i < n; ++i) {
@@ -78,10 +78,10 @@ class BondsLinesGroup extends BondsGroup {
     const drawMultiple = mode.drawMultiorderBonds()
     const showAromatic = mode.showAromaticLoops()
 
-    const bondDir = new THREE.Vector3()
+    const bondDir = new Vector3()
 
-    const leftPos = new THREE.Vector3()
-    const rightPos = new THREE.Vector3()
+    const leftPos = new Vector3()
+    const rightPos = new Vector3()
     let currBondIdx = 0
     const updateColor = frameData.needsColorUpdate(colorer)
     for (let i = 0, n = bondsIdc.length; i < n; ++i) {

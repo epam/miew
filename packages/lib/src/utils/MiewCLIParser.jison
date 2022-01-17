@@ -250,9 +250,9 @@ RepresentationReference
 
 Description
     : Descriptor                                  -> $1
-    | Descriptor Descriptor                       -> yy._.assign($1, $2)
-    | Descriptor Descriptor Descriptor            -> yy._.assign($1, $2, $3)
-    | Descriptor Descriptor Descriptor Descriptor -> yy._.assign($1, $2, $3, $4)
+    | Descriptor Descriptor                       -> yy.assign($1, $2)
+    | Descriptor Descriptor Descriptor            -> yy.assign($1, $2, $3)
+    | Descriptor Descriptor Descriptor Descriptor -> yy.assign($1, $2, $3, $4)
     ;
 
 Descriptor

@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import EventDispatcher from '../../utils/EventDispatcher'
+import { Vector3 } from 'three'
 
 function createLabel(fieldTxt, className) {
   const text = document.createElement('div')
@@ -24,7 +24,7 @@ function createLabel(fieldTxt, className) {
   } else {
     text.appendChild(fieldTxt)
   }
-  text.worldPos = new THREE.Vector3()
+  text.worldPos = new Vector3()
   return text
 }
 class LabelsGeometry extends EventDispatcher {
@@ -58,7 +58,7 @@ class LabelsGeometry extends EventDispatcher {
         break
     }
 
-    const deltaPos = new THREE.Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0)
+    const deltaPos = new Vector3(opts.dx || 0, opts.dy || 0, opts.dz || 0)
     this.userData = {
       translation: `translate(${xTranslation}%, ${yTranslation}%)`,
       offset: deltaPos

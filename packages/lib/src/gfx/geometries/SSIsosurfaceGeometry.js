@@ -1,4 +1,3 @@
-import * as THREE from 'three'
 import IsoSurfaceGeometry from './IsoSurfaceGeometry'
 import IsoSurfaceAtomColored from './IsoSurfaceAtomColored'
 import IsosurfaceBuildNormals from './IsosurfaceBuildNormals'
@@ -6,6 +5,7 @@ import IsoSurfaceMarchCube from './IsoSurfaceMarchCube'
 import IsoSurfaceGeo from './IsoSurfaceGeo'
 import chem from '../../chem'
 import utils from '../../utils'
+import { BufferAttribute, Vector3 } from 'three'
 
 const COLOR_SIZE = 3
 const HASH_SIZE = 32768
@@ -67,10 +67,10 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       indices[i] = geoOut._indices[i]
     }
 
-    this.setIndex(new THREE.BufferAttribute(indices, 1))
-    this.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    this.setAttribute('normal', new THREE.BufferAttribute(normals, 3))
-    this.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+    this.setIndex(new BufferAttribute(indices, 1))
+    this.setAttribute('position', new BufferAttribute(positions, 3))
+    this.setAttribute('normal', new BufferAttribute(normals, 3))
+    this.setAttribute('color', new BufferAttribute(colors, 3))
     this.computeBoundingBox()
     this.computeBoundingSphere()
 
@@ -288,13 +288,13 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
 
     const vaEdges = new Array(arrSize)
     for (let i = 0; i < arrSize; i++) {
-      vaEdges[i] = new THREE.Vector3()
+      vaEdges[i] = new Vector3()
     }
     const sign = []
     for (let i = 0; i < cNumVerts; i++) {
       sign[i] = 1.0
     }
-    const vCorner = new THREE.Vector3()
+    const vCorner = new Vector3()
     let indCell = 0
     let indY = 0
     for (let y = 0; y < numCells; y++, indY += side2) {
@@ -489,8 +489,8 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
   calculateGridCorners(corners, side, vBoxMin, vBoxMax, atoms, probeRad) {
     const side2 = side * side
     const side3 = side2 * side
-    const vCorner = new THREE.Vector3()
-    const vDif = new THREE.Vector3()
+    const vCorner = new Vector3()
+    const vDif = new Vector3()
     /* eslint-disable no-magic-numbers */
     const aLot = +1.0e12
     /* eslint-enable no-magic-numbers */
@@ -618,7 +618,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const r106 = 1.0e-6
 
     const hashResolution = this.marCubeResoultion << 2
-    const v = new THREE.Vector3()
+    const v = new Vector3()
     const ix = Math.floor(
       (hashResolution * (vAdd.x - this.vBoxMin.x)) /
         (this.vBoxMax.x + oneHynberes - this.vBoxMin.x)
@@ -812,8 +812,8 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     this.convertToAtomsColored(packedArrays, atomsColored)
 
     // find bbox for spheres scene
-    const vBoxMin = (this.vBoxMin = new THREE.Vector3())
-    const vBoxMax = (this.vBoxMax = new THREE.Vector3())
+    const vBoxMin = (this.vBoxMin = new Vector3())
+    const vBoxMax = (this.vBoxMax = new Vector3())
     this.getBoundingBox(atomsColored, vBoxMin, vBoxMax)
 
     const marCubeResoultion = (this.marCubeResoultion =
@@ -842,7 +842,7 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       return ok
     }
     // copy corners to cells
-    const vCellStep = new THREE.Vector3()
+    const vCellStep = new Vector3()
     vCellStep.x = (vBoxMax.x - vBoxMin.x) / numCells
     vCellStep.y = (vBoxMax.y - vBoxMin.y) / numCells
     vCellStep.z = (vBoxMax.z - vBoxMin.z) / numCells

@@ -1,15 +1,15 @@
-import * as THREE from 'three'
 import utils from '../../utils'
 import gfxutils from '../gfxutils'
 import ChunkedObjectsGeometry from './ChunkedObjectsGeometry'
+import { CylinderBufferGeometry, Matrix3, Vector3 } from 'three'
 
 const VEC_SIZE = 3
-const tmpVector = new THREE.Vector3()
-const normMtx = new THREE.Matrix3()
+const tmpVector = new Vector3()
+const normMtx = new Matrix3()
 
 class CylinderCollisionGeo extends ChunkedObjectsGeometry {
   constructor(instanceCount, polyComplexity) {
-    const cylGeometry = new THREE.CylinderBufferGeometry(
+    const cylGeometry = new CylinderBufferGeometry(
       1,
       1,
       1.0,

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isArray, isEqual } from 'lodash'
 import chai, { expect } from 'chai'
 import dirtyChai from 'dirty-chai'
 import options from './options'
@@ -292,7 +292,7 @@ describe('options', () => {
 
   describe('.toScript()', () => {
     function equalCommands(original, generated) {
-      if (!_.isArray(original) || original.length !== generated.length + 2) {
+      if (!isArray(original) || original.length !== generated.length + 2) {
         return false
       }
       if (
@@ -386,7 +386,7 @@ describe('options', () => {
           if (
             key !== 'preset' &&
             key !== 'reps' &&
-            (!another.hasOwnProperty(key) || !_.isEqual(one[key], another[key]))
+            (!another.hasOwnProperty(key) || !isEqual(one[key], another[key]))
           ) {
             return false
           }
@@ -424,7 +424,7 @@ describe('options', () => {
         if (
           ((origReps === undefined || origReps[i] === undefined) &&
             Object.keys(genReps[i]).length > 0) ||
-          !_.isEqual(origReps[i], genReps[i])
+          !isEqual(origReps[i], genReps[i])
         ) {
           return false
         }

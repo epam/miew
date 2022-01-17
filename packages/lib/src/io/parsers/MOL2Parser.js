@@ -1,6 +1,6 @@
-import * as THREE from 'three'
 import Parser from './Parser'
 import chem from '../../chem'
+import { Vector3 } from 'three'
 
 const { Complex, Element, Bond, Molecule } = chem
 
@@ -176,7 +176,7 @@ class MOL2Parser extends Parser {
       const type = Element.getByName(element)
       const role = Element.Role[atomName]
 
-      const xyz = new THREE.Vector3(x, y, z)
+      const xyz = new Vector3(x, y, z)
       this._residue.addAtom(
         atomName,
         type,

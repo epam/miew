@@ -1,14 +1,14 @@
-import _ from 'lodash'
-import * as THREE from 'three'
 import utils from '../../utils'
+import { Vector3, Color, BufferGeometry, BufferAttribute } from 'three'
+import { fill } from 'lodash'
 
 const MAX_IDC_16BIT = 65535
 const VERTEX_PER_SEGMENT = 4
 const POS_SIZE = 4
 const DIR_SIZE = 3
 const COL_SIZE = 3
-const tmpColor = new THREE.Color()
-const direction = new THREE.Vector3()
+const tmpColor = new Color()
+const direction = new Vector3()
 
 function setArrayXYZ(arr, idx, x, y, z) {
   arr[idx] = x
@@ -38,7 +38,7 @@ function getSubset(arr, startSegmentIdx, segmentsCount, elemSize) {
  * collision geometry.
  */
 
-class ThickLinesGeometry extends THREE.BufferGeometry {
+class ThickLinesGeometry extends BufferGeometry {
   constructor(segmentsCount) {
     super()
     this._initVertices(segmentsCount)
@@ -93,7 +93,7 @@ class ThickLinesGeometry extends THREE.BufferGeometry {
   setOpacity(startSegIdx, endSegIdx, value) {
     const start = startSegIdx * VERTEX_PER_SEGMENT
     const end = endSegIdx * VERTEX_PER_SEGMENT
-    _.fill(this.alpha, value, end, start)
+    fill(this.alpha, value, end, start)
     this.getAttribute('alphaColor').needsUpdate = true
   }
 
@@ -148,7 +148,7 @@ class ThickLinesGeometry extends THREE.BufferGeometry {
     this._colors = utils.allocateTyped(Float32Array, pointsCount * COL_SIZE)
     this._directions = utils.allocateTyped(Float32Array, pointsCount * DIR_SIZE)
     const alpha = (this._alpha = utils.allocateTyped(Float32Array, pointsCount))
-    _.fill(alpha, 1.0)
+    fill(alpha, 1.0)
 
     const index = this._index
     let indexOffset = 0
@@ -165,20 +165,17 @@ class ThickLinesGeometry extends THREE.BufferGeometry {
       index[indexOffset + 4] = pointOffset + 2
       index[indexOffset + 5] = pointOffset + 3
     }
-    this.setIndex(new THREE.BufferAttribute(this._index, 1))
+    this.setIndex(new BufferAttribute(this._index, 1))
 
     this.setAttribute(
       'position',
-      new THREE.BufferAttribute(this._positions, POS_SIZE)
+      new BufferAttribute(this._positions, POS_SIZE)
     )
-    this.setAttribute(
-      'color',
-      new THREE.BufferAttribute(this._colors, COL_SIZE)
-    )
-    this.setAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1))
+    this.setAttribute('color', new BufferAttribute(this._colors, COL_SIZE))
+    this.setAttribute('alphaColor', new BufferAttribute(alpha, 1))
     this.setAttribute(
       'direction',
-      new THREE.BufferAttribute(this._directions, DIR_SIZE)
+      new BufferAttribute(this._directions, DIR_SIZE)
     )
   }
 }

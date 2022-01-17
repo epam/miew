@@ -1,9 +1,9 @@
-import * as THREE from 'three'
-import _ from 'lodash'
 import Parser from './Parser'
 import chem from '../../chem'
 import MMTF from '../../vendors/mmtf'
 import StructuralElement from '../../chem/StructuralElement'
+import { isArrayBuffer, isUndefined } from 'lodash'
+import { Matrix4, Vector3 } from 'three'
 
 const {
   Complex,
@@ -88,7 +88,7 @@ class MMTFParser extends Parser {
   static canProbablyParse(data) {
     // check if it's binary MessagePack format containing a map (dictionary)
     // see https://github.com/msgpack/msgpack/blob/master/spec.md
-    return _.isArrayBuffer(data) && (getFirstByte(data) | 1) === 0xdf
+    return isArrayBuffer(data) && (getFirstByte(data) | 1) === 0xdf
   }
 
   _onModel(_modelData) {}
@@ -137,7 +137,7 @@ class MMTFParser extends Parser {
       atomData.groupIndex, // we store residue index here to replace it later with actual reference
       atomData.atomName,
       Element.getByName(atomData.element.toUpperCase()),
-      new THREE.Vector3(atomData.xCoord, atomData.yCoord, atomData.zCoord),
+      new Vector3(atomData.xCoord, atomData.yCoord, atomData.zCoord),
       Element.Role[atomData.atomName],
       false, // hetero atoms will be marked later
       atomData.atomId,
@@ -171,7 +171,7 @@ class MMTFParser extends Parser {
   _updateSecStructure(complex, residue, groupData) {
     const helixClasses = [3, -1, 1, -1, 5]
 
-    if (!_.isUndefined(groupData) && groupData.secStruct === this._ssType) {
+    if (!isUndefined(groupData) && groupData.secStruct === this._ssType) {
       residue._secondary = this._ssStruct
       if (this._ssStruct) {
         this._ssStruct.term = residue
@@ -179,7 +179,7 @@ class MMTFParser extends Parser {
       return
     }
 
-    if (!_.isUndefined(groupData)) {
+    if (!isUndefined(groupData)) {
       // start new secondary structure
       const type = secStructToType[groupData.secStruct]
       this._ssType = groupData.secStruct
@@ -374,9 +374,7 @@ class MMTFParser extends Parser {
 
       // add unique matrices to assembly
       a.addMatrix(
-        new THREE.Matrix4()
-          .fromArray(baInfo.transformList[0].matrix)
-          .transpose()
+        new Matrix4().fromArray(baInfo.transformList[0].matrix).transpose()
       )
       for (j = 1; j < baInfo.transformList.length; ++j) {
         const transform = baInfo.transformList[j]
@@ -390,7 +388,7 @@ class MMTFParser extends Parser {
           continue
         }
 
-        const m = new THREE.Matrix4().fromArray(transform.matrix).transpose()
+        const m = new Matrix4().fromArray(transform.matrix).transpose()
 
         // check if matrix is already in the list
         for (k = 0; k < a.matrices.length; ++k) {

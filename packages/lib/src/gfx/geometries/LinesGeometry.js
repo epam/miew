@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import BaseLinesGeometry from './ThickLinesGeometry'
+import { Box3, Sphere, Vector3 } from 'three'
 
 /**
  * This class represents geometry which consists lines. This can build bounding volumes
@@ -16,14 +16,14 @@ class LinesGeometry extends BaseLinesGeometry {
     const { boundingBox } = this
     // Build bounding sphere
     let radiusSquared = 0.0
-    const center = new THREE.Vector3()
+    const center = new Vector3()
     if (boundingBox) {
       boundingBox.getCenter(center)
     }
     const positions = this._positions
-    const sphere = this.boundingSphere || new THREE.Sphere()
+    const sphere = this.boundingSphere || new Sphere()
     const size = this._positions.length
-    const pos = new THREE.Vector3()
+    const pos = new Vector3()
     const posSize = this.getPositionSize()
     for (let i = 0; i < size; i += posSize) {
       pos.set(positions[i], positions[i + 1], positions[i + 2])
@@ -38,9 +38,9 @@ class LinesGeometry extends BaseLinesGeometry {
 
   computeBoundingBox() {
     const positions = this._positions
-    const box = new THREE.Box3()
+    const box = new Box3()
     const size = this._positions.length
-    const tmpVec = new THREE.Vector3()
+    const tmpVec = new Vector3()
     const posSize = this.getPositionSize()
     for (let i = 0; i < size; i += posSize) {
       tmpVec.set(positions[i], positions[i + 1], positions[i + 2])

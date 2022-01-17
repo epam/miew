@@ -1,7 +1,13 @@
-import * as THREE from 'three'
 import VolumeMaterial from './shaders/VolumeMaterial'
 import meshes from './meshes/meshes'
 import gfxutils from './gfxutils'
+import {
+  BufferAttribute,
+  BufferGeometry,
+  MathUtils,
+  Matrix4,
+  Vector4
+} from 'three'
 
 // Thes geometric far plane is required for correct filling in the BFTexture in case, when far plane cuts the volume
 // cube. In cut place of cube there is no correct data in BFTexture and volume rendering integral is calculated
@@ -16,7 +22,7 @@ class VolumeFarPlane {
     this._plane = new meshes.Mesh(planeGeo, mat)
     this._plane.frustumCulled = false
     this._plane.doubleSided = true
-    const matWorldToVolume = new THREE.Matrix4()
+    const matWorldToVolume = new Matrix4()
 
     this._plane._onBeforeRender = function (
       _renderer,
@@ -32,7 +38,7 @@ class VolumeFarPlane {
       }
 
       // count point in world at farplane place
-      const planeCamPos = new THREE.Vector4(0, 0, -(camera.far - 0.1), 1)
+      const planeCamPos = new Vector4(0, 0, -(camera.far - 0.1), 1)
       planeCamPos.applyMatrix4(camera.matrixWorld)
 
       // recalc matrices to make plane be placed as farplane in the World relative to camera
@@ -53,7 +59,7 @@ class VolumeFarPlane {
       material.uniforms.aspectRatio.value = camera.aspect
       material.uniforms.farZ.value = camera.far
       material.uniforms.tanHalfFOV.value = Math.tan(
-        THREE.MathUtils.DEG2RAD * 0.5 * camera.fov
+        MathUtils.DEG2RAD * 0.5 * camera.fov
       )
       material.uniforms.matWorld2Volume.value = matWorldToVolume
     }
@@ -63,7 +69,7 @@ class VolumeFarPlane {
   }
 
   _initPlaneGeo(width, height) {
-    const planeGeo = new THREE.BufferGeometry()
+    const planeGeo = new BufferGeometry()
 
     width = width || 1
     height = height || 1
@@ -83,7 +89,7 @@ class VolumeFarPlane {
       0
     ])
 
-    planeGeo.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+    planeGeo.setAttribute('position', new BufferAttribute(vertices, 3))
     planeGeo.setIndex([0, 2, 1, 2, 3, 1])
 
     return planeGeo

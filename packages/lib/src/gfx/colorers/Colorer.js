@@ -1,7 +1,7 @@
-import _ from 'lodash'
 import settings from '../../settings'
 import utils from '../../utils'
 import palettes from '../palettes'
+import { merge, isEmpty } from 'lodash'
 
 /**
  * Create new colorer.
@@ -26,7 +26,7 @@ class Colorer {
      * Colorer options inherited (prototyped) from defaults.
      * @type {object}
      */
-    this.opts = _.merge(
+    this.opts = merge(
       utils.deriveDeep(settings.now.colorers[this.id], true),
       opts
     )
@@ -45,7 +45,7 @@ class Colorer {
    */
   identify() {
     const diff = utils.objectsDiff(this.opts, settings.now.colorers[this.id])
-    if (!_.isEmpty(diff)) {
+    if (!isEmpty(diff)) {
       return [this.id, diff]
     }
     return this.id

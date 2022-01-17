@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import Mode from './Mode'
+import { Vector2 } from 'three'
 
 class CartoonMode extends Mode {
   static id = 'CA'
@@ -70,15 +70,15 @@ class CartoonMode extends Mode {
     const tubeRad = this.opts.radius
     const secHeight = this.opts.depth
 
-    this.TUBE_RADIUS = new THREE.Vector2(tubeRad, tubeRad)
-    this.ARROW_END = new THREE.Vector2(secHeight, tubeRad)
+    this.TUBE_RADIUS = new Vector2(tubeRad, tubeRad)
+    this.ARROW_END = new Vector2(secHeight, tubeRad)
     const secCache = {}
     const secData = this.opts.ss
     /* eslint-disable guard-for-in */
     for (const prop in secData) {
       secCache[prop] = {
-        center: new THREE.Vector2(secHeight, secData[prop].width),
-        start: new THREE.Vector2(secHeight, secData[prop].arrow)
+        center: new Vector2(secHeight, secData[prop].width),
+        start: new Vector2(secHeight, secData[prop].arrow)
       }
     }
     this.secCache = secCache

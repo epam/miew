@@ -1,4 +1,11 @@
-import * as THREE from 'three'
+import {
+  DataTexture,
+  NearestFilter,
+  RepeatWrapping,
+  RGBFormat,
+  UnsignedByteType,
+  UVMapping
+} from 'three'
 
 const noiseWidth = 4
 const noiseHeight = 4
@@ -7,17 +14,17 @@ const _noiseData = new Uint8Array([
   0, 160, 4, 0, 226, 46, 0, 224, 211, 0, 3, 157, 0, 174, 247, 0, 12, 182, 0,
   220, 216, 0, 1, 109, 0, 253, 154, 0
 ])
-const _noiseWrapS = THREE.RepeatWrapping
-const _noiseWrapT = THREE.RepeatWrapping
-const _noiseMinFilter = THREE.NearestFilter
-const _noiseMagFilter = THREE.NearestFilter
-const _noiseMapping = THREE.UVMapping
-const noiseTexture = new THREE.DataTexture(
+const _noiseWrapS = RepeatWrapping
+const _noiseWrapT = RepeatWrapping
+const _noiseMinFilter = NearestFilter
+const _noiseMagFilter = NearestFilter
+const _noiseMapping = UVMapping
+const noiseTexture = new DataTexture(
   _noiseData,
   noiseWidth,
   noiseHeight,
-  THREE.RGBFormat,
-  THREE.UnsignedByteType,
+  RGBFormat,
+  UnsignedByteType,
   _noiseMapping,
   _noiseWrapS,
   _noiseWrapT,

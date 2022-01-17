@@ -1,7 +1,7 @@
-import * as THREE from 'three'
 import { Smooth } from '../../../vendors/Smooth'
 import gfxutils from '../../gfxutils'
 import chem from '../../../chem'
+import { Vector2, Vector3 } from 'three'
 
 const { ResidueType } = chem
 
@@ -25,7 +25,7 @@ function _buildStructureInterpolator(points, tension) {
     }
     const newt = transformT(t)
     const ans = path(newt)
-    return new THREE.Vector3(ans[0], ans[1], ans[2])
+    return new Vector3(ans[0], ans[1], ans[2])
   }
 }
 
@@ -180,7 +180,7 @@ class CartoonHelper {
   prepareMatrices(idx, firstRad, secondRad) {
     const mtcCount = this._segmentsCount
     const outMtc = new Array(mtcCount)
-    const currRad = new THREE.Vector2(0, 0)
+    const currRad = new Vector2(0, 0)
 
     const topInterp = this._topInterp
     const cenInterp = this._centerInterp

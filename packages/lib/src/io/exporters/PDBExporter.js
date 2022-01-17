@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { invert } from 'lodash'
 import Complex from '../../chem/Complex'
 import Exporter from './Exporter'
 import PDBResult from './PDBResult'
@@ -150,7 +150,7 @@ export default class PDBExporter extends Exporter {
     const helices = this._source._helices
     for (let i = 0; i < helices.length; i++) {
       const helix = helices[i]
-      const helixClass = _.invert(typeByPDBHelixClass)
+      const helixClass = invert(typeByPDBHelixClass)
       result.newString()
       result.writeString(helix.serial, 10, 8)
       result.writeString(helix.name, 14, 12)

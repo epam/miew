@@ -1,11 +1,11 @@
-import _ from 'lodash'
-import * as THREE from 'three'
+import { BufferAttribute, BufferGeometry, Color } from 'three'
 import utils from '../../utils'
+import { fill } from 'lodash'
 
 const VERTEX_PER_SEGMENT = 2
 const POS_SIZE = 3
 const COL_SIZE = 3
-const tmpColor = new THREE.Color()
+const tmpColor = new Color()
 
 function setArrayXYZ(arr, idx, x, y, z) {
   arr[idx] = x
@@ -28,7 +28,7 @@ function getSubset(arr, startSegmentIdx, segmentsCount, elemSize) {
  * collision geometry.
  */
 
-class ThinLinesGeometry extends THREE.BufferGeometry {
+class ThinLinesGeometry extends BufferGeometry {
   constructor(segmentsCount) {
     super()
     this._initVertices(segmentsCount)
@@ -62,7 +62,7 @@ class ThinLinesGeometry extends THREE.BufferGeometry {
   setOpacity(startSegIdx, endSegIdx, value) {
     const start = startSegIdx * VERTEX_PER_SEGMENT
     const end = endSegIdx * VERTEX_PER_SEGMENT
-    _.fill(this.alpha, value, end, start)
+    fill(this.alpha, value, end, start)
     this.getAttribute('alphaColor').needsUpdate = true
   }
 
@@ -102,16 +102,13 @@ class ThinLinesGeometry extends THREE.BufferGeometry {
     this._positions = utils.allocateTyped(Float32Array, pointsCount * POS_SIZE)
     this._colors = utils.allocateTyped(Float32Array, pointsCount * COL_SIZE)
     const alpha = (this._alpha = utils.allocateTyped(Float32Array, pointsCount))
-    _.fill(alpha, 1.0)
+    fill(alpha, 1.0)
     this.setAttribute(
       'position',
-      new THREE.BufferAttribute(this._positions, POS_SIZE)
+      new BufferAttribute(this._positions, POS_SIZE)
     )
-    this.setAttribute(
-      'color',
-      new THREE.BufferAttribute(this._colors, COL_SIZE)
-    )
-    this.setAttribute('alphaColor', new THREE.BufferAttribute(alpha, 1))
+    this.setAttribute('color', new BufferAttribute(this._colors, COL_SIZE))
+    this.setAttribute('alphaColor', new BufferAttribute(alpha, 1))
   }
 }
 

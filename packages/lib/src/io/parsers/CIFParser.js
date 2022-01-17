@@ -1,9 +1,9 @@
-import * as THREE from 'three'
-import _ from 'lodash'
 import Parser from './Parser'
 import chem from '../../chem'
 import StructuralElement from '../../chem/StructuralElement'
 import readCIF from './readCIF'
+import { isArray, isString } from 'lodash'
+import { Matrix4, Vector3 } from 'three'
 
 const { Complex, Element, Helix, Sheet, Strand, Assembly, Molecule } = chem
 
@@ -39,7 +39,7 @@ function arrize(arrayLikeObject) {
   if (
     arrayLikeObject === null ||
     arrayLikeObject === undefined ||
-    _.isArray(arrayLikeObject)
+    isArray(arrayLikeObject)
   ) {
     return arrayLikeObject
   }
@@ -82,7 +82,7 @@ function _getOperations(operList) {
 
   const ops = []
   for (let i = 0, n = idc.length; i < n; ++i) {
-    const mtx = new THREE.Matrix4()
+    const mtx = new Matrix4()
     const { elements } = mtx
 
     for (let row = 0; row < 3; ++row) {
@@ -98,7 +98,7 @@ function _getOperations(operList) {
 }
 
 function _extractOperations(assemblyGen, opsDict) {
-  assemblyGen = _.isString(assemblyGen) ? assemblyGen : `${assemblyGen}`
+  assemblyGen = isString(assemblyGen) ? assemblyGen : `${assemblyGen}`
   const l = assemblyGen.replace(/\)\s*\(/g, '!').replace(/[()']/g, '')
   const groupStr = l.split('!')
   const gps = []
@@ -128,7 +128,7 @@ function _extractOperations(assemblyGen, opsDict) {
   let cnt = 0
   function traverse(level, mtx) {
     for (let ii = 0, nn = gps[level].length; ii < nn; ++ii) {
-      const newMtx = mtx ? mtx.clone() : new THREE.Matrix4()
+      const newMtx = mtx ? mtx.clone() : new Matrix4()
       newMtx.multiplyMatrices(gps[level][ii], newMtx)
       if (level === 0) {
         matrices[cnt++] = newMtx
@@ -150,7 +150,7 @@ class CIFParser extends Parser {
   }
 
   static canProbablyParse(data) {
-    return _.isString(data) && /^\s*data_/i.test(data)
+    return isString(data) && /^\s*data_/i.test(data)
   }
 
   parseSync() {
@@ -313,7 +313,7 @@ class CIFParser extends Parser {
       const element = elements[i] || nameToElement(name)
       const type = Element.getByName(element)
       const role = Element.Role[name.trim()]
-      const xyz = new THREE.Vector3(x[i], y[i], z[i])
+      const xyz = new Vector3(x[i], y[i], z[i])
       const het = group[i] === 'HETATM' || false
       const serial = serials[i] || i
       const tempFactor = tempFactors[i] || 0.0

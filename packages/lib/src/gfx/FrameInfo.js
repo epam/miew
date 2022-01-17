@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import SecondaryStructureColorer from './colorers/SecondaryStructureColorer'
+import { Vector3 } from 'three'
 
 const cDataOffset = 12
 const cFirstMask = 0x0fffff00
@@ -333,7 +333,7 @@ class FrameInfo {
    * Returns link to atom pos vector, clone it if needed
    */
 
-  static _vec = new THREE.Vector3()
+  static _vec = new Vector3()
 
   getAtomPos(atomIdx) {
     const vec = FrameInfo._vec

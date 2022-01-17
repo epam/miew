@@ -1,19 +1,19 @@
-import * as THREE from 'three'
+import { AxesHelper, PerspectiveCamera, Scene, Vector2 } from 'three'
 
 class Axes {
   constructor(target, targetCamera) {
     this._target = target
     this._targetCamera = targetCamera
-    this._camera = new THREE.PerspectiveCamera(
+    this._camera = new PerspectiveCamera(
       targetCamera.fov,
       targetCamera.aspect,
       1,
       100
     )
-    this._object = new THREE.AxesHelper(1)
-    this._scene = new THREE.Scene()
+    this._object = new AxesHelper(1)
+    this._scene = new Scene()
     this._scene.add(this._object)
-    this._full = new THREE.Vector2()
+    this._full = new Vector2()
 
     this._update()
   }

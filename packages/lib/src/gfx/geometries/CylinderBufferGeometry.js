@@ -1,10 +1,15 @@
-import * as THREE from 'three'
 import utils from '../../utils'
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Uint16BufferAttribute,
+  Vector3
+} from 'three'
 
 const MAX_POINTS_COUNT_16BIT = 65536
 const PTS_PER_TRIANGLE = 3
 
-class CylinderBufferGeometry extends THREE.BufferGeometry {
+class CylinderBufferGeometry extends BufferGeometry {
   constructor(
     radiusTop,
     radiusBottom,
@@ -41,21 +46,21 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
     const heightHalf = height / 2
 
     /* eslint-disable no-magic-numbers */
-    const positions = new THREE.BufferAttribute(
+    const positions = new BufferAttribute(
       utils.allocateTyped(Float32Array, vertexCount * 3),
       3
     )
-    const normals = new THREE.BufferAttribute(
+    const normals = new BufferAttribute(
       utils.allocateTyped(Float32Array, vertexCount * 3),
       3
     )
-    const indices = new THREE.Uint16BufferAttribute(
+    const indices = new Uint16BufferAttribute(
       utils.allocateTyped(Uint16Array, facesCount * PTS_PER_TRIANGLE),
       1
     )
     /* eslint-enable no-magic-numbers */
 
-    const uvs = new THREE.BufferAttribute(
+    const uvs = new BufferAttribute(
       utils.allocateTyped(Float32Array, vertexCount * 2),
       2
     )
@@ -96,7 +101,7 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
         const vy = v * height - heightHalf
         const vz = radius * Math.cos(u * thetaLength + thetaStart)
 
-        const normal = new THREE.Vector3(
+        const normal = new Vector3(
           vx,
           Math.sqrt(vx * vx + vz * vz) * tanTheta,
           vz

@@ -1,11 +1,11 @@
-import * as THREE from 'three'
 import settings from '../settings'
+import { Quaternion, Vector3 } from 'three'
 
 class View {
   constructor() {
-    this.position = new THREE.Vector3(0, 0, 0)
+    this.position = new Vector3(0, 0, 0)
     this.scale = 1
-    this.orientation = new THREE.Quaternion(0, 0, 0, 1)
+    this.orientation = new Quaternion(0, 0, 0, 1)
   }
 
   set(position, scale, orientation) {

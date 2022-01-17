@@ -1,10 +1,11 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
-import * as THREE from 'three'
+
 import vertexShader from './ScreenQuad.vert'
 import fragmentShader from './Anaglyph.frag'
+import { RawShaderMaterial } from 'three'
 
-class AnaglyphMaterial extends THREE.RawShaderMaterial {
+class AnaglyphMaterial extends RawShaderMaterial {
   constructor() {
     super()
     const settings = {

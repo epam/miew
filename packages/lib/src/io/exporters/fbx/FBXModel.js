@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { Vector4 } from 'three'
 
 const FBX_POS_SIZE = 3
 const FBX_NORM_SIZE = 3
@@ -17,7 +17,7 @@ function copyFbxPoint4(src, srcIdx, dst, dstIdx, value) {
   dst[dstIdx + 3] = value
 }
 
-const vector4 = new THREE.Vector4()
+const vector4 = new Vector4()
 function copyTransformedPoint3(src, srcIdx, dst, dstIdx, opts) {
   vector4.set(src[srcIdx], src[srcIdx + 1], src[srcIdx + 2], opts.w)
   vector4.applyMatrix4(opts.matrix)

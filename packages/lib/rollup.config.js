@@ -34,11 +34,7 @@ const config = {
       name: 'Miew',
       file: packageJson.main,
       banner,
-      sourcemap: true,
-      globals: {
-        three: 'THREE',
-        lodash: '_'
-      }
+      sourcemap: true
     },
     {
       format: 'es',

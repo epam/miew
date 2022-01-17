@@ -1,8 +1,8 @@
-import * as THREE from 'three'
+import { Color } from 'three'
 import EntityList from '../utils/EntityList'
 
 function neutralColor(intensity) {
-  return new THREE.Color(intensity, intensity, intensity)
+  return new Color(intensity, intensity, intensity)
 }
 
 const materialList = [

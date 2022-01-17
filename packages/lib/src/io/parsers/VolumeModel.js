@@ -1,6 +1,6 @@
-import * as THREE from 'three'
-import _ from 'lodash'
 import Volume from '../../chem/Volume'
+import { Box3, Vector3 } from 'three'
+import { isArrayBuffer, isTypedArray, pick } from 'lodash'
 
 export const valueType = {
   singular: 0,
@@ -12,29 +12,29 @@ export const valueType = {
 class VolumeModel {
   _xyz2crs = []
 
-  _origin = new THREE.Vector3(0, 0, 0)
+  _origin = new Vector3(0, 0, 0)
 
   constructor() {
     this._header = {}
-    this._boxSize = new THREE.Vector3()
-    this._boxStart = new THREE.Vector3()
+    this._boxSize = new Vector3()
+    this._boxStart = new Vector3()
     this._header.delta = {}
     this._header.extent = []
     this._header.nstart = []
     this._header.grid = []
     this._header.crs2xyz = []
-    this._header.cellDims = new THREE.Vector3()
+    this._header.cellDims = new Vector3()
     this._header.angles = []
-    this._header.origin = new THREE.Vector3(0, 0, 0)
+    this._header.origin = new Vector3(0, 0, 0)
     this._header.dmin = 0
     this._header.dmean = 0
     this._header.dmax = 0
   }
 
   _typedCheck() {
-    if (_.isTypedArray(this._buff)) {
+    if (isTypedArray(this._buff)) {
       this._buff = this._buff.buffer
-    } else if (!_.isArrayBuffer(this._buff)) {
+    } else if (!isArrayBuffer(this._buff)) {
       throw new TypeError('Expected ArrayBuffer or TypedArray')
     }
   }
@@ -109,13 +109,13 @@ class VolumeModel {
       (Math.cos(alpha) - Math.cos(beta) * Math.cos(gamma)) / Math.sin(gamma)
     const z3 = Math.sqrt(1.0 - z1 * z1 - z2 * z2)
 
-    const xaxis = new THREE.Vector3(xScale, 0, 0)
-    const yaxis = new THREE.Vector3(
+    const xaxis = new Vector3(xScale, 0, 0)
+    const yaxis = new Vector3(
       Math.cos(gamma) * yScale,
       Math.sin(gamma) * yScale,
       0
     )
-    const zaxis = new THREE.Vector3(z1 * zScale, z2 * zScale, z3 * zScale)
+    const zaxis = new Vector3(z1 * zScale, z2 * zScale, z3 * zScale)
 
     return [xaxis, yaxis, zaxis]
   }
@@ -129,13 +129,7 @@ class VolumeModel {
   }
 
   _getVolumeInfo() {
-    const volInfo = _.pick(this._header, [
-      'dmean',
-      'dmin',
-      'dmax',
-      'sd',
-      'delta'
-    ])
+    const volInfo = pick(this._header, ['dmean', 'dmin', 'dmax', 'sd', 'delta'])
     volInfo.obtuseAngle = this._header.angles.map((angle) =>
       Number(angle >= Math.PI / 2)
     )
@@ -158,12 +152,12 @@ class VolumeModel {
       shiftY += Math.abs(zaxis.y)
     }
 
-    this._boxStart = new THREE.Vector3(
+    this._boxStart = new Vector3(
       this._origin.x - shiftX,
       this._origin.y - shiftY,
       this._origin.z
     )
-    this._boxSize = new THREE.Vector3(
+    this._boxSize = new Vector3(
       Math.abs(xaxis.x) + Math.abs(yaxis.x) + Math.abs(zaxis.x),
       Math.abs(yaxis.y) + Math.abs(zaxis.y),
       Math.abs(zaxis.z)
@@ -176,7 +170,7 @@ class VolumeModel {
   }
 
   _getXYZbox() {
-    return new THREE.Box3(
+    return new Box3(
       this._boxStart.clone(),
       this._boxStart.clone().add(this._boxSize)
     )

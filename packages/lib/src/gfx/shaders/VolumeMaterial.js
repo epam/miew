@@ -1,6 +1,5 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
-import * as THREE from 'three'
 import vertexVolumeFaces from './VolumeFaces.vert'
 import fragmentVolumeFaces from './VolumeFaces.frag'
 import vertexVolume from './Volume.vert'
@@ -8,18 +7,27 @@ import fragmentVolume from './Volume.frag'
 import vertexFarPlane from './VolumeFarPlane.vert'
 import fragmentFarPlane from './VolumeFarPlane.frag'
 import settings from '../../settings'
+import {
+  BackSide,
+  FrontSide,
+  Matrix4,
+  ShaderMaterial,
+  UniformsUtils,
+  Vector2,
+  Vector3
+} from 'three'
 
-const volumeUniforms = THREE.UniformsUtils.merge([
+const volumeUniforms = UniformsUtils.merge([
   {
-    volumeDim: { type: 'v3', value: new THREE.Vector3(512, 512, 512) },
+    volumeDim: { type: 'v3', value: new Vector3(512, 512, 512) },
     tileTex: { type: 't', value: null },
-    tileTexSize: { type: 'v2', value: new THREE.Vector2(512, 512) },
-    tileStride: { type: 'v2', value: new THREE.Vector2(512, 512) },
+    tileTexSize: { type: 'v2', value: new Vector2(512, 512) },
+    tileStride: { type: 'v2', value: new Vector2(512, 512) },
 
-    boxAngles: { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
-    delta: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
+    boxAngles: { type: 'v3', value: new Vector3(1, 1, 1) },
+    delta: { type: 'v3', value: new Vector3(0, 0, 0) },
 
-    _isoLevel0: { type: 'v2', value: new THREE.Vector3(0.5, 0.75, 1.0) },
+    _isoLevel0: { type: 'v2', value: new Vector3(0.5, 0.75, 1.0) },
     _flipV: { type: 'f', value: 0.0 },
     _BFLeft: { type: 't', value: null },
     _BFRight: { type: 't', value: null },
@@ -31,7 +39,7 @@ const volumeUniforms = THREE.UniformsUtils.merge([
 ])
 
 function overrideUniforms(params, defUniforms) {
-  const uniforms = THREE.UniformsUtils.clone(defUniforms)
+  const uniforms = UniformsUtils.clone(defUniforms)
   for (const p in params) {
     if (uniforms.hasOwnProperty(p)) {
       uniforms[p].value = params[p]
@@ -52,9 +60,9 @@ function facesPosMaterialParams(params, sideType) {
   }
 }
 
-class BackFacePosMaterial extends THREE.ShaderMaterial {
+class BackFacePosMaterial extends ShaderMaterial {
   constructor(params) {
-    const backFaceParams = facesPosMaterialParams(params, THREE.BackSide)
+    const backFaceParams = facesPosMaterialParams(params, BackSide)
     super(backFaceParams)
   }
 }
@@ -67,18 +75,18 @@ class ShaderParams {
     this.transparent = false
     this.depthTest = false
     this.depthWrite = false
-    this.side = THREE.FrontSide
+    this.side = FrontSide
   }
 }
 
-class BackFacePosMaterialFarPlane extends THREE.ShaderMaterial {
+class BackFacePosMaterialFarPlane extends ShaderMaterial {
   constructor(params) {
-    const matUniforms = THREE.UniformsUtils.merge([
+    const matUniforms = UniformsUtils.merge([
       {
         aspectRatio: { type: 'f', value: 0.0 },
         farZ: { type: 'f', value: 0.0 },
         tanHalfFOV: { type: 'f', value: 0.0 },
-        matWorld2Volume: { type: '4fv', value: new THREE.Matrix4() }
+        matWorld2Volume: { type: '4fv', value: new Matrix4() }
       }
     ])
 
@@ -92,14 +100,14 @@ class BackFacePosMaterialFarPlane extends THREE.ShaderMaterial {
   }
 }
 
-class FrontFacePosMaterial extends THREE.ShaderMaterial {
+class FrontFacePosMaterial extends ShaderMaterial {
   constructor(params) {
-    const frontFaceParams = facesPosMaterialParams(params, THREE.FrontSide)
+    const frontFaceParams = facesPosMaterialParams(params, FrontSide)
     super(frontFaceParams)
   }
 }
 
-class VolumeMaterial extends THREE.ShaderMaterial {
+class VolumeMaterial extends ShaderMaterial {
   constructor(params) {
     const shaderParams = new ShaderParams(
       params,

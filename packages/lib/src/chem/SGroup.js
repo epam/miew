@@ -1,11 +1,11 @@
-import * as THREE from 'three'
+import { Vector3 } from 'three'
 
 /**
  * Atom measurements.
  *
  * @param {string} id              - SGroup id
  * @param {string} name            - Name of the group
- * @param {THREE.Vector3} position - Registered coordinates
+ * @param {Vector3} position - Registered coordinates
  * @param {array} atoms            - Atoms group consists of
  * @param {object} saveNode        - XML node from file for saving
  *
@@ -16,7 +16,7 @@ class SGroup {
   constructor(id, name, position, atoms, saveNode) {
     this._id = id
     this._name = name
-    this._position = position || new THREE.Vector3()
+    this._position = position || new Vector3()
     this._atoms = atoms || []
     this._charge = 0 // default group charge
     this._repeat = 1 // how many times group repeated: always > 0
@@ -46,8 +46,8 @@ class SGroup {
       return // nothing to do if we are not relative
     }
 
-    const bLow = new THREE.Vector3(nLimon, nLimon, nLimon)
-    const bHight = new THREE.Vector3(-nLimon, -nLimon, -nLimon)
+    const bLow = new Vector3(nLimon, nLimon, nLimon)
+    const bHight = new Vector3(-nLimon, -nLimon, -nLimon)
     for (let j = 0, n = this._atoms.length; j < n; j++) {
       const aPos = this._atoms[j].position
       bLow.set(

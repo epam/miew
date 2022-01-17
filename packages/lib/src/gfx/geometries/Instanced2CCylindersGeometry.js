@@ -1,12 +1,18 @@
-import _ from 'lodash'
-import * as THREE from 'three'
+import {
+  Color,
+  InstancedBufferAttribute,
+  InstancedBufferGeometry,
+  Matrix4,
+  PlaneBufferGeometry
+} from 'three'
 import utils from '../../utils'
 import gfxutils from '../gfxutils'
 import Simple2CCylindersGeometry from './Simple2CCylindersGeometry'
 import CylinderBufferGeometry from './CylinderBufferGeometry'
+import { fill } from 'lodash'
 
-const tmpColor = new THREE.Color()
-const invMatrix = new THREE.Matrix4()
+const tmpColor = new Color()
+const invMatrix = new Matrix4()
 
 const OFFSET_SIZE = 4
 const COLOR_SIZE = 3
@@ -66,12 +72,12 @@ function _assignOpacity(cylinderInfo, color1, color2) {
     }
   }
 }
-class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
+class Instanced2CCylindersGeometry extends InstancedBufferGeometry {
   constructor(instanceCount, polyComplexity, useZSprites, openEnded) {
     super()
     this._useZSprites = useZSprites
     this._cylGeometry = useZSprites
-      ? new THREE.PlaneBufferGeometry(2, 2, 1, 1)
+      ? new PlaneBufferGeometry(2, 2, 1, 1)
       : new CylinderBufferGeometry(
           1,
           1,
@@ -163,7 +169,7 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
     const info = _prepareCylinderInfo(chunkIndices)
     const cylinderIndices = info.indices
     const instanceCount = cylinderIndices.length
-    const geom = new THREE.InstancedBufferGeometry()
+    const geom = new InstancedBufferGeometry()
     this._init.call(geom, instanceCount, this._cylGeometry, this._useZSprites)
 
     copySubArrays(
@@ -238,47 +244,32 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
       Float32Array,
       instanceCount
     ))
-    _.fill(alpha, 1.0)
+    fill(alpha, 1.0)
 
     this.setAttribute(
       'matVector1',
-      new THREE.InstancedBufferAttribute(
-        this._matVector1,
-        OFFSET_SIZE,
-        false,
-        1
-      )
+      new InstancedBufferAttribute(this._matVector1, OFFSET_SIZE, false, 1)
     )
     this.setAttribute(
       'matVector2',
-      new THREE.InstancedBufferAttribute(
-        this._matVector2,
-        OFFSET_SIZE,
-        false,
-        1
-      )
+      new InstancedBufferAttribute(this._matVector2, OFFSET_SIZE, false, 1)
     )
     this.setAttribute(
       'matVector3',
-      new THREE.InstancedBufferAttribute(
-        this._matVector3,
-        OFFSET_SIZE,
-        false,
-        1
-      )
+      new InstancedBufferAttribute(this._matVector3, OFFSET_SIZE, false, 1)
     )
     this.setAttribute(
       'color',
-      new THREE.InstancedBufferAttribute(this._color1, COLOR_SIZE, false, 1)
+      new InstancedBufferAttribute(this._color1, COLOR_SIZE, false, 1)
     )
     this.setAttribute(
       'color2',
-      new THREE.InstancedBufferAttribute(this._color2, COLOR_SIZE, false, 1)
+      new InstancedBufferAttribute(this._color2, COLOR_SIZE, false, 1)
     )
 
     this.setAttribute(
       'alphaColor',
-      new THREE.InstancedBufferAttribute(this._alpha, 1, false, 1)
+      new InstancedBufferAttribute(this._alpha, 1, false, 1)
     )
 
     if (useZSprites) {
@@ -297,30 +288,15 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
 
       this.setAttribute(
         'invmatVector1',
-        new THREE.InstancedBufferAttribute(
-          this._invmatVector1,
-          OFFSET_SIZE,
-          false,
-          1
-        )
+        new InstancedBufferAttribute(this._invmatVector1, OFFSET_SIZE, false, 1)
       )
       this.setAttribute(
         'invmatVector2',
-        new THREE.InstancedBufferAttribute(
-          this._invmatVector2,
-          OFFSET_SIZE,
-          false,
-          1
-        )
+        new InstancedBufferAttribute(this._invmatVector2, OFFSET_SIZE, false, 1)
       )
       this.setAttribute(
         'invmatVector3',
-        new THREE.InstancedBufferAttribute(
-          this._invmatVector3,
-          OFFSET_SIZE,
-          false,
-          1
-        )
+        new InstancedBufferAttribute(this._invmatVector3, OFFSET_SIZE, false, 1)
       )
     }
   }
