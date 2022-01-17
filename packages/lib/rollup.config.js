@@ -100,7 +100,7 @@ const config = {
     cleanup({
       extensions: extensions.map((ext) => ext.trimStart('.')),
       comments: 'none',
-      include: ['./src/**/*']
+      include: includePattern
     }),
     ...(isProduction ? [strip({ include: includePattern })] : [])
   ]
