@@ -4,7 +4,7 @@ import $ from 'jquery'
 import _ from 'lodash'
 // waiting for fix https://github.com/benmosher/eslint-plugin-import/issues/1712
 // eslint-disable-next-line import/no-extraneous-dependencies
-import Miew from 'Miew' // eslint-disable-line import/no-unresolved
+import Miew from 'miew' // eslint-disable-line import/no-unresolved
 import menuHtml from '../../menu.html'
 import 'bootstrap'
 import 'bootstrap-switch'

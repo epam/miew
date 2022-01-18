@@ -61,11 +61,6 @@ const configure = (prod) => ({
       }
     ]
   },
-  resolve: {
-    alias: {
-      Miew: path.resolve(__dirname, '../packages/lib/src/index.js')
-    }
-  },
   plugins: [
     new webpack.DefinePlugin({
       PACKAGE_VERSION: JSON.stringify(version.combined),
