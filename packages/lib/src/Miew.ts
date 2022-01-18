@@ -4496,19 +4496,6 @@ assign(
     gfx: {
       Representation
     }
-
-    /**
-     * Third-party libraries packaged together with Miew.
-     *
-     * @property {object} lodash - [Lodash](https://lodash.com/), a modern JavaScript utility library delivering
-     *   modularity, performance & extras.
-     * @property {object} three - [js](https://threejs.org/), JavaScript 3D library.
-     *
-     * @example
-     * var _ = Miew.thirdParty.lodash;
-     * var opts = merge({ ... }, Miew.options.fromURL(window.location.search));
-     * var miew = new Miew(opts);
-     */
   }
 )
 
