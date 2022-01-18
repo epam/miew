@@ -48,6 +48,7 @@ const config = {
     commonjs({ sourceMap: false }),
     replace(
       {
+        preventAssignment: true,
         'process.env.NODE_ENV': JSON.stringify(
           isProduction ? mode.PRODUCTION : mode.DEVELOPMENT
         ),
@@ -73,7 +74,7 @@ const config = {
       targets: [{ src: 'src/style/*.svg', dest: 'dist' }]
     }),
     cleanup({
-      extensions: extensions.map(ext => ext.trimStart('.')),
+      extensions: extensions.map((ext) => ext.trimStart('.')),
       comments: 'none'
     }),
     ...(isProduction ? [strip({ include: 'src/**/*.{js,jsx,ts,tsx}' })] : [])

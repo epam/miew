@@ -42,7 +42,11 @@ const config = {
       name: 'Miew',
       file: packageJson.main,
       banner,
-      sourcemap: true
+      sourcemap: true,
+      globals: {
+        three: 'THREE',
+        lodash: '_'
+      }
     },
     {
       format: 'es',
@@ -56,7 +60,11 @@ const config = {
       name: 'miew',
       plugins: [terser()],
       banner,
-      sourcemap: true
+      sourcemap: true,
+      globals: {
+        three: 'THREE',
+        lodash: '_'
+      }
     }
   ],
   onwarn(warning, warn) {
