@@ -1,7 +1,7 @@
-import * as THREE from 'three'
-import _ from 'lodash'
+import { isString } from 'lodash'
 import Parser from './Parser'
 import chem from '../../chem'
+import { Vector3 } from 'three'
 
 const { Complex, Element, Molecule } = chem
 
@@ -17,7 +17,7 @@ class XYZParser extends Parser {
   }
 
   static canProbablyParse(data) {
-    return _.isString(data) && /^\s*\d+ *\n[^\n]*\n\s*\w{1,3}\s+-?\d/.test(data)
+    return isString(data) && /^\s*\d+ *\n[^\n]*\n\s*\w{1,3}\s+-?\d/.test(data)
   }
 
   _parseToAtomsInf(source) {
@@ -64,7 +64,7 @@ class XYZParser extends Parser {
 
       const serial = i + 1
       const name = words[0]
-      const xyz = new THREE.Vector3(
+      const xyz = new Vector3(
         parseFloat(words[1]),
         parseFloat(words[2]),
         parseFloat(words[3])

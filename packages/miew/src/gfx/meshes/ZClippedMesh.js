@@ -1,23 +1,23 @@
-import * as THREE from 'three'
 import UberObject from './UberObject'
+import { Matrix4, Mesh, Vector3 } from 'three'
 
-const Mesh = UberObject(THREE.Mesh)
+const OurMesh = UberObject(Mesh)
 
-class ZClippedMesh extends Mesh {
+class ZClippedMesh extends OurMesh {
   constructor(geometry, material) {
     super(geometry, material)
     this.castShadow = true
     this.receiveShadow = true
   }
 
-  static _mvLength = new THREE.Vector3()
+  static _mvLength = new Vector3()
 
-  static _center = new THREE.Vector3()
+  static _center = new Vector3()
 
-  static _modelView = new THREE.Matrix4()
+  static _modelView = new Matrix4()
 
   _onBeforeRender(renderer, scene, camera) {
-    Mesh.prototype._onBeforeRender.call(this, renderer, scene, camera)
+    OurMesh.prototype._onBeforeRender.call(this, renderer, scene, camera)
 
     const geo = this.geometry
     const { material } = this

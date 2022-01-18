@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai'
 import dirtyChai from 'dirty-chai'
-import _ from 'lodash'
+import { clone } from 'lodash'
 import utils from './utils'
 
 chai.use(dirtyChai)
@@ -156,7 +156,7 @@ describe('utils.objectsDiff()', () => {
     date: new Date(1522576800)
   }
 
-  ref.deep = { inside: _.clone(ref) }
+  ref.deep = { inside: clone(ref) }
 
   const expectSame = (o) => {
     expect(objectsDiff(o, ref)).to.deep.equal(o)
@@ -168,9 +168,9 @@ describe('utils.objectsDiff()', () => {
 
   it('ignores the same value', () => {
     expectEmpty({ num: ref.num })
-    expectEmpty({ obj: _.clone(ref.obj) })
-    expectEmpty({ array: _.clone(ref.array) })
-    expectEmpty({ date: _.clone(ref.date) })
+    expectEmpty({ obj: clone(ref.obj) })
+    expectEmpty({ array: clone(ref.array) })
+    expectEmpty({ date: clone(ref.date) })
   })
 
   it('detects a changed value', () => {
@@ -189,9 +189,9 @@ describe('utils.objectsDiff()', () => {
 
   it('deeply ignores the same value', () => {
     expectEmpty({ deep: { inside: { num: ref.num } } })
-    expectEmpty({ deep: { inside: { obj: _.clone(ref.obj) } } })
-    expectEmpty({ deep: { inside: { array: _.clone(ref.array) } } })
-    expectEmpty({ deep: { inside: { date: _.clone(ref.date) } } })
+    expectEmpty({ deep: { inside: { obj: clone(ref.obj) } } })
+    expectEmpty({ deep: { inside: { array: clone(ref.array) } } })
+    expectEmpty({ deep: { inside: { date: clone(ref.date) } } })
   })
 
   it('deeply detects a changed value', () => {

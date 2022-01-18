@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isBoolean, isUndefined, isNumber, isString } from 'lodash'
 import { Matrix4 } from 'three'
 
 export default class PDBResult {
@@ -30,12 +30,12 @@ export default class PDBResult {
     } else {
       this._tag = tag
     }
-    if (!_.isUndefined(numeration)) {
-      if (_.isNumber(numeration)) {
+    if (!isUndefined(numeration)) {
+      if (isNumber(numeration)) {
         this._tagStrNum = numeration
         this._numeration = true
         this._fixedNumeration = true
-      } else if (_.isBoolean(numeration)) {
+      } else if (isBoolean(numeration)) {
         this._tagStrNum = 0
         this._numeration = numeration
         this._fixedNumeration = false
@@ -94,19 +94,19 @@ export default class PDBResult {
 
     const curStrLength = curStr ? curStr.length : 0
 
-    if (_.isUndefined(string)) {
+    if (isUndefined(string)) {
       return
     }
 
-    if (!_.isNumber(begin)) {
+    if (!isNumber(begin)) {
       begin = curStrLength + 1
     }
 
-    if (!_.isNumber(end)) {
+    if (!isNumber(end)) {
       end = curStrLength + string.length
     }
 
-    if (!_.isString(string)) {
+    if (!isString(string)) {
       str = string.toString()
     } else {
       str = string

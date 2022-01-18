@@ -1,5 +1,3 @@
-import _ from 'lodash'
-import * as THREE from 'three'
 import utils from './utils'
 import logger from './utils/logger'
 import chem from './chem'
@@ -13,6 +11,8 @@ import Representation from './gfx/Representation'
 import Visual from './Visual'
 import ComplexVisualEdit from './ComplexVisualEdit'
 import meshutils from './gfx/meshutils'
+import { isEmpty, merge } from 'lodash'
+import { Group, Mesh } from 'three'
 
 const { selectors } = chem
 
@@ -40,7 +40,7 @@ class ComplexVisual extends Visual {
     this._reprUsedBits = 0
     this._selectionCount = 0
 
-    this._selectionGeometry = new THREE.Group()
+    this._selectionGeometry = new Group()
   }
 
   getBoundaries() {
@@ -198,7 +198,7 @@ class ComplexVisual extends Visual {
       )
 
       // something was changed
-      if (!_.isEmpty(diff)) {
+      if (!isEmpty(diff)) {
         target.needsRebuild = true
         for (const key in diff) {
           if (diff.hasOwnProperty(key)) {
@@ -279,7 +279,7 @@ class ComplexVisual extends Visual {
 
     // Fill in default values
     const def = settings.now.presets.default[0]
-    const desc = _.merge(
+    const desc = merge(
       {
         selector: def.selector,
         mode: def.mode,
@@ -859,7 +859,7 @@ class ComplexVisual extends Visual {
       rep.material.setValues(values)
       if (needTraverse) {
         rep.geo.traverse((object) => {
-          if (object instanceof THREE.Mesh) {
+          if (object instanceof Mesh) {
             object.material.setValues(values)
 
             if (process !== undefined) {

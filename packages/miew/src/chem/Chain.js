@@ -1,6 +1,6 @@
-import * as THREE from 'three'
 import Residue from './Residue'
 import ResidueType from './ResidueType'
+import { Vector3 } from 'three'
 
 /**
  * Residues in chain are either amino acid either nucleic acid (and water)
@@ -105,9 +105,9 @@ class Chain {
     // fix very first wing
     if (residues.length > 1 && residues[1]._wingVector) {
       const p = residues[1]._wingVector
-      residues[0]._wingVector = new THREE.Vector3(p.x, p.y, p.z)
+      residues[0]._wingVector = new Vector3(p.x, p.y, p.z)
     } else if (residues.length > 0) {
-      residues[0]._wingVector = new THREE.Vector3(1, 0, 0)
+      residues[0]._wingVector = new Vector3(1, 0, 0)
     }
   }
 
@@ -138,9 +138,7 @@ class Chain {
     }
 
     frameRes[residues[0]._index]._wingVector =
-      n > 1
-        ? frameRes[residues[1]._index]._wingVector
-        : new THREE.Vector3(1, 0, 0)
+      n > 1 ? frameRes[residues[1]._index]._wingVector : new Vector3(1, 0, 0)
   }
 
   /**

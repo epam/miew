@@ -1,5 +1,11 @@
-import * as THREE from 'three'
 import gfxutils from './gfxutils'
+import {
+  BufferAttribute,
+  BufferGeometry,
+  LineBasicMaterial,
+  LineSegments,
+  Vector3
+} from 'three'
 
 function _flattenArray(input) {
   const n = input.length
@@ -26,24 +32,20 @@ class VolumeBounds {
     const { delta } = volInfo // {x: XY, y : XZ, z: YZ}
     const { obtuseAngle } = volInfo // 1 - obtuse, 0 - acute
 
-    const bSize = new THREE.Vector3()
+    const bSize = new Vector3()
     bBox.getSize(bSize)
     bSize.multiplyScalar(0.5)
 
     const offsetVert = this._getBaseVertices(delta, obtuseAngle)
 
-    const geometry = new THREE.BufferGeometry()
+    const geometry = new BufferGeometry()
     const vertices = []
 
     for (let i = 0; i < 4; i++) {
       vertices.push(offsetVert[i].clone().multiply(bSize))
       vertices.push(offsetVert[(i + 1) % 4].clone().multiply(bSize))
     }
-    const translation = new THREE.Vector3(
-      2 * bSize.x * (1 - delta.x - delta.y),
-      0,
-      0
-    )
+    const translation = new Vector3(2 * bSize.x * (1 - delta.x - delta.y), 0, 0)
     for (let i = 0; i < 8; i++) {
       vertices.push(vertices[i].clone().add(translation))
     }
@@ -51,19 +53,16 @@ class VolumeBounds {
       vertices.push(vertices[i * 2].clone())
       vertices.push(vertices[i * 2 + 8].clone())
     }
-    const center = new THREE.Vector3()
+    const center = new Vector3()
     bBox.getCenter(center)
     vertices.forEach((vertex) => vertex.add(center)) // pivot shift
 
     const flatVertices = _flattenArray(vertices)
-    geometry.setAttribute(
-      'position',
-      new THREE.BufferAttribute(flatVertices, 3)
-    )
+    geometry.setAttribute('position', new BufferAttribute(flatVertices, 3))
 
-    this._lines = new THREE.LineSegments(
+    this._lines = new LineSegments(
       geometry,
-      new THREE.LineBasicMaterial({ color: 0xffffff })
+      new LineBasicMaterial({ color: 0xffffff })
     )
     this._lines.layers.set(gfxutils.LAYERS.VOLUME)
   }
@@ -81,22 +80,22 @@ class VolumeBounds {
     }
 
     const offsetVert = [
-      new THREE.Vector3(
+      new Vector3(
         -1 + 2 * (proj('XZ', 1) + proj('XY', 1)),
         -1 + 2 * proj('YZ', 1),
         -1
       ),
-      new THREE.Vector3(
+      new Vector3(
         -1 + 2 * (proj('XZ', -1) + proj('XY', 1)),
         -1 + 2 * proj('YZ', -1),
         1
       ),
-      new THREE.Vector3(
+      new Vector3(
         -1 + 2 * (proj('XZ', -1) + proj('XY', -1)),
         1 - 2 * proj('YZ', 1),
         1
       ),
-      new THREE.Vector3(
+      new Vector3(
         -1 + 2 * (proj('XZ', 1) + proj('XY', -1)),
         1 - 2 * proj('YZ', -1),
         -1

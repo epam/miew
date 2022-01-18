@@ -1,10 +1,10 @@
-import * as THREE from 'three'
-import _ from 'lodash'
+import { isString, isUndefined } from 'lodash'
 import Parser from './Parser'
 import chem from '../../chem'
 import Remark290 from './pdb/Remark290'
 import Remark350 from './pdb/Remark350'
 import PDBStream from './PDBStream'
+import { Vector3 } from 'three'
 
 const { Complex, Element, Helix, Sheet, Strand, Bond, Molecule } = chem
 
@@ -61,7 +61,7 @@ class PDBParser extends Parser {
   }
 
   static canProbablyParse(data) {
-    return _.isString(data) && pdbStartRegexp.test(data)
+    return isString(data) && pdbStartRegexp.test(data)
   }
 
   _finalize() {
@@ -70,12 +70,12 @@ class PDBParser extends Parser {
 
     // keep crystallographic symmetry transformations
     const remark290 = this._remarks[290]
-    this._complex.symmetry = _.isUndefined(remark290) ? [] : remark290.matrices
+    this._complex.symmetry = isUndefined(remark290) ? [] : remark290.matrices
 
     // add loaded biological assemblies
     const remark350 = this._remarks[350]
     this._complex.units = this._complex.units.concat(
-      _.isUndefined(remark350) ? [] : remark350.assemblies
+      isUndefined(remark350) ? [] : remark350.assemblies
     )
 
     // add loaded macromolecules
@@ -207,7 +207,7 @@ class PDBParser extends Parser {
       this._residue = residue = chain.addResidue(resName, resSeq, iCode)
     }
 
-    const xyz = new THREE.Vector3(x, y, z)
+    const xyz = new Vector3(x, y, z)
     residue.addAtom(
       name,
       type,
@@ -293,7 +293,7 @@ class PDBParser extends Parser {
 
     // create remark parser if needed
     let remark = this._remarks[remarkNum]
-    if (_.isUndefined(remark)) {
+    if (isUndefined(remark)) {
       const RemarkParser = remarkParsers[remarkNum]
       if (typeof RemarkParser === 'function') {
         this._remarks[remarkNum] = remark = new RemarkParser(this._complex)
@@ -301,7 +301,7 @@ class PDBParser extends Parser {
     }
 
     // delegate parsing
-    if (!_.isUndefined(remark)) {
+    if (!isUndefined(remark)) {
       remark.parse(stream)
     }
   }

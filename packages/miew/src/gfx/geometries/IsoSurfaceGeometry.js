@@ -1,9 +1,9 @@
-import * as THREE from 'three'
+import { BufferGeometry, Color } from 'three'
 import utils from '../../utils'
 
 const POS_RAD_SIZE = 4
 const COLOR_SIZE = 3
-const tmpColor = new THREE.Color()
+const tmpColor = new Color()
 
 /**
  * This is a base class for isosurface algorithms.
@@ -11,7 +11,7 @@ const tmpColor = new THREE.Color()
  * @param opts - geometry specific options
  * @constructor
  */
-class IsoSurfaceGeometry extends THREE.BufferGeometry {
+class IsoSurfaceGeometry extends BufferGeometry {
   constructor(spheresCount, opts) {
     super()
 

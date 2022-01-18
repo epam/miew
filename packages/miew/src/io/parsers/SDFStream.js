@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isUndefined } from 'lodash'
 
 export default class SDFStream {
   constructor(data) {
@@ -33,7 +33,7 @@ export default class SDFStream {
   findNextDataItem() {
     let curStr = this.getNextString()
     let res = false
-    while (!_.isUndefined(curStr) && curStr.trim() !== '$$$$') {
+    while (!isUndefined(curStr) && curStr.trim() !== '$$$$') {
       if (curStr.match(/>\s+<(.*)>/)) {
         res = true
         break
@@ -46,7 +46,7 @@ export default class SDFStream {
 
   findNextCompoundStart() {
     let curStr = this.getCurrentString()
-    while (!_.isUndefined(curStr) && curStr.trim() !== '$$$$') {
+    while (!isUndefined(curStr) && curStr.trim() !== '$$$$') {
       curStr = this.getNextString()
     }
     this.setStart(++this._currentStringIndx)

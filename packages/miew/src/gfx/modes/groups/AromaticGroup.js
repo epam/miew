@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import AtomsGroup from './AtomsGroup'
+import { Vector3 } from 'three'
 
 function _slerp(omega, v1, v2, t) {
   const oSin = Math.sin(omega)
@@ -13,8 +13,8 @@ class AromaticGroup extends AtomsGroup {
   _buildInner(radOffset, addChunk) {
     const chunksToIdx = this._selection.chunks
 
-    const prevVector = new THREE.Vector3()
-    const currVector = new THREE.Vector3()
+    const prevVector = new Vector3()
+    const currVector = new Vector3()
     const segmentsHeight = this._segmentsHeight
     const leprStep = 1.0 / segmentsHeight
     const colorer = this._colorer

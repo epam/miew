@@ -1,10 +1,11 @@
 /* eslint-disable no-magic-numbers */
 /* eslint-disable guard-for-in */
-import * as THREE from 'three'
+
 import vertexShader from './ScreenQuad.vert'
 import fragmentShader from './FXAA.frag'
+import { RawShaderMaterial, Vector2, Color } from 'three'
 
-class FXAAMaterial extends THREE.RawShaderMaterial {
+class FXAAMaterial extends RawShaderMaterial {
   constructor(params) {
     super(params)
 
@@ -14,9 +15,9 @@ class FXAAMaterial extends THREE.RawShaderMaterial {
         srcTex: { type: 't', value: null },
         srcTexelSize: {
           type: 'v2',
-          value: new THREE.Vector2(1.0 / 512.0, 1.0 / 512.0)
+          value: new Vector2(1.0 / 512.0, 1.0 / 512.0)
         },
-        bgColor: { type: 'c', value: new THREE.Color(0xffffff) }
+        bgColor: { type: 'c', value: new Color(0xffffff) }
       },
       vertexShader,
       fragmentShader,

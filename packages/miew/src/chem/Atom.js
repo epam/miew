@@ -4,7 +4,7 @@
  * @param {Residue} residue    - (required) Residue containing the atom
  * @param {string} name        - (required) Name, unique in the residue
  * @param {Element} type       - (required) Chemical element reference
- * @param {THREE.Vector3} position - Registered coordinates
+ * @param {Vector3} position - Registered coordinates
  *
  * @param {number} role        - Role of atom inside monomer: Lead and wing are particularity interesting
  * @param {boolean} het        - Non-standard residue indicator

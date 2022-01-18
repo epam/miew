@@ -1,5 +1,5 @@
-import * as THREE from 'three'
 import utils from '../../utils'
+import { Vector3 } from 'three'
 
 // suppress some JSHint warnings
 /* jshint bitwise: false */
@@ -18,8 +18,8 @@ class IsosurfaceBuildNormals {
   constructor(numAtoms, atoms, vBoxMin, vBoxMax, probeRadius) {
     this._numAtoms = numAtoms
     this._atoms = atoms
-    this._vBoxMin = new THREE.Vector3()
-    this._vBoxMax = new THREE.Vector3()
+    this._vBoxMin = new Vector3()
+    this._vBoxMax = new Vector3()
     this._vBoxMin.copy(vBoxMin)
     this._vBoxMax.copy(vBoxMax)
     this._probeRadius = probeRadius

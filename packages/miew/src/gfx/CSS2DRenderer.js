@@ -2,10 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import * as THREE from 'three'
 import CSS2DObject from './CSS2DObject'
+import { Matrix4, Vector3, Color, MathUtils } from 'three'
 
-const tempColor = new THREE.Color()
+const tempColor = new Color()
 
 class CSS2DRenderer {
   constructor() {
@@ -14,9 +14,9 @@ class CSS2DRenderer {
     this._widthHalf = 0
     this._heightHalf = 0
 
-    this._vector = new THREE.Vector3()
-    this._viewMatrix = new THREE.Matrix4()
-    this._projectionMatrix = new THREE.Matrix4()
+    this._vector = new Vector3()
+    this._viewMatrix = new Matrix4()
+    this._projectionMatrix = new Matrix4()
 
     this._domElement = document.createElement('div')
     this._domElement.style.overflow = 'hidden'
@@ -67,7 +67,7 @@ class CSS2DRenderer {
         object.userData !== undefined &&
         object.userData.offset !== undefined
       ) {
-        const localOffset = new THREE.Vector3(
+        const localOffset = new Vector3(
           object.userData.offset.x,
           object.userData.offset.y,
           0
@@ -90,7 +90,7 @@ class CSS2DRenderer {
           element.style.background = colorAsHex(object.userData.background)
         }
       } else {
-        const fogFactor = THREE.MathUtils.smoothstep(
+        const fogFactor = MathUtils.smoothstep(
           -this._vector.z,
           scene.fog.near,
           scene.fog.far

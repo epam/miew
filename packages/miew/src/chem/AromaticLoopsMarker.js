@@ -1,6 +1,6 @@
-import * as THREE from 'three'
 import Bond from './Bond'
 import Element from './Element'
+import { MathUtils, Vector3 } from 'three'
 
 const cCrossThresh = 0.1
 const cAromaticType = Bond.BondType.AROMATIC
@@ -18,9 +18,9 @@ const cAromaticAtoms = [
  */
 
 const _coDirVectors = (function () {
-  const v1Tmp = new THREE.Vector3()
-  const v2Tmp = new THREE.Vector3()
-  const cp = new THREE.Vector3()
+  const v1Tmp = new Vector3()
+  const v2Tmp = new Vector3()
+  const cp = new Vector3()
   return function (v1, v2) {
     v1Tmp.copy(v1).normalize()
     v2Tmp.copy(v2).normalize()
@@ -47,7 +47,7 @@ function _anotherAtom(bond, currAtom) {
 
 function _cosBetween(v1, v2) {
   const theta = v1.dot(v2) / Math.sqrt(v1.lengthSq() * v2.lengthSq())
-  return THREE.MathUtils.clamp(theta, -1, 1)
+  return MathUtils.clamp(theta, -1, 1)
 }
 
 function _markAromatic(bond) {
@@ -62,7 +62,7 @@ class Cycle {
 
   update() {
     const { atoms } = this
-    const center = new THREE.Vector3()
+    const center = new Vector3()
     const nA = atoms.length
     for (let j = 0; j < nA; ++j) {
       center.add(atoms[j].position)
@@ -215,7 +215,7 @@ class AromaticLoopsMarker {
   _startCycle(bond) {
     // start from left to right
     this._currStart = bond._left
-    if (this._tryBond(bond, bond._right, new THREE.Vector3())) {
+    if (this._tryBond(bond, bond._right, new Vector3())) {
       _insertAscending(this._bondsData[bond._index], this._currIdx)
       this._cycles[this._currIdx].push(bond._left)
     }

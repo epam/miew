@@ -1,9 +1,9 @@
-import _ from 'lodash'
-import * as THREE from 'three'
 import CSS2DObject from '../CSS2DObject'
 import utils from '../../utils'
+import { Group } from 'three'
+import { clone } from 'lodash'
 
-class TextMesh extends THREE.Group {
+class TextMesh extends Group {
   constructor(geometry, _material) {
     super()
     this.geometry = geometry
@@ -29,7 +29,7 @@ class TextMesh extends THREE.Group {
       }
       const item = utils.shallowCloneNode(srcItem)
       const label = new CSS2DObject(item)
-      label.userData = _.clone(userData)
+      label.userData = clone(userData)
       const el = label.getElement()
       el.style.visibility = 'visible'
       label.source = srcItem

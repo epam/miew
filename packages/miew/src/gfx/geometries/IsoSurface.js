@@ -1,6 +1,6 @@
-import * as THREE from 'three'
 import IsoSurfaceMarchCube from './IsoSurfaceMarchCube'
 import utils from '../../utils'
+import { BufferAttribute, BufferGeometry, Matrix3, Vector3 } from 'three'
 
 const edgeTable = [
   0x0, 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c, 0x80c, 0x905, 0xa0f,
@@ -42,8 +42,8 @@ class GridCell {
     this.g = new Array(this._arrSize)
     this.val = new Array(this._arrSize)
     for (let i = 0; i < this._arrSize; ++i) {
-      this.p[i] = new THREE.Vector3()
-      this.g[i] = new THREE.Vector3()
+      this.p[i] = new Vector3()
+      this.g[i] = new Vector3()
     }
     this.cubeIndex = 0
   }
@@ -53,18 +53,18 @@ class GridCell {
 class Triangle {
   constructor() {
     this.a = {
-      p: new THREE.Vector3(),
-      n: new THREE.Vector3()
+      p: new Vector3(),
+      n: new Vector3()
     }
 
     this.b = {
-      p: new THREE.Vector3(),
-      n: new THREE.Vector3()
+      p: new Vector3(),
+      n: new Vector3()
     }
 
     this.c = {
-      p: new THREE.Vector3(),
-      n: new THREE.Vector3()
+      p: new Vector3(),
+      n: new Vector3()
     }
   }
 }
@@ -72,7 +72,7 @@ class Triangle {
 function createArray(arrSize) {
   const arr = new Array(arrSize)
   for (let i = 0; i < arrSize; ++i) {
-    arr[i] = new THREE.Vector3()
+    arr[i] = new Vector3()
   }
 
   return arr
@@ -87,12 +87,12 @@ class IsoSurface {
     this._colors = null
     this._indices = []
     this._volumetricData = null
-    this._xAxis = new THREE.Vector3()
-    this._yAxis = new THREE.Vector3()
-    this._zAxis = new THREE.Vector3()
-    this._xDir = new THREE.Vector3()
-    this._yDir = new THREE.Vector3()
-    this._zDir = new THREE.Vector3()
+    this._xAxis = new Vector3()
+    this._yAxis = new Vector3()
+    this._zAxis = new Vector3()
+    this._xDir = new Vector3()
+    this._yDir = new Vector3()
+    this._zDir = new Vector3()
   }
 
   _prepareAxesAndDirs() {
@@ -117,7 +117,7 @@ class IsoSurface {
     zDir.set(0, 0, 1)
 
     // flip normals if coordinate system is in the wrong handedness
-    const tmp = new THREE.Vector3()
+    const tmp = new Vector3()
     tmp.crossVectors(xDir, yDir)
     if (tmp.dot(zDir) < 0) {
       xDir.negate()
@@ -240,14 +240,14 @@ class IsoSurface {
     const gcVal = gc.val
     const gcValSize = gc.val.length
     const additions = [
-      new THREE.Vector3(0, 0, 0), // 0
-      new THREE.Vector3(step, 0, 0), // 1
-      new THREE.Vector3(step, step, 0), // 2
-      new THREE.Vector3(0, step, 0), // 3
-      new THREE.Vector3(0, 0, step), // 4
-      new THREE.Vector3(step, 0, step), // 5
-      new THREE.Vector3(step, step, step), // 6
-      new THREE.Vector3(0, step, step) // 7
+      new Vector3(0, 0, 0), // 0
+      new Vector3(step, 0, 0), // 1
+      new Vector3(step, step, 0), // 2
+      new Vector3(0, step, 0), // 3
+      new Vector3(0, 0, step), // 4
+      new Vector3(step, 0, step), // 5
+      new Vector3(step, step, step), // 6
+      new Vector3(0, step, step) // 7
     ]
 
     const tmpTriCount = 5
@@ -263,11 +263,7 @@ class IsoSurface {
     if (appendSimple) {
       // Special case for axis-aligned grid with positive unit vector normals
       appendVertex = (function () {
-        const axis = new THREE.Vector3(
-          self._xAxis.x,
-          self._yAxis.y,
-          self._zAxis.z
-        )
+        const axis = new Vector3(self._xAxis.x, self._yAxis.y, self._zAxis.z)
         return function (triVertex) {
           const vertex = triVertex.p.clone()
           vertex.multiply(axis)
@@ -277,7 +273,7 @@ class IsoSurface {
       })()
     } else {
       appendVertex = (function () {
-        const posMtx = new THREE.Matrix3()
+        const posMtx = new Matrix3()
         posMtx.set(
           self._xAxis.x,
           self._yAxis.x,
@@ -289,7 +285,7 @@ class IsoSurface {
           self._yAxis.z,
           self._zAxis.z
         )
-        const normMtx = new THREE.Matrix3()
+        const normMtx = new Matrix3()
         normMtx.set(
           self._xDir.x,
           self._yDir.x,
@@ -654,11 +650,11 @@ class IsoSurface {
   }
 
   toMesh() {
-    const geo = new THREE.BufferGeometry()
-    geo.setIndex(new THREE.BufferAttribute(this._indices, 1))
-    geo.setAttribute('position', new THREE.BufferAttribute(this._position, 3))
-    geo.setAttribute('normal', new THREE.BufferAttribute(this._normals, 3))
-    geo.setAttribute('color', new THREE.BufferAttribute(this._colors, 3))
+    const geo = new BufferGeometry()
+    geo.setIndex(new BufferAttribute(this._indices, 1))
+    geo.setAttribute('position', new BufferAttribute(this._position, 3))
+    geo.setAttribute('normal', new BufferAttribute(this._normals, 3))
+    geo.setAttribute('color', new BufferAttribute(this._colors, 3))
     geo.computeBoundingSphere()
     return geo
   }

@@ -1,9 +1,9 @@
-import * as THREE from 'three'
 import SceneObject from './SceneObject'
 import meshutils from '../meshutils'
 import UberMaterial from '../shaders/UberMaterial'
 import meshes from '../meshes/meshes'
 import settings from '../../settings'
+import { BufferAttribute, BufferGeometry, Group, Color } from 'three'
 
 class LinesObj extends SceneObject {
   constructor(params, opts) {
@@ -25,7 +25,7 @@ class LinesObj extends SceneObject {
   }
 
   build(complex) {
-    const geom = new THREE.BufferGeometry()
+    const geom = new BufferGeometry()
     this._atom1 = this._getAtomFromName(complex, this._id1)
     this._atom2 = this._getAtomFromName(complex, this._id2)
 
@@ -33,7 +33,7 @@ class LinesObj extends SceneObject {
     const p2 = this._atom2.position
     const vertices = new Float32Array([p1.x, p1.y, p1.z, p2.x, p2.y, p2.z])
 
-    geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+    geom.setAttribute('position', new BufferAttribute(vertices, 3))
     geom.computeBoundingBox()
     const material = new UberMaterial()
     material.setValues({
@@ -46,7 +46,7 @@ class LinesObj extends SceneObject {
     this._line = new meshes.Line(geom, material)
     this._line.computeLineDistances()
     this._line.material.setUberOptions({
-      fixedColor: new THREE.Color(this.opts.color),
+      fixedColor: new Color(this.opts.color),
       dashedLineSize: this.opts.dashSize,
       dashedLinePeriod: this.opts.dashSize + this.opts.gapSize
     })
@@ -56,7 +56,7 @@ class LinesObj extends SceneObject {
     this._mesh = this._line
     const transforms = complex.getTransforms()
     if (transforms.length > 0) {
-      this._mesh = new THREE.Group()
+      this._mesh = new Group()
       this._mesh.add(this._line)
       meshutils.applyTransformsToMeshes(this._mesh, transforms)
     }

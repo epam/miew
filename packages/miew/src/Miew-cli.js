@@ -1,9 +1,9 @@
-import _ from 'lodash'
 import Miew from './Miew'
 import { parser as parsercli } from './utils/MiewCLIParser'
 import clihelp from './utils/MiewCLIHelp'
 import logger from './utils/logger'
 import utils from './utils'
+import { slice, sortBy, get, keys, isUndefined, set, assign } from 'lodash'
 
 const {
   chem: { selectors },
@@ -176,15 +176,15 @@ class CLIUtils {
   }
 
   help(path) {
-    if (_.isUndefined(path)) {
-      return `${this.joinHelpStr(clihelp.$help)}\n${_.slice(
-        _.sortBy(_.keys(clihelp)),
+    if (isUndefined(path)) {
+      return `${this.joinHelpStr(clihelp.$help)}\n${slice(
+        sortBy(keys(clihelp)),
         1
       ).join(', ')}\n`
     }
 
-    const helpItem = _.get(clihelp, path)
-    return _.isUndefined(helpItem)
+    const helpItem = get(clihelp, path)
+    return isUndefined(helpItem)
       ? this.help()
       : `${this.joinHelpStr(helpItem.$help)}\n`
   }
@@ -239,7 +239,7 @@ class CLIUtils {
   propagateProp(path, arg) {
     if (path !== undefined) {
       let argExc = {}
-      const adapter = options.adapters[typeof _.get(settings.defaults, path)]
+      const adapter = options.adapters[typeof get(settings.defaults, path)]
       if (adapter === undefined) {
         const pathExc = { message: `${path} is not existed` }
         throw pathExc
@@ -277,10 +277,7 @@ class CLIUtils {
         adapter(arg) !== arg > 0
       ) {
         argExc = {
-          message: `${path} must be a "${typeof _.get(
-            settings.defaults,
-            path
-          )}"`
+          message: `${path} must be a "${typeof get(settings.defaults, path)}"`
         }
         throw argExc
       }
@@ -335,7 +332,7 @@ ArgList.prototype.toJSO = function (cliUtils, cmd, arg) {
 
   const list = this._values
   for (let i = 0, n = list.length; i < n; ++i) {
-    _.set(
+    set(
       res,
       list[i].id,
       cliUtils.propagateProp(
@@ -363,7 +360,7 @@ cliutils.echo = null
 cliutils.representations = representationsStorage
 cliutils.utils = utilFunctions
 
-cliutils._ = _
+cliutils.assign = assign
 cliutils.CreateObjectPair = CreateObjectPair
 cliutils.keyRemap = keyRemap
 cliutils.Context = selectors.Context

@@ -1,6 +1,6 @@
-import * as THREE from 'three'
 import Atom from './Atom'
 import Element from './Element'
+import { Vector3 } from 'three'
 
 const cNucleicControlNames = ["C3'", 'C3*', 'P', 'H5T', 'H3T']
 const cNucleicWing1Names = ['OP1', 'O1P']
@@ -230,7 +230,7 @@ class Residue {
     const bFirstInChain = prev === null
 
     const lp = getAtomPosition(this._leadAtom)
-    const currLeadPos = new THREE.Vector3(lp.x, lp.y, lp.z)
+    const currLeadPos = new Vector3(lp.x, lp.y, lp.z)
     if (chainAsNucleic) {
       this._detectLeadWing(dst, nextRes, getAtomPosition)
       return

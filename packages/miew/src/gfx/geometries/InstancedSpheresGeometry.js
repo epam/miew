@@ -1,9 +1,15 @@
-import _ from 'lodash'
-import * as THREE from 'three'
+import {
+  Color,
+  InstancedBufferAttribute,
+  InstancedBufferGeometry,
+  PlaneBufferGeometry,
+  SphereBufferGeometry
+} from 'three'
 import utils from '../../utils'
 import SphereCollisionGeo from './SphereCollisionGeo'
+import { fill } from 'lodash'
 
-const tmpColor = new THREE.Color()
+const tmpColor = new Color()
 
 const OFFSET_SIZE = 4
 const COLOR_SIZE = 3
@@ -22,13 +28,13 @@ function setArrayXYZW(arr, idx, x, y, z, w) {
   arr[idx + 3] = w
 }
 class InstancedSpheresGeometry extends SphereCollisionGeo(
-  THREE.InstancedBufferGeometry
+  InstancedBufferGeometry
 ) {
   constructor(spheresCount, sphereComplexity, useZSprites) {
     super(spheresCount)
     this._sphGeometry = useZSprites
-      ? new THREE.PlaneBufferGeometry(2, 2, 1, 1)
-      : new THREE.SphereBufferGeometry(
+      ? new PlaneBufferGeometry(2, 2, 1, 1)
+      : new SphereBufferGeometry(
           1,
           sphereComplexity * 2,
           sphereComplexity,
@@ -87,7 +93,7 @@ class InstancedSpheresGeometry extends SphereCollisionGeo(
 
   getSubset(chunkIndices) {
     const instanceCount = chunkIndices.length
-    const geom = new THREE.InstancedBufferGeometry()
+    const geom = new InstancedBufferGeometry()
     this._init.call(geom, instanceCount, this._sphGeometry)
 
     copySubArrays(this._offsets, geom._offsets, chunkIndices, OFFSET_SIZE)
@@ -109,19 +115,19 @@ class InstancedSpheresGeometry extends SphereCollisionGeo(
       Float32Array,
       spheresCount
     ))
-    _.fill(alpha, 1.0)
+    fill(alpha, 1.0)
 
     this.setAttribute(
       'offset',
-      new THREE.InstancedBufferAttribute(this._offsets, OFFSET_SIZE, false, 1)
+      new InstancedBufferAttribute(this._offsets, OFFSET_SIZE, false, 1)
     )
     this.setAttribute(
       'color',
-      new THREE.InstancedBufferAttribute(this._colors, COLOR_SIZE, false, 1)
+      new InstancedBufferAttribute(this._colors, COLOR_SIZE, false, 1)
     )
     this.setAttribute(
       'alphaColor',
-      new THREE.InstancedBufferAttribute(alpha, 1, false, 1)
+      new InstancedBufferAttribute(alpha, 1, false, 1)
     )
   }
 }
