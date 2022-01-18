@@ -40,7 +40,6 @@
     "build:css:bundle": "postcss src/Miew.scss -o dist/Miew.css",
     "build:css:minify": "postcss dist/Miew.css -o dist/Miew.min.css --use cssnano --map",
     "show:cover": "node tools/open.js coverage/lcov-report/index.html",
-    "show:docs": "node tools/open.js build/docs/index.html",
     "show:e2e": "node tools/open.js 'test/e2e/mismatch/*.html'",
     "preversion": "run-s lint test",
     "version": "cross-env NODE_ENV=production run-s build:js build:css dist",
