@@ -186,10 +186,11 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
   buildEdgePoint(indexA, indexB, sign, cube, indexPointValue, vOut) {
     if (sign[indexA] ^ sign[indexB]) {
       const cTwentyFour = 24
-      const t =
-        (0 - cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]) /
-        (cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexB] -
-          cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA])
+      const a =
+        0 - cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]
+      const b = cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexB]
+      const c = cube.pointsValuesLinear[indexPointValue + cTwentyFour + indexA]
+      const t = a / (b - c)
       const xa = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 0]
       const ya = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 1]
       const za = cube.pointsValuesLinear[indexPointValue + indexA * (2 + 1) + 2]

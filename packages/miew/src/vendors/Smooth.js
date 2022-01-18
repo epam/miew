@@ -219,7 +219,6 @@ Licensed under MIT license (see "Smooth.js MIT license.txt")
 
     return CubicInterpolator
   })(AbstractInterpolator)
-
   ;(sin = Math.sin), (PI = Math.PI)
 
   sinc = function (x) {
@@ -465,7 +464,6 @@ Licensed under MIT license (see "Smooth.js MIT license.txt")
   }
 
   Smooth.deepValidation = true
-
   ;(typeof exports !== 'undefined' && exports !== null
     ? exports
     : window
