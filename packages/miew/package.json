@@ -13,12 +13,11 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/epam/miew.git",
-    "directory": "packages/lib"
+    "directory": "packages/miew"
   },
   "license": "MIT",
   "scripts": {
     "ci": "run-s clean test-cover build",
-    "ci-fast": "run-s lint:js test:unit build:demo",
     "eslint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "eslint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "prettier": "prettier --check \"./**/*.{js,jsx,json,ts,tsx}\"",
@@ -36,7 +35,6 @@
     "clean": "rimraf 'build/*' 'coverage/*'",
     "build": "rollup -c -m true",
     "show:cover": "node tools/open.js coverage/lcov-report/index.html",
-    "show:docs": "node tools/open.js build/docs/index.html",
     "show:e2e": "node tools/open.js 'test/e2e/mismatch/*.html'",
     "preversion": "run-s lint test",
     "version": "cross-env NODE_ENV=production run-s build:js build:css dist",

@@ -1,25 +1,25 @@
 module.exports = {
   source: {
     include: [
-      'packages/lib/README.md',
-      'packages/lib/src/Miew.js',
-      'packages/lib/src/settings.js',
-      'packages/lib/src/chem/StructuralElement.js',
-      'packages/lib/src/chem/Helix.js',
-      'packages/lib/src/chem/Strand.js',
+      'packages/miew/README.md',
+      'packages/miew/src/Miew.js',
+      'packages/miew/src/settings.js',
+      'packages/miew/src/chem/StructuralElement.js',
+      'packages/miew/src/chem/Helix.js',
+      'packages/miew/src/chem/Strand.js',
       // 'src/gfx/modes.js',
       // 'src/gfx/modes/Mode.js',
       // 'src/gfx/colorers.js',
       // 'src/gfx/colorers/Colorer.js',
       // 'src/gfx/colorers/ElementColorer.js',
-      'packages/lib/src/io/loaders/LoaderList.js',
-      'packages/lib/src/io/parsers/ParserList.js',
-      'packages/lib/src/utils/EntityList.js',
-      'packages/lib/src/utils/EventDispatcher.js',
-      'packages/lib/src/utils/logger.js',
-      'packages/lib/src/io/parsers/PDBStream.js',
-      'packages/lib/src/io/parsers/GROReader.js',
-      'packages/lib/src/io/parsers/GROParser.js'
+      'packages/miew/src/io/loaders/LoaderList.js',
+      'packages/miew/src/io/parsers/ParserList.js',
+      'packages/miew/src/utils/EntityList.js',
+      'packages/miew/src/utils/EventDispatcher.js',
+      'packages/miew/src/utils/logger.js',
+      'packages/miew/src/io/parsers/PDBStream.js',
+      'packages/miew/src/io/parsers/GROReader.js',
+      'packages/miew/src/io/parsers/GROParser.js'
     ]
   },
   opts: {

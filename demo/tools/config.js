@@ -10,9 +10,9 @@ export default {
     dst: 'coverage/',
     show: 'coverage/lcov-report/index.html'
   },
-  lib: {
+  miew: {
     src: 'src/',
-    dst: 'build/dist/'
+    dst: 'dist/'
   },
   examples: {
     src: 'examples/',
