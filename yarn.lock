@@ -12717,9 +12717,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"miew-app@workspace:packages/app":
+"miew-app@workspace:packages/miew-app":
   version: 0.0.0-use.local
-  resolution: "miew-app@workspace:packages/app"
+  resolution: "miew-app@workspace:packages/miew-app"
   dependencies:
     "@babel/core": ^7.12.3
     "@babel/plugin-external-helpers": ^7.2.0

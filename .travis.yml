@@ -23,8 +23,8 @@ script:
   - yarn build:ci
 after_success:
   - mkdir coverage
-  # merge coverage report from miew, app projects
-  - cat packages/app/coverage/lcov.info | sed "s/^SF:src/SF:packages\\/app\\/src/g" > coverage/lcov_app.info
+  # merge coverage report from miew, miew-app projects
+  - cat packages/miew-app/coverage/lcov.info | sed "s/^SF:src/SF:packages\\/miew-app\\/src/g" > coverage/lcov_miew-app.info
   - cat packages/miew/coverage/lcov.info | sed "s/^SF:src/SF:packages\\/miew\\/src/g" > coverage/lcov_miew.info
   - yarn run merge-cover
   # upload report to online quality tools
