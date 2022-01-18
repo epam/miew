@@ -414,7 +414,7 @@ function _includesInSelector(atom, selector) {
  * @constructor
  */
 
-interface MiewOptions {
+export interface MiewOptions {
   container?: HTMLElement
   settingsCookie?: string
   cookiePath?: string
@@ -452,7 +452,7 @@ interface MiewOptions {
   }
 }
 
-class Miew extends EventDispatcher {
+export class Miew extends EventDispatcher {
   constructor(opts: MiewOptions) {
     super()
     this._opts = merge(
@@ -4537,5 +4537,3 @@ assign(
     }
   }
 )
-
-export default Miew
