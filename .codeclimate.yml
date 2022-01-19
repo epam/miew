@@ -1,7 +1,8 @@
 version: 2,
 exclude_patterns:
-  - "tools/"
+  - "**/tools/"
+  - "**/vendors/"
   - "examples/"
   - "documentation/"
-  - "packages/miew/src/Miew.ts"
-  - "packages/miew/test/"
+  - "**/test/"
+  - "**/__test__/"
