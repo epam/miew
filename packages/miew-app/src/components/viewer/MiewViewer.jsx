@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react'
-
-import 'MiewStyles' // eslint-disable-line import/no-unresolved
-
-import Miew from 'MiewModule' // eslint-disable-line import/no-unresolved
+import 'MiewStyles'
+import { Miew } from 'MiewModule'
 
 let viewer = null
 export default function MiewViewer({
