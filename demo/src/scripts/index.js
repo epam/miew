@@ -10,7 +10,7 @@ import $ from 'jquery'
 import toastr from 'toastr'
 // waiting for fix https://github.com/benmosher/eslint-plugin-import/issues/1712
 // eslint-disable-next-line import/no-extraneous-dependencies
-import Miew from 'miew' // eslint-disable-line import/no-unresolved
+import { Miew } from 'miew' // eslint-disable-line import/no-unresolved
 import Menu from './ui/Menu'
 
 window.DEBUG = true

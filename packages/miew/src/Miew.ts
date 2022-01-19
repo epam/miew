@@ -415,7 +415,7 @@ function _includesInSelector(atom, selector) {
  */
 
 export interface MiewOptions {
-  container?: HTMLElement
+  container?: HTMLDivElement | null
   settingsCookie?: string
   cookiePath?: string
   load?: string
