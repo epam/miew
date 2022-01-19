@@ -1,4 +1,4 @@
-import Miew from './Miew'
+import { Miew } from './Miew'
 import { parser as parsercli } from './utils/MiewCLIParser'
 import clihelp from './utils/MiewCLIHelp'
 import logger from './utils/logger'

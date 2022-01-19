@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import useResizeObserver from 'use-resize-observer'
-import Miew from 'miew'
+import { Miew, MiewOptions } from 'miew'
 import { Theme } from '@emotion/react'
 
 const MEDIA_SIZES = {
@@ -10,7 +10,7 @@ const MEDIA_SIZES = {
 
 type ViewerProps = {
   onInit?: (miew: object) => void
-  options?: object
+  options?: MiewOptions
 }
 
 const Viewer = (props: ViewerProps) => {
