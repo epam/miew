@@ -7,9 +7,9 @@ jest.mock('use-resize-observer', () =>
   jest.fn().mockReturnValue({ ref: null, width: 100, height: 100 })
 )
 
-jest.mock('miew', () =>
-  jest.fn().mockReturnValue({ init: jest.fn(() => true), run: jest.fn() })
-)
+jest.mock('miew', () => ({
+  Miew: jest.fn(() => ({ init: jest.fn(() => true), run: jest.fn() }))
+}))
 
 describe('Viewer component', () => {
   it('should be rendered', () => {
