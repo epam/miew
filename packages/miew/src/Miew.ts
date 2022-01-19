@@ -413,6 +413,7 @@ function _includesInSelector(atom, selector) {
  * @exports Miew
  * @constructor
  */
+
 class Miew extends EventDispatcher {
   constructor(opts) {
     super()

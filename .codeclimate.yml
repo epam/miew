@@ -1,0 +1,6 @@
+version: 2,
+exclude_patterns:
+  - "tools/"
+  - "examples/"
+  - "documentation/"
+  - "packages/miew/src/Miew.ts"
