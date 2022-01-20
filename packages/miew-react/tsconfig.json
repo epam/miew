@@ -34,7 +34,9 @@
     "paths": {
       "components/*": ["src/components/*"],
       "state/*": ["src/state/*"],
-      "state": ["src/state"]
+      "state": ["src/state"],
+      "theming": ["src/theming"],
+      "utils": ["src/utils"]
     },
   },
   "include": [ "src" ],

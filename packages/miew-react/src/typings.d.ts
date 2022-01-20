@@ -1,4 +1,5 @@
 import { Theme as MuiTheme } from '@mui/material'
+import { MiewTheme } from './theming/theme.types'
 
 declare module '*.svg' {
   import * as React from 'react'
@@ -11,26 +12,7 @@ declare module '*.svg' {
   export default src
 }
 
-interface CustomTheme {
-  customTheme?: {
-    palette?: {
-      accent?: {
-        main?: string
-        dark?: string
-      }
-      primary?: {
-        main?: string
-        light?: string
-        dark?: string
-      }
-    }
-    typography?: {
-      htmlFontSize?: number
-    }
-  }
-}
-
 declare module '@emotion/react' {
   /* eslint-disable @typescript-eslint/no-empty-interface */
-  export interface Theme extends MuiTheme, CustomTheme {}
+  export interface Theme extends MuiTheme, MiewTheme {}
 }
