@@ -1,47 +1,21 @@
-export interface MiewTheme {
-  miewPalette: {
-    accent: {
-      main: string
-      light: string
-      dark: string
-    }
-    primary: {
-      main: string
-      light: string
-      dark: string
-    }
-    secondary: {
-      main: string
-      light: string
-      dark: string
-    }
-  }
-  miewTypography: {
-    fontSize: number
-    fontFamily: string
-  }
+type ColorSet = {
+  main: string
+  light: string
+  dark: string
 }
 
-export interface UserTheme {
+export interface MiewTheme {
   palette: {
-    accent: {
-      main: string
-      light: string
-      dark: string
-    }
-    primary: {
-      main: string
-      light: string
-      dark: string
-    }
-    secondary: {
-      main: string
-      light: string
-      dark: string
-    }
+    accent: ColorSet
+    primary: ColorSet
+    secondary: ColorSet
   }
   typography: {
     fontSize: number
     fontFamily: string
   }
+}
+
+export type DeepPartial<T> = {
+  [P in keyof T]?: DeepPartial<T[P]>
 }

@@ -13,24 +13,16 @@ jest.mock('miew', () => ({
 const customTheme = {
   palette: {
     accent: {
-      main: '#f00',
-      dark: '#6b0000',
-      light: '#fff'
+      main: '#f00'
     },
     primary: {
-      main: '#e2b6b6',
-      light: '#fcf8f8',
-      dark: '#8e4343'
-    },
-    secondary: {
       main: '#e2b6b6',
       light: '#fcf8f8',
       dark: '#8e4343'
     }
   },
   typography: {
-    fontSize: 14,
-    fontFamily: 'serif'
+    fontSize: 14
   }
 }
 

@@ -1,4 +1,3 @@
-import { Theme as MuiTheme } from '@mui/material'
 import { MiewTheme } from 'theming'
 
 declare module '*.svg' {
@@ -13,6 +12,7 @@ declare module '*.svg' {
 }
 
 declare module '@emotion/react' {
-  /* eslint-disable @typescript-eslint/no-empty-interface */
-  export interface Theme extends MuiTheme, MiewTheme {}
+  export interface Theme {
+    miew: MiewTheme
+  }
 }

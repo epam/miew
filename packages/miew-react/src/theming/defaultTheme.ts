@@ -1,7 +1,7 @@
-import { MiewTheme } from 'theming'
+import { MiewTheme } from './theme.types'
 
 export const defaultTheme: MiewTheme = {
-  miewPalette: {
+  palette: {
     accent: {
       main: '#2E6DA4',
       dark: '#204D74',
@@ -18,7 +18,7 @@ export const defaultTheme: MiewTheme = {
       dark: '#383838'
     }
   },
-  miewTypography: {
+  typography: {
     fontSize: 16,
     fontFamily: 'sans-serif'
   }

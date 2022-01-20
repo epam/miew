@@ -7,8 +7,7 @@ import { createTheme } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import { merge } from 'lodash'
 import { store } from 'state'
-import { defaultTheme, UserTheme } from './theming'
-import { transformThemeKeys } from './utils/transformThemeKeys'
+import { defaultTheme, DeepPartial, MiewTheme } from './theming'
 
 const MEDIA_SIZES = {
   smallWidth: 800,
@@ -18,13 +17,13 @@ const MEDIA_SIZES = {
 type ViewerProps = {
   onInit?: (miew: Miew) => void
   options?: MiewOptions
-  theme?: UserTheme
+  theme?: DeepPartial<MiewTheme>
 }
 
 const muiTheme = createTheme()
 
 const Viewer = ({ onInit, options, theme }: ViewerProps) => {
-  const viewerTheme = theme ? transformThemeKeys(theme, 'miew') : defaultTheme
+  const viewerTheme = theme ? merge(defaultTheme, theme) : defaultTheme
 
   const ref = useRef<HTMLDivElement>(null)
   const { width, height } = useResizeObserver<HTMLDivElement>({ ref })
@@ -34,7 +33,7 @@ const Viewer = ({ onInit, options, theme }: ViewerProps) => {
     (width && width <= MEDIA_SIZES.smallWidth)
 
   const viewerStyle = (theme: Theme) => {
-    const palette = theme.miewPalette
+    const palette = theme.miew.palette
     return {
       backgroundColor: isSizeSmall ? palette.accent.main : palette.primary.main,
       height: '100%',
@@ -57,7 +56,7 @@ const Viewer = ({ onInit, options, theme }: ViewerProps) => {
 
   return (
     <Provider store={store}>
-      <ThemeProvider theme={merge(muiTheme, viewerTheme)}>
+      <ThemeProvider theme={merge(muiTheme, { miew: viewerTheme })}>
         <CssBaseline />
         <div ref={ref} css={viewerStyle} />
       </ThemeProvider>
