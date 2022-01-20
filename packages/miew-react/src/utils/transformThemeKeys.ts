@@ -1,4 +1,4 @@
-import { MiewTheme, UserTheme } from 'src/theming'
+import { MiewTheme, UserTheme } from 'theming'
 
 export const transformThemeKeys = (theme: UserTheme, prefix: string) => {
   return Object.entries(theme).reduce(

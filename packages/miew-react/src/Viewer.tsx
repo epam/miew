@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import { Provider } from 'react-redux'
-import Miew from 'miew'
+import { Miew, MiewOptions } from 'miew'
 import useResizeObserver from 'use-resize-observer'
 import { Theme, ThemeProvider } from '@emotion/react'
 import { createTheme } from '@mui/material/styles'
@@ -16,8 +16,8 @@ const MEDIA_SIZES = {
 }
 
 type ViewerProps = {
-  onInit?: (miew: object) => void
-  options?: object
+  onInit?: (miew: Miew) => void
+  options?: MiewOptions
   theme?: UserTheme
 }
 

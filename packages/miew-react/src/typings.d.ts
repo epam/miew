@@ -1,5 +1,5 @@
 import { Theme as MuiTheme } from '@mui/material'
-import { MiewTheme } from './theming/theme.types'
+import { MiewTheme } from 'theming'
 
 declare module '*.svg' {
   import * as React from 'react'

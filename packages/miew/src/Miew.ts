@@ -413,8 +413,47 @@ function _includesInSelector(atom, selector) {
  * @exports Miew
  * @constructor
  */
-class Miew extends EventDispatcher {
-  constructor(opts) {
+
+export interface MiewOptions {
+  container?: HTMLDivElement | null
+  settingsCookie?: string
+  cookiePath?: string
+  load?: string
+  settings?: {
+    palette?: string
+    shadow?: object
+    ao?: boolean
+    aromatic?: boolean
+    autobuild?: boolean
+    autoRotation?: number
+    autoRotationAxisFixed?: boolean
+    axes?: boolean
+    colorers?: object
+    editing?: boolean
+    fbxprec?: number
+    fox?: boolean
+    fogFarFactor?: number
+    fogNearFactor?: number
+    fps?: boolean
+    fxaa?: boolean
+    interpolateViews?: boolean
+    maxfps?: number
+    modes?: object
+    outline?: boolean
+    pick?: string
+    picking?: boolean
+    singleUnit?: boolean
+    stereo?: string
+    suspendRender?: boolean
+    translationSpeed?: number
+    transparency?: string
+    zooming?: boolean
+    zSprite?: boolean
+  }
+}
+
+export class Miew extends EventDispatcher {
+  constructor(opts: MiewOptions) {
     super()
     this._opts = merge(
       {
@@ -4498,5 +4537,3 @@ assign(
     }
   }
 )
-
-export default Miew

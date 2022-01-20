@@ -36,7 +36,7 @@
       "state/*": ["src/state/*"],
       "state": ["src/state"],
       "theming": ["src/theming"],
-      "utils": ["src/utils"]
+      "utils/*": ["src/utils/*"]
     },
   },
   "include": [ "src" ],

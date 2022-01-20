@@ -1,4 +1,4 @@
-import { MiewTheme } from '../theming'
+import { MiewTheme } from 'theming'
 
 export const defaultTheme: MiewTheme = {
   miewPalette: {
