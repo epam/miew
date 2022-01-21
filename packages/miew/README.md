@@ -50,7 +50,7 @@ You may also download the [minified library](dist/Miew.min.js) and access it fro
 
 There is also a [demo application] available in the git repository.
 
-[tutorials]: ../../documentation/jsdoc-templates/tutorials/embed.md
+[tutorials]: ../../tools/templates/tutorials/embed.md
 [examples]: ../../examples/
 [demo application]: https://miew.opensource.epam.com/
 

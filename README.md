@@ -23,13 +23,11 @@ of a molecule.
 
 It works as a standalone HTML5 web application or integrates as a component into 
 your web pages. We plan to support the [latest versions](https://browsehappy.com/) of WebGL-enabled desktop (Chrome,
-Firefox, Safari, Opera, Edge, IE11) and mobile (iOS, Android) browsers.
+Firefox, Safari, Opera, Edge) and mobile (iOS, Android) browsers.
 
 You can find details on installation and usage of Miew component in [miew readme].
 There is also a [demo application] available in the git repository.
 
-[tutorials]: documentation/jsdoc-templates/tutorials/embed.md
-[examples]: examples/
 [miew readme]: packages/miew/README.md
 [demo application]: https://miew.opensource.epam.com/
 
