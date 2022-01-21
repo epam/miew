@@ -7,11 +7,15 @@ import { createTheme } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import { merge } from 'lodash'
 import { store } from 'state'
-import { defaultTheme, DeepPartial, MiewTheme } from './theming'
+import { defaultTheme, MiewTheme } from './theming'
 
 const MEDIA_SIZES = {
   smallWidth: 800,
   smallHeight: 400
+}
+
+type DeepPartial<T> = {
+  [P in keyof T]?: DeepPartial<T[P]>
 }
 
 type ViewerProps = {
