@@ -1,3 +1,3 @@
-import { ViewerContainer } from './ViewerContainer'
+import { Viewer } from './Viewer'
 
-export default ViewerContainer
+export default Viewer
