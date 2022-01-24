@@ -1,4 +1,4 @@
-const Miew = require('../packages/miew/dist/Miew')
+const Miew = require('../packages/miew/dist/miew')
 
 window.onload = function () {
   const viewer = new Miew({
