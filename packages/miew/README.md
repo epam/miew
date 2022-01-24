@@ -11,7 +11,7 @@
 [![SonarCloud Reliability](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=epam:miew&metric=Reliability)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=alert_status)](https://sonarcloud.io/dashboard?id=epam:miew)
 
-Copyright (c) 2015–2020 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2022 [EPAM Systems, Inc.](https://www.epam.com/)
 
 Miew is a high performance web library for advanced visualization and manipulation of molecular
 structures.
@@ -44,7 +44,7 @@ var Miew = require('miew');
 console.log(Miew.VERSION);
 ```
 
-You may also download the [minified library](dist/Miew.min.js) and access it from the browser's
+You may also download the [minified library](dist/miew.min.js) and access it from the browser's
 `<SCRIPT>` tag, or asynchronously include it via [Require.js]. Refer to the [tutorials],
 [examples] and API docs for more `details`.
 

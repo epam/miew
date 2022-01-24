@@ -1,3 +1,5 @@
+dist/*
+!dist/miew.min.js
 .nyc_output/
 .sonar/
 .idea/workspace.xml
