@@ -4,7 +4,7 @@
 [![Downloads](https://img.shields.io/npm/dm/miew-react)](https://www.npmjs.com/package/miew-react)
 [![License](https://img.shields.io/badge/MIT%20-blue.svg)](https://opensource.org/licenses/MIT)
 
-Copyright (c) 2022 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2022 [EPAM Systems, Inc.](https://www.epam.com/)
 
 Miew is a high performance web library for advanced visualization and manipulation of molecular structures.
 
@@ -32,16 +32,18 @@ yarn add miew-react
 import Viewer from 'miew-react'
 
 const MyComponent = () => {
-  return (
-    <Viewer />
-  )
+  return <Viewer />
 }
 ```
 
 ### Props
 
-Imported component accepts the following optional props:  
-+ **options**: an object containing representation settings for Miew and initial structure to be shown (all the fields are also optional, when not provided, default settings are applied)
-+ **onInit**: a callback function which recieves an instance of Miew, and called after initialization of Miew instance inside the Viewer component. With a help of this prop you can access Miew methods and fields.
-+ **theme**: an object containing theme which should be used inside the Viewer component (all the fields are also optional, when not provided, default theme is applied)
+Imported component accepts the following optional props:
 
+- **options**: an object containing representation settings for Miew and initial structure to be shown (all the fields are also optional, when not provided, default settings are applied)
+- **onInit**: a callback function which recieves an instance of Miew, and called after initialization of Miew instance inside the Viewer component. With a help of this prop you can access Miew methods and fields.
+- **theme**: an object containing theme which should be used inside the Viewer component (all the fields are also optional, when not provided, default theme is applied)
+
+## License
+
+[MIT](../../LICENSE.md)
