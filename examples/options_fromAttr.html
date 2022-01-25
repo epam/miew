@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <title>.options.fromAttr() - Miew API</title>
 
-  <link rel="stylesheet" href="../packages/miew/dist/Miew.min.css">
+  <link rel="stylesheet" href="../packages/miew/dist/miew.min.css">
   <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
-  <script src="https://unpkg.com/lodash@^4.17.15/lodash.js"></script>
-  <script src="https://unpkg.com/three@0.125.0/build/three.min.js"></script>
-  <script src="../packages/miew/dist/Miew.min.js"></script>
+  <script src="https://unpkg.com/lodash@4.17.21/lodash.js"></script>
+  <script src="https://unpkg.com/three@0.131.3/build/three.min.js"></script>
+  <script src="../packages/miew/dist/miew.min.js"></script>
 </head>
 <body>
   <h1>Specify options in a data attribute</h1>
@@ -16,7 +16,7 @@
 
   <script>
     (function() {
-      var _ = Miew.thirdParty.lodash;
+      const { Miew } = miew
       var container = document.getElementsByClassName('miew-container')[0];
       var viewer = new Miew(_.merge({
           container: container,

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>.projected() - Miew API</title>
 
-  <link rel="stylesheet" href="../packages/miew/dist/Miew.min.css">
+  <link rel="stylesheet" href="../packages/miew/dist/miew.min.css">
   <style>
     .marker {
       position: absolute;
@@ -25,9 +25,9 @@
   </style>
 
   <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
-  <script src="https://unpkg.com/lodash@^4.17.15/lodash.js"></script>
-  <script src="https://unpkg.com/three@0.125.0/build/three.min.js"></script>
-  <script src="../packages/miew/dist/Miew.min.js"></script>
+  <script src="https://unpkg.com/lodash@4.17.21/lodash.js"></script>
+  <script src="https://unpkg.com/three@0.131.3/build/three.min.js"></script>
+  <script src="../packages/miew/dist/miew.min.js"></script>
 </head>
 <body>
   <h1>Project an atom onto the canvas</h1>
@@ -39,6 +39,7 @@
 
   <script>
     (function() {
+      const { Miew } = miew
       var viewer = new Miew({
         container: document.getElementsByClassName('miew-container')[0],
         load: '1CRN',

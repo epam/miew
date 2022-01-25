@@ -1,8 +1,7 @@
-const path = require('path')
 module.exports = {
   entry: './miew_via_webpack.js',
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: __dirname,
     chunkFilename: '[name].bundle.js',
     filename: 'miew_via_webpack.bundle.js'
   },

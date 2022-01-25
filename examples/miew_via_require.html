@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <title>Miew via Require.js</title>
 
-  <link rel="stylesheet" href="../packages/miew/dist/Miew.min.css">
+  <link rel="stylesheet" href="../packages/miew/dist/miew.min.css">
+  <script src="https://unpkg.com/lodash@4.17.21/lodash.js"></script>
+  <script src="https://unpkg.com/three@0.131.3/build/three.min.js"></script>
   <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 </head>
@@ -15,12 +17,12 @@
   <script>
     require.config({
       paths: {
-        'lodash': 'https://unpkg.com/lodash@^4.17.15/lodash',
-        'three': 'https://unpkg.com/three@0.125.0/build/three.min',
+        'lodash': 'https://unpkg.com/lodash@4.17.21/lodash',
+        'three': 'https://unpkg.com/three@0.131.3/build/three.min',
       }
     });
-    require(['../packages/miew/dist/Miew.min'], function(Miew) {
-      var viewer = new Miew({
+    require(['../packages/miew/dist/miew.min'], function(Miew) {
+      var viewer = new miew.Miew({
         container: document.getElementsByClassName('miew-container')[0],
         load: '1CRN',
       });
