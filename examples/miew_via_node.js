@@ -1,3 +1,3 @@
-const Miew = require('../packages/miew/dist/miew.min')
+const Miew = require('../packages/miew/dist/miew')
 
-console.log(Miew.VERSION)
+console.log(Miew)
