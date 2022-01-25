@@ -1792,7 +1792,7 @@ export class Miew extends EventDispatcher {
           light.shadow.map = new WebGLRenderTarget(
             light.shadow.mapSize.width,
             light.shadow.mapSize.height,
-            pars
+            this.pars
           )
           light.shadow.camera.updateProjectionMatrix()
         }
