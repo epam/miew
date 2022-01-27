@@ -17,7 +17,7 @@
   "dependencies": {
     "lodash": "^4.17.15",
     "miew": "workspace:*",
-    "three": "0.131.3"
+    "three": "0.137.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
