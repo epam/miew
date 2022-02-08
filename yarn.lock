@@ -7004,7 +7004,7 @@ __metadata:
     stylelint-config-standard: ^24.0.0
     stylelint-prettier: ^2.0.0
     stylelint-scss: ^4.0.0
-    three: 0.131.3
+    three: 0.137.0
     toastr: ^2.1.4
     typescript: ^4.5.3
     uglify-js: ^3.9.3
@@ -13217,7 +13217,7 @@ __metadata:
     stylelint-config-standard: ^22.0.0
     stylelint-prettier: ^2.0.0
     stylelint-scss: ^4.0.0
-    three: 0.131.3
+    three: 0.137.0
     typescript: ^4.5.3
     webpack: ^4.43.0
     webpack-cli: ^3.3.10
@@ -13373,7 +13373,7 @@ __metadata:
     stylelint-config-standard: ^24.0.0
     stylelint-prettier: ^2.0.0
     stylelint-scss: ^4.0.0
-    three: 0.131.3
+    three: 0.137.0
     toastr: ^2.1.4
     ttypescript: ^1.5.13
     typescript: ^4.5.3
@@ -19252,10 +19252,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"three@npm:0.131.3":
-  version: 0.131.3
-  resolution: "three@npm:0.131.3"
-  checksum: 947308298088de498c61ebbcbc5d9ae2b1acdd876855f4b3bd98214797706b96902d136eab330d8a8ae93c0edb6ac2324442b1c00abccb50bf55f7db98ea60ec
+"three@npm:0.137.0":
+  version: 0.137.0
+  resolution: "three@npm:0.137.0"
+  checksum: c3d005a73818a8023d014af4803c12e34ab5b095f50ac58c994173d6f433a480ad4547543b106f95ee240c827272b1de2eca48dcafd2b65cdcd0a0f3e5bf128b
   languageName: node
   linkType: hard
 

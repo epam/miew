@@ -2,7 +2,7 @@ import {
   DataTexture,
   NearestFilter,
   RepeatWrapping,
-  RGBFormat,
+  RGBAFormat,
   UnsignedByteType,
   UVMapping
 } from 'three'
@@ -23,7 +23,7 @@ const noiseTexture = new DataTexture(
   _noiseData,
   noiseWidth,
   noiseHeight,
-  RGBFormat,
+  RGBAFormat,
   UnsignedByteType,
   _noiseMapping,
   _noiseWrapS,
