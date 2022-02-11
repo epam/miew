@@ -32,7 +32,7 @@
     "test-cover": "cross-env NODE_ENV=coverage nyc mocha",
     "test:unit": "mocha",
     "test:e2e": "rimraf './test/e2e/mismatch/*.png' './test/e2e/mismatch/report-*.html' && mocha --config ./test/.e2e.mocharc.js",
-    "clean": "rimraf 'build/*' 'coverage/*'",
+    "clean": "rimraf 'dist/*' 'coverage/*'",
     "build": "rollup -c -m true",
     "show:cover": "node tools/open.js coverage/lcov-report/index.html",
     "show:e2e": "node tools/open.js 'test/e2e/mismatch/*.html'",
