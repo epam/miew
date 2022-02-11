@@ -44,7 +44,6 @@ const config = {
       banner,
       sourcemap: true,
       globals: {
-        miew: 'Miew',
         lodash: '_'
       }
     }

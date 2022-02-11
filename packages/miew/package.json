@@ -1,6 +1,6 @@
 {
   "name": "miew",
-  "version": "0.9.0",
+  "version": "0.10.1",
   "description": "Miew - 3D Molecular Viewer",
   "author": "EPAM Systems, Inc.",
   "main": "dist/miew.js",

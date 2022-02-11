@@ -10,7 +10,7 @@
 [![SonarCloud Reliability](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=epam:miew&metric=Reliability)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=alert_status)](https://sonarcloud.io/dashboard?id=epam:miew)
 
-Copyright (c) 2015–2020 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2022 [EPAM Systems, Inc.](https://www.epam.com/)
 
 Miew is a high performance web tool for advanced visualization and manipulation of molecular
 structures.
@@ -23,13 +23,11 @@ of a molecule.
 
 It works as a standalone HTML5 web application or integrates as a component into 
 your web pages. We plan to support the [latest versions](https://browsehappy.com/) of WebGL-enabled desktop (Chrome,
-Firefox, Safari, Opera, Edge, IE11) and mobile (iOS, Android) browsers.
+Firefox, Safari, Opera, Edge) and mobile (iOS, Android) browsers.
 
 You can find details on installation and usage of Miew component in [miew readme].
 There is also a [demo application] available in the git repository.
 
-[tutorials]: documentation/jsdoc-templates/tutorials/embed.md
-[examples]: examples/
 [miew readme]: packages/miew/README.md
 [demo application]: https://miew.opensource.epam.com/
 
