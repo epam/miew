@@ -44,7 +44,7 @@ function initializeTerminal(viewer) {
 }
 
 ;(function () {
-  const viewer = new Miew({
+  const viewer = new miew.Miew({
     container: document.getElementsByClassName('miew-container')[0],
     load: '1CRN'
   })

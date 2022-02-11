@@ -1385,14 +1385,6 @@ export class Miew extends EventDispatcher {
   }
 
   _onUpdate() {
-    if (
-      this.isScriptingCommandAvailable !== undefined &&
-      this.isScriptingCommandAvailable() &&
-      !this._building
-    ) {
-      this.callNextCmd()
-    }
-
     this._objectControls.update()
 
     this._forEachComplexVisual((visual) => {

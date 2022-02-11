@@ -1,9 +1,9 @@
-import { Miew } from './Miew'
-import { parser as parsercli } from './utils/MiewCLIParser'
-import clihelp from './utils/MiewCLIHelp'
-import logger from './utils/logger'
-import utils from './utils'
+import { Miew } from 'miew'
+import { parser as parsercli } from './MiewCLIParser'
+import clihelp from './MiewCLIHelp'
+import logger from './logger'
 import { slice, sortBy, get, keys, isUndefined, set, assign } from 'lodash'
+import utils from './utils'
 
 const {
   chem: { selectors },
@@ -372,57 +372,96 @@ cliutils.notimplemented = function () {
   return this.NULL
 }
 
-Miew.prototype.script = function (script, _printCallback, _errorCallback) {
-  parsercli.yy.miew = this
-  parsercli.yy.echo = _printCallback
-  parsercli.yy.error = _errorCallback
-  if (this.cmdQueue === undefined) {
-    this.cmdQueue = []
-  }
-
-  if (this.commandInAction === undefined) {
-    this.commandInAction = false
-  }
-
-  this.cmdQueue = this.cmdQueue.concat(script.split('\n'))
-}
-
-Miew.prototype.awaitWhileCMDisInProcess = function () {
-  this.commandInAction = true
-}
-
-Miew.prototype.finishAwaitingCMDInProcess = function () {
-  this.commandInAction = false
-}
-
-Miew.prototype.isScriptingCommandAvailable = function () {
-  return (
-    this.commandInAction !== undefined &&
-    !this.commandInAction &&
-    this.cmdQueue !== undefined &&
-    this.cmdQueue.length > 0
-  )
-}
-
-Miew.prototype.callNextCmd = function () {
-  if (this.isScriptingCommandAvailable()) {
-    const cmd = this.cmdQueue.shift()
-
-    const res = {}
-    res.success = false
-    try {
-      parsercli.parse(cmd)
-      res.success = true
-    } catch (e) {
-      res.error = e.message
-      parsercli.yy.error(res.error)
-      this.finishAwaitingCMDInProcess()
-    }
-    return res
-  }
-  return ''
-}
-
 parsercli.yy = cliutils
 // workaround for incorrect JISON parser generator for AMD module
 parsercli.yy.parseError = parsercli.parseError
+
+export const getMiewWithCli = (miewInstance) => {
+  const obj = Object.create(miewInstance)
+
+  obj.script = function (script, _printCallback, _errorCallback) {
+    parsercli.yy.miew = obj
+    parsercli.yy.echo = _printCallback
+    parsercli.yy.error = _errorCallback
+    if (obj.cmdQueue === undefined) {
+      obj.cmdQueue = []
+    }
+    if (obj.commandInAction === undefined) {
+      obj.commandInAction = false
+    }
+
+    obj.cmdQueue = obj.cmdQueue.concat(script.split('\n'))
+  }
+
+  obj.awaitWhileCMDisInProcess = function () {
+    obj.commandInAction = true
+  }
+
+  obj.finishAwaitingCMDInProcess = function () {
+    obj.commandInAction = false
+  }
+
+  obj.isScriptingCommandAvailable = function () {
+    return (
+      obj.commandInAction !== undefined &&
+      !obj.commandInAction &&
+      obj.cmdQueue !== undefined &&
+      obj.cmdQueue.length > 0
+    )
+  }
+
+  obj.callNextCmd = function () {
+    if (obj.isScriptingCommandAvailable()) {
+      const cmd = obj.cmdQueue.shift()
+      const res = {}
+      res.success = false
+      try {
+        parsercli.parse(cmd)
+        res.success = true
+      } catch (e) {
+        res.error = e.message
+        parsercli.yy.error(res.error)
+        obj.finishAwaitingCMDInProcess()
+      }
+      return res
+    }
+    return ''
+  }
+
+  obj._onUpdate = function () {
+    if (
+      obj.isScriptingCommandAvailable !== undefined &&
+      obj.isScriptingCommandAvailable() &&
+      !obj._building
+    ) {
+      obj.callNextCmd()
+    }
+
+    obj._objectControls.update()
+
+    obj._forEachComplexVisual((visual) => {
+      visual.getComplex().update()
+    })
+
+    if (
+      settings.now.autobuild &&
+      !obj._loading.length &&
+      !obj._building &&
+      obj._needRebuild()
+    ) {
+      obj.rebuild()
+    }
+
+    if (!obj._loading.length && !obj._building && !obj._needRebuild()) {
+      obj._updateView()
+    }
+
+    obj._updateFog()
+
+    if (obj._gfx.renderer.xr.enabled) {
+      obj.webVR.updateMoleculeScale()
+    }
+  }
+
+  return obj
+}
