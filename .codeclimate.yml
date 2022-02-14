@@ -1,8 +1,24 @@
-version: 2,
+version: "2"
+plugins:
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  duplication:
+    enabled: true
+    exclude_patterns:
+    - "**/*.test.js"
+    - "**/*.test.ts"
+    - "**/*.e2e.js"
 exclude_patterns:
-  - "**/tools/"
-  - "**/vendors/"
-  - "examples/"
-  - "documentation/"
-  - "**/test/"
-  - "**/__test__/"
+- ".github/"
+- ".idea/"
+- "dist/"
+- "docs/"
+- "**/tools/"
+- "**/vendors/"
+- "examples/"
+- "documentation/"
+- "**/test/"
+- "**/__test__/"
+- "**/*.d.ts"
