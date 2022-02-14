@@ -1,7 +1,5 @@
 version: "2"
 plugins:
-  eslint:
-    enabled: true
   fixme:
     enabled: true
   duplication:
