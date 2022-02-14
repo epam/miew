@@ -6981,6 +6981,7 @@ __metadata:
     jquery.terminal: =2.31.1
     lodash: ^4.17.15
     miew: "workspace:*"
+    miew-cli: "workspace:*"
     npm-run-all: ^4.1.3
     postcss-advanced-variables: ^3.0.1
     postcss-calc: ^7.0.2
@@ -13195,7 +13196,8 @@ __metadata:
     jquery: =3.6.0
     jquery.terminal: =2.31.1
     lodash: ^4.17.20
-    miew: 0.9.0
+    miew: "workspace:*"
+    miew-cli: "workspace:*"
     miew-react: "workspace:*"
     mini-css-extract-plugin: ^0.9.0
     npm-run-all: ^4.1.5
@@ -13222,6 +13224,42 @@ __metadata:
     webpack: ^4.43.0
     webpack-cli: ^3.3.10
     webpack-dev-server: ^3.11.0
+  languageName: unknown
+  linkType: soft
+
+"miew-cli@workspace:*, miew-cli@workspace:packages/miew-cli":
+  version: 0.0.0-use.local
+  resolution: "miew-cli@workspace:packages/miew-cli"
+  dependencies:
+    "@babel/core": ^7.12.3
+    "@babel/plugin-transform-runtime": ^7.12.1
+    "@babel/preset-env": ^7.12.1
+    "@babel/preset-typescript": ^7.12.1
+    "@babel/runtime": ^7.12.5
+    "@rollup/plugin-babel": ^5.2.1
+    "@rollup/plugin-commonjs": ^16.0.0
+    "@rollup/plugin-json": ^4.1.0
+    "@rollup/plugin-node-resolve": ^10.0.0
+    "@rollup/plugin-replace": ^2.3.4
+    "@rollup/plugin-strip": ^2.0.0
+    "@svgr/rollup": ^5.4.0
+    "@types/lodash": ^4.14.178
+    "@typescript-eslint/eslint-plugin": ^5.6.0
+    "@typescript-eslint/parser": ^5.6.0
+    cross-env: ^7.0.3
+    eslint: ^8.4.1
+    lodash: ^4.17.21
+    miew: "workspace:*"
+    npm-run-all: ^4.1.5
+    prettier: ^2.5.1
+    rollup: ^2.60.2
+    rollup-plugin-cleanup: ^3.2.1
+    rollup-plugin-copy: ^3.4.0
+    rollup-plugin-delete: ^2.0.0
+    rollup-plugin-peer-deps-external: ^2.2.4
+    rollup-plugin-terser: ^7.0.2
+    rollup-plugin-typescript2: ^0.31.1
+    typescript: ^4.5.2
   languageName: unknown
   linkType: soft
 
@@ -13289,16 +13327,6 @@ __metadata:
     react-dom: ^17.0.2
   languageName: unknown
   linkType: soft
-
-"miew@npm:0.9.0":
-  version: 0.9.0
-  resolution: "miew@npm:0.9.0"
-  dependencies:
-    lodash: ^4.17.15
-    three: 0.112.1
-  checksum: d8df64a8f140f2a0da53a8db9f55753dcf6696defb302a7576502916ee3fb0fe66c5cde39737378a0b2bcad234679c728a80294c2f29068ed76ac6fa4f4bec00
-  languageName: node
-  linkType: hard
 
 "miew@workspace:*, miew@workspace:packages/miew":
   version: 0.0.0-use.local
@@ -19259,13 +19287,6 @@ __metadata:
   version: 0.2.0
   resolution: "text-table@npm:0.2.0"
   checksum: b6937a38c80c7f84d9c11dd75e49d5c44f71d95e810a3250bd1f1797fc7117c57698204adf676b71497acc205d769d65c16ae8fa10afad832ae1322630aef10a
-  languageName: node
-  linkType: hard
-
-"three@npm:0.112.1":
-  version: 0.112.1
-  resolution: "three@npm:0.112.1"
-  checksum: 01e4c84b6262fe06a3ab712eb6d8ce9628a79c6f17b7e39b01ba1f9ff5404abb251507f867595a4b3a1009b3521eb7385b3cbf672f8ec0b9fd95d5a09cb953bc
   languageName: node
   linkType: hard
 

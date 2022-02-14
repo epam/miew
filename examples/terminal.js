@@ -16,7 +16,7 @@ function initializeTerminal(viewer) {
     },
     {
       greetings:
-        'Miew - 3D Molecular Viewer\nCopyright © 2015-2020 EPAM Systems, Inc.\n',
+        'Miew - 3D Molecular Viewer\nCopyright © 2015-2022 EPAM Systems, Inc.\n',
       prompt: 'miew> ',
       name: 'miew',
       scrollOnEcho: true,
@@ -45,10 +45,11 @@ function initializeTerminal(viewer) {
 
 ;(function () {
   const { Miew } = miew
-  const viewer = new Miew({
+  let viewer = new Miew({
     container: document.getElementsByClassName('miew-container')[0],
     load: '1CRN'
   })
+  viewer = miewCli(viewer)
 
   if (viewer.init()) {
     initializeTerminal(viewer)

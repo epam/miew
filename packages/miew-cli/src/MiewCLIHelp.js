@@ -1,5 +1,5 @@
-import palettes from '../gfx/palettes'
-import settings from '../settings'
+// import palettes from '../gfx/palettes' // TODO actualy, does nothing
+// import settings from '../settings'
 
 const modeIdDesc = {
   $help: [
@@ -126,12 +126,12 @@ const colorDesc = {
       'Parameters of coloring modes customization',
       '   Uniform',
       '      color = <number|color> #RGB->HEX->dec\n'
-    ],
-    color: {
-      $help: Object.keys(palettes.get(settings.now.palette).namedColors)
-        .sort()
-        .join('\n')
-    }
+    ]
+    // color: {
+    //   $help: Object.keys(palettes.get(settings.now.palette).namedColors)
+    //     .sort()
+    //     .join('\n')
+    // }
   }
 }
 

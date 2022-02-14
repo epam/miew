@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import 'MiewStyles'
-import { Miew } from 'MiewModule'
+import { Miew } from 'miew'
+import getMiewWithCli from 'miew-cli'
 
 let viewer = null
 export default function MiewViewer({
@@ -29,6 +30,7 @@ export default function MiewViewer({
       container: domElement.current,
       load: '1crn'
     })
+    viewer = getMiewWithCli(viewer)
     saveViewer(viewer)
     viewer.addEventListener('fetching', () => {
       updateLoadingStage('Fetching...')

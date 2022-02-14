@@ -9,6 +9,7 @@ import $ from 'jquery'
 import toastr from 'toastr'
 import { Miew } from 'miew'
 import Menu from './ui/Menu'
+import getMiewWithCli from 'miew-cli'
 
 window.DEBUG = true
 
@@ -77,7 +78,7 @@ window.onerror = function (err, url, line, col, obj) {
 // create viewer (and run it) for each container element on the page
 window.addEventListener('load', () => {
   $('.miew-container').each((i, container) => {
-    const viewer = (window.miew = new Miew(
+    let viewer = new Miew(
       $.extend(
         true,
         {
@@ -88,7 +89,9 @@ window.addEventListener('load', () => {
         Miew.options.fromAttr(container.getAttribute('data-miew')),
         Miew.options.fromURL(window.location.search)
       )
-    ))
+    )
+
+    viewer = getMiewWithCli(viewer)
 
     const convertLevel = {
       error: 'error',
