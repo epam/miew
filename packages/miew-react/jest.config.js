@@ -1,8 +1,10 @@
 module.exports = {
   testPathIgnorePatterns: ['dist', 'node_modules'],
+  testEnvironment: 'jsdom',
   transform: {
     '\\.js?$': 'babel-jest',
-    '\\.(ts|tsx)$': 'ts-jest'
+    '\\.(ts|tsx)$': 'ts-jest',
+    '\\.svg$': '<rootDir>/testFileTransformer.js'
   },
   moduleNameMapper: {
     '\\.(css|scss)$': 'identity-obj-proxy',

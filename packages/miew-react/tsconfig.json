@@ -35,7 +35,8 @@
       "components/*": ["src/components/*"],
       "state/*": ["src/state/*"],
       "state": ["src/state"],
-      "theming": ["src/theming"]
+      "theming": ["src/theming"],
+      "assets/*": ["src/assets/*"]
     },
   },
   "include": [ "src" ],
