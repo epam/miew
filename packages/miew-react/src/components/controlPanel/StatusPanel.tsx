@@ -6,7 +6,6 @@ export const StatusPanel = () => {
   const StyledSpan = styled.span`
     color: ${({ theme }) => theme.miew.palette.secondary.light};
   `
-
   const status = useAppSelector(
     (state: RootState) => state.status.currentStatus
   )
