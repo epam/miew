@@ -10,7 +10,7 @@ export const defaultTheme: MiewTheme = {
     primary: {
       main: '#DDD',
       light: '#FFF',
-      dark: '#DDD'
+      dark: '#404040'
     },
     secondary: {
       main: '#333',
