@@ -1,13 +1,4 @@
-plugins:
-  fixme:
-    enabled: true
-  duplication:
-    enabled: true
-    exclude_patterns:
-    - "**/*.test.js"
-    - "**/*.test.ts"
-    - "**/*.test.tsx"
-    - "**/*.e2e.js"
+version: 2,
 exclude_patterns:
 - ".github/"
 - ".idea/"
@@ -20,3 +11,7 @@ exclude_patterns:
 - "**/test/"
 - "**/__test__/"
 - "**/*.d.ts"
+- "**/*.test.js"
+- "**/*.test.ts"
+- "**/*.test.tsx"
+- "**/*.e2e.js"
