@@ -1,9 +1,8 @@
-import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
-import 'jest-canvas-mock'
-import { combineReducers, createStore } from 'redux'
-import { Provider } from 'react-redux'
 import { Viewer, ViewerMode } from './Viewer'
+import { render } from '@testing-library/react'
+import 'jest-canvas-mock'
+import { createStore, combineReducers } from 'redux'
+import { Provider } from 'react-redux'
 import { statusReducer } from './state/status/statusSlice'
 
 jest.mock('use-resize-observer', () =>
@@ -34,8 +33,6 @@ const customTheme = {
   }
 }
 
-const ControlPanelTestId = 'ControlPanel'
-
 const renderComponent = (props = {}) => {
   return render(<Viewer {...props} />, {
     wrapper: ({ children }) => {
@@ -55,19 +52,21 @@ describe('Viewer component', () => {
     expect(renderComponent({ theme: customTheme }).container).toMatchSnapshot()
   })
   it('should not contain Control panel, if no mode prop is provided', () => {
-    renderComponent()
-    expect(screen.queryByTestId(ControlPanelTestId)).not.toBeInTheDocument()
+    expect(renderComponent()).toMatchSnapshot()
   })
   it('should not contain Control panel, if "minimal" mode prop is provided', () => {
-    renderComponent({ mode: ViewerMode.MINIMAL })
-    expect(screen.queryByTestId(ControlPanelTestId)).not.toBeInTheDocument()
+    expect(
+      renderComponent({ mode: ViewerMode.MINIMAL }).container
+    ).toMatchSnapshot()
   })
   it('should contain Control panel, if "default" mode prop is provided', () => {
-    renderComponent({ mode: ViewerMode.DEFAULT })
-    expect(screen.getByTestId(ControlPanelTestId)).toBeInTheDocument()
+    expect(
+      renderComponent({ mode: ViewerMode.DEFAULT }).container
+    ).toMatchSnapshot()
   })
   it('should contain Control panel, if "custom" mode prop is provided', () => {
-    renderComponent({ mode: ViewerMode.CUSTOM })
-    expect(screen.getByTestId(ControlPanelTestId)).toBeInTheDocument()
+    expect(
+      renderComponent({ mode: ViewerMode.CUSTOM }).container
+    ).toMatchSnapshot()
   })
 })

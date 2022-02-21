@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
-import { Miew, MiewOptions } from 'miew'
+import { Miew, MiewOptions, MiewEvents } from 'miew'
 import useResizeObserver from 'use-resize-observer'
 import { Theme, ThemeProvider } from '@emotion/react'
 import { createTheme } from '@mui/material/styles'
@@ -7,8 +7,8 @@ import { CssBaseline } from '@mui/material'
 import { merge } from 'lodash'
 import { defaultTheme, MiewTheme } from './theming'
 import { useAppDispatch } from 'state'
-import { ControlPanel } from 'components/controlPanel/ControlPanel'
-import { UPDATE_STATUS } from 'state/status'
+import { ControlPanel } from 'components/controlPanel'
+import { UPDATE_STATUS, UPDATE_TITLE } from 'state/status'
 
 const MEDIA_SIZES = {
   smallWidth: 800,
@@ -71,17 +71,20 @@ const Viewer = ({ onInit, options, theme, mode }: ViewerProps) => {
     })
     if (miew.init()) miew.run()
     if (typeof onInit === 'function') onInit(miew)
-    miew.addEventListener('fetching', () => {
-      dispatch(UPDATE_STATUS('Fetching...'))
+    miew.addEventListener(MiewEvents.FETCHING, () => {
+      dispatch(UPDATE_STATUS(MiewEvents.FETCHING))
     })
-    miew.addEventListener('parsing', () => {
-      dispatch(UPDATE_STATUS('Parsing…...'))
+    miew.addEventListener(MiewEvents.PARSING, () => {
+      dispatch(UPDATE_STATUS(MiewEvents.PARSING))
     })
-    miew.addEventListener('rebuilding', () => {
-      dispatch(UPDATE_STATUS('Building geometry...'))
+    miew.addEventListener(MiewEvents.REBUILDING, () => {
+      dispatch(UPDATE_STATUS(MiewEvents.REBUILDING))
     })
-    miew.addEventListener('titleChanged', (e) => {
-      dispatch(UPDATE_STATUS(e.data))
+    miew.addEventListener(MiewEvents.BUILDING_DONE, () => {
+      dispatch(UPDATE_STATUS(MiewEvents.BUILDING_DON))
+    })
+    miew.addEventListener(MiewEvents.TITLE_CHANGED, (e) => {
+      dispatch(UPDATE_TITLE(e.data))
     })
   }, [options, onInit])
 

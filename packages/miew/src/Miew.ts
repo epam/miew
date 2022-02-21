@@ -90,6 +90,23 @@ import {
   isEmpty
 } from 'lodash'
 
+export enum MiewEvents {
+  FETCHING = 'fetching',
+  LOADING = 'loading',
+  PARSING = 'parsing',
+  REBUILDING ='rebuilding',
+  BUILDING_DONE = 'buildingDone',
+  ROTATE = 'rotate',
+  ZOOM = 'zoom',
+  TRANSFORM = 'transform',
+  RESIZE = 'resize',
+  EXPORTING = 'exporting',
+  EXPORTING_DONE = 'exportingDone',
+  TITLE_CHANGED = 'titleChanged',
+  REP_ADDED = 'redAdded',
+  REP_REMOVED = 'repRemoved',
+}
+
 const { selectors, Atom, Residue, Chain, Molecule } = chem
 
 const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 }

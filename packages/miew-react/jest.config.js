@@ -4,7 +4,7 @@ module.exports = {
   transform: {
     '\\.js?$': 'babel-jest',
     '\\.(ts|tsx)$': 'ts-jest',
-    '\\.svg$': '<rootDir>/testFileTransformer.js'
+    '\\.svg$': '<rootDir>/fileTransformer.js'
   },
   moduleNameMapper: {
     '\\.(css|scss)$': 'identity-obj-proxy',

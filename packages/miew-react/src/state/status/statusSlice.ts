@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface StatusState {
-  currentStatus: string
+  status: string
+  title: string
 }
 
 const initialState: StatusState = {
-  currentStatus: ''
+  status: '',
+  title: ''
 }
 
 export const StatusSlice = createSlice({
@@ -13,11 +15,14 @@ export const StatusSlice = createSlice({
   initialState,
   reducers: {
     UPDATE_STATUS: (state: StatusState, action: PayloadAction<string>) => {
-      state.currentStatus = action.payload
+      state.status = action.payload
+    },
+    UPDATE_TITLE: (state: StatusState, action: PayloadAction<string>) => {
+      state.title = action.payload
     }
   }
 })
 
-export const { UPDATE_STATUS } = StatusSlice.actions
+export const { UPDATE_STATUS, UPDATE_TITLE } = StatusSlice.actions
 
 export const statusReducer = StatusSlice.reducer

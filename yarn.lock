@@ -1399,15 +1399,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.4.2, @babel/runtime@npm:^7.4.5":
-  version: 7.17.2
-  resolution: "@babel/runtime@npm:7.17.2"
-  dependencies:
-    regenerator-runtime: ^0.13.4
-  checksum: a48702d271ecc59c09c397856407afa29ff980ab537b3da58eeee1aeaa0f545402d340a1680c9af58aec94dfdcbccfb6abb211991b74686a86d03d3f6956cacd
-  languageName: node
-  linkType: hard
-
 "@babel/template@npm:^7.16.0, @babel/template@npm:^7.3.3":
   version: 7.16.0
   resolution: "@babel/template@npm:7.16.0"
@@ -2386,13 +2377,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@popperjs/core@npm:^2.0.0":
-  version: 2.11.2
-  resolution: "@popperjs/core@npm:2.11.2"
-  checksum: 5695bf020eda54636e16a62dc9b5fdd92beaf7b2d19f62fcef049d57c5cff92773562d80cbf760b217c3ec928da310eb24994ab6a00fd39dffa0af9b5dfc01a6
-  languageName: node
-  linkType: hard
-
 "@popperjs/core@npm:^2.4.4, @popperjs/core@npm:^2.8.6":
   version: 2.11.0
   resolution: "@popperjs/core@npm:2.11.0"
@@ -2485,7 +2469,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@restart/hooks@npm:^0.3.12, @restart/hooks@npm:^0.3.21, @restart/hooks@npm:^0.3.26":
+"@restart/hooks@npm:^0.3.26":
   version: 0.3.27
   resolution: "@restart/hooks@npm:0.3.27"
   dependencies:
@@ -3271,17 +3255,6 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: e68b0d59aa69577fc6a6d654b25d5d8408625498f4c483f160b557fac21e840f6e8807cbde93e9f039949b6d624a019b1990d18499c1d65aecf3605c25e30242
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:^16.9.23":
-  version: 16.14.23
-  resolution: "@types/react@npm:16.14.23"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: 2c765e87c25421c23c6a813ec2b27a909bb051a2d84c07a0d5368ef22dca0e1dbb02489a79274316ad900bcbb1bec9a7153908c7012db4e8bb4a1c3f704330f5
   languageName: node
   linkType: hard
 
@@ -7316,7 +7289,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dom-helpers@npm:^5.0.1, dom-helpers@npm:^5.1.0, dom-helpers@npm:^5.1.2, dom-helpers@npm:^5.2.0, dom-helpers@npm:^5.2.1":
+"dom-helpers@npm:^5.0.1, dom-helpers@npm:^5.2.0, dom-helpers@npm:^5.2.1":
   version: 5.2.1
   resolution: "dom-helpers@npm:5.2.1"
   dependencies:
@@ -7550,13 +7523,6 @@ __metadata:
   version: 3.0.0
   resolution: "emojis-list@npm:3.0.0"
   checksum: ddaaa02542e1e9436c03970eeed445f4ed29a5337dfba0fe0c38dfdd2af5da2429c2a0821304e8a8d1cadf27fdd5b22ff793571fa803ae16852a6975c65e8e70
-  languageName: node
-  linkType: hard
-
-"emotion-rgba@npm:^0.0.9":
-  version: 0.0.9
-  resolution: "emotion-rgba@npm:0.0.9"
-  checksum: eacf890b0b1018fdea2cd2c6915d4bac50ea3ade31a1f371ac24d397827a5237dc7804f86cfd9985cf2c3721b1df6a0d2a768d9f31f70ac749ed3234fbc81d00
   languageName: node
   linkType: hard
 
@@ -9616,6 +9582,13 @@ __metadata:
   version: 1.1.0
   resolution: "hex-color-regex@npm:1.1.0"
   checksum: 44fa1b7a26d745012f3bfeeab8015f60514f72d2fcf10dce33068352456b8d71a2e6bc5a17f933ab470da2c5ab1e3e04b05caf3fefe3c1cabd7e02e516fc8784
+  languageName: node
+  linkType: hard
+
+"hex-to-rgba@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "hex-to-rgba@npm:2.0.1"
+  checksum: adbb81babe9d06cf743b925e2104968bb32d9e10f0de328b71c9e20ff52da4028fadde4623261866eaed4d9a3b975fb325fa34f2422eb035e839ed71ec462431
   languageName: node
   linkType: hard
 
@@ -13394,13 +13367,13 @@ __metadata:
     babel-jest: ^27.4.5
     clsx: ^1.1.1
     cross-env: ^7.0.3
-    emotion-rgba: ^0.0.9
     eslint: ^8.4.1
     eslint-plugin-jest: ^25.3.0
     eslint-plugin-jsx-a11y: ^6.5.1
     eslint-plugin-react: ^7.27.1
     eslint-plugin-react-hooks: ^4.3.0
     eslint-plugin-testing-library: ^5.0.1
+    hex-to-rgba: ^2.0.1
     jest: ^27.4.5
     jest-canvas-mock: ^2.3.1
     jest-dom: ^4.0.0
@@ -13408,7 +13381,6 @@ __metadata:
     miew: "workspace:*"
     npm-run-all: ^4.1.5
     prettier: ^2.5.1
-    react-bootstrap: 1.0.1
     react-icons: ^4.3.1
     react-redux: ^7.2.6
     redux: ^4.1.2
@@ -16667,30 +16639,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-bootstrap@npm:1.0.1":
-  version: 1.0.1
-  resolution: "react-bootstrap@npm:1.0.1"
-  dependencies:
-    "@babel/runtime": ^7.4.2
-    "@restart/context": ^2.1.4
-    "@restart/hooks": ^0.3.21
-    "@types/react": ^16.9.23
-    classnames: ^2.2.6
-    dom-helpers: ^5.1.2
-    invariant: ^2.2.4
-    prop-types: ^15.7.2
-    prop-types-extra: ^1.1.0
-    react-overlays: ^3.1.2
-    react-transition-group: ^4.0.0
-    uncontrollable: ^7.0.0
-    warning: ^4.0.3
-  peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: a3b0cfac99db790ec95ecda1b7c095b73f7de46386168276b289e2b25110daa4428b845cb00cee04e6999dbdb5213ef42ff0a75f31cb61970831a480c0cd5d8d
-  languageName: node
-  linkType: hard
-
 "react-bootstrap@npm:^1.0.1":
   version: 1.6.4
   resolution: "react-bootstrap@npm:1.6.4"
@@ -16774,25 +16722,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-overlays@npm:^3.1.2":
-  version: 3.2.0
-  resolution: "react-overlays@npm:3.2.0"
-  dependencies:
-    "@babel/runtime": ^7.4.5
-    "@popperjs/core": ^2.0.0
-    "@restart/hooks": ^0.3.12
-    "@types/warning": ^3.0.0
-    dom-helpers: ^5.1.0
-    prop-types: ^15.7.2
-    uncontrollable: ^7.0.0
-    warning: ^4.0.3
-  peerDependencies:
-    react: ">=16.3.0"
-    react-dom: ">=16.3.0"
-  checksum: 15994d03e57e3de51193315c995f4489cf6a431eff63fa3638e3b5bd74fe6f4e20cc8407fcaf2bb5fecd91067fbd5f59cff77d32798a79a83e51a8f7d591f776
-  languageName: node
-  linkType: hard
-
 "react-overlays@npm:^5.1.1":
   version: 5.1.1
   resolution: "react-overlays@npm:5.1.1"
@@ -16833,7 +16762,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-transition-group@npm:^4.0.0, react-transition-group@npm:^4.4.1, react-transition-group@npm:^4.4.2":
+"react-transition-group@npm:^4.4.1, react-transition-group@npm:^4.4.2":
   version: 4.4.2
   resolution: "react-transition-group@npm:4.4.2"
   dependencies:
@@ -20005,7 +19934,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uncontrollable@npm:^7.0.0, uncontrollable@npm:^7.2.1":
+"uncontrollable@npm:^7.2.1":
   version: 7.2.1
   resolution: "uncontrollable@npm:7.2.1"
   dependencies:
