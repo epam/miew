@@ -92,9 +92,12 @@ import {
 
 export enum MiewEvents {
   FETCHING = 'fetching',
+  FETCHING_DONE = 'fetchingDone',
   LOADING = 'loading',
+  LOADING_DONE = 'loadingDone',
   PARSING = 'parsing',
-  REBUILDING ='rebuilding',
+  PARSING_DONE = 'parsingDone',
+  REBUILDING = 'rebuilding',
   BUILDING_DONE = 'buildingDone',
   ROTATE = 'rotate',
   ZOOM = 'zoom',
@@ -104,7 +107,7 @@ export enum MiewEvents {
   EXPORTING_DONE = 'exportingDone',
   TITLE_CHANGED = 'titleChanged',
   REP_ADDED = 'redAdded',
-  REP_REMOVED = 'repRemoved',
+  REP_REMOVED = 'repRemoved'
 }
 
 const { selectors, Atom, Residue, Chain, Molecule } = chem
