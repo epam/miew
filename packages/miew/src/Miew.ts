@@ -107,7 +107,10 @@ export enum MiewEvents {
   EXPORTING_DONE = 'exportingDone',
   TITLE_CHANGED = 'titleChanged',
   REP_ADDED = 'redAdded',
-  REP_REMOVED = 'repRemoved'
+  REP_CHANGED = 'repChanged',
+  REP_REMOVED = 'repRemoved',
+  EDIT_MODE_CHANGED = 'editModeChanged',
+  MD_PLAYER_STATE_CHANGED = 'mdPlayerStateChanged'
 }
 
 const { selectors, Atom, Residue, Chain, Molecule } = chem
@@ -293,7 +296,7 @@ function _fetchData(source, opts, job) {
     if (job.shouldCancel()) {
       throw new Error('Operation cancelled')
     }
-    job.notify({ type: 'fetching' })
+    job.notify({ type: MiewEvents.FETCHING })
 
     // allow for source shortcuts
     source = resolveSourceShortcut(source, opts)
@@ -355,7 +358,7 @@ function _fetchData(source, opts, job) {
       .then((data) => {
         console.timeEnd('fetch')
         opts.context.logger.info('Fetching finished')
-        job.notify({ type: 'fetchingDone', data })
+        job.notify({ type: MiewEvents.FETCHING_DONE, data })
         return data
       })
       .catch((error) => {
@@ -365,7 +368,7 @@ function _fetchData(source, opts, job) {
           opts.context.logger.debug(error.stack)
         }
         opts.context.logger.error('Fetching failed')
-        job.notify({ type: 'fetchingDone', error })
+        job.notify({ type: MiewEvents.FETCHING_DONE, error })
         throw error
       })
     resolve(promise)
@@ -377,7 +380,7 @@ function _parseData(data, opts, job) {
     return Promise.reject(new Error('Operation cancelled'))
   }
 
-  job.notify({ type: 'parsing' })
+  job.notify({ type: MiewEvents.PARSING })
 
   const TheParser = head(
     io.parsers.find({ format: opts.fileType, ext: opts.fileExt, data })
@@ -395,7 +398,7 @@ function _parseData(data, opts, job) {
     .parse()
     .then((dataSet) => {
       console.timeEnd('parse')
-      job.notify({ type: 'parsingDone', data: dataSet })
+      job.notify({ type: MiewEvents.PARSING_DONE, data: dataSet })
       return dataSet
     })
     .catch((error) => {
@@ -406,7 +409,7 @@ function _parseData(data, opts, job) {
         opts.context.logger.debug(error.stack)
       }
       opts.context.logger.error('Parsing failed')
-      job.notify({ type: 'parsingDone', error })
+      job.notify({ type: MiewEvents.PARSING_DONE, error })
       throw error
     })
 }
@@ -703,16 +706,16 @@ export class Miew extends EventDispatcher {
         }
         // route rotate, zoom, translate and translatePivot events to the external API
         switch (e.action) {
-          case 'rotate':
-            self.dispatchEvent({ type: 'rotate', quaternion: e.quaternion })
+          case MiewEvents.ROTATE:
+            self.dispatchEvent({ type: MiewEvents.ROTATE, quaternion: e.quaternion })
             break
-          case 'zoom':
-            self.dispatchEvent({ type: 'zoom', factor: e.factor })
+          case MiewEvents.ZOOM:
+            self.dispatchEvent({ type: MiewEvents.ZOOM, factor: e.factor })
             break
           default:
             self.dispatchEvent({ type: e.action })
         }
-        self.dispatchEvent({ type: 'transform' })
+        self.dispatchEvent({ type: MiewEvents.TRANSFORM })
         self._needRender = true
       })
 
@@ -1282,7 +1285,7 @@ export class Miew extends EventDispatcher {
     gfx.renderer.setSize(gfx.width, gfx.height)
     gfx.renderer2d.setSize(gfx.width, gfx.height)
 
-    this.dispatchEvent({ type: 'resize' })
+    this.dispatchEvent({ type: MiewEvents.RESIZE })
   }
 
   _resizeOffscreenBuffers(width, height, stereo) {
@@ -2170,7 +2173,7 @@ export class Miew extends EventDispatcher {
         new Error('Could not find suitable exporter for this source')
       )
     }
-    this.dispatchEvent({ type: 'exporting' })
+    this.dispatchEvent({ type: MiewEvents.EXPORTING })
 
     if (this._visuals[this._curVisualName] instanceof ComplexVisual) {
       let dataSource = null
@@ -2226,7 +2229,7 @@ export class Miew extends EventDispatcher {
 
     this._interpolator.reset()
 
-    this.dispatchEvent({ type: 'loading', options: opts, source })
+    this.dispatchEvent({ type: MiewEvents.LOADING, options: opts, source })
 
     const job = new JobHandle()
     this._loading.push(job)
@@ -2243,7 +2246,7 @@ export class Miew extends EventDispatcher {
       }
       this._spinner.stop()
       this._refreshTitle()
-      job.notify({ type: 'loadingDone', anything })
+      job.notify({ type: MiewEvents.LOADING_DONE, anything })
       return anything
     }
 
@@ -2290,7 +2293,7 @@ export class Miew extends EventDispatcher {
       this._frameInfo = new FrameInfo(visual.getComplex(), fileData, {
         onLoadStatusChanged() {
           self.dispatchEvent({
-            type: 'mdPlayerStateChanged',
+            type: MiewEvents.MD_PLAYER_STATE_CHANGED,
             state: {
               isPlaying: self._isAnimating,
               isLoading: self._frameInfo ? self._frameInfo.isLoading : true
@@ -2323,7 +2326,7 @@ export class Miew extends EventDispatcher {
     this._animInterval = null
     if (this._frameInfo) {
       this.dispatchEvent({
-        type: 'mdPlayerStateChanged',
+        type: MiewEvents.MD_PLAYER_STATE_CHANGED,
         state: {
           isPlaying: this._isAnimating,
           isLoading: this._frameInfo.isLoading
@@ -2351,7 +2354,7 @@ export class Miew extends EventDispatcher {
     }
     this._animInterval = setInterval(() => {
       self.dispatchEvent({
-        type: 'mdPlayerStateChanged',
+        type: MiewEvents.MD_PLAYER_STATE_CHANGED,
         state: {
           isPlaying: self._isAnimating,
           isLoading: self._frameInfo.isLoading
@@ -2389,7 +2392,7 @@ export class Miew extends EventDispatcher {
     this._frameInfo = null
     this._animInterval = null
     this.dispatchEvent({
-      type: 'mdPlayerStateChanged',
+      type: MiewEvents.MD_PLAYER_STATE_CHANGED,
       state: null
     })
   }
@@ -2629,7 +2632,7 @@ export class Miew extends EventDispatcher {
     }
     this._building = true
 
-    this.dispatchEvent({ type: 'rebuilding' })
+    this.dispatchEvent({ type: MiewEvents.REBUILDING })
 
     this._rebuildObjects()
 
@@ -2659,7 +2662,7 @@ export class Miew extends EventDispatcher {
       self._needRender = true
 
       self._refreshTitle()
-      this.dispatchEvent({ type: 'buildingDone' })
+      this.dispatchEvent({ type: MiewEvents.BUILDING_DONE })
       self._building = false
     })
   }
@@ -2684,7 +2687,7 @@ export class Miew extends EventDispatcher {
     }
     title += appendix
 
-    this.dispatchEvent({ type: 'titleChanged', data: title })
+    this.dispatchEvent({ type: MiewEvents.TITLE_CHANGED, data: title })
   }
 
   setNeedRender() {
@@ -2719,7 +2722,7 @@ export class Miew extends EventDispatcher {
       }
 
       this.dispatchEvent({
-        type: 'repAdded',
+        type: MiewEvents.REP_ADDED,
         index: res.index,
         name: visual.name
       })
@@ -2823,13 +2826,13 @@ export class Miew extends EventDispatcher {
     const res = visual.rep(index, rep)
     if (res.status === 'created') {
       this.dispatchEvent({
-        type: 'repAdded',
+        type: MiewEvents.REP_ADDED,
         index: res.index,
         name: visual.name
       })
     } else if (res.status === 'changed') {
       this.dispatchEvent({
-        type: 'repChanged',
+        type: MiewEvents.REP_CHANGED,
         index: res.index,
         name: visual.name
       })
@@ -2860,7 +2863,7 @@ export class Miew extends EventDispatcher {
 
     const res = visual.repAdd(rep)
     if (res) {
-      this.dispatchEvent({ type: 'repAdded', index: res.index, name })
+      this.dispatchEvent({ type: MiewEvents.REP_ADDED, index: res.index, name })
       return res.index
     }
     return -1
@@ -2877,7 +2880,7 @@ export class Miew extends EventDispatcher {
     }
 
     visual.repRemove(index)
-    this.dispatchEvent({ type: 'repRemoved', index, name })
+    this.dispatchEvent({ type: MiewEvents.REP_REMOVED, index, name })
   }
 
   /**
@@ -2908,7 +2911,7 @@ export class Miew extends EventDispatcher {
     }
 
     this.dispatchEvent({
-      type: 'editModeChanged',
+      type: MiewEvents.EDIT_MODE_CHANGED,
       data: mode === EDIT_MODE.COMPLEX
     })
   }
@@ -3294,7 +3297,7 @@ export class Miew extends EventDispatcher {
 
     boundingBox.getCenter(center)
     this._objectControls.setPivot(center.negate())
-    this.dispatchEvent({ type: 'transform' })
+    this.dispatchEvent({ type: MiewEvents.TRANSFORM })
   }
 
   setPivotResidue(residue) {
@@ -3321,7 +3324,7 @@ export class Miew extends EventDispatcher {
     }
     center.applyMatrix4(visual.matrix).negate()
     this._objectControls.setPivot(center)
-    this.dispatchEvent({ type: 'transform' })
+    this.dispatchEvent({ type: MiewEvents.TRANSFORM })
   }
 
   setPivotAtom(atom) {
@@ -3336,7 +3339,7 @@ export class Miew extends EventDispatcher {
     center.copy(atom.position)
     center.applyMatrix4(visual.matrix).negate()
     this._objectControls.setPivot(center)
-    this.dispatchEvent({ type: 'transform' })
+    this.dispatchEvent({ type: MiewEvents.TRANSFORM })
   }
 
   getSelectionCenter(center, includesAtom, selector) {
@@ -3372,7 +3375,7 @@ export class Miew extends EventDispatcher {
 
     if (this.getSelectionCenter(_center, includesAtom, selector)) {
       this._objectControls.setPivot(_center)
-      this.dispatchEvent({ type: 'transform' })
+      this.dispatchEvent({ type: MiewEvents.TRANSFORM })
     } else {
       this.logger.warn('selection is empty. Center operation not performed')
     }
@@ -3495,13 +3498,13 @@ export class Miew extends EventDispatcher {
         const filename = this._visuals[this._curVisualName]._complex.name
         utils.download(dataString, filename, opts.fileType)
         this._refreshTitle()
-        this.dispatchEvent({ type: 'exportingDone' })
+        this.dispatchEvent({ type: MiewEvents.EXPORTING_DONE })
       })
       .catch((error) => {
         this.logger.error('Could not export data')
         this.logger.debug(error)
         this._refreshTitle()
-        this.dispatchEvent({ type: 'exportingDone', error })
+        this.dispatchEvent({ type: MiewEvents.EXPORTING_DONE, error })
       })
   }
 
@@ -4254,7 +4257,7 @@ export class Miew extends EventDispatcher {
       pivot.position.copy(curr.position)
       self._objectControls.setScale(curr.scale * settings.now.radiusToFit)
       self._objectControls.setOrientation(curr.orientation)
-      this.dispatchEvent({ type: 'transform' })
+      this.dispatchEvent({ type: MiewEvents.TRANSFORM })
       self._needRender = true
     }
   }
@@ -4267,7 +4270,7 @@ export class Miew extends EventDispatcher {
    */
   translate(x, y, z) {
     this._objectControls.translatePivot(x, y, z)
-    this.dispatchEvent({ type: 'transform' })
+    this.dispatchEvent({ type: MiewEvents.TRANSFORM })
     this._needRender = true
   }
 
@@ -4281,7 +4284,7 @@ export class Miew extends EventDispatcher {
     this._objectControls.rotate(
       new Quaternion().setFromEuler(new Euler(x, y, z, 'XYZ'))
     )
-    this.dispatchEvent({ type: 'transform' })
+    this.dispatchEvent({ type: MiewEvents.TRANSFORM })
     this._needRender = true
   }
 
@@ -4294,7 +4297,7 @@ export class Miew extends EventDispatcher {
       throw new RangeError('Scale should be greater than zero')
     }
     this._objectControls.scale(factor)
-    this.dispatchEvent({ type: 'transform' })
+    this.dispatchEvent({ type: MiewEvents.TRANSFORM })
     this._needRender = true
   }
 
