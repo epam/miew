@@ -4,9 +4,13 @@ import styled from '@emotion/styled'
 
 const statusesMap = {
   fetching: 'Fetching...',
+  fetchingDone: 'Fetching is done',
+  loading: 'Loading...',
+  loadingDone: 'Loading is done',
   parsing: 'Parsing...',
+  parsingDone: 'Parsing is done',
   rebuilding: 'Building geometry...',
-  buildingDone: 'Building is ready'
+  buildingDone: 'Building geometry is done'
 }
 
 export const StatusPanel = () => {

@@ -6,7 +6,7 @@ import { createTheme } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import { merge } from 'lodash'
 import { defaultTheme, MiewTheme } from './theming'
-import { useAppDispatch } from 'state'
+import { AppDispatch, useAppDispatch } from 'state'
 import { ControlPanel } from 'components/controlPanel'
 import { UPDATE_STATUS, UPDATE_TITLE } from 'state/status'
 
@@ -32,6 +32,65 @@ type ViewerProps = {
   options?: MiewOptions
   theme?: DeepPartial<MiewTheme>
   mode?: ViewerMode
+}
+
+const addStatusListeners = (miew: Miew, dispatch: AppDispatch) => {
+  const {
+    FETCHING,
+    FETCHING_DONE,
+    LOADING,
+    LOADING_DONE,
+    PARSING,
+    PARSING_DONE,
+    REBUILDING,
+    BUILDING_DONE,
+    EXPORTING,
+    EXPORTING_DONE
+  } = MiewEvents
+  const events = [
+    FETCHING,
+    FETCHING_DONE,
+    LOADING,
+    LOADING_DONE,
+    PARSING,
+    PARSING_DONE,
+    REBUILDING,
+    BUILDING_DONE,
+    EXPORTING,
+    EXPORTING_DONE
+  ]
+  const action = UPDATE_STATUS
+  const eventCallbacks = {}
+  const getEventCallback = (payload) => () => dispatch(action(payload))
+
+  events.forEach((event) => {
+    const eventCallBack = getEventCallback(event)
+    eventCallbacks[event] = eventCallBack
+    miew.addEventListener(event, eventCallBack)
+  })
+
+  return eventCallbacks
+}
+
+const addTitleListener = (miew: Miew, dispatch: AppDispatch) => {
+  const { TITLE_CHANGED } = MiewEvents
+  const eventCallback = (event) => dispatch(UPDATE_TITLE(event.data))
+  miew.addEventListener(TITLE_CHANGED, eventCallback)
+  return { [TITLE_CHANGED]: eventCallback }
+}
+
+const addListeners = (miew: Miew, dispatch: AppDispatch) => {
+  return {
+    ...addStatusListeners(miew, dispatch),
+    ...addTitleListener(miew, dispatch)
+  }
+}
+
+const removeListeners = (miew: Miew, listeners: object) => {
+  const listenersEntries = Object.entries(listeners)
+  listenersEntries.forEach(([event, callback]) => {
+    miew.removeEventListener(event, callback)
+  })
 }
 
 const muiTheme = createTheme()
@@ -71,21 +130,8 @@ const Viewer = ({ onInit, options, theme, mode }: ViewerProps) => {
     })
     if (miew.init()) miew.run()
     if (typeof onInit === 'function') onInit(miew)
-    miew.addEventListener(MiewEvents.FETCHING, () => {
-      dispatch(UPDATE_STATUS(MiewEvents.FETCHING))
-    })
-    miew.addEventListener(MiewEvents.PARSING, () => {
-      dispatch(UPDATE_STATUS(MiewEvents.PARSING))
-    })
-    miew.addEventListener(MiewEvents.REBUILDING, () => {
-      dispatch(UPDATE_STATUS(MiewEvents.REBUILDING))
-    })
-    miew.addEventListener(MiewEvents.BUILDING_DONE, () => {
-      dispatch(UPDATE_STATUS(MiewEvents.BUILDING_DON))
-    })
-    miew.addEventListener(MiewEvents.TITLE_CHANGED, (e) => {
-      dispatch(UPDATE_TITLE(e.data))
-    })
+    const callbacks = addListeners(miew, dispatch)
+    return () => removeListeners(miew, callbacks)
   }, [options, onInit])
 
   return (
