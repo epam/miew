@@ -22,15 +22,6 @@ Object {
   border-radius: 4px;
   color: #C0C0C0;
   background-color: rgba(142, 67, 67, 0.75);
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: left;
-  -ms-flex-pack: left;
-  -webkit-justify-content: left;
-  justify-content: left;
-  opacity: 0;
 }
 
 .emotion-0>.overlay p {
@@ -64,15 +55,6 @@ Object {
   border-radius: 4px;
   color: #C0C0C0;
   background-color: rgba(142, 67, 67, 0.75);
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: left;
-  -ms-flex-pack: left;
-  -webkit-justify-content: left;
-  justify-content: left;
-  opacity: 0;
 }
 
 .emotion-0>.overlay p {
@@ -161,15 +143,6 @@ Object {
   border-radius: 4px;
   color: #C0C0C0;
   background-color: rgba(64, 64, 64, 0.75);
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: left;
-  -ms-flex-pack: left;
-  -webkit-justify-content: left;
-  justify-content: left;
-  opacity: 0;
 }
 
 .emotion-0>.overlay p {
@@ -203,15 +176,6 @@ Object {
   border-radius: 4px;
   color: #C0C0C0;
   background-color: rgba(64, 64, 64, 0.75);
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: left;
-  -ms-flex-pack: left;
-  -webkit-justify-content: left;
-  justify-content: left;
-  opacity: 0;
 }
 
 .emotion-0>.overlay p {
