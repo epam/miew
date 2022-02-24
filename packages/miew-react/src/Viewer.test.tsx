@@ -40,8 +40,6 @@ const customTheme = {
   }
 }
 
-const { MINIMAL, CUSTOM, DEFAULT } = ViewerMode
-
 describe('Viewer component', () => {
   it('should apply custom theme when theme prop is provided', () => {
     expect(render(<Viewer theme={customTheme} />).container).toMatchSnapshot()
@@ -50,12 +48,18 @@ describe('Viewer component', () => {
     expect(render(<Viewer />).container).toMatchSnapshot()
   })
   it('should not contain Control panel, if "minimal" mode prop is provided', () => {
-    expect(render(<Viewer mode={MINIMAL} />).container).toMatchSnapshot()
+    expect(
+      render(<Viewer mode={ViewerMode.MINIMAL} />).container
+    ).toMatchSnapshot()
   })
   it('should contain Control panel, if "default" mode prop is provided', () => {
-    expect(render(<Viewer mode={DEFAULT} />).container).toMatchSnapshot()
+    expect(
+      render(<Viewer mode={ViewerMode.DEFAULT} />).container
+    ).toMatchSnapshot()
   })
   it('should contain Control panel, if "custom" mode prop is provided', () => {
-    expect(render(<Viewer mode={CUSTOM} />).container).toMatchSnapshot()
+    expect(
+      render(<Viewer mode={ViewerMode.CUSTOM} />).container
+    ).toMatchSnapshot()
   })
 })
