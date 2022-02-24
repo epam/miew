@@ -1,31 +1,45 @@
 import { StatusPanel } from './StatusPanel'
-import { render, screen } from '@testing-library/react'
-import { combineReducers, createStore } from 'redux'
-import { Provider } from 'react-redux'
-import { statusReducer } from 'state/status/statusSlice'
+import { render } from '@testing-library/react'
 import { ThemeProvider } from '@emotion/react'
-import { defaultTheme } from 'theming'
-import { merge } from 'lodash'
-import { createTheme } from '@mui/material/styles'
-import { UPDATE_STATUS } from 'state/status'
 import '@testing-library/jest-dom'
+import { useAppSelector } from 'state/hooks'
 
-const theme = merge(createTheme(), { miew: defaultTheme })
-const testStatus = 'TEST'
+jest.mock('state/hooks', () => ({
+  useAppSelector: jest.fn()
+}))
+
+const theme = {
+  miew: {
+    palette: {
+      secondary: {
+        light: '#fff'
+      }
+    }
+  }
+}
 
 describe('StatusPanel component', () => {
-  it('should display status stored in store', () => {
-    const store = createStore(combineReducers({ status: statusReducer }))
-    store.dispatch({ type: UPDATE_STATUS, payload: testStatus })
-    render(<StatusPanel />, {
-      wrapper: ({ children }) => {
-        return (
-          <Provider store={store}>
-            <ThemeProvider theme={theme}>{children}</ThemeProvider>
-          </Provider>
-        )
-      }
-    })
-    expect(screen.getByText(testStatus)).toBeInTheDocument()
-  })
+  it.each`
+    status             | moleculeInfo       | expectedResult
+    ${''}              | ${''}              | ${''}
+    ${'fetching'}      | ${''}              | ${'Fetching...'}
+    ${'unknownStatus'} | ${''}              | ${''}
+    ${''}              | ${'molecule mode'} | ${'molecule mode'}
+    ${'fetching'}      | ${'molecule mode'} | ${'molecule mode'}
+    ${'unknownStatus'} | ${'molecule mode'} | ${'molecule mode'}
+  `(
+    'should display status, molecule info or emtpy line depending on store (infoSlice) state',
+    ({ status, moleculeInfo, expectedResult }) => {
+      ;(
+        useAppSelector as jest.MockedFunction<typeof useAppSelector>
+      ).mockImplementation(() => ({ status, moleculeInfo }))
+      const { container } = render(
+        <ThemeProvider theme={theme}>
+          <StatusPanel />
+        </ThemeProvider>
+      )
+      // eslint-disable-next-line
+      expect(container.querySelector('span')?.innerHTML).toEqual(expectedResult) //cannot use getByRole for span
+    }
+  )
 })

@@ -1,15 +1,13 @@
 import createSagaMiddleware from 'redux-saga'
 import { configureStore } from '@reduxjs/toolkit'
 import { rootSaga } from 'state/rootSaga'
-import { initReducer } from 'state/common'
-import { statusReducer } from './status'
+import { infoReducer } from './info'
 
 const sagaMiddleware = createSagaMiddleware()
 
 export const store = configureStore({
   reducer: {
-    init: initReducer,
-    status: statusReducer
+    info: infoReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(sagaMiddleware)

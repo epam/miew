@@ -10,14 +10,17 @@ const statusesMap = {
   parsing: 'Parsing...',
   parsingDone: 'Parsing is done',
   rebuilding: 'Building geometry...',
-  buildingDone: 'Building geometry is done'
+  buildingDone: 'Building geometry is done',
+  exporting: 'Exporting...',
+  exportingDone: 'Exporting is done'
 }
 
+const StyledSpan = styled.span`
+  color: ${({ theme }) => theme.miew.palette.secondary.light};
+`
 export const StatusPanel = () => {
-  const StyledSpan = styled.span`
-    color: ${({ theme }) => theme.miew.palette.secondary.light};
-  `
-  const { status, title } = useAppSelector((state: RootState) => state.status)
-
-  return <StyledSpan>{title || statusesMap[status]}</StyledSpan>
+  const { status, moleculeInfo } = useAppSelector(
+    (state: RootState) => state.info
+  )
+  return <StyledSpan>{moleculeInfo || statusesMap[status]}</StyledSpan>
 }

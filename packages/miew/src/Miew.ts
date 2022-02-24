@@ -90,6 +90,7 @@ import {
   isEmpty
 } from 'lodash'
 
+/* eslint-disable no-unused-vars */
 export enum MiewEvents {
   FETCHING = 'fetching',
   FETCHING_DONE = 'fetchingDone',
@@ -112,6 +113,7 @@ export enum MiewEvents {
   EDIT_MODE_CHANGED = 'editModeChanged',
   MD_PLAYER_STATE_CHANGED = 'mdPlayerStateChanged'
 }
+/* eslint-enable no-unused-vars */
 
 const { selectors, Atom, Residue, Chain, Molecule } = chem
 
@@ -707,7 +709,10 @@ export class Miew extends EventDispatcher {
         // route rotate, zoom, translate and translatePivot events to the external API
         switch (e.action) {
           case MiewEvents.ROTATE:
-            self.dispatchEvent({ type: MiewEvents.ROTATE, quaternion: e.quaternion })
+            self.dispatchEvent({
+              type: MiewEvents.ROTATE,
+              quaternion: e.quaternion
+            })
             break
           case MiewEvents.ZOOM:
             self.dispatchEvent({ type: MiewEvents.ZOOM, factor: e.factor })

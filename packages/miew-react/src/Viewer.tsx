@@ -8,7 +8,7 @@ import { merge } from 'lodash'
 import { defaultTheme, MiewTheme } from './theming'
 import { AppDispatch, useAppDispatch } from 'state'
 import { ControlPanel } from 'components/controlPanel'
-import { UPDATE_STATUS, UPDATE_TITLE } from 'state/status'
+import { UPDATE_STATUS, UPDATE_MOLECULE_INFO } from 'state/info'
 
 const MEDIA_SIZES = {
   smallWidth: 800,
@@ -35,48 +35,29 @@ type ViewerProps = {
 }
 
 const addStatusListeners = (miew: Miew, dispatch: AppDispatch) => {
-  const {
-    FETCHING,
-    FETCHING_DONE,
-    LOADING,
-    LOADING_DONE,
-    PARSING,
-    PARSING_DONE,
-    REBUILDING,
-    BUILDING_DONE,
-    EXPORTING,
-    EXPORTING_DONE
-  } = MiewEvents
   const events = [
-    FETCHING,
-    FETCHING_DONE,
-    LOADING,
-    LOADING_DONE,
-    PARSING,
-    PARSING_DONE,
-    REBUILDING,
-    BUILDING_DONE,
-    EXPORTING,
-    EXPORTING_DONE
+    MiewEvents.FETCHING,
+    MiewEvents.FETCHING_DONE,
+    MiewEvents.LOADING,
+    MiewEvents.LOADING_DONE,
+    MiewEvents.PARSING,
+    MiewEvents.PARSING_DONE,
+    MiewEvents.REBUILDING,
+    MiewEvents.BUILDING_DONE,
+    MiewEvents.EXPORTING,
+    MiewEvents.EXPORTING_DONE
   ]
-  const action = UPDATE_STATUS
-  const eventCallbacks = {}
-  const getEventCallback = (payload) => () => dispatch(action(payload))
-
-  events.forEach((event) => {
-    const eventCallBack = getEventCallback(event)
-    eventCallbacks[event] = eventCallBack
-    miew.addEventListener(event, eventCallBack)
-  })
-
-  return eventCallbacks
+  return events.reduce((acc, event) => {
+    const eventCallback = () => dispatch(UPDATE_STATUS(event))
+    miew.addEventListener(event, eventCallback)
+    return { ...acc, [event]: eventCallback }
+  }, {})
 }
 
 const addTitleListener = (miew: Miew, dispatch: AppDispatch) => {
-  const { TITLE_CHANGED } = MiewEvents
-  const eventCallback = (event) => dispatch(UPDATE_TITLE(event.data))
-  miew.addEventListener(TITLE_CHANGED, eventCallback)
-  return { [TITLE_CHANGED]: eventCallback }
+  const eventCallback = (event) => dispatch(UPDATE_MOLECULE_INFO(event.data))
+  miew.addEventListener(MiewEvents.TITLE_CHANGED, eventCallback)
+  return { [MiewEvents.TITLE_CHANGED]: eventCallback }
 }
 
 const addListeners = (miew: Miew, dispatch: AppDispatch) => {
@@ -87,10 +68,9 @@ const addListeners = (miew: Miew, dispatch: AppDispatch) => {
 }
 
 const removeListeners = (miew: Miew, listeners: object) => {
-  const listenersEntries = Object.entries(listeners)
-  listenersEntries.forEach(([event, callback]) => {
+  Object.entries(listeners).forEach(([event, callback]) =>
     miew.removeEventListener(event, callback)
-  })
+  )
 }
 
 const muiTheme = createTheme()
