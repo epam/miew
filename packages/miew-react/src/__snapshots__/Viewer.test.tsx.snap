@@ -1,5 +1,57 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Viewer component should  contain ControlPanel for custom mode 1`] = `
+.emotion-0 {
+  background-color: #f00;
+  height: 100%;
+  width: 100%;
+}
+
+.emotion-0>.miew-canvas {
+  height: 100%;
+  width: 100%;
+}
+
+.emotion-0>.atom-info {
+  color: #fcf8f8;
+}
+
+<div>
+  <div>
+    Control Panel
+  </div>
+  <div
+    class="emotion-0"
+  />
+</div>
+`;
+
+exports[`Viewer component should  contain ControlPanel for default mode 1`] = `
+.emotion-0 {
+  background-color: #f00;
+  height: 100%;
+  width: 100%;
+}
+
+.emotion-0>.miew-canvas {
+  height: 100%;
+  width: 100%;
+}
+
+.emotion-0>.atom-info {
+  color: #fcf8f8;
+}
+
+<div>
+  <div>
+    Control Panel
+  </div>
+  <div
+    class="emotion-0"
+  />
+</div>
+`;
+
 exports[`Viewer component should apply custom theme when theme prop is provided 1`] = `
 .emotion-0 {
   background-color: #f00;
@@ -23,82 +75,7 @@ exports[`Viewer component should apply custom theme when theme prop is provided 
 </div>
 `;
 
-exports[`Viewer component should contain Control panel, if "custom" mode prop is provided 1`] = `
-.emotion-0 {
-  background-color: #f00;
-  height: 100%;
-  width: 100%;
-}
-
-.emotion-0>.miew-canvas {
-  height: 100%;
-  width: 100%;
-}
-
-.emotion-0>.atom-info {
-  color: #fcf8f8;
-}
-
-<div>
-  <div>
-    Control Panel
-  </div>
-  <div
-    class="emotion-0"
-  />
-</div>
-`;
-
-exports[`Viewer component should contain Control panel, if "default" mode prop is provided 1`] = `
-.emotion-0 {
-  background-color: #f00;
-  height: 100%;
-  width: 100%;
-}
-
-.emotion-0>.miew-canvas {
-  height: 100%;
-  width: 100%;
-}
-
-.emotion-0>.atom-info {
-  color: #fcf8f8;
-}
-
-<div>
-  <div>
-    Control Panel
-  </div>
-  <div
-    class="emotion-0"
-  />
-</div>
-`;
-
-exports[`Viewer component should not contain Control panel, if "minimal" mode prop is provided 1`] = `
-.emotion-0 {
-  background-color: #f00;
-  height: 100%;
-  width: 100%;
-}
-
-.emotion-0>.miew-canvas {
-  height: 100%;
-  width: 100%;
-}
-
-.emotion-0>.atom-info {
-  color: #fcf8f8;
-}
-
-<div>
-  <div
-    class="emotion-0"
-  />
-</div>
-`;
-
-exports[`Viewer component should not contain Control panel, if no mode prop is provided 1`] = `
+exports[`Viewer component should not contain ControlPanel for minimal mode 1`] = `
 .emotion-0 {
   background-color: #f00;
   height: 100%;

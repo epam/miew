@@ -44,22 +44,15 @@ describe('Viewer component', () => {
   it('should apply custom theme when theme prop is provided', () => {
     expect(render(<Viewer theme={customTheme} />).container).toMatchSnapshot()
   })
-  it('should not contain Control panel, if no mode prop is provided', () => {
-    expect(render(<Viewer />).container).toMatchSnapshot()
-  })
-  it('should not contain Control panel, if "minimal" mode prop is provided', () => {
-    expect(
-      render(<Viewer mode={ViewerMode.MINIMAL} />).container
-    ).toMatchSnapshot()
-  })
-  it('should contain Control panel, if "default" mode prop is provided', () => {
-    expect(
-      render(<Viewer mode={ViewerMode.DEFAULT} />).container
-    ).toMatchSnapshot()
-  })
-  it('should contain Control panel, if "custom" mode prop is provided', () => {
-    expect(
-      render(<Viewer mode={ViewerMode.CUSTOM} />).container
-    ).toMatchSnapshot()
-  })
+  it.each`
+    mode                  | shouldContainPanel
+    ${ViewerMode.MINIMAL} | ${'not'}
+    ${ViewerMode.CUSTOM}  | ${''}
+    ${ViewerMode.DEFAULT} | ${''}
+  `(
+    `should $shouldContainPanel contain ControlPanel for $mode mode`,
+    ({ mode }) => {
+      expect(render(<Viewer mode={mode} />).container).toMatchSnapshot()
+    }
+  )
 })
