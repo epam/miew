@@ -1,22 +1,15 @@
 version: "2"
-plugins:
-  fixme:
-    enabled: true
-  duplication:
-    enabled: true
-    exclude_patterns:
-    - "**/*.test.js"
-    - "**/*.test.ts"
-    - "**/*.e2e.js"
 exclude_patterns:
 - ".github/"
-- ".idea/"
-- "dist/"
-- "docs/"
+- "**/dist/"
 - "**/tools/"
 - "**/vendors/"
 - "examples/"
 - "documentation/"
 - "**/test/"
 - "**/__test__/"
+- "**/*.test.js"
+- "**/*.test.ts"
+- "**/*.test.tsx"
+- "**/e2e/"
 - "**/*.d.ts"
