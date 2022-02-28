@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { Miew, MiewOptions, MiewEvents } from 'miew'
 import useResizeObserver from 'use-resize-observer'
-import { Theme, ThemeProvider } from '@emotion/react'
+import { css, Theme, ThemeProvider } from '@emotion/react'
 import { createTheme } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import { merge } from 'lodash'
@@ -9,6 +9,7 @@ import { defaultTheme, MiewTheme } from './theming'
 import { AppDispatch, useAppDispatch } from 'state'
 import { ControlPanel } from 'components/controlPanel'
 import { UPDATE_STATUS, UPDATE_MOLECULE_INFO } from 'state/info'
+import hexToRgba from 'hex-to-rgba'
 
 const MEDIA_SIZES = {
   smallWidth: 800,
@@ -73,9 +74,42 @@ const removeListeners = (miew: Miew, listeners: object) => {
   )
 }
 
+const getStyle = (isSizeSmall, hasControlPanel) => {
+  return (theme: Theme) => {
+    const palette = theme.miew.palette
+    return css({
+      backgroundColor: isSizeSmall ? palette.accent.main : palette.primary.main,
+      height: '100%',
+      width: '100%',
+      position: 'relative',
+      '& > .miew-canvas': {
+        height: '100%',
+        width: '100%'
+      },
+      '& > .overlay': {
+        position: 'absolute',
+        top: hasControlPanel ? '47px' : '10px',
+        right: '10px',
+        borderRadius: '4px',
+        color: palette.secondary.light,
+        backgroundColor: hexToRgba(palette.primary.dark, 0.75),
+        p: {
+          margin: '10px',
+          textAlign: 'left'
+        }
+      }
+    })
+  }
+}
+
 const muiTheme = createTheme()
 
-const Viewer = ({ onInit, options, theme, mode }: ViewerProps) => {
+const Viewer = ({
+  onInit,
+  options,
+  theme,
+  mode = ViewerMode.MINIMAL
+}: ViewerProps) => {
   const dispatch = useAppDispatch()
 
   const viewerTheme = theme ? merge(defaultTheme, theme) : defaultTheme
@@ -87,21 +121,9 @@ const Viewer = ({ onInit, options, theme, mode }: ViewerProps) => {
     (height && height <= MEDIA_SIZES.smallHeight) ||
     (width && width <= MEDIA_SIZES.smallWidth)
 
-  const viewerStyle = (theme: Theme) => {
-    const palette = theme.miew.palette
-    return {
-      backgroundColor: isSizeSmall ? palette.accent.main : palette.primary.main,
-      height: '100%',
-      width: '100%',
-      '& > .miew-canvas': {
-        height: '100%',
-        width: '100%'
-      },
-      '& > .atom-info': {
-        color: palette.primary.light
-      }
-    }
-  }
+  const hasControlPanel = mode !== ViewerMode.MINIMAL
+
+  const style = getStyle(isSizeSmall, hasControlPanel)
 
   useLayoutEffect(() => {
     const miew = new Miew({
@@ -110,6 +132,7 @@ const Viewer = ({ onInit, options, theme, mode }: ViewerProps) => {
     })
     if (miew.init()) miew.run()
     if (typeof onInit === 'function') onInit(miew)
+
     const callbacks = addListeners(miew, dispatch)
     return () => removeListeners(miew, callbacks)
   }, [options, onInit])
@@ -117,8 +140,8 @@ const Viewer = ({ onInit, options, theme, mode }: ViewerProps) => {
   return (
     <ThemeProvider theme={merge(muiTheme, { miew: viewerTheme })}>
       <CssBaseline />
-      {!mode || mode === ViewerMode.MINIMAL || <ControlPanel />}
-      <div ref={ref} css={viewerStyle} />
+      {hasControlPanel && <ControlPanel />}
+      <div ref={ref} css={style} />
     </ThemeProvider>
   )
 }

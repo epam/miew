@@ -5,6 +5,7 @@ exports[`Viewer component should  contain ControlPanel for custom mode 1`] = `
   background-color: #f00;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .emotion-0>.miew-canvas {
@@ -12,8 +13,18 @@ exports[`Viewer component should  contain ControlPanel for custom mode 1`] = `
   width: 100%;
 }
 
-.emotion-0>.atom-info {
-  color: #fcf8f8;
+.emotion-0>.overlay {
+  position: absolute;
+  top: 47px;
+  right: 10px;
+  border-radius: 4px;
+  color: #C0C0C0;
+  background-color: rgba(142, 67, 67, 0.75);
+}
+
+.emotion-0>.overlay p {
+  margin: 10px;
+  text-align: left;
 }
 
 <div>
@@ -31,6 +42,7 @@ exports[`Viewer component should  contain ControlPanel for default mode 1`] = `
   background-color: #f00;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .emotion-0>.miew-canvas {
@@ -38,8 +50,18 @@ exports[`Viewer component should  contain ControlPanel for default mode 1`] = `
   width: 100%;
 }
 
-.emotion-0>.atom-info {
-  color: #fcf8f8;
+.emotion-0>.overlay {
+  position: absolute;
+  top: 47px;
+  right: 10px;
+  border-radius: 4px;
+  color: #C0C0C0;
+  background-color: rgba(142, 67, 67, 0.75);
+}
+
+.emotion-0>.overlay p {
+  margin: 10px;
+  text-align: left;
 }
 
 <div>
@@ -57,6 +79,7 @@ exports[`Viewer component should apply custom theme when theme prop is provided 
   background-color: #f00;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .emotion-0>.miew-canvas {
@@ -64,8 +87,18 @@ exports[`Viewer component should apply custom theme when theme prop is provided 
   width: 100%;
 }
 
-.emotion-0>.atom-info {
-  color: #fcf8f8;
+.emotion-0>.overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: 4px;
+  color: #C0C0C0;
+  background-color: rgba(142, 67, 67, 0.75);
+}
+
+.emotion-0>.overlay p {
+  margin: 10px;
+  text-align: left;
 }
 
 <div>
@@ -80,6 +113,7 @@ exports[`Viewer component should not contain ControlPanel for minimal mode 1`] =
   background-color: #f00;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .emotion-0>.miew-canvas {
@@ -87,8 +121,18 @@ exports[`Viewer component should not contain ControlPanel for minimal mode 1`] =
   width: 100%;
 }
 
-.emotion-0>.atom-info {
-  color: #fcf8f8;
+.emotion-0>.overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: 4px;
+  color: #C0C0C0;
+  background-color: rgba(142, 67, 67, 0.75);
+}
+
+.emotion-0>.overlay p {
+  margin: 10px;
+  text-align: left;
 }
 
 <div>
