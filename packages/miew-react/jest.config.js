@@ -1,5 +1,6 @@
 module.exports = {
   testPathIgnorePatterns: ['dist', 'node_modules'],
+  testEnvironment: 'jsdom',
   transform: {
     '\\.js?$': 'babel-jest',
     '\\.(ts|tsx)$': 'ts-jest'

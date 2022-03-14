@@ -1,4 +1,4 @@
-import { Miew, MiewOptions } from './Miew'
+import { Miew, MiewOptions, MiewEvents } from './Miew'
 export type { MiewOptions }
-export { Miew }
+export { Miew, MiewEvents }
 export default Miew

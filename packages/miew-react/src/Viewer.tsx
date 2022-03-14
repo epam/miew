@@ -1,13 +1,14 @@
 import { useLayoutEffect, useRef } from 'react'
-import { Provider } from 'react-redux'
-import { Miew, MiewOptions } from 'miew'
+import { Miew, MiewOptions, MiewEvents } from 'miew'
 import useResizeObserver from 'use-resize-observer'
 import { css, Theme, ThemeProvider } from '@emotion/react'
 import { createTheme } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import { merge } from 'lodash'
-import { store } from 'state'
 import { defaultTheme, MiewTheme } from './theming'
+import { AppDispatch, useAppDispatch } from 'state'
+import { ControlPanel } from 'components/controlPanel'
+import { UPDATE_STATUS, UPDATE_MOLECULE_INFO } from 'state/info'
 import hexToRgba from 'hex-to-rgba'
 
 const MEDIA_SIZES = {
@@ -19,15 +20,61 @@ type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>
 }
 
+/* eslint-disable no-unused-vars */
+// will be used later
+export enum ViewerMode {
+  MINIMAL = 'minimal',
+  DEFAULT = 'default',
+  CUSTOM = 'custom'
+}
+
 type ViewerProps = {
   onInit?: (miew: Miew) => void
   options?: MiewOptions
   theme?: DeepPartial<MiewTheme>
+  mode?: ViewerMode
 }
 
-const muiTheme = createTheme()
+const addStatusListeners = (miew: Miew, dispatch: AppDispatch) => {
+  const events = [
+    MiewEvents.FETCHING,
+    MiewEvents.FETCHING_DONE,
+    MiewEvents.LOADING,
+    MiewEvents.LOADING_DONE,
+    MiewEvents.PARSING,
+    MiewEvents.PARSING_DONE,
+    MiewEvents.REBUILDING,
+    MiewEvents.BUILDING_DONE,
+    MiewEvents.EXPORTING,
+    MiewEvents.EXPORTING_DONE
+  ]
+  return events.reduce((acc, event) => {
+    const eventCallback = () => dispatch(UPDATE_STATUS(event))
+    miew.addEventListener(event, eventCallback)
+    return { ...acc, [event]: eventCallback }
+  }, {})
+}
 
-const getViewerStyle = (isSizeSmall) => {
+const addTitleListener = (miew: Miew, dispatch: AppDispatch) => {
+  const eventCallback = (event) => dispatch(UPDATE_MOLECULE_INFO(event.data))
+  miew.addEventListener(MiewEvents.TITLE_CHANGED, eventCallback)
+  return { [MiewEvents.TITLE_CHANGED]: eventCallback }
+}
+
+const addListeners = (miew: Miew, dispatch: AppDispatch) => {
+  return {
+    ...addStatusListeners(miew, dispatch),
+    ...addTitleListener(miew, dispatch)
+  }
+}
+
+const removeListeners = (miew: Miew, listeners: object) => {
+  Object.entries(listeners).forEach(([event, callback]) =>
+    miew.removeEventListener(event, callback)
+  )
+}
+
+const getStyle = (isSizeSmall, hasControlPanel) => {
   return (theme: Theme) => {
     const palette = theme.miew.palette
     return css({
@@ -41,7 +88,7 @@ const getViewerStyle = (isSizeSmall) => {
       },
       '& > .overlay': {
         position: 'absolute',
-        top: '10px', // TODO: Should be dynamic, depending on mode; refactor when controlPanel is merged
+        top: hasControlPanel ? '47px' : '10px',
         right: '10px',
         borderRadius: '4px',
         color: palette.secondary.light,
@@ -55,7 +102,16 @@ const getViewerStyle = (isSizeSmall) => {
   }
 }
 
-const Viewer = ({ onInit, options, theme }: ViewerProps) => {
+const muiTheme = createTheme()
+
+const Viewer = ({
+  onInit,
+  options,
+  theme,
+  mode = ViewerMode.MINIMAL
+}: ViewerProps) => {
+  const dispatch = useAppDispatch()
+
   const viewerTheme = theme ? merge(defaultTheme, theme) : defaultTheme
 
   const ref = useRef<HTMLDivElement>(null)
@@ -65,7 +121,9 @@ const Viewer = ({ onInit, options, theme }: ViewerProps) => {
     (height && height <= MEDIA_SIZES.smallHeight) ||
     (width && width <= MEDIA_SIZES.smallWidth)
 
-  const viewerStyle = getViewerStyle(isSizeSmall)
+  const hasControlPanel = mode !== ViewerMode.MINIMAL
+
+  const style = getStyle(isSizeSmall, hasControlPanel)
 
   useLayoutEffect(() => {
     const miew = new Miew({
@@ -74,15 +132,17 @@ const Viewer = ({ onInit, options, theme }: ViewerProps) => {
     })
     if (miew.init()) miew.run()
     if (typeof onInit === 'function') onInit(miew)
+
+    const callbacks = addListeners(miew, dispatch)
+    return () => removeListeners(miew, callbacks)
   }, [options, onInit])
 
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={merge(muiTheme, { miew: viewerTheme })}>
-        <CssBaseline />
-        <div ref={ref} css={viewerStyle} />
-      </ThemeProvider>
-    </Provider>
+    <ThemeProvider theme={merge(muiTheme, { miew: viewerTheme })}>
+      <CssBaseline />
+      {hasControlPanel && <ControlPanel />}
+      <div ref={ref} css={style} />
+    </ThemeProvider>
   )
 }
 
