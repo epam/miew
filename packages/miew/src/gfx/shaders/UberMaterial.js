@@ -131,7 +131,7 @@ const uberOptions = {
 
 class UberMaterial extends RawShaderMaterial {
   constructor(params) {
-    super(params)
+    super()
     // add fog
     this.fog = true
     // used for instanced geometry
@@ -178,17 +178,19 @@ class UberMaterial extends RawShaderMaterial {
     this.normalsToGBuffer = false
     // used for toon material
     this.toonShading = false
-    this.uberOptions = uberOptions
+    // uber options of "root" materials are inherited from single uber-options object that resides in prototype
+    this.uberOptions = Object.create(uberOptions)
     // set default values
-    this.setValues({
+    super.setValues({
       uniforms: UniformsUtils.clone(defaultUniforms),
       vertexShader: this.precisionString() + vertexShader,
       fragmentShader: this.precisionString() + fragmentShader,
       lights: true,
       fog: true,
-      side: DoubleSide,
-      ...params
+      side: DoubleSide
     })
+
+    this.setValues(params)
   }
 
   precisionString() {
@@ -238,6 +240,7 @@ class UberMaterial extends RawShaderMaterial {
     return this
   }
 
+  // create copy of this material
   // its options are prototyped after this material's options
   createInstance() {
     const inst = new UberMaterial()
@@ -383,5 +386,7 @@ class UberMaterial extends RawShaderMaterial {
     })
   }
 }
+
+UberMaterial.prototype.uberOptions = uberOptions
 
 export default UberMaterial
