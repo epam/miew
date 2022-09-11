@@ -201,7 +201,7 @@ class ComplexVisual extends Visual {
       if (!isEmpty(diff)) {
         target.needsRebuild = true
         for (const key in diff) {
-          if (diff.hasOwnProperty(key)) {
+          if (Object.hasOwn(diff, key)) {
             desc[key] = diff[key]
             logger.debug(`rep[${index}].${key} changed to ${diff[key]}`)
           }
@@ -655,6 +655,7 @@ class ComplexVisual extends Visual {
               }
             }
 
+            /* global DEBUG:false */
             if (DEBUG && !errorOccured) {
               logger.debug(
                 `Triangles count: ${meshutils.countTriangles(repr.geo)}`
@@ -755,7 +756,7 @@ class ComplexVisual extends Visual {
       }
       if (Object.keys(residues).length > 0) {
         for (const ch in residues) {
-          if (residues.hasOwnProperty(ch)) {
+          if (Object.hasOwn(residues, ch)) {
             selector = selectors.and(
               selectors.chain(ch),
               selectors.residx(optimizeList(residues[ch]))

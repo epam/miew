@@ -314,7 +314,7 @@ class MMTFParser extends Parser {
     for (let i = 0; i < this._complex._chains.length; ++i) {
       const chain = this._complex._chains[i]
       const name = chain.getName()
-      if (!named.hasOwnProperty(name)) {
+      if (!Object.hasOwn(named, name)) {
         named[name] = []
       }
 
@@ -351,7 +351,7 @@ class MMTFParser extends Parser {
       const allChains = []
       let name
       for (name in chainNames) {
-        if (chainNames.hasOwnProperty(name)) {
+        if (Object.hasOwn(chainNames, name)) {
           // just concat arrays -- there should be no duplicates
           Array.prototype.push.apply(allChains, this._chainsByName[name])
         }
@@ -367,7 +367,7 @@ class MMTFParser extends Parser {
 
       // add chains to assembly
       for (name in chainNames) {
-        if (chainNames.hasOwnProperty(name)) {
+        if (Object.hasOwn(chainNames, name)) {
           a.addChain(name)
         }
       }
@@ -445,7 +445,7 @@ class MMTFParser extends Parser {
     for (i = 0; i < this._complex._chains.length; ++i) {
       const chain = this._complex._chains[i]
       const name = chain.getName()
-      if (!primaryChainsHash.hasOwnProperty(name)) {
+      if (!Object.hasOwn(primaryChainsHash, name)) {
         // new name -- this is a primary chain
         primaryChainsHash[name] = chain
         chain._index = primaryChainsArray.length // update index as this array will later replace original chain list

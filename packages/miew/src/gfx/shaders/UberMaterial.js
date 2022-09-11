@@ -350,7 +350,7 @@ class UberMaterial extends RawShaderMaterial {
     }
 
     for (const key in values) {
-      if (!values.hasOwnProperty(key)) {
+      if (!Object.hasOwn(values, key)) {
         continue
       }
 
@@ -373,7 +373,7 @@ class UberMaterial extends RawShaderMaterial {
     const self = this
 
     uberOptionNames.forEach((p) => {
-      if (self.uniforms.hasOwnProperty(p)) {
+      if (Object.hasOwn(self.uniforms, p)) {
         if (
           self.uberOptions[p] instanceof Color ||
           self.uberOptions[p] instanceof Matrix4

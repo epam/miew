@@ -70,7 +70,7 @@ class ChunkedObjectsGeometry extends BufferGeometry {
     mesh.raycast(raycaster, inters)
     const facesPerChunk = this._chunkGeo.index.count / 3
     for (let i = 0, n = inters.length; i < n; ++i) {
-      if (!inters[i].hasOwnProperty('faceIndex')) {
+      if (!Object.hasOwn(inters[i], 'faceIndex')) {
         continue
       }
       inters[i].chunkIdx = Math.floor(inters[i].faceIndex / facesPerChunk)

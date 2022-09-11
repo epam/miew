@@ -386,7 +386,7 @@ describe('options', () => {
           if (
             key !== 'preset' &&
             key !== 'reps' &&
-            (!another.hasOwnProperty(key) || !isEqual(one[key], another[key]))
+            (!Object.hasOwn(another, key) || !isEqual(one[key], another[key]))
           ) {
             return false
           }

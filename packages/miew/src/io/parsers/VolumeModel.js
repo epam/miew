@@ -41,7 +41,7 @@ class VolumeModel {
 
   _fillHeader(headerFormat, arrays) {
     for (const key in headerFormat) {
-      if (headerFormat.hasOwnProperty(key)) {
+      if (Object.hasOwn(headerFormat, key)) {
         switch (headerFormat[key][0]) {
           case valueType.singular:
             this._header[key] =

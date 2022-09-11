@@ -209,7 +209,7 @@ function _countMeshTriangles(mesh) {
     const attribs = geom.attributes
     for (const property in attribs) {
       if (
-        attribs.hasOwnProperty(property) &&
+        Object.hasOwn(attribs, property) &&
         attribs[property] instanceof InstancedBufferAttribute
       ) {
         const currAttr = attribs[property]

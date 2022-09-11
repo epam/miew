@@ -279,7 +279,7 @@ var parser = (function () {
       var lexer = Object.create(this.lexer)
       var sharedState = { yy: {} }
       for (var k in this.yy) {
-        if (Object.prototype.hasOwnProperty.call(this.yy, k)) {
+        if (Object.hasOwn(this.yy, k)) {
           sharedState.yy[k] = this.yy[k]
         }
       }

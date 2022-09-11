@@ -339,7 +339,7 @@ function isAlmostPlainObject(o) {
   const proto = o && Object.getPrototypeOf(o)
   return (
     !!proto &&
-    !proto.hasOwnProperty('constructor') &&
+    !Object.hasOwn(proto, 'constructor') &&
     isAlmostPlainObject(proto)
   )
 }

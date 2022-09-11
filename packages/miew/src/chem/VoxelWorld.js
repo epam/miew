@@ -458,7 +458,7 @@ class VoxelWorld {
 
     // for each marked voxel
     for (voxel in voxels) {
-      if (voxels.hasOwnProperty(voxel)) {
+      if (Object.hasOwn(voxels, voxel)) {
         self._forEachAtomInVoxel(voxel, processIfWithin)
       }
     }

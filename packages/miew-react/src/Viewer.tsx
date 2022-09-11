@@ -135,7 +135,7 @@ const Viewer = ({
 
     const callbacks = addListeners(miew, dispatch)
     return () => removeListeners(miew, callbacks)
-  }, [options, onInit])
+  }, [options, onInit, dispatch])
 
   return (
     <ThemeProvider theme={merge(muiTheme, { miew: viewerTheme })}>

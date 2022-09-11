@@ -41,7 +41,7 @@ const volumeUniforms = UniformsUtils.merge([
 function overrideUniforms(params, defUniforms) {
   const uniforms = UniformsUtils.clone(defUniforms)
   for (const p in params) {
-    if (uniforms.hasOwnProperty(p)) {
+    if (Object.hasOwn(uniforms, p)) {
       uniforms[p].value = params[p]
     }
   }

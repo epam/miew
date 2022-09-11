@@ -102,7 +102,7 @@ class ComplexComponentEditor extends ComplexEditor {
       reprNode = selection.children[i]
       for (j = 0; j < reprNode.children.length; ++j) {
         geo = reprNode.children[j]
-        if (geo.hasOwnProperty('_component') && geo._component === component) {
+        if (Object.hasOwn(geo, '_component') && geo._component === component) {
           res.objects.push(geo)
         }
       }
@@ -178,7 +178,7 @@ class ComplexComponentEditor extends ComplexEditor {
       reprNode = visual.children[i]
       for (j = 0; j < reprNode.children.length; ++j) {
         geo = reprNode.children[j]
-        if (geo.hasOwnProperty('_component')) {
+        if (Object.hasOwn(geo, '_component')) {
           geo.position.set(0, 0, 0)
           geo.quaternion.set(0, 0, 0, 1)
         }
@@ -190,7 +190,7 @@ class ComplexComponentEditor extends ComplexEditor {
       reprNode = selection.children[i]
       for (j = 0; j < reprNode.children.length; ++j) {
         geo = reprNode.children[j]
-        if (geo.hasOwnProperty('_component')) {
+        if (Object.hasOwn(geo, '_component')) {
           geo.position.set(0, 0, 0)
           geo.quaternion.set(0, 0, 0, 1)
         }

@@ -230,7 +230,7 @@ selectors.InfixOperator = InfixOperator
 selectors.Context = Object.create({})
 
 selectors.GetSelector = function (key) {
-  if (!selectors.Context.hasOwnProperty(key)) {
+  if (!Object.hasOwn(selectors.Context, key)) {
     const exc = { message: `selector ${key} is not registered` }
     throw exc
   }

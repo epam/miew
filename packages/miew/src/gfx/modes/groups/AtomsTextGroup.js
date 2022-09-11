@@ -45,7 +45,7 @@ const colorMappings = {
 
 function propagateColor(color, rule) {
   let result
-  if (colorMappings.hasOwnProperty(rule)) {
+  if (Object.hasOwn(colorMappings, rule)) {
     result = utils.hexColor(colorMappings[rule](color))
   } else {
     const val = parseInt(rule, 16)
@@ -93,7 +93,7 @@ const parseTemplate = function (atom, str) {
     let key = m.replace(/\s+/g, '')
     key = key.substring(2, key.length - 2).toLowerCase()
 
-    if (templateMappings.hasOwnProperty(key)) {
+    if (Object.hasOwn(templateMappings, key)) {
       return templateMappings[key](atom)
     }
     return 'null'
