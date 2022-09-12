@@ -1,3 +1,4 @@
+/* global DEBUG:false, PACKAGE_VERSION:false */
 // eslint-disable-next-line
 //@ts-nocheck
 import { Spinner } from 'spin.js'
@@ -1031,7 +1032,7 @@ export class Miew extends EventDispatcher {
 
     let name = baseName
     let suffix = 1
-    while (this._visuals.hasOwnProperty(name)) {
+    while (Object.hasOwn(this._visuals, name)) {
       name = `${baseName} (${suffix.toString()})`
       suffix++
     }
@@ -1078,7 +1079,7 @@ export class Miew extends EventDispatcher {
 
     if (
       !obj ||
-      !this._visuals.hasOwnProperty(name) ||
+      !Object.hasOwn(this._visuals, name) ||
       this._visuals[name] !== obj
     ) {
       return
@@ -1100,7 +1101,7 @@ export class Miew extends EventDispatcher {
    */
   _forEachVisual(callback) {
     for (const name in this._visuals) {
-      if (this._visuals.hasOwnProperty(name)) {
+      if (Object.hasOwn(this._visuals, name)) {
         callback(this._visuals[name])
       }
     }
@@ -1116,7 +1117,7 @@ export class Miew extends EventDispatcher {
     }
 
     for (const name in this._visuals) {
-      if (this._visuals.hasOwnProperty(name)) {
+      if (Object.hasOwn(this._visuals, name)) {
         this._visuals[name].release()
       }
     }
@@ -1135,7 +1136,7 @@ export class Miew extends EventDispatcher {
 
     for (const name in this._visuals) {
       if (
-        this._visuals.hasOwnProperty(name) &&
+        Object.hasOwn(this._visuals, name) &&
         this._visuals[name] instanceof ComplexVisual
       ) {
         callback(this._visuals[name])

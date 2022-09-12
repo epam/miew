@@ -1,0 +1,6 @@
+# https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
+* text=auto
+
+*.png binary
+*.jpg binary
+*.ico binary

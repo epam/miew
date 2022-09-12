@@ -16,6 +16,9 @@
     "directory": "packages/miew"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=16.9.0"
+  },
   "scripts": {
     "ci": "run-s clean test-cover build",
     "eslint": "eslint . --ext .ts,.tsx,.js,.jsx",

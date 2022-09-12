@@ -81,7 +81,7 @@ function ensureRepAssign(opts, prop, value) {
   ensureRepList(opts)
   const rep = opts.reps[repIndex]
   // prop specified twice therefore start new rep by cloning the current
-  if (rep.hasOwnProperty(prop)) {
+  if (Object.hasOwn(rep, prop)) {
     repIndex = opts.reps.length
     opts.reps[repIndex] = utils.deriveDeep(rep, true)
   }
@@ -252,7 +252,7 @@ function _fromArray(entries) {
     const /** string[] */ entry = entries[i]
     let /** string? */ key = entry[0]
     const /** string? */ value = entry[1]
-    if (actions.hasOwnProperty(key)) {
+    if (Object.hasOwn(actions, key)) {
       let /** function|string? */ action = actions[key]
       while (isString(action)) {
         key = action

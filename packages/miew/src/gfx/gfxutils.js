@@ -318,7 +318,7 @@ function _calcChunkMatrix(eye, target, up, rad) {
 function _groupHasGeometryToRender(group) {
   let hasGeoms = false
   group.traverse((node) => {
-    if (node.hasOwnProperty('geometry') || node instanceof CSS2DObject) {
+    if (Object.hasOwn(node, 'geometry') || node instanceof CSS2DObject) {
       hasGeoms = true
     }
   })

@@ -992,7 +992,7 @@ utils.deriveClass(Settings, EventDispatcher, {
   },
 
   applyDiffs(diffs) {
-    if (diffs.hasOwnProperty('VERSION') && diffs.VERSION !== VERSION) {
+    if (Object.hasOwn(diffs, 'VERSION') && diffs.VERSION !== VERSION) {
       throw new Error('Settings version does not match!')
     }
     // VERSION shouldn't be presented inside settings structure

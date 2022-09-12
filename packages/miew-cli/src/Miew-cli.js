@@ -44,7 +44,7 @@ class RepresentationMap {
     }
 
     if (index !== undefined) {
-      if (!this.representationMap.hasOwnProperty(strId)) {
+      if (!Object.hasOwn(this.representationMap, strId)) {
         this.representationMap[strId.toString()] = index
         this.representationID[index] = strId.toString()
       } else {
@@ -55,14 +55,14 @@ class RepresentationMap {
   }
 
   remove(index) {
-    if (index && this.representationID.hasOwnProperty(index)) {
+    if (index && Object.hasOwn(this.representationID, index)) {
       delete this.representationMap[this.representationID[index]]
       delete this.representationID[index]
     }
 
     const sortedKeys = Object.keys(this.representationID).sort()
     for (const i in sortedKeys) {
-      if (sortedKeys.hasOwnProperty(i)) {
+      if (Object.hasOwn(sortedKeys, i)) {
         const id = sortedKeys[i]
         if (id > index) {
           this.representationID[id - 1] = this.representationID[id]
@@ -145,7 +145,7 @@ class CLIUtils {
     let ret = ''
 
     for (const k in context) {
-      if (context.hasOwnProperty(k)) {
+      if (Object.hasOwn(context, k)) {
         ret += `${k} : "${context[k]}"\n`
       }
     }

@@ -685,7 +685,7 @@ class Complex {
   }
 
   getAtomNames() {
-    if (this.hasOwnProperty('_atomNames')) {
+    if (Object.hasOwn(this, '_atomNames')) {
       return this._atomNames
     }
 
@@ -699,7 +699,7 @@ class Complex {
   }
 
   getElements() {
-    if (this.hasOwnProperty('_elements')) {
+    if (Object.hasOwn(this, '_elements')) {
       return this._elements
     }
 
@@ -713,7 +713,7 @@ class Complex {
   }
 
   getResidueNames() {
-    if (this.hasOwnProperty('_residueNames')) {
+    if (Object.hasOwn(this, '_residueNames')) {
       return this._residueNames
     }
 
@@ -727,7 +727,7 @@ class Complex {
   }
 
   getChainNames() {
-    if (this.hasOwnProperty('_chainNames')) {
+    if (Object.hasOwn(this, '_chainNames')) {
       return this._chainNames
     }
 
@@ -741,7 +741,7 @@ class Complex {
   }
 
   getAltLocNames() {
-    if (this.hasOwnProperty('_altlocNames')) {
+    if (Object.hasOwn(this, '_altlocNames')) {
       return this._altlocNames
     }
 
@@ -755,7 +755,7 @@ class Complex {
   }
 
   getVoxelWorld() {
-    if (!this.hasOwnProperty('_voxelWorld')) {
+    if (!Object.hasOwn(this, '_voxelWorld')) {
       try {
         this._voxelWorld = new VoxelWorld(
           this.getDefaultBoundaries().boundingBox,
@@ -854,7 +854,7 @@ class Complex {
       this.addElement(c.structures, this.structures, 0, doNothing)
       // merge residue types
       for (const rt in c._residueTypes) {
-        if (c._residueTypes.hasOwnProperty(rt)) {
+        if (Object.hasOwn(c._residueTypes, rt)) {
           this._residueTypes[rt] = c._residueTypes[rt]
         }
       }

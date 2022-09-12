@@ -116,7 +116,7 @@ class ResiduesTraceGroup extends ChemGroup {
     const chunksToIdx = this._chunksIdc
     // process inters array - arr object references
     for (let i = 0, n = inters.length; i < n; ++i) {
-      if (!inters[i].hasOwnProperty('chunkIdx')) {
+      if (!Object.hasOwn(inters[i], 'chunkIdx')) {
         continue
       }
       const { chunkIdx } = inters[i]

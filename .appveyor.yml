@@ -1,7 +1,7 @@
 version: "{build}"
 environment:
   matrix:
-    - nodejs_version: "14"
+    - nodejs_version: "16"
 cache:
   - "%LOCALAPPDATA%\\Yarn"
 init:
