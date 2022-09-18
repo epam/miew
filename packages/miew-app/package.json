@@ -90,7 +90,7 @@
     "babel-eslint": "^10.0.0",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.5.3",
-    "eslint": "^8.4.1",
+    "eslint": "^8.23.1",
     "html-loader": "^1.0.0",
     "html-webpack-plugin": "^4.3.0",
     "identity-obj-proxy": "^3.0.0",
