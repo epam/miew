@@ -28,7 +28,7 @@
     &.active:hover,
     &.active.hover,
     &.active:focus,
-    &:active:focus:not(:disabled):not(.disabled) {
+    &:active:focus:not(:disabled, .disabled) {
       background-color: $titlebarBkg;
       outline: 0;
       border: none;

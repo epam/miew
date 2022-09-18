@@ -138,6 +138,7 @@ $selection-panel-row-height: 42px;
       $titlebar-gray,
       $titlebar-alpha
     );
+
     // font-size: larger;
   }
 
@@ -194,8 +195,7 @@ $selection-panel-row-height: 42px;
       position: absolute;
       right: 0;
       display: flex;
-      flex-wrap: wrap;
-      flex-direction: column;
+      flex-flow: column wrap;
       justify-content: flex-start;
       padding: 0;
       margin: 0;
@@ -296,17 +296,18 @@ $selection-panel-row-height: 42px;
 
     input[type='number']::-webkit-outer-spin-button,
     input[type='number']::-webkit-inner-spin-button {
-      -webkit-appearance: none;
+      appearance: none;
     }
 
     input[type='number'] {
-      -moz-appearance: textfield;
+      appearance: textfield;
     }
   }
 
   .panel-menu {
     padding: 0;
     margin-bottom: 0;
+
     // border-color: #aaa;
     // border-radius: 0;
 
@@ -684,8 +685,6 @@ $selection-panel-row-height: 42px;
 #toast-container > div {
   opacity: 0.9;
   box-shadow: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
   font-weight: bold;
 }
 

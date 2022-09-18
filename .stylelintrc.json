@@ -1,10 +1,12 @@
 {
   "extends": [
-    "stylelint-config-standard",
-    "stylelint-config-recommended-scss",
-    "stylelint-config-prettier"
+    "stylelint-config-standard-scss",
+    "stylelint-config-prettier-scss"
   ],
   "rules": {
-    "at-rule-no-unknown": null
+    "alpha-value-notation": null,
+    "color-function-notation": null,
+    "scss/at-import-partial-extension": null,
+    "scss/dollar-variable-pattern": null
   }
 }
