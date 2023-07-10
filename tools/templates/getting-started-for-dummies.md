@@ -25,128 +25,126 @@ Table of contents:
 
 <!-- /TOC -->
 
-Быстрые ссылки:
+Quick Links:
 
--   промо-сайт: <https://epa.ms/miew/>
--   демо-приложение: <https://miew.opensource.epam.com/>
--   исходный код: <https://github.com/epam/miew/>
+-   promo site: <https://epa.ms/miew/>
+-   demo-application: <https://miew.opensource.epam.com/>
+-   source code: <https://github.com/epam/miew/>
 
 
 ## Project Overview
 
 ### Web Application
 
-Miew --- это приложение, позволяющее просматривать трёхмерные изображения
-молекул прямо в веб-браузере, манипулировать ими, анализировать различные
-характеристики. В первую очередь речь идёт о сложных биологических молекулах:
-[белках][] (протеинах) и [нуклеиновых кислотах][] (ДНК, РНК). Разумеется, могут
-отображаться и другие химические соединения. В программе можно рассматривать не
-просто отдельные молекулы, но целые молекулярные комплексы/структуры, которые
-состоят из взаимодействующих белков, РНК/ДНК и малых молекул ([лигандов][]).
-Таким образом пользователи могут наглядно представить, как различные части
-молекул располагаются в пространстве друг относительно друга, какие между ними
-возможны взаимодействия.
+Miew --- is an application that allows you to view three-dimensional images
+of molecules directly in a web browser, manipulate them, analyze various
+characteristics. It is primarily concerned with complex biological molecules: 
+[proteins][] (proteins) and [nucleic acids][] (DNA, RNA). Of course, other
+chemical compounds can be displayed. In the program, 
+it is possible to consider not just individual molecules, but entire molecular
+complexes/structures that consist of interacting proteins, RNA/DNA and small
+molecules ([ligands][]). In this way, users can visualize how the different
+parts of the molecules are arranged in space relative to each other, and what
+interactions are possible between them.
 
-> Пример сложной структуры: [Nucleosome Particles in Complex with DNA-binding Ligands][].
+> Example of a complex structure: [Nucleosome Particles in Complex with DNA-binding Ligands][].
 
-[белках]: https://en.wikipedia.org/wiki/Protein
-[нуклеиновых кислотах]: https://en.wikipedia.org/wiki/Nucleic_acid
-[лигандов]: https://en.wikipedia.org/wiki/Ligand_(biochemistry)
+[proteins]: https://en.wikipedia.org/wiki/Protein
+[nucleic acids]: https://en.wikipedia.org/wiki/Nucleic_acid
+[ligands]: https://en.wikipedia.org/wiki/Ligand_(biochemistry)
 [Nucleosome Particles in Complex with DNA-binding Ligands]: https://miew.opensource.epam.com/?l=1M19&v=1Vo4FwggsB8JxfTXCR/aAPGbfmz84oF09uY4UvA%3D%3D
 
 
 ### Embeddable Component
 
-В то же время Miew это не только полноценное приложение, но и отдельная
-библиотека, предоставляющая те же возможности по просмотру молекул,
-предназначенная для встройки в сторонние продукты в качестве компонента. Эта
-функциональность по встраиванию позволяет расширить область применения, делая
-Miew элементом визуализации в более сложных научных программах.
+At the same time, Miew is not only a full-fledged application, but also a
+separate library that provides the same molecular viewing capabilities, 
+designed to be integrated into third-party products as a component. This 
+embedding functionality allows to extend the scope of the application by 
+making Miew a visualization element in more complex scientific programs.
 
-И сама компонента, и демонстрационное приложение разрабатывается с учетом
-[адаптивного веб-дизайна][], чтобы быть одинаково удобным на экранах разного
-размера, от смартфонов до больших мониторов. Заявлена поддержка последних версий
-всех [ведущих браузеров][] для десктопов и мобильных платформ, а также
-устаревшего, но широко распространенного Internet Explorer 11.
+Both the component itself and the demonstration application are designed 
+with an eye toward [adaptive web design][] to be equally usable on devices 
+with different screen sizes, from smartphones to large monitors. We support 
+not only latest versions of all [modern browsers][] for desktop and mobile 
+platforms, but also the outdated but widely used Internet Explorer 11.
 
-> Пример встраивания компоненты: [Miew in a Responsive Grid Layout][].
+> Example of embedding a component: [Miew in a Responsive Grid Layout][].
 
-[адаптивного веб-дизайна]: https://en.wikipedia.org/wiki/Responsive_web_design
-[ведущих браузеров]: https://browsehappy.com/
+[adaptive web design]: https://en.wikipedia.org/wiki/Responsive_web_design
+[modern browsers]: https://browsehappy.com/
 [Miew in a Responsive Grid Layout]: https://miew.opensource.epam.com/examples/grid.html
 
 
 ### Display Modes
 
-Для малых молекул стандартным является отображение атомов сферами, а связей
-между ними --- цилиндрами (режим [Balls and Sticks][]). Можно отображать только
-связи, или только сферы, а их радиус может быть пропорционален ["размеру"
-атома][]. При изучении более крупных молекул, таких как белки, расположение
-отдельных атомов уже не так важно. Большее значение имеют группы атомов
-([мономеры][], из которых построен полимер), их взаимное расположение и типичные
-конфигурации, которые они образуют. Центры мономеров могут соединяться
-отрезками, либо даже плавным сплайном переменной толщины (режим Cartoon,
-отображающий [вторичную структуру][]). Часто в исследованиях полезной
-оказывается ["поверхность" молекулы][], такой режим тоже предусмотрен. Есть и
-другие поддерживаемые форматы данных и режимы для их отображения.
+When dealing with small molecules, it's common to represent atoms as spheres 
+and bonds between them as cylinders using the [Balls and Sticks][] mode. The 
+size of the spheres can also be adjusted to reflect the ["size" of the atom][]. 
+However, when studying larger molecules like proteins, the arrangement of 
+individual atoms isn't as crucial. Instead, it's more important to focus on 
+the groups of atoms, or [monomers][], that make up the polymer and their typical 
+configurations. In the "Cartoon" mode, these monomers can be connected by 
+segments or a smooth spline of varying thickness to display their [secondary structure][]. 
+Additionally, researchers may find it useful to view the ["surface" of the molecule][], 
+which is also an available mode. Finally, there are various other supported data 
+formats and modes for molecule display.
 
-Показывать можно молекулу целиком или только определенную ее часть. Также
-построенную геометрию можно раскрасить разными способами, отобразив тем самым
-дополнительную информацию, начиная с типа химического элемента или мономера, и
-заканчивая такими характеристиками как температурный фактор или
-[гидрофобность][]. Все эти настройки вместе (режим, раскраска и подмножество
-атомов) составляют _представление_ данных. Несколько представлений можно
-комбинировать, отображая разные части молекулы в разных режимах.
+It is possible to display either the entire molecule or only a specific portion of it. 
+The constructed geometry can be colored in a variety of ways, providing additional 
+details such as the chemical element or monomer type, as well as characteristics 
+like temperature factor or [hydrophobicity][]. These settings, including mode, 
+coloring, and subset of atoms, comprise a data view. Different views can be merged 
+to present various sections of the molecule in different modes.
 
-> Пример комбинации представлений: [Гемоглобин][].
+> Example of combination of representations: [Hemoglobin][].
 
 [Balls and Sticks]: https://en.wikipedia.org/wiki/Ball-and-stick_model
-["размеру" атома]: https://en.wikipedia.org/wiki/Van_der_Waals_radius
-[мономеры]: https://en.wikipedia.org/wiki/Monomer
-["поверхность" молекулы]: https://en.wikipedia.org/wiki/Accessible_surface_area
-[гидрофобность]: https://en.wikipedia.org/wiki/Hydrophobicity_scales
-[Гемоглобин]: https://miew.opensource.epam.com/?l=2hhb&m=TU&c=CH&m=CS&c=UN!color:0xFF00&mt=TR&s=chain+A&s=sequence+52:72&m=TU!radius:0.8&c=UN!color:0xFF0000&s=sequence+52:72+and+not+name+C,N,O&m=LC&c=EL&mt=ME
+["size" of the atom]: https://en.wikipedia.org/wiki/Van_der_Waals_radius
+[monomers]: https://en.wikipedia.org/wiki/Monomer
+["surface" of the molecule]: https://en.wikipedia.org/wiki/Accessible_surface_area
+[hydrophobicity]: https://en.wikipedia.org/wiki/Hydrophobicity_scales
+[Hemoglobin]: https://miew.opensource.epam.com/?l=2hhb&m=TU&c=CH&m=CS&c=UN!color:0xFF00&mt=TR&s=chain+A&s=sequence+52:72&m=TU!radius:0.8&c=UN!color:0xFF0000&s=sequence+52:72+and+not+name+C,N,O&m=LC&c=EL&mt=ME
 
 
 ### Source Data
 
-Исходные данные для отображения --- это файлы, в которых записаны координаты
-атомов, а также дополнительная информация. Форматов множество, но если говорить
-о белках, то существует единая база данных, [Protein Data Bank][], собирающая
-результаты [кристаллографии][] различных молекулярных комплексов. Этим
-результатам экспериментов присваиваются идентификаторы из четырех букв и цифр,
-например, один из самых маленьких белков [крамбин][] имеет идентификатор
-[1CRN][] (327 атомов), а огромная рибосома хранится как [4V88][] (больше 400
-тысяч атомов). Заметьте, что одни и те же молекулы могут присутствовать в базе
-несколько раз, если их координаты были сняты в результате разных экспериментов
-разных людей (тот же крамбин представлен более чем в 10 координатных файлах:
-1CRN, 1EJG, 3NIR, ...).
+The mapping process relies on input files that contain atom coordinates along 
+with other essential information. Multiple formats are available, but for 
+proteins, the [Protein Data Bank][] serves as a centralized database. This 
+database gathers results from [crystallography][] experiments of molecular 
+complexes and assigns them unique four-letter and number identifiers. For 
+instance, one of the smallest protein, [crambin][], is identified as [1CRN][] 
+and comprises 327 atoms, while the colossal ribosome carries the identifier 
+[4V88][] and has over 400,000 atoms. Importantly, the same molecules can appear 
+in the database multiple times, each with different coordinates from various 
+experiments conducted by different individuals. For example, the crambin protein 
+boasts more than ten coordinate files, including 1CRN, 1EJG, 3NIR, and so on.
 
-В банке белков основным форматом является текстовый [PDB][], но он имеет
-ограничения (по количеству атомов и остатков), поэтому ему на смену приходят
-многословный [CIF][] и бинарный [MMTF][]. Miew поддерживает загрузку данных
-напрямую из банка по идентификатору (`1CRN`), возможно, с указанием формата
-(`cif:1CRN`, `mmtf:1CRN`).
+The primary format used in the protein bank is text [PDB][], but it has its 
+limitations in terms of the number of atoms and residues. As a result, it has 
+been replaced by the more comprehensive formats of verbose [CIF][] and binary 
+[MMTF][]. To load data directly from the bank, Miew supports using the unique 
+identifier (`1CRN`) and specifying the format (`cif:1CRN`, `mmtf:1CRN`).
 
-Малые молекулы могут встречаться в формате [MOL/SDF][], CML или в других видах.
-Основным доступным источником координатных файлов для распространенных
-химических соединений является сайт [PubChem][]. Miew позволяет загружать данные
-по имени соединения: так `pc:aspirin` загрузит трехмерные координаты
-[аспирина][].
+Small molecules can be found in various formats such as [MOL/SDF][], CML, or 
+others. The [PubChem][] site is the primary source for coordinate files of common 
+chemical compounds. With Miew, you can easily load data by entering the compound 
+name, such as `pc:aspirin`, which will load the 3D coordinates of [aspirin][].
 
-Поддерживается и совсем другой тип исходных данных --- объемные данные
-[электронной плотности][], хранящиеся как трехмерное [скалярное поле][],
-например, в формате [CCP4][]. Для некоторых белков из Protein Data Bank можно
-подгрузить соответствующий файл электронной плотности просто по идентификатору,
-например, `ccp4:3C9L`.
+Miew is capable of supporting a distinct type of raw data - bulk [electron density][] 
+data, which is stored as a three-dimensional [scalar field][] in [CCP4][] format, 
+for instance. In addition, the corresponding electron density file for certain 
+proteins from the Protein Data Bank can be loaded effortlessly using their identifier, 
+such as `ccp4:3C9L`.
 
-Разумеется, Miew может загружать данные из локального файла или запрашивать их
-по заданному URL. В планах поддержка [многих форматов][] и даже других типов
-данных (например, загрузка 3D геометрии в популярных форматах).
+Moreover, Miew permits loading data from a local file or requesting it through a 
+specific URL. Future plans include supporting [numerous formats][] and even other 
+data types, such as loading 3D geometry in prevalent formats.
 
 [Protein Data Bank]: http://www.rcsb.org/
-[кристаллографии]: https://en.wikipedia.org/wiki/X-ray_crystallography
-[крамбин]: https://en.wikipedia.org/wiki/Crambin
+[crystallography]: https://en.wikipedia.org/wiki/X-ray_crystallography
+[crambin]: https://en.wikipedia.org/wiki/Crambin
 [1CRN]: https://www.rcsb.org/structure/1crn
 [4V88]: https://www.rcsb.org/structure/4v88
 [PDB]: http://www.wwpdb.org/documentation/file-format-content/format33/v3.3.html
@@ -154,121 +152,110 @@ Miew элементом визуализации в более сложных н
 [MMTF]: https://mmtf.rcsb.org/
 [MOL/SDF]: http://www.wwpdb.org/documentation/file-format-content/format33/v3.3.html
 [PubChem]: https://pubchem.ncbi.nlm.nih.gov/
-[аспирина]: https://pubchem.ncbi.nlm.nih.gov/compound/2244
-[электронной плотности]: https://en.wikipedia.org/wiki/Electron_density
-[скалярное поле]: https://en.wikipedia.org/wiki/Scalar_field
+[aspirin]: https://pubchem.ncbi.nlm.nih.gov/compound/2244
+[electron density]: https://en.wikipedia.org/wiki/Electron_density
+[scalar field]: https://en.wikipedia.org/wiki/Scalar_field
 [CCP4]: http://structure.usc.edu/ccp4/
-[многих форматов]: https://en.wikipedia.org/wiki/Chemical_file_format
+[numerous formats]: https://en.wikipedia.org/wiki/Chemical_file_format
 
 
 ## Biochemistry
 
 ### Proteins
 
-[Белки][] --- это макромолекулы (от сотен до сотен тысяч атомов), которые
-выполняют большое количество функций в живом организме. Они представляют собой
-длинные [полимерные цепочки][], состоящие из [аминокислотных остатков][],
-возможно, компактно свернутые в пространстве. Существует 21 базовая
-аминокислота, каждая из них имеет схожее строение, отличаясь только "хвостиком".
-У каждой аминокислоты есть название, а также сокращенные трехбуквенные и
-однобуквенные коды для удобства записи.
+Living organisms consists of [proteins][], which are macromolecules 
+consisting of hundreds to hundreds of thousands of atoms. These molecules 
+perform a variety of functions and are made up of long [polymer chains][] 
+of [amino acid residues][]. There are 21 basic amino acids, each with a 
+unique name and abbreviated three-letter and one-letter codes.
 
-Аминокислоты связаны друг с другом при помощи [пептидных связей][] в линейные
-цепочки (это обычные [ковалентные связи][] как и большинство других в молекуле).
-Заданная последовательность аминокислот в белке (напр., `Phe Leu Ser Cis...`)
-называется [первичной структурой][] белка.
+The [primary structure][] of a protein is formed by [peptide bonds][] linking 
+amino acids together in linear chains. For instance, `Phe Leu Ser Cis...`. 
+However, the [secondary structure][], which features [spirals][], [layers][], 
+turns, and loops, is determined by the way residues hang on to each other 
+through [hydrogen bonds][]. Predicting how a protein will fold based solely on 
+its primary structure is impossible.
 
-Располагаясь в пространстве, остатки цепляются друг за друга [водородными
-связями][], образуя характерные конфигурации, которые составляют [вторичную
-структуру][] белка: [спирали][], [слои][], повороты, петли... В общем случае
-заранее по первичной структуре нельзя предположить какие вторичные структуры
-образует белок при сворачивании.
+The [alpha-carbon][], located at the center of each amino acid, serves as 
+the starting point for the residue. Some data files for large molecules contain only coordinates 
+for these atoms, as it is difficult to reconstruct the rest of the molecule's 
+coordinates with low measurement accuracy.
 
-Центральный атом углерода каждой аминокислоты, с которым связан "хвостик",
-называется [альфа-углеродом][]. Он является своеобразным центром остатка,
-началом отсчета. Некоторые файлы данных для больших молекул содержат координаты
-только для этих атомов, так как при низкой точности измерений восстановить
-остальные координаты не представляется возможным.
-
-Видеоуроки:
+Video tutorials:
 
 1.  [Introduction to Biochemistry](https://youtu.be/CHJsaq2lNjU)
 2.  [Amino Acids](https://youtu.be/J6R8zDAl_vw)
 3.  [Protein Structure](https://youtu.be/EweuU2fEgjw)
 
-[Белки]: https://en.wikipedia.org/wiki/Protein
-[полимерные цепочки]: https://en.wikipedia.org/wiki/Polymer
-[аминокислотных остатков]: https://en.wikipedia.org/wiki/Amino_acid
-[пептидных связей]: https://en.wikipedia.org/wiki/Peptide_bond
-[ковалентные связи]: https://en.wikipedia.org/wiki/Covalent_bond
-[первичной структурой]: https://en.wikipedia.org/wiki/Protein_primary_structure
-[водородными связями]: https://en.wikipedia.org/wiki/Hydrogen_bond
-[вторичную структуру]: https://en.wikipedia.org/wiki/Protein_secondary_structure
-[спирали]: https://en.wikipedia.org/wiki/Alpha_helix
-[слои]: https://en.wikipedia.org/wiki/Beta_sheet
-[альфа-углеродом]: https://en.wikipedia.org/wiki/Alpha_and_beta_carbon
+[proteins]: https://en.wikipedia.org/wiki/Protein
+[polymer chains]: https://en.wikipedia.org/wiki/Polymer
+[amino acid residues]: https://en.wikipedia.org/wiki/Amino_acid
+[peptide bonds]: https://en.wikipedia.org/wiki/Peptide_bond
+[primary structure]: https://en.wikipedia.org/wiki/Protein_primary_structure
+[hydrogen bonds]: https://en.wikipedia.org/wiki/Hydrogen_bond
+[secondary structure]: https://en.wikipedia.org/wiki/Protein_secondary_structure
+[spirals]: https://en.wikipedia.org/wiki/Alpha_helix
+[layers]: https://en.wikipedia.org/wiki/Beta_sheet
+[alpha-carbon]: https://en.wikipedia.org/wiki/Alpha_and_beta_carbon
 
 
 ### Nucleic Acids
 
-Белки строятся с использованием информации, которая хранится в ДНК. ДНК --- это
-парные спиральные [полимерные цепочки][], состоящие из сотен миллионов
-[нуклеотидов][] четырех видов: цитозин (C), гуанин (G), аденин (A) и тимин (T).
-Две цепочки соединяются друг с другом [водородными связями][] между парными
-нуклеотидами G-C и A-T, по-другому они не стыкуются.
+Proteins are built using the genetic information stored in DNA. DNA is a pair of 
+helical [polymer chains][] composed of millions of [nucleotides][] of four types: 
+cytosine (C), guanine (G), adenine (A), and thymine (T). The nucleotides are 
+paired together by [hydrogen bonds][], specifically G-C and A-T. 
 
-Большая часть ДНК является некодирующей, и только небольшие участки ([гены][])
-используются в образовании РНК (при транскрипции) для последующего построения по
-ним белков (в процессе трансляции). Трем последовательным нуклеотидам в РНК
-соответствует один аминокислотный остаток, такие тройки наываются [кодонами][].
-Некоторые тройки кодируют одни и те же аминокислоты (есть избыточность). А
-некоторые тройки являются служебными командами (старт, стоп).
+Most of the DNA is non-coding, and only small sections, called [genes][], are 
+utilized in the creation of RNA during transcription. [RNA][] is then used 
+in the subsequent construction of proteins during translation. [Codons][] are 
+triplets of nucleotides in RNA that correspond to one amino acid residue. Some 
+triplets encode the same amino acid, while others are service commands such as 
+start and stop codons.
 
-В процессе [репликации][] ДНК могут происходить как случайные, так и наведенные
-ошибки. Часть из них автоматически исправляется или уничтожается, оставшиеся же
-приводят к [мутациям][]. Есть безобидные мутации, некоторые немного изменяют
-белок (и он может перестать выполнять свою функцию в организме), а некоторые
-мутации могут привести к стоп-кодону, то есть исчезновению целой части белка.
+Errors can occur during DNA [replication][], both randomly and induced. Some 
+of these errors are automatically corrected, while others lead to [mutations][]. 
+These mutations can range from harmless to slightly altering the protein's 
+function in the body. In some cases, mutations can cause a stop codon, leading 
+to the loss of a portion of the protein.
 
-Видеоуроки:
+Video tutorials:
 
 1.  [DNA and RNA](https://youtu.be/6NhDY3IDp00)
 2.  [From DNA to Protein](https://youtu.be/bKIpDtJdK8Q)
 
-[нуклеотидов]: https://en.wikipedia.org/wiki/Nucleotide
-[гены]: https://en.wikipedia.org/wiki/Gene
-[кодонами]: https://en.wikipedia.org/wiki/Genetic_code
-[репликации]: https://en.wikipedia.org/wiki/DNA_replication
-[мутациям]: https://en.wikipedia.org/wiki/Mutation
+[nucleotides]: https://en.wikipedia.org/wiki/Nucleotide
+[genes]: https://en.wikipedia.org/wiki/Gene
+[Codons]: https://en.wikipedia.org/wiki/Genetic_code
+[replication]: https://en.wikipedia.org/wiki/DNA_replication
+[mutations]: https://en.wikipedia.org/wiki/Mutation
 
 
 ## Development Tools
 
-Если вы участвуете в разработке, то полезно будет ознакомиться с файлом
-[CONTRIBUTING.md][], в котором описаны основные комментарии и пожелания к
-процессу работы над проектом.
+To effectively contribute to the project's development, it would be beneficial 
+to review the file labeled [CONTRIBUTING.md][] as it outlines essential 
+suggestions and feedback for the working process.
 
 [CONTRIBUTING.md]: https://github.com/epam/miew/blob/master/CONTRIBUTING.md
 
 
 ### Git
 
-Исходный код проектов принято хранить в [системе контроля версий][] --- у нас
-используется [Git][], а в качестве основного репозитория ("сервера") служит
-[GitHub][]. Для работы вам потребуется установить следующие программы:
+We use [Git][] as a [source version control system][] and [GitHub][] keeps 
+main repository. You should install the following applications for successful 
+work: 
 
--   [GitHub Desktop][] или/и [SourceTree][] в качестве дружелюбного
-    пользовательского интерфейса,
--   [Git for Windows][] для более тонкой работы из командной строки в
-    операционной системе Windows (для других ОС часто git идёт вместе с
-    "инструментами разработчика", либо смотрите [Git Downloads][]).
+-   [GitHub Desktop][] and/or [SourceTree][] as a friendly user interface for git,
+-   [Git for Windows][] if you prefer to work  in command line in Windows (see 
+[Git Downloads][] for othe OS).
 
-Что можно/нужно почитать дополнительно:
+What to read in addition:
 
 -   [Pro Git Book](https://git-scm.com/book/en/v2),
 -   [GitHub Guides](https://guides.github.com/).
 
-[системе контроля версий]: https://en.wikipedia.org/wiki/Version_control
+[source version control system]: https://en.wikipedia.org/wiki/Version_control
 [Git]: https://git-scm.com/
 [GitHub]: https://github.com/epam/miew
 [GitHub Desktop]: https://desktop.github.com/
@@ -279,36 +266,35 @@ Miew элементом визуализации в более сложных н
 
 ### Node.js
 
-Наш проект чисто клиентский, т.е. весь его код выполняется в браузере. Для этого
-он написан на [JavaScript][] (см. [раздел ниже](#javascript)) --- [скриптовом
-языке][], специально для этого изобретённом. Со времени создания язык развивался
-и достаточно давно стал полноценным скриптовым языком общего назначения наряду с
-[Python][], [Ruby][], [Perl][]... Теперь можно выполнять программы на JS не
-только в браузере, но и в командной строке, при наличии
-интерпретатора/компилятора.
+Our project runs solely on the client-side, meaning that all of its code is 
+executed in the browser. To achieve this, we utilized [JavaScript][], a scripting 
+language specifically designed for this purpose. Over time, this language has 
+evolved and is now a fully-fledged general-purpose [scripting language][], alongside 
+[Python][], [Ruby][], and [Perl][]. JavaScript programs can now be executed 
+not only in browsers but also in command line through an interpreter/compiler.
 
-Зачем? Дело в том, что есть определённый ряд действий по сборке проекта, его
-подготовки к публикации, которые хочется автоматизировать. Эта автоматизация
-либо встроена в среду разработки (IDE), либо реализуется самостоятельно на
-скриптовом языке. [Windows Batch Files][] или [Linux Shell Scripts][] не
-являются переносимыми на другие платформы. Использовать для этого Python или
-Perl? А зачем, если вы и так уже выучили и используете на проекте JavaScript.
+Why do we use command line? The reason is that there are certain tasks involved 
+in project development and preparation for publication that can be automated. 
+This automation can either be integrated into the development environment (IDE) 
+or implemented independently using a scripting language. [Windows Batch Files][] 
+or [Linux Shell Scripts][] are not portable to other platforms. So why not use 
+JavaScript, which you are already familiar with and using for your project, 
+instead of Python or Perl?
 
-Тут на помощь приходит платформа [Node.js][], предоставляющая интерпретатор и
-среду выполнения скриптов, написанных на JavaScript. Помимо стандартной
-библиотеки функций есть возможность использовать сторонние библиотеки (пакеты),
-распространяющиеся через репозиторий [NPM][] (Node.js Package Manager). Вы и
-сами можете создать свой пакет, зависящий от других и реализующий какую-нибудь
-полезную функциональность. Так мы поступили и с [Miew][].
+[Node.js][] is a platform that comes in handy as it provides an interpreter 
+and execution environment for JavaScript scripts. The platform offers a standard 
+library of functions, and you can also leverage third-party libraries (packages) 
+that are available through the Node.js Package Manager ([NPM][]) repository. You 
+can even create your own package that depends on others, implementing some useful 
+functionality - which is what we did with [Miew][].
 
-Итак, JS используется у нас как для сборки проекта, так и в самом проекте в
-браузере. Для загрузки сторонних пакетов может использоваться NPM, а может
-альтернативный менеджер [Yarn][], работающий с тем же репозиторием (но быстрее и
-качественнее?). Подробности по сборке проекта можно прочитать в
-[CONTRIBUTING.md][].
+JS is used for building projects as well as for the project itself in 
+the browser. You can use NPM to load third-party packages or opt for the alternative 
+[Yarn][] manager, which works with the same repository but is faster and better. 
+For more information on building the project, refer to [CONTRIBUTING.md][].
 
 [JavaScript]: https://en.wikipedia.org/wiki/JavaScript
-[скриптовом языке]: https://en.wikipedia.org/wiki/Scripting_language
+[scripting language]: https://en.wikipedia.org/wiki/Scripting_language
 [Python]: https://www.python.org/
 [Ruby]: https://www.ruby-lang.org/
 [Perl]: https://www.perl.org/
@@ -322,74 +308,73 @@ Perl? А зачем, если вы и так уже выучили и испол
 
 ### JavaScript
 
-JS --- это объектно-ориентированный скриптовый язык общего назначения. Программа
-на этом языке при выполнении компилируется в промежуточное представление, а
-затем выполняется на виртуальной машине, будь то в браузере или из командной
-строки.
 
-В языке используется непривычный подход к объектно-ориентированной парадигме, в
-отличие от Си++ здесь нет классов в исходном смысле этого слова, вместо этого
-все построено на [объектах-прототипах][]. Язык развивался, для знатаков Си++
-было придумано, как создать видимость существования классов, а затем и синтаксис
-языка был изменён: в него было добавлено ключевое слово `class` и многое другое.
-**Обратите внимание!** Подход к объектно-ориентированному программированию при
-этом не изменился, он по-прежнему прототипный.
+JS is a general purpose object-oriented scripting language. Program
+in this language, when executed, is compiled into an intermediate representation, and
+then executed in the virtual machine, whether in the browser or from the command line
+lines.
 
-Вы можете часто встретить упоминание двух стандартов языка.
+The language uses an unusual approach to the object-oriented paradigm, 
+unlike C++, there are no classes in the original sense of the word, 
+instead everything is built on [prototype objects][]. The language evolved, 
+for C++ connoisseurs it was figured out how to create the appearance of 
+the existence of classes, and then the syntax of the language was changed: 
+the `class` keyword was added to it and much more.
+**Note!** The approach to object-oriented programming has not changed, it 
+is still prototype.
 
--   Старый ES5 (ECMAScript), который поддерживается всеми браузерами, кроме
-    очень древних IE. Это базовый синтаксис.
+You will often see two language standards mentioned.
 
--   Новый ES6, ES2015, ES2015+, который постепенно начинает поддерживаться
-    браузерами, [но не всеми и не полностью][]. При этом он постоянно
-    развивается, теперь каждый год в язык [добавляются новые фичи][], проходя
-    сложную и долгую [систему отбора и утверждения][].
+- Old ES5 (ECMAScript) which is supported by all browsers except 
+	very ancient IE. This is the basic syntax.
 
-Чтобы писать переносимые программы, приходится либо использовать старый стандарт
-языка ES5, либо писать на новом и использовать "transpilers" --- своего рода
-компиляторы, переводящие с одного языка на другой. Примером является
-[Babel.js][], который теперь используется и в нашем проекте. В основном код Miew
-был написан на ES5, а теперь постепенно переводится на ES2015+ (по мере
-необходимости и по возможности).
+- New ES6, ES2015, ES2015+ which is supported by browsers [but not all and not completely][].
+At the same time, he constantly is developing, now every year in the language 
+[new features are added][], passing complex and lengthy [selection and approval system][].
 
-Полезные ссылки для изучения:
+To write portable programs, you either have to use the old standard
+ES5 language, or write in a new language and use "transpilers" --- a kind of
+compilers that translate from one language to another. An example is
+[Babel.js][], which is now used in our project. Basically Miew code
+was written in ES5, and is now being translated to ES2015+ (as
+necessary and possible).
 
--   [Современный учебник Javascript](https://learn.javascript.ru/) (на русском).
+Useful links to study:
+
+-   [Modern Javascript Tutorial](https://learn.javascript.ru/) (in Russian).
 -   [Eloquent JavaScript](http://eloquentjavascript.net/).
 -   [JavaScript best practices](https://www.w3.org/wiki/JavaScript_best_practices).
--   [ООП в JavaScript. Часть 1](https://dikmax.name/post/oopjs-1/),
-    [Часть 2](https://dikmax.name/post/oopjs-2/) (на русском).
 -   [Learn ES2015](https://babeljs.io/learn-es2015/).
 
-[объектах-прототипах]: https://en.wikipedia.org/wiki/Prototype-based_programming
-[но не всеми и не полностью]: http://kangax.github.io/compat-table/es6/#ie11
-[добавляются новые фичи]: https://github.com/tc39/proposals
-[систему отбора и утверждения]: https://tc39.github.io/process-document/
+[prototype objects]: https://en.wikipedia.org/wiki/Prototype-based_programming
+[but not all and not completely]: http://kangax.github.io/compat-table/es6/#ie11
+[new features are added]: https://github.com/tc39/proposals
+[selection and approval system]: https://tc39.github.io/process-document/
 [Babel.js]: https://babeljs.io/
 
 
 ### IDE
 
-В принципе, для разработки достаточно писать текст в Блокноте, компилировать из
-командной строки npm-скриптами, а отлаживать программу встроенными в браузер
-средствами. Более удобным решением является использование подходящей среды
-разработки.
+In principle, for development it is enough to write text in Notepad, compile from
+command line with npm scripts, and debug the program with built-in browser
+means. A more convenient solution is to use a suitable environment
+development.
 
-Хорошей средой разработки для веб-проектов является, например, [WebStorm][] от
-JetBrains. Это коммерческая программа, на которую нужна личная или корпоративная
-лицензия. В то же время для академических проектов студентам предлагается
-[бесплатная лицензия][], которую можно продлевать каждый год, пока учишься.
+A good development environment for web projects is, for example, [WebStorm][] from
+jetbrains. This is a commercial program that requires a personal or corporate
+license. At the same time, for academic projects, students are offered
+[free license][], which can be renewed every year while you study.
 
 > ...use software for [non-commercial, educational purposes only][], including
 > conducting academic research or providing educational services.
 
-Если у вас нет лицензии на WebStorm, или ваша задача не подходит под её условия,
-то следует выбрать альтернативную среду разработки. Например, редакторы с
-открытыми исходными кодами [Visual Studio Code][] или [Atom][] (они, кстати,
-сами написаны на JavaScript).
+If you do not have a license for WebStorm, or your task does not fit its conditions,
+then you should choose an alternative development environment. For example, editors with
+open source [Visual Studio Code][] or [Atom][] (they, by the way,
+themselves written in JavaScript).
 
 [WebStorm]: https://www.jetbrains.com/webstorm/
-[бесплатная лицензия]: http://www.jetbrains.com/student/
+[free license]: http://www.jetbrains.com/student/
 [non-commercial, educational purposes only]: http://www.jetbrains.com/student/license_educational.html
 [Visual Studio Code]: https://code.visualstudio.com/
 [Atom]: https://atom.io/
@@ -397,4 +382,4 @@ JetBrains. Это коммерческая программа, на котору
 
 ## Usage
 
-Тут пример использования Miew...
+Here should be an example of Miew usage...
