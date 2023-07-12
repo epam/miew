@@ -124,7 +124,7 @@ and consists of 327 atoms, while a huge ribosome is stored as
 [4V88][] and has over 400,000 atoms. Importantly, the same molecules can appear 
 in the database multiple times, each with different coordinates from various 
 experiments conducted by different individuals. For example, the crambin protein 
-boasts more than ten coordinate files, including 1CRN, 1EJG, 3NIR, and so on.
+is found in more than ten coordinate files, including 1CRN, 1EJG, 3NIR, and so on.
 
 The primary format used in the protein bank is text [PDB][], but it has its 
 limitations in terms of the number of atoms and residues. As a result, it has 
