@@ -31,6 +31,11 @@ Quick Links:
 -   demo-application: <https://miew.opensource.epam.com/>
 -   source code: <https://github.com/epam/miew/>
 
+Disclaimer: this text was written in 2018 for students that likely didn't know
+much about Git, JavaScript, et al. In 2023 we translated it in English as-is,
+so some passages may sound archaic or outdated now. Still, it contains
+a pretty good background overview and introduction to Miew development.
+
 
 ## Project Overview
 
