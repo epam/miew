@@ -109,7 +109,7 @@ to present various sections of the molecule in different modes.
 
 ### Source Data
 
-The mapping process relies on input files that contain atom coordinates along 
+Source data for the visualization are files that contain atom coordinates along 
 with other essential information. Multiple formats are available, but for 
 proteins, the [Protein Data Bank][] serves as a centralized database. This 
 database gathers results from [crystallography][] experiments of molecular 
