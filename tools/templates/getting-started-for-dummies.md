@@ -39,7 +39,7 @@ Quick Links:
 Miew --- is an application that allows you to view three-dimensional images
 of molecules directly in a web browser, manipulate them, analyze various
 characteristics. It is primarily concerned with complex biological molecules: 
-[proteins][] (proteins) and [nucleic acids][] (DNA, RNA). Of course, other
+[proteins][] and [nucleic acids][] (DNA, RNA). Of course, other
 chemical compounds can be displayed. In the program, 
 it is possible to consider not just individual molecules, but entire molecular
 complexes/structures that consist of interacting proteins, RNA/DNA and small
