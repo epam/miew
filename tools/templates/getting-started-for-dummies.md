@@ -110,7 +110,7 @@ to present various sections of the molecule in different modes.
 ### Source Data
 
 Source data for the visualization are files that contain atom coordinates along 
-with other essential information. Multiple formats are available, but for 
+with other essential information. Multiple file formats exist, but for 
 proteins, the [Protein Data Bank][] serves as a centralized database. This 
 database gathers results from [crystallography][] experiments of molecular 
 complexes and assigns them unique four-letter and number identifiers. For 
