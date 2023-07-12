@@ -327,8 +327,8 @@ You will often see two language standards mentioned.
 	very ancient IE. This is the basic syntax.
 
 - New ES6, ES2015, ES2015+ which is supported by browsers [but not all and not completely][].
-At the same time, he constantly is developing, now every year in the language 
-[new features are added][], passing complex and lengthy [selection and approval system][].
+At the same time, it constantly is developing. Every year 
+[new features are added][] to the language, passing complex and lengthy [selection and approval process][].
 
 To write portable programs, you either have to use the old standard
 ES5 language, or write in a new language and use "transpilers" --- a kind of
