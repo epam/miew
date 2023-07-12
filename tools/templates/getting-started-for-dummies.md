@@ -113,7 +113,7 @@ Source data for the visualization are files that contain atom coordinates along
 with other essential information. Multiple file formats exist, but for 
 proteins, the [Protein Data Bank][] serves as a centralized database. This 
 database gathers results from [crystallography][] experiments of molecular 
-complexes and assigns them unique four-letter and number identifiers. For 
+complexes and assigns them unique identifiers of four letters and digits. For 
 instance, one of the smallest protein, [crambin][], is identified as [1CRN][] 
 and comprises 327 atoms, while the colossal ribosome carries the identifier 
 [4V88][] and has over 400,000 atoms. Importantly, the same molecules can appear 
