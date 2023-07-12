@@ -41,7 +41,7 @@ of molecules directly in a web browser, manipulate them, analyze various
 characteristics. It is primarily concerned with complex biological molecules: 
 [proteins][] and [nucleic acids][] (DNA, RNA). Of course, other
 chemical compounds can be displayed. In the program, 
-it is possible to consider not just individual molecules, but entire molecular
+it is possible to view not just individual molecules, but entire molecular
 complexes/structures that consist of interacting proteins, RNA/DNA and small
 molecules ([ligands][]). In this way, users can visualize how the different
 parts of the molecules are arranged in space relative to each other, and what
