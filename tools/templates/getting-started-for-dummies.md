@@ -135,11 +135,11 @@ identifier (`1CRN`) and a format specifier (`cif:1CRN`, `mmtf:1CRN`).
 Small molecules can be found in various formats such as [MOL/SDF][], CML, or 
 others. The [PubChem][] site is the primary source for coordinate files of common 
 chemical compounds. With Miew, you can easily load data by entering the compound 
-name, such as `pc:aspirin`, which will load the 3D coordinates of [aspirin][].
+name. For example, `pc:aspirin` will load the 3D coordinates of [aspirin][].
 
-Miew is capable of supporting a distinct type of raw data - bulk [electron density][] 
+Miew is capable of supporting a distinct type of raw data - volumetric [electron density][] 
 data, which is stored as a three-dimensional [scalar field][] in [CCP4][] format, 
-for instance. In addition, the corresponding electron density file for certain 
+for instance. The corresponding electron density file for certain 
 proteins from the Protein Data Bank can be loaded effortlessly using their identifier, 
 such as `ccp4:3C9L`.
 
@@ -172,7 +172,7 @@ Living organisms consists of [proteins][], which are macromolecules
 consisting of hundreds to hundreds of thousands of atoms. These molecules 
 perform a variety of functions and are made up of long [polymer chains][] 
 of [amino acid residues][]. There are 21 basic amino acids, each with a 
-unique name and abbreviated three-letter and one-letter codes.
+similar structure, a unique name, and abbreviated three-letter and one-letter codes.
 
 The [primary structure][] of a protein is formed by [peptide bonds][] linking 
 amino acids together in linear chains. For instance, `Phe Leu Ser Cis...`. 
@@ -207,8 +207,8 @@ Video tutorials:
 ### Nucleic Acids
 
 Proteins are built using the genetic information stored in DNA. DNA is a pair of 
-helical [polymer chains][] composed of millions of [nucleotides][] of four types: 
-cytosine (C), guanine (G), adenine (A), and thymine (T). The nucleotides are 
+helical [polymer chains][] composed of hundreds of millions of [nucleotides][] of four types: 
+cytosine (C), guanine (G), adenine (A), and thymine (T). The chains of nucleotides are 
 paired together by [hydrogen bonds][], specifically G-C and A-T. 
 
 Most of the DNA is non-coding, and only small sections, called [genes][], are 
@@ -240,27 +240,28 @@ Video tutorials:
 
 To effectively contribute to the project's development, it would be beneficial 
 to review the file labeled [CONTRIBUTING.md][] as it outlines essential 
-suggestions and feedback for the working process.
+suggestions and requests for the working process.
 
 [CONTRIBUTING.md]: https://github.com/epam/miew/blob/master/CONTRIBUTING.md
 
 
 ### Git
 
-We use [Git][] as a [source version control system][] and [GitHub][] keeps 
+Source code is meant to be stored in a [version control system][].
+We use [Git][] for this, while [GitHub][] serves as the
 main repository. You should install the following applications for successful 
 work: 
 
 -   [GitHub Desktop][] and/or [SourceTree][] as a friendly user interface for git,
 -   [Git for Windows][] if you prefer to work  in command line in Windows (see 
-[Git Downloads][] for othe OS).
+[Git Downloads][] for other OS).
 
 What to read in addition:
 
 -   [Pro Git Book](https://git-scm.com/book/en/v2),
 -   [GitHub Guides](https://guides.github.com/).
 
-[source version control system]: https://en.wikipedia.org/wiki/Version_control
+[version control system]: https://en.wikipedia.org/wiki/Version_control
 [Git]: https://git-scm.com/
 [GitHub]: https://github.com/epam/miew
 [GitHub Desktop]: https://desktop.github.com/
@@ -278,7 +279,7 @@ evolved and is now a fully-fledged general-purpose [scripting language][], along
 [Python][], [Ruby][], and [Perl][]. JavaScript programs can now be executed 
 not only in browsers but also in command line through an interpreter/compiler.
 
-Why do we use command line? The reason is that there are certain tasks involved 
+Why do we use JavaScript in command line? The reason is that there are certain tasks involved 
 in project development and preparation for publication that can be automated. 
 This automation can either be integrated into the development environment (IDE) 
 or implemented independently using a scripting language. [Windows Batch Files][] 
