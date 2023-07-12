@@ -358,7 +358,7 @@ command line with npm scripts, and debug the program with built-in browser
 means. A more convenient solution is to use a suitable development environment.
 
 A good development environment for web projects is, for example, [WebStorm][] from
-jetbrains. This is a commercial program that requires a personal or corporate
+JetBrains. This is a commercial program that requires a personal or corporate
 license. At the same time, for academic projects, students are offered
 [free license][], which can be renewed every year while you study.
 
