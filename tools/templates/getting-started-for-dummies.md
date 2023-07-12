@@ -355,8 +355,7 @@ Useful links to study:
 
 In principle, for development it is enough to write text in Notepad, compile from
 command line with npm scripts, and debug the program with built-in browser
-means. A more convenient solution is to use a suitable environment
-development.
+means. A more convenient solution is to use a suitable development environment.
 
 A good development environment for web projects is, for example, [WebStorm][] from
 jetbrains. This is a commercial program that requires a personal or corporate
