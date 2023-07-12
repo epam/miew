@@ -145,7 +145,7 @@ such as `ccp4:3C9L`.
 
 Moreover, Miew permits loading data from a local file or requesting it through a 
 specific URL. Future plans include supporting [numerous formats][] and even other 
-data types, such as loading 3D geometry in prevalent formats.
+data types, such as loading 3D geometry in widely used formats.
 
 [Protein Data Bank]: http://www.rcsb.org/
 [crystallography]: https://en.wikipedia.org/wiki/X-ray_crystallography
@@ -215,7 +215,7 @@ Most of the DNA is non-coding, and only small sections, called [genes][], are
 utilized in the creation of RNA during transcription. [RNA][] is then used 
 in the subsequent construction of proteins during translation. [Codons][] are 
 triplets of nucleotides in RNA that correspond to one amino acid residue. Some 
-triplets encode the same amino acid, while others are service commands such as 
+triplets encode the same amino acids, while others are service commands such as 
 start and stop codons.
 
 Errors can occur during DNA [replication][], both randomly and induced. Some 
