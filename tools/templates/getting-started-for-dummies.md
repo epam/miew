@@ -315,10 +315,9 @@ then executed in the virtual machine, whether in the browser or from the command
 
 The language uses an unusual approach to the object-oriented paradigm, 
 unlike C++, there are no classes in the original sense of the word, 
-instead everything is built on [prototype objects][]. The language evolved, 
-for C++ connoisseurs it was figured out how to create the appearance of 
-the existence of classes, and then the syntax of the language was changed: 
-the `class` keyword was added to it and much more.
+instead everything is built on [prototype objects][]. The language evolved. 
+The syntax of the language was changed to add the `class` keyword and much more for
+developers with C++ or Java-like background. It looks as if there are classes now.
 **Note!** The approach to object-oriented programming has not changed, it 
 is still prototype.
 
