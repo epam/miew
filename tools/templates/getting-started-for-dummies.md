@@ -168,18 +168,24 @@ data types, such as loading 3D geometry in widely used formats.
 
 ### Proteins
 
-Living organisms consists of [proteins][], which are macromolecules 
-consisting of hundreds to hundreds of thousands of atoms. These molecules 
-perform a variety of functions and are made up of long [polymer chains][] 
-of [amino acid residues][]. There are 21 basic amino acids, each with a 
-similar structure, a unique name, and abbreviated three-letter and one-letter codes.
+[Proteins][] are macromolecules (hundreds to hundreds of thousands of atoms) that
+perform many functions in a living organism. They represent
+long [polymer chains][], consisting of [amino acid residues][],
+possibly compactly folded in space. There are 21 basic
+amino acids, each of them has a similar structure, differing only in the "tail".
+Each amino acid has a name, as well as abbreviation of three-letter and
+single-letter code for ease of notation.
 
-The [primary structure][] of a protein is formed by [peptide bonds][] linking 
-amino acids together in linear chains. For instance, `Phe Leu Ser Cis...`. 
-However, the [secondary structure][], which features [spirals][], [layers][], 
-turns, and loops, is determined by the way residues hang on to each other 
-through [hydrogen bonds][]. Predicting how a protein will fold based solely on 
-its primary structure is impossible.
+Amino acids are linked to each other by [peptide bonds][] in linear
+chains (these are ordinary [covalent bonds][] like most others in a molecule).
+A given sequence of amino acids in a protein (e.g. `Phe Leu Ser Cis...`)
+called the [primary structure][] of the protein.
+
+Being located in space, the residues hold on to each other by [hydrogen
+bonds][], forming the characteristic configurations that make up the [secondary
+structure][] of a protein: [helices][], [layers][], turns, loops... In general
+it is impossible to predict in advance which secondary structures
+forms protein when folded.
 
 The [alpha-carbon][], located at the center of each amino acid, serves as 
 the starting point for the residue. Some data files for large molecules contain only coordinates 
@@ -199,7 +205,7 @@ Video tutorials:
 [primary structure]: https://en.wikipedia.org/wiki/Protein_primary_structure
 [hydrogen bonds]: https://en.wikipedia.org/wiki/Hydrogen_bond
 [secondary structure]: https://en.wikipedia.org/wiki/Protein_secondary_structure
-[spirals]: https://en.wikipedia.org/wiki/Alpha_helix
+[helices]: https://en.wikipedia.org/wiki/Alpha_helix
 [layers]: https://en.wikipedia.org/wiki/Beta_sheet
 [alpha-carbon]: https://en.wikipedia.org/wiki/Alpha_and_beta_carbon
 
