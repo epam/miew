@@ -125,7 +125,7 @@ The primary format used in the protein bank is text [PDB][], but it has its
 limitations in terms of the number of atoms and residues. As a result, it has 
 been replaced by the more comprehensive formats of verbose [CIF][] and binary 
 [MMTF][]. To load data directly from the bank, Miew supports using the unique 
-identifier (`1CRN`) and specifying the format (`cif:1CRN`, `mmtf:1CRN`).
+identifier (`1CRN`) and a format specifier (`cif:1CRN`, `mmtf:1CRN`).
 
 Small molecules can be found in various formats such as [MOL/SDF][], CML, or 
 others. The [PubChem][] site is the primary source for coordinate files of common 
