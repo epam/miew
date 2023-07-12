@@ -94,7 +94,7 @@ It is possible to display either the entire molecule or only a specific portion 
 The constructed geometry can be colored in a variety of ways, providing additional 
 details such as the chemical element or monomer type, as well as characteristics 
 like temperature factor or [hydrophobicity][]. These settings, including mode, 
-coloring, and subset of atoms, comprise a data view. Different views can be merged 
+coloring, and subset of atoms, comprise a data _representation_. Different representations can be merged 
 to present various sections of the molecule in different modes.
 
 > Example of combination of representations: [Hemoglobin][].
