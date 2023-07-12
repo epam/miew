@@ -347,7 +347,7 @@ Useful links to study:
 [prototype objects]: https://en.wikipedia.org/wiki/Prototype-based_programming
 [but not all and not completely]: http://kangax.github.io/compat-table/es6/#ie11
 [new features are added]: https://github.com/tc39/proposals
-[selection and approval system]: https://tc39.github.io/process-document/
+[selection and approval process]: https://tc39.github.io/process-document/
 [Babel.js]: https://babeljs.io/
 
 
