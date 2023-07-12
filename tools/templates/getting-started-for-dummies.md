@@ -309,7 +309,7 @@ For more information on building the project, refer to [CONTRIBUTING.md][].
 ### JavaScript
 
 
-JS is a general purpose object-oriented scripting language. Program
+JS is a general purpose object-oriented scripting language. A program
 in this language, when executed, is compiled into an intermediate representation, and
 then executed in the virtual machine, whether in the browser or from the command line
 lines.
