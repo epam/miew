@@ -120,7 +120,7 @@ proteins, the [Protein Data Bank][] serves as a centralized database. This
 database gathers results from [crystallography][] experiments of molecular 
 complexes and assigns them unique identifiers of four letters and digits. For 
 instance, one of the smallest protein, [crambin][], is identified as [1CRN][] 
-and comprises 327 atoms, while the colossal ribosome carries the identifier 
+and consists of 327 atoms, while a huge ribosome is stored as
 [4V88][] and has over 400,000 atoms. Importantly, the same molecules can appear 
 in the database multiple times, each with different coordinates from various 
 experiments conducted by different individuals. For example, the crambin protein 
