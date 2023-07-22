@@ -1,5 +1,5 @@
 /** 3D Molecular Viewer v0.0.1
-Copyright (c) 2015-2022 EPAM Systems, Inc. */
+Copyright (c) 2015-2023 EPAM Systems, Inc. */
 
 import { Miew } from 'miew';
 import { find, forEach, remove, omitBy, findKey, isNumber, assign, forIn, isEmpty, isEqual, isString, isPlainObject, isUndefined, slice, sortBy, keys, get, set } from 'lodash';
@@ -2132,7 +2132,7 @@ var parser = function () {
         yy: {}
       };
       for (var k in this.yy) {
-        if (Object.prototype.hasOwnProperty.call(this.yy, k)) {
+        if (Object.hasOwn(this.yy, k)) {
           sharedState.yy[k] = this.yy[k];
         }
       }
@@ -3485,7 +3485,7 @@ function isAlmostPlainObject(o) {
     return true;
   }
   var proto = o && Object.getPrototypeOf(o);
-  return !!proto && !proto.hasOwnProperty('constructor') && isAlmostPlainObject(proto);
+  return !!proto && !Object.hasOwn(proto, 'constructor') && isAlmostPlainObject(proto);
 }
 function objectsDiff(src, dst) {
   var diff = {};
@@ -3714,7 +3714,7 @@ var RepresentationMap = function () {
         return 'Can not create representation: there is no data';
       }
       if (index !== undefined) {
-        if (!this.representationMap.hasOwnProperty(strId)) {
+        if (!Object.hasOwn(this.representationMap, strId)) {
           this.representationMap[strId.toString()] = index;
           this.representationID[index] = strId.toString();
         } else {
@@ -3726,13 +3726,13 @@ var RepresentationMap = function () {
   }, {
     key: "remove",
     value: function remove(index) {
-      if (index && this.representationID.hasOwnProperty(index)) {
+      if (index && Object.hasOwn(this.representationID, index)) {
         delete this.representationMap[this.representationID[index]];
         delete this.representationID[index];
       }
       var sortedKeys = Object.keys(this.representationID).sort();
       for (var i in sortedKeys) {
-        if (sortedKeys.hasOwnProperty(i)) {
+        if (Object.hasOwn(sortedKeys, i)) {
           var id = sortedKeys[i];
           if (id > index) {
             this.representationID[id - 1] = this.representationID[id];
@@ -3815,7 +3815,7 @@ var CLIUtils = function () {
     value: function listSelector(miew, context) {
       var ret = '';
       for (var k in context) {
-        if (context.hasOwnProperty(k)) {
+        if (Object.hasOwn(context, k)) {
           ret += "".concat(k, " : \"").concat(context[k], "\"\n");
         }
       }

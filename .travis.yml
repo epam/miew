@@ -1,7 +1,7 @@
 language: node_js
 version: 1.0
 node_js:
-  - "16"
+  - "18"
 cache:
   yarn: true
   directories:
@@ -44,7 +44,7 @@ deploy:
     tag: latest
     on:
       tags: true
-      node: "16"
+      node: "18"
       condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$
   - provider: script
     edge: true
@@ -52,7 +52,7 @@ deploy:
     script: "chmod +x ./tools/deploy.sh && ./tools/deploy.sh"
     on:
       all_branches: true
-      node: "16"
+      node: "18"
 notifications:
   slack:
     secure: CkwGMCqK7Liq81tnr7wMUJ893JW09caDeio5oOYQmjGwu3FBkwNU7zApRltN6NJ/a14Of97fHre0vMPga7BrNmhDH9ztvh6qafEmZXPYxiZSbOQ5JGYP3SlotIFF+z0WowCt6erXmNeRHzTBCoZKo4Sxd/2ZHLrkm3nVcCnugpIlyiFrhGnv+QIS2JbMVhai/0rYU1+CsIm6Lb/Kt4cpUgbdJGOsUizTZNKHxhgbnElFczaF0bUFbifkP7LRqdEXtsJPodLfPOezKM62BA6rBnlFGPrRKER1r3ZCHOHimAjyIWD6emUc331w2OmhXDuHGL4ZXq94joiHJVhfrnUsIzgewIxE0qKCMO7y4WcAdXCiwY+x1SoOUlUreJp6EkDI0IgiKOCfb8BnjSXV7VhqymGPjuvFvNzBxXyLjo9jceathGsKQ7usFjhVT1JBkmNYadVN8Y7PYEbyzOjWJol/f5Ol4B28pzypVMP3N6M0KKLJZ4gp6vFtobC72u7/7ThCfUfjDaPyf/yoUNmMQN6lLTRGvZnix+NU/DWVptbDrfAOm9+bBN7Z53Kdhfhpzjedr1Bb7Y+UuHSbNbQe0AvZdhzX3qCrneKDmlbIUvJfe1yzVh8981RedBFTXFcAb38wVfofnMrbZPaWw9k9L3fP1V52GYGjN6L2AX0VQZ3/arE=
