@@ -69,9 +69,9 @@
     "toastr": "^2.1.4",
     "typescript": "^4.5.3",
     "uglify-js": "^3.9.3",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.11.0",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
     "yargs": "^15.3.0"
   },
   "browserslist": [

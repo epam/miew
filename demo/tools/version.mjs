@@ -2,7 +2,8 @@
 
 import yargs from 'yargs'
 import { spawnSync } from 'child_process'
-import packageJson from '../package.json'
+import packageJson from '../package.json' assert { type: "json" }
+import { pathToFileURL } from 'url'
 
 const version = {
   base: packageJson.version,
@@ -34,7 +35,7 @@ version.copyright = `${packageJson.description} v${
   version.combined
 } Copyright (c) 2015-${new Date().getFullYear()} ${packageJson.author}`
 
-if (require.main === module) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   process.stdout.write(version.copyright)
 }
 

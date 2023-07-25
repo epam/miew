@@ -7,7 +7,11 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 import ScriptExtHtmlWebpackPlugin from 'script-ext-html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
-import version from './tools/version'
+import version from './tools/version.mjs'
+
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const configure = (prod) => ({
   entry: {
@@ -67,7 +71,7 @@ const configure = (prod) => ({
       COOKIE_PATH: JSON.stringify(yargs.argv.cookiePath),
       DEBUG: !prod
     }),
-    new webpack.IgnorePlugin(/vertx/), // https://github.com/webpack/webpack/issues/353
+    new webpack.IgnorePlugin({resourceRegExp: /vertx/}), // https://github.com/webpack/webpack/issues/353
     new webpack.ProvidePlugin({
       jQuery: 'jquery'
     }),
@@ -86,8 +90,7 @@ const configure = (prod) => ({
     new CopyWebpackPlugin([
       { from: 'src/data', to: 'data' },
       { from: 'src/images', to: 'images' }
-    ]),
-    new webpack.HashedModuleIdsPlugin()
+    ])
   ],
   optimization: {
     runtimeChunk: {
@@ -96,34 +99,37 @@ const configure = (prod) => ({
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
-        vendor: {
+        defaultVendors: {
           name: 'vendor',
           test: /[\\/](node_modules|vendor)[\\/]/
         }
       }
-    }
+    },
+    moduleIds: 'deterministic'
   },
   devtool: 'source-map',
   stats: {
     assets: false,
     colors: true,
-    chunks: true
   },
   watchOptions: {
     ignored: /node_modules/
   },
   devServer: {
-    // hot: true,
-    contentBase: './build',
-    publicPath: '/',
-    compress: true,
-    clientLogLevel: 'info',
-    overlay: true,
-    stats: {
-      assets: false,
-      colors: true,
-      cached: false,
-      cachedAssets: false
+    static: './build',
+    client: {
+      logging: 'info',
+    },
+    devMiddleware: {
+      // hot: true,
+      publicPath: '/',
+      stats: {
+        assets: false,
+        colors: true,
+        chunks: true,
+        cached: false,
+        cachedAssets: false
+      }
     }
   }
 })
