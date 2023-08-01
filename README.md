@@ -1,5 +1,11 @@
 # Miew – 3D Molecular Viewer
 
+> ⚠ It seems that experiments over recent years have led to application instability. We decided
+> to step back and proceed with architectural changes slowly. We apologize for any inconvenience
+> it may cause during the transition period. The old "master" branch is kept for your reference.
+> This is the new "main" branch for further development 🚀 
+
+
 [![Linux Build Status](https://img.shields.io/travis/epam/miew/master.svg?label=linux)](https://travis-ci.org/epam/miew)
 [![Windows Build Status](https://img.shields.io/appveyor/ci/paulsmirnov/miew/master.svg?label=windows)](https://ci.appveyor.com/project/paulsmirnov/miew/branch/master)
 [![Snyk badge](https://snyk.io/test/github/epam/miew/badge.svg)](https://snyk.io/test/github/epam/miew)
@@ -10,7 +16,7 @@
 [![SonarCloud Reliability](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=epam:miew&metric=Reliability)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=epam:miew&metric=alert_status)](https://sonarcloud.io/dashboard?id=epam:miew)
 
-Copyright (c) 2015–2020 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2023 [EPAM Systems, Inc.](https://www.epam.com/)
 
 Miew is a high performance web tool for advanced visualization and manipulation of molecular
 structures.
