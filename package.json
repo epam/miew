@@ -7,9 +7,9 @@
   "workspaces": [
     "packages/*"
   ],
-  "engines" : { 
-    "npm" : ">=6.0.0 <7.0.0",
-    "node" : ">=14.0.0 <15.0.0"
+  "engines": {
+    "npm": ">=9.0.0 <10.0.0",
+    "node": ">=18.0.0 <19.0.0"
   },
   "scripts": {
     "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",

@@ -173,9 +173,9 @@
     "toastr": "^2.1.4",
     "uglify-js": "^3.9.3",
     "url-loader": "^4.1.0",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.11.0",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
     "yargs": "^15.3.0"
   }
 }

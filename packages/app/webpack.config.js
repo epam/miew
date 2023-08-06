@@ -52,7 +52,7 @@ module.exports = {
       template: './src/index.html',
       title: 'Miew – 3D Molecular Viewer',
     }),
-    new webpack.HashedModuleIdsPlugin(),
+    new webpack.ids.HashedModuleIdsPlugin(),
     new MiniCssExtractPlugin(),
   ],
   optimization: {

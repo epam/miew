@@ -1,8 +1,8 @@
 /* eslint-env node */
 
-import yargs from 'yargs';
-import { spawnSync } from 'child_process';
-import packageJson from '../package.json';
+const yargs = require('yargs');
+const spawnSync = require('child_process').spawnSync;
+const packageJson = require('../package.json');
 
 const version = {
   base: packageJson.version,
@@ -34,4 +34,4 @@ if (require.main === module) {
   process.stdout.write(version.copyright);
 }
 
-export default version;
+module.exports = version;
