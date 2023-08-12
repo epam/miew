@@ -112,26 +112,26 @@ const configure = (prod) => ({
     ignored: /node_modules/,
   },
   devServer: {
-	  static: {
-        directory: './build',
-		publicPath: '/',
-		staticOptions: {			
-		  compress: true
-		}
-	  },	  
-	  client: {
-		logging: 'info',
-	    overlay: true
-	  },
-	  devMiddleware : {
+    static: {
+      directory: './build',
+      publicPath: '/',
+      staticOptions: {
+        compress: true
+      }
+    },
+    client: {
+      logging: 'info',
+      overlay: true
+    },
+    devMiddleware : {
       // hot: true,
-        stats: {
-          assets: false,
-          colors: true,
-          cached: false,
-          cachedAssets: false,
-	    }
-	 },
+      stats: {
+        assets: false,
+        colors: true,
+        cached: false,
+        cachedAssets: false,
+      }
+    },
   },
 });
 
