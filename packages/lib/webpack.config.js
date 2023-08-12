@@ -115,11 +115,13 @@ const configure = (prod) => ({
 	  static: {
         directory: './build',
 		publicPath: '/',
+		staticOptions: {			
+		  compress: true
+		}
 	  },	  
 	  client: {
 		logging: 'info',
-	    overlay: true,
-		compress: true
+	    overlay: true
 	  },
 	  devMiddleware : {
       // hot: true,
