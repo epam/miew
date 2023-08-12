@@ -49,7 +49,7 @@ const configure = (prod) => ({
       use: [{
         loader: 'url-loader',
         options: {
-          limit: 1000000,
+          limit: 131072,
         },
       },
       ],
@@ -118,7 +118,8 @@ const configure = (prod) => ({
 	  },	  
 	  client: {
 		logging: 'info',
-	    overlay: true,  
+	    overlay: true,
+		compress: true
 	  },
 	  devMiddleware : {
       // hot: true,
