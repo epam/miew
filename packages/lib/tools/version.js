@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 const yargs = require('yargs');
-const spawnSync = require('child_process').spawnSync;
+const { spawnSync } = require('child_process');
 const packageJson = require('../package.json');
 
 const version = {
