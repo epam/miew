@@ -116,23 +116,23 @@ const configure = (prod) => ({
       directory: './build',
       publicPath: '/',
       staticOptions: {
-        compress: true
-      }
+        compress: true,
+      },
     },
     client: {
       logging: 'info',
-      overlay: true
+      overlay: true,
     },
-    devMiddleware : {
+    devMiddleware: {
       // hot: true,
       stats: {
         assets: false,
         colors: true,
         cached: false,
         cachedAssets: false,
-      }
+      },
     },
   },
 });
 
-module.exports=(env, argv) => configure(argv.mode === 'production');
+module.exports = (env, argv) => configure(argv.mode === 'production');
