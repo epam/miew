@@ -20,19 +20,15 @@ We adhere to the [Semantic Versioning] scheme. The major version number changes 
 API changes. While there is no external API specified yet it stays at zero for now.
 
 According to the Continuous Integration principles, all the development occurs inside
-the `master` branch, and we use the `latest` branch _for tagging_ released versions only.
+the `main` branch, and we use the `latest` branch _for tagging_ released versions only.
 We rarely use public feature branches as they [go against CI/CD].
 
-There is a live [demo application] and [a set of examples] available. Each branch or tag gets its
-own subdirectory on the server, e.g. [`master`] or [`v0.7.10`].
+There is a live [demo application] and [a set of examples] available.
 
 [Semantic Versioning]: http://semver.org/
 [go against CI/CD]: https://martinfowler.com/bliki/FeatureBranch.html
 [demo application]: https://miew.opensource.epam.com/
 [a set of examples]: https://miew.opensource.epam.com/examples/
-[`master`]: https://miew.opensource.epam.com/master/
-[`v0.7.10`]: https://miew.opensource.epam.com/v0.7.10/
-
 
 ## Reporting Issues
 
@@ -53,7 +49,7 @@ number consists of several parts, e.g. `0.7.10+20171225.164646.68e4556`:
   - `-mod` suffix is appended if the project directory contained unversioned or changed files
     during the build.
 
-[an issue template]: .github/ISSUE_TEMPLATE.md
+[an issue template]: https://github.com/epam/miew/tree/main/.github/ISSUE_TEMPLATE
 
 
 ## Building and Running
@@ -100,18 +96,23 @@ the browser console.
 ## Making Changes
 
 > Please make sure maintainers are expecting your changes and will consider merging them into
-> master. If the changes do not fit the project roadmap, it might unfortunately happen that
+> main. If the changes do not fit the project roadmap, it might unfortunately happen that
 > you have wasted your time.
 
-Core developers do not normally use pull requests. If you have rights to push, then clone the main
-repository and just start working on `master` branch. Commit and push to the origin but make sure
-you do not ruin anything.
+### Core developers
+Commit and push to the `origin/main` is forbidden.
+All core developers should use Pull Requests. Clone the main repository and just start working 
+in a new branch created from `main` branch. When you are ready create a PR and select a [reviewer].
+When the PR is approved the author should merge it using "Squash and merge" approach following
+with the branch deletion. **Note**:The PR should be synchonized with `main` branch at a moment of merging.
 
+### External developers
 External contributors are welcome to fork, branch and create pull-requests. Fork the project
 [on GitHub] and clone your fork locally. Apply changes, run automated and manual tests to verify
 that everything works correctly.
 
 [on GitHub]: https://github.com/epam/miew
+[reviewer]: #markdown-header-code-review
 
 ```sh
 # grab the forked project
@@ -120,7 +121,7 @@ cd miew
 git remote add upstream https://github.com/epam/miew.git
 
 # create a branch
-git checkout -b hotfix/great-fix-whatever -t origin/master
+git checkout -b hotfix/great-fix-whatever -t origin/main
 
 # install necessary Node.js modules
 yarn
@@ -137,6 +138,19 @@ Before you commit and push, please ensure that the build is not broken:
   - It is also a good idea to run the graphics regression tests (`yarn run test:e2e`, `yarn run show:e2e`).
     Unfortunately, some tests fail yet.
 
+### Code Review
+
+When you create a new PR you should select a reviewer among core developers. By default we take 
+2 days for a code review. If the reviewer's estimation is more than 2 days, he/she should notify the author.
+
+When you choose a reviewer it's a good practice to select:
+
+- an expert in the system you've changed
+- or a person who should be noticed or learnt
+- or an owner of changed code (default)
+
+You can use the following list of recommendations as "what to look at" while code review:
+[Google review guidelines|https://google.github.io/eng-practices/review/reviewer/looking-for.html#summary]
 
 ## Commiting
 
@@ -160,7 +174,7 @@ section).
 ```sh
 # update
 git fetch upstream
-git rebase upstream/master
+git rebase upstream/main
 
 # lint, test and build
 npm run ci
@@ -208,15 +222,15 @@ Unfortunately, it is still a semi-manual process.
             git commit --amend
             git tag -fa v0.0.1 -m "0.0.1"
 
-4.  Merge `master` into `latest` branch.
+4.  Merge `main` into `latest` branch.
 
         git checkout latest
-        git merge --ff-only master
-        git checkout master
+        git merge --ff-only main
+        git checkout main
 
 5.  Push updated branches and tags.
 
-        git push origin master latest
+        git push origin main latest
         git push --tags
 
 6.  Update a release description at https://github.com/epam/miew/releases. 
@@ -225,6 +239,6 @@ Unfortunately, it is still a semi-manual process.
     *  Select the new version tag among existing and fill in a description text box with new release link and list of changes (see `CHANGELOG.md`)
     *  Press `Publish`.
 
-Upon commit [Travis CI][] builds `master`, `latest` branches and `v0.0.1` tag. The tag automatically initiates NPM publish process if the build is successful.
+Upon commit [Travis CI][] builds `main`, `latest` branches and `v0.0.1` tag. The tag automatically initiates NPM publish process if the build is successful.
 
 [Travis CI]: https://travis-ci.org/epam/miew
