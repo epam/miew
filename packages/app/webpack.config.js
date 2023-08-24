@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const prod = process.env.NODE_ENV === 'production';
 
@@ -36,6 +37,10 @@ module.exports = {
           },
           'postcss-loader',
         ],
+      },
+      {
+        test: /\.(png)$/,
+        type: 'asset/resource',
       }],
   },
   performance: {
@@ -54,6 +59,12 @@ module.exports = {
     }),
     new webpack.ids.HashedModuleIdsPlugin(),
     new MiniCssExtractPlugin(),
+    new CopyWebpackPlugin(
+    {
+      patterns: [    
+      { from: 'images', to: 'images' },
+      ]
+    }),
   ],
   optimization: {
     runtimeChunk: {
@@ -80,6 +91,15 @@ module.exports = {
     colors: true,
     chunks: true,
   },
+  devServer: {
+    static: {
+      directory: './build',
+      publicPath: '/',
+      staticOptions: {
+        compress: true,
+      },
+    },
+  },  
   watchOptions: {
     ignored: /node_modules/,
   },
