@@ -37,10 +37,6 @@ module.exports = {
           },
           'postcss-loader',
         ],
-      },
-      {
-        test: /\.(png)$/,
-        type: 'asset/resource',
       }],
   },
   performance: {
