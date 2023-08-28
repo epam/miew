@@ -13,11 +13,12 @@
   },
   "scripts": {
     "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
-    "coveralls": "cat coverage/general.info | coveralls"
+    "coveralls": "cat coverage/general.info | coveralls",
+    "build:ci": "yarn workspaces foreach -ptv run ci"
   },
   "devDependencies": {
     "coveralls": "^3.1.0",
-    "lcov-result-merger": "^3.1.0",
-    "lerna": "^3.21.0"
-  }
+    "lcov-result-merger": "^3.1.0"
+  },
+  "packageManager": "yarn@3.6.3"
 }

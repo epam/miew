@@ -13,7 +13,8 @@ install:
   - lerna bootstrap
 test_script:
   - node --version
-  - lerna run ci
+  - yarn build:ci
+
 build: off
 notifications:
   - provider: Slack

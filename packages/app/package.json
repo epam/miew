@@ -8,9 +8,9 @@
   "license": "MIT",
   "scripts": {
     "ci": "run-s clean lint build",
-    "clean": "rimraf build/*",
+    "clean": "rimraf 'build/*'",
     "lint": "eslint -f unix --ext .js,.jsx src/ ",
-    "lint:css": "stylelint **/*.scss",
+    "lint:css": "stylelint '**/*.scss'",
     "build": "webpack --mode production",
     "start": "webpack-dev-server --mode development --open",
     "test": "jest",
