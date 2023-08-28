@@ -1,13 +1,13 @@
 /* eslint-env node */
 
-import path from 'path';
-import webpack from 'webpack';
-import yargs from 'yargs';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import ScriptExtHtmlWebpackPlugin from 'script-ext-html-webpack-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
-import version from './tools/version';
+const path = require('path');
+const webpack = require('webpack');
+const yargs = require('yargs');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const version = require('./tools/version');
 
 const configure = (prod) => ({
   entry: {
@@ -49,7 +49,7 @@ const configure = (prod) => ({
       use: [{
         loader: 'url-loader',
         options: {
-          limit: 8192,
+          limit: 131072,
         },
       },
       ],
@@ -66,7 +66,7 @@ const configure = (prod) => ({
       COOKIE_PATH: JSON.stringify(yargs.argv.cookiePath),
       DEBUG: !prod,
     }),
-    new webpack.IgnorePlugin(/vertx/), // https://github.com/webpack/webpack/issues/353
+    new webpack.IgnorePlugin({ resourceRegExp: /vertx/ }), // https://github.com/webpack/webpack/issues/353
     new webpack.ProvidePlugin({
       jQuery: 'jquery',
     }),
@@ -86,7 +86,7 @@ const configure = (prod) => ({
       { from: 'demo/data', to: 'data' },
       { from: 'demo/images', to: 'images' },
     ]),
-    new webpack.HashedModuleIdsPlugin(),
+    new webpack.ids.HashedModuleIdsPlugin(),
   ],
   optimization: {
     runtimeChunk: {
@@ -112,19 +112,27 @@ const configure = (prod) => ({
     ignored: /node_modules/,
   },
   devServer: {
-    // hot: true,
-    contentBase: './build',
-    publicPath: '/',
-    compress: true,
-    clientLogLevel: 'info',
-    overlay: true,
-    stats: {
-      assets: false,
-      colors: true,
-      cached: false,
-      cachedAssets: false,
+    static: {
+      directory: './build',
+      publicPath: '/',
+      staticOptions: {
+        compress: true,
+      },
+    },
+    client: {
+      logging: 'info',
+      overlay: true,
+    },
+    devMiddleware: {
+      // hot: true,
+      stats: {
+        assets: false,
+        colors: true,
+        cached: false,
+        cachedAssets: false,
+      },
     },
   },
 });
 
-export default (env, argv) => configure(argv.mode === 'production');
+module.exports = (env, argv) => configure(argv.mode === 'production');

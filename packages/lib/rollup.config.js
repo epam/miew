@@ -1,14 +1,14 @@
 /* eslint-env node */
 
-import rollupPluginBabel from 'rollup-plugin-babel';
-import rollupPluginCommonJS from 'rollup-plugin-commonjs';
-import rollupPluginReplace from 'rollup-plugin-replace';
-import rollupPluginNodeResolve from 'rollup-plugin-node-resolve';
-import { string } from 'rollup-plugin-string';
+const rollupPluginBabel = require('rollup-plugin-babel');
+const rollupPluginCommonJS = require('rollup-plugin-commonjs');
+const rollupPluginReplace = require('rollup-plugin-replace');
+const rollupPluginNodeResolve = require('rollup-plugin-node-resolve');
+const { string } = require('rollup-plugin-string');
 
-import path from 'path';
-import version from './tools/version';
-import packageJson from './package.json';
+const path = require('path');
+const version = require('./tools/version');
+const packageJson = require('./package.json');
 
 const banner = `/** ${version.copyright} */\n`;
 
