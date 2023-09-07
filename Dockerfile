@@ -1,7 +1,6 @@
-FROM node:14 AS build
+FROM node:18 AS build
 COPY . /miew
 RUN cd /miew \
-    && yarn global
     && yarn ci
 
 FROM nginx:1.21-alpine
