@@ -1,8 +1,8 @@
 FROM node:14 AS build
 COPY . /miew
 RUN cd /miew \
-    && yarn global add lerna \
-    && lerna build:ci
+    && yarn global
+    && yarn ci
 
 FROM nginx:1.21-alpine
 LABEL maintainer="miew@epam.com"
