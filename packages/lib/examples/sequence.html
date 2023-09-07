@@ -25,6 +25,7 @@
       color: black;
       text-decoration: none;
       font-family: monospace;
+      border-bottom: 2px solid black;
     }
 
     .sequence {
@@ -67,9 +68,10 @@
 
         viewer._forEachComplexVisual(function(visual) {
           var complex = visual.getComplex();
+          var colorer = visual.repGet().colorer;
           var chains = complex.getChainNames();
           for (var i = 0; i < chains.length; ++i) {
-            var elem = createChainElement(complex.getChain(chains[i]));
+            var elem = createChainElement(complex.getChain(chains[i]), colorer);
             div.appendChild(elem);
           }
         });
@@ -128,7 +130,7 @@
         });
       });
 
-      function createChainElement(chain) {
+      function createChainElement(chain, colorer) {
         var elem = document.createElement('div');
 
         // show chain name
@@ -147,10 +149,14 @@
           // skip water
           if (resType.flags & Miew.chem.ResidueType.Flags.WATER) return;
 
+          // assign color
+          var color = colorer.getResidueColor(res, chain._complex);
+
           // create residue a-element
           var resElem = document.createElement('a');
           resElem.id = String(res._index);
           resElem.textContent = resType.letterCode;
+          resElem.style.borderColor = '#' + color.toString(16).padStart(6, '0');
           resElem.href = '#';
           resElem.dataset.residx = res._index;
           resDiv.appendChild(resElem);
