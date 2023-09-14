@@ -239,6 +239,4 @@ Unfortunately, it is still a semi-manual process.
     *  Select the new version tag among existing and fill in a description text box with new release link and list of changes (see `CHANGELOG.md`)
     *  Press `Publish`.
 
-Upon commit [Travis CI][] builds `main`, `latest` branches and `v0.0.1` tag. The tag automatically initiates NPM publish process if the build is successful.
-
-[Travis CI]: https://travis-ci.org/epam/miew
+Upon push, GitHub Actions build `main`, `latest` branches and `v0.0.1` tag. The tag automatically initiates NPM publish process if the build is successful.
