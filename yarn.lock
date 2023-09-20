@@ -1485,6 +1485,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jcubic/lily@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@jcubic/lily@npm:0.3.0"
+  checksum: c67f7eb552540c4a37c8128ba65e08ad57f551d30fac682d9bc918f4007d293adf6fa896fcba98b196393a82025997365c3426747a394d293fe50d53cd1a9ac5
+  languageName: node
+  linkType: hard
+
 "@jest/console@npm:^26.6.2":
   version: 26.6.2
   resolution: "@jest/console@npm:26.6.2"
@@ -2171,21 +2178,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jquery@npm:^3.3.29":
-  version: 3.5.5
-  resolution: "@types/jquery@npm:3.5.5"
+"@types/jquery@npm:^3.5.10, @types/jquery@npm:^3.5.14":
+  version: 3.5.19
+  resolution: "@types/jquery@npm:3.5.19"
   dependencies:
     "@types/sizzle": "*"
-  checksum: b8fb9ebc09e3d29c9867016426cb038f3d3baa25a2e631c14b07c827feab12fc03c4a1cd5782090840d1f3b1f52113bf5eaabda76f861fd3d4856217a60e5af7
-  languageName: node
-  linkType: hard
-
-"@types/jquery@npm:^3.3.6":
-  version: 3.5.4
-  resolution: "@types/jquery@npm:3.5.4"
-  dependencies:
-    "@types/sizzle": "*"
-  checksum: 79f823045439badedbc306ffdb37f198e470582cae31390ec7621fddf4a984771e7a5c631406da8fa4f858aa5047f6521b464d630b21b5942209432b001675e3
+  checksum: 0298e53a353089e2abae4be2f660b5f2bfb4797464623701c5c2f2c911317b554f1887c2c3d587d0f724d70a3fb5e31907bf7fa5d96df33af07e2842660ef52a
   languageName: node
   linkType: hard
 
@@ -3061,6 +3059,13 @@ __metadata:
   version: 1.0.0
   resolution: "ansi-styles@npm:1.0.0"
   checksum: 6dd47dccb268b4cc1fd0dd6617067a7acd34ad2761f0438800fdd55c0d45f50a90787acd82806009c2bf467f4e2920166be03e19b23529038c1c4527d80f598b
+  languageName: node
+  linkType: hard
+
+"ansidec@npm:^0.3.4":
+  version: 0.3.4
+  resolution: "ansidec@npm:0.3.4"
+  checksum: 93bbce8624def84ab39f9b14948c4cef98650ac97312b7bbb272d4cd4cbfedbecd1586e601e5f2ef901773ba7729921b1df14c198ab089d7211172d5ae8c2ef5
   languageName: node
   linkType: hard
 
@@ -7356,6 +7361,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:^2.3.2":
+  version: 2.3.3
+  resolution: "fsevents@npm:2.3.3"
+  dependencies:
+    node-gyp: latest
+  checksum: 11e6ea6fea15e42461fc55b4b0e4a0a3c654faa567f1877dbd353f39156f69def97a69936d1746619d656c4b93de2238bf731f6085a03a50cabf287c9d024317
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:~2.1.1, fsevents@npm:~2.1.2":
   version: 2.1.3
   resolution: "fsevents@npm:2.1.3"
@@ -7379,6 +7394,15 @@ __metadata:
 "fsevents@patch:fsevents@^2.1.2#~builtin<compat/fsevents>":
   version: 2.2.1
   resolution: "fsevents@patch:fsevents@npm%3A2.2.1#~builtin<compat/fsevents>::version=2.2.1&hash=df0bf1"
+  dependencies:
+    node-gyp: latest
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
+"fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>":
+  version: 2.3.3
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.3#~builtin<compat/fsevents>::version=2.3.3&hash=df0bf1"
   dependencies:
     node-gyp: latest
   conditions: os=darwin
@@ -8389,6 +8413,15 @@ __metadata:
   dependencies:
     safer-buffer: ">= 2.1.2 < 3.0.0"
   checksum: 03e03eb9fc003bc94f7956849f747258e57c162760259d76d1e67483058cad854a4b681b635e21e3ec41f4bd15ceed1b4a350f890565d680343442c5b139fa8a
+  languageName: node
+  linkType: hard
+
+"iconv-lite@npm:^0.6.3":
+  version: 0.6.3
+  resolution: "iconv-lite@npm:0.6.3"
+  dependencies:
+    safer-buffer: ">= 2.1.2 < 3.0.0"
+  checksum: 3f60d47a5c8fc3313317edfd29a00a692cc87a19cac0159e2ce711d0ebc9019064108323b5e493625e25594f11c6236647d8e256fbe7a58f4a3b33b89e6d30bf
   languageName: node
   linkType: hard
 
@@ -9926,34 +9959,59 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jquery.terminal@npm:=2.1.0":
-  version: 2.1.0
-  resolution: "jquery.terminal@npm:2.1.0"
+"jquery.terminal@npm:=2.31.1":
+  version: 2.31.1
+  resolution: "jquery.terminal@npm:2.31.1"
   dependencies:
-    "@types/jquery": ^3.3.6
-    jquery: ~3
-    prismjs: ^1.15.0
+    "@jcubic/lily": ^0.3.0
+    "@types/jquery": ^3.5.10
+    ansidec: ^0.3.4
+    fsevents: ^2.3.2
+    iconv-lite: ^0.6.3
+    jquery: ^3.6.0
+    prismjs: ^1.25.0
     wcwidth: ^1.0.1
-  checksum: ed2b57683cac1a705cf9f1dee4e7850934ba03fa3282a212fa0378bff899417ce8d29db2a64ef2fb6ac4f3992fd2da7b10bb004db18174bfcecc50d51c0d9b79
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    from-ansi: bin/convert.js
+  checksum: 7cfc24cbf8f16247b31cd3ced592ac935888c456a31ac374892471e46ca869d78b54f197dd9da1f9bd33df459c7995468036d0d19c81b30a6cd1d5c1d4ea2a7f
   languageName: node
   linkType: hard
 
-"jquery.terminal@npm:^2.20.1":
-  version: 2.20.1
-  resolution: "jquery.terminal@npm:2.20.1"
+"jquery.terminal@npm:^2.31.1":
+  version: 2.37.2
+  resolution: "jquery.terminal@npm:2.37.2"
   dependencies:
-    "@types/jquery": ^3.3.29
-    jquery: ^3.5.0
-    prismjs: ^1.21.0
+    "@jcubic/lily": ^0.3.0
+    "@types/jquery": ^3.5.14
+    ansidec: ^0.3.4
+    fsevents: ^2.3.2
+    iconv-lite: ^0.6.3
+    jquery: ^3.6.0
+    prismjs: ^1.27.0
     wcwidth: ^1.0.1
-  checksum: 1e2ef378d24accde2bab5610049fa883a4c76799cc79c1476a2f480455b37e477617d7d32ea78be5c5f5788e8e5675515bcf6c27ab99b923260e7245431393ac
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    from-ansi: bin/convert.js
+  checksum: 8f8e7ac1b1195b0a897dd307c7f34cc73197d3b896919829f8407830fb76a2468fe0fec65b502a6c72ca3cc22d67766f9697a01d86533ee0dd1b03d4305a4fa5
   languageName: node
   linkType: hard
 
-"jquery@npm:3.5.1, jquery@npm:>=1.12.0, jquery@npm:^3.5.0, jquery@npm:^3.5.1, jquery@npm:~3":
+"jquery@npm:3.5.1, jquery@npm:>=1.12.0, jquery@npm:^3.5.1":
   version: 3.5.1
   resolution: "jquery@npm:3.5.1"
   checksum: 813047b852511ca1ecfaa7b2568aba1d7270a92e5c74962b308792a401adf041869a3b2a6858b0b7a02f6684947fb93171e40cbb4460831977a937b40b0e15ce
+  languageName: node
+  linkType: hard
+
+"jquery@npm:^3.6.0":
+  version: 3.7.1
+  resolution: "jquery@npm:3.7.1"
+  checksum: 4370b8139d6ae82867eb6f7f21d1edccf1d1bdf41c0840920ea80d366c2cd5dbe1ceebb110ee9772aa839b04400faa1572c5c560b507c688ed7b61cea26c0e27
   languageName: node
   linkType: hard
 
@@ -11005,7 +11063,7 @@ __metadata:
     jest-canvas-mock: ^2.2.0
     jest-simple-dot-reporter: ^1.0.5
     jquery: ^3.5.1
-    jquery.terminal: ^2.20.1
+    jquery.terminal: ^2.31.1
     lodash: ^4.17.20
     miew: 0.9.0
     mini-css-extract-plugin: ^0.9.0
@@ -11065,7 +11123,7 @@ __metadata:
     html-webpack-plugin: ^4.3.0
     jison: ^0.4.18
     jquery: 3.5.1
-    jquery.terminal: =2.1.0
+    jquery.terminal: =2.31.1
     jsdoc: ^3.6.3
     lodash: ^4.17.15
     mini-css-extract-plugin: ^0.9.0
@@ -13280,10 +13338,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prismjs@npm:^1.15.0, prismjs@npm:^1.21.0":
-  version: 1.25.0
-  resolution: "prismjs@npm:1.25.0"
-  checksum: 04d8eae9d1b26b76c350bc65621584c8f8cab80ace7da3953f8aef2f9a8dd4b4f71c1d15bc5c67f126ddc90cd5af613919dc1340589a6c57355bed86fa3ac010
+"prismjs@npm:^1.25.0, prismjs@npm:^1.27.0":
+  version: 1.29.0
+  resolution: "prismjs@npm:1.29.0"
+  checksum: 007a8869d4456ff8049dc59404e32d5666a07d99c3b0e30a18bd3b7676dfa07d1daae9d0f407f20983865fd8da56de91d09cb08e6aa61f5bc420a27c0beeaf93
   languageName: node
   linkType: hard
 
