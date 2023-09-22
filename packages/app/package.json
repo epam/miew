@@ -27,15 +27,7 @@
     "react"
   ],
   "browserslist": [
-    "last 2 Chrome versions",
-    "last 2 Firefox versions",
-    "last 2 Safari versions",
-    "last 2 Edge versions",
-    "IE >= 11",
-    "last 2 iOS versions",
-    "last 1 Android version",
-    "last 2 ChromeAndroid versions",
-    "last 2 FirefoxAndroid versions"
+    "defaults and supports webgl"
   ],
   "moduleDirectories": [
     "node_modules",
