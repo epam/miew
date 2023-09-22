@@ -219,10 +219,13 @@ class MOL2Parser extends Parser {
       if (originAtomId > targetAtomId) {
         [originAtomId, targetAtomId] = [targetAtomId, originAtomId];
       }
-      this._complex.addBond(originAtomId, targetAtomId,
+      this._complex.addBond(
+        originAtomId,
+        targetAtomId,
         orderMap[bondType] || 0,
         typeMap[bondType] || Bond.BondType.UNKNOWN,
-        true);
+        true,
+      );
     }
   }
 

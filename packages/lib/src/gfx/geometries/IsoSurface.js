@@ -190,7 +190,8 @@ class IsoSurface {
     for (; i < arrSize; ++i) {
       if (edgeTable[cubeIndex] & (1 << i)) {
         this._vertexInterp(
-          isoLevel, grid,
+          isoLevel,
+          grid,
           firstIndices[i],
           secondIndices[i],
           vertexList[i],
@@ -268,15 +269,27 @@ class IsoSurface {
       appendVertex = (function () {
         const posMtx = new THREE.Matrix3();
         posMtx.set(
-          self._xAxis.x, self._yAxis.x, self._zAxis.x,
-          self._xAxis.y, self._yAxis.y, self._zAxis.y,
-          self._xAxis.z, self._yAxis.z, self._zAxis.z,
+          self._xAxis.x,
+          self._yAxis.x,
+          self._zAxis.x,
+          self._xAxis.y,
+          self._yAxis.y,
+          self._zAxis.y,
+          self._xAxis.z,
+          self._yAxis.z,
+          self._zAxis.z,
         );
         const normMtx = new THREE.Matrix3();
         normMtx.set(
-          self._xDir.x, self._yDir.x, self._zDir.x,
-          self._xDir.y, self._yDir.y, self._zDir.y,
-          self._xDir.z, self._yDir.z, self._zDir.z,
+          self._xDir.x,
+          self._yDir.x,
+          self._zDir.x,
+          self._xDir.y,
+          self._yDir.y,
+          self._zDir.y,
+          self._xDir.z,
+          self._yDir.z,
+          self._zDir.z,
         );
 
         return function (triVertex) {

@@ -189,7 +189,9 @@ class Volume {
           // re-worked for non-orthogonal datasets.
 
           gradient.setValue(
-            xi, yi, zi,
+            xi,
+            yi,
+            zi,
             (_voxelValue(xp, yi, zi) - _voxelValue(xm, yi, zi)) * vs.x,
             (_voxelValue(xi, yp, zi) - _voxelValue(xi, ym, zi)) * vs.y,
             (_voxelValue(xi, yi, zp) - _voxelValue(xi, yi, zm)) * vs.z,
@@ -286,8 +288,16 @@ class Volume {
     }
 
     const texture = new THREE.DataTexture(
-      data, width, height, THREE.LuminanceFormat, THREE.UnsignedByteType,
-      THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.LinearFilter,
+      data,
+      width,
+      height,
+      THREE.LuminanceFormat,
+      THREE.UnsignedByteType,
+      THREE.UVMapping,
+      THREE.ClampToEdgeWrapping,
+      THREE.ClampToEdgeWrapping,
+      THREE.LinearFilter,
+      THREE.LinearFilter,
     );
     texture.needsUpdate = true;
     return texture;

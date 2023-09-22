@@ -3,6 +3,8 @@ import React from 'react';
 import Menu from '../containers/MenuContainer';
 import Viewer from '../containers/MiewViewerContainer';
 import './App.scss';
+// Need to fix this because the demo will be removed. We should not depend on anything there.
+// eslint-disable-next-line import/no-relative-packages
 import '../../../lib/demo/styles/main.scss';
 
 export default class App extends React.Component {

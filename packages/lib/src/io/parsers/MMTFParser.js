@@ -157,8 +157,11 @@ class MMTFParser extends Parser {
     }
     const left = Math.min(bondData.atomIndex1, bondData.atomIndex2);
     this._complex.addBond(
-      this._complex._atoms[left], this._complex._atoms[right],
-      bondData.bondOrder, Bond.BondType.UNKNOWN, true,
+      this._complex._atoms[left],
+      this._complex._atoms[right],
+      bondData.bondOrder,
+      Bond.BondType.UNKNOWN,
+      true,
     );
   }
 

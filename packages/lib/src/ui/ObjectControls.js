@@ -100,7 +100,8 @@ ObjectHandler.prototype.translate = (function () {
     // reverse-project viewport movement to view coords (compensate for screen aspect ratio)
     dir.set(
       delta.x / this.camera.projectionMatrix.elements[0],
-      delta.y / this.camera.projectionMatrix.elements[5], 0,
+      delta.y / this.camera.projectionMatrix.elements[5],
+      0,
     );
     let dist = dir.length();
     dir.normalize();

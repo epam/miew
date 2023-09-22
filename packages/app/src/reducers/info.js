@@ -1,6 +1,6 @@
 import ACTIONS from '../constants';
 
-const info = (state = {}, action) => {
+const info = (state = {}, action = {}) => {
   switch (action.type) {
     case ACTIONS.SEND_INFO:
       return { ...state, complex: action.payload };

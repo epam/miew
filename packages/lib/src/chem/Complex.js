@@ -507,7 +507,8 @@ class Complex {
       // This code is extremely dangerous for non-PDB formats
       residueHash[this.getUnifiedSerial(
         res.getChain().getName().charCodeAt(0),
-        res.getSequence(), res.getICode().charCodeAt(0),
+        res.getSequence(),
+        res.getICode().charCodeAt(0),
       )] = res;
     }
 

@@ -14,8 +14,17 @@ const _noiseMinFilter = THREE.NearestFilter;
 const _noiseMagFilter = THREE.NearestFilter;
 const _noiseMapping = THREE.UVMapping;
 const noiseTexture = new THREE.DataTexture(
-  _noiseData, noiseWidth, noiseHeight, THREE.RGBFormat,
-  THREE.UnsignedByteType, _noiseMapping, _noiseWrapS, _noiseWrapT, _noiseMagFilter, _noiseMinFilter, 1,
+  _noiseData,
+  noiseWidth,
+  noiseHeight,
+  THREE.RGBFormat,
+  THREE.UnsignedByteType,
+  _noiseMapping,
+  _noiseWrapS,
+  _noiseWrapT,
+  _noiseMagFilter,
+  _noiseMinFilter,
+  1,
 );
 noiseTexture.needsUpdate = true;
 

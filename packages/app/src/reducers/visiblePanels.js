@@ -1,6 +1,6 @@
 import ACTIONS from '../constants';
 
-const visiblePanels = (state = {}, action) => {
+const visiblePanels = (state = {}, action = {}) => {
   switch (action.type) {
     case ACTIONS.SHOW_NAV:
       return { ...state, isPanelListVisible: !state.isPanelListVisible };

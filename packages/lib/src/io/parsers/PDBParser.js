@@ -361,7 +361,9 @@ class PDBParser extends Parser {
         obj,
         this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode),
         this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode),
-        helixClass, shCur, shPrev,
+        helixClass,
+        shCur,
+        shPrev,
       );
       obj.addStrand(strand);
       this._complex.structures.push(strand);
@@ -370,7 +372,10 @@ class PDBParser extends Parser {
         helixClass,
         this._complex.getUnifiedSerial(startChainID, startSequenceNumber, startICode),
         this._complex.getUnifiedSerial(endChainID, endSequenceNumber, endICode),
-        serialNumber, structureName, comment, helLength,
+        serialNumber,
+        structureName,
+        comment,
+        helLength,
       );
       adder(obj);
     }

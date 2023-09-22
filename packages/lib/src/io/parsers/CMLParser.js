@@ -56,8 +56,11 @@ class CMLParser extends Parser {
 
   _createSGroup(molecule, moleculeArr) {
     const newGroup = new SGroup(
-      molecule.id, molecule.fieldData,
-      new THREE.Vector3(parseFloat(molecule.x), parseFloat(molecule.y), 0), molecule.atomRefs, molecule,
+      molecule.id,
+      molecule.fieldData,
+      new THREE.Vector3(parseFloat(molecule.x), parseFloat(molecule.y), 0),
+      molecule.atomRefs,
+      molecule,
     );
     if (molecule.placement === 'Relative') {
       newGroup._center = new THREE.Vector3(0, 0, 0);
@@ -553,8 +556,16 @@ class CMLParser extends Parser {
           }
           const atomSerial = parseInt(atom.id.replace(/[^0-9]/, ''), 10);
           const added = residue.addAtom(
-            atomFullNameStruct, element, xyz, Element.Role.SG,
-            true, atomSerial, ' ', 1.0, 0.0, atomCharge,
+            atomFullNameStruct,
+            element,
+            xyz,
+            Element.Role.SG,
+            true,
+            atomSerial,
+            ' ',
+            1.0,
+            0.0,
+            atomCharge,
           );
           if (atom.hydrogenCount) {
             added.hydrogenCount = parseInt(atom.hydrogenCount, 10);
@@ -577,7 +588,9 @@ class CMLParser extends Parser {
         }
         this._parseBond(
           parseInt(atom.id.replace(/[^0-9]/, ''), 10),
-          parseInt(atoms[cb.end].id.replace(/[^0-9]/, ''), 10), cb.order, cb.type,
+          parseInt(atoms[cb.end].id.replace(/[^0-9]/, ''), 10),
+          cb.order,
+          cb.type,
         );
       }
     }

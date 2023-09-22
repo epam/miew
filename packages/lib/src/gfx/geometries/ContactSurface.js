@@ -551,8 +551,11 @@ function ContactSurface(packedArrays, boundaries, params, _indexList) {
     for (let innI = 0; innI < nAtoms; innI++) {
       const innIdx = itemSize * innI;
       hash.withinRadii(
-        posRad[innIdx], posRad[innIdx + 1], posRad[innIdx + 2],
-        posRad[innIdx + 3], neighbours,
+        posRad[innIdx],
+        posRad[innIdx + 1],
+        posRad[innIdx + 2],
+        posRad[innIdx + 3],
+        neighbours,
       );
       let ia = 0;
       let ni = neighbours[ia];

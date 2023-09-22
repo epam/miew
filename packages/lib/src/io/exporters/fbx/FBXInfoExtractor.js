@@ -344,10 +344,24 @@ export default class FBXInfoExtractor {
     const matVector2 = geo.attributes.matVector2.array;
     const matVector3 = geo.attributes.matVector3.array;
     const idxOffset = instIdx * 4; // used 4 because offset arrays are stored in quads
-    matrix.set(matVector1[idxOffset], matVector1[idxOffset + 1], matVector1[idxOffset + 2], matVector1[idxOffset + 3],
-      matVector2[idxOffset], matVector2[idxOffset + 1], matVector2[idxOffset + 2], matVector2[idxOffset + 3],
-      matVector3[idxOffset], matVector3[idxOffset + 1], matVector3[idxOffset + 2], matVector3[idxOffset + 3],
-      0, 0, 0, 1);
+    matrix.set(
+      matVector1[idxOffset],
+      matVector1[idxOffset + 1],
+      matVector1[idxOffset + 2],
+      matVector1[idxOffset + 3],
+      matVector2[idxOffset],
+      matVector2[idxOffset + 1],
+      matVector2[idxOffset + 2],
+      matVector2[idxOffset + 3],
+      matVector3[idxOffset],
+      matVector3[idxOffset + 1],
+      matVector3[idxOffset + 2],
+      matVector3[idxOffset + 3],
+      0,
+      0,
+      0,
+      1,
+    );
   }
 
   _getSphereInstanceMatrix(geo, instIdx, matrix) {
@@ -358,10 +372,22 @@ export default class FBXInfoExtractor {
     const z = offset.array[idx + 2];
     const scale = offset.array[idx + 3];
     matrix.set(
-      scale, 0, 0, x,
-      0, scale, 0, y,
-      0, 0, scale, z,
-      0, 0, 0, 1,
+      scale,
+      0,
+      0,
+      x,
+      0,
+      scale,
+      0,
+      y,
+      0,
+      0,
+      scale,
+      z,
+      0,
+      0,
+      0,
+      1,
     );
   }
 }

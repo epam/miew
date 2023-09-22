@@ -59,9 +59,7 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
     vB.fromBufferAttribute(position, b);
     vC.fromBufferAttribute(position, c);
 
-    const intersection = this.checkIntersection(
-      object, raycaster, ray, vA, vB, vC, intersectionPoint,
-    );
+    const intersection = this.checkIntersection(object, raycaster, ray, vA, vB, vC, intersectionPoint);
     if (intersection) {
       if (uv) {
         const uvA = RaycastableBufferGeometry._uvA;
@@ -71,9 +69,7 @@ class RaycastableBufferGeometry extends THREE.BufferGeometry {
         uvA.fromBufferAttribute(uv, a);
         uvB.fromBufferAttribute(uv, b);
         uvC.fromBufferAttribute(uv, c);
-        intersection.uv = this.uvIntersection(
-          intersectionPoint, vA, vB, vC, uvA, uvB, uvC,
-        );
+        intersection.uv = this.uvIntersection(intersectionPoint, vA, vB, vC, uvA, uvB, uvC);
       }
       const normal = new THREE.Vector3();
       THREE.Triangle.getNormal(vA, vB, vC, normal);
