@@ -4,7 +4,6 @@ import 'bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css';
 import 'toastr/build/toastr.min.css';
 import 'jquery.terminal/css/jquery.terminal.min.css';
 import '../styles/main.scss';
-import '@babel/polyfill';
 
 import $ from 'jquery';
 import toastr from 'toastr';

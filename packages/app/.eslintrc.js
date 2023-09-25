@@ -4,7 +4,7 @@ module.exports = {
   root: true,
   extends: 'airbnb-base', // https://github.com/airbnb/javascript
 
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   parserOptions: {
     sourceType: 'module',
     ecmaFeatures: {
