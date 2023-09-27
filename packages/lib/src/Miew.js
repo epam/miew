@@ -264,11 +264,13 @@ Miew.prototype.init = function () {
 
   const frag = document.createDocumentFragment();
   frag.appendChild(this._msgMode = createElement(
-    'div', { class: 'mode-message overlay' },
+    'div',
+    { class: 'mode-message overlay' },
     createElement('p', {}, 'COMPONENT EDIT MODE'),
   ));
   frag.appendChild(this._msgAtomInfo = createElement(
-    'div', { class: 'atom-info overlay' },
+    'div',
+    { class: 'atom-info overlay' },
     createElement('p', {}, ''),
   ));
   container.appendChild(frag);
@@ -301,8 +303,11 @@ Miew.prototype.init = function () {
     });
 
     this._objectControls = new ObjectControls(
-      this._gfx.root, this._gfx.pivot,
-      this._gfx.camera, this._gfx.renderer.domElement, (() => self._getAltObj()),
+      this._gfx.root,
+      this._gfx.pivot,
+      this._gfx.camera,
+      this._gfx.renderer.domElement,
+      () => self._getAltObj(),
     );
     this._objectControls.addEventListener('change', (e) => {
       if (settings.now.shadow.on) {
@@ -445,8 +450,10 @@ Miew.prototype._initGfx = function () {
   gfx.renderer2d.setSize(gfx.width, gfx.height);
 
   gfx.camera = new THREE.PerspectiveCamera(
-    settings.now.camFov, gfx.width / gfx.height,
-    settings.now.camNear, settings.now.camFar,
+    settings.now.camFov,
+    gfx.width / gfx.height,
+    settings.now.camNear,
+    settings.now.camFar,
   );
   gfx.camera.setMinimalFov(settings.now.camFov);
   gfx.camera.position.z = settings.now.camDistance;
@@ -2050,7 +2057,8 @@ Miew.prototype._startAnimation = function (fileData) {
   }
   try {
     this._frameInfo = new FrameInfo(
-      visual.getComplex(), fileData,
+      visual.getComplex(),
+      fileData,
       {
         onLoadStatusChanged() {
           self.dispatchEvent({

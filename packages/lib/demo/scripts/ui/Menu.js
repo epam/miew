@@ -182,7 +182,8 @@ Menu.prototype._fillSelectionColorCombo = function (paletteID) {
       'data-value': color,
     }, [
       createElement(
-        'a', {
+        'a',
+        {
           'href': '#',
           'class': 'thumbnail',
           'style': 'text-align:center;',
@@ -235,7 +236,8 @@ Menu.prototype._fillCombo = function (type, name, path, entityList) {
       'data-value': entry.id,
     }, [
       createElement(
-        'div', { 'class': 'media-left' },
+        'div',
+        { 'class': 'media-left' },
         createElement('img', {
           'class': 'media-object',
           'src': `images/${name}/${entry.id}.png`,
@@ -417,21 +419,25 @@ Menu.prototype._addReprListItem = function (panel, index, repr) {
     'class': 'panel panel-default valid',
   }, [
     createElement(
-      'div', {
+      'div',
+      {
         'class': 'panel-heading',
         'role': 'tab',
       },
       createElement('h4', { 'class': 'panel-title' }, [
         createElement(
-          'button', { 'class': 'btn btn-default btn-invisible' },
+          'button',
+          { 'class': 'btn btn-default btn-invisible' },
           createElement('span', { 'class': 'glyphicon glyphicon-unchecked' }),
         ),
         createElement(
-          'button', { 'class': 'btn btn-default btn-visible' },
+          'button',
+          { 'class': 'btn btn-default btn-visible' },
           createElement('span', { 'class': 'glyphicon glyphicon-check' }),
         ),
         createElement(
-          'a', {
+          'a',
+          {
             'role': 'button',
             'data-toggle': 'collapse',
             'data-parent': '.panel-menu[data-panel-type=miew-menu-panel-representation] .miew-repr-list',
@@ -442,15 +448,18 @@ Menu.prototype._addReprListItem = function (panel, index, repr) {
           `#${String(validReprN + 1)}: ${repr.mode.name}`,
         ),
         createElement(
-          'div', { 'class': 'pseudo-div' },
+          'div',
+          { 'class': 'pseudo-div' },
           createElement(
-            'span', { 'class': 'pull-right badge' },
+            'span',
+            { 'class': 'pull-right badge' },
             String(hasComplex(this._viewer) ? getNumAtomsBySelector(self._viewer, repr.selector) : '0'),
           ),
         )]),
     ),
     createElement(
-      'div', {
+      'div',
+      {
         'data-number': `repr-${String(index + 1)}`,
         'class': 'panel-collapse collapse',
         'role': 'tabpanel',
@@ -533,7 +542,8 @@ Menu.prototype._addReprListItem = function (panel, index, repr) {
           'Radius scale',
           createElement('span', { 'class': 'input-group pull-right' }, [
             createElement(
-              'span', {
+              'span',
+              {
                 'class': 'input-group-addon spinner-dec-btn',
                 'data-toggle': 'spinner',
                 'data-value': 'rad',
@@ -550,7 +560,8 @@ Menu.prototype._addReprListItem = function (panel, index, repr) {
               'step': '0.1',
             }),
             createElement(
-              'span', {
+              'span',
+              {
                 'class': 'input-group-addon spinner-inc-btn',
                 'data-toggle': 'spinner',
                 'data-value': 'rad',
@@ -564,7 +575,8 @@ Menu.prototype._addReprListItem = function (panel, index, repr) {
           'Isosurface threshold',
           createElement('span', { 'class': 'input-group pull-right' }, [
             createElement(
-              'span', {
+              'span',
+              {
                 'class': 'input-group-addon spinner-dec-btn',
                 'data-toggle': 'spinner',
                 'data-value': 'iso',
@@ -581,7 +593,8 @@ Menu.prototype._addReprListItem = function (panel, index, repr) {
               'step': '0.5',
             }),
             createElement(
-              'span', {
+              'span',
+              {
                 'class': 'input-group-addon spinner-inc-btn',
                 'data-toggle': 'spinner',
                 'data-value': 'iso',
@@ -594,7 +607,8 @@ Menu.prototype._addReprListItem = function (panel, index, repr) {
         }, [
           createElement('label', {}, 'Z clipping'),
           createElement(
-            'span', { 'class': 'pull-right' },
+            'span',
+            { 'class': 'pull-right' },
             createElement('input', {
               'type': 'checkbox',
               'data-dir': 'representation',
@@ -709,7 +723,8 @@ Menu.prototype._copyCurReprListItem = function (index) {
   selector.find('[type=checkbox]').bootstrapSwitch('state', zClipState);
   qSurfParamSelector[0].appendChild(createElement('label', {}, 'Z clipping'));
   qSurfParamSelector[0].appendChild(createElement(
-    'span', { 'class': 'pull-right' },
+    'span',
+    { 'class': 'pull-right' },
     createElement('input', {
       'type': 'checkbox',
       'data-dir': 'representation',
@@ -752,7 +767,8 @@ Menu.prototype._fillSourceList = function () {
   for (let i = 0, n = names.length; i < n; ++i) {
     const name = names[i];
     const link = createElement(
-      'a', { href: '#' },
+      'a',
+      { href: '#' },
       (name !== curName) ? name : [
         createElement('b', null, name),
         createElement('span', {
@@ -1581,7 +1597,8 @@ Menu.prototype._initSelectionPanel = function () {
     for (i = 0, n = self._singleWordsPrimary.length; i < n; i++) {
       const wordPrimary = self._singleWordsPrimary[i];
       newItem = createElement(
-        'a', {
+        'a',
+        {
           'href': '#',
           'class': 'list-group-item frequent',
           'data-toggle': 'selection-input',
@@ -1599,7 +1616,8 @@ Menu.prototype._initSelectionPanel = function () {
         continue;
       }
       newItem = createElement(
-        'a', {
+        'a',
+        {
           'href': '#',
           'class': 'list-group-item',
           'data-toggle': 'selection-input',
@@ -1620,7 +1638,8 @@ Menu.prototype._initSelectionPanel = function () {
     for (let i = 0, n = self._keyWordsPrimary.length; i < n; i++) {
       const wordPrimary = self._keyWordsPrimary[i];
       newItem = createElement(
-        'a', {
+        'a',
+        {
           'href': '#',
           'class': 'list-group-item frequent keyword-item',
           'data-toggle': 'selection-input',
@@ -1707,7 +1726,8 @@ Menu.prototype._initSelectionPanel = function () {
     for (let i = 0, n = values.length; i < n; i++) {
       const val = values[i];
       newItem = createElement(
-        'a', {
+        'a',
+        {
           'href': '#',
           'class': 'list-group-item value',
           'data-toggle': 'selection-input',
@@ -1770,11 +1790,13 @@ Menu.prototype._initToolbar = function () {
           'style': `background:url(images/${name.substring(0, name.indexOf('-'))}/${entry.id}.png)`,
         }),
         createElement(
-          'div', {
+          'div',
+          {
             'class': 'caption text-center',
           },
           createElement(
-            'small', {},
+            'small',
+            {},
             entry.shortName,
           ),
         )]);
@@ -2100,7 +2122,8 @@ Menu.prototype._updateInfo = function (dataSource) {
 
   frag.appendChild(createElement('table', { 'class': 'table' }, [
     createElement(
-      'thead', null,
+      'thead',
+      null,
       createElement('tr', null, [
         createElement('th', { 'class': 'col-xs-10' }, 'Statistics'),
         createElement('th', { 'class': 'col-xs-2 text-center' }, 'Value'),
@@ -2124,7 +2147,8 @@ Menu.prototype._updateInfo = function (dataSource) {
   }
   frag.appendChild(createElement('table', { 'class': 'table' }, [
     createElement(
-      'thead', null,
+      'thead',
+      null,
       createElement('tr', null, [
         createElement('th', { 'class': 'col-xs-10' }, 'Molecules'),
       ]),

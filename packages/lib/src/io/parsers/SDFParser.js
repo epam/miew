@@ -131,10 +131,13 @@ export default class SDFParser extends Parser {
       if (atom1 > atom2) {
         [atom1, atom2] = [atom2, atom1];
       }
-      this._complex.addBond(atom1, atom2,
+      this._complex.addBond(
+        atom1,
+        atom2,
         orderMap[bondType] || 1,
         typeMap[bondType] || Bond.BondType.UNKNOWN,
-        true);
+        true,
+      );
     }
   }
 

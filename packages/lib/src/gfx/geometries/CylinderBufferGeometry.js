@@ -127,7 +127,9 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
         const currSrcBIdx = fBIdx;
         positions.setXYZ(
           currVtxIdx,
-          positions.getX(currSrcBIdx), positions.getY(currSrcBIdx), positions.getZ(currSrcBIdx),
+          positions.getX(currSrcBIdx),
+          positions.getY(currSrcBIdx),
+          positions.getZ(currSrcBIdx),
         );
         normals.setXYZ(currVtxIdx, 0, -1, 0);
         uvs.setXY(currVtxIdx, 0, 0);

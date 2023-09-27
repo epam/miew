@@ -634,9 +634,12 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
    * @returns {number} always 0
    */
   modifyExcludedFromGeo(
-    side, probeSphereRadius,
-    vBoxMin, vBoxMax,
-    geoOut, corners,
+    side,
+    probeSphereRadius,
+    vBoxMin,
+    vBoxMax,
+    geoOut,
+    corners,
   ) {
     let ind;
     let distToSphere;
@@ -795,8 +798,11 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       probeRadForNormalsColors = 0.01;
     }
     this.voxelWorld = new IsosurfaceBuildNormals(
-      atomsColored.length, atomsColored,
-      vBoxMin, vBoxMax, probeRadForNormalsColors,
+      atomsColored.length,
+      atomsColored,
+      vBoxMin,
+      vBoxMax,
+      probeRadForNormalsColors,
     );
     this.voxelWorld.createVoxels();
 
@@ -840,8 +846,10 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     }
     if (this.useVertexColors) {
       this.voxelWorld.buildColors(
-        this.geoOut._vertices.length, this.geoOut._vertices,
-        this.geoOut._colors, radiusColorSmoothness,
+        this.geoOut._vertices.length,
+        this.geoOut._vertices,
+        this.geoOut._colors,
+        radiusColorSmoothness,
       );
     }
     this.voxelWorld.destroyVoxels();

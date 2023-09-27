@@ -316,8 +316,16 @@ class CIFParser extends Parser {
       const charge = charges[i] || 0;
 
       residue.addAtom(
-        name, type, xyz,
-        role, het, serial, altLoc, occupancy, tempFactor, charge,
+        name,
+        type,
+        xyz,
+        role,
+        het,
+        serial,
+        altLoc,
+        occupancy,
+        tempFactor,
+        charge,
       );
     }
   }

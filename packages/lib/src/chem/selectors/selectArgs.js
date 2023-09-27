@@ -26,6 +26,8 @@ class Range {
 class List {
   constructor(arg) {
     if (arg instanceof this.constructor) {
+      // delegate construction to a different class
+      // eslint-disable-next-line no-constructor-return
       return arg;
     }
     if (arg instanceof Array) {
@@ -100,6 +102,8 @@ class ValueList extends List {
     } else {
       this.upperOnly = false;
     }
+    // return constructed object
+    // eslint-disable-next-line no-constructor-return
     return list;
   }
 
