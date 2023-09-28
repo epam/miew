@@ -7,7 +7,6 @@ import './Terminal.scss';
 
 function Terminal({ viewer, isTerminalVisible }) {
   const ref = useRef();
-  let terminal;
 
   useEffect(() => {
     if (viewer) {
@@ -31,11 +30,10 @@ function Terminal({ viewer, isTerminalVisible }) {
   }
 
   const terminalConfig = {
-    greetings: 'Miew - 3D Molecular Viewer\nCopyright © 2015-2020 EPAM Systems, Inc.\n',
+    greetings: 'Miew - 3D Molecular Viewer\nCopyright © 2015-2023 EPAM Systems, Inc.\n',
     prompt: 'miew> ',
     name: 'miew',
     scrollOnEcho: true,
-    height: '100%',
     keydown(event, _term) {
       if (event.keyCode === 192) { // skip '~'
         return false;
@@ -55,7 +53,10 @@ function Terminal({ viewer, isTerminalVisible }) {
   }
 
   useEffect(() => {
-    terminal = $(ref.current);
+    if (!viewer) {
+      return undefined;
+    }
+    const terminal = $(ref.current);
     terminal.terminal((command, term) => {
       if (viewer) {
         handleCommand(command, term);
@@ -68,7 +69,13 @@ function Terminal({ viewer, isTerminalVisible }) {
     };
   }, [viewer]);
 
-  return <div ref={ref} className={classNames('terminal', { 'terminal-hidden': !isTerminalVisible })}/>;
+  return (
+    <div className={classNames('miew-terminal', { 'terminal-hidden': !isTerminalVisible })}>
+      <div className="miew-terminal-body">
+        <div ref={ref} className='terminal-window'/>
+      </div>
+    </div>
+  );
 }
 
 export default Terminal;
