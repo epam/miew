@@ -73,7 +73,6 @@ const uberOptionNames = [
   'srcTexelSize',
 ];
 
-
 // properties that convert to uniforms
 const uberOptions = {
   diffuse: new THREE.Color(0xffffff), // used in phong lighting
@@ -188,14 +187,12 @@ class UberMaterial extends THREE.RawShaderMaterial {
     this.setValues(params);
   }
 
-
   precisionString() {
     const { precision } = capabilities;
     const str = `precision ${precision} float;\n`
       + `precision ${precision} int;\n\n`;
     return str;
-  };
-
+  }
 
   copy(source) {
     super.copy(source);
