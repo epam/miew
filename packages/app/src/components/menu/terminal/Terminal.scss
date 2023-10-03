@@ -1,51 +1,29 @@
-.terminal {
-  border: 1px solid #444;
-  background: rgba(0, 0, 0, 0.75);
+@import "jquery.terminal/css/jquery.terminal.min.css";
+
+.miew-terminal {
   position: fixed;
-  color: #aaa;
-  top: 40px;
+  top: 0;
   left: 0;
   bottom: 0;
   width: 30%;
-  padding: 10px;
-  font-family: monospace;
-  font-size: 12px;
-  line-height: 14px;
-  overflow: auto;
+  padding: 0;
+  margin-top: 40px;
 
-  [data-index="0"] {
-    margin-bottom: 13.3px;
+  --background: transparent;
+
+  .row {
+    margin-left: 0;
+    margin-right: 0;
   }
+}
 
-  .cmd {
-    &-wrapper {
-      display: flex;
-    }
+.miew-terminal-body {
+  display: block;
+  height: 100%;
+  border: 1px solid #444;
+  background: rgba(0, 0, 0, 0.75);
 
-    &-clipboard {
-      display: none;
-    }
-
-    &-blink {
-      height: 14px;
-      width: 8px;
-      margin-left: -1px;
-      animation: cursor-blink 1s step-end infinite;
-      background-color: #aaa;
-    }
-  }
-
-  @keyframes cursor-blink {
-    50% {
-      background-color: transparent;
-    }
-  }
-
-  &-error {
-    color: #f00;
-  }
-
-  &-hidden {
-    display: none;
+  .terminal-window {
+    height: 100%;
   }
 }

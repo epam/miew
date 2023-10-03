@@ -137,11 +137,10 @@ Menu.prototype._initializeTerminal = function () {
       }
     },
     {
-      greetings: 'Miew - 3D Molecular Viewer\nCopyright © 2015-2020 EPAM Systems, Inc.\n',
+      greetings: 'Miew - 3D Molecular Viewer\nCopyright © 2015-2023 EPAM Systems, Inc.\n',
       prompt: 'miew> ',
       name: 'miew',
       scrollOnEcho: true,
-      height: '100%',
       keydown(event, _term) {
         if (event.keyCode === 192) { // skip '~'
           return false;
