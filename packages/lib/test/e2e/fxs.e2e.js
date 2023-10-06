@@ -9,6 +9,7 @@ import EmptyPage from './pages/empty.page';
 import golden from './golden';
 import goldenCfg from './golden.cfg';
 import chromeOptionsArguments from './webdriver.cfg';
+import defaultSettings from './defaultSettings';
 
 import testPostProcess from './gfx/postprocess';
 import testShadows from './gfx/shadows';
@@ -27,10 +28,17 @@ let driver;
 let page;
 
 function runMiewAndCheck(fn, id, opts) {
+  const args = {
+    ...opts,
+    settings: {
+      ...defaultSettings,
+      ...opts?.settings,
+    },
+  };
   return function () {
     return page.reload()
       .then(() => page.waitForMiew())
-      .then(() => driver.executeScript(fn, opts))
+      .then(() => driver.executeScript(fn, args))
       .then(() => page.waitUntilRebuildIsDone())
       .then(() => golden.shouldMatch(id, this));
   };
@@ -48,7 +56,7 @@ function getPropListFromMiew(fn, opts, propStorage, checkFn, listName, checkId) 
 
 describe('As a third-party developer, I want to', function () {
   this.timeout(0);
-  this.slow(1000);
+  this.slow(2000);
 
   before(() => {
     driver = new webdriver.Builder()

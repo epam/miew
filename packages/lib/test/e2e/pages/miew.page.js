@@ -8,8 +8,8 @@ const dom = {
   terminal: {
     window: By.css('.terminal-window'),
     button: By.id('miew-terminal-btn'),
-    clipboard: By.css('.terminal-wrapper textarea.clipboard'),
-    command: By.css('.terminal-output .command'),
+    clipboard: By.css('.terminal-wrapper textarea.cmd-clipboard'),
+    command: By.css('.terminal-output .terminal-command'),
   },
 };
 

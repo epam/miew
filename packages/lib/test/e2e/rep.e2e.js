@@ -13,6 +13,7 @@ import golden from './golden';
 
 import goldenCfg from './golden.cfg';
 import chromeOptionsArguments from './webdriver.cfg';
+import defaultSettings from './defaultSettings';
 
 chai.use(dirtyChai);
 
@@ -26,10 +27,17 @@ let driver;
 let page;
 
 function runMiewAndCheck(fn, id, opts) {
+  const args = {
+    ...opts,
+    settings: {
+      ...defaultSettings,
+      ...opts?.settings,
+    },
+  };
   return function () {
     return page.reload()
       .then(() => page.waitForMiew())
-      .then(() => driver.executeScript(fn, opts))
+      .then(() => driver.executeScript(fn, args))
       .then(() => page.waitUntilRebuildIsDone())
       .then(() => golden.shouldMatch(id, this));
   };
@@ -37,7 +45,7 @@ function runMiewAndCheck(fn, id, opts) {
 
 describe('As a power user, I want to', function () {
   this.timeout(0);
-  this.slow(1000);
+  this.slow(2000);
 
   before(() => {
     driver = new webdriver.Builder()
@@ -123,7 +131,7 @@ describe('As a power user, I want to', function () {
     // runs Miew with specific rep mode and view
     function runRep(opts) {
       window.miew = new window.Miew({
-        settings: { interpolateViews: false },
+        settings: opts.settings,
         view: opts.view,
       });
       if (miew.init()) {
@@ -138,7 +146,6 @@ describe('As a power user, I want to', function () {
 
     it(`load ${protein} (filler test)`, runMiewAndCheck(run, protein, {
       load: proteinPath,
-      settings: { interpolateViews: false },
       view,
     }));
 
@@ -186,7 +193,7 @@ describe('As a power user, I want to', function () {
 
     function runReps(opts) {
       window.miew = new window.Miew({
-        settings: { interpolateViews: false },
+        settings: opts.settings,
         view: '1HM0iwbqdTz5fQpPCZaEBPfgFibut+Q0/vYEbwA==',
       });
       if (miew.init()) {
