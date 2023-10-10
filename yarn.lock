@@ -15972,6 +15972,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"three@npm:0.140.0":
+  version: 0.140.0
+  resolution: "three@npm:0.140.0"
+  checksum: f7d16e643046c831741972d3caddf1f0b64ed42d454e13708e8d6cc329d700fa0544324942fc361d1bffb924a144750fce3662288208c2b7ed640e3a732a6d2a
+  languageName: node
+  linkType: hard
+
 "throat@npm:^5.0.0":
   version: 5.0.0
   resolution: "throat@npm:5.0.0"
