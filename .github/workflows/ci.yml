@@ -25,11 +25,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
-    - name: Install specific version of Yarn
-      run: |
-        curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 3.6.3
-        echo "$HOME/.yarn/bin" >> $GITHUB_PATH
-
     - name: Setup Code Climate test-reporter
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > /tmp/cc-test-reporter
