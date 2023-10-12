@@ -27,7 +27,7 @@ jobs:
 
     - name: Install specific version of Yarn
       run: |
-        curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.15.2
+        curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 3.6.3
         echo "$HOME/.yarn/bin" >> $GITHUB_PATH
 
     - name: Setup Code Climate test-reporter
