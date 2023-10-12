@@ -1,0 +1,60 @@
+name: Miew CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+          ~/.sonar/cache
+          ~/.yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - name: Install specific version of Yarn
+      run: |
+        curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.15.2
+        echo "$HOME/.yarn/bin" >> $GITHUB_PATH
+
+    - name: Setup Code Climate test-reporter
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > /tmp/cc-test-reporter
+        chmod +x /tmp/cc-test-reporter
+
+    - name: Install dependencies and run CI script
+      run: |
+        yarn install
+        yarn run ci
+
+    - name: After success steps
+      run: |
+        sonar-scanner
+        npm run coveralls
+        if [ "${{ github.event_name }}" != "pull_request" ]; then
+          /tmp/cc-test-reporter after-build --exit-code $?
+        fi
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+    - name: NPM Deployment
+      if: startsWith(github.ref, 'refs/tags/v') && matrix.node == 18
+      run: |
+        # Ensure you set up the NPM_AUTH_TOKEN secret in your GitHub repository
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
+        npm publish --tag latest
