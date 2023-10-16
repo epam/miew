@@ -19,7 +19,7 @@ let page;
 
 describe('As a power user, I want to', function () {
   this.timeout(0);
-  this.slow(1000);
+  this.slow(2000);
 
   before(() => {
     driver = new webdriver.Builder()
@@ -47,7 +47,7 @@ describe('As a power user, I want to', function () {
   it('see 1CRN by default in demo', function () {
     return page.waitUntilTitleContains('1CRN')
       .then(() => page.waitUntilRebuildIsDone())
-      .then(() => golden.shouldMatch('1crn', this));
+      .then(() => golden.shouldMatch('1crn_demo', this));
   });
 
   it('load 1AID with an appropriate orientation and scale using Terminal', function () {
@@ -58,6 +58,6 @@ load 1AID
 view "18KeRwuF6IsJGtmPAkO9IPZrOGD9xy0I/ku/APQ=="`))
       .then(() => page.waitUntilTitleContains('1AID'))
       .then(() => page.waitUntilRebuildIsDone())
-      .then(() => golden.shouldMatch('1aid', this));
+      .then(() => golden.shouldMatch('1aid_demo', this));
   });
 });

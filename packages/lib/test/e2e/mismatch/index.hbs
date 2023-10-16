@@ -24,8 +24,20 @@
     .white { background-color: white; }
     .fail { background-color: #B22746; color: white; font-weight: bold; }
     .skip { background-color: #CCCCCC }
-    .pass { display: none; }
+    .pass { background-color: #27B246; color: white; font-weight: bold; display: none; }
   </style>
+  <script>
+    function displayPassed() {
+      for (const sheet of document.styleSheets) {
+        for (const rule of sheet.rules) {
+          if (rule.selectorText === '.pass') {
+            rule.style.display = '';
+            return;
+          }
+        }
+      }
+    }
+  </script>
 </head>
 <body>
   <h1>{{title}}</h1>
@@ -63,6 +75,6 @@
     {{/entries}}
     </tbody>
   </table>
-  <h3>Passed tests are not displayed!</h3>
+  <h3>Passed tests are not displayed! <a href="#" onclick="displayPassed();">Display</a></h3>
 </body>
 </html>

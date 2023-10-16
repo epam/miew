@@ -178,7 +178,7 @@ function fbxDownload(fn, complexInfo) {
 
 describe('As a third-party developer, I want to ', function () {
   this.timeout(0);
-  this.slow(1000);
+  this.slow(2000);
 
   const cfg = {
     title: 'FBX Tests',

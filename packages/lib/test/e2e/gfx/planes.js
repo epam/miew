@@ -26,7 +26,6 @@ function testPlanes(runMiewAndCheckFn) {
   describe('check effects with clip planes', () => {
     it(`render parts of ${protein} with clipped surface modes`, runMiewAndCheckFn(runReps, `${protein}_zclip`, {
       load: proteinPath,
-      settings: { interpolateViews: false },
       reps: [
         { selector: 'all', mode: 'TU', colorer: 'UN' },
         { selector: 'sequence 42', mode: ['QS', { zClip: true }], colorer: 'SQ' },
@@ -52,7 +51,6 @@ function testPlanes(runMiewAndCheckFn) {
         fogNearFactor: 0.7,
         fogFarFactor: 0.7,
         bg: { color: 0x800000 },
-        interpolateViews: false,
       },
       reps,
       view,
@@ -64,7 +62,6 @@ function testPlanes(runMiewAndCheckFn) {
         draft: { clipPlane: true },
         fog: false,
         bg: { color: 0x800000 },
-        interpolateViews: false,
       },
       reps,
       view,
@@ -76,7 +73,6 @@ function testPlanes(runMiewAndCheckFn) {
         draft: { clipPlane: true, clipPlaneFactor: 0.3 },
         fog: true,
         bg: { transparent: true },
-        interpolateViews: false,
       },
       reps,
       view,
@@ -90,7 +86,6 @@ function testPlanes(runMiewAndCheckFn) {
         fogColor: 0x008000,
         fogColorEnable: true,
         bg: { color: 0x800000 },
-        interpolateViews: false,
       },
       reps,
       view,

@@ -63,7 +63,7 @@ function loadMolWithEffects(opts) {
 function buildParams(bitMask) {
   const descStrs = [];
   const idStrs = [''];
-  const settings = { interpolateViews: false };
+  const settings = {};
   const selectStrs = [];
   const load = [];
   for (let n = 0; n < effects.length; n++) {
