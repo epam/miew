@@ -70,7 +70,7 @@ class Instanced2CCylindersGeometry extends THREE.InstancedBufferGeometry {
   constructor(instanceCount, polyComplexity, useZSprites, openEnded) {
     super();
     this._useZSprites = useZSprites;
-    this._cylGeometry = useZSprites ? new THREE.PlaneBufferGeometry(2, 2, 1, 1)
+    this._cylGeometry = useZSprites ? new THREE.PlaneGeometry(2, 2, 1, 1)
       : new CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, openEnded);
     this._init(instanceCount, this._cylGeometry, this._useZSprites);
 

@@ -24,7 +24,7 @@ function setArrayXYZW(arr, idx, x, y, z, w) {
 class InstancedSpheresGeometry extends SphereCollisionGeo(THREE.InstancedBufferGeometry) {
   constructor(spheresCount, sphereComplexity, useZSprites) {
     super(spheresCount);
-    this._sphGeometry = useZSprites ? new THREE.PlaneBufferGeometry(2, 2, 1, 1)
+    this._sphGeometry = useZSprites ? new THREE.PlaneGeometry(2, 2, 1, 1)
       : new THREE.SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
     this._init(spheresCount, this._sphGeometry);
   }

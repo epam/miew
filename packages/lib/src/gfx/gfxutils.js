@@ -45,10 +45,11 @@ THREE.Object3D.prototype.addSavingWorldTransform = (function () {
 
 // render a tiny transparent quad in the center of the screen
 THREE.WebGLRenderer.prototype.renderDummyQuad = (function () {
-  const _material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.0, depthWrite: false });
+  //const _material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.0, depthWrite: false });
+  const _material = new THREE.MeshBasicMaterial();
 
   const _scene = new THREE.Scene();
-  const _quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(0.01, 0.01), _material);
+  const _quad = new THREE.Mesh(new THREE.PlaneGeometry(0.01, 0.01), _material);
   _scene.add(_quad);
 
   const _camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000);
@@ -61,7 +62,7 @@ THREE.WebGLRenderer.prototype.renderDummyQuad = (function () {
 
 THREE.WebGLRenderer.prototype.renderScreenQuad = (function () {
   const _scene = new THREE.Scene();
-  const _quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(1.0, 1.0));
+  const _quad = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.0));
   _scene.add(_quad);
 
   const _camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000);
@@ -301,7 +302,7 @@ function _buildDistorionMesh(widthSegments, heightSegements, coef) {
     return 1.0 / dr;
   }
 
-  const geo = new THREE.PlaneBufferGeometry(2.0, 2.0, widthSegments, heightSegements);
+  const geo = new THREE.PlaneGeometry(2.0, 2.0, widthSegments, heightSegements);
 
   const pos = geo.getAttribute('position');
   for (let i = 0; i < pos.count; ++i) {
