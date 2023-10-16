@@ -45,8 +45,7 @@ THREE.Object3D.prototype.addSavingWorldTransform = (function () {
 
 // render a tiny transparent quad in the center of the screen
 THREE.WebGLRenderer.prototype.renderDummyQuad = (function () {
-  //const _material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.0, depthWrite: false });
-  const _material = new THREE.MeshBasicMaterial();
+  const _material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.0, depthWrite: false });
 
   const _scene = new THREE.Scene();
   const _quad = new THREE.Mesh(new THREE.PlaneGeometry(0.01, 0.01), _material);
