@@ -33,15 +33,6 @@
     "node_modules",
     "src"
   ],
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ],
-    "plugins": [
-      "@babel/plugin-transform-class-properties"
-    ]
-  },
   "css": {
     "includePaths": [
       "./node_modules"
