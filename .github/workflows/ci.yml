@@ -35,13 +35,13 @@ jobs:
         yarn install
         yarn run ci
 
-    - name: After success steps
-      run: |
-        sonar-scanner
-        npm run coveralls
-        if [ "${{ github.event_name }}" != "pull_request" ]; then
-          /tmp/cc-test-reporter after-build --exit-code $?
-        fi
+    # - name: After success steps
+    #   run: |
+    #     sonar-scanner
+    #     npm run coveralls
+    #     if [ "${{ github.event_name }}" != "pull_request" ]; then
+    #       /tmp/cc-test-reporter after-build --exit-code $?
+    #     fi
 
   deploy:
     needs: build-and-test
