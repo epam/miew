@@ -50,6 +50,7 @@ export default {
       },
     }),
     rollupPluginBabel({
+      rootMode: 'upward',
       runtimeHelpers: true,
       exclude: [
         /node_modules[\\/](?!three)/,

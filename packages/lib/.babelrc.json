@@ -1,5 +1,4 @@
 {
-  "extends": "../../babel.config.json",
   "env": {
     "coverage": {
       "plugins": [

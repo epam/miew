@@ -23,7 +23,12 @@ const configure = (prod) => ({
     rules: [{
       test: /\.js$/,
       exclude: /(node_modules[\\/](?!three))|vendor/,
-      use: ['babel-loader'],
+      use: {
+        loader: 'babel-loader',
+        options: {
+          rootMode: 'upward',
+        },
+      },
     }, {
       test: /\.[sp]?css$/,
       use: [

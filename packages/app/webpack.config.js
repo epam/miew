@@ -18,12 +18,14 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js)$/,
-        use: ['babel-loader'],
-      },
-      {
-        test: /\.(jsx)$/,
-        use: ['babel-loader'],
+        test: /\.(jsx?)$/,
+        exclude: /(node_modules[\\/](?!three))/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            rootMode: 'upward',
+          },
+        },
       },
       {
         test: /\.[sp]?css$/,
@@ -95,7 +97,7 @@ module.exports = {
         compress: true,
       },
     },
-  },  
+  },
   watchOptions: {
     ignored: /node_modules/,
   },
