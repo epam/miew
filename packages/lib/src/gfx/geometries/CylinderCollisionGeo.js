@@ -9,7 +9,7 @@ const normMtx = new THREE.Matrix3();
 
 class CylinderCollisionGeo extends ChunkedObjectsGeometry {
   constructor(instanceCount, polyComplexity) {
-    const cylGeometry = new THREE.CylinderBufferGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, true);
+    const cylGeometry = new THREE.CylinderGeometry(1, 1, 1.0, Math.max(3, polyComplexity), 2, true);
     super(cylGeometry, instanceCount);
 
     const chunkSize = this._chunkSize;

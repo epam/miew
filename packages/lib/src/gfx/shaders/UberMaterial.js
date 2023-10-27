@@ -276,11 +276,11 @@ class UberMaterial extends THREE.RawShaderMaterial {
     }
     if (this.sphereSprite) {
       defines.SPHERE_SPRITE = 1;
-      extensions.fragDepth = 1;
+      extensions.fragDepth = true;
     }
     if (this.cylinderSprite) {
       defines.CYLINDER_SPRITE = 1;
-      extensions.fragDepth = 1;
+      extensions.fragDepth = true;
     }
     if (this.zClip) {
       defines.ZCLIP = 1;
@@ -326,7 +326,7 @@ class UberMaterial extends THREE.RawShaderMaterial {
       defines.FOG_TRANSPARENT = 1;
     }
     if (this.normalsToGBuffer) {
-      extensions.drawBuffers = 1;
+      extensions.drawBuffers = true;
       defines.NORMALS_TO_G_BUFFER = 1;
     }
     if (this.toonShading) {
