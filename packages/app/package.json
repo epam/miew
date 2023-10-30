@@ -26,9 +26,6 @@
     "threejs",
     "react"
   ],
-  "browserslist": [
-    "defaults and supports webgl"
-  ],
   "moduleDirectories": [
     "node_modules",
     "src"
