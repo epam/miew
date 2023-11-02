@@ -71,8 +71,8 @@ making Miew a visualization element in more complex scientific programs.
 Both the component itself and the demonstration application are designed 
 with an eye toward [adaptive web design][] to be equally usable on devices 
 with different screen sizes, from smartphones to large monitors. We support 
-not only latest versions of all [modern browsers][] for desktop and mobile 
-platforms, but also the outdated but widely used Internet Explorer 11.
+the latest versions of all [modern browsers][] for desktop and mobile 
+platforms.
 
 > Example of embedding a component: [Miew in a Responsive Grid Layout][].
 
