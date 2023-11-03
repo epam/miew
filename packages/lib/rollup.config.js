@@ -6,7 +6,6 @@ const rollupPluginReplace = require('rollup-plugin-replace');
 const rollupPluginNodeResolve = require('rollup-plugin-node-resolve');
 const { string } = require('rollup-plugin-string');
 
-const path = require('path');
 const version = require('./tools/version');
 const packageJson = require('./package.json');
 
@@ -51,6 +50,7 @@ export default {
       },
     }),
     rollupPluginBabel({
+      rootMode: 'upward',
       runtimeHelpers: true,
       exclude: [
         /node_modules[\\/](?!three)/,
@@ -58,7 +58,6 @@ export default {
         './src/utils/SelectionParser',
         './src/utils/MiewCLIParser.js',
       ],
-      extends: path.join(__dirname, '/.babelrc'),
     }),
 
   ],

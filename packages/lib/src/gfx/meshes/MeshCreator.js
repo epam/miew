@@ -10,10 +10,11 @@ function setMatParams(params, uniforms) {
 }
 
 function _createInstancedCylinders(useZSprites, openEnded) {
+  function Geometry(a, b) {
+    return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
+  }
   return {
-    Geometry(a, b) {
-      return new geometries.Instanced2CCylindersGeometry(a, b, useZSprites, openEnded);
-    },
+    Geometry,
     Object: useZSprites ? meshes.ZSprite : meshes.Instanced,
     initMaterial: setMatParams({
       instancedMatrix: true,
@@ -75,10 +76,11 @@ function _createIsoSurfaceGeoTriplet(geoClass, caps, settings, renderParams) {
 class MeshCreator {
   static createSpheres(caps, settings) {
     const useZSprites = settings.now.zSprites;
+    function Geometry(a, b) {
+      return new geometries.InstancedSpheresGeometry(a, b, useZSprites);
+    }
     return {
-      Geometry(a, b) {
-        return new geometries.InstancedSpheresGeometry(a, b, useZSprites);
-      },
+      Geometry,
       Object: useZSprites ? meshes.ZSprite : meshes.Instanced,
       initMaterial: setMatParams({
         instancedPos: true,
