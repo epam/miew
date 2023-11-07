@@ -8,8 +8,10 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const version = require('./tools/version');
+const packageJson = require('./package.json');
 
-const configure = (prod) => ({
+const configureDemo = (prod) => ({
+  name: 'demo',
   entry: {
     demo: './demo/scripts/index.js',
   },
@@ -135,4 +137,51 @@ const configure = (prod) => ({
   },
 });
 
-module.exports = (env, argv) => configure(argv.mode === 'production');
+const configureLib = (prod) => ({
+  name: 'lib',
+  externals: {
+    three: 'three',
+    lodash: 'lodash',
+  },
+  entry: path.resolve(__dirname, 'src', 'index.js'),
+  plugins: [
+    new webpack.DefinePlugin({
+      PACKAGE_VERSION: JSON.stringify(version.combined),
+      DEBUG: !prod,
+    }),
+  ],
+  module: {
+    rules: [{
+      test: /\.(vert|frag)$/,
+      use: 'raw-loader',
+    }, {
+      test: /\.js$/,
+      exclude: [
+        /(node_modules[\\/](?!three))|vendor/,
+        path.resolve(__dirname, 'src/utils/SelectionParser.js'),
+        path.resolve(__dirname, 'src/utils/MiewCLIParser.js')],
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env'],
+        },
+      },
+    },
+    ],
+  },
+  output: {
+    path: path.resolve(__dirname, 'build'),
+    filename: '${packageJson.main}',
+    chunkFilename: '[name].[chunkhash].js',
+    library: 'Miew',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: 'typeof self !== "undefined" ? self : this',
+  },
+  devtool: 'source-map',
+});
+
+module.exports = [
+  (env, argv) => configureDemo(argv.mode === 'production'),
+  (env, argv) => configureLib(argv.mode === 'production'),
+];
