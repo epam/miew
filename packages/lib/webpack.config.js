@@ -88,10 +88,12 @@ const configureDemo = (prod) => ({
       filename: '[name].[contenthash].css',
       chunkFilename: '[name].[contenthash].css',
     }),
-    new CopyWebpackPlugin([
-      { from: resolvePath('demo/data'), to: 'data' },
-      { from: resolvePath('demo/images'), to: 'images' },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: resolvePath('demo/data'), to: 'data' },
+        { from: resolvePath('demo/images'), to: 'images' },
+      ],
+    }),
     new webpack.ids.HashedModuleIdsPlugin(),
   ],
   optimization: {

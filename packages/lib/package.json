@@ -100,7 +100,7 @@
     "browserify": "^16.5.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "copy-webpack-plugin": "^5.1.1",
+    "copy-webpack-plugin": "^11.0.0",
     "cross-env": "^7.0.2",
     "css-loader": "^3.5.3",
     "cssnano": "^4.1.10",
@@ -118,7 +118,7 @@
     "jquery": "^3.5.1",
     "jquery.terminal": "^2.1.0",
     "jsdoc": "^3.6.3",
-    "mini-css-extract-plugin": "^0.9.0",
+    "mini-css-extract-plugin": "^2.7.6",
     "mkdirp": "^1.0.3",
     "mocha": "^7.1.2",
     "ncp": "^2.0.0",
@@ -148,9 +148,9 @@
     "terser-webpack-plugin": "^5.3.9",
     "toastr": "^2.1.4",
     "url-loader": "^4.1.0",
-    "webpack": "^5.88.2",
+    "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
-    "yargs": "^15.3.0"
+    "yargs": "^17.7.2"
   }
 }
