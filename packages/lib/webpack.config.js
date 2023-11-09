@@ -7,15 +7,24 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
 const version = require('./tools/version');
 
-const configure = (prod) => ({
+const ignoreWarnings = [
+  /size limit/,
+  /performance recommendations/,
+];
+
+const resolvePath = (name) => path.resolve(__dirname, name);
+
+const configureDemo = (prod) => ({
+  name: 'demo',
   entry: {
-    demo: './demo/scripts/index.js',
+    demo: resolvePath('demo/scripts/index.js'),
   },
   output: {
-    publicPath: './',
-    path: path.resolve(__dirname, 'build'),
+    publicPath: '',
+    path: resolvePath('build'),
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[chunkhash].js',
   },
@@ -57,7 +66,7 @@ const configure = (prod) => ({
   },
   resolve: {
     alias: {
-      Miew: path.resolve(__dirname, 'src/index.js'),
+      Miew: resolvePath('src/index.js'),
     },
   },
   plugins: [
@@ -71,9 +80,9 @@ const configure = (prod) => ({
       jQuery: 'jquery',
     }),
     new HtmlWebpackPlugin({
-      template: 'demo/index.ejs',
+      template: resolvePath('demo/index.ejs'),
       title: 'Miew – 3D Molecular Viewer',
-      favicon: 'demo/favicon.ico',
+      favicon: resolvePath('demo/favicon.ico'),
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
@@ -83,8 +92,8 @@ const configure = (prod) => ({
       defaultAttribute: 'defer',
     }),
     new CopyWebpackPlugin([
-      { from: 'demo/data', to: 'data' },
-      { from: 'demo/images', to: 'images' },
+      { from: resolvePath('demo/data'), to: 'data' },
+      { from: resolvePath('demo/images'), to: 'images' },
     ]),
     new webpack.ids.HashedModuleIdsPlugin(),
   ],
@@ -113,7 +122,7 @@ const configure = (prod) => ({
   },
   devServer: {
     static: {
-      directory: './build',
+      directory: resolvePath('build'),
       publicPath: '/',
       staticOptions: {
         compress: true,
@@ -133,6 +142,91 @@ const configure = (prod) => ({
       },
     },
   },
+  ignoreWarnings,
 });
 
-module.exports = (env, argv) => configure(argv.mode === 'production');
+const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
+  name: libName,
+  externals: {
+    three: {
+      module: 'three',
+      commonjs: 'three',
+      commonjs2: 'three',
+      amd: 'three',
+      root: 'THREE',
+    },
+    lodash: {
+      module: 'lodash',
+      commonjs: 'lodash',
+      commonjs2: 'lodash',
+      amd: 'lodash',
+      root: '_',
+    },
+  },
+  entry: {
+    Miew: resolvePath('src/index.js'),
+  },
+  plugins: [
+    new webpack.BannerPlugin(`${version.copyright}`),
+    new webpack.DefinePlugin({
+      PACKAGE_VERSION: JSON.stringify(version.combined),
+      DEBUG: !prod,
+    }),
+  ],
+  module: {
+    rules: [{
+      test: /\.(vert|frag)$/,
+      use: 'raw-loader',
+    }, {
+      test: /\.js$/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          rootMode: 'upward',
+        },
+      },
+    },
+    ],
+  },
+  output: {
+    path: resolvePath('build'),
+    filename: libFile,
+    library: {
+      ...(libType !== 'module') && { name: 'Miew', export: 'default' },
+      type: libType,
+      umdNamedDefine: false,
+    },
+    globalObject: 'this',
+    environment: {
+      module: true,
+    },
+  },
+  experiments: {
+    outputModule: libType === 'module',
+  },
+  optimization: {
+    minimize,
+    minimizer: [
+      new TerserWebpackPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true,
+          },
+          format: {
+            comments: /copyright/i,
+          },
+        },
+        extractComments: false,
+      }),
+    ],
+  },
+  devtool: 'source-map',
+  ignoreWarnings,
+});
+
+module.exports = [
+  (env, argv) => configureLib(argv.mode === 'production', 'miew', 'dist/[name].js', 'umd'),
+  (env, argv) => configureLib(argv.mode === 'production', 'miew-min', 'dist/[name].min.js', 'umd', true),
+  (env, argv) => configureLib(argv.mode === 'production', 'miew-module', 'dist/[name].module.js', 'module'),
+  (env, argv) => configureDemo(argv.mode === 'production'),
+];
