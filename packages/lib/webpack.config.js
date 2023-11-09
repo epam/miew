@@ -9,6 +9,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const version = require('./tools/version');
 
+const ignoreWarnings = [
+  /size limit/,
+  /performance recommendations/,
+];
+
 const configureDemo = (prod) => ({
   name: 'demo',
   entry: {
@@ -134,6 +139,7 @@ const configureDemo = (prod) => ({
       },
     },
   },
+  ignoreWarnings,
 });
 
 const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
@@ -198,6 +204,7 @@ const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
     minimize,
   },
   devtool: 'source-map',
+  ignoreWarnings,
 });
 
 module.exports = [
