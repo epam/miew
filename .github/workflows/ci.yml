@@ -3,7 +3,7 @@ name: Miew CI/CD
 on: [push, pull_request]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -13,35 +13,10 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 18
+        cache: 'yarn'
         
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          node_modules
-          ~/.sonar/cache
-          ~/.yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+    - name: Install dependencies
+      run: yarn install
 
-    - name: Setup Code Climate test-reporter
-      run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > /tmp/cc-test-reporter
-        chmod +x /tmp/cc-test-reporter
-
-    - name: Install dependencies and run CI script
-      run: |
-        yarn install
-        yarn run ci
-
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-    - name: NPM Deployment
-      if: startsWith(github.ref, 'refs/tags/v') && matrix.node == 18
-      run: |
-        # Ensure you set up the NPM_AUTH_TOKEN secret in your GitHub repository
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
-        npm publish --tag latest
+    - name: Run CI script
+      run: yarn run ci
