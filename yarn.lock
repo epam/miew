@@ -11742,7 +11742,6 @@ __metadata:
     terser-webpack-plugin: ^5.3.9
     three: 0.125.0
     toastr: ^2.1.4
-    uglify-js: ^3.9.3
     url-loader: ^4.1.0
     webpack: ^5.88.2
     webpack-cli: ^5.1.4
@@ -17126,7 +17125,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uglify-js@npm:^3.1.4, uglify-js@npm:^3.9.3":
+"uglify-js@npm:^3.1.4":
   version: 3.17.4
   resolution: "uglify-js@npm:3.17.4"
   bin:
