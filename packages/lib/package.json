@@ -146,6 +146,7 @@
     "style-loader": "^1.2.1",
     "stylelint": "^13.3.3",
     "stylelint-config-standard": "^20.0.0",
+    "terser-webpack-plugin": "^5.3.9",
     "toastr": "^2.1.4",
     "uglify-js": "^3.9.3",
     "url-loader": "^4.1.0",

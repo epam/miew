@@ -7,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
 const version = require('./tools/version');
 
 const ignoreWarnings = [
@@ -166,6 +167,7 @@ const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
     Miew: resolvePath('src/index.js'),
   },
   plugins: [
+    new webpack.BannerPlugin(`${version.copyright}`),
     new webpack.DefinePlugin({
       PACKAGE_VERSION: JSON.stringify(version.combined),
       DEBUG: !prod,
@@ -204,6 +206,19 @@ const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
   },
   optimization: {
     minimize,
+    minimizer: [
+      new TerserWebpackPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true,
+          },
+          format: {
+            comments: /copyright/i,
+          },
+        },
+        extractComments: false,
+      }),
+    ],
   },
   devtool: 'source-map',
   ignoreWarnings,

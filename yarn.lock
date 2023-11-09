@@ -11739,6 +11739,7 @@ __metadata:
     style-loader: ^1.2.1
     stylelint: ^13.3.3
     stylelint-config-standard: ^20.0.0
+    terser-webpack-plugin: ^5.3.9
     three: 0.125.0
     toastr: ^2.1.4
     uglify-js: ^3.9.3
@@ -16644,7 +16645,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:^5.3.7":
+"terser-webpack-plugin@npm:^5.3.7, terser-webpack-plugin@npm:^5.3.9":
   version: 5.3.9
   resolution: "terser-webpack-plugin@npm:5.3.9"
   dependencies:
