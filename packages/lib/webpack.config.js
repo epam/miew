@@ -8,7 +8,6 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const version = require('./tools/version');
-const packageJson = require('./package.json');
 
 const configureDemo = (prod) => ({
   name: 'demo',
@@ -137,13 +136,27 @@ const configureDemo = (prod) => ({
   },
 });
 
-const configureLib = (prod) => ({
-  name: 'lib',
+const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
+  name: libName,
   externals: {
-    three: 'three',
-    lodash: 'lodash',
+    three: {
+      module: 'three',
+      commonjs: 'three',
+      commonjs2: 'three',
+      amd: 'three',
+      root: 'THREE',
+    },
+    lodash: {
+      module: 'lodash',
+      commonjs: 'lodash',
+      commonjs2: 'lodash',
+      amd: 'lodash',
+      root: '_',
+    },
   },
-  entry: path.resolve(__dirname, 'src', 'index.js'),
+  entry: {
+    Miew: path.resolve(__dirname, 'src', 'index.js'),
+  },
   plugins: [
     new webpack.DefinePlugin({
       PACKAGE_VERSION: JSON.stringify(version.combined),
@@ -156,14 +169,10 @@ const configureLib = (prod) => ({
       use: 'raw-loader',
     }, {
       test: /\.js$/,
-      exclude: [
-        /(node_modules[\\/](?!three))|vendor/,
-        path.resolve(__dirname, 'src/utils/SelectionParser.js'),
-        path.resolve(__dirname, 'src/utils/MiewCLIParser.js')],
       use: {
         loader: 'babel-loader',
         options: {
-          presets: ['@babel/preset-env'],
+          rootMode: 'upward',
         },
       },
     },
@@ -171,17 +180,29 @@ const configureLib = (prod) => ({
   },
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: '${packageJson.main}',
-    chunkFilename: '[name].[chunkhash].js',
-    library: 'Miew',
-    libraryTarget: 'umd',
-    umdNamedDefine: true,
-    globalObject: 'typeof self !== "undefined" ? self : this',
+    filename: libFile,
+    library: {
+      ...(libType !== 'module') && { name: 'Miew', export: 'default' },
+      type: libType,
+      umdNamedDefine: false,
+    },
+    globalObject: 'this',
+    environment: {
+      module: true,
+    },
+  },
+  experiments: {
+    outputModule: libType === 'module',
+  },
+  optimization: {
+    minimize,
   },
   devtool: 'source-map',
 });
 
 module.exports = [
+  (env, argv) => configureLib(argv.mode === 'production', 'miew', 'dist/[name].js', 'umd'),
+  (env, argv) => configureLib(argv.mode === 'production', 'miew-min', 'dist/[name].min.js', 'umd', true),
+  (env, argv) => configureLib(argv.mode === 'production', 'miew-module', 'dist/[name].module.js', 'module'),
   (env, argv) => configureDemo(argv.mode === 'production'),
-  (env, argv) => configureLib(argv.mode === 'production'),
 ];
