@@ -1,0 +1,22 @@
+name: Miew CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'yarn'
+        
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Run CI script
+      run: yarn run ci
