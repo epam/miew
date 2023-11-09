@@ -14,14 +14,16 @@ const ignoreWarnings = [
   /performance recommendations/,
 ];
 
+const resolvePath = (name) => path.resolve(__dirname, name);
+
 const configureDemo = (prod) => ({
   name: 'demo',
   entry: {
-    demo: './demo/scripts/index.js',
+    demo: resolvePath('demo/scripts/index.js'),
   },
   output: {
-    publicPath: './',
-    path: path.resolve(__dirname, 'build'),
+    publicPath: '',
+    path: resolvePath('build'),
     filename: '[name].[chunkhash].js',
     chunkFilename: '[name].[chunkhash].js',
   },
@@ -63,7 +65,7 @@ const configureDemo = (prod) => ({
   },
   resolve: {
     alias: {
-      Miew: path.resolve(__dirname, 'src/index.js'),
+      Miew: resolvePath('src/index.js'),
     },
   },
   plugins: [
@@ -77,9 +79,9 @@ const configureDemo = (prod) => ({
       jQuery: 'jquery',
     }),
     new HtmlWebpackPlugin({
-      template: 'demo/index.ejs',
+      template: resolvePath('demo/index.ejs'),
       title: 'Miew – 3D Molecular Viewer',
-      favicon: 'demo/favicon.ico',
+      favicon: resolvePath('demo/favicon.ico'),
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
@@ -89,8 +91,8 @@ const configureDemo = (prod) => ({
       defaultAttribute: 'defer',
     }),
     new CopyWebpackPlugin([
-      { from: 'demo/data', to: 'data' },
-      { from: 'demo/images', to: 'images' },
+      { from: resolvePath('demo/data'), to: 'data' },
+      { from: resolvePath('demo/images'), to: 'images' },
     ]),
     new webpack.ids.HashedModuleIdsPlugin(),
   ],
@@ -119,7 +121,7 @@ const configureDemo = (prod) => ({
   },
   devServer: {
     static: {
-      directory: './build',
+      directory: resolvePath('build'),
       publicPath: '/',
       staticOptions: {
         compress: true,
@@ -161,7 +163,7 @@ const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
     },
   },
   entry: {
-    Miew: path.resolve(__dirname, 'src', 'index.js'),
+    Miew: resolvePath('src/index.js'),
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -185,7 +187,7 @@ const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
     ],
   },
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: resolvePath('build'),
     filename: libFile,
     library: {
       ...(libType !== 'module') && { name: 'Miew', export: 'default' },
