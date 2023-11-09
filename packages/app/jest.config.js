@@ -1,5 +1,8 @@
 module.exports = {
   verbose: true,
+  transform: {
+    '^.+\\.jsx?$': './tools/babel-jest-wrapper.js',
+  },
   reporters: [
     ['jest-simple-dot-reporter', { color: true }],
   ],

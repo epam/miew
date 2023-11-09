@@ -62,9 +62,6 @@
     "webgl",
     "threejs"
   ],
-  "browserslist": [
-    "defaults and supports webgl"
-  ],
   "nyc": {
     "cache": true,
     "all": true,

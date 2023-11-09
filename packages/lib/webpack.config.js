@@ -26,7 +26,7 @@ const configure = (prod) => ({
       use: {
         loader: 'babel-loader',
         options: {
-          extends: path.join(__dirname, '/.babelrc'),
+          rootMode: 'upward',
         },
       },
     }, {
