@@ -51,16 +51,10 @@ const configureDemo = (prod) => ({
       ],
     }, {
       test: /\.(vert|frag|html)$/,
-      use: ['raw-loader'],
+      type: 'asset/source',
     }, {
       test: /\.(woff|woff2|eot|ttf|svg)$/,
-      use: [{
-        loader: 'url-loader',
-        options: {
-          limit: 131072,
-        },
-      },
-      ],
+      type: 'asset/inline',
     }],
   },
   resolve: {
@@ -175,7 +169,7 @@ const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
   module: {
     rules: [{
       test: /\.(vert|frag)$/,
-      use: 'raw-loader',
+      type: 'asset/source',
     }, {
       test: /\.js$/,
       use: {
