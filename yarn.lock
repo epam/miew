@@ -15965,10 +15965,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"three@npm:0.152.0":
-  version: 0.152.0
-  resolution: "three@npm:0.152.0"
-  checksum: 9a0bcbedea537aeec9e3df0475f786a235052aceb5cf88aedd1aae64f3adf19cd43a5d1d790e09ce96563c8b836367efbd5c39ad86cb1a353c52f4b2e55f375d
+"three@npm:0.153.0":
+  version: 0.153.0
+  resolution: "three@npm:0.153.0"
+  checksum: 68899ca90e048967a83866a1d54a9d28bba3532d228ede9e4c2a3b9bec347c31d8bb633eeaf7828397d2419cded8f57cf32f2a9c037a3587d45122e793ddc0c4
   languageName: node
   linkType: hard
 
