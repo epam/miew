@@ -4,7 +4,6 @@ const path = require('path');
 const webpack = require('webpack');
 const yargs = require('yargs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
@@ -52,16 +51,10 @@ const configureDemo = (prod) => ({
       ],
     }, {
       test: /\.(vert|frag|html)$/,
-      use: ['raw-loader'],
+      type: 'asset/source',
     }, {
       test: /\.(woff|woff2|eot|ttf|svg)$/,
-      use: [{
-        loader: 'url-loader',
-        options: {
-          limit: 131072,
-        },
-      },
-      ],
+      type: 'asset/inline',
     }],
   },
   resolve: {
@@ -83,18 +76,18 @@ const configureDemo = (prod) => ({
       template: resolvePath('demo/index.ejs'),
       title: 'Miew – 3D Molecular Viewer',
       favicon: resolvePath('demo/favicon.ico'),
+      scriptLoading: 'defer',
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
       chunkFilename: '[name].[contenthash].css',
     }),
-    new ScriptExtHtmlWebpackPlugin({
-      defaultAttribute: 'defer',
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: resolvePath('demo/data'), to: 'data' },
+        { from: resolvePath('demo/images'), to: 'images' },
+      ],
     }),
-    new CopyWebpackPlugin([
-      { from: resolvePath('demo/data'), to: 'data' },
-      { from: resolvePath('demo/images'), to: 'images' },
-    ]),
     new webpack.ids.HashedModuleIdsPlugin(),
   ],
   optimization: {
@@ -176,7 +169,7 @@ const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
   module: {
     rules: [{
       test: /\.(vert|frag)$/,
-      use: 'raw-loader',
+      type: 'asset/source',
     }, {
       test: /\.js$/,
       use: {

@@ -57,11 +57,10 @@ module.exports = {
     }),
     new webpack.ids.HashedModuleIdsPlugin(),
     new MiniCssExtractPlugin(),
-    new CopyWebpackPlugin(
-    {
-      patterns: [    
-      { from: 'images', to: 'images' },
-      ]
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'images', to: 'images' },
+      ],
     }),
   ],
   optimization: {
