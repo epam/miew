@@ -2,8 +2,9 @@ version: "{build}"
 environment:
   matrix:
     - nodejs_version: "18"
+    - nodejs_version: "20"
 cache:
-  - "%LOCALAPPDATA%\\Yarn"
+  - ".yarn\\cache"
   - node_modules
 init:
   - git config --global core.autocrlf true
@@ -15,8 +16,3 @@ test_script:
   - yarn ci
 
 build: off
-notifications:
-  - provider: Slack
-    on_build_success: false
-    incoming_webhook:
-      secure: osWQbJf4imIh5jMhkZW0RfHDY+fm5Uksv9CeOMJFysrAfMBuOWnJGfHqcI3xAiKsbY8yZkd7VefQBu+4nu0iimyvsrQouxIoCcp4rkpz+EE=
