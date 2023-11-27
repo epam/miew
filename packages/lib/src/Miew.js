@@ -57,8 +57,8 @@ const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 const LOADER_NOT_FOUND = 'Could not find suitable loader for this source';
 const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
 
-// Colormanagement in threejs changed a lot in 152+ version.
-// To store previous colors for we disable the color management system
+// Color management changed a lot in threejs 152+ version.
+// To store miew colors we disable the new color management system
 THREE.ColorManagement.enabled = false;
 
 const { createElement } = utils;

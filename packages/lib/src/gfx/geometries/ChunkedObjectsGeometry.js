@@ -65,7 +65,7 @@ class ChunkedObjectsGeometry extends THREE.BufferGeometry {
 
   raycast(raycaster, intersects) {
     const inters = [];
-    // use THREE.Mesh racysting interface for the Geometry. The Mesh is
+    // use THREE.Mesh raycasting interface for the Geometry. The Mesh is
     // created with existed geometry and default material, so it doesn't slowdown.
     const mesh = new THREE.Mesh();
     mesh.geometry = this;
