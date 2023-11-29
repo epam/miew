@@ -58,7 +58,7 @@ const LOADER_NOT_FOUND = 'Could not find suitable loader for this source';
 const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
 
 // Color management changed a lot in threejs 152+ version.
-// To store miew colors we disable the new color management system
+// To keep miew colors we disable the new color management system
 THREE.ColorManagement.enabled = false;
 
 const { createElement } = utils;
