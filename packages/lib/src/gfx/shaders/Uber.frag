@@ -58,7 +58,6 @@ uniform float clipPlaneValue;
   varying vec3 viewNormal;
 #endif
 
-#define PI 3.14159265359
 #define RECIPROCAL_PI 0.31830988618
 #define saturate(a) clamp( a, 0.0, 1.0 )
 
@@ -447,7 +446,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
       }
     #endif
 
-    vec3 irradiance = dotNL * directLight.color * PI;
+    vec3 irradiance = dotNL * directLight.color;
     reflectedLight.directDiffuse += penumbra * irradiance * BRDF_Diffuse_Lambert( material.diffuseColor );
     reflectedLight.directSpecular += penumbra * irradiance * BRDF_Specular_BlinnPhong( directLight, geometry, material.specularColor, material.specularShininess );
   }
@@ -458,7 +457,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
 
   vec3 calcLighting(const in GeometricContext geometry, const in BlinnPhongMaterial material, vec3 vViewPosition) {
     ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ));
-    vec3 irradiance = ambientLightColor * PI;
+    vec3 irradiance = ambientLightColor;
 
     float shadowMask = 1.0;
     // see THREE.WebGLProgram.unrollLoops

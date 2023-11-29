@@ -11159,7 +11159,7 @@ __metadata:
     stylelint: ^13.3.3
     stylelint-config-standard: ^20.0.0
     terser-webpack-plugin: ^5.3.9
-    three: 0.125.0
+    three: 0.153.0
     toastr: ^2.1.4
     webpack: ^5.89.0
     webpack-cli: ^5.1.4
@@ -15965,10 +15965,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"three@npm:0.125.0":
-  version: 0.125.0
-  resolution: "three@npm:0.125.0"
-  checksum: 2999e4e8701e3492fe7b87b285e903fb76ccce540f17949e30b8512269552e16bba4a8b3d0ca97743f54f6163cb12813a48ab3cb439cfb4fd0343148efb00100
+"three@npm:0.153.0":
+  version: 0.153.0
+  resolution: "three@npm:0.153.0"
+  checksum: 68899ca90e048967a83866a1d54a9d28bba3532d228ede9e4c2a3b9bec347c31d8bb633eeaf7828397d2419cded8f57cf32f2a9c037a3587d45122e793ddc0c4
   languageName: node
   linkType: hard
 

@@ -57,6 +57,10 @@ const EDIT_MODE = { COMPLEX: 0, COMPONENT: 1, FRAGMENT: 2 };
 const LOADER_NOT_FOUND = 'Could not find suitable loader for this source';
 const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
 
+// Color management changed a lot in threejs 152+ version.
+// To keep miew colors we disable the new color management system
+THREE.ColorManagement.enabled = false;
+
 const { createElement } = utils;
 
 function updateFogRange(fog, center, radius) {
