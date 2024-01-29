@@ -1,7 +1,7 @@
 .git/
 .github/
 .idea/
-.vscode
+.vscode/
 .sonar/
 **/.nyc_output/
 **/build/

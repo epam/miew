@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="Jison files" pattern="file[miew]:**/*.jison" />
-</component>
