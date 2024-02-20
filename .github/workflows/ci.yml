@@ -23,3 +23,17 @@ jobs:
 
     - name: Run CI script
       run: yarn run ci
+
+    - name: Collect coverage
+      run: yarn run merge-cover
+
+    - name: Publicate coverage
+      run: yarn run coveralls
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@v1.1.3
+      with:
+        github-token: ${{ secrets.COVERALLS_TOKEN }}
+        path-to-lcov: ./coverage/lcov.info
+        flag-name: run-label
+        parallel: false
