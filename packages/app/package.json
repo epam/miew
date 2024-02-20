@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "ci": "run-s clean lint test-cover build",
-    "clean": "rimraf 'build/*'",
+    "clean": "rimraf build",
     "lint": "eslint -f unix --ext .js,.jsx src/ ",
     "lint:css": "stylelint '**/*.scss'",
     "build": "webpack --mode production",
@@ -70,7 +70,7 @@
     "postcss-loader": "^7.3.3",
     "postcss-scss": "^2.0.0",
     "redux": "^4.0.5",
-    "rimraf": "^3.0.2",
+    "rimraf": "^5.0.5",
     "style-loader": "^3.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
