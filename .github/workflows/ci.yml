@@ -32,4 +32,4 @@ jobs:
       with:
         github-token: ${{ secrets.COVERALLS_TOKEN }}
         path-to-lcov: ./coverage/lcov.info
-        devug: true
+        debug: true
