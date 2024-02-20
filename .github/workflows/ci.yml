@@ -27,3 +27,9 @@ jobs:
     - name: Collect coverage
       run: yarn run merge-cover
 
+    - name: Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.COVERALLS_TOKEN }}
+        path-to-lcov: ./coverage/lcov.info
+        devug: true
