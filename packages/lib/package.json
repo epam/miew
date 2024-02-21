@@ -115,7 +115,7 @@
     "jsdoc": "^3.6.3",
     "mini-css-extract-plugin": "^2.7.6",
     "mkdirp": "^1.0.3",
-    "mocha": "^7.1.2",
+    "mocha": "^10.3.0",
     "ncp": "^2.0.0",
     "node-resemble-js": "^0.2.0",
     "npm-run-all": "^4.1.3",
