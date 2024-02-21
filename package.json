@@ -13,7 +13,7 @@
   },
   "scripts": {
     "clean": "rimraf coverage",
-    "merge-cover": "mkdirp coverage | lcov-result-merger 'packages/*/coverage/lcov*.info' 'coverage/lcov.info' --prepend-source-files --prepend-path-fix '../src'",
+    "merge-cover": "mkdirp coverage | lcov-result-merger 'packages/*/coverage/lcov.info' 'coverage/lcov.info' --prepend-source-files --prepend-path-fix '..'",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "ci": "yarn workspaces foreach -ptv run ci"
   },
