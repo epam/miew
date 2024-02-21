@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        node: [18, 20]
+        node: [20]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -33,16 +33,3 @@ jobs:
         github-token: ${{ secrets.COVERALLS_TOKEN }}
         path-to-lcov: ./coverage/lcov.info
         debug: true
-        flag-name: run-${{ join(matrix.*, '-') }}
-        parallel: true
-
-  finish:
-    needs: build
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@v2
-      with:
-        parallel-finished: true
-        carryforward: "run-18,run-20"
