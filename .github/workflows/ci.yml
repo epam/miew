@@ -33,3 +33,16 @@ jobs:
         github-token: ${{ secrets.COVERALLS_TOKEN }}
         path-to-lcov: ./coverage/lcov.info
         debug: true
+        flag-name: run-${{ join(matrix.*, '-') }}
+        parallel: true
+
+  finish:
+    needs: build
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel-finished: true
+        carryforward: "run-18,run-20"
