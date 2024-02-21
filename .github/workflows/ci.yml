@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        node: [20]
+        node: [18, 20]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -25,11 +25,14 @@ jobs:
       run: yarn run ci
 
     - name: Collect coverage
+      if: matrix.node == '20'  
       run: yarn run merge-cover
 
     - name: Coveralls
+      if: matrix.node == '20'  
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.COVERALLS_TOKEN }}
         path-to-lcov: ./coverage/lcov.info
         debug: true
+   
