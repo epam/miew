@@ -12,13 +12,14 @@
     "node": ">=18.0.0 <21.0.0"
   },
   "scripts": {
-    "merge-cover": "lcov-result-merger 'coverage/lcov_*.info' > coverage/general.info",
-    "coveralls": "cat coverage/general.info | coveralls",
+    "clean": "rimraf coverage && yarn workspaces foreach -ptv run clean",
+    "merge-cover": "mkdirp coverage && lcov-result-merger 'packages/*/coverage/lcov.info' 'coverage/lcov.info' --prepend-source-files --prepend-path-fix '..'",
     "ci": "yarn workspaces foreach -ptv run ci"
   },
   "devDependencies": {
-    "coveralls": "^3.1.0",
-    "lcov-result-merger": "^3.1.0"
+    "lcov-result-merger": "^5.0.0",
+    "mkdirp": "^3.0.1",
+    "rimraf": "^5.0.5"
   },
   "packageManager": "yarn@3.6.3"
 }
