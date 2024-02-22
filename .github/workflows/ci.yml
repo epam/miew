@@ -23,3 +23,15 @@ jobs:
 
     - name: Run CI script
       run: yarn run ci
+
+    - name: Collect coverage
+      if: github.event_name == 'push' && matrix.node == '20'
+      run: yarn run merge-cover
+
+    - name: Coveralls
+      if: github.event_name == 'push' && matrix.node == '20'  
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.COVERALLS_TOKEN }}
+        path-to-lcov: ./coverage/lcov.info
+   
