@@ -23,6 +23,6 @@
   },
   "packageManager": "yarn@3.6.3",
   "resolutions": {
-    "nomnom": "^1.8.1" 
+    "nomnom": "^1.8.1"
   }
 }
