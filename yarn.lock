@@ -4649,13 +4649,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"colors@npm:0.5.x":
-  version: 0.5.1
-  resolution: "colors@npm:0.5.1"
-  checksum: ef0533f715066999335270424800907dcedfe6fa11127ff700bffab8466ef058446d00ef37c728f3e4cfa60b4695fbe10d194e4646dd57d110496f2adaefeefe
-  languageName: node
-  linkType: hard
-
 "combine-source-map@npm:^0.8.0, combine-source-map@npm:~0.8.0":
   version: 0.8.0
   resolution: "combine-source-map@npm:0.8.0"
@@ -11305,17 +11298,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nomnom@npm:1.5.2":
-  version: 1.5.2
-  resolution: "nomnom@npm:1.5.2"
-  dependencies:
-    colors: 0.5.x
-    underscore: 1.1.x
-  checksum: 90d5746932649bb336f9f6508b240b4394d79a35e264d111c2c507678236f9bd7615f16beae0aad4b4c9b096f746bc83a43f94366bd73d3590075a15efd51a23
-  languageName: node
-  linkType: hard
-
-"nomnom@npm:>= 1.5.x":
+"nomnom@npm:^1.8.1":
   version: 1.8.1
   resolution: "nomnom@npm:1.8.1"
   dependencies:
@@ -15724,13 +15707,6 @@ __metadata:
   bin:
     undeclared-identifiers: bin.js
   checksum: e1f2a18d7bf735ec2b9ee464a621d8db72768e75e59334d34d1f7085e21558c621cc105dfd4cc7a0a219b91c43b71fbdea0508cdbe3b3396ed96902c6d5d590e
-  languageName: node
-  linkType: hard
-
-"underscore@npm:1.1.x":
-  version: 1.1.7
-  resolution: "underscore@npm:1.1.7"
-  checksum: 0c728c3bd3e7a7f0f7aa4d7f53e4afbd6c3af357fb1d16425d0fc39cc477f98def2a0f7039d3047fad76edac073cf7370cef75416115e90521d93999999d4861
   languageName: node
   linkType: hard
 

@@ -21,5 +21,8 @@
     "mkdirp": "^3.0.1",
     "rimraf": "^5.0.5"
   },
-  "packageManager": "yarn@3.6.3"
+  "packageManager": "yarn@3.6.3",
+  "resolutions": {
+    "nomnom": "^1.8.1" 
+  }
 }
