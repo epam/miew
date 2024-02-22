@@ -24,7 +24,7 @@
     "test": "run-s test:unit",
     "test-cover": "cross-env NODE_ENV=coverage nyc mocha",
     "test:unit": "mocha",
-    "test:e2e": "rimraf './test/e2e/mismatch/*.png' './test/e2e/mismatch/report-*.html' && mocha --config ./test/.e2e.mocharc.js",
+    "test:e2e": "rimraf --glob './test/e2e/mismatch/*.png' './test/e2e/mismatch/report-*.html' && mocha --config ./test/.e2e.mocharc.js",
     "start": "webpack-dev-server --mode development --open",
     "clean": "rimraf build coverage",
     "build": "run-s 'build:*'",
