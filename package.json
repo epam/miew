@@ -12,7 +12,7 @@
     "node": ">=18.0.0 <21.0.0"
   },
   "scripts": {
-    "clean": "rimraf coverage",
+    "clean": "rimraf coverage | yarn workspaces foreach -ptv run clean",
     "merge-cover": "mkdirp coverage | lcov-result-merger 'packages/*/coverage/lcov.info' 'coverage/lcov.info' --prepend-source-files --prepend-path-fix '..'",
     "ci": "yarn workspaces foreach -ptv run ci"
   },
