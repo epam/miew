@@ -38,7 +38,7 @@
     "build:examples:browserify": "cd build/examples/ && browserify -e miew_via_browserify.js -o miew_via_browserify.bundle.js",
     "build:examples:react": "cd build/examples/ && webpack --mode production --config miew_via_react.config.js",
     "build:docs": "jsdoc -c jsdoc.config.js",
-    "demo": "node tools/serve.js",
+    "demo": "node tools/serve.mjs",
     "show:cover": "node tools/open.mjs coverage/lcov-report/index.html",
     "show:docs": "node tools/open.mjs build/docs/index.html",
     "show:e2e": "node tools/open.mjs 'test/e2e/mismatch/*.html'",
