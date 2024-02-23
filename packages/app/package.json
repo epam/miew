@@ -15,7 +15,7 @@
     "start": "webpack-dev-server --mode development --open",
     "test": "jest",
     "test-cover": "jest --coverage",
-    "show:cover": "node tools/open.js coverage/lcov-report/index.html"
+    "show:cover": "node tools/open.mjs coverage/lcov-report/index.html"
   },
   "keywords": [
     "molecule",
