@@ -298,13 +298,13 @@ Miew.prototype.init = function () {
       zIndex: 700,
     });
 
-    window.top.addEventListener('keydown', (event) => {
-      self._onKeyDown(event);
-    });
+window.addEventListener('keydown', (event) => {
+  self._onKeyDown(event);
+});
 
-    window.top.addEventListener('keyup', (event) => {
-      self._onKeyUp(event);
-    });
+window.addEventListener('keyup', (event) => {
+  self._onKeyUp(event);
+});
 
     this._objectControls = new ObjectControls(
       this._gfx.root,

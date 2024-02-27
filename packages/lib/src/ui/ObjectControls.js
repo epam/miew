@@ -806,7 +806,7 @@ ObjectControls.prototype.keydownup = function (event) {
 };
 
 ObjectControls.prototype.getKeyBindObject = function () {
-  return window.top;
+  return window;
 };
 
 ObjectControls.prototype.dispose = function () {
