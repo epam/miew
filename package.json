@@ -23,7 +23,6 @@
   },
   "packageManager": "yarn@3.6.3",
   "resolutions": {
-    "nomnom": "^1.8.1",
-    "autoprefixer": "10.4.5"
+    "nomnom": "^1.8.1"
   }
 }
