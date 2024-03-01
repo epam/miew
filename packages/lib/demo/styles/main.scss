@@ -1,5 +1,3 @@
-/* stylelint-disable no-descending-specificity */
-
 @import "../../src/Miew.scss";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -121,7 +119,6 @@ $selection-panel-row-height: 42px;
     width: $titlebar-height;
     height: $titlebar-height;
     outline-color: rgba($titlebar-gray, $titlebar-gray, $titlebar-gray, $titlebar-alpha);
-    // font-size: larger;
   }
 
   .btns-miew-titlebar-left {
@@ -280,9 +277,6 @@ $selection-panel-row-height: 42px;
   .panel-menu {
     padding: 0;
     margin-bottom: 0;
-    // border-color: #aaa;
-    // border-radius: 0;
-
     border: none;
     background-color: #eee;
     height: 100%;
@@ -316,7 +310,7 @@ $selection-panel-row-height: 42px;
         }
       }
 
-      [data-toggle='preset-pdb'] {
+      [data-toggle=preset-pdb] {
         padding-left: 5px;
         padding-right: 5px;
       }

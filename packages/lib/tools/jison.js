@@ -1,7 +1,7 @@
 const fs = require('fs');
 const os = require('os');
 const jison = require('jison');
-const glob = require('glob');
+const glob = require('glob').globSync;
 
 function endsWith(str, sub) {
   return str.substr(-sub.length) === sub;
@@ -49,14 +49,10 @@ function convertFile(src, dst) {
 
 const sources = process.argv.slice(2);
 sources.forEach((arg) => {
-  glob(arg, (matchError, filenames) => {
-    if (matchError) {
-      throw matchError;
-    }
-    filenames.forEach((src) => {
-      const dst = `${src.replace(/\.jison$/i, '')}.js`;
-      console.log(src);
-      convertFile(src, dst);
-    });
+  const filenames = glob(arg);
+  filenames.forEach((src) => {
+    const dst = `${src.replace(/\.jison$/i, '')}.js`;
+    console.log(src);
+    convertFile(src, dst);
   });
 });
