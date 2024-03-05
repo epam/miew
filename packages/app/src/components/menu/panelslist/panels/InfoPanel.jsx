@@ -6,6 +6,8 @@ import './InfoPanel.scss';
 const InfoPanel = ({ complex }) => {
   const { name, metadata } = complex[0];
   const { classification, title, id } = metadata;
+
+  const isTitleProvided = title !== undefined;
   const molecules = complex[0].getMolecules();
 
   const statistics = [
@@ -48,7 +50,7 @@ const InfoPanel = ({ complex }) => {
         {id || name || 'Unknown data'}
         {classification && <small> / {classification}</small>}
       </h1>
-      <p>{title.join(' ')}</p>
+      <p>{isTitleProvided ? title.join(' ') : ''}</p>
       <Table>
         <thead>
           <tr>
