@@ -11,7 +11,7 @@
 [![Downloads](https://img.shields.io/npm/dm/miew)](https://www.npmjs.com/package/miew?activeTab=versions)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE.md)
 
-Copyright (c) 2015–2023 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2024 [EPAM Systems, Inc.](https://www.epam.com/)
 
 Miew is a high performance web tool for advanced visualization and manipulation of molecular
 structures.
