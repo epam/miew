@@ -1,6 +1,6 @@
 # Getting Started with Miew Development: The Beginner's Guide
 
-Copyright (c) 2015–2020 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2024 [EPAM Systems, Inc.](https://www.epam.com/)
 
 ![Miew screenshot](https://github.com/epam/miew/raw/master/README.png)
 
@@ -8,20 +8,21 @@ Table of contents:
 
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-- [Project Overview](#project-overview)
-	- [Web Application](#web-application)
-	- [Embeddable Component](#embeddable-component)
-	- [Display Modes](#display-modes)
-	- [Source Data](#source-data)
-- [Biochemistry](#biochemistry)
-	- [Proteins](#proteins)
-	- [Nucleic Acids](#nucleic-acids)
-- [Development Tools](#development-tools)
-	- [Git](#git)
-	- [Node.js](#nodejs)
-	- [JavaScript](#javascript)
-	- [IDE](#ide)
-- [Usage](#usage)
+- [Getting Started with Miew Development: The Beginner's Guide](#getting-started-with-miew-development-the-beginners-guide)
+  - [Project Overview](#project-overview)
+    - [Web Application](#web-application)
+    - [Embeddable Component](#embeddable-component)
+    - [Display Modes](#display-modes)
+    - [Source Data](#source-data)
+  - [Biochemistry](#biochemistry)
+    - [Proteins](#proteins)
+    - [Nucleic Acids](#nucleic-acids)
+  - [Development Tools](#development-tools)
+    - [Git](#git)
+    - [Node.js](#nodejs)
+    - [JavaScript](#javascript)
+    - [IDE](#ide)
+  - [Usage](#usage)
 
 <!-- /TOC -->
 

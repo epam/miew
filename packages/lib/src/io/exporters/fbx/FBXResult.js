@@ -168,7 +168,7 @@ export default class FBXResult {
     const creator = `Miew FBX Exporter v${this._info.version}`; // Supposed to be an engine
 
     return `; FBX 6.1.0 project file
-; Created by ${creator} Copyright (c) 2015-2020 EPAM Systems, Inc.
+; Created by ${creator} Copyright (c) 2015-2024 EPAM Systems, Inc.
 ; For support please contact miew@epam.com
 ; ----------------------------------------------------
 
@@ -178,7 +178,7 @@ FBXHeaderExtension:  {
   CreationTimeStamp:  {
     Version: ${timeStampVersion}
     Year: ${date.getFullYear()}
-    Month: ${date.getMonth() + 1} 
+    Month: ${date.getMonth() + 1}
     Day: ${date.getDate()}
     Hour: ${date.getHours()}
     Minute: ${date.getMinutes()}
@@ -191,7 +191,7 @@ FBXHeaderExtension:  {
   }
 }
 CreationTime: "${date}"
-Creator: "${creator}"  
+Creator: "${creator}"
 `;
   }
 
@@ -222,12 +222,12 @@ ${defaultDefinitions}
       const vertCount = model.verticesCount;
       allModels += `
   Model: "Model::${this._info.name}_${i}", "Mesh" {
-    Version: ${modelVersion} 
+    Version: ${modelVersion}
     ${defaultProperties}
     ${this._verticesIndices(model.positions, model.indices)}
-    ${this._normalLayer(model.normals)} 
-    ${this._colorLayer(model.colors, vertCount)} 
-    ${defaultMaterialLayer}  
+    ${this._normalLayer(model.normals)}
+    ${this._colorLayer(model.colors, vertCount)}
+    ${defaultMaterialLayer}
     ${defaultLayerBlock}
   }`;
     }
@@ -394,7 +394,7 @@ Connections:  {
       Version: ${layerElementNormalVersion}
       Name: "${layerElementNormalName}"
       MappingInformationType: "ByVertice"
-      ReferenceInformationType: "Direct" 
+      ReferenceInformationType: "Direct"
       Normals: ${normalsStr}
     }`;
   }
