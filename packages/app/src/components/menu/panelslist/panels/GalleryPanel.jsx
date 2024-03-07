@@ -19,7 +19,7 @@ const galleryPanels = [
       </>
     ),
     image: '1CRN',
-    value: 'data/1CRN.pdb',
+    value: '1CRN',
     query: 'p=macro',
   },
   {
