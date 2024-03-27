@@ -297,23 +297,23 @@ Miew.prototype.init = function () {
       color: '#fff',
       zIndex: 700,
     });
-    
+
     // When rendering Miew inside a CORS iframe, window.top will cause a security exception.
-		try {
-			window.top.addEventListener('keydown', function (event) {
-				self._onKeyDown(event)
-			})
-			window.top.addEventListener('keyup', function (event) {
-				self._onKeyUp(event)
-			})
-		} catch (error) {
-			window.addEventListener('keydown', function (event) {
-				self._onKeyDown(event)
-			})
-			window.addEventListener('keyup', function (event) {
-				self._onKeyUp(event)
-			})
-		}
+    try {
+      window.top.addEventListener('keydown', (event) => {
+        self._onKeyDown(event);
+      });
+      window.top.addEventListener('keyup', (event) => {
+        self._onKeyUp(event);
+      });
+    } catch (error) {
+      window.addEventListener('keydown', (event) => {
+        self._onKeyDown(event);
+      });
+      window.addEventListener('keyup', (event) => {
+        self._onKeyUp(event);
+      });
+    }
 
     this._objectControls = new ObjectControls(
       this._gfx.root,
@@ -2898,16 +2898,16 @@ Miew.prototype._onKeyDown = function (event) {
       break;
     case 'S'.charCodeAt(0):
       if (!['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName)) {
-        event.preventDefault()
-        event.stopPropagation()
+        event.preventDefault();
+        event.stopPropagation();
       }
       settings.set('ao', !settings.now.ao);
       this._needRender = true;
       break;
     case 107: // + on num keyboard
       if (!['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName)) {
-        event.preventDefault()
-        event.stopPropagation()
+        event.preventDefault();
+        event.stopPropagation();
       }
       this._forEachComplexVisual((visual) => {
         visual.expandSelection();
@@ -2918,8 +2918,8 @@ Miew.prototype._onKeyDown = function (event) {
       break;
     case 109: // - on num keyboard
       if (!['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName)) {
-        event.preventDefault()
-        event.stopPropagation()
+        event.preventDefault();
+        event.stopPropagation();
       }
       this._forEachComplexVisual((visual) => {
         visual.shrinkSelection();
