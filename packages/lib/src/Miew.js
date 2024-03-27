@@ -298,13 +298,22 @@ Miew.prototype.init = function () {
       zIndex: 700,
     });
 
-window.addEventListener('keydown', (event) => {
-  self._onKeyDown(event);
-});
-
-window.addEventListener('keyup', (event) => {
-  self._onKeyUp(event);
-});
+    // When rendering Miew inside a CORS iframe, window.top will cause a security exception.
+    try {
+      window.top.addEventListener('keydown', (event) => {
+        self._onKeyDown(event);
+      });
+      window.top.addEventListener('keyup', (event) => {
+        self._onKeyUp(event);
+      });
+    } catch (error) {
+      window.addEventListener('keydown', (event) => {
+        self._onKeyDown(event);
+      });
+      window.addEventListener('keyup', (event) => {
+        self._onKeyUp(event);
+      });
+    }
 
     this._objectControls = new ObjectControls(
       this._gfx.root,
@@ -2888,14 +2897,18 @@ Miew.prototype._onKeyDown = function (event) {
       }
       break;
     case 'S'.charCodeAt(0):
-      event.preventDefault();
-      event.stopPropagation();
+      if (!['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       settings.set('ao', !settings.now.ao);
       this._needRender = true;
       break;
-    case 107:
-      event.preventDefault();
-      event.stopPropagation();
+    case 107: // + on num keyboard
+      if (!['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       this._forEachComplexVisual((visual) => {
         visual.expandSelection();
         visual.rebuildSelectionGeometry();
@@ -2903,9 +2916,11 @@ Miew.prototype._onKeyDown = function (event) {
       this._updateInfoPanel();
       this._needRender = true;
       break;
-    case 109:
-      event.preventDefault();
-      event.stopPropagation();
+    case 109: // - on num keyboard
+      if (!['TEXTAREA', 'INPUT'].includes(document.activeElement?.tagName)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       this._forEachComplexVisual((visual) => {
         visual.shrinkSelection();
         visual.rebuildSelectionGeometry();
