@@ -10,6 +10,18 @@ const configureLib = (libName, libFile, libType) => () => ({
       module: 'react',
       commonjs2: 'react',
     },
+    miew: {
+      module: 'miew',
+      commonjs2: 'miew',
+    },
+    three: {
+      module: 'three',
+      commonjs2: 'three',
+    },
+    lodash: {
+      module: 'lodash',
+      commonjs2: 'lodash',
+    },
   },
   entry: {
     index: resolvePath('src/index.js'),

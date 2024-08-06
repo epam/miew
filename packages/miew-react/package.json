@@ -12,6 +12,9 @@
     "test-cover": "jest --coverage",
     "build": "webpack --mode production"
   },
+  "dependencies": {
+    "miew": "workspace:^"
+  },
   "devDependencies": {
     "@babel/core": "^7.22.20",
     "@testing-library/react": "^16.0.0",

@@ -4724,17 +4724,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001332, caniuse-lite@npm:^1.0.30001541":
+"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001332, caniuse-lite@npm:^1.0.30001541, caniuse-lite@npm:^1.0.30001587":
   version: 1.0.30001649
   resolution: "caniuse-lite@npm:1.0.30001649"
   checksum: 7952512a243f22c942e0e99249def19d781ad1900db101f2d8de9d83de37db000a7dc7f226c9c99134001975e22852becf1677539c24c7ecae53467b681c400f
-  languageName: node
-  linkType: hard
-
-"caniuse-lite@npm:^1.0.30001587":
-  version: 1.0.30001588
-  resolution: "caniuse-lite@npm:1.0.30001588"
-  checksum: 2ab5fcec8fd3ee5d817a44bf1fb69804a6924d190e476863fb519692cd3e85a3a775bf4a2b6ba793f8db592ca61255b7f77f3d773ff7d42b452216f180bcdd2f
   languageName: node
   linkType: hard
 
@@ -11168,6 +11161,7 @@ __metadata:
     jest: ^29.7.0
     jest-environment-jsdom: ^29.7.0
     jest-simple-dot-reporter: ^1.0.5
+    miew: "workspace:^"
     ncp: ^2.0.0
     npm-run-all: ^4.1.5
     postcss: ^8.4.31
@@ -11184,7 +11178,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"miew@0.9.0, miew@workspace:packages/lib":
+"miew@0.9.0, miew@workspace:^, miew@workspace:packages/lib":
   version: 0.0.0-use.local
   resolution: "miew@workspace:packages/lib"
   dependencies:
