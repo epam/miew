@@ -12,30 +12,32 @@ const configureLib = (libName, libFile, libType) => () => ({
     },
   },
   entry: {
-    'index': resolvePath('src/index.js'),
+    index: resolvePath('src/index.js'),
   },
   module: {
-    rules: [{
-      test: /\.jsx?$/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          rootMode: 'upward',
-        },
-      },
-    }, {
-      test: /\.[sp]?css$/,
-      use: [
-        'style-loader',
-        {
-          loader: 'css-loader',
+    rules: [
+      {
+        test: /\.jsx?$/,
+        use: {
+          loader: 'babel-loader',
           options: {
-            importLoaders: 1,
+            rootMode: 'upward',
           },
         },
-        'postcss-loader',
-      ],
-    },
+      },
+      {
+        test: /\.[sp]?css$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
+          'postcss-loader',
+        ],
+      },
     ],
   },
   resolve: {

@@ -6,7 +6,8 @@
   "module": "dist/index.modern.js",
   "scripts": {
     "ci": "run-s lint test build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "prettier . --check && eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint-fix": "prettier . --write; eslint . --ext js,jsx --fix",
     "test": "echo 'Tests are not implemented yet'",
     "build": "webpack --mode production"
   },
@@ -15,6 +16,7 @@
     "babel-loader": "^9.1.3",
     "css-loader": "^6.8.1",
     "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
@@ -22,6 +24,7 @@
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.31",
     "postcss-loader": "^7.3.3",
+    "prettier": "^3.2.5",
     "react": "^18.2.0",
     "style-loader": "^3.3.3",
     "webpack": "^5.89.0",
