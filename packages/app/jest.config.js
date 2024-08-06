@@ -1,7 +1,12 @@
+/* eslint-env node */
 module.exports = {
   verbose: true,
+  testEnvironment: "jsdom",
+  testEnvironmentOptions: {
+    url: "https://localhost",
+  },
   transform: {
-    "^.+\\.jsx?$": "./tools/babel-jest-wrapper.js",
+    "^.+\\.[jt]sx?$": ["babel-jest", { rootMode: "upward" }],
   },
   reporters: [["jest-simple-dot-reporter", { color: true }]],
   collectCoverageFrom: ["src/**/*.jsx"],
@@ -9,6 +14,6 @@ module.exports = {
   coverageReporters: ["lcov", "text-summary"],
   coverageDirectory: "coverage",
   moduleNameMapper: {
-    "\\.(css|scss)$": "<rootDir>/__mocks__/styleMock.js",
+    "^.+\\.[sp]?css$": "babel-jest",
   },
 };
