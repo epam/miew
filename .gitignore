@@ -1,6 +1,7 @@
 node_modules/
 build/
 coverage/
+packages/miew-react/dist/
 .nyc_output/
 .sonar/
 .idea/

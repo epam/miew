@@ -1,0 +1,34 @@
+{
+  "name": "miew-react",
+  "version": "1.1.0-dev",
+  "packageManager": "yarn@3.6.3",
+  "main": "dist/index.js",
+  "module": "dist/index.modern.js",
+  "scripts": {
+    "ci": "run-s lint test build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "test": "echo 'Tests are not implemented yet'",
+    "build": "webpack --mode production"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.20",
+    "babel-loader": "^9.1.3",
+    "css-loader": "^6.8.1",
+    "eslint": "^8.50.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "ncp": "^2.0.0",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.31",
+    "postcss-loader": "^7.3.3",
+    "react": "^18.2.0",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
