@@ -6,8 +6,10 @@
   "main": "dist/Miew.js",
   "module": "dist/Miew.module.js",
   "style": "dist/Miew.min.css",
+  "types": "types/index.d.ts",
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "types/**/*"
   ],
   "repository": {
     "type": "git",

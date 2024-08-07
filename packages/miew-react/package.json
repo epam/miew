@@ -4,6 +4,11 @@
   "packageManager": "yarn@3.6.3",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "types/**/*"
+  ],
   "scripts": {
     "ci": "run-s lint test-cover build",
     "lint": "prettier . --check && eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
