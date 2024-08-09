@@ -11124,7 +11124,7 @@ __metadata:
     jest-simple-dot-reporter: ^1.0.5
     jquery: ^3.5.1
     jquery.terminal: ^2.20.1
-    miew: 0.9.0
+    miew: "workspace:^"
     mini-css-extract-plugin: ^2.8.0
     npm-run-all: ^4.1.5
     popper.js: ^1.16.1
@@ -11178,7 +11178,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"miew@0.9.0, miew@workspace:^, miew@workspace:packages/lib":
+"miew@workspace:^, miew@workspace:packages/lib":
   version: 0.0.0-use.local
   resolution: "miew@workspace:packages/lib"
   dependencies:
