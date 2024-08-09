@@ -25,15 +25,16 @@ function destroyMiewRef(miewRef) {
 }
 
 // eslint-disable-next-line react/prop-types
-export default function Viewer({ onInit }) {
+export default function Viewer({ onInit, options }) {
   const miewRef = useRef();
   const rootRef = useRef();
 
   useLayoutEffect(() => {
-    const settings = { axes: false, fps: false };
-    createMiewRef(miewRef, { container: rootRef.current, settings }, onInit);
+    // eslint-disable-next-line react/prop-types
+    const settings = { axes: false, fps: false, ...options?.settings };
+    createMiewRef(miewRef, { ...options, container: rootRef.current, settings }, onInit);
     return () => destroyMiewRef(miewRef);
-  }, [onInit]);
+  }, [onInit, options]);
 
   return (
     <div className={styles.root} ref={rootRef}>
