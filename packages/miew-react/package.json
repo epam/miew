@@ -1,6 +1,23 @@
 {
   "name": "miew-react",
   "version": "1.1.0-dev",
+  "description": "Miew - 3D Molecular Viewer (React component)",
+  "author": "EPAM Systems, Inc.",
+  "homepage": "https://github.com/epam/miew#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/epam/miew.git",
+    "directory": "packages/miew-react"
+  },
+  "bugs": {
+    "url": "https://github.com/epam/miew/issues"
+  },
+  "keywords": [
+    "molecule",
+    "visualizer",
+    "chemistry"
+  ],
   "packageManager": "yarn@3.6.3",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
