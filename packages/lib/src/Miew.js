@@ -894,9 +894,13 @@ Miew.prototype.enableHotKeys = function (enabled) {
  * @private
  */
 Miew.prototype._onResize = function () {
+  const gfx = this._gfx;
+  if (!gfx) {
+    return;
+  }
+
   this._needRender = true;
 
-  const gfx = this._gfx;
   gfx.width = this._container.clientWidth;
   gfx.height = this._container.clientHeight;
 

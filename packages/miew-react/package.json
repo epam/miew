@@ -1,0 +1,68 @@
+{
+  "name": "miew-react",
+  "version": "1.1.0-dev",
+  "description": "Miew - 3D Molecular Viewer (React component)",
+  "author": "EPAM Systems, Inc.",
+  "homepage": "https://github.com/epam/miew#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/epam/miew.git",
+    "directory": "packages/miew-react"
+  },
+  "bugs": {
+    "url": "https://github.com/epam/miew/issues"
+  },
+  "keywords": [
+    "molecule",
+    "visualizer",
+    "chemistry"
+  ],
+  "packageManager": "yarn@3.6.3",
+  "main": "dist/index.js",
+  "module": "dist/index.modern.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "types/**/*"
+  ],
+  "scripts": {
+    "ci": "run-s lint test-cover build",
+    "lint": "prettier . --check && eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "lint-fix": "prettier . --write; eslint . --ext js,jsx --fix",
+    "test": "jest",
+    "test-cover": "jest --coverage",
+    "build": "webpack --mode production"
+  },
+  "dependencies": {
+    "miew": "workspace:^"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.20",
+    "@testing-library/react": "^16.0.0",
+    "babel-loader": "^9.1.3",
+    "css-loader": "^6.8.1",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-simple-dot-reporter": "^1.0.5",
+    "ncp": "^2.0.0",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.31",
+    "postcss-loader": "^7.3.3",
+    "prettier": "^3.2.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
