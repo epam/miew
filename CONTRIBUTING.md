@@ -72,7 +72,7 @@ cd miew
 yarn
 
 # execute the full build pipeline
-cd packages/lib
+cd packages/miew
 yarn run ci
 
 # run the demo application
@@ -127,7 +127,7 @@ git checkout -b hotfix/great-fix-whatever -t origin/main
 yarn
 
 # start development server, with in-memory builds and live reload
-cd packages/lib
+cd packages/miew
 yarn start
 ```
 
