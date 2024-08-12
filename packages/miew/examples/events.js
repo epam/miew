@@ -10,7 +10,7 @@
   }
 
   document.getElementById('load-4xn6').addEventListener('click', function () {
-    viewer.load('mmtf:4XN6');
+    viewer.load('cif:4XN6');
   });
 
   document.getElementById('load-1crn').addEventListener('click', function () {

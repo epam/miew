@@ -130,8 +130,8 @@ is found in more than ten coordinate files, including 1CRN, 1EJG, 3NIR, and so o
 The primary format used in the protein bank is text [PDB][], but it has its 
 limitations in terms of the number of atoms and residues. As a result, it has 
 been replaced by the more verbose [CIF][] and binary 
-[MMTF][]. To load data directly from the bank, Miew supports using the unique 
-identifier (`1CRN`) and a format specifier (`cif:1CRN`, `mmtf:1CRN`).
+[BCIF][]. To load data directly from the bank, Miew supports using the unique 
+identifier (`1CRN`) and a format specifier (`cif:1CRN`, `pdb:1CRN`).
 
 Small molecules can be found in various formats such as [MOL/SDF][], CML, or 
 others. The [PubChem][] site is the primary source for coordinate files of common 
@@ -155,7 +155,7 @@ data types, such as loading 3D geometry in widely used formats.
 [4V88]: https://www.rcsb.org/structure/4v88
 [PDB]: http://www.wwpdb.org/documentation/file-format-content/format33/v3.3.html
 [CIF]: http://mmcif.wwpdb.org/
-[MMTF]: https://mmtf.rcsb.org/
+[BCIF]: https://github.com/molstar/BinaryCIF
 [MOL/SDF]: http://www.wwpdb.org/documentation/file-format-content/format33/v3.3.html
 [PubChem]: https://pubchem.ncbi.nlm.nih.gov/
 [aspirin]: https://pubchem.ncbi.nlm.nih.gov/compound/2244

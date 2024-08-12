@@ -1751,7 +1751,7 @@ Miew.prototype._export = function (format) {
   return Promise.reject(new Error('Unexpected format of data'));
 };
 
-const rePdbId = /^(?:(pdb|cif|mmtf|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
+const rePdbId = /^(?:(pdb|cif|ccp4|dsn6):\s*)?(\d[a-z\d]{3})$/i;
 const rePubchem = /^(?:pc|pubchem):\s*([a-z]+)$/i;
 const reUrlScheme = /^([a-z][a-z\d\-+.]*):/i;
 
@@ -1760,7 +1760,7 @@ function resolveSourceShortcut(source, opts) {
     return source;
   }
 
-  // e.g. "mmtf:1CRN"
+  // e.g. "cif:1CRN"
   const matchesPdbId = rePdbId.exec(source);
   if (matchesPdbId) {
     let [, format = 'pdb', id] = matchesPdbId;
@@ -1774,9 +1774,6 @@ function resolveSourceShortcut(source, opts) {
         break;
       case 'cif':
         source = `https://files.rcsb.org/download/${id}.cif`;
-        break;
-      case 'mmtf':
-        source = `https://mmtf.rcsb.org/v1.0/full/${id}`;
         break;
       case 'ccp4':
         source = `https://www.ebi.ac.uk/pdbe/coordinates/files/${id.toLowerCase()}.ccp4`;
