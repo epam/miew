@@ -11100,9 +11100,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"miew-app@workspace:packages/app":
+"miew-app@workspace:packages/miew-app":
   version: 0.0.0-use.local
-  resolution: "miew-app@workspace:packages/app"
+  resolution: "miew-app@workspace:packages/miew-app"
   dependencies:
     "@babel/core": ^7.22.20
     "@babel/eslint-parser": ^7.22.15
@@ -11178,9 +11178,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"miew@workspace:^, miew@workspace:packages/lib":
+"miew@workspace:^, miew@workspace:packages/miew":
   version: 0.0.0-use.local
-  resolution: "miew@workspace:packages/lib"
+  resolution: "miew@workspace:packages/miew"
   dependencies:
     "@babel/core": ^7.22.20
     "@babel/eslint-parser": ^7.22.15

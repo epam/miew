@@ -46,8 +46,8 @@ module.exports = {
   },
   resolve: {
     alias: {
-      MiewModule: (prod) ? path.resolve(__dirname, 'node_modules/miew/dist/Miew.module.js') : path.resolve(__dirname, '../lib/build/dist/Miew.module.js'),
-      MiewStyles: (prod) ? path.resolve(__dirname, 'node_modules/miew/dist/Miew.css') : path.resolve(__dirname, '../lib/build/dist/Miew.css'),
+      MiewModule: (prod) ? path.resolve(__dirname, 'node_modules/miew/dist/Miew.module.js') : path.resolve(__dirname, '../miew/build/dist/Miew.module.js'),
+      MiewStyles: (prod) ? path.resolve(__dirname, 'node_modules/miew/dist/Miew.css') : path.resolve(__dirname, '../miew/build/dist/Miew.css'),
     },
   },
   plugins: [
