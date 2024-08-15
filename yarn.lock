@@ -11121,7 +11121,7 @@ __metadata:
     mini-css-extract-plugin: ^2.8.0
     npm-run-all: ^4.1.5
     popper.js: ^1.16.1
-    postcss: ^8.4.35
+    postcss: ^8.4.36
     postcss-loader: ^8.1.0
     postcss-scss: ^4.0.9
     react: ^16.13.1
@@ -11157,7 +11157,7 @@ __metadata:
     miew: "workspace:^"
     ncp: ^2.0.0
     npm-run-all: ^4.1.5
-    postcss: ^8.4.31
+    postcss: ^8.4.36
     postcss-loader: ^7.3.3
     prettier: ^3.2.5
     react: ^18.2.0
@@ -11212,7 +11212,7 @@ __metadata:
     npm-run-all: ^4.1.5
     nyc: ^15.1.0
     open: ^10.0.3
-    postcss: ^8.4.35
+    postcss: ^8.4.36
     postcss-advanced-variables: ^3.0.1
     postcss-calc: ^9.0.1
     postcss-cli: ^11.0.0
@@ -13227,18 +13227,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.31":
-  version: 8.4.41
-  resolution: "postcss@npm:8.4.41"
-  dependencies:
-    nanoid: ^3.3.7
-    picocolors: ^1.0.1
-    source-map-js: ^1.2.0
-  checksum: f865894929eb0f7fc2263811cc853c13b1c75103028b3f4f26df777e27b201f1abe21cb4aa4c2e901c80a04f6fb325ee22979688fe55a70e2ea82b0a517d3b6f
-  languageName: node
-  linkType: hard
-
-"postcss@npm:^8.4.33, postcss@npm:^8.4.35":
+"postcss@npm:^8.4.33":
   version: 8.4.35
   resolution: "postcss@npm:8.4.35"
   dependencies:
@@ -13246,6 +13235,17 @@ __metadata:
     picocolors: ^1.0.0
     source-map-js: ^1.0.2
   checksum: cf3c3124d3912a507603f6d9a49b3783f741075e9aa73eb592a6dd9194f9edab9d20a8875d16d137d4f779fe7b6fbd1f5727e39bfd1c3003724980ee4995e1da
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.4.36":
+  version: 8.4.41
+  resolution: "postcss@npm:8.4.41"
+  dependencies:
+    nanoid: ^3.3.7
+    picocolors: ^1.0.1
+    source-map-js: ^1.2.0
+  checksum: f865894929eb0f7fc2263811cc853c13b1c75103028b3f4f26df777e27b201f1abe21cb4aa4c2e901c80a04f6fb325ee22979688fe55a70e2ea82b0a517d3b6f
   languageName: node
   linkType: hard
 
