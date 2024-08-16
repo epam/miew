@@ -2855,58 +2855,68 @@ Miew.prototype._onKeyDown = function (event) {
     return;
   }
 
-  switch (event.keyCode) {
-    case 'C'.charCodeAt(0):
-      if (settings.now.editing) {
+  // editing keys
+  if (settings.now.editing) {
+    switch (event.code) {
+      case 'KeyC':
         this._enterComponentEditMode();
-      }
-      break;
-    case 'F'.charCodeAt(0):
-      if (settings.now.editing) {
+        break;
+      case 'KeyF':
         this._enterFragmentEditMode();
+        break;
+      case 'KeyA':
+        switch (this._editMode) {
+          case EDIT_MODE.COMPONENT:
+            this._applyComponentEdit();
+            break;
+          case EDIT_MODE.FRAGMENT:
+            this._applyFragmentEdit();
+            break;
+          default:
+            break;
+        }
+        break;
+      case 'KeyD':
+        switch (this._editMode) {
+          case EDIT_MODE.COMPONENT:
+            this._discardComponentEdit();
+            break;
+          case EDIT_MODE.FRAGMENT:
+            this._discardFragmentEdit();
+            break;
+          default:
+            break;
+        }
+        break;
+      default:
+    }
+  }
+
+  // other keys
+  switch (event.code) {
+    case 'NumpadAdd':
+      if (event.altKey) {
+        event.preventDefault();
+        event.stopPropagation();
+        this._forEachComplexVisual((visual) => {
+          visual.expandSelection();
+          visual.rebuildSelectionGeometry();
+        });
+        this._updateInfoPanel();
+        this._needRender = true;
       }
       break;
-    case 'A'.charCodeAt(0):
-      switch (this._editMode) {
-        case EDIT_MODE.COMPONENT:
-          this._applyComponentEdit();
-          break;
-        case EDIT_MODE.FRAGMENT:
-          this._applyFragmentEdit();
-          break;
-        default: break;
+    case 'NumpadSubtract':
+      if (event.altKey) {
+        event.preventDefault();
+        event.stopPropagation();
+        this._forEachComplexVisual((visual) => {
+          visual.shrinkSelection();
+          visual.rebuildSelectionGeometry();
+        });
+        this._updateInfoPanel();
+        this._needRender = true;
       }
-      break;
-    case 'D'.charCodeAt(0):
-      switch (this._editMode) {
-        case EDIT_MODE.COMPONENT:
-          this._discardComponentEdit();
-          break;
-        case EDIT_MODE.FRAGMENT:
-          this._discardFragmentEdit();
-          break;
-        default: break;
-      }
-      break;
-    case 107:
-      event.preventDefault();
-      event.stopPropagation();
-      this._forEachComplexVisual((visual) => {
-        visual.expandSelection();
-        visual.rebuildSelectionGeometry();
-      });
-      this._updateInfoPanel();
-      this._needRender = true;
-      break;
-    case 109:
-      event.preventDefault();
-      event.stopPropagation();
-      this._forEachComplexVisual((visual) => {
-        visual.shrinkSelection();
-        visual.rebuildSelectionGeometry();
-      });
-      this._updateInfoPanel();
-      this._needRender = true;
       break;
     default:
   }
@@ -2917,7 +2927,7 @@ Miew.prototype._onKeyUp = function (event) {
     return;
   }
 
-  if (event.keyCode === 'X'.charCodeAt(0)) {
+  if (event.code === 'KeyX') {
     this._extractRepresentation();
   }
 };
