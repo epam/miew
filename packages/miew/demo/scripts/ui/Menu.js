@@ -923,6 +923,11 @@ Menu.prototype._init = function () {
         }
       }
     }
+    if (!self._terminal.is(':visible')) {
+      if (e.code === 'KeyS') {
+        settings.set('ao', !settings.now.ao);
+      }
+    }
   });
 
   $(`${self._menuId} [data-toggle="panel"]`).on('click', function _setPanel() {

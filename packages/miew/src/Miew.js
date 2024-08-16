@@ -2888,12 +2888,6 @@ Miew.prototype._onKeyDown = function (event) {
         default: break;
       }
       break;
-    case 'S'.charCodeAt(0):
-      event.preventDefault();
-      event.stopPropagation();
-      settings.set('ao', !settings.now.ao);
-      this._needRender = true;
-      break;
     case 107:
       event.preventDefault();
       event.stopPropagation();
