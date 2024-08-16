@@ -94,7 +94,7 @@ Data source:
     You may choose a different file source: [`l=cif:4xn6`], [`l=pubchem:serotonin`].
 
   - **t**, **type** = _typeId_  
-    Specify explicit type of the loaded file: [`t=mmtf&l=http://mmtf.rcsb.org/v1.0/full/4xn6`].  
+    Specify explicit type of the loaded file: [`t=cif&l=https://files.rcsb.org/view/4XN6.cif`].  
     By default, the application determines the data type automatically by the file name (extension) or the
     file source used.
 
@@ -136,7 +136,7 @@ Visual representation:
 [`l=4xn6`]:             https://miew.opensource.epam.com/?l=4xn6
 [`l=cif:4xn6`]:         https://miew.opensource.epam.com/?l=cif:4xn6
 [`l=pubchem:serotonin`]:https://miew.opensource.epam.com/?l=pubchem:serotonin
-[`t=mmtf&l=http://mmtf.rcsb.org/v1.0/full/4xn6`]: https://miew.opensource.epam.com/?t=mmtf&l=http://mmtf.rcsb.org/v1.0/full/4xn6
+[`t=cif&l=https://files.rcsb.org/view/4XN6.cif`]: https://miew.opensource.epam.com/?t=cif&l=https://files.rcsb.org/view/4XN6.cif
 [`l=3s95&u=2`]:         https://miew.opensource.epam.com/?l=3s95&u=2
 [`p=wire`]:             https://miew.opensource.epam.com/?p=wire
 [`s=residue+ALA,CYS`]:  https://miew.opensource.epam.com/?s=residue+ALA,CYS
@@ -149,13 +149,13 @@ Visual representation:
 
 A complex example follows (whitespaces are for better readability):
 
-[l=mmtf:1rx1 &  
+[l=cif:1rx1 &  
 s=not+hetatm & m=CA & c=SS &  
 s=hetatm+and+not+water & m=LC & c=EL &  
 s=sequence+6:7,17:19,43:45,62:64,77,95:99 & m=CS & mt=PL &  
-bg.color=0xCCCCCC](https://miew.opensource.epam.com/?l=mmtf:1rx1&s=not+hetatm&m=CA&c=SS&s=hetatm+and+not+water&m=LC&c=EL&s=sequence+6:7,17:19,43:45,62:64,77,95:99&m=CS&mt=PL&bg.color=0xCCCCCC)
+bg.color=0xCCCCCC](https://miew.opensource.epam.com/?l=cif:1rx1&s=not+hetatm&m=CA&c=SS&s=hetatm+and+not+water&m=LC&c=EL&s=sequence+6:7,17:19,43:45,62:64,77,95:99&m=CS&mt=PL&bg.color=0xCCCCCC)
 
-  - load 1RX1 in mmtf format;
+  - load 1RX1 in cif format;
   - select "`not hetatm`", set Cartoon mode with Secondary Structure coloring;
   - select "`hetatm and not water`", set Licorice mode with coloring by Element;
   - select residues by their sequential numbers, set Contact Surface mode with the previous coloring (by Element)

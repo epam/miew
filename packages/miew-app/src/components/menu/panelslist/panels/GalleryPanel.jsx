@@ -62,7 +62,7 @@ const galleryPanels = [
       </>
     ),
     image: '4TNW',
-    value: 'mmtf:4TNW',
+    value: 'cif:4TNW',
     query: 'p=macro&c=SQ&v=1xQCuQgIrbUHD9arAmmsnPIj8NL/mF6u%2Bx26BPg%3D%3D',
   },
 ];

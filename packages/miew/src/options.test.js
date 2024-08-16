@@ -157,11 +157,11 @@ describe('options', () => {
       options: {
         view: '1+n4pwTVeI8Erh8LAHI6CPW63vD40uzs/Ne4ovg==',
         unit: 1,
-        load: 'mmtf:1crn',
+        load: 'cif:1crn',
       },
-      string: 'l=mmtf:1crn&u=1&v=1%2Bn4pwTVeI8Erh8LAHI6CPW63vD40uzs/Ne4ovg%3D%3D',
+      string: 'l=cif:1crn&u=1&v=1%2Bn4pwTVeI8Erh8LAHI6CPW63vD40uzs/Ne4ovg%3D%3D',
       commands: [
-        'load "mmtf:1crn"',
+        'load "cif:1crn"',
         'unit 1',
         'view 1+n4pwTVeI8Erh8LAHI6CPW63vD40uzs/Ne4ovg==',
       ],
