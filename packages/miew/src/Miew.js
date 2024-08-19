@@ -43,6 +43,7 @@ import capabilities from './gfx/capabilities';
 import WebVRPoC from './gfx/vr/WebVRPoC';
 import vertexScreenQuadShader from './gfx/shaders/ScreenQuad.vert';
 import fragmentScreenQuadFromDistTex from './gfx/shaders/ScreenQuadFromDistortionTex.frag';
+import getTopWindow from './utils/getTopWindow';
 
 const {
   selectors,
@@ -298,11 +299,12 @@ Miew.prototype.init = function () {
       zIndex: 700,
     });
 
-    window.top.addEventListener('keydown', (event) => {
+    const target = getTopWindow();
+    target.addEventListener('keydown', (event) => {
       self._onKeyDown(event);
     });
 
-    window.top.addEventListener('keyup', (event) => {
+    target.addEventListener('keyup', (event) => {
       self._onKeyUp(event);
     });
 

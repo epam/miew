@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Timer from '../Timer';
 import settings from '../settings';
 import EventDispatcher from '../utils/EventDispatcher';
+import getTopWindow from '../utils/getTopWindow';
 
 const VK_LEFT = 37;
 const VK_UP = 38;
@@ -806,7 +807,7 @@ ObjectControls.prototype.keydownup = function (event) {
 };
 
 ObjectControls.prototype.getKeyBindObject = function () {
-  return window.top;
+  return getTopWindow();
 };
 
 ObjectControls.prototype.dispose = function () {
