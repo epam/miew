@@ -2039,7 +2039,7 @@ Menu.prototype._onTerminalOff = function () {
 };
 
 Menu.prototype._fixKeyboard = function () {
-  // do IFRAME related hack
+  // do IFRAME related hack // NOTE: embedding the demo is not recommended/supported anymore
   if (window !== window.top) {
     const parentDocument = window.top.document;
     let button = parentDocument.querySelector('button');
