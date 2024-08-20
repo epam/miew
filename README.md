@@ -6,7 +6,8 @@
 > This is the new "main" branch for further development 🚀 
 
 
-[![Build Status](https://img.shields.io/appveyor/ci/paulsmirnov/miew/main.svg)](https://ci.appveyor.com/project/paulsmirnov/miew/branch/main)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/epam/miew/ci.yml?label=linux)](https://github.com/epam/miew/actions?query=branch%3Amain)
+[![AppVeyor Build Status](https://img.shields.io/appveyor/ci/paulsmirnov/miew/main?label=windows)](https://ci.appveyor.com/project/paulsmirnov/miew)
 [![Version](https://img.shields.io/npm/v/miew)](https://www.npmjs.com/package/miew?activeTab=versions)
 [![Downloads](https://img.shields.io/npm/dm/miew)](https://www.npmjs.com/package/miew?activeTab=versions)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE.md)
