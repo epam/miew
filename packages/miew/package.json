@@ -106,7 +106,7 @@
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react": "^7.35.0",
     "express": "^4.19.2",
     "glob": "^10.3.10",
     "handlebars": "^4.7.8",
