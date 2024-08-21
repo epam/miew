@@ -49,10 +49,10 @@
     "react-redux": "^7.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.20",
-    "@babel/eslint-parser": "^7.22.15",
-    "@babel/preset-env": "^7.22.20",
-    "@babel/preset-react": "^7.22.15",
+    "@babel/core": "^7.25.2",
+    "@babel/eslint-parser": "^7.25.1",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/preset-react": "^7.24.7",
     "@testing-library/react": "^11.2.0",
     "babel-jest": "^26.0.0",
     "babel-loader": "^9.1.3",
