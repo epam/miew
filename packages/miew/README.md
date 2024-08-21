@@ -1,65 +1,104 @@
-# Miew – 3D Molecular Viewer
+# miew
 
-[![Build Status](https://img.shields.io/appveyor/ci/paulsmirnov/miew/main.svg)](https://ci.appveyor.com/project/paulsmirnov/miew/branch/main)
 [![Version](https://img.shields.io/npm/v/miew)](https://www.npmjs.com/package/miew?activeTab=versions)
 [![Downloads](https://img.shields.io/npm/dm/miew)](https://www.npmjs.com/package/miew?activeTab=versions)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE.md)
 
-Copyright (c) 2015–2024 [EPAM Systems, Inc.](https://www.epam.com/)
+Miew is a high performance web tool for advanced visualization and manipulation
+of molecular structures.
 
-Miew is a high performance web library for advanced visualization and manipulation of molecular
-structures.
+The `miew` package is the core JavaScript library that implements the functionality.
+Please refer to the topmost [README][] for an overview of the entire project.
+
+[README]: https://github.com/epam/miew#readme
 
 ![Screenshot](README.png)
 
-It provides a full-featured set of tools for 3D visualization and editing of small molecules as
-well as large molecular complexes, including means to view, analyze, and modify the 3D structure
-of a molecule. It integrates as a component into your web pages.  
-
 ## Installation and Usage
 
-Miew library is available as an [NPM] package. Install it either with NPM:
+Miew library is available as an [npm package](https://www.npmjs.com/package/miew).
+It provides both UMD and ES2015 modules, so can be included in a SCRIPT tag via a CDN
+or built with a bundler of your choice. For more details refer to:
 
-```sh
-npm install --save miew
+- [tutorials](docs/tutorials/),
+- [examples](examples/).
+
+### SCRIPT tag
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/lodash@4.17.15/lodash.js"></script>
+    <script src="https://unpkg.com/three@0.112.1/build/three.min.js"></script>
+    <script src="https://unpkg.com/miew@0.9.0/dist/Miew.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/miew@0.9.0/dist/Miew.min.css" />
+  </head>
+  <body>
+    <div class="miew-container" style="width:640px; height:480px"></div>
+
+    <script>
+      (function () {
+        var viewer = new Miew({ load: '1CRN' });
+        if (viewer.init()) {
+          viewer.run();
+        }
+      })();
+    </script>
+  </body>
+</html>
 ```
 
-or [Yarn]:
+### Webpack
+
+Install using npm:
 
 ```sh
-yarn add miew
+npm i --save miew
 ```
 
-Then use it in your [Webpack] / [Browserify] / [Rollup] setup, or just test it right in the Node
-environment.
+index.js
 
 ```js
-var Miew = require('miew');
-console.log(Miew.VERSION);
+import Miew from 'miew';
+import './index.css';
+
+window.onload = function () {
+  var viewer = new Miew({ load: '1CRN' });
+  if (viewer.init()) {
+    viewer.run();
+  }
+};
 ```
 
-You may also download the [minified library](dist/Miew.min.js) and access it from the browser's
-`<SCRIPT>` tag, or asynchronously include it via [Require.js]. Refer to the [tutorials],
-[examples] and API docs for more `details`.
+index.css
 
-There is also a [demo application] available in the git repository.
+```css
+@import 'miew';
+```
 
-[tutorials]: docs/tutorials/embed.md
-[examples]: examples/
-[demo application]: https://miew.opensource.epam.com/
+index.html
 
-[Require.js]: http://requirejs.org/
-[Webpack]: https://webpack.js.org/
-[Browserify]: http://browserify.org/
-[Rollup]: https://rollupjs.org/
-[Node.js]: https://nodejs.org/
-[NPM]: https://www.npmjs.com/
-[Yarn]: https://yarnpkg.com/
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="./dist/main.js"></script>
+  </head>
+  <body>
+    <div class="miew-container" style="width:640px; height:480px"></div>
+  </body>
+</html>
+```
 
-## Contributing
+## Contribution
 
-Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
 ## License
 
-[MIT](../../LICENSE.md)
+[MIT](LICENSE.md)
+
+Copyright (c) 2015–2024 [EPAM Systems, Inc.](https://www.epam.com/)

@@ -1,49 +1,70 @@
 # miew-react
 
-[![npm version](https://img.shields.io/npm/v/miew-react)](https://www.npmjs.com/package/miew-react)
-[![Downloads](https://img.shields.io/npm/dm/miew-react)](https://www.npmjs.com/package/miew-react)
-[![License](https://img.shields.io/badge/MIT%20-blue.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/npm/v/miew-react)](https://www.npmjs.com/package/miew-react?activeTab=versions)
+[![Downloads](https://img.shields.io/npm/dm/miew-react)](https://www.npmjs.com/package/miew-react?activeTab=versions)
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE.md)
 
-Copyright (c) 2015–2024 [EPAM Systems, Inc.](https://www.epam.com/)
+Miew is a high performance web tool for advanced visualization and manipulation
+of molecular structures.
 
-Miew is a high performance web library for advanced visualization and manipulation of molecular structures.
+The `miew-react` package contains only a React.js wrapper component.
+Please refer to the topmost [README][] for an overview of the entire project.
 
-For more details please look at the following [link](https://github.com/epam/miew).
+[README]: https://github.com/epam/miew#readme
 
-The miew-react package contains only the functionality necessary to define components. It is used together with [miew](https://www.npmjs.com/package/miew).
+![Screenshot](README.png)
 
-## Installation
+## Installation and Usage
 
-The miew-react library is available as an [NPM](https://www.npmjs.com/) package. Install it either with NPM:
-
-```sh
-npm install --save miew-react
-```
-
-or [Yarn](https://yarnpkg.com/):
+The component is available as an [npm package](https://www.npmjs.com/package/miew-react).
 
 ```sh
-yarn add miew-react
+npm i --save miew-react
 ```
 
-## Usage
+index.jsx
 
 ```js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import Viewer from 'miew-react';
 
-const MyComponent = () => {
-  return <Viewer />;
-};
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <Viewer options={{ load: '1crn' }} />
+  </React.StrictMode>,
+);
+```
+
+index.html (e.g., using Vite)
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <div id="root" style="width:640px; height:480px"></div>
+    <script type="module" src="index.jsx"></script>
+  </body>
+</html>
 ```
 
 ### Props
 
-Imported component accepts the following optional props:
+The component accepts the following optional props:
 
 - **onInit**: a callback function which recieves an instance of Miew, and called after initialization of Miew instance inside the Viewer component. With a help of this prop you can access Miew methods and fields.
 - **options**: an object containing representation settings for Miew and initial structure to be shown (all the fields are also optional, when not provided, default settings are applied)
 - **theme**: ignored
 
+## Contribution
+
+Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
+
 ## License
 
 [MIT](LICENSE.md)
+
+Copyright (c) 2015–2024 [EPAM Systems, Inc.](https://www.epam.com/)
