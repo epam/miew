@@ -2978,12 +2978,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jquery@npm:^3.5.14":
-  version: 3.5.19
-  resolution: "@types/jquery@npm:3.5.19"
+"@types/jquery@npm:^3.5.29":
+  version: 3.5.30
+  resolution: "@types/jquery@npm:3.5.30"
   dependencies:
     "@types/sizzle": "*"
-  checksum: 0298e53a353089e2abae4be2f660b5f2bfb4797464623701c5c2f2c911317b554f1887c2c3d587d0f724d70a3fb5e31907bf7fa5d96df33af07e2842660ef52a
+  checksum: 4594d10fa9b347062883d254a23c9259ae814ef5989ce1985f093dcc7ad4475e324ac3343aef10599c478ea4951726f0e7f79d8ed471ab04de394b7e724d6d13
   languageName: node
   linkType: hard
 
@@ -5704,6 +5704,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"coveralls-next@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "coveralls-next@npm:4.2.1"
+  dependencies:
+    form-data: 4.0.0
+    js-yaml: 4.1.0
+    lcov-parse: 1.0.0
+    log-driver: 1.2.7
+    minimist: 1.2.8
+  bin:
+    coveralls: bin/coveralls.js
+  checksum: 6fd54a133827cf1f4b1e23b3a382ec0c5dcd23f6880bf0cd428b1435191fb4f6ece17bcb856783afeb8df1c219dc2c13468faeed7a4f96ed0e404085ebc813a8
+  languageName: node
+  linkType: hard
+
 "create-ecdh@npm:^4.0.0":
   version: 4.0.4
   resolution: "create-ecdh@npm:4.0.4"
@@ -6019,6 +6034,13 @@ __metadata:
   version: 1.0.0
   resolution: "dash-ast@npm:1.0.0"
   checksum: db59e5e275d8159fb3b84bcd2936470c3fecb626f6486c179a28afad141cd95a578faaa3695ad6106153ca861da99a3d891fda37757b49afab773b3a46c638e6
+  languageName: node
+  linkType: hard
+
+"data-uri-to-buffer@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "data-uri-to-buffer@npm:4.0.1"
+  checksum: 0d0790b67ffec5302f204c2ccca4494f70b4e2d940fea3d36b09f0bb2b8539c2e86690429eb1f1dc4bcc9e4df0644193073e63d9ee48ac9fce79ec1506e4aa4c
   languageName: node
   linkType: hard
 
@@ -7868,6 +7890,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fetch-blob@npm:^3.1.2, fetch-blob@npm:^3.1.4":
+  version: 3.2.0
+  resolution: "fetch-blob@npm:3.2.0"
+  dependencies:
+    node-domexception: ^1.0.0
+    web-streams-polyfill: ^3.0.3
+  checksum: f19bc28a2a0b9626e69fd7cf3a05798706db7f6c7548da657cbf5026a570945f5eeaedff52007ea35c8bcd3d237c58a20bf1543bc568ab2422411d762dd3d5bf
+  languageName: node
+  linkType: hard
+
 "file-entry-cache@npm:^6.0.1":
   version: 6.0.1
   resolution: "file-entry-cache@npm:6.0.1"
@@ -8093,7 +8125,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"form-data@npm:^4.0.0":
+"form-data@npm:4.0.0, form-data@npm:^4.0.0":
   version: 4.0.0
   resolution: "form-data@npm:4.0.0"
   dependencies:
@@ -8101,6 +8133,15 @@ __metadata:
     combined-stream: ^1.0.8
     mime-types: ^2.1.12
   checksum: 01135bf8675f9d5c61ff18e2e2932f719ca4de964e3be90ef4c36aacfc7b9cb2fceb5eca0b7e0190e3383fe51c5b37f4cb80b62ca06a99aaabfcfd6ac7c9328c
+  languageName: node
+  linkType: hard
+
+"formdata-polyfill@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "formdata-polyfill@npm:4.0.10"
+  dependencies:
+    fetch-blob: ^3.1.2
+  checksum: 82a34df292afadd82b43d4a740ce387bc08541e0a534358425193017bf9fb3567875dc5f69564984b1da979979b70703aa73dee715a17b6c229752ae736dd9db
   languageName: node
   linkType: hard
 
@@ -10697,16 +10738,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jquery.terminal@npm:^2.1.0, jquery.terminal@npm:^2.20.1":
-  version: 2.37.2
-  resolution: "jquery.terminal@npm:2.37.2"
+"jquery.terminal@npm:^2.42.2":
+  version: 2.42.2
+  resolution: "jquery.terminal@npm:2.42.2"
   dependencies:
     "@jcubic/lily": ^0.3.0
-    "@types/jquery": ^3.5.14
+    "@types/jquery": ^3.5.29
     ansidec: ^0.3.4
+    coveralls-next: ^4.2.1
     fsevents: ^2.3.2
     iconv-lite: ^0.6.3
-    jquery: ^3.6.0
+    jquery: ^3.7.1
+    node-fetch: ^3.3.2
     prismjs: ^1.27.0
     wcwidth: ^1.0.1
   dependenciesMeta:
@@ -10714,11 +10757,11 @@ __metadata:
       optional: true
   bin:
     from-ansi: bin/convert.js
-  checksum: 8f8e7ac1b1195b0a897dd307c7f34cc73197d3b896919829f8407830fb76a2468fe0fec65b502a6c72ca3cc22d67766f9697a01d86533ee0dd1b03d4305a4fa5
+  checksum: 7ef658f76f962687baeefe04d1a0500f51afb5a7deb55e3264de7194341d5a63611e24d967976e6d7f63e0cff00799e5a0029cccc72ec8001da28f7ff2d2ff13
   languageName: node
   linkType: hard
 
-"jquery@npm:>=1.12.0, jquery@npm:^3.5.1, jquery@npm:^3.6.0":
+"jquery@npm:>=1.12.0, jquery@npm:^3.7.1":
   version: 3.7.1
   resolution: "jquery@npm:3.7.1"
   checksum: 4370b8139d6ae82867eb6f7f21d1edccf1d1bdf41c0840920ea80d366c2cd5dbe1ceebb110ee9772aa839b04400faa1572c5c560b507c688ed7b61cea26c0e27
@@ -11053,6 +11096,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lcov-parse@npm:1.0.0":
+  version: 1.0.0
+  resolution: "lcov-parse@npm:1.0.0"
+  bin:
+    lcov-parse: ./bin/cli.js
+  checksum: d4b14b5e33d8f7511dc62dea49252a79f04720aa837ce120235451c43653e8aeb7e330588691f2d584826c5ac8145a0aa778dd02f543cd71270f80374e5fcf20
+  languageName: node
+  linkType: hard
+
 "lcov-result-merger@npm:^5.0.0":
   version: 5.0.0
   resolution: "lcov-result-merger@npm:5.0.0"
@@ -11244,6 +11296,13 @@ __metadata:
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
+  languageName: node
+  linkType: hard
+
+"log-driver@npm:1.2.7":
+  version: 1.2.7
+  resolution: "log-driver@npm:1.2.7"
+  checksum: 14949119f830d897f52a0f83b058d8af3d13b9d21deedcc341c65c523091d4f95b0c151798b0bb988ed2712f487d9d44c302cd95b177708a80ac8e47a6a28a16
   languageName: node
   linkType: hard
 
@@ -11597,8 +11656,8 @@ __metadata:
     jest: ^29.7.0
     jest-environment-jsdom: ^29.7.0
     jest-simple-dot-reporter: ^1.0.5
-    jquery: ^3.5.1
-    jquery.terminal: ^2.20.1
+    jquery: ^3.7.1
+    jquery.terminal: ^2.42.2
     miew: "workspace:^"
     mini-css-extract-plugin: ^2.9.1
     npm-run-all: ^4.1.5
@@ -11683,8 +11742,8 @@ __metadata:
     handlebars: ^4.7.8
     html-webpack-plugin: ^5.6.0
     jison: ^0.4.18
-    jquery: ^3.5.1
-    jquery.terminal: ^2.1.0
+    jquery: ^3.7.1
+    jquery.terminal: ^2.42.2
     jsdoc: ^4.0.2
     lodash: ^4.17.15
     mini-css-extract-plugin: ^2.9.1
@@ -11853,7 +11912,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimist@npm:^1.1.0, minimist@npm:^1.1.1, minimist@npm:^1.2.0, minimist@npm:^1.2.5, minimist@npm:^1.2.6":
+"minimist@npm:1.2.8, minimist@npm:^1.1.0, minimist@npm:^1.1.1, minimist@npm:^1.2.0, minimist@npm:^1.2.5, minimist@npm:^1.2.6":
   version: 1.2.8
   resolution: "minimist@npm:1.2.8"
   checksum: 75a6d645fb122dad29c06a7597bddea977258957ed88d7a6df59b5cd3fe4a527e253e9bbf2e783e4b73657f9098b96a5fe96ab8a113655d4109108577ecf85b0
@@ -12177,6 +12236,24 @@ __metadata:
     lower-case: ^2.0.2
     tslib: ^2.0.3
   checksum: 0b2ebc113dfcf737d48dde49cfebf3ad2d82a8c3188e7100c6f375e30eafbef9e9124aadc3becef237b042fd5eb0aad2fd78669c20972d045bbe7fea8ba0be5c
+  languageName: node
+  linkType: hard
+
+"node-domexception@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "node-domexception@npm:1.0.0"
+  checksum: ee1d37dd2a4eb26a8a92cd6b64dfc29caec72bff5e1ed9aba80c294f57a31ba4895a60fd48347cf17dd6e766da0ae87d75657dfd1f384ebfa60462c2283f5c7f
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:^3.3.2":
+  version: 3.3.2
+  resolution: "node-fetch@npm:3.3.2"
+  dependencies:
+    data-uri-to-buffer: ^4.0.0
+    fetch-blob: ^3.1.4
+    formdata-polyfill: ^4.0.10
+  checksum: 06a04095a2ddf05b0830a0d5302699704d59bda3102894ea64c7b9d4c865ecdff2d90fd042df7f5bc40337266961cb6183dcc808ea4f3000d024f422b462da92
   languageName: node
   linkType: hard
 
@@ -16999,6 +17076,13 @@ __metadata:
   dependencies:
     defaults: ^1.0.3
   checksum: 814e9d1ddcc9798f7377ffa448a5a3892232b9275ebb30a41b529607691c0491de47cba426e917a4d08ded3ee7e9ba2f3fe32e62ee3cd9c7d3bafb7754bd553c
+  languageName: node
+  linkType: hard
+
+"web-streams-polyfill@npm:^3.0.3":
+  version: 3.3.3
+  resolution: "web-streams-polyfill@npm:3.3.3"
+  checksum: 21ab5ea08a730a2ef8023736afe16713b4f2023ec1c7085c16c8e293ee17ed085dff63a0ad8722da30c99c4ccbd4ccd1b2e79c861829f7ef2963d7de7004c2cb
   languageName: node
   linkType: hard
 
