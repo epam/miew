@@ -23,6 +23,8 @@
   },
   "packageManager": "yarn@3.6.3",
   "resolutions": {
-    "underscore": "1.13.0"
+    "jpeg-js": "0.4.4",
+    "semver": "7.6.3",
+    "underscore": "1.13.7"
   }
 }
