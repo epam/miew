@@ -17,12 +17,14 @@
     "ci": "yarn workspaces foreach -ptv run ci"
   },
   "devDependencies": {
-    "lcov-result-merger": "^5.0.0",
+    "lcov-result-merger": "^5.0.1",
     "mkdirp": "^3.0.1",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.10"
   },
   "packageManager": "yarn@3.6.3",
   "resolutions": {
-    "underscore": "1.13.0"
+    "jpeg-js": "0.4.4",
+    "semver": "7.6.3",
+    "underscore": "1.13.7"
   }
 }
