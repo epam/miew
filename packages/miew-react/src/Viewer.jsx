@@ -1,6 +1,6 @@
 import Miew from 'miew';
 import React, { useLayoutEffect, useRef } from 'react';
-import styles from './Viewer.module.scss';
+import * as styles from './Viewer.module.scss';
 import 'miew/dist/Miew.css';
 
 function createMiewRef(miewRef, options, onInit) {
