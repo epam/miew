@@ -39,10 +39,10 @@ is to reference a CDN version:
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <script src="https://unpkg.com/lodash@4.17.15/lodash.js"></script>
-    <script src="https://unpkg.com/three@0.112.1/build/three.min.js"></script>
-    <script src="https://unpkg.com/miew@0.9.0/dist/Miew.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/miew@0.9.0/dist/Miew.min.css" />
+    <script src="https://unpkg.com/lodash@^4.17.21/lodash.js"></script>
+    <script src="https://unpkg.com/three@0.153.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/miew@0.11.0/dist/Miew.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/miew@0.11.0/dist/Miew.min.css" />
   </head>
   <body>
     <div class="miew-container" style="width:640px; height:480px"></div>

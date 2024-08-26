@@ -30,10 +30,10 @@ or built with a bundler of your choice. For more details refer to:
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <script src="https://unpkg.com/lodash@4.17.15/lodash.js"></script>
-    <script src="https://unpkg.com/three@0.112.1/build/three.min.js"></script>
-    <script src="https://unpkg.com/miew@0.9.0/dist/Miew.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/miew@0.9.0/dist/Miew.min.css" />
+    <script src="https://unpkg.com/lodash@^4.17.21/lodash.js"></script>
+    <script src="https://unpkg.com/three@0.153.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/miew@0.11.0/dist/Miew.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/miew@0.11.0/dist/Miew.min.css" />
   </head>
   <body>
     <div class="miew-container" style="width:640px; height:480px"></div>
@@ -55,10 +55,12 @@ or built with a bundler of your choice. For more details refer to:
 Install using npm:
 
 ```sh
-npm i --save miew
+# npm init
+# npm i -D webpack webpack-cli style-loader css-loader
+npm i miew
 ```
 
-index.js
+src/index.js
 
 ```js
 import Miew from 'miew';
@@ -72,25 +74,38 @@ window.onload = function () {
 };
 ```
 
-index.css
+src/index.css
 
 ```css
 @import 'miew';
 ```
 
-index.html
+dist/index.html
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <script src="./dist/main.js"></script>
+    <script src="main.js"></script>
   </head>
   <body>
     <div class="miew-container" style="width:640px; height:480px"></div>
   </body>
 </html>
+```
+
+webpack.config.js
+
+```js
+module.exports = {
+  module: {
+    rules: [{
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader'],
+    }],
+  },
+};
 ```
 
 ## Contribution

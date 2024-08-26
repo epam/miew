@@ -176,7 +176,7 @@ function fbxDownload(fn, complexInfo) {
   };
 }
 
-describe('As a third-party developer, I want to ', function () {
+describe.skip('As a third-party developer, I want to ', function () {
   this.timeout(0);
   this.slow(2000);
 

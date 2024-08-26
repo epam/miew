@@ -177,7 +177,7 @@ git fetch upstream
 git rebase upstream/main
 
 # lint, test and build
-npm run ci
+yarn run ci
 
 # run automated and manual tests, etc.
 ...
@@ -190,7 +190,7 @@ Unfortunately, it is still a semi-manual process.
 1.  Ensure that you have a clean repo. Check the build pipeline etc.
 
         git status
-        npm run ci
+        yarn run ci
         ...
 
 2.  Use npm to automatically increment version (patch, minor or major).
@@ -201,9 +201,15 @@ Unfortunately, it is still a semi-manual process.
 
     -   Increment product version in the `sonar-project.properties` file.
 
+    -   Examine the changes since the last version. Check the commit log and follow the external
+        links (PRs, issues) to refresh the knowledge.
+
+            git log v0.0.1..HEAD --reverse \
+                --first-parent --pretty=format:"%as - %s (%an)"
+
     -   Update `CHANGELOG.md` file. Don't copy the git log blindly, summarize, reword and reorder. Use the following groups order:
 
-            ## [0.0.1] - 2000-01-01
+            ## [0.0.2] - 2000-01-01
             ### Added
             ### Changed
             ### Deprecated
@@ -214,13 +220,13 @@ Unfortunately, it is still a semi-manual process.
             
     -   Update unreleased link in `CHANGELOG.md` file.
     
-            [Unreleased]: https://github.com/epam/miew/compare/v0.0.1...HEAD
+            [Unreleased]: https://github.com/epam/miew/compare/v0.0.2...HEAD
 
     -   Replace the automatic commit and move the tag.
 
             git add sonar-project.properties CHANGELOG.md 
             git commit --amend
-            git tag -fa v0.0.1 -m "0.0.1"
+            git tag -fa v0.0.2 -m "0.0.2"
 
 4.  Merge `main` into `latest` branch.
 
@@ -239,4 +245,4 @@ Unfortunately, it is still a semi-manual process.
     *  Select the new version tag among existing and fill in a description text box with new release link and list of changes (see `CHANGELOG.md`)
     *  Press `Publish`.
 
-Upon push, GitHub Actions build `main`, `latest` branches and `v0.0.1` tag. The tag automatically initiates NPM publish process if the build is successful.
+Upon push, GitHub Actions build `main`, `latest` branches and `v0.0.2` tag. The tag automatically initiates NPM publish process if the build is successful.

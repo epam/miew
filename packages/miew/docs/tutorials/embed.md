@@ -31,11 +31,11 @@ _index.html_
   <meta charset="UTF-8">
   <title>Miew via Global</title>
   
-  <link rel="stylesheet" href="https://unpkg.com/miew@0.9.0/dist/Miew.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/miew@0.11.0/dist/Miew.min.css">
   <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
-  <script src="https://unpkg.com/lodash@4.17.15/lodash.js"></script>
-  <script src="https://unpkg.com/three@0.112.1/build/three.min.js"></script>
-  <script src="https://unpkg.com/miew@0.9.0/dist/Miew.min.js"></script>
+  <script src="https://unpkg.com/lodash@^4.17.21/lodash.js"></script>
+  <script src="https://unpkg.com/three@0.153.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/miew@0.11.0/dist/Miew.min.js"></script>
 </head>
 <body>
   <h1>Use Miew via browser globals</h1>
@@ -64,7 +64,7 @@ _index.html_
   <meta charset="UTF-8">
   <title>Miew via Require.js</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/miew@0.9.0/dist/Miew.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/miew@0.11.0/dist/Miew.min.css">
   <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 </head>
@@ -75,11 +75,11 @@ _index.html_
   <script>
     require.config({
       paths: {
-        'lodash': 'https://unpkg.com/lodash@^4.17.15/lodash',
-        'three': 'https://unpkg.com/three@0.112.0/build/three.min',
+        'lodash': 'https://unpkg.com/lodash@^4.17.21/lodash',
+        'three': 'https://unpkg.com/three@0.153.0/build/three.min',
       }
     });
-    require(['https://unpkg.com/miew@0.9.0/dist/Miew.min.js'], function(Miew) {
+    require(['https://unpkg.com/miew@0.11.0/dist/Miew.min.js'], function(Miew) {
       var viewer = new Miew({ load: '1CRN' });
       if (viewer.init()) {
         viewer.run();
@@ -120,7 +120,7 @@ _index.html_
   <meta charset="UTF-8">
   <title>Miew via Browserify</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/miew@0.9.0/dist/Miew.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/miew@0.11.0/dist/Miew.min.css">
   <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
   <script src="bundle.js"></script>
 </head>

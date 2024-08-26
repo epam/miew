@@ -19,24 +19,25 @@ Please refer to the topmost [README][] for an overview of the entire project.
 The component is available as an [npm package](https://www.npmjs.com/package/miew-react).
 
 ```sh
-npm i --save miew-react
+# npm create vite@latest .
+npm i miew-react
 ```
 
-index.jsx
+src/main.jsx
 
-```js
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+```jsx
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import Viewer from 'miew-react';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
     <Viewer options={{ load: '1crn' }} />
-  </React.StrictMode>,
+  </StrictMode>,
 );
 ```
 
-index.html (e.g., using Vite)
+index.html
 
 ```html
 <!doctype html>
@@ -46,7 +47,7 @@ index.html (e.g., using Vite)
   </head>
   <body>
     <div id="root" style="width:640px; height:480px"></div>
-    <script type="module" src="index.jsx"></script>
+    <script type="module" src="src/main.jsx"></script>
   </body>
 </html>
 ```
