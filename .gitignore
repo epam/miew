@@ -7,7 +7,7 @@ packages/miew-react/dist/
 .idea/
 .vscode/
 .pnp.*
-.yarn/
+.yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases

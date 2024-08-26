@@ -1,7 +1,6 @@
 {
-  "name": "monorepo",
-  "version": "1.0.0",
-  "main": "packages/miew/dist/Miew.js",
+  "name": "miew-monorepo",
+  "version": "0.11.0",
   "license": "MIT",
   "private": true,
   "workspaces": [

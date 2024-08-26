@@ -1,10 +1,68 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.11.0] - 2024-08-26
+
+### Added
+
+- Add a [`miew-react`][] package that contains a React.js wrapper component. It is published
+  as a separate [miew-react](https://www.npmjs.com/package/miew-react) package on npm.
+- Add a [`miew-app`][] package with a new demo application code. The goal is to rewrite the old
+  monolith plain JavaScript demo in modular React.js
+
+[`miew-react`]: https://github.com/epam/miew/tree/main/packages/miew-react
+[`miew-app`]: https://github.com/epam/miew/tree/main/packages/miew-app
+
+### Changed
+
+- Support shadows in sprite-based modes (Licorice, Balls and Sticks, VDW, and Trace).
+- Clip sprites with near plane instead of culling them.
+- Color residue names in the "sequence" example according to the secondary structure.
+- Use CIF format in the demo and examples instead of discontinued MMTF.
+- **BREAKING CHANGE:** Bump tree.js to r153. Can break your code only if you rely on specific
+  three.js API yourself.
+
+### Removed
+
+- **BREAKING CHANGE:** Remove support for `mmtf:` prefix during loading because the format
+  is discontinued and files are not served anymore. Parsing local files or specific URLs
+  is still supported.
+- **BREAKING CHANGE:** The `miew` library no longer intercepts the `S` key. Numpad plus and minus
+  are still processed but require the `Alt` key pressed to avoid conflicts. The keys will likely
+  be removed in the future versions in favor of event handlers and API calls.
+
+### Fixed
+
+- Don't crash on `addEventListener` call if embedded in a cross-origin IFRAME.
+- Create empty molecules correctly.
+- Fix `HydrophobicityColorer` behavior.
+- Rebuild the geometry after enabling or disabling `zSprite` setting.
+- Change event name in the docs: `rebuildingDone` to `buildingDone`.
+- Fix "sequence" example to use the proper event.
+
+### Internal
+
+- Use the `main` branch as the main instead of the abandoned `master`.
+- Reorganize the project as a monorepo.
+- Migrate to Yarn 3.
+- Migrate to GitHub Actions for CI builds instead if TravisCI.
+- Migrate to Webpack instead of Rollup for building the library.
+- Remove IDE files from the repository.
+- Support the current Node LTS 18 and 20 for development.
+- Create a Dockerfile for building an image.
+- Convert several remaining old-style JS files to ES2015 classes.
+- Update babel and eslint configurations and fix issues.
+- Add more tests.
+- Regenerate golden images.
+- Translate help document for beginners into English.
+
+## [0.10.0] - 2022-01-25 \[YANKED]
 
 ## [0.9.0] - 2020-03-23
 ### Added
@@ -584,7 +642,9 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/epam/miew/compare/v0.9.0...v0.11.0
+[0.10.0]: https://github.com/epam/miew/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/epam/miew/compare/v0.8.7...v0.9.0
 [0.8.7]: https://github.com/epam/miew/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/epam/miew/compare/v0.8.5...v0.8.6
