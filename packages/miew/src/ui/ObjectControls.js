@@ -547,6 +547,12 @@ ObjectControls.prototype.scale = function (factor) {
   if (factor <= 0) {
     return;
   }
+
+  // avoid zoom getting lost in space
+  const tooSmall = this.object.scale.x <= 0.0005 && factor < 1;
+  const tooBig = this.object.scale.x >= 20 && factor > 1;
+  if (tooSmall || tooBig) return;
+
   this.setScale(this.object.scale.x * factor);
   this.dispatchEvent({ type: 'change', action: 'zoom', factor });
 };
