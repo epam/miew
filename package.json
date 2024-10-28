@@ -18,7 +18,7 @@
   "devDependencies": {
     "lcov-result-merger": "^5.0.1",
     "mkdirp": "^3.0.1",
-    "rimraf": "^5.0.10"
+    "rimraf": "^6.0.1"
   },
   "packageManager": "yarn@3.6.3",
   "resolutions": {
