@@ -24,6 +24,7 @@
   "resolutions": {
     "jpeg-js": "0.4.4",
     "semver": "7.6.3",
-    "underscore": "1.13.7"
+    "underscore": "1.13.7",
+    "express": "4.21.1"
   }
 }
