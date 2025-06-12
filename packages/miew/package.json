@@ -93,7 +93,7 @@
     "autoprefixer": "^10.4.20",
     "babel-loader": "^9.2.1",
     "babel-plugin-istanbul": "^7.0.0",
-    "bootstrap": "^3.4.1",
+    "bootstrap": "^5.0.0",
     "bootstrap-switch": "=3.3.4",
     "browserify": "^17.0.1",
     "chai": "^4.5.0",
