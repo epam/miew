@@ -2741,6 +2741,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/express-serve-static-core@npm:^4.17.21":
+  version: 4.19.6
+  resolution: "@types/express-serve-static-core@npm:4.19.6"
+  dependencies:
+    "@types/node": "*"
+    "@types/qs": "*"
+    "@types/range-parser": "*"
+    "@types/send": "*"
+  checksum: b0576eddc2d25ccdf10e68ba09598b87a4d7b2ad04a81dc847cb39fe56beb0b6a5cc017b1e00aa0060cb3b38e700384ce96d291a116a0f1e54895564a104aae9
+  languageName: node
+  linkType: hard
+
 "@types/express@npm:*":
   version: 4.17.17
   resolution: "@types/express@npm:4.17.17"
@@ -8307,13 +8319,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-entities@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "html-entities@npm:2.4.0"
-  checksum: 25bea32642ce9ebd0eedc4d24381883ecb0335ccb8ac26379a0958b9b16652fdbaa725d70207ce54a51db24103436a698a8e454397d3ba8ad81460224751f1dc
-  languageName: node
-  linkType: hard
-
 "html-escaper@npm:^2.0.0":
   version: 2.0.2
   resolution: "html-escaper@npm:2.0.2"
@@ -8442,9 +8447,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-proxy-middleware@npm:^2.0.3":
-  version: 2.0.7
-  resolution: "http-proxy-middleware@npm:2.0.7"
+"http-proxy-middleware@npm:^2.0.9":
+  version: 2.0.9
+  resolution: "http-proxy-middleware@npm:2.0.9"
   dependencies:
     "@types/http-proxy": ^1.17.8
     http-proxy: ^1.18.1
@@ -8456,7 +8461,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/express":
       optional: true
-  checksum: 18caa21145917aa1054740353916e8f03f5a3a93bede9106f1f44d84f7b174df17af1c72bf5fade5cc440c2058ee813f47cbb2bdd6ae6874af1cf33e0ac575f3
+  checksum: 0ea88609b9c13fa03b89f8e6b85bd5c537027ec6990005dd81a7fbb3e73fcf8d6a6e3db2b57b1c6cddbcda80965704584dc6291d0e721b2700198c4e59ee0d0b
   languageName: node
   linkType: hard
 
@@ -10797,7 +10802,7 @@ __metadata:
     style-loader: ^4.0.0
     webpack: ^5.95.0
     webpack-cli: ^5.1.4
-    webpack-dev-server: ^5.1.0
+    webpack-dev-server: ^5.2.1
   languageName: unknown
   linkType: soft
 
@@ -10910,7 +10915,7 @@ __metadata:
     toastr: ^2.1.4
     webpack: ^5.95.0
     webpack-cli: ^5.1.4
-    webpack-dev-server: ^5.1.0
+    webpack-dev-server: ^5.2.1
     yargs: ^17.7.2
   languageName: unknown
   linkType: soft
@@ -15927,13 +15932,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "webpack-dev-server@npm:5.1.0"
+"webpack-dev-server@npm:^5.2.1":
+  version: 5.2.2
+  resolution: "webpack-dev-server@npm:5.2.2"
   dependencies:
     "@types/bonjour": ^3.5.13
     "@types/connect-history-api-fallback": ^1.5.4
     "@types/express": ^4.17.21
+    "@types/express-serve-static-core": ^4.17.21
     "@types/serve-index": ^1.9.4
     "@types/serve-static": ^1.15.5
     "@types/sockjs": ^0.3.36
@@ -15944,10 +15950,9 @@ __metadata:
     colorette: ^2.0.10
     compression: ^1.7.4
     connect-history-api-fallback: ^2.0.0
-    express: ^4.19.2
+    express: ^4.21.2
     graceful-fs: ^4.2.6
-    html-entities: ^2.4.0
-    http-proxy-middleware: ^2.0.3
+    http-proxy-middleware: ^2.0.9
     ipaddr.js: ^2.1.0
     launch-editor: ^2.6.1
     open: ^10.0.3
@@ -15968,7 +15973,7 @@ __metadata:
       optional: true
   bin:
     webpack-dev-server: bin/webpack-dev-server.js
-  checksum: 3128fffeb76b97cc4c506607f81bb644437f6961cf310915e22ecaf79a45c185893d7fc8e1844183fb44827061ec2f3d321e937840f02d4989959a09551a8e35
+  checksum: 96994d684563cfee76dcb031c7c18a1fa10aee2df0520a0f327c8d72d4692c0dcdd7e455adeed4f8da9695f2e9f8f5481053c7e6e27d7e35085e45357fc9f697
   languageName: node
   linkType: hard
 
