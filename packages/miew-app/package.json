@@ -36,7 +36,7 @@
     ]
   },
   "dependencies": {
-    "bootstrap": "^4.6.2",
+    "bootstrap": "^5.0.0",
     "bootstrap-switch-button-react": "^1.2.0",
     "classnames": "^2.5.1",
     "jquery": "^3.7.1",
