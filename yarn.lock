@@ -9925,9 +9925,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jquery.terminal@npm:^2.42.2":
-  version: 2.42.2
-  resolution: "jquery.terminal@npm:2.42.2"
+"jquery.terminal@npm:^2.44.1":
+  version: 2.44.1
+  resolution: "jquery.terminal@npm:2.44.1"
   dependencies:
     "@jcubic/lily": ^0.3.0
     "@types/jquery": ^3.5.29
@@ -9944,7 +9944,7 @@ __metadata:
       optional: true
   bin:
     from-ansi: bin/convert.js
-  checksum: 7ef658f76f962687baeefe04d1a0500f51afb5a7deb55e3264de7194341d5a63611e24d967976e6d7f63e0cff00799e5a0029cccc72ec8001da28f7ff2d2ff13
+  checksum: cb67fa86914745274b0dcd48d250da7066a3f0682c707918e919443ea32495ed6f45030b107f8af59b8142239f9979dfe00d1e9ae59136f9fc4ccfe09eb5c9d7
   languageName: node
   linkType: hard
 
@@ -10792,12 +10792,12 @@ __metadata:
     jest-environment-jsdom: ^29.7.0
     jest-simple-dot-reporter: ^1.0.5
     jquery: ^3.7.1
-    jquery.terminal: ^2.42.2
+    jquery.terminal: ^2.44.1
     miew: "workspace:^"
-    mini-css-extract-plugin: ^2.9.1
+    mini-css-extract-plugin: ^2.9.2
     npm-run-all: ^4.1.5
     popper.js: ^1.16.1
-    postcss: ^8.5.5
+    postcss: ^8.5.6
     postcss-loader: ^8.1.1
     postcss-scss: ^4.0.9
     react: ^16.14.0
@@ -10844,7 +10844,7 @@ __metadata:
     miew: "workspace:^"
     ncp: ^2.0.0
     npm-run-all: ^4.1.5
-    postcss: ^8.5.5
+    postcss: ^8.5.6
     postcss-loader: ^8.1.1
     prettier: ^3.3.3
     react: ^18.3.1
@@ -10888,22 +10888,22 @@ __metadata:
     html-webpack-plugin: ^5.6.3
     jison: ^0.4.18
     jquery: ^3.7.1
-    jquery.terminal: ^2.42.2
+    jquery.terminal: ^2.44.1
     jsdoc: ^4.0.4
     lodash: ^4.17.21
-    mini-css-extract-plugin: ^2.9.1
+    mini-css-extract-plugin: ^2.9.2
     mkdirp: ^3.0.1
     mocha: ^10.7.3
     ncp: ^2.0.0
     node-resemble-js: ^0.2.0
     npm-run-all: ^4.1.5
     nyc: ^17.1.0
-    open: ^10.1.0
-    postcss: ^8.5.5
+    open: ^10.1.2
+    postcss: ^8.5.6
     postcss-advanced-variables: ^5.0.0
     postcss-calc: ^10.1.1
     postcss-cli: ^11.0.1
-    postcss-import: ^16.1.0
+    postcss-import: ^16.1.1
     postcss-loader: ^8.1.1
     postcss-nested: ^7.0.2
     postcss-scss: ^4.0.9
@@ -10995,15 +10995,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mini-css-extract-plugin@npm:^2.9.1":
-  version: 2.9.1
-  resolution: "mini-css-extract-plugin@npm:2.9.1"
+"mini-css-extract-plugin@npm:^2.9.2":
+  version: 2.9.2
+  resolution: "mini-css-extract-plugin@npm:2.9.2"
   dependencies:
     schema-utils: ^4.0.0
     tapable: ^2.2.1
   peerDependencies:
     webpack: ^5.0.0
-  checksum: 036b0fbb207cf9a56e2f5f5dce5e35100cbd255e5b5a920a5357ec99215af16a77136020729b2d004a041d04ebb0a544b2f442535cbb982704dcd50297014c9e
+  checksum: 67a1f75359371a7776108999d472ae0942ccd904401e364e3a2c710d4b6fec61c4f53288594fcac35891f009e6df8825a00dfd3bfe4bcec0f862081d1f7cad50
   languageName: node
   linkType: hard
 
@@ -11796,15 +11796,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"open@npm:^10.1.0":
-  version: 10.1.0
-  resolution: "open@npm:10.1.0"
+"open@npm:^10.1.2":
+  version: 10.1.2
+  resolution: "open@npm:10.1.2"
   dependencies:
     default-browser: ^5.2.1
     define-lazy-prop: ^3.0.0
     is-inside-container: ^1.0.0
     is-wsl: ^3.1.0
-  checksum: 079b0771616bac13b08129b0300032dc9328d72f345e460dd0416b8a8196a5bdf5e0251fefec8aa2a6a97c736734ac65dd8f1d29ab3fc9a13e85624aa5bc4470
+  checksum: cb40d9786e8c679a1c647c62ad3642bbf1a8cc986c3ec970e99ed13d279c93328ea46bf756db64ea465d2d707815d4e792e7ba906830c3439cc8577cdefb8610
   languageName: node
   linkType: hard
 
@@ -12413,16 +12413,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-import@npm:^16.1.0":
-  version: 16.1.0
-  resolution: "postcss-import@npm:16.1.0"
+"postcss-import@npm:^16.1.1":
+  version: 16.1.1
+  resolution: "postcss-import@npm:16.1.1"
   dependencies:
     postcss-value-parser: ^4.0.0
     read-cache: ^1.0.0
     resolve: ^1.1.7
   peerDependencies:
     postcss: ^8.0.0
-  checksum: 6d7f2fd649b7c7c3ff58d9d08003a0502466a007176655922ec535c98ab1a6bb42f09f017bb05bd18dd5fb57419df0ed9a06ec7f53b1a286fcb2daf964eec19c
+  checksum: 7652c42b63a2752584aa08a6e78445bd7d93f47ab392843157c3e21970595750f3c0f2eec02bd283d2820ccfbda0b4f4423debcad761cf64dd48128dcc2b33c1
   languageName: node
   linkType: hard
 
@@ -12879,14 +12879,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.5.5":
-  version: 8.5.5
-  resolution: "postcss@npm:8.5.5"
+"postcss@npm:^8.5.6":
+  version: 8.5.6
+  resolution: "postcss@npm:8.5.6"
   dependencies:
     nanoid: ^3.3.11
     picocolors: ^1.1.1
     source-map-js: ^1.2.1
-  checksum: 980c13ce7f94d7eec3e28a7f2910c0094d877e080c3b7ecd04f043994fea68c035eddfa2ec02fa56e4ef5717c820d46525f47aac9d6146ca9230f43b50b8c54e
+  checksum: 20f3b5d673ffeec2b28d65436756d31ee33f65b0a8bedb3d32f556fbd5973be38c3a7fb5b959a5236c60a5db7b91b0a6b14ffaac0d717dce1b903b964ee1c1bb
   languageName: node
   linkType: hard
 
