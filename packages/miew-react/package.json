@@ -38,10 +38,10 @@
     "miew": "workspace:^"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.0",
+    "@babel/core": "^7.27.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.0.0",
-    "babel-loader": "^9.2.1",
+    "babel-loader": "^10.0.0",
     "css-loader": "^7.1.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
