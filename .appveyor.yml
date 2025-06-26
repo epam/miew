@@ -1,8 +1,8 @@
 version: "{build}"
 environment:
   matrix:
-    - nodejs_version: "18"
     - nodejs_version: "20"
+    - nodejs_version: "22"
 cache:
   - ".yarn\\cache"
   - node_modules
