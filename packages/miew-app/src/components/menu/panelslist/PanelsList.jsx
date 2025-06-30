@@ -10,7 +10,7 @@ import AboutPanel from '../../../containers/AboutPanelContainer';
 import ToolsPanel from '../../../containers/ToolsPanelContainer';
 import GalleryPanel from '../../../containers/GalleryPanelContainer';
 import RenderSettingsPanel from '../../../containers/RenderSettingsPanelContainer';
-import LoadPanel from './panels/LoadPanel.jsx';
+import LoadPanel from './panels/LoadPanel/LoadPanel.jsx';
 import PanelsListButton from './PanelsListButton.jsx';
 
 import './PanelsList.scss';

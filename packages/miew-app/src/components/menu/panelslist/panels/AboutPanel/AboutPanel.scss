@@ -1,3 +1,5 @@
+@import "./gh-fork-ribbon.css";
+
 .about-panel {
   padding: 15px;
   height: calc(100% - 40px);
@@ -16,10 +18,9 @@
     font: inherit !important;
   }
 
-  .git-hub,
   .git-hub-container {
     position: absolute;
-    top: 0;
+    top: -40px;
     left: 0;
     border: 0;
   }

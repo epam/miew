@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import AboutPanel from '../components/menu/panelslist/panels/AboutPanel.jsx';
+import AboutPanel from '../components/menu/panelslist/panels/AboutPanel/AboutPanel.jsx';
 
 const mapStateToProps = (state) => ({
   version: state.info.viewer.VERSION,
