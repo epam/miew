@@ -1,13 +1,14 @@
 import React from 'react';
 
+import GitHubForkRibbon from 'react-github-fork-ribbon';
 import './AboutPanel.scss';
 
 const AboutPanel = ({ version }) => (
   <div className="about-panel">
     <div className="git-hub-container">
-      <a className="github-fork-ribbon left-top" href="https://github.com/epam/miew" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">
+      <GitHubForkRibbon href="https://github.com/epam/miew" target="_blank" position="left">
         Fork me on GitHub
-      </a>
+      </GitHubForkRibbon>
     </div>
     <div className="miew-info">
       <img src="images/logo.svg"></img>

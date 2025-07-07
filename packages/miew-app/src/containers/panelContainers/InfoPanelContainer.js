@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import InfoPanel from '../components/menu/panelslist/panels/InfoPanel/InfoPanel.jsx';
+import { InfoPanel } from '../../components/menu/panelslist/panels/InfoPanel';
 
 const mapStateToProps = (state) => ({
   complex: state.info.complex,

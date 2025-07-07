@@ -5,12 +5,10 @@ import {
 import { BsImage } from 'react-icons/bs';
 import { ImEye, ImStarFull } from 'react-icons/im';
 
-import InfoPanel from '../../../containers/InfoPanelContainer';
-import AboutPanel from '../../../containers/AboutPanelContainer';
-import ToolsPanel from '../../../containers/ToolsPanelContainer';
-import GalleryPanel from '../../../containers/GalleryPanelContainer';
-import RenderSettingsPanel from '../../../containers/RenderSettingsPanelContainer';
-import LoadPanel from './panels/LoadPanel/LoadPanel.jsx';
+import {
+  AboutPanel, GalleryPanel, InfoPanel, RenderSettingsPanel, ToolsPanel,
+} from '../../../containers/panelContainers/index.js';
+import { LoadPanel } from './panels/LoadPanel';
 import PanelsListButton from './PanelsListButton.jsx';
 
 import './PanelsList.scss';
