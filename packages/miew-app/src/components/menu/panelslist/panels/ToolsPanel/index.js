@@ -1,1 +1,3 @@
-export { default as ToolsPanel } from './ToolsPanel.jsx';
+import ToolsPanel from './ToolsPanel.jsx';
+
+export default ToolsPanel;

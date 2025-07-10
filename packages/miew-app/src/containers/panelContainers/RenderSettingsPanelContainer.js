@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { RenderSettingsPanel } from '../../components/menu/panelslist/panels/RenderSettingsPanel';
+import RenderSettingsPanel from '../../components/menu/panelslist/panels/RenderSettingsPanel';
 
 const mapStateToProps = (state) => ({
   viewer: state.info.viewer,

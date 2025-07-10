@@ -1,1 +1,3 @@
-export { default as AboutPanel } from './AboutPanel.jsx';
+import AboutPanel from './AboutPanel.jsx';
+
+export default AboutPanel;

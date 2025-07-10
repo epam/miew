@@ -7,8 +7,8 @@ import { ImEye, ImStarFull } from 'react-icons/im';
 
 import {
   AboutPanel, GalleryPanel, InfoPanel, RenderSettingsPanel, ToolsPanel,
-} from '../../../containers/panelContainers/index.js';
-import { LoadPanel } from './panels/LoadPanel';
+} from '../../../containers/panelContainers';
+import LoadPanel from './panels/LoadPanel';
 import PanelsListButton from './PanelsListButton.jsx';
 
 import './PanelsList.scss';

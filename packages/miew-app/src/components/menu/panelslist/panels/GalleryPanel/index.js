@@ -1,1 +1,3 @@
-export { default as GalleryPanel } from './GalleryPanel.jsx';
+import GalleryPanel from './GalleryPanel.jsx';
+
+export default GalleryPanel;

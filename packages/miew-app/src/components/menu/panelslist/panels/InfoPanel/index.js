@@ -1,1 +1,3 @@
-export { default as InfoPanel } from './InfoPanel.jsx';
+import InfoPanel from './InfoPanel.jsx';
+
+export default InfoPanel;

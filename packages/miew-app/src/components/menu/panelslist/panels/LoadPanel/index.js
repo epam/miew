@@ -1,1 +1,3 @@
-export { default as LoadPanel } from './LoadPanel.jsx';
+import LoadPanel from './LoadPanel.jsx';
+
+export default LoadPanel;

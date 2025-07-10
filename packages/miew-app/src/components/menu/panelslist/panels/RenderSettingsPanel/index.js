@@ -1,1 +1,3 @@
-export { default as RenderSettingsPanel } from './RenderSettingsPanel.jsx';
+import RenderSettingsPanel from './RenderSettingsPanel.jsx';
+
+export default RenderSettingsPanel;
