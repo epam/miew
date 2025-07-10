@@ -11479,6 +11479,7 @@ __metadata:
     react: ^16.14.0
     react-bootstrap: ^2.10.10
     react-dom: ^16.14.0
+    react-github-fork-ribbon: ^0.7.1
     react-icons: ^5.5.0
     react-redux: ^7.2.9
     redux: ^4.2.1
@@ -13855,6 +13856,15 @@ __metadata:
   peerDependencies:
     react: ^18.3.1
   checksum: 298954ecd8f78288dcaece05e88b570014d8f6dce5db6f66e6ee91448debeb59dcd31561dddb354eee47e6c1bb234669459060deb238ed0213497146e555a0b9
+  languageName: node
+  linkType: hard
+
+"react-github-fork-ribbon@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "react-github-fork-ribbon@npm:0.7.1"
+  peerDependencies:
+    react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: 608b336bd229b774ea3d41b75c49d5ba89316308aca2fec439dc29fab2d987126d57ba960a9e09913dce6b32e82eb73fa196104b33734c45d8a74ccd69bc67b2
   languageName: node
   linkType: hard
 
