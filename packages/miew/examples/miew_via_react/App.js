@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import ViewerContainer from './components/ViewerContainer';
 import Checkbox from './controls/Checkbox';
 import SpeedButton from './controls/SpeedButton';
@@ -38,5 +38,6 @@ class App extends React.Component {
   }
 }
 
-const root = document.getElementsByClassName('main')[0];
-ReactDOM.render(<App/>, root);
+const container = document.getElementsByClassName('main')[0];
+const root = createRoot(container);
+root.render(<App />);
