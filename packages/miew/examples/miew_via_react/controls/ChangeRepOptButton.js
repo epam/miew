@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import MiewContext from '../MiewContext';
 
-export default class ChangeRepOptButton extends React.Component {
-  onChange(_event) {
-    if (this.props.viewer) {
-      this.props.viewer.rep(this.props.rep, { mode: this.props.mode });
-    }
-  }
+export default function ChangeRepOptButton({ rep, mode }) {
+  const viewer = useContext(MiewContext);
 
-  render() {
-    return <button onClick={ (e) => this.onChange(e) }> {`Set rep ${this.props.rep} to ${this.props.mode}`}</button>;
-  }
+  const onChange = () => {
+    viewer.rep(rep, { mode });
+  };
+
+  return <button disabled={!viewer} onClick={onChange}> {`Set rep ${rep} to ${mode}`}</button>;
 }

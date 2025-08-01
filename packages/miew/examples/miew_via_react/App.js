@@ -1,41 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import ViewerContainer from './components/ViewerContainer';
-import Checkbox from './controls/Checkbox';
+import CheckBox from './controls/Checkbox';
 import SpeedButton from './controls/SpeedButton';
 import InfoPanel from './controls/InfoPanel';
 import LoadButton from './controls/LoadButton';
 import ChangeRepOptButton from './controls/ChangeRepOptButton';
+import Miew from '../../dist/Miew';
+import MiewContext from './MiewContext';
 
-class App extends React.Component {
-  constructor() {
-    super();
-    this._viewer = null;
+const style = {
+  width: '640px',
+  height: '480px',
+};
 
-    this._onViewerChange = this._onViewerChange.bind(this);
-  }
+function App() {
+  const domElementRef = useRef(null);
+  const [viewer, setViewer] = useState(null);
 
-  _onViewerChange = (changed) => {
-    if (changed.viewer !== undefined) {
-      this._viewer = changed.viewer;
+  useEffect(() => {
+    const miew = new Miew({ container: domElementRef.current, load: '1crn' });
+    setViewer(miew);
+
+    if (miew.init()) {
+      miew.run();
     }
-    this.forceUpdate();
-  };
+    return () => {
+      miew.dispose();
+      setViewer(null);
+    };
+  }, []);
 
-  render() {
-    return <div>
-      <ViewerContainer onChange={ this._onViewerChange } />
-      <div style={ { 'padding-top': '0.5em' } }>
-        <LoadButton viewer={ this._viewer } file = '1zlm' />&nbsp;
-        <ChangeRepOptButton viewer={ this._viewer } rep = '0' mode = 'BS' />&nbsp;
-        Axes =  <Checkbox viewer={ this._viewer } prefName='axes' prefType={Boolean}/>&nbsp;
-        Rotation = &nbsp;
-        <SpeedButton viewer={ this._viewer } prefName='autoRotation' delta = {0.1} prefType={Number}/>&nbsp;
-        <SpeedButton viewer={ this._viewer } prefName='autoRotation' delta = {-0.1} prefType={Number}/>&nbsp;
-        <InfoPanel viewer={ this._viewer }/>
-      </div>
-    </div>;
-  }
+  return (
+    <div>
+      <div className='miew-container' ref={domElementRef} style={ style }/>
+      <MiewContext.Provider value={viewer}>
+        <div style={{ paddingTop: '0.5em' }}>
+            <LoadButton file='1zlm' />&nbsp;
+            <ChangeRepOptButton rep='0' mode='BS' />&nbsp;
+            Axes = <CheckBox prefName='axes' prefType={Boolean} />&nbsp;
+            Rotation = &nbsp;
+            <SpeedButton prefName='autoRotation' delta={0.1} />&nbsp;
+            <SpeedButton prefName='autoRotation' delta={-0.1} />&nbsp;
+            <InfoPanel />
+        </div>
+      </MiewContext.Provider>
+    </div>
+  );
 }
 
 const container = document.getElementsByClassName('main')[0];
