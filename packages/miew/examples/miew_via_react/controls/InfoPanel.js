@@ -1,24 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import MiewContext from '../MiewContext';
 
-export default class InfoPanel extends React.Component {
-  constructor(props) {
-    super(props);
+export default function InfoPanel() {
+  const viewer = useContext(MiewContext);
+  const [autoRotation, setAutoRotation] = useState(0.0);
 
-    this.state = {
-      autoRotation: 0.0,
+  useEffect(() => {
+    if (!viewer) return () => {};
+
+    const handleChange = () => {
+      setAutoRotation(viewer.get('autoRotation'));
     };
-  }
 
-  onChange(_event) {
-    const { viewer } = this.props;
-    if (viewer) {
-      this.setState({ autoRotation: viewer.get('autoRotation') });
-    }
-  }
+    setAutoRotation(viewer.get('autoRotation'));
+    viewer.settings.addEventListener('change:autoRotation', handleChange);
 
-  render() {
-    const { viewer } = this.props;
-    const value = viewer ? viewer.get('autoRotation') : 0;
-    return <a> {`Current speed: ${value.toFixed(1)}`} </a>;
-  }
+    return () => {
+      viewer.settings.removeEventListener('change:autoRotation', handleChange);
+    };
+  }, [viewer]);
+
+  return <a> {`Current speed: ${autoRotation.toFixed(1)}`} </a>;
 }

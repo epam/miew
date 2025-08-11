@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import MiewContext from '../MiewContext';
 
-export default class LoadButton extends React.Component {
-  onChange(_event) {
-    if (this.props.viewer) {
-      this.props.viewer.load(this.props.file);
-    }
-  }
+export default function LoadButton({ file }) {
+  const viewer = useContext(MiewContext);
 
-  render() {
-    return <button onClick={ (e) => this.onChange(e) }> {`Load ${this.props.file.toUpperCase()}.pdb`}</button>;
-  }
+  const onChange = () => {
+    viewer.load(file);
+  };
+
+  return <button disabled={!viewer} onClick={onChange}> {`Load ${file.toUpperCase()}.pdb`}</button>;
 }
