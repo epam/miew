@@ -26,7 +26,6 @@ function App() {
     }
     return () => {
       miew.dispose();
-      setViewer(null);
     };
   }, []);
 

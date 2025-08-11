@@ -19,7 +19,6 @@ export default function CheckBox({ prefName, prefType }) {
     setIsChecked(getPrefFromViewer(viewer, prefName, prefType));
     viewer.settings.addEventListener(`change:${prefName}`, handleCheckedChange);
     return () => {
-      setIsChecked(prefType());
       viewer.settings.removeEventListener(`change:${prefName}`, handleCheckedChange);
     };
   }, [viewer]);

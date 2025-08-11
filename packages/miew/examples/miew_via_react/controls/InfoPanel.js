@@ -16,7 +16,6 @@ export default function InfoPanel() {
     viewer.settings.addEventListener('change:autoRotation', handleChange);
 
     return () => {
-      setAutoRotation(0.0);
       viewer.settings.removeEventListener('change:autoRotation', handleChange);
     };
   }, [viewer]);
