@@ -4987,7 +4987,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai-as-promised@npm:^7.1.1":
+"chai-as-promised@npm:=7.1.2":
   version: 7.1.2
   resolution: "chai-as-promised@npm:7.1.2"
   dependencies:
@@ -11542,7 +11542,7 @@ __metadata:
     bootstrap-switch: =3.3.4
     browserify: ^17.0.1
     chai: ^4.5.0
-    chai-as-promised: ^7.1.1
+    chai-as-promised: =7.1.2
     copy-webpack-plugin: ^13.0.0
     cross-env: ^7.0.3
     css-loader: ^7.1.2
