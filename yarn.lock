@@ -11523,8 +11523,8 @@ __metadata:
     webpack: ^5.99.9
     webpack-cli: ^6.0.1
   peerDependencies:
-    react: ^18.2.0
-    react-dom: ^18.2.0
+    react: ">=18.2.0"
+    react-dom: ">=18.2.0"
   languageName: unknown
   linkType: soft
 
