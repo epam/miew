@@ -56,14 +56,14 @@
     "postcss": "^8.5.6",
     "postcss-loader": "^8.1.1",
     "prettier": "^3.6.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "style-loader": "^4.0.0",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
   },
   "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0"
   }
 }
