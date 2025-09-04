@@ -25,6 +25,7 @@
     "jpeg-js": "0.4.4",
     "semver": "7.6.3",
     "underscore": "1.13.7",
-    "express": "4.21.1"
+    "express": "4.21.1",
+    "form-data": "4.0.4"
   }
 }
