@@ -10,8 +10,6 @@ const info = (state = {}, action = {}) => {
       return { ...state, colorers: action.payload };
     case ACTIONS.SAVE_MODES:
       return { ...state, modes: action.payload };
-    case ACTIONS.SAVE_VIEWER:
-      return { ...state, viewer: action.payload };
     case ACTIONS.CHANGE_THEME:
       return { ...state, theme: action.payload };
     default:
