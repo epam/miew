@@ -80,11 +80,11 @@ Note that the core library (`miew`) is framework-agnostic and does not depend on
 - Follow React best practices for state management
 - Use JSX for component rendering
 - Implement proper prop validation
+- Use SCSS modules for styling
 
 ### File Naming
-- Use PascalCase for class files and React components: `ComplexVisual.js`, `AboutPanel.jsx`
-- Use camelCase for utility files and modules: `gfxutils.js`, `meshutils.js`
-- Use lowercase with hyphens for CSS/SCSS: `main.scss`, `tools-panel.scss`
+- Use PascalCase for class files, React components, and SCSS modules: `ComplexVisual.js`, `AboutPanel.module.scss`
+- Use camelCase for utility files and modules: `settings.js`, `getTopWindow.js`, `main.scss`
 
 ### Code Organization
 - One class per file for major components
@@ -121,12 +121,7 @@ memory exhaustion with large molecules.
 
 ### Package Scripts
 - `yarn ci`: Full CI pipeline (clean, lint, test, build)
-- `yarn lint`: Run ESLint and Stylelint
-- `yarn test`: Run unit tests
-- `yarn test:e2e`: Run end-to-end tests
-- `yarn build`: Build production bundles
-- `yarn start`: Start development server
-- `yarn demo`: Serve demo application
+- `yarn test:e2e`: Run time-consuming end-to-end visual regression tests for `miew` package
 
 ### Testing Guidelines
 - Write unit tests for new functionality
@@ -168,24 +163,13 @@ memory exhaustion with large molecules.
 - Memory management for large datasets
 - Progressive loading for better user experience
 
-## File Format Support
-
-The library supports various molecular file formats:
-- **PDB**: Protein Data Bank format
-- **SDF/MOL**: Structure Data Format
-- **GRO**: Gromacs format
-- **XYZ**: Simple Cartesian coordinates
-- **CCP4**: Electron density maps
-
-When adding new format support, implement both parser and loader components following existing patterns.
-
 ## Documentation Guidelines
 
 - Use JSDoc for API documentation
 - Include examples in documentation
 - Update CHANGELOG.md for user-facing changes
 - Maintain README files for each package
-- Write tutorials for complex features
+- Consider writing tutorials for complex features
 
 ## Security and Dependencies
 
