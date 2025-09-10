@@ -2,16 +2,17 @@ import React, { useEffect, useRef } from 'react';
 
 import './DisplayPreference.scss';
 import Thumbnail from './thumbnail/Thumbnail.jsx';
+import { useMiew } from '../../../contexts/MiewContext';
 
 function DisplayPreferences({
   options,
-  viewer,
   showDisplayPreference,
   preferenceName,
 }) {
   const ref = useRef();
-  const repr = viewer.rep(viewer.repCurrent());
-  const instances = options.all.map((E) => new E());
+  const viewer = useMiew();
+  const repr = viewer ? viewer.rep(viewer.repCurrent()) : {};
+  const instances = options ? options.all.map((E) => new E()) : [];
 
   const Thumbnails = instances.map(({ shortName, id }, index) => (
     <Thumbnail
@@ -21,8 +22,10 @@ function DisplayPreferences({
       selected={repr[preferenceName] === id}
       preferenceName={preferenceName}
       onClick={() => {
-        viewer.rep({ [preferenceName]: id });
-        showDisplayPreference();
+        if (viewer) {
+          viewer.rep({ [preferenceName]: id });
+          showDisplayPreference();
+        }
       }}
     />
   ));
