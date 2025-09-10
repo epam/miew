@@ -94,6 +94,31 @@ Note that the core library (`miew`) is framework-agnostic and does not depend on
 
 ## Development Workflow
 
+### Git Commit Messages
+Follow these guidelines for writing clear and consistent commit messages:
+
+- **Capitalize and use imperative mood**: Start with a verb like "Add", "Fix", "Update", "Remove"
+- **Keep subject line concise**: Aim for 50 characters or less
+- **Separate subject from body**: Use a blank line between the subject and detailed description
+- **Focus on what and why**: Explain what changed and why, not how it was implemented
+
+Examples:
+```
+Add support for CIF file format
+
+Implement parser and loader for Crystallographic Information File
+format to support crystal structure visualization. This addresses
+user requests for broader file format compatibility.
+```
+
+```
+Fix memory leak in molecular rendering
+
+Properly dispose of Three.js geometries and materials when
+switching between visualization modes to prevent browser
+memory exhaustion with large molecules.
+```
+
 ### Package Scripts
 - `yarn ci`: Full CI pipeline (clean, lint, test, build)
 - `yarn lint`: Run ESLint and Stylelint
