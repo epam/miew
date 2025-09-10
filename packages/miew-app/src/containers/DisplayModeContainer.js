@@ -5,7 +5,6 @@ import { showDisplayMode } from '../actions';
 
 const mapStateToProps = (state) => ({
   options: state.info.modes,
-  viewer: state.info.viewer,
 });
 
 const mapDispatchToProps = (dispatch) => ({

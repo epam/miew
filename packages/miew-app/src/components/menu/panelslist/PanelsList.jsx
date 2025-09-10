@@ -10,6 +10,7 @@ import {
 } from '../../../containers/panelContainers';
 import LoadPanel from './panels/LoadPanel';
 import PanelsListButton from './PanelsListButton.jsx';
+import { useMiew } from '../../../contexts/MiewContext';
 
 import './PanelsList.scss';
 
@@ -44,16 +45,20 @@ const panels = [
   },
 ];
 
-function PanelsList({ viewer }) {
+function PanelsList() {
   const [selectedPanel, setSelectedPanel] = useState('Info');
+  const viewer = useMiew();
 
   useEffect(() => {
-    viewer.halt();
-    document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
-    return () => {
-      viewer.run();
+    if (viewer) {
+      viewer.halt();
       document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
-    };
+      return () => {
+        viewer.run();
+        document.getElementsByClassName('miew-canvas')[0].classList.toggle('blur');
+      };
+    }
+    return undefined;
   });
 
   const handlePanelClick = (panel) => () => {

@@ -1,9 +1,14 @@
 import React from 'react';
 
 import GitHubForkRibbon from 'react-github-fork-ribbon';
+import { useMiew } from '../../../../../contexts/MiewContext';
 import './AboutPanel.scss';
 
-const AboutPanel = ({ version }) => (
+const AboutPanel = () => {
+  const viewer = useMiew();
+  const version = viewer ? viewer.VERSION : 'Loading...';
+
+  return (
   <div className="about-panel">
     <div className="git-hub-container">
       <GitHubForkRibbon href="https://github.com/epam/miew" target="_blank" position="left">
@@ -115,6 +120,7 @@ const AboutPanel = ({ version }) => (
       </tbody>
     </table>
   </div>
-);
+  );
+};
 
 export default AboutPanel;

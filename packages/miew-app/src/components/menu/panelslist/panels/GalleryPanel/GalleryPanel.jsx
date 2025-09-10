@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 
 import { showNav } from '../../../../../actions';
+import { useMiew } from '../../../../../contexts/MiewContext';
 
 import './GalleryPanel.scss';
 
@@ -67,8 +68,9 @@ const galleryPanels = [
   },
 ];
 
-function GalleryPanel({ viewer }) {
+function GalleryPanel() {
   const dispatch = useDispatch();
+  const viewer = useMiew();
 
   const renderGalleryButtons = () => galleryPanels.map(({
     label, image, value, query,

@@ -5,7 +5,6 @@ import { showDisplayColor } from '../actions';
 
 const mapStateToProps = (state) => ({
   options: state.info.colorers,
-  viewer: state.info.viewer,
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -3,10 +3,12 @@ import $ from 'jquery';
 import 'jquery.terminal';
 import classNames from 'classnames';
 
+import { useMiew } from '../../../contexts/MiewContext';
 import './Terminal.scss';
 
-function Terminal({ viewer, isTerminalVisible }) {
+function Terminal({ isTerminalVisible }) {
   const ref = useRef();
+  const viewer = useMiew();
 
   useEffect(() => {
     if (viewer) {
