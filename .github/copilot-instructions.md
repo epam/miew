@@ -67,6 +67,13 @@ Note that the core library (`miew`) is framework-agnostic and does not depend on
 
 ## Coding Standards and Conventions
 
+### Code Quality and Change Management
+- **Keep changes focused**: Each commit should address a single, well-defined issue or feature
+- **Honor Single Responsibility Principle**: Classes and functions should have one clear purpose
+- **Avoid irrelevant changes**: Don't mix formatting, refactoring, or unrelated fixes in feature commits
+- **Split large changes**: Break substantial modifications into multiple commits and pull requests for easier review
+- **One concept per PR**: Each pull request should implement one feature, fix one bug, or address one improvement
+
 ### JavaScript/ES6+
 - Follow **Airbnb JavaScript Style Guide** via ESLint configuration
 - Use ES6+ features: arrow functions, destructuring, template literals, modules
