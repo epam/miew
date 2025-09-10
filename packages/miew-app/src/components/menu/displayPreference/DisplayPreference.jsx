@@ -1,18 +1,27 @@
 import React, { useEffect, useRef } from 'react';
 
+import Miew from 'MiewModule'; // eslint-disable-line import/no-unresolved
+
 import './DisplayPreference.scss';
 import Thumbnail from './thumbnail/Thumbnail.jsx';
 import { useMiew } from '../../../contexts/MiewContext';
 
 function DisplayPreferences({
-  options,
   showDisplayPreference,
   preferenceName,
 }) {
   const ref = useRef();
   const viewer = useMiew();
-  const repr = viewer ? viewer.rep(viewer.repCurrent()) : {};
-  const instances = options ? options.all.map((E) => new E()) : [];
+
+  if (!viewer) {
+    return null;
+  }
+
+  const repr = viewer.rep(viewer.repCurrent());
+
+  // Get modes or colorers from Miew static properties
+  const registry = preferenceName === 'mode' ? Miew.modes : Miew.colorers;
+  const instances = registry.all.map((E) => new E());
 
   const Thumbnails = instances.map(({ shortName, id }, index) => (
     <Thumbnail
