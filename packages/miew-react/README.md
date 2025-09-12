@@ -56,9 +56,12 @@ index.html
 
 The component accepts the following optional props:
 
-- **onInit**: a callback function which recieves an instance of Miew, and called after initialization of Miew instance inside the Viewer component. With a help of this prop you can access Miew methods and fields.
-- **options**: an object containing representation settings for Miew and initial structure to be shown (all the fields are also optional, when not provided, default settings are applied)
-- **theme**: ignored
+- **onInit**: a callback function which receives an instance of Miew, and called after initialization of Miew instance inside the Viewer component. With a help of this prop you can access Miew methods and fields.
+- **onError**: a callback function which receives an Error object when Miew initialization fails. Use this prop to handle initialization errors gracefully.
+- **options**: an object for passing custom settings to Miew. This can include everything from the initial molecule to load, to viewer settings and representations. All fields are optional. For a full list of available options, please refer to the Miew documentation.
+- **theme**: ⚠️ **DEPRECATED** - This prop is deprecated and will be removed in future versions. It is kept for backwards compatibility only.
+
+Do not forget to use `useCallback` with `onInit` and `onError` to avoid constant recreation of the Miew instance.
 
 ## Contribution
 
