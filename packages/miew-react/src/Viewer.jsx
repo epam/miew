@@ -1,6 +1,6 @@
 import Miew from 'miew';
 import PropTypes from 'prop-types';
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as styles from './Viewer.module.scss';
 import 'miew/dist/Miew.css';
 
@@ -48,6 +48,20 @@ function destroyMiewRef(miewRef) {
 }
 
 /**
+ * Deep comparison for options object to prevent unnecessary re-initializations
+ * @param {Object} prev - Previous options
+ * @param {Object} next - New options
+ * @returns {boolean} True if options are equivalent
+ */
+function areOptionsEqual(prev, next) {
+  try {
+    return prev === next || JSON.stringify(prev) === JSON.stringify(next);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * React component wrapper for Miew 3D molecular viewer
  * @param {Object} props - Component props
  * @param {Function} props.onInit - Callback function called after successful Miew initialization
@@ -59,6 +73,15 @@ function destroyMiewRef(miewRef) {
 export default function Viewer({ onInit, onError, options, theme }) {
   const miewRef = useRef();
   const rootRef = useRef();
+  const onInitRef = useRef(onInit);
+  const onErrorRef = useRef(onError);
+  const optionsRef = useRef();
+
+  // Keep callback refs updated
+  useLayoutEffect(() => {
+    onInitRef.current = onInit;
+    onErrorRef.current = onError;
+  });
 
   // Deprecation warning for theme prop
   useEffect(() => {
@@ -69,11 +92,30 @@ export default function Viewer({ onInit, onError, options, theme }) {
     }
   }, [theme]);
 
-  useLayoutEffect(() => {
+  // Memoize the complete options object to prevent re-initialization on equivalent options
+  const stableOptions = useMemo(() => {
     const settings = { axes: false, fps: false, ...options?.settings };
-    createMiewRef(miewRef, { ...options, container: rootRef.current, settings }, onInit, onError);
+    const newOptions = { ...options, settings };
+
+    // Only return new object if options actually changed
+    if (areOptionsEqual(optionsRef.current, newOptions)) {
+      return optionsRef.current;
+    }
+
+    optionsRef.current = newOptions;
+    return newOptions;
+  }, [options]);
+
+  // Initialize Miew instance only when options actually change
+  useLayoutEffect(() => {
+    createMiewRef(
+      miewRef,
+      { ...stableOptions, container: rootRef.current },
+      onInitRef.current,
+      onErrorRef.current,
+    );
     return () => destroyMiewRef(miewRef);
-  }, [onInit, onError, options]);
+  }, [stableOptions]);
 
   return (
     <div className={styles.root} ref={rootRef}>

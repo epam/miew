@@ -1,5 +1,11 @@
+// Track constructor calls for testing
+export const miewConstructorCalls = [];
+
 export default class Miew {
   constructor(options) {
+    // Track constructor calls
+    miewConstructorCalls.push(options);
+
     this.options = options;
     // Allow controlling behavior through options for testing
     this.shouldInitFail = options?.__test__shouldInitFail;

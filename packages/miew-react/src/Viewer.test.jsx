@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals';
 import { render, screen, cleanup } from '@testing-library/react';
 import Viewer from './Viewer';
+import { miewConstructorCalls } from 'miew';
 
 // Mock console.warn to test deprecation warnings
 const originalWarn = console.warn;
@@ -10,6 +11,9 @@ let mockWarn;
 beforeEach(() => {
   mockWarn = jest.fn();
   console.warn = mockWarn;
+
+  // Clear constructor call tracking
+  miewConstructorCalls.length = 0;
 });
 
 afterEach(() => {
@@ -234,12 +238,14 @@ describe('Viewer', () => {
       const onInitMock = jest.fn();
       const { rerender } = render(<Viewer onInit={onInitMock} />);
 
+      expect(miewConstructorCalls.length).toBe(1);
       expect(onInitMock).toHaveBeenCalledTimes(1);
 
       // Re-render with same props
       rerender(<Viewer onInit={onInitMock} />);
 
-      // Should not create new instance
+      // Should not create new Miew instance
+      expect(miewConstructorCalls.length).toBe(1);
       expect(onInitMock).toHaveBeenCalledTimes(1);
     });
 
@@ -247,12 +253,14 @@ describe('Viewer', () => {
       const onInitMock = jest.fn();
       const { rerender } = render(<Viewer onInit={onInitMock} options={{ load: 'molecule1' }} />);
 
+      expect(miewConstructorCalls.length).toBe(1);
       expect(onInitMock).toHaveBeenCalledTimes(1);
 
       // Re-render with different options
       rerender(<Viewer onInit={onInitMock} options={{ load: 'molecule2' }} />);
 
-      // Should create new instance
+      // Should create new Miew instance
+      expect(miewConstructorCalls.length).toBe(2);
       expect(onInitMock).toHaveBeenCalledTimes(2);
     });
 
@@ -269,6 +277,233 @@ describe('Viewer', () => {
 
       // Should call term() for cleanup
       expect(termSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('options stability', () => {
+    it('does not recreate Miew instance for equivalent inline options objects', () => {
+      const { rerender } = render(<Viewer options={{ load: '1crn' }} />);
+
+      expect(miewConstructorCalls.length).toBe(1);
+
+      // Re-render with new object but same content
+      rerender(<Viewer options={{ load: '1crn' }} />);
+
+      // Should not create new Miew instance because content is equivalent
+      expect(miewConstructorCalls.length).toBe(1);
+    });
+
+    it('does not recreate Miew instance for equivalent complex nested options', () => {
+      const complexOptions = {
+        load: '1crn',
+        settings: { axes: true, fps: false },
+        reps: [{ mode: 'LC' }],
+      };
+
+      const { rerender } = render(<Viewer options={complexOptions} />);
+
+      expect(miewConstructorCalls.length).toBe(1);
+
+      // Re-render with new object but equivalent nested content
+      rerender(
+        <Viewer
+          options={{
+            load: '1crn',
+            settings: { axes: true, fps: false },
+            reps: [{ mode: 'LC' }],
+          }}
+        />,
+      );
+
+      // Should not create new Miew instance because deep content is equivalent
+      expect(miewConstructorCalls.length).toBe(1);
+    });
+
+    it('creates new Miew instance only when options content actually changes', () => {
+      const { rerender } = render(<Viewer options={{ load: '1crn', settings: { axes: false } }} />);
+
+      expect(miewConstructorCalls.length).toBe(1);
+
+      // Re-render with same content - should not recreate
+      rerender(<Viewer options={{ load: '1crn', settings: { axes: false } }} />);
+      expect(miewConstructorCalls.length).toBe(1);
+
+      // Re-render with different content - should recreate
+      rerender(<Viewer options={{ load: '1crn', settings: { axes: true } }} />);
+      expect(miewConstructorCalls.length).toBe(2);
+    });
+
+    it('handles options with undefined/null values correctly', () => {
+      const { rerender } = render(<Viewer options={{ load: '1crn', type: null }} />);
+
+      expect(miewConstructorCalls.length).toBe(1);
+
+      // Re-render with equivalent options including null values
+      rerender(<Viewer options={{ load: '1crn', type: null }} />);
+
+      // Should not recreate Miew instance
+      expect(miewConstructorCalls.length).toBe(1);
+    });
+
+    it('handles options with circular references gracefully', () => {
+      // Create options with circular reference that would break JSON.stringify
+      const circularOptions = { load: '1crn' };
+      circularOptions.self = circularOptions;
+
+      const { rerender } = render(<Viewer options={circularOptions} />);
+
+      expect(miewConstructorCalls.length).toBe(1);
+
+      // Create another circular reference - should recreate because equality check fails safely
+      const anotherCircularOptions = { load: '1crn' };
+      anotherCircularOptions.self = anotherCircularOptions;
+
+      rerender(<Viewer options={anotherCircularOptions} />);
+
+      // Should recreate Miew because areOptionsEqual fails safely for circular references
+      expect(miewConstructorCalls.length).toBe(2);
+    });
+  });
+
+  describe('callback stability', () => {
+    it('does not recreate Miew instance when callbacks change but options remain the same', () => {
+      const onInitMock1 = jest.fn();
+      const onInitMock2 = jest.fn();
+      const onErrorMock1 = jest.fn();
+      const onErrorMock2 = jest.fn();
+
+      const { rerender } = render(
+        <Viewer onInit={onInitMock1} onError={onErrorMock1} options={{ load: '1crn' }} />,
+      );
+
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock1).toHaveBeenCalledTimes(1);
+
+      // Re-render with different callbacks but same options
+      rerender(<Viewer onInit={onInitMock2} onError={onErrorMock2} options={{ load: '1crn' }} />);
+
+      // Should not create new Miew instance
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock2).toHaveBeenCalledTimes(0);
+    });
+
+    it('uses latest callbacks even when Miew instance is not recreated', () => {
+      const onInitMock = jest.fn();
+      const onErrorMock1 = jest.fn();
+      const onErrorMock2 = jest.fn();
+
+      const { rerender } = render(
+        <Viewer onInit={onInitMock} onError={onErrorMock1} options={{ load: '1crn' }} />,
+      );
+
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock).toHaveBeenCalledTimes(1);
+      expect(onErrorMock1).toHaveBeenCalledTimes(0);
+      expect(onErrorMock2).toHaveBeenCalledTimes(0);
+
+      // Re-render with different onError callback but same options
+      rerender(<Viewer onInit={onInitMock} onError={onErrorMock2} options={{ load: '1crn' }} />);
+
+      // Should not create new Miew instance
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock).toHaveBeenCalledTimes(1);
+      expect(onErrorMock1).toHaveBeenCalledTimes(0);
+      expect(onErrorMock2).toHaveBeenCalledTimes(0);
+
+      // Re-render with options that will cause an error to test latest callback usage
+      rerender(
+        <Viewer
+          onInit={onInitMock}
+          onError={onErrorMock2}
+          options={{ load: '1crn', __test__shouldInitFail: true }}
+        />,
+      );
+
+      // Should recreate and use the latest onError callback (onErrorMock2)
+      expect(miewConstructorCalls.length).toBe(2);
+      expect(onInitMock).toHaveBeenCalledTimes(1);
+      expect(onErrorMock1).toHaveBeenCalledTimes(0);
+      expect(onErrorMock2).toHaveBeenCalledTimes(1);
+    });
+
+    it('handles inline callback functions without unnecessary re-initialization', () => {
+      const onInitMock = jest.fn();
+      let capturedViewer = null;
+
+      const { rerender } = render(
+        <Viewer
+          options={{ load: '1crn' }}
+          onInit={(viewer) => {
+            onInitMock();
+            capturedViewer = viewer;
+          }}
+        />,
+      );
+
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock).toHaveBeenCalledTimes(1);
+      expect(capturedViewer).not.toBeNull();
+      const firstViewer = capturedViewer;
+
+      // Re-render with new inline callback - should not recreate Miew
+      rerender(
+        <Viewer
+          options={{ load: '1crn' }}
+          onInit={(viewer) => {
+            onInitMock();
+            capturedViewer = viewer;
+          }}
+        />,
+      );
+
+      // Should not have created new Miew instance
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock).toHaveBeenCalledTimes(1); // Still called only once
+      expect(capturedViewer).toBe(firstViewer);
+    });
+  });
+
+  describe('mixed stability scenarios', () => {
+    it('handles simultaneous callback and options changes correctly', () => {
+      const onInitMock1 = jest.fn();
+      const onInitMock2 = jest.fn();
+
+      const { rerender } = render(<Viewer onInit={onInitMock1} options={{ load: '1crn' }} />);
+
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock1).toHaveBeenCalledTimes(1);
+
+      // Change both callbacks and options - should recreate and use new callback
+      rerender(<Viewer onInit={onInitMock2} options={{ load: '2abc' }} />);
+
+      expect(miewConstructorCalls.length).toBe(2);
+      expect(onInitMock1).toHaveBeenCalledTimes(1);
+      expect(onInitMock2).toHaveBeenCalledTimes(1);
+    });
+
+    it('maintains callback stability across multiple re-renders', () => {
+      const onInitMock = jest.fn();
+      let renderCount = 0;
+
+      const TestComponent = () => {
+        renderCount++;
+        return <Viewer options={{ load: '1crn' }} onInit={() => onInitMock(renderCount)} />;
+      };
+
+      const { rerender } = render(<TestComponent />);
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock).toHaveBeenCalledTimes(1);
+      expect(onInitMock).toHaveBeenLastCalledWith(1);
+
+      // Multiple re-renders should not recreate Miew
+      rerender(<TestComponent />);
+      rerender(<TestComponent />);
+      rerender(<TestComponent />);
+
+      // Miew should only be instantiated once, despite 4 renders
+      expect(miewConstructorCalls.length).toBe(1);
+      expect(onInitMock).toHaveBeenCalledTimes(1);
+      expect(renderCount).toBe(4);
     });
   });
 });

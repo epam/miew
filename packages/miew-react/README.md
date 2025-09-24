@@ -61,7 +61,7 @@ The component accepts the following optional props:
 - **options**: an object for passing custom settings to Miew. This can include everything from the initial molecule to load, to viewer settings and representations. All fields are optional. For a full list of available options, please refer to the Miew documentation.
 - **theme**: ⚠️ **DEPRECATED** - This prop is deprecated and will be removed in future versions. It is kept for backwards compatibility only.
 
-Do not forget to use `useCallback` with `onInit` and `onError` to avoid constant recreation of the Miew instance.
+You can safely inline the options object and callback props (as in the example). The underlying Miew instance is recreated only when the actual option values change, so routine React re-renders will not trigger unnecessary re-initialization.
 
 ## Contribution
 
