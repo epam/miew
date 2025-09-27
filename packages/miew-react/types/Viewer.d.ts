@@ -30,9 +30,13 @@ declare type ViewerProps = {
   onError?: (error: Error) => void;
   /** Configuration options for the Miew viewer */
   options?: ViewerOptions;
+  /** Additional CSS classes to apply to the root container */
+  className?: string;
+  /** Inline styles to apply to the root container */
+  style?: React.CSSProperties;
   /** @deprecated This prop is deprecated and will be removed in future versions */
   theme?: any;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Miew 3D Molecular Viewer React Component
@@ -61,6 +65,9 @@ declare type ViewerProps = {
  *       options={{ load: '1CRN' }}
  *       onInit={handleInit}
  *       onError={handleError}
+ *       className="custom-viewer"
+ *       style={{ border: '1px solid #ccc', borderRadius: '8px' }}
+ *       data-testid="molecular-viewer"
  *     />
  *   );
  * }
@@ -69,5 +76,13 @@ declare type ViewerProps = {
  * @param props - Component properties
  * @returns React component for 3D molecular visualization
  */
-declare const Viewer: ({ onInit, onError, options, theme }: ViewerProps) => JSX.Element;
+declare const Viewer: ({
+  onInit,
+  onError,
+  options,
+  className,
+  style,
+  theme,
+  ...rest
+}: ViewerProps) => JSX.Element;
 export default Viewer;
