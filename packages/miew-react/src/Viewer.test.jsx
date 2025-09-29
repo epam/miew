@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import Miew from 'miew';
 import Viewer from './Viewer';
 
@@ -270,6 +270,42 @@ describe('Viewer', () => {
       expect(onInitMock).toHaveBeenCalledTimes(2);
     });
 
+    it('does not recreate Miew instance when only presentation props change', () => {
+      const onInitMock = jest.fn();
+      const { rerender } = render(
+        <Viewer
+          onInit={onInitMock}
+          options={{ load: '1CRN' }}
+          className="test1"
+          style={{ color: 'red' }}
+        />,
+      );
+
+      expect(Miew).toHaveBeenCalledTimes(1);
+      expect(onInitMock).toHaveBeenCalledTimes(1);
+
+      // Change only presentation props - should not recreate Miew
+      rerender(
+        <Viewer
+          onInit={onInitMock}
+          options={{ load: '1CRN' }}
+          className="test2"
+          style={{ color: 'blue' }}
+          data-version="v2"
+        />,
+      );
+
+      // Should not create new Miew instance
+      expect(Miew).toHaveBeenCalledTimes(1);
+      expect(onInitMock).toHaveBeenCalledTimes(1);
+
+      // But new props should be applied
+      const viewerElement = screen.getByText('Viewer');
+      expect(viewerElement.className).toBe('root test2');
+      expect(viewerElement.style.color).toBe('blue');
+      expect(viewerElement.getAttribute('data-version')).toBe('v2');
+    });
+
     it('properly cleans up Miew instance when component unmounts', () => {
       const onInitMock = jest.fn();
       const { unmount } = render(<Viewer onInit={onInitMock} />);
@@ -510,6 +546,132 @@ describe('Viewer', () => {
       expect(Miew).toHaveBeenCalledTimes(1);
       expect(onInitMock).toHaveBeenCalledTimes(1);
       expect(renderCount).toBe(4);
+    });
+  });
+
+  describe('className prop', () => {
+    it('applies default className when no custom className is provided', () => {
+      render(<Viewer />);
+      const viewerElement = screen.getByText('Viewer');
+      expect(viewerElement.className).toBe('root');
+    });
+
+    it('merges custom className with default styles.root', () => {
+      render(<Viewer className="custom-class" />);
+      const viewerElement = screen.getByText('Viewer');
+      expect(viewerElement.className).toBe('root custom-class');
+    });
+
+    it('supports multiple custom classes', () => {
+      render(<Viewer className="class1 class2 class3" />);
+      const viewerElement = screen.getByText('Viewer');
+      expect(viewerElement.className).toBe('root class1 class2 class3');
+    });
+
+    it('handles empty or falsy className values gracefully', () => {
+      render(<Viewer className="" />);
+      const viewerElement = screen.getByText('Viewer');
+      expect(viewerElement.className).toBe('root');
+    });
+  });
+
+  describe('style prop', () => {
+    it('applies inline styles when provided', () => {
+      const customStyle = {
+        border: '2px solid red',
+        backgroundColor: 'blue',
+        padding: '10px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        maxWidth: '500px',
+      };
+      render(<Viewer style={customStyle} />);
+      const viewerElement = screen.getByText('Viewer');
+
+      expect(viewerElement.style.border).toBe('2px solid red');
+      expect(viewerElement.style.backgroundColor).toBe('blue');
+      expect(viewerElement.style.padding).toBe('10px');
+      expect(viewerElement.style.borderRadius).toBe('8px');
+      expect(viewerElement.style.boxShadow).toBe('0 2px 4px rgba(0,0,0,0.1)');
+      expect(viewerElement.style.maxWidth).toBe('500px');
+    });
+
+    it('handles empty or falsy style values gracefully', () => {
+      const { unmount } = render(<Viewer />);
+      const viewerElement = screen.getByText('Viewer');
+      expect(viewerElement).toBeDefined();
+      unmount();
+
+      render(<Viewer style={{}} />);
+      expect(screen.getByText('Viewer')).toBeDefined();
+    });
+  });
+
+  describe('spread props (rest)', () => {
+    it('spreads HTML attributes including aria attributes for accessibility', () => {
+      render(
+        <Viewer
+          data-testid="custom-viewer"
+          id="viewer-id"
+          title="Molecular Viewer"
+          tabIndex={0}
+          aria-label="3D Molecular Structure Viewer"
+          aria-describedby="viewer-description"
+          role="application"
+        />,
+      );
+      const viewerElement = screen.getByText('Viewer');
+
+      // Standard HTML attributes
+      expect(viewerElement.dataset.testid).toBe('custom-viewer');
+      expect(viewerElement.id).toBe('viewer-id');
+      expect(viewerElement.title).toBe('Molecular Viewer');
+      expect(viewerElement.tabIndex).toBe(0);
+
+      // Accessibility attributes
+      expect(viewerElement.getAttribute('aria-label')).toBe('3D Molecular Structure Viewer');
+      expect(viewerElement.getAttribute('aria-describedby')).toBe('viewer-description');
+      expect(viewerElement.getAttribute('role')).toBe('application');
+    });
+
+    it('supports event handlers', () => {
+      const handleClick = jest.fn();
+      const handleMouseEnter = jest.fn();
+      const handleKeyDown = jest.fn();
+
+      render(
+        <Viewer onClick={handleClick} onMouseEnter={handleMouseEnter} onKeyDown={handleKeyDown} />,
+      );
+      const viewerElement = screen.getByText('Viewer');
+
+      // Use fireEvent to properly trigger React event handlers
+      fireEvent.click(viewerElement);
+      fireEvent.mouseEnter(viewerElement);
+      fireEvent.keyDown(viewerElement, { key: 'Enter' });
+
+      expect(handleClick).toHaveBeenCalledTimes(1);
+      expect(handleMouseEnter).toHaveBeenCalledTimes(1);
+      expect(handleKeyDown).toHaveBeenCalledTimes(1);
+    });
+
+    it('filters out undefined and null spread props gracefully', () => {
+      const props = {
+        'data-testid': 'viewer',
+        title: undefined,
+        id: null,
+        className: 'custom', // This should be handled by className prop, not spread
+        style: { color: 'red' }, // This should be handled by style prop, not spread
+        role: 'application',
+      };
+
+      render(<Viewer {...props} />);
+      const viewerElement = screen.getByText('Viewer');
+
+      expect(viewerElement.getAttribute('data-testid')).toBe('viewer');
+      expect(viewerElement.getAttribute('role')).toBe('application');
+      // className and style should be handled by their respective props
+      expect(viewerElement.className).toBe('root custom');
+      expect(viewerElement.style.color).toBe('red');
     });
   });
 });
