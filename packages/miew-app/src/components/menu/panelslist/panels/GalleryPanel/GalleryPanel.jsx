@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
-import { showNav } from '../../../../actions';
+import { showNav } from '../../../../../actions';
 
 import './GalleryPanel.scss';
 
