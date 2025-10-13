@@ -537,9 +537,14 @@ class Complex {
     }
 
     if (opts.needAutoBonding) {
-      const autoConnector = new AutoBond(this);
-      autoConnector.build();
-      autoConnector.destroy();
+      // Ignore errors during autobonding
+      try {
+        const autoConnector = new AutoBond(this);
+        autoConnector.build();
+        autoConnector.destroy();
+      } catch (e) {
+        console.warn('Autobonding failed:', e);
+      }
     }
 
     const chains = this._chains;
