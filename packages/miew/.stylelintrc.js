@@ -7,6 +7,6 @@ module.exports = {
     'alpha-value-notation': 'number',
     'property-no-vendor-prefix': null,
     'declaration-block-no-redundant-longhand-properties': null,
-    'scss/at-import-partial-extension': 'always',
+    'scss/load-partial-extension': 'always',
   },
 };

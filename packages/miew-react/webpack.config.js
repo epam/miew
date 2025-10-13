@@ -44,6 +44,10 @@ const configureLib = (libName, libFile, libType) => () => ({
           {
             loader: 'css-loader',
             options: {
+              modules: {
+                auto: true,
+                namedExport: false,
+              },
               importLoaders: 1,
             },
           },

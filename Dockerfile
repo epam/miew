@@ -1,4 +1,4 @@
-FROM node:20 AS build
+FROM node:22 AS build
 COPY . /miew
 RUN cd /miew \
     && yarn \

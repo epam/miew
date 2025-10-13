@@ -1,20 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import MiewContext from '../MiewContext';
 
 const style = {
   width: '25px',
 };
 
-export default class SpeedButton extends React.Component {
-  onChange(_event) {
-    if (this.props.viewer) {
-      const value = this.props.viewer.get(this.props.prefName) + this.props.delta;
-      if (!Number.isNaN(value)) {
-        this.props.viewer.set(this.props.prefName, value);
-      }
-    }
-  }
+export default function SpeedButton({ prefName, delta }) {
+  const viewer = useContext(MiewContext);
 
-  render() {
-    return <button style = { style } onClick={ () => this.onChange() }> {this.props.delta > 0 ? '+' : '-'} </button>;
-  }
+  const onChange = () => {
+    const value = viewer.get(prefName) + delta;
+    if (!Number.isNaN(value)) {
+      viewer.set(prefName, value);
+    }
+  };
+
+  return <button style = {style} disabled={!viewer} onClick={onChange}> {delta > 0 ? '+' : '-'} </button>;
 }
