@@ -68,4 +68,4 @@ Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) for details on our code of 
 
 [MIT](LICENSE.md)
 
-Copyright (c) 2015–2024 [EPAM Systems, Inc.](https://www.epam.com/)
+Copyright (c) 2015–2025 [EPAM Systems, Inc.](https://www.epam.com/)
