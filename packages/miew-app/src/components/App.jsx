@@ -20,8 +20,9 @@ export default class App extends React.Component {
 
   render() {
     return <div className="root">
-      <Viewer onChange={ this._onViewerChange } />
+      <Viewer onChange={ this._onViewerChange }>
         <Menu/>
+      </Viewer>
     </div>;
   }
 }

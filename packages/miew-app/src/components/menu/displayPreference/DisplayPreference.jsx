@@ -1,17 +1,29 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
+
+import Miew from 'MiewModule'; // eslint-disable-line import/no-unresolved
 
 import './DisplayPreference.scss';
 import Thumbnail from './thumbnail/Thumbnail.jsx';
+import { useMiew } from '../../../contexts/MiewContext';
 
 function DisplayPreferences({
-  options,
-  viewer,
   showDisplayPreference,
   preferenceName,
 }) {
   const ref = useRef();
+  const viewer = useMiew();
+
+  // Memoize instances to avoid recreating them on every render
+  const instances = useMemo(() => {
+    const registry = preferenceName === 'mode' ? Miew.modes : Miew.colorers;
+    return registry.all.map((E) => new E());
+  }, [preferenceName]);
+
+  if (!viewer) {
+    return null;
+  }
+
   const repr = viewer.rep(viewer.repCurrent());
-  const instances = options.all.map((E) => new E());
 
   const Thumbnails = instances.map(({ shortName, id }, index) => (
     <Thumbnail
@@ -21,8 +33,10 @@ function DisplayPreferences({
       selected={repr[preferenceName] === id}
       preferenceName={preferenceName}
       onClick={() => {
-        viewer.rep({ [preferenceName]: id });
-        showDisplayPreference();
+        if (viewer) {
+          viewer.rep({ [preferenceName]: id });
+          showDisplayPreference();
+        }
       }}
     />
   ));

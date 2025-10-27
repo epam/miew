@@ -6,11 +6,13 @@ import { RiArrowUpDownFill, RiSave3Fill, RiCameraFill } from 'react-icons/ri';
 import { BsLink45Deg, BsFileText } from 'react-icons/bs';
 
 import { showNav } from '../../../../../actions';
+import { useMiew } from '../../../../../contexts/MiewContext';
 
 import './ToolsPanel.scss';
 
-const ToolsPanel = ({ viewer }) => {
+const ToolsPanel = () => {
   const dispatch = useDispatch();
+  const viewer = useMiew();
   const [modelInfo, setModelInfo] = useState({});
   const panels = [
     {

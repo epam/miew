@@ -1,35 +1,44 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 
+import { useMiew } from '../../../../../contexts/MiewContext';
 import './InfoPanel.scss';
 
-const InfoPanel = ({ complex }) => {
-  const { name, metadata } = complex[0];
+const InfoPanel = () => {
+  const viewer = useMiew();
+
+  // TODO: Replace with public API when available
+  const complex = viewer?._getComplexVisual()?.getComplex();
+  if (!complex) {
+    return <div className="info-panel">No data loaded</div>;
+  }
+
+  const { name, metadata } = complex;
   const { classification, title, id } = metadata;
 
   const isTitleProvided = title !== undefined;
-  const molecules = complex[0].getMolecules();
+  const molecules = complex.getMolecules();
 
   const statistics = [
     {
       label: 'Atoms',
-      value: complex[0].getAtomCount(),
+      value: complex.getAtomCount(),
     },
     {
       label: 'Bonds',
-      value: complex[0].getBondCount(),
+      value: complex.getBondCount(),
     },
     {
       label: 'Residues',
-      value: complex[0].getResidueCount(),
+      value: complex.getResidueCount(),
     },
     {
       label: 'Chains',
-      value: complex[0].getChainCount(),
+      value: complex.getChainCount(),
     },
     {
       label: 'Molecules',
-      value: complex[0].getMoleculeCount(),
+      value: complex.getMoleculeCount(),
     },
   ];
 
