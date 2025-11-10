@@ -1,4 +1,4 @@
-/*! Miew - 3D Molecular Viewer v0.11.0 Copyright (c) 2015-2024 EPAM Systems, Inc. */
+/*! Miew - 3D Molecular Viewer v0.11.1 Copyright (c) 2015-2025 EPAM Systems, Inc. */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("lodash"), require("three"));
@@ -11236,9 +11236,14 @@ class Complex {
       currAtom.index = i;
     }
     if (opts.needAutoBonding) {
-      const autoConnector = new chem_AutoBond(this);
-      autoConnector.build();
-      autoConnector.destroy();
+      // Ignore errors during autobonding
+      try {
+        const autoConnector = new chem_AutoBond(this);
+        autoConnector.build();
+        autoConnector.destroy();
+      } catch (e) {
+        console.warn('Autobonding failed:', e);
+      }
     }
     const chains = this._chains;
     for (i = 0, n = chains.length; i < n; ++i) {
@@ -35399,7 +35404,7 @@ Miew.prototype.motm = function () {
     visual.resetReps(rep);
   });
 };
-Miew.prototype.VERSION =  true && "0.11.0" || 0;
+Miew.prototype.VERSION =  true && "0.11.1" || 0;
 
 // Uncomment this to get debug trace:
 // Miew.prototype.debugTracer = new utils.DebugTracer(Miew.prototype);
