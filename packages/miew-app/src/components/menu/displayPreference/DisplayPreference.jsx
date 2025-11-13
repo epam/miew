@@ -42,7 +42,22 @@ function DisplayPreferences({
   ));
 
   const handleClickOutside = ({ target }) => {
-    if (!ref.current.contains(target)) {
+    const pane = ref.current;
+    if (!pane) {
+      return;
+    }
+
+    const element = target instanceof Element ? target : target?.parentElement;
+    if (!element) {
+      return;
+    }
+
+    const trigger = element.closest('[data-preference-trigger]');
+    if (trigger && trigger.getAttribute('data-preference-trigger') === preferenceName) {
+      return;
+    }
+
+    if (!pane.contains(element)) {
       showDisplayPreference();
     }
   };
