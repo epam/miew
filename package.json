@@ -26,6 +26,9 @@
     "semver": "7.6.3",
     "underscore": "1.13.7",
     "express": "4.21.1",
-    "form-data": "4.0.4"
+    "form-data": "4.0.4",
+    "bootstrap-switch-button-react@^1.2.0": "patch:bootstrap-switch-button-react@npm%3A1.2.0#./.yarn/patches/bootstrap-switch-button-react-npm-1.2.0-e97ab0d77d.patch",
+    "react-github-fork-ribbon@^0.7.1": "patch:react-github-fork-ribbon@npm%3A0.7.1#./.yarn/patches/react-github-fork-ribbon-npm-0.7.1-8a5e219e19.patch",
+    "@react-aria/ssr@^3.5.0": "patch:@react-aria/ssr@npm%3A3.8.0#./.yarn/patches/@react-aria-ssr-npm-3.8.0-845fb67bda.patch"
   }
 }

@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index 995bdad92f889e014aac5c7234b6e13564a633ce..ed1c7cc50e018c61888f277687c0b0d08c3d4452 100644
+--- a/package.json
++++ b/package.json
+@@ -36,7 +36,7 @@
+   },
+   "main": "component/index.js",
+   "peerDependencies": {
+-    "react": "^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0"
++    "react": ">=0.14.0"
+   },
+   "devDependencies": {
+     "@storybook/react": "^3.2.12",

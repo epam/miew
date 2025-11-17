@@ -5,7 +5,7 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import Button from 'react-bootstrap/Button';
 
 const TitlebarButton = ({
-  onClick, dispatchFunction, content, tip,
+  onClick, dispatchFunction, content, tip, preferenceTrigger,
 }) => <OverlayTrigger
       placement="bottom"
       delay={{ show: 250, hide: 400 }}
@@ -15,7 +15,7 @@ const TitlebarButton = ({
         </Tooltip>
       }
     >
-      <Button className="titlebar-button" onClick={(e) => {
+      <Button className="titlebar-button" data-preference-trigger={preferenceTrigger} onClick={(e) => {
         e.preventDefault();
         if (onClick) {
           onClick(dispatchFunction);

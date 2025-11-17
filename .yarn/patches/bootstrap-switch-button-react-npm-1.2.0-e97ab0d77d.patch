@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index 07a686d33e68d8450756e3318c3ad44bf8e80221..55c8182114edb816fd3ea219eb59945910f7faea 100644
+--- a/package.json
++++ b/package.json
+@@ -8,7 +8,7 @@
+   },
+   "main": "./lib/bootstrap-switch-button-react.js",
+   "peerDependencies": {
+-    "react": "^16.4.0"
++    "react": ">=16.4.0"
+   },
+   "scripts": {
+     "start": "webpack --watch",

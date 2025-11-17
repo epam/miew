@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import rootReducer from './reducers';
@@ -11,9 +11,12 @@ const store = createStore(
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
 );
 
-ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('miew-react-app'),
-);
+const container = document.getElementById('miew-react-app');
+if (container) {
+  const root = createRoot(container);
+  root.render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+  );
+}

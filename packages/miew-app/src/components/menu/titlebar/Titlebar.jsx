@@ -50,11 +50,13 @@ const Titlebar = ({ loadingStage, isPanelListVisible }) => {
           dispatchFunction={showDisplayMode}
           content={<AiOutlinePicture />}
           tip="Display mode"
+          preferenceTrigger="mode"
         />
         <TitlebarButton
           dispatchFunction={showDisplayColor}
           content={<GiDrop />}
           tip="Display color"
+          preferenceTrigger="colorer"
         />
       </ButtonGroup>
     </ButtonToolbar>
