@@ -4,7 +4,7 @@ export default function getTopWindow() {
     if (window.top.location.href !== undefined) {
       return window.top;
     }
-  } catch (e) {
+  } catch {
     // provide fallback
   }
   return window;

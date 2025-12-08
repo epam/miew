@@ -419,7 +419,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
   }
 
   getType(letter) {
-    /* eslint-disable no-magic-numbers */
     const atomT = [0, 0, 1, 1, 2, 6, 3, 6, 4, 6, 5, 6, 6, 0, 7, 3, 8, 2, 9, 6, 10, 6, 11, 6, 12, 6, 13, 6, 14, 6, 15, 4,
       16, 5, 17, 6, 18, 6, 19, 6, 20, 6, 21, 6, 22, 6, 23, 6, 24, 6, 25, 6, 26, 6, 27, 6, 28, 6, 29, 6, 30, 6, 31, 6,
       32, 6, 33, 6, 34, 6, 35, 6, 36, 6, 37, 6, 38, 6, 39, 6, 40, 6, 41, 6, 42, 6, 43, 6, 44, 6, 45, 6, 46, 6, 47, 6,
@@ -427,7 +426,6 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
       64, 6, 65, 6, 66, 6, 67, 6, 68, 6, 69, 6, 70, 6, 71, 6, 72, 6, 73, 6, 74, 6, 75, 6, 76, 6, 77, 6, 78, 6, 79, 6,
       80, 6, 81, 6, 82, 6, 83, 6, 84, 6, 85, 6, 86, 6, 87, 6, 88, 6, 89, 6, 90, 6, 91, 6, 92, 6, 93, 6, 94, 6, 95, 6,
       96, 6, 97, 6, 98, 6, 99, 6, 100, 6, 101, 6, 102, 6, 103, 6, 104, 6, 105, 6, 106, 6, 107, 6, 108, 6, 109, 6];
-    /* eslint-enable no-magic-numbers */
 
     if (letter < 1 || letter > atomT.length / 2
       || (Object.keys(Element.ByAtomicNumber).length * 2) !== atomT.length) {
@@ -452,9 +450,8 @@ class SSIsosurfaceGeometry extends IsoSurfaceGeometry {
     const side3 = side2 * side;
     const vCorner = new THREE.Vector3();
     const vDif = new THREE.Vector3();
-    /* eslint-disable no-magic-numbers */
+
     const aLot = +1.0e12;
-    /* eslint-enable no-magic-numbers */
 
     for (let i = 0; i < side3; i++) {
       corners[i] = aLot; // to large value

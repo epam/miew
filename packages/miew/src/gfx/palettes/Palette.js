@@ -239,7 +239,6 @@ _.assign(Palette.prototype, {
   ],
 
   namedColors: {},
-  /* eslint-enable no-magic-numbers */
 
   gradients: {
     rainbow: [

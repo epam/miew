@@ -161,7 +161,6 @@ class PDBParser extends Parser {
       return;
     }
 
-    /* eslint-disable no-magic-numbers */
     const het = stream.readCharCode(1) === 0x48;
 
     // field names according to wwPDB Format
@@ -180,7 +179,7 @@ class PDBParser extends Parser {
     const tempFactor = stream.readFloat(61, 66);
     const element = stream.readString(77, 78).trim() || nameToElement(name);
     const charge = stream.readInt(79, 80) || 0;
-    /* eslint-enable no-magic-numbers */
+
     // skip waters (there may be lots of them)
     if (this.settings.now.nowater) {
       if (resName === 'HOH' || resName === 'WAT') {
@@ -217,13 +216,11 @@ class PDBParser extends Parser {
   }
 
   _parseCONECT(stream) {
-    /* eslint-disable no-magic-numbers */
     const serial0 = stream.readInt(7, 11);
     const serial1 = stream.readInt(12, 16);
     const serial2 = stream.readInt(17, 21);
     const serial3 = stream.readInt(22, 26);
     const serial4 = stream.readInt(27, 31);
-    /* eslint-enable no-magic-numbers */
 
     const complex = this._complex;
 
@@ -243,11 +240,9 @@ class PDBParser extends Parser {
   }
 
   _parseCOMPND(stream) {
-    /* eslint-disable no-magic-numbers */
     const str = stream.readString(11, 80);
     const tokenIdx = str.indexOf(':');
     this._compndCurrToken = tokenIdx > 0 ? str.substring(0, tokenIdx).trim() : this._compndCurrToken;
-    /* eslint-enable no-magic-numbers */
 
     // start reading new molecule
     if (this._compndCurrToken === 'MOL_ID') {
@@ -271,9 +266,7 @@ class PDBParser extends Parser {
   }
 
   _parseREMARK(stream) {
-    /* eslint-disable no-magic-numbers */
     const remarkNum = stream.readInt(8, 10);
-    /* eslint-enable no-magic-numbers */
 
     // create remark parser if needed
     let remark = this._remarks[remarkNum];
@@ -291,9 +284,8 @@ class PDBParser extends Parser {
   }
 
   _parseHELIX(stream) {
-    /* eslint-disable no-magic-numbers */
     const fields = [20, 22, 32, 34];
-    /* eslint-enable no-magic-numbers */
+
     this._parseSTRUCTURE(stream, fields, (obj) => {
       this._complex.addHelix(obj);
       this._complex.structures.push(obj);
@@ -301,9 +293,8 @@ class PDBParser extends Parser {
   }
 
   _parseSHEET(stream) {
-    /* eslint-disable no-magic-numbers */
     const fields = [22, 23, 33, 34];
-    /* eslint-enable no-magic-numbers */
+
     this._parseSTRUCTURE(stream, fields, (obj) => {
       this._complex.addSheet(obj);
     });
@@ -316,7 +307,7 @@ class PDBParser extends Parser {
     const endIndex = 3;
 
     // identify fields: debugging and stuff
-    /* eslint-disable no-magic-numbers */
+
     const codeOfS = 0x53;
     const serialNumber = stream.readInt(8, 10);
     const structureName = stream.readString(12, 14).trim(); // FIXME: LString(3) forbids trim()
@@ -326,7 +317,7 @@ class PDBParser extends Parser {
     const shWidth = stream.readInt(15, 16);
     const shCur = stream.readInt(42, 45);
     const shPrev = stream.readInt(57, 60);
-    /* eslint-enable no-magic-numbers */
+
     // file fields
     const startChainID = stream.readString(pars[startId], pars[endId] + 1).charCodeAt(0);
     const endChainID = stream.readString(pars[endId], pars[endId] + 1).charCodeAt(0);

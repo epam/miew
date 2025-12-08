@@ -2082,7 +2082,7 @@ Miew.prototype._startAnimation = function (fileData) {
         },
       },
     );
-  } catch (e) {
+  } catch {
     this.logger.error('Animation file does not fit to current complex!');
     return;
   }
@@ -2144,7 +2144,7 @@ Miew.prototype._continueAnimation = function () {
       } time interval - ${self._frameInfo._timeStep}`);
       try {
         self._frameInfo.nextFrame();
-      } catch (e) {
+      } catch {
         self.logger.error('Error during animation');
         self._stopAnimation();
         return;

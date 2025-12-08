@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import Mode from './Mode';
 
 class LicoriceMode extends Mode {

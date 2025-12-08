@@ -38,11 +38,9 @@ class CylinderBufferGeometry extends THREE.BufferGeometry {
 
     const heightHalf = height / 2;
 
-    /* eslint-disable no-magic-numbers */
     const positions = new THREE.BufferAttribute(utils.allocateTyped(Float32Array, vertexCount * 3), 3);
     const normals = new THREE.BufferAttribute(utils.allocateTyped(Float32Array, vertexCount * 3), 3);
     const indices = new THREE.Uint16BufferAttribute(utils.allocateTyped(Uint16Array, facesCount * PTS_PER_TRIANGLE), 1);
-    /* eslint-enable no-magic-numbers */
 
     const uvs = new THREE.BufferAttribute(utils.allocateTyped(Float32Array, vertexCount * 2), 2);
     console.assert(vertexCount < MAX_POINTS_COUNT_16BIT, 'DEBUG: Cylinder Geometry has too many vertices (65536 max).');

@@ -82,7 +82,7 @@ function resolveURL(str) {
         return new URL(str, window.location).href;
       }
       return new URL(str).href;
-    } catch (error) {
+    } catch {
       // IE 11 has a URL object with no constructor available so just try a different approach instead
     }
   }
@@ -219,7 +219,7 @@ function DebugTracer(namespace) {
         logger.debug(`${spaces + name_} {`);
       }
       indent++;
-      const result = method_.apply(this, args); // eslint-disable-line no-invalid-this
+      const result = method_.apply(this, args);
       indent--;
       if (enabled) {
         logger.debug(`${spaces}} // ${name_}`);
