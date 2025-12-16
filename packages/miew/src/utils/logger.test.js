@@ -1,11 +1,9 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
 import logger from './logger';
 
 chai.use(dirtyChai);
-chai.use(sinonChai);
 
 describe('utils/logger', () => {
   describe('.instantiate()', () => {

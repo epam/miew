@@ -1,11 +1,9 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
 import XHRLoader from './XHRLoader';
 
 chai.use(dirtyChai);
-chai.use(sinonChai);
 
 describe('XHRLoader', () => {
   const fakeSource = 'http://localhost/foo';

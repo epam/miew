@@ -1,11 +1,9 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
 import FileLoader from './FileLoader';
 
 chai.use(dirtyChai);
-chai.use(sinonChai);
 
 class BlobStub {}
 class FileStub extends BlobStub {

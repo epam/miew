@@ -1,11 +1,9 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
 import EventDispatcher from './EventDispatcher';
 
 chai.use(dirtyChai);
-chai.use(sinonChai);
 
 describe('utils/EventDispatcher', () => {
   const type = 'test';
