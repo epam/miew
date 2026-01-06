@@ -1,5 +1,3 @@
-/* eslint-disable no-magic-numbers */
-/* eslint-disable guard-for-in */
 import * as THREE from 'three';
 import vertexShader from './Uber.vert';
 import fragmentShader from './Uber.frag';

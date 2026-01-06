@@ -1,12 +1,10 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
-import sinonChai from 'sinon-chai';
 import chaiAsPromised from 'chai-as-promised';
 import Loader from './Loader';
 
 chai.use(dirtyChai);
-chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
 describe('Loader', () => {

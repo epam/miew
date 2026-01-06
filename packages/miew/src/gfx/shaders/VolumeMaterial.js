@@ -1,5 +1,3 @@
-/* eslint-disable no-magic-numbers */
-/* eslint-disable guard-for-in */
 import * as THREE from 'three';
 import vertexVolumeFaces from './VolumeFaces.vert';
 import fragmentVolumeFaces from './VolumeFaces.frag';

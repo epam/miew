@@ -276,18 +276,14 @@ class Complex {
   }
 
   getUnifiedSerial(chain, serial, iCode) {
-    /* eslint-disable no-magic-numbers */
     const maxSerial = 65536;
     const chainShift = maxSerial * 256;
-    /* eslint-enable no-magic-numbers */
     return serial + iCode * maxSerial + chain * chainShift;
   }
 
   splitUnifiedSerial(uniSerial) {
-    /* eslint-disable no-magic-numbers */
     const maxSerial = 65536;
     const chainShift = maxSerial * 256;
-    /* eslint-enable no-magic-numbers */
     const chainId = Math.floor(uniSerial / chainShift);
     const remnant = uniSerial - chainId * chainShift;
     const insCode = Math.floor(remnant / maxSerial);
@@ -754,7 +750,7 @@ class Complex {
           new THREE.Vector3(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE),
         );
         this._voxelWorld.addAtoms(this);
-      } catch (e) {
+      } catch {
         logger.warn('Unable to create voxel world');
         this._voxelWorld = null;
       }

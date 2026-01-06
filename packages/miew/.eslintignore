@@ -1,5 +1,0 @@
-/dist
-/vendor
-!.eslintrc.js
-!.mocharc.js
-!.stylelintrc.js

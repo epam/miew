@@ -306,8 +306,6 @@ class IsoSurface {
       for (let y = 0; y < (ySize - step); y += step) {
         let idx = vol.getDirectIdx(0, y, z);
         for (let x = 0; x < (xSize - step); x += step, idx += stepX) {
-          /* eslint-disable no-multi-spaces */
-          /* eslint-disable computed-property-spacing */
           gcVal[0] = volData[idx];
           gcVal[1] = volData[idx + stepX];
           gcVal[3] = volData[idx + stepY];
@@ -316,8 +314,6 @@ class IsoSurface {
           gcVal[5] = volData[idx + stepX + stepZ];
           gcVal[7] = volData[idx + stepY + stepZ];
           gcVal[6] = volData[idx + stepX + stepY + stepZ];
-          /* eslint-enable no-multi-spaces */
-          /* eslint-enable computed-property-spacing */
 
           // Determine the index into the edge table which
           // tells us which vertices are inside of the surface

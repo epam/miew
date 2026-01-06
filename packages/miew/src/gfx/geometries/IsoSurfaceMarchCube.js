@@ -33,7 +33,6 @@ class IsoSurfaceMarchCube {
   }
 }
 
-/* eslint-disable no-magic-numbers */
 IsoSurfaceMarchCube.prototype.striIndicesMarchCube = [
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
   0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -292,6 +291,5 @@ IsoSurfaceMarchCube.prototype.striIndicesMarchCube = [
   0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 ];
-/* eslint-enable no-magic-numbers */
 
 export default IsoSurfaceMarchCube;

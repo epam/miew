@@ -1,6 +1,5 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
-import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
 import * as THREE from 'three';
 import Complex from './Complex';
@@ -8,7 +7,6 @@ import AutoBond from './AutoBond';
 import Element from './Element';
 
 chai.use(dirtyChai);
-chai.use(sinonChai);
 
 describe('Complex', () => {
   describe('finalize', () => {
