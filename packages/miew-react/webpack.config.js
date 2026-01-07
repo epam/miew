@@ -1,4 +1,3 @@
-/* eslint-env node */
 const path = require('path');
 
 const resolvePath = (name) => path.resolve(__dirname, name);
