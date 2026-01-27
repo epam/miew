@@ -1,5 +1,3 @@
-/* eslint-env node */
-
 export default {
   docs: {
     dst: 'docs/auto/',

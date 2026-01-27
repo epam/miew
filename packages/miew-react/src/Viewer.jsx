@@ -1,6 +1,6 @@
 import Miew from 'miew';
 import PropTypes from 'prop-types';
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useReducer, useRef } from 'react';
 import styles from './Viewer.module.scss';
 import 'miew/dist/Miew.css';
 
@@ -48,6 +48,16 @@ function destroyMiewRef(miewRef) {
 }
 
 /**
+ * Builds complete options object with default settings
+ * @param {Object} opts - User-provided options
+ * @returns {Object} Options with defaults applied
+ */
+function buildOptions(opts) {
+  const settings = { axes: false, fps: false, ...opts?.settings };
+  return opts ? { ...opts, settings } : { settings };
+}
+
+/**
  * Deep comparison for options object to prevent unnecessary re-initializations
  * @param {Object} prev - Previous options
  * @param {Object} next - New options
@@ -78,7 +88,26 @@ export default function Viewer({ onInit, onError, options, className, style, the
   const rootRef = useRef();
   const onInitRef = useRef(onInit);
   const onErrorRef = useRef(onError);
-  const optionsRef = useRef();
+  const optionsRef = useRef(options);
+
+  // Reducer that maintains stable options identity when content is equivalent.
+  // Only returns a new object when options actually change, preventing unnecessary Miew re-initialization.
+  const optionsReducer = (prevOptions, newOptions) => {
+    const builtOptions = buildOptions(newOptions);
+    return areOptionsEqual(prevOptions, builtOptions) ? prevOptions : builtOptions;
+  };
+
+  const [stableOptions, updateOptions] = useReducer(optionsReducer, options, buildOptions);
+
+  // Update options when prop reference changes. Skip when the same object is re-passed
+  // (e.g. initial render or parent re-render) to avoid duplicate dispatches;
+  // the reducer still guards deep equality for new objects.
+  useLayoutEffect(() => {
+    if (options !== optionsRef.current) {
+      updateOptions(options);
+    }
+    optionsRef.current = options;
+  }, [options]);
 
   // Keep callback refs updated
   useLayoutEffect(() => {
@@ -94,20 +123,6 @@ export default function Viewer({ onInit, onError, options, className, style, the
       );
     }
   }, [theme]);
-
-  // Memoize the complete options object to prevent re-initialization on equivalent options
-  const stableOptions = useMemo(() => {
-    const settings = { axes: false, fps: false, ...options?.settings };
-    const newOptions = { ...options, settings };
-
-    // Only return new object if options actually changed
-    if (areOptionsEqual(optionsRef.current, newOptions)) {
-      return optionsRef.current;
-    }
-
-    optionsRef.current = newOptions;
-    return newOptions;
-  }, [options]);
 
   // Initialize Miew instance only when options actually change
   useLayoutEffect(() => {
