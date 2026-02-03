@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from '@reduxjs/toolkit';
 import visiblePanels from './visiblePanels';
 import info from './info';
 

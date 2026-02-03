@@ -1,15 +1,14 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './reducers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './components/App.jsx';
 
-const store = createStore(
-  rootReducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
-);
+const store = configureStore({
+  reducer: rootReducer,
+});
 
 const container = document.getElementById('miew-react-app');
 if (container) {
