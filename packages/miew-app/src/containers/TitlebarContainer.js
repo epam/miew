@@ -1,10 +1,18 @@
-import { connect } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 
 import Titlebar from '../components/menu/titlebar/Titlebar.jsx';
 
-const mapStateToProps = (state) => ({
-  loadingStage: state.info.loadingStage,
-  isPanelListVisible: state.visiblePanels.isPanelListVisible,
-});
+const TitlebarContainer = () => {
+  const loadingStage = useSelector((state) => state.info?.loadingStage);
+  const isPanelListVisible = useSelector((state) => state.visiblePanels?.isPanelListVisible);
 
-export default connect(mapStateToProps)(Titlebar);
+  return (
+    <Titlebar
+      loadingStage={loadingStage}
+      isPanelListVisible={isPanelListVisible}
+    />
+  );
+};
+
+export default TitlebarContainer;

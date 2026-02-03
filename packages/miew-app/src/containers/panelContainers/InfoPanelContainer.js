@@ -1,8 +1,9 @@
-import { connect } from 'react-redux';
+import React from 'react';
 
 import InfoPanel from '../../components/menu/panelslist/panels/InfoPanel';
 
-const mapStateToProps = () => ({
-});
+const InfoPanelContainer = (props) => (
+  <InfoPanel {...props} />
+);
 
-export default connect(mapStateToProps)(InfoPanel);
+export default InfoPanelContainer;

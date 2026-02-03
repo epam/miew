@@ -1,13 +1,18 @@
-import { connect } from 'react-redux';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 
 import DisplayPreferences from '../components/menu/displayPreference/DisplayPreference.jsx';
 import { showDisplayMode } from '../actions';
 
-const mapStateToProps = () => ({
-});
+const DisplayModeContainer = (props) => {
+  const dispatch = useDispatch();
 
-const mapDispatchToProps = (dispatch) => ({
-  showDisplayPreference: () => (dispatch(showDisplayMode())),
-});
+  return (
+    <DisplayPreferences
+      {...props}
+      showDisplayPreference={() => dispatch(showDisplayMode())}
+    />
+  );
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(DisplayPreferences);
+export default DisplayModeContainer;

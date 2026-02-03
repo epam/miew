@@ -1,9 +1,14 @@
-import { connect } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 
 import Terminal from '../components/menu/terminal/Terminal.jsx';
 
-const mapStateToProps = (state) => ({
-  isTerminalVisible: state.visiblePanels.isTerminalVisible,
-});
+const TerminalContainer = () => {
+  const isTerminalVisible = useSelector(
+    (state) => state.visiblePanels?.isTerminalVisible,
+  );
 
-export default connect(mapStateToProps)(Terminal);
+  return <Terminal isTerminalVisible={isTerminalVisible} />;
+};
+
+export default TerminalContainer;

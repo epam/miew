@@ -1,16 +1,22 @@
-import { connect } from 'react-redux';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import MiewViewer from '../components/viewer/MiewViewer.jsx';
 import {
   updateLoadingStage,
 } from '../actions';
 
-const mapStateToProps = (state) => ({
-  frozen: state.visiblePanels.visibility,
-});
+const MiewViewerContainer = (props) => {
+  const dispatch = useDispatch();
+  const frozen = useSelector((state) => state.visiblePanels?.visibility);
 
-const mapDispatchToProps = (dispatch) => ({
-  updateLoadingStage: (title) => dispatch(updateLoadingStage(title)),
-});
+  return (
+    <MiewViewer
+      {...props}
+      frozen={frozen}
+      updateLoadingStage={(title) => dispatch(updateLoadingStage(title))}
+    />
+  );
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(MiewViewer);
+export default MiewViewerContainer;
