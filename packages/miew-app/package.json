@@ -43,6 +43,7 @@
     "jquery": "^3.7.1",
     "jquery.terminal": "^2.45.2",
     "miew": "workspace:^",
+    "miew-react": "workspace:^",
     "react": "^19.2.3",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.3",
