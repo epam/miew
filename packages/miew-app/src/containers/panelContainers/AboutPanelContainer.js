@@ -1,8 +1,9 @@
-import { connect } from 'react-redux';
+import React from 'react';
 
 import AboutPanel from '../../components/menu/panelslist/panels/AboutPanel';
 
-const mapStateToProps = () => ({
-});
+const AboutPanelContainer = (props) => (
+  <AboutPanel {...props} />
+);
 
-export default connect(mapStateToProps)(AboutPanel);
+export default AboutPanelContainer;

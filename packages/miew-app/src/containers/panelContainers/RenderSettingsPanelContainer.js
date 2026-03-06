@@ -1,8 +1,9 @@
-import { connect } from 'react-redux';
+import React from 'react';
 
 import RenderSettingsPanel from '../../components/menu/panelslist/panels/RenderSettingsPanel';
 
-const mapStateToProps = () => ({
-});
+const RenderSettingsPanelContainer = (props) => (
+  <RenderSettingsPanel {...props} />
+);
 
-export default connect(mapStateToProps)(RenderSettingsPanel);
+export default RenderSettingsPanelContainer;

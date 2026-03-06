@@ -1,13 +1,18 @@
-import { connect } from 'react-redux';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 
 import DisplayPrefence from '../components/menu/displayPreference/DisplayPreference.jsx';
 import { showDisplayColor } from '../actions';
 
-const mapStateToProps = () => ({
-});
+const DisplayColorContainer = (props) => {
+  const dispatch = useDispatch();
 
-const mapDispatchToProps = (dispatch) => ({
-  showDisplayPreference: () => (dispatch(showDisplayColor())),
-});
+  return (
+    <DisplayPrefence
+      {...props}
+      showDisplayPreference={() => dispatch(showDisplayColor())}
+    />
+  );
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(DisplayPrefence);
+export default DisplayColorContainer;

@@ -1,8 +1,9 @@
-import { connect } from 'react-redux';
+import React from 'react';
 
 import ToolsPanel from '../../components/menu/panelslist/panels/ToolsPanel';
 
-const mapStateToProps = () => ({
-});
+const ToolsPanelContainer = (props) => (
+  <ToolsPanel {...props} />
+);
 
-export default connect(mapStateToProps)(ToolsPanel);
+export default ToolsPanelContainer;

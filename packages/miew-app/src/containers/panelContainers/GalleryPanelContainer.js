@@ -1,8 +1,9 @@
-import { connect } from 'react-redux';
+import React from 'react';
 
 import GalleryPanel from '../../components/menu/panelslist/panels/GalleryPanel';
 
-const mapStateToProps = () => ({
-});
+const GalleryPanelContainer = (props) => (
+  <GalleryPanel {...props} />
+);
 
-export default connect(mapStateToProps)(GalleryPanel);
+export default GalleryPanelContainer;

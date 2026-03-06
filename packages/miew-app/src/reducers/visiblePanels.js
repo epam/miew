@@ -1,18 +1,29 @@
-import ACTIONS from '../constants';
+import { createSlice } from '@reduxjs/toolkit';
 
-const visiblePanels = (state = {}, action = {}) => {
-  switch (action.type) {
-    case ACTIONS.SHOW_NAV:
-      return { ...state, isPanelListVisible: !state.isPanelListVisible };
-    case ACTIONS.SHOW_TERMINAL:
-      return { ...state, isTerminalVisible: !state.isTerminalVisible };
-    case ACTIONS.SHOW_DISPLAY_MODE:
-      return { ...state, isDisplayModeVisible: !state.isDisplayModeVisible };
-    case ACTIONS.SHOW_DISPLAY_COLOR:
-      return { ...state, isDisplayColorVisible: !state.isDisplayColorVisible };
-    default:
-      return state;
-  }
-};
+const visiblePanelsSlice = createSlice({
+  name: 'visiblePanels',
+  initialState: {},
+  reducers: {
+    showNav: (state) => {
+      state.isPanelListVisible = !state.isPanelListVisible;
+    },
+    showTerminal: (state) => {
+      state.isTerminalVisible = !state.isTerminalVisible;
+    },
+    showDisplayMode: (state) => {
+      state.isDisplayModeVisible = !state.isDisplayModeVisible;
+    },
+    showDisplayColor: (state) => {
+      state.isDisplayColorVisible = !state.isDisplayColorVisible;
+    },
+  },
+});
 
-export default visiblePanels;
+export const {
+  showNav,
+  showTerminal,
+  showDisplayMode,
+  showDisplayColor,
+} = visiblePanelsSlice.actions;
+
+export default visiblePanelsSlice.reducer;

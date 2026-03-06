@@ -1,13 +1,9 @@
-import { connect } from 'react-redux';
+import React from 'react';
 
 import PanelsList from '../components/menu/panelslist/PanelsList.jsx';
 
-// push complexes info to the panel
-const mapStateToProps = () => ({
-});
+const PanelListContainer = (props) => (
+  <PanelsList {...props} />
+);
 
-const VisiblePanelsList = connect(
-  mapStateToProps,
-)(PanelsList);
-
-export default VisiblePanelsList;
+export default PanelListContainer;
