@@ -44,6 +44,7 @@ const report = {
       title,
       version: 'N/A',
       browser: 'N/A',
+      renderer: 'N/A',
       url: 'N/A',
       date: new Date(),
       threshold: 0,
@@ -108,6 +109,30 @@ function _prepareServer(cfg) {
   });
 }
 
+function _getWebGLRendererInfo() {
+  const script = `
+var canvas = document.createElement('canvas');
+var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+if (!gl) {
+  return JSON.stringify({ available: false });
+}
+var ext = gl.getExtension('WEBGL_debug_renderer_info');
+var renderer = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+var vendor = ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR);
+return JSON.stringify({ available: true, renderer: renderer, vendor: vendor });
+`;
+
+  return driver.executeScript(script)
+    .then((json) => {
+      const info = JSON.parse(json);
+      if (!info.available) {
+        return 'WebGL unavailable';
+      }
+      return `${info.vendor} | ${info.renderer}`;
+    })
+    .catch(() => 'Renderer detection failed');
+}
+
 function startup(webDriver, cfg) {
   driver = webDriver;
   report.begin(cfg.title);
@@ -117,6 +142,10 @@ function startup(webDriver, cfg) {
   return _prepareBrowser()
     .then((browser) => {
       report.data.browser = browser;
+      return _getWebGLRendererInfo();
+    })
+    .then((renderer) => {
+      report.data.renderer = renderer;
       return _prepareServer(cfg);
     })
     .then((url) => {
