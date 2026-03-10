@@ -1,62 +1,93 @@
-import React, { useEffect, useRef } from 'react';
-
-import 'MiewStyles'; // eslint-disable-line import/no-unresolved
-
-import Miew from 'MiewModule'; // eslint-disable-line import/no-unresolved
+import React, {
+  useEffect, useMemo, useCallback, useState,
+} from 'react';
+import Viewer from 'miew-react';
 import { MiewProvider } from '../../contexts/MiewContext';
 
-let viewer = null;
 export default function MiewViewer({
   frozen, onChange, updateLoadingStage, children,
 }) {
-  const domElement = useRef();
-  const _onChange = (prefs) => {
+  const [viewer, setViewer] = useState(null);
+
+  const handlePrefsChange = useCallback((prefs) => {
     onChange({ prefs });
-  };
+  }, [onChange]);
 
-  function removeViewer() {
-    // viewer.settings.now.removeEventListener(_onChange);
-    viewer.term();
-    viewer = null;
-    onChange({ viewer });
-  }
+  const options = useMemo(() => ({
+    load: '1crn',
+    settings: {
+      axes: false,
+      fps: false,
+    },
+  }), []);
+
+  const handleInit = useCallback((miew) => {
+    window.miew = miew;
+    miew.logger.level = 'debug';
+    setViewer(miew);
+    onChange({ viewer: miew });
+  }, [onChange]);
+
+  const handleError = useCallback(() => {
+    updateLoadingStage('Failed to initialize viewer');
+  }, [updateLoadingStage]);
 
   useEffect(() => {
-    viewer = window.miew = new Miew({ container: domElement.current, load: '1crn' });
-    viewer.addEventListener('fetching', () => {
-      updateLoadingStage('Fetching...');
-    });
-    viewer.addEventListener('parsing', () => {
-      updateLoadingStage('Parsing…');
-    });
-    viewer.addEventListener('rebuilding', () => {
-      updateLoadingStage('Building geometry…');
-    });
-    viewer.addEventListener('titleChanged', (e) => {
-      updateLoadingStage(e.data);
-    });
-    viewer.logger.level = 'debug';
-
-    viewer.settings.addEventListener('change:axes', _onChange);
-    viewer.settings.addEventListener('change:autoRotation', _onChange);
-    onChange({ viewer });
-    if (viewer.init()) {
-      viewer.run();
+    if (!viewer) {
+      return undefined;
     }
-    return removeViewer;
-  }, []);
+
+    const handleFetching = () => updateLoadingStage('Fetching...');
+    const handleParsing = () => updateLoadingStage('Parsing...');
+    const handleRebuilding = () => updateLoadingStage('Building geometry...');
+    const handleTitleChanged = (e) => updateLoadingStage(e.data);
+
+    viewer.addEventListener('fetching', handleFetching);
+    viewer.addEventListener('parsing', handleParsing);
+    viewer.addEventListener('rebuilding', handleRebuilding);
+    viewer.addEventListener('titleChanged', handleTitleChanged);
+    viewer.settings.addEventListener('change:axes', handlePrefsChange);
+    viewer.settings.addEventListener('change:autoRotation', handlePrefsChange);
+
+    return () => {
+      viewer.removeEventListener('fetching', handleFetching);
+      viewer.removeEventListener('parsing', handleParsing);
+      viewer.removeEventListener('rebuilding', handleRebuilding);
+      viewer.removeEventListener('titleChanged', handleTitleChanged);
+      viewer.settings.removeEventListener('change:axes', handlePrefsChange);
+      viewer.settings.removeEventListener('change:autoRotation', handlePrefsChange);
+    };
+  }, [viewer, updateLoadingStage, handlePrefsChange]);
 
   useEffect(() => {
+    if (!viewer) {
+      return;
+    }
+
     if (frozen) {
       viewer.halt();
     } else {
       viewer.run();
     }
-  }, [frozen]);
+  }, [frozen, viewer]);
+
+  useEffect(() => () => {
+    if (viewer) {
+      if (window.miew === viewer) {
+        window.miew = null;
+      }
+      onChange({ viewer: null });
+    }
+  }, [viewer, onChange]);
 
   return (
     <MiewProvider viewer={viewer}>
-      <div className='miew-container' ref={domElement}/>
+      <Viewer
+        className="miew-container"
+        options={options}
+        onInit={handleInit}
+        onError={handleError}
+      />
       {children}
     </MiewProvider>
   );
