@@ -174,9 +174,10 @@ class UberMaterial extends THREE.RawShaderMaterial {
 
     // set default values
     super.setValues({
-      uniforms: THREE.UniformsUtils.clone(defaultUniforms),
+      glslVersion: THREE.GLSL3,
       vertexShader: this.precisionString() + vertexShader,
       fragmentShader: this.precisionString() + fragmentShader,
+      uniforms: THREE.UniformsUtils.clone(defaultUniforms),
       lights: true,
       fog: true,
       side: THREE.DoubleSide,

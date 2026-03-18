@@ -1,11 +1,12 @@
 #if defined (NORMALS_TO_G_BUFFER)
-  #define fragColor gl_FragData[0]
+  layout(location = 0) out vec4 fragColor;
+  layout(location = 1) out vec4 fragNormal;
 #else
-  #define fragColor gl_FragColor
+  out vec4 fragColor;
 #endif
 
 #ifdef ATTR_ALPHA_COLOR
-  varying float alphaCol;
+  in float alphaCol;
 #endif
 
 #ifdef COLOR_FROM_POS
@@ -16,8 +17,8 @@
 	#if NUM_DIR_LIGHTS > 0
 		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHTS ];
     uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ]; //only for sprites
-		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
-		varying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
+		in vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
+		in vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
     vec4 vDirLightWorldCoord[ NUM_DIR_LIGHTS ];
     vec3 vDirLightWorldNormal[ NUM_DIR_LIGHTS ];
 
@@ -35,13 +36,13 @@
 #endif
 
 #ifdef ATTR_COLOR
-  varying vec3 vColor;
+  in vec3 vColor;
 #endif
 
 #ifdef ATTR_COLOR2
-  varying vec3 vColor2;
+  in vec3 vColor2;
   #ifndef CYLINDER_SPRITE
-    varying vec2 vUv;
+    in vec2 vUv;
   #endif
 #endif
 
@@ -55,7 +56,7 @@ uniform float zClipValue;
 uniform float clipPlaneValue;
 
 #ifdef NORMALS_TO_G_BUFFER
-  varying vec3 viewNormal;
+  in vec3 viewNormal;
 #endif
 
 #define RECIPROCAL_PI 0.31830988618
@@ -68,11 +69,11 @@ uniform float clipPlaneValue;
   uniform float fogFar;
 #endif
 
-varying vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)
-varying vec3 vViewPosition;
+in vec3 vWorldPosition; // world position of the pixel (invalid when INSTANCED_SPRITE is defined)
+in vec3 vViewPosition;
 
 #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
-  varying vec3 vNormal;
+  in vec3 vNormal;
 #endif
 
 /////////////////////////////////////////// ZSprites ////////////////////////////////////////////////
@@ -81,7 +82,7 @@ varying vec3 vViewPosition;
 #endif
 
 #ifdef SPHERE_SPRITE
-  varying vec4 spritePosEye;
+  in vec4 spritePosEye;
 #endif
 
 #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
@@ -98,7 +99,7 @@ varying vec3 vViewPosition;
 #endif
 
 #ifdef SPHERE_SPRITE
-  varying vec4 instOffset;
+  in vec4 instOffset;
   uniform mat4 modelMatrix;
   uniform mat4 modelViewMatrix;
   uniform mat4 invModelViewMatrix;
@@ -173,19 +174,19 @@ varying vec3 vViewPosition;
 #endif
 
 #ifdef CYLINDER_SPRITE
-  varying vec4 matVec1;
-  varying vec4 matVec2;
-  varying vec4 matVec3;
-  varying vec4 invmatVec1;
-  varying vec4 invmatVec2;
-  varying vec4 invmatVec3;
+  in vec4 matVec1;
+  in vec4 matVec2;
+  in vec4 matVec3;
+  in vec4 invmatVec1;
+  in vec4 invmatVec2;
+  in vec4 invmatVec3;
 
   uniform mat4 modelMatrix;
   uniform mat4 modelViewMatrix;
   uniform mat4 invModelViewMatrix;
   uniform mat3 normalMatrix;
 
-  varying vec4 spritePosEye;
+  in vec4 spritePosEye;
 
   bool intersect_ray_cylinder(in vec3 origin, in vec3 ray, out vec3 point, out float frontFaced) {
 
@@ -481,7 +482,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
 #ifdef DASHED_LINE
   uniform float dashedLineSize;
   uniform float dashedLinePeriod;
-  varying float vLineDistance;
+  in float vLineDistance;
 #endif
 
 /////////////////////////////////////////// Main ///////////////////////////////////////////////
@@ -623,7 +624,7 @@ void main() {
   #ifdef PREPASS_TRANSP
     fragColor = vec4(1.0, 1.0, 1.0, 1.0);
     #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+      gl_FragDepth = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
     #endif
     return;
   #endif
@@ -659,7 +660,7 @@ void main() {
     diffuseColor.rgb *= vertexColor;
 
   #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-    gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+    gl_FragDepth = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
   #endif
 
   #ifdef NORMALS_TO_G_BUFFER
@@ -671,7 +672,7 @@ void main() {
     #endif
     // [-1, 1] -> [0, 1]
     viewNormaInColor = 0.5 * viewNormaInColor + 0.5;
-    gl_FragData[1] = vec4(viewNormaInColor, frontFaced);
+    fragNormal = vec4(viewNormaInColor, frontFaced);
   #endif
 
   #if defined(USE_LIGHTS) && NUM_DIR_LIGHTS > 0
@@ -691,8 +692,8 @@ void main() {
   #ifdef COLOR_FROM_DEPTH
     float depth = 0.0;
     #if defined(SPHERE_SPRITE) || defined(CYLINDER_SPRITE)
-      gl_FragDepthEXT = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
-      depth = gl_FragDepthEXT;
+      gl_FragDepth = calcDepthForSprites(pixelPosEye, zOffset, projectionMatrix);
+      depth = gl_FragDepth;
     #else
       depth = gl_FragCoord.z;
     #endif
