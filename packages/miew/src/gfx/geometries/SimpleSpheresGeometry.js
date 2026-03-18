@@ -7,7 +7,7 @@ const VEC_SIZE = 3;
 
 class SimpleSpheresGeometry extends SphereCollisionGeo(ChunkedObjectsGeometry) {
   constructor(spheresCount, sphereComplexity) {
-    const sphGeometry = new THREE.SphereBufferGeometry(
+    const sphGeometry = new THREE.SphereGeometry(
       1,
       sphereComplexity * 2,
       sphereComplexity,
