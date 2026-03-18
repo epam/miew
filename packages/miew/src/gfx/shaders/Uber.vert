@@ -1,74 +1,74 @@
 float INSTANCED_SPRITE_OVERSCALE = 1.3;
 
-attribute vec3 normal;
+in vec3 normal;
 
 #ifdef NORMALS_TO_G_BUFFER
-  varying vec3 viewNormal;
+  out vec3 viewNormal;
 #endif
 #if !defined (SPHERE_SPRITE) && !defined (CYLINDER_SPRITE)
-  varying vec3 vNormal;
+  out vec3 vNormal;
 #endif
 
 #ifdef THICK_LINE
-  attribute vec4 position; // W contains vert pos or neg offset
+  in vec4 position; // W contains vert pos or neg offset
 #else
-  attribute vec3 position;
+  in vec3 position;
 #endif
 
-varying vec3 vWorldPosition;
-varying vec3 vViewPosition;
+out vec3 vWorldPosition;
+out vec3 vViewPosition;
 
 #ifdef ATTR_ALPHA_COLOR
-  attribute float alphaColor;
-  varying float alphaCol;
+  in float alphaColor;
+  out float alphaCol;
 #endif
 
 #if defined(USE_LIGHTS) && defined(SHADOWMAP)
 	#if NUM_DIR_LIGHTS > 0
 		uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHTS ];
-		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
-		varying vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
+		out vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHTS ];
+		out vec3 vDirectionalShadowNormal[ NUM_DIR_LIGHTS ];
 	#endif
 #endif
 
 #ifdef ATTR_COLOR
-  attribute vec3 color;
-  varying vec3 vColor;
+  in vec3 color;
+  out vec3 vColor;
 #endif
 
 #ifdef ATTR_COLOR2
-  attribute vec3 color2;
-  varying vec3 vColor2;
-  attribute vec2 uv;
+  in vec3 color2;
+  out vec3 vColor2;
+  in vec2 uv;
   #ifndef CYLINDER_SPRITE
-    varying vec2 vUv;
+    out vec2 vUv;
   #endif
 #endif
 
 #ifdef INSTANCED_POS
-  attribute vec4 offset;
+  in vec4 offset;
   #ifdef SPHERE_SPRITE
-    varying vec4 instOffset;
-  varying vec4 spritePosEye;
+    out vec4 instOffset;
+    out vec4 spritePosEye;
   #endif
 #endif
 
 #ifdef INSTANCED_MATRIX
-  attribute vec4 matVector1;
-  attribute vec4 matVector2;
-  attribute vec4 matVector3;
-  attribute vec4 invmatVector1;
-  attribute vec4 invmatVector2;
-  attribute vec4 invmatVector3;
+  in vec4 matVector1;
+  in vec4 matVector2;
+  in vec4 matVector3;
+  in vec4 invmatVector1;
+  in vec4 invmatVector2;
+  in vec4 invmatVector3;
 
   #ifdef CYLINDER_SPRITE
-    varying vec4 matVec1;
-    varying vec4 matVec2;
-    varying vec4 matVec3;
-    varying vec4 invmatVec1;
-    varying vec4 invmatVec2;
-    varying vec4 invmatVec3;
-    varying vec4 spritePosEye;
+    out vec4 matVec1;
+    out vec4 matVec2;
+    out vec4 matVec3;
+    out vec4 invmatVec1;
+    out vec4 invmatVec2;
+    out vec4 invmatVec3;
+    out vec4 spritePosEye;
   #endif
 #endif
 
@@ -78,12 +78,12 @@ uniform mat3 normalMatrix; // optional
 uniform mat4 modelMatrix; // optional
 
 #ifdef DASHED_LINE
-  attribute float lineDistance;
-  varying float vLineDistance;
+  in float lineDistance;
+  out float vLineDistance;
 #endif
 
 #ifdef THICK_LINE
-  attribute vec3 direction;
+  in vec3 direction;
   uniform mat4 projMatrixInv;
   uniform vec2 viewport;
   uniform float lineWidth;
