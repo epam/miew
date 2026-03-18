@@ -407,15 +407,6 @@ Miew.prototype._requestAnimationFrame = function (callback) {
   requestAnimationFrame(callback);
 };
 
-function arezSpritesSupported(context) {
-  return context.getExtension('EXT_frag_depth');
-}
-
-function isAOSupported(context) {
-  return (context.getExtension('WEBGL_depth_texture')
-  && context.getExtension('WEBGL_draw_buffers'));
-}
-
 /**
  * Initialize WebGL and set 3D scene up.
  * @private
@@ -433,19 +424,11 @@ Miew.prototype._initGfx = function () {
 
   gfx.renderer2d = new CSS2DRenderer();
 
-  gfx.renderer = new THREE.WebGL1Renderer(webGLOptions);
+  gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
   gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
   gfx.renderer.shadowMap.autoUpdate = false;
   gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
   capabilities.init(gfx.renderer);
-
-  // z-sprites and ambient occlusion possibility
-  if (!arezSpritesSupported(gfx.renderer.getContext())) {
-    settings.set('zSprites', false);
-  }
-  if (!isAOSupported(gfx.renderer.getContext())) {
-    settings.set('ao', false);
-  }
 
   gfx.renderer.autoClear = false;
   gfx.renderer.setPixelRatio(window.devicePixelRatio);
@@ -523,10 +506,8 @@ Miew.prototype._initGfx = function () {
     },
   );
 
-  if (gfx.renderer.getContext().getExtension('WEBGL_depth_texture')) {
-    gfx.offscreenBuf.depthTexture = new THREE.DepthTexture();
-    gfx.offscreenBuf.depthTexture.type = THREE.UnsignedShortType;
-  }
+  gfx.offscreenBuf.depthTexture = new THREE.DepthTexture();
+  gfx.offscreenBuf.depthTexture.type = THREE.UnsignedShortType;
 
   gfx.offscreenBuf2 = new THREE.WebGLRenderTarget(
     deviceWidth,
@@ -556,50 +537,46 @@ Miew.prototype._initGfx = function () {
   gfx.volFFTex = gfx.offscreenBuf4;
   gfx.volWFFTex = gfx.offscreenBuf;
 
-  // use float textures for volume rendering if possible
-  if (gfx.renderer.getContext().getExtension('OES_texture_float')) {
-    gfx.offscreenBuf5 = new THREE.WebGLRenderTarget(
-      deviceWidth,
-      deviceHeight,
-      {
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
-        format: THREE.RGBAFormat,
-        type: THREE.FloatType,
-        depthBuffer: false,
-      },
-    );
+  // use float textures for volume rendering (WebGL2 core feature)
+  gfx.offscreenBuf5 = new THREE.WebGLRenderTarget(
+    deviceWidth,
+    deviceHeight,
+    {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+      type: THREE.FloatType,
+      depthBuffer: false,
+    },
+  );
 
-    gfx.offscreenBuf6 = new THREE.WebGLRenderTarget(
-      deviceWidth,
-      deviceHeight,
-      {
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
-        format: THREE.RGBAFormat,
-        type: THREE.FloatType,
-        depthBuffer: false,
-      },
-    );
+  gfx.offscreenBuf6 = new THREE.WebGLRenderTarget(
+    deviceWidth,
+    deviceHeight,
+    {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+      type: THREE.FloatType,
+      depthBuffer: false,
+    },
+  );
 
-    gfx.offscreenBuf7 = new THREE.WebGLRenderTarget(
-      deviceWidth,
-      deviceHeight,
-      {
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
-        format: THREE.RGBAFormat,
-        type: THREE.FloatType,
-        depthBuffer: true,
-      },
-    );
+  gfx.offscreenBuf7 = new THREE.WebGLRenderTarget(
+    deviceWidth,
+    deviceHeight,
+    {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+      type: THREE.FloatType,
+      depthBuffer: true,
+    },
+  );
 
-    gfx.volBFTex = gfx.offscreenBuf5;
-    gfx.volFFTex = gfx.offscreenBuf6;
-    gfx.volWFFTex = gfx.offscreenBuf7;
-  } else {
-    this.logger.warn('Device doesn\'t support OES_texture_float extension');
-  }
+  gfx.volBFTex = gfx.offscreenBuf5;
+  gfx.volFFTex = gfx.offscreenBuf6;
+  gfx.volWFFTex = gfx.offscreenBuf7;
 
   gfx.stereoBufL = new THREE.WebGLRenderTarget(
     deviceWidth,
@@ -1184,11 +1161,10 @@ Miew.prototype._setUberMaterialValues = function (values) {
 Miew.prototype._enableMRT = function (on, renderBuffer, textureBuffer) {
   const gfx = this._gfx;
   const gl = gfx.renderer.getContext();
-  const ext = gl.getExtension('WEBGL_draw_buffers');
   const { properties } = gfx.renderer;
 
   if (!on) {
-    ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, null]);
+    gl.drawBuffers([gl.COLOR_ATTACHMENT0, null]);
     return;
   }
 
@@ -1207,10 +1183,10 @@ Miew.prototype._enableMRT = function (on, renderBuffer, textureBuffer) {
   fb.width = renderBuffer.width;
   fb.height = renderBuffer.height;
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tx, 0);
-  gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, tx8, 0);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, tx8, 0);
 
-  // mapping textures
-  ext.drawBuffersWEBGL([gl.COLOR_ATTACHMENT0, ext.COLOR_ATTACHMENT1_WEBGL]);
+  // mapping textures (MRT is core feature in WebGL2)
+  gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
 };
 
 Miew.prototype._renderScene = (function () {
@@ -3692,20 +3668,11 @@ Miew.prototype._initOnSettingsChanged = function () {
   });
 
   on('ao', () => {
-    if (settings.now.ao && !isAOSupported(this._gfx.renderer.getContext())) {
-      this.logger.warn('Your device or browser does not support ao');
-      settings.set('ao', false);
-    } else {
-      const values = { normalsToGBuffer: settings.now.ao };
-      this._setUberMaterialValues(values);
-    }
+    const values = { normalsToGBuffer: settings.now.ao };
+    this._setUberMaterialValues(values);
   });
 
   on('zSprites', () => {
-    if (settings.now.zSprites && !arezSpritesSupported(this._gfx.renderer.getContext())) {
-      this.logger.warn('Your device or browser does not support zSprites');
-      settings.set('zSprites', false);
-    }
     this.rebuildAll();
   });
 

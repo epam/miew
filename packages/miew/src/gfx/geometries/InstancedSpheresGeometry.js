@@ -25,7 +25,7 @@ class InstancedSpheresGeometry extends SphereCollisionGeo(THREE.InstancedBufferG
   constructor(spheresCount, sphereComplexity, useZSprites) {
     super(spheresCount);
     this._sphGeometry = useZSprites ? new THREE.PlaneGeometry(2, 2, 1, 1)
-      : new THREE.SphereBufferGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
+      : new THREE.SphereGeometry(1, sphereComplexity * 2, sphereComplexity, 0, Math.PI * 2, 0, Math.PI);
     this._init(spheresCount, this._sphGeometry);
   }
 
