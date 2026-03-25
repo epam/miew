@@ -291,7 +291,7 @@ class Volume {
       data,
       width,
       height,
-      THREE.LuminanceFormat,
+      THREE.RedFormat,
       THREE.UnsignedByteType,
       THREE.UVMapping,
       THREE.ClampToEdgeWrapping,

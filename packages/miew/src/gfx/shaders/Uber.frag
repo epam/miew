@@ -333,7 +333,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
 
   #if defined(SHADOWMAP)
   	float texture2DCompare( sampler2D depths, vec2 uv, float compare ) {
-  		return step( compare, unpackRGBAToDepth( texture2D( depths, uv ) ) );
+  		return step( compare, unpackRGBAToDepth( texture( depths, uv ) ) );
   	}
 
     float getShadow( sampler2D shadowMap, DirectionalLightShadow dirLight, vec4 shadowCoord, vec3 vViewPosition, vec3 vNormal ) {
@@ -380,7 +380,7 @@ float unpackRGBAToDepth( const in vec4 v ) {
           vec4 vUv = ((projectionMatrix * vec4(vViewPosition, 1.0)) + 1.0) / 2.0;
           vec2 vUvNoise = vUv.xy / srcTexelSize * noiseTexelSize;
 
-          vec2 noiseVec = normalize(texture2D(noiseTex, vUvNoise).rg);
+          vec2 noiseVec = normalize(texture(noiseTex, vUvNoise).rg);
           mat2 mNoise = mat2(noiseVec.x, noiseVec.y, -noiseVec.y, noiseVec.x);
 
           vec2 offset;
