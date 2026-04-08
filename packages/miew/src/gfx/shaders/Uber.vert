@@ -1,3 +1,10 @@
+/*
+ * GLSL Version: ES 3.00 (WebGL 2.0 compatible)
+ * No #version directive in this file (injected by Three.js).
+ * Use GLSL3 semantics (`in`/`out`).
+ * Set `glslVersion: THREE.GLSL3` in ShaderMaterial/RawShaderMaterial.
+ */
+
 float INSTANCED_SPRITE_OVERSCALE = 1.3;
 
 in vec3 normal;
