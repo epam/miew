@@ -1,3 +1,10 @@
+/*
+ * GLSL Version: ES 3.00 (WebGL 2.0 compatible)
+ * No #version directive in this file (injected by Three.js).
+ * Use GLSL3 semantics (`in`/`out`, `layout(location=...)`, `texture`).
+ * Set `glslVersion: THREE.GLSL3` in ShaderMaterial/RawShaderMaterial.
+ */
+
 #if defined (NORMALS_TO_G_BUFFER)
   layout(location = 0) out vec4 fragColor;
   layout(location = 1) out vec4 fragNormal;
