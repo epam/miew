@@ -83,7 +83,7 @@
     "instrument": false
   },
   "dependencies": {
-    "lodash": "^4.17.23",
+    "lodash": "^4.18.1",
     "three": "0.153.0"
   },
   "devDependencies": {
