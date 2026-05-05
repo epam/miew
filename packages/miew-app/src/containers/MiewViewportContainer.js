@@ -1,17 +1,17 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import MiewViewer from '../components/viewer/MiewViewer.jsx';
+import MiewViewport from '../components/viewport/MiewViewport.jsx';
 import {
   updateLoadingStage,
 } from '../actions';
 
-const MiewViewerContainer = (props) => {
+const MiewViewportContainer = (props) => {
   const dispatch = useDispatch();
   const frozen = useSelector((state) => state.visiblePanels?.visibility);
 
   return (
-    <MiewViewer
+    <MiewViewport
       {...props}
       frozen={frozen}
       updateLoadingStage={(title) => dispatch(updateLoadingStage(title))}
@@ -19,4 +19,4 @@ const MiewViewerContainer = (props) => {
   );
 };
 
-export default MiewViewerContainer;
+export default MiewViewportContainer;

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 
-import Miew from 'MiewModule'; // eslint-disable-line import/no-unresolved
+import Miew from 'miew';
 
 import './DisplayPreference.scss';
 import Thumbnail from './thumbnail/Thumbnail.jsx';

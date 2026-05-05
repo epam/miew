@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Menu from '../containers/MenuContainer';
-import Viewer from '../containers/MiewViewerContainer';
+import MiewViewport from '../containers/MiewViewportContainer';
 import './App.scss';
 
 export default class App extends React.Component {
@@ -20,9 +20,9 @@ export default class App extends React.Component {
 
   render() {
     return <div className="root">
-      <Viewer onChange={ this._onViewerChange }>
+      <MiewViewport onChange={ this._onViewerChange }>
         <Menu/>
-      </Viewer>
+      </MiewViewport>
     </div>;
   }
 }
