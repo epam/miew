@@ -2645,7 +2645,7 @@ Miew.prototype._enterComponentEditMode = function () {
     }
   });
 
-  if (editors === []) {
+  if (editors.length === 0) {
     return;
   }
 
