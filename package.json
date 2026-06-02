@@ -16,7 +16,7 @@
     "ci": "yarn workspaces foreach -ptv run ci"
   },
   "devDependencies": {
-    "lcov-result-merger": "^5.0.1",
+    "lcov-result-merger": "^6.0.0",
     "mkdirp": "^3.0.1",
     "rimraf": "^6.1.3"
   },
