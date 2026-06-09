@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-06-09
+
+### Changed
+
+- Upgraded the WebGL renderer to WebGL 2.0, replacing deprecated extension APIs with built-in
+  WebGL 2.0 equivalents. This may affect applications that rely on the specific WebGL 1.0
+  extension behavior.
+- Updated shaders to GLSL 3.0, restoring ambient occlusion, shadows, electron density,
+  sprite-based rendering modes, and other visual effects that had regressed with the
+  newer Three.js renderer.
+
+### Fixed
+
+- Fixed an always-false condition check in the component edit mode.
+
+### Internal
+
+- Updated third-party dependencies.
+
 ## [0.11.1] - 2025-10-14
 
 ### Fixed
@@ -648,7 +667,8 @@ in [0.7.7+hotfix] and later releases.
 - Update dependencies to the latest supported versions.
 - Move the project to GitHub.
 
-[Unreleased]: https://github.com/epam/miew/compare/v0.11.1...HEAD
+[Unreleased]: https://github.com/epam/miew/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/epam/miew/compare/v0.11.1...v0.12.0
 [0.11.1]: https://github.com/epam/miew/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/epam/miew/compare/v0.9.0...v0.11.0
 [0.10.0]: https://github.com/epam/miew/compare/v0.9.0...v0.10.0
