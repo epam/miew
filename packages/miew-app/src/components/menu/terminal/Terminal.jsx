@@ -32,7 +32,7 @@ function Terminal({ isTerminalVisible }) {
   }
 
   const terminalConfig = {
-    greetings: 'Miew - 3D Molecular Viewer\nCopyright © 2015-2025 EPAM Systems, Inc.\n',
+    greetings: 'Miew - 3D Molecular Viewer\nCopyright © 2015-2026 EPAM Systems, Inc.\n',
     prompt: 'miew> ',
     name: 'miew',
     scrollOnEcho: true,
