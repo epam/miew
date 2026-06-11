@@ -19,7 +19,7 @@ const AboutPanel = () => {
       <img src="images/logo.svg"></img>
       <h3 className="miew-name">Miew – 3D Molecular Viewer </h3>
       <p>{version}</p>
-      <p>Copyright © 2015–2025 EPAM Systems, Inc.</p>
+      <p>Copyright © 2015–2026 EPAM Systems, Inc.</p>
       <p>
         <a href="https://epa.ms/miew">https://epa.ms/miew</a>
       </p>
