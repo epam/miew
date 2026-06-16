@@ -55,6 +55,7 @@ ObjectHandler.prototype._rotate = (function () {
     }
 
     m.decompose(p, q, s);
+    q.normalize();
 
     // update objects
     if (!zeroPivot) {
@@ -507,10 +508,16 @@ ObjectControls.prototype.rotateByMouse = (function () {
 }());
 
 // rotate object by specified quaternion
-ObjectControls.prototype.rotate = function (quat) {
-  this.object.quaternion.multiply(quat);
-  this.dispatchEvent({ type: 'change', action: 'rotate', quaternion: quat });
-};
+ObjectControls.prototype.rotate = (function () {
+  const normalizedQuat = new THREE.Quaternion();
+
+  return function (quat) {
+    normalizedQuat.copy(quat).normalize();
+    this.object.quaternion.multiply(normalizedQuat);
+    this.object.quaternion.normalize();
+    this.dispatchEvent({ type: 'change', action: 'rotate', quaternion: normalizedQuat.clone() });
+  };
+}());
 
 // get object's orientation
 ObjectControls.prototype.getOrientation = function () {
@@ -518,9 +525,14 @@ ObjectControls.prototype.getOrientation = function () {
 };
 
 // set object's orientation
-ObjectControls.prototype.setOrientation = function (quat) {
-  this.object.quaternion.copy(quat);
-};
+ObjectControls.prototype.setOrientation = (function () {
+  const normalizedQuat = new THREE.Quaternion();
+
+  return function (quat) {
+    normalizedQuat.copy(quat).normalize();
+    this.object.quaternion.copy(normalizedQuat);
+  };
+}());
 
 // translate object based on latest mouse/touch movement
 ObjectControls.prototype.translate = (function () {

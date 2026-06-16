@@ -62,6 +62,9 @@ const PARSER_NOT_FOUND = 'Could not find suitable parser for this source';
 // To keep miew colors we disable the new color management system
 THREE.ColorManagement.enabled = false;
 
+const DIRECTIONAL_LIGHT_INTENSITY = Math.PI * 0.45;
+const AMBIENT_LIGHT_INTENSITY = Math.PI;
+
 const { createElement } = utils;
 
 function updateFogRange(fog, center, radius) {
@@ -425,6 +428,9 @@ Miew.prototype._initGfx = function () {
   gfx.renderer2d = new CSS2DRenderer();
 
   gfx.renderer = new THREE.WebGLRenderer(webGLOptions);
+  if ('useLegacyLights' in gfx.renderer) {
+    gfx.renderer.useLegacyLights = false;
+  }
   gfx.renderer.shadowMap.enabled = settings.now.shadow.on;
   gfx.renderer.shadowMap.autoUpdate = false;
   gfx.renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -473,7 +479,7 @@ Miew.prototype._initGfx = function () {
   gfx.selectionPivot.matrixAutoUpdate = false;
   gfx.selectionRoot.add(gfx.selectionPivot);
 
-  const light12 = new THREE.DirectionalLight(0xffffff, 0.45);
+  const light12 = new THREE.DirectionalLight(0xffffff, DIRECTIONAL_LIGHT_INTENSITY);
   light12.position.set(0, 0.414, 1);
   light12.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   light12.castShadow = true;
@@ -489,7 +495,7 @@ Miew.prototype._initGfx = function () {
   gfx.scene.add(light12);
   gfx.scene.add(light12.target);
 
-  const light3 = new THREE.AmbientLight(0x666666);
+  const light3 = new THREE.AmbientLight(0x666666, AMBIENT_LIGHT_INTENSITY);
   light3.layers.enable(gfxutils.LAYERS.TRANSPARENT);
   gfx.scene.add(light3);
 
