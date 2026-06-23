@@ -241,9 +241,9 @@ DebugTracer.spaces = '                                                          
 
 class OutOfMemoryError extends Error {
   constructor(message) {
-    super();
+    super(message);
     this.name = 'OutOfMemoryError';
-    this.message = message;
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
