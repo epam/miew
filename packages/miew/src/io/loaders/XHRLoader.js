@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import CancellationError from '../CancellationError';
 import Loader from './Loader';
 
 // we don't need to detect all kinds of URLs, just the evident ones
@@ -15,7 +16,8 @@ export default class XHRLoader extends Loader {
   load() {
     return new Promise((resolve, reject) => {
       if (this._abort) {
-        throw new Error('Loading aborted');
+        reject(new CancellationError('Loading aborted'));
+        return;
       }
 
       const url = this._source;
@@ -32,7 +34,7 @@ export default class XHRLoader extends Loader {
         reject(new Error('HTTP request failed'));
       });
       request.addEventListener('abort', () => {
-        reject(new Error('Loading aborted'));
+        reject(new CancellationError('Loading aborted'));
       });
       request.addEventListener('progress', (event) => {
         this.dispatchEvent(event);

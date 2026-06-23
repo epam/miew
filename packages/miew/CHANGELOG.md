@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix uncaught promise rejection when a load operation is cancelled. The `load()` promise now
+  resolves normally on cancellation instead of rejecting with an unhandled error.
+
 ## [0.12.0] - 2026-06-09
 
 ### Changed

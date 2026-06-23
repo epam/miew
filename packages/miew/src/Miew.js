@@ -12,6 +12,7 @@ import Visual from './Visual';
 import ComplexVisual from './ComplexVisual';
 import Complex from './chem/Complex';
 import VolumeVisual from './VolumeVisual';
+import CancellationError from './io/CancellationError';
 import io from './io/io';
 import modes from './gfx/modes';
 import colorers from './gfx/colorers';
@@ -1831,9 +1832,10 @@ function updateBinaryMode(opts) {
 }
 
 function _fetchData(source, opts, job) {
-  return new Promise(((resolve) => {
+  return new Promise(((resolve, reject) => {
     if (job.shouldCancel()) {
-      throw new Error('Operation cancelled');
+      reject(new CancellationError('Operation cancelled'));
+      return;
     }
     job.notify({ type: 'fetching' });
 
@@ -1843,7 +1845,8 @@ function _fetchData(source, opts, job) {
     // detect a proper loader
     const TheLoader = _.head(io.loaders.find({ type: opts.sourceType, source }));
     if (!TheLoader) {
-      throw new Error(LOADER_NOT_FOUND);
+      reject(new Error(LOADER_NOT_FOUND));
+      return;
     }
 
     // split file name
@@ -1898,11 +1901,13 @@ function _fetchData(source, opts, job) {
       .catch((error) => {
         console.timeEnd('fetch');
         opts.context.logger.debug(error.message);
-        if (error.stack) {
-          opts.context.logger.debug(error.stack);
+        if (!(error instanceof CancellationError)) {
+          if (error.stack) {
+            opts.context.logger.debug(error.stack);
+          }
+          opts.context.logger.error('Fetching failed');
+          job.notify({ type: 'fetchingDone', error });
         }
-        opts.context.logger.error('Fetching failed');
-        job.notify({ type: 'fetchingDone', error });
         throw error;
       });
     resolve(promise);
@@ -1911,7 +1916,7 @@ function _fetchData(source, opts, job) {
 
 function _parseData(data, opts, job) {
   if (job.shouldCancel()) {
-    return Promise.reject(new Error('Operation cancelled'));
+    return Promise.reject(new CancellationError('Operation cancelled'));
   }
 
   job.notify({ type: 'parsing' });
@@ -1936,11 +1941,13 @@ function _parseData(data, opts, job) {
       console.timeEnd('parse');
       opts.error = error;
       opts.context.logger.debug(error.message);
-      if (error.stack) {
-        opts.context.logger.debug(error.stack);
+      if (!(error instanceof CancellationError)) {
+        if (error.stack) {
+          opts.context.logger.debug(error.stack);
+        }
+        opts.context.logger.error('Parsing failed');
+        job.notify({ type: 'parsingDone', error });
       }
-      opts.context.logger.error('Parsing failed');
-      job.notify({ type: 'parsingDone', error });
       throw error;
     });
 }
@@ -2006,6 +2013,10 @@ Miew.prototype.load = function (source, opts) {
       return onLoadEnd(name);
     })
     .catch((err) => {
+      if (err instanceof CancellationError) {
+        this.logger.debug('Loading cancelled');
+        return onLoadEnd(undefined);
+      }
       this.logger.error('Could not load data');
       this.logger.debug(err);
       throw onLoadEnd(err);

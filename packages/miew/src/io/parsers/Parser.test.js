@@ -2,6 +2,7 @@ import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
 import chaiAsPromised from 'chai-as-promised';
+import CancellationError from '../CancellationError';
 import Parser from './Parser';
 
 chai.use(dirtyChai);
@@ -48,6 +49,21 @@ describe('Parser', () => {
       parser.abort();
       return expect(promise).to.be.rejected().then(() => {
         expect(parser.parseSync).to.not.have.been.called();
+      });
+    });
+
+    it('rejects with CancellationError if aborted beforehand', () => {
+      parser.abort();
+      return expect(parser.parse()).to.be.rejected().then((err) => {
+        expect(err).to.be.instanceOf(CancellationError);
+      });
+    });
+
+    it('rejects with CancellationError if aborted afterwards', () => {
+      const promise = parser.parse();
+      parser.abort();
+      return expect(promise).to.be.rejected().then((err) => {
+        expect(err).to.be.instanceOf(CancellationError);
       });
     });
   });

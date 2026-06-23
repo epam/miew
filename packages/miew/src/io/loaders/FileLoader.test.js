@@ -1,6 +1,7 @@
 import chai, { expect } from 'chai';
 import dirtyChai from 'dirty-chai';
 import sinon from 'sinon';
+import CancellationError from '../CancellationError';
 import FileLoader from './FileLoader';
 
 chai.use(dirtyChai);
@@ -117,10 +118,25 @@ describe('FileLoader', () => {
       return expect(loader.load()).to.be.rejected();
     });
 
+    it('rejects with CancellationError if aborted beforehand', () => {
+      loader.abort();
+      return expect(loader.load()).to.be.rejected().then((err) => {
+        expect(err).to.be.instanceOf(CancellationError);
+      });
+    });
+
     it('rejects a promise if aborted afterwards', () => {
       const promise = loader.load();
       loader.abort();
       return expect(promise).to.be.rejected();
+    });
+
+    it('rejects with CancellationError if aborted afterwards', () => {
+      const promise = loader.load();
+      loader.abort();
+      return expect(promise).to.be.rejected().then((err) => {
+        expect(err).to.be.instanceOf(CancellationError);
+      });
     });
 
     it('generates progress events', () => {
