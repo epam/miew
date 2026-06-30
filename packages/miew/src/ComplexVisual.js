@@ -49,7 +49,7 @@ class ComplexVisual extends Visual {
 
   release() {
     if (this._selectionGeometry.parent) {
-      this._selectionGeometry.remove(this._selectionGeometry);
+      this._selectionGeometry.parent.remove(this._selectionGeometry);
     }
     Visual.prototype.release.call(this);
   }
