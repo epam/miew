@@ -1,3 +1,4 @@
+import CancellationError from '../CancellationError';
 import Loader from './Loader';
 
 export default class FileLoader extends Loader {
@@ -11,7 +12,8 @@ export default class FileLoader extends Loader {
   load() {
     return new Promise((resolve, reject) => {
       if (this._abort) {
-        throw new Error('Loading aborted');
+        reject(new CancellationError('Loading aborted'));
+        return;
       }
 
       const blob = this._source;
@@ -24,7 +26,7 @@ export default class FileLoader extends Loader {
         reject(reader.error);
       });
       reader.addEventListener('abort', () => {
-        reject(new Error('Loading aborted'));
+        reject(new CancellationError('Loading aborted'));
       });
       reader.addEventListener('progress', (event) => {
         this.dispatchEvent(event);

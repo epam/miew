@@ -18,7 +18,7 @@ describe('ParsingError', () => {
       expect(error).to.be.an('error');
     });
 
-    it('creates an throwable instance', () => {
+    it('creates a throwable instance', () => {
       expect(() => { throw error; }).to.throw(ParsingError);
     });
 

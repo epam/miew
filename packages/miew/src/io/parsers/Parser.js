@@ -1,3 +1,4 @@
+import CancellationError from '../CancellationError';
 import makeContextDependent from '../../utils/makeContextDependent';
 
 export default class Parser {
@@ -16,7 +17,7 @@ export default class Parser {
       setTimeout(() => {
         try {
           if (this._abort) {
-            return reject(new Error('Parsing aborted'));
+            return reject(new CancellationError('Parsing aborted'));
           }
           return resolve(this.parseSync());
         } catch (error) {

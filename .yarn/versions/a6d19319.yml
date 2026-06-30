@@ -1,0 +1,4 @@
+releases:
+  miew: patch
+  miew-app: patch
+  miew-react: patch

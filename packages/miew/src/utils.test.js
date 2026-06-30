@@ -3,6 +3,8 @@ import dirtyChai from 'dirty-chai';
 import _ from 'lodash';
 import utils from './utils';
 
+const { OutOfMemoryError } = utils;
+
 chai.use(dirtyChai);
 
 describe('utils.deriveDeep()', () => {
@@ -217,5 +219,33 @@ describe('utils.objectsDiff()', () => {
     expectSame({ obj: 5 });
     expectSame({ array: 5 });
     expectSame({ date: 5 });
+  });
+});
+
+describe('utils.OutOfMemoryError', () => {
+  let error;
+
+  beforeEach(() => {
+    error = new OutOfMemoryError('out of memory');
+  });
+
+  it('creates an Error', () => {
+    expect(error).to.be.an('error');
+  });
+
+  it('creates a throwable instance', () => {
+    expect(() => { throw error; }).to.throw(OutOfMemoryError);
+  });
+
+  it('is an instanceof OutOfMemoryError', () => {
+    expect(error).to.be.instanceOf(OutOfMemoryError);
+  });
+
+  it('sets correct name', () => {
+    expect(error).to.have.property('name', 'OutOfMemoryError');
+  });
+
+  it('sets correct message', () => {
+    expect(error).to.have.property('message', 'out of memory');
   });
 });
