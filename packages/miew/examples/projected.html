@@ -31,11 +31,25 @@
 </head>
 <body>
   <h1>Project an atom onto the canvas</h1>
-  <div style="position: absolute; border: 1px solid black">
+  <div style="position: relative; border: 1px solid black; width: 640px; height: 480px">
     <div class="miew-container" style="width:640px; height:480px"></div>
     <div id="marker" style="position:absolute"><div class="marker"></div></div>
     <canvas id="canvas" width="640" height ="480" class="canvas"></canvas>
   </div>
+
+  <p style="width: 640px">
+    This page demonstrates two ways of projecting an atom's 3D position onto the
+    2D canvas using <code>viewer.projected()</code>: a <span style="color: #d00000">red circle</span>,
+    which is a plain HTML element positioned with CSS, and a <span style="color: #008000">green circle</span>,
+    which is drawn directly onto an HTML5 canvas.
+  </p>
+  <p style="width: 640px">
+    Rotate the molecule so that the tracked atom (<code>A.1.CA</code>) moves out
+    of the viewer's bounds. The <span style="color: #d00000">red circle</span> stays visible because
+    the HTML element is not clipped by its container, while the <span style="color: #008000">green circle</span>
+    disappears because it is drawn on a canvas that clips its contents to its own width and height.
+    Both behaviors are expected.
+  </p>
 
   <script>
     (function() {
