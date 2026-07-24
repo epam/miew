@@ -13894,8 +13894,8 @@ __metadata:
   linkType: hard
 
 "svgo@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "svgo@npm:4.0.1"
+  version: 4.0.2
+  resolution: "svgo@npm:4.0.2"
   dependencies:
     commander: ^11.1.0
     css-select: ^5.1.0
@@ -13906,7 +13906,7 @@ __metadata:
     sax: ^1.5.0
   bin:
     svgo: ./bin/svgo.js
-  checksum: 9f3d1d44f7ca1fbb75ecf8bd01d4f0263e4175f84a1bc13459bc2b951c3a138a78d8bc80968c90c7e6aabae0c7ce0588c07ad8672257bdd4fb20048b3ba24c7d
+  checksum: d227ec4aa2dd466c32ba97c1be99649e89174062befbbe7c8852271241254ca10062f10864cacf36c3c273a494e5d8dc07d330034e72a15ebbc9189039e9ddc4
   languageName: node
   linkType: hard
 
