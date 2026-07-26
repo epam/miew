@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Add a description to the "Project an atom onto the canvas" example, explaining why the
+  HTML marker stays visible while the canvas-drawn marker disappears when the tracked atom
+  moves outside the viewer's bounds.
+
 ### Fixed
 
 - Fix uncaught promise rejection when a load operation is cancelled. The `load()` promise now
