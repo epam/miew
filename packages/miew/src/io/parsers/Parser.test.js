@@ -109,12 +109,68 @@ describe('Parser', () => {
       expect(parser.resolveAutoBonding(true)).to.be.false();
     });
 
-    it('falls back to the format default for an unrecognized mode', () => {
+    it('falls back to the format default when the setting is "nohetatm"', () => {
       const parser = new Parser();
       withSetting(parser, 'nohetatm');
 
       expect(parser.resolveAutoBonding(true)).to.be.true();
       expect(parser.resolveAutoBonding(false)).to.be.false();
+    });
+
+    it('falls back to the format default for an unrecognized mode', () => {
+      const parser = new Parser();
+      withSetting(parser, 'bogus-mode');
+
+      expect(parser.resolveAutoBonding(true)).to.be.true();
+      expect(parser.resolveAutoBonding(false)).to.be.false();
+    });
+  });
+
+  describe('#excludeHetatmFromAutoBonding()', () => {
+    function withSetting(parser, value) {
+      parser.context = { settings: { now: { autoBonding: value } } };
+    }
+
+    it('returns false when the setting is "default"', () => {
+      const parser = new Parser();
+      withSetting(parser, 'default');
+
+      expect(parser.excludeHetatmFromAutoBonding()).to.be.false();
+    });
+
+    it('returns false when the setting is "disable"', () => {
+      const parser = new Parser();
+      withSetting(parser, 'disable');
+
+      expect(parser.excludeHetatmFromAutoBonding()).to.be.false();
+    });
+
+    it('returns false when the setting is "force"', () => {
+      const parser = new Parser();
+      withSetting(parser, 'force');
+
+      expect(parser.excludeHetatmFromAutoBonding()).to.be.false();
+    });
+
+    it('returns true when the setting is "nohetatm"', () => {
+      const parser = new Parser();
+      withSetting(parser, 'nohetatm');
+
+      expect(parser.excludeHetatmFromAutoBonding()).to.be.true();
+    });
+
+    it('lets a per-load override win over the setting ("nohetatm" overrides "force")', () => {
+      const parser = new Parser(null, { autoBonding: 'nohetatm' });
+      withSetting(parser, 'force');
+
+      expect(parser.excludeHetatmFromAutoBonding()).to.be.true();
+    });
+
+    it('lets a per-load override win over the setting ("force" overrides "nohetatm")', () => {
+      const parser = new Parser(null, { autoBonding: 'force' });
+      withSetting(parser, 'nohetatm');
+
+      expect(parser.excludeHetatmFromAutoBonding()).to.be.false();
     });
   });
 });

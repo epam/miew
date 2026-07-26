@@ -23,28 +23,35 @@ function _getBondingRadius(atom) {
   throw new Error('_getBondingRadius: Logic error.');
 }
 
-function _isAtomEligible(atom) {
-  // build for all non-hetatm and for hetatm without bonds
-  return !atom.isHet() || (atom.bonds && atom.bonds.length === 0);
-}
-
 /**
  * Bond between atoms.
  *
  * @param {Complex} complex molecular complex
+ * @param {object} [opts] - Options.
+ * @param {boolean} [opts.excludeHetatm] - Exclude HETATM atoms from auto-bonding entirely,
+ *   instead of only skipping hetatm atoms that already have bonds.
 
  * @exports AutoBond
  * @constructor
  */
 class AutoBond {
-  constructor(complex) {
+  constructor(complex, opts) {
     this._complex = complex;
     this._maxRad = 1.8;
     const bBox = this._complex.getDefaultBoundaries().boundingBox;
     this._vBoxMin = bBox.min.clone();
     this._vBoxMax = bBox.max.clone();
 
+    this._excludeHetatm = !!(opts && opts.excludeHetatm);
     this._pairCollection = null;
+  }
+
+  _isAtomEligible(atom) {
+    if (this._excludeHetatm) {
+      return !atom.isHet();
+    }
+    // build for all non-hetatm and for hetatm without bonds
+    return !atom.isHet() || (atom.bonds && atom.bonds.length === 0);
   }
 
   /**
@@ -88,6 +95,10 @@ class AutoBond {
     let atomA;
 
     const processAtom = function (atomB) {
+      if (self._excludeHetatm && atomB.isHet()) {
+        return;
+      }
+
       if (isHydrogenA && atomB.isHydrogen()) {
         return;
       }
@@ -116,7 +127,7 @@ class AutoBond {
 
     for (let i = 0; i < atomsNum; ++i) {
       atomA = atoms[i];
-      if (!_isAtomEligible(atomA)) {
+      if (!this._isAtomEligible(atomA)) {
         continue;
       }
 

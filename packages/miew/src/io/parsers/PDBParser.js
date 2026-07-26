@@ -90,6 +90,7 @@ class PDBParser extends Parser {
     // create secondary structure etc.
     this._complex.finalize({
       needAutoBonding: this.resolveAutoBonding(true),
+      excludeHetatmFromAutoBonding: this.excludeHetatmFromAutoBonding(),
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
       serialAtomMap: this._serialAtomMap,

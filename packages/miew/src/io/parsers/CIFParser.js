@@ -179,6 +179,7 @@ class CIFParser extends Parser {
     this._extractMetadata(complex, complexData);
     complex.finalize({
       needAutoBonding: this.resolveAutoBonding(true),
+      excludeHetatmFromAutoBonding: this.excludeHetatmFromAutoBonding(),
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
     });
