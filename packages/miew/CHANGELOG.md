@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add a description to the "Project an atom onto the canvas" example, explaining why the
   HTML marker stays visible while the canvas-drawn marker disappears when the tracked atom
   moves outside the viewer's bounds.
+- Add an `autoBonding` setting (`'default'|'disable'|'force'`) to control whether bonds are
+  automatically reconstructed on load, independent of file format. Can be overridden per `load()`
+  call via `opts.autoBonding`.
 
 ### Fixed
 

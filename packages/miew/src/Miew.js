@@ -1960,6 +1960,8 @@ function _parseData(data, opts, job) {
  * @param {string=} opts.fileType - Data contents type (e.g. 'pdb', 'cml').
  * @param {string=} opts.mdFile - .nc file path.
  * @param {boolean=} opts.keepRepsInfo - prevent reset of object and reps information.
+ * @param {string=} opts.autoBonding - Override the `autoBonding` setting for this load only
+ *   ('default'|'disable'|'force').
  * @returns {Promise} name of the visual that was added to the viewer
  */
 Miew.prototype.load = function (source, opts) {

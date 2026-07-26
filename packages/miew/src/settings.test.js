@@ -62,6 +62,14 @@ describe('settings', () => {
     });
   });
 
+  describe('defaults', () => {
+    it('defaults autoBonding to "default"', () => {
+      const s = new Settings();
+
+      expect(s.now.autoBonding).to.equal('default');
+    });
+  });
+
   describe('.reset()', () => {
     it('resets all parameters to default values', () => {
       const s = new Settings();
