@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        node: [24, 22, 20]
+        node: [26, 24, 22]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
