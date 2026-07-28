@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add a description to the "Project an atom onto the canvas" example, explaining why the
   HTML marker stays visible while the canvas-drawn marker disappears when the tracked atom
   moves outside the viewer's bounds.
+- Add an `autoBonding` setting (`'default'|'disable'|'force'|'nohetatm'`) to control whether bonds
+  are automatically reconstructed on load, independent of file format. `'nohetatm'` excludes HETATM
+  atoms from auto-bonding (in either direction) while still reconstructing bonds for the rest of
+  the structure per the format's default behavior; it only has an effect for formats with a
+  genuine per-atom HETATM distinction (PDB, CIF, MMTF). Can be overridden per `load()` call via
+  `opts.autoBonding`.
 
 ### Fixed
 

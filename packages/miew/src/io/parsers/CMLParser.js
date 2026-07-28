@@ -611,7 +611,7 @@ class CMLParser extends Parser {
     this._complex.originalCML = data.originalCML;
     this._fixBondsArray();
     complex.finalize({
-      needAutoBonding: false,
+      needAutoBonding: this.resolveAutoBonding(false),
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
       serialAtomMap: this._serialAtomMap,

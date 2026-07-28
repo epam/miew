@@ -26,7 +26,7 @@ class PubChemParser extends Parser {
     if (complexData) {
       this._extractAtoms(complex, complexData);
       complex.finalize({
-        needAutoBonding: false,
+        needAutoBonding: this.resolveAutoBonding(false),
         detectAromaticLoops: this.settings.now.aromatic,
         enableEditing: this.settings.now.editing,
       });

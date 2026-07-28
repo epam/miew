@@ -864,6 +864,24 @@ const defaults = {
   aromatic: false,
 
   /**
+   * Control auto-bonding behavior when building a complex.
+   *
+   * - "default":  keep the per-format behavior (some formats reconstruct bonds, some don't),
+   * - "disable":  never reconstruct bonds, regardless of format,
+   * - "force":    always reconstruct bonds, regardless of format,
+   * - "nohetatm": reconstruct bonds per the format's default behavior, but exclude HETATM
+   *               atoms from auto-bonding. Only has an effect for formats with a genuine
+   *               per-atom HETATM distinction (PDB, CIF, MMTF); other formats behave as
+   *               with "default".
+   *
+   * Can be overridden per {@link Miew#load} call via `opts.autoBonding`.
+   *
+   * @type {string}
+   * @instance
+   */
+  autoBonding: 'default',
+
+  /**
    * Load only one biological unit from all those described in PDB file.
    * @type {boolean}
    * @instance

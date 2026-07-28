@@ -459,6 +459,7 @@ class Complex {
    * Finalizes complex's inner data(i.e. after parsing).
    * @param {objects} opts - Build bonds automatically.
    * @param {boolean} opts.needAutoBonding     - Build bonds automatically.
+   * @param {boolean} [opts.excludeHetatmFromAutoBonding] - Exclude HETATM atoms from auto-bonding.
    * @param {boolean} opts.detectAromaticLoops - Find/mark aromatic loops.
    * @param {boolean} opts.enableEditing       - Restructure Complex to enable per-component editing.
    * @param {Array<Atom>} [opts.serialAtomMap] - Array of atoms ordered by their serials.
@@ -535,7 +536,7 @@ class Complex {
     if (opts.needAutoBonding) {
       // Ignore errors during autobonding
       try {
-        const autoConnector = new AutoBond(this);
+        const autoConnector = new AutoBond(this, { excludeHetatm: opts.excludeHetatmFromAutoBonding });
         autoConnector.build();
         autoConnector.destroy();
       } catch (e) {

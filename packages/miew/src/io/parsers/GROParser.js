@@ -146,7 +146,7 @@ class GROParser extends Parser {
     this._complex._molecules[0] = molecule;
     this._molecules.push(molecule);
     this._complex.finalize({
-      needAutoBonding: true,
+      needAutoBonding: this.resolveAutoBonding(true),
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
       serialAtomMap: this._serialAtomMap,

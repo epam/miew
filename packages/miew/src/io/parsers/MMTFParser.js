@@ -463,7 +463,8 @@ class MMTFParser extends Parser {
     this._joinSynonymousChains();
 
     this._complex.finalize({
-      needAutoBonding: false,
+      needAutoBonding: this.resolveAutoBonding(false),
+      excludeHetatmFromAutoBonding: this.excludeHetatmFromAutoBonding(),
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
       serialAtomMap: this._serialAtomMap,

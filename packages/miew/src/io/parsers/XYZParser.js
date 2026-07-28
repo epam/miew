@@ -83,7 +83,7 @@ class XYZParser extends Parser {
     this._parseAtomsInf();
 
     this._complex.finalize({
-      needAutoBonding: true,
+      needAutoBonding: this.resolveAutoBonding(true),
       detectAromaticLoops: this.settings.now.aromatic,
       enableEditing: this.settings.now.editing,
       serialAtomMap: this._serialAtomMap,
