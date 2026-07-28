@@ -45,7 +45,7 @@ Note that the core library (`miew`) is framework-agnostic and does not depend on
 - **Webpack 5**: Module bundler for all packages
 - **Babel**: JavaScript transpilation with preset-env and preset-react
 - **Yarn 3**: Package manager with workspaces
-- **Node.js 20-24**: Development environment
+- **Node.js 22-26**: Development environment
 
 ### React Ecosystem (miew-app, miew-react)
 - **React 16/19**: UI framework

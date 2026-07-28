@@ -1,10 +1,10 @@
 version: "{build}"
-image: Visual Studio 2022
+image: Visual Studio 2026
 environment:
   matrix:
+    - nodejs_version: "26"
     - nodejs_version: "24"
     - nodejs_version: "22"
-    - nodejs_version: "20"
 cache:
   - ".yarn\\cache"
   - node_modules
