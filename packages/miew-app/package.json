@@ -52,6 +52,7 @@
     "react-redux": "^9.3.0"
   },
   "devDependencies": {
+    "@4c/tsconfig": "^0.4.1",
     "@babel/core": "^7.29.7",
     "@babel/eslint-parser": "^7.29.7",
     "@babel/preset-env": "^7.29.7",

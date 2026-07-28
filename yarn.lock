@@ -5,6 +5,15 @@ __metadata:
   version: 6
   cacheKey: 8
 
+"@4c/tsconfig@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@4c/tsconfig@npm:0.4.1"
+  dependencies:
+    typescript-workspace-plugin: ^2.0.1
+  checksum: 67544e726538aeddcb2b878012c49b62c078380de90da35e4d7faa57623d6c02bff84c14c59ab65a117952f17903d4ca377148036748357f41c885f79849ac1c
+  languageName: node
+  linkType: hard
+
 "@aashutoshrathi/word-wrap@npm:^1.2.3":
   version: 1.2.6
   resolution: "@aashutoshrathi/word-wrap@npm:1.2.6"
@@ -1370,7 +1379,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.24.7, @babel/runtime@npm:^7.26.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.3, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.24.7, @babel/runtime@npm:^7.26.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.7":
   version: 7.27.6
   resolution: "@babel/runtime@npm:7.27.6"
   checksum: 3f7b879df1823c0926bd5dbc941c62f5d60faa790c1aab9758c04799e1f04ee8d93553be9ec059d4e5882f19fe03cbe8933ee4f46212dced0f6d8205992c9c9a
@@ -2881,7 +2890,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:>=16.9.11":
+"@types/react@npm:*":
   version: 19.2.16
   resolution: "@types/react@npm:19.2.16"
   dependencies:
@@ -9987,6 +9996,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "miew-app@workspace:packages/miew-app"
   dependencies:
+    "@4c/tsconfig": ^0.4.1
     "@babel/core": ^7.29.7
     "@babel/eslint-parser": ^7.29.7
     "@babel/preset-env": ^7.29.7
@@ -12381,13 +12391,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-lifecycles-compat@npm:^3.0.4":
-  version: 3.0.4
-  resolution: "react-lifecycles-compat@npm:3.0.4"
-  checksum: a904b0fc0a8eeb15a148c9feb7bc17cec7ef96e71188280061fc340043fd6d8ee3ff233381f0e8f95c1cf926210b2c4a31f38182c8f35ac55057e453d6df204f
-  languageName: node
-  linkType: hard
-
 "react-redux@npm:^9.3.0":
   version: 9.3.0
   resolution: "react-redux@npm:9.3.0"
@@ -14486,6 +14489,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript-workspace-plugin@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "typescript-workspace-plugin@npm:2.0.1"
+  peerDependencies:
+    typescript: ">= 2.3.1 < 4"
+  checksum: d91fca290982a32890a3f207e0c06ced93b5382f65a5efa9ae2edf92790f6d02bc3b9350a2ba2e6d4116725e5bda43cf0b0ae115e8fa0f24ae4492b8383aae29
+  languageName: node
+  linkType: hard
+
 "uc.micro@npm:^2.0.0, uc.micro@npm:^2.1.0":
   version: 2.1.0
   resolution: "uc.micro@npm:2.1.0"
@@ -14520,20 +14532,6 @@ __metadata:
     has-symbols: ^1.1.0
     which-boxed-primitive: ^1.1.1
   checksum: 729f13b84a5bfa3fead1d8139cee5c38514e63a8d6a437819a473e241ba87eeb593646568621c7fc7f133db300ef18d65d1a5a60dc9c7beb9000364d93c581df
-  languageName: node
-  linkType: hard
-
-"uncontrollable@npm:^7.2.1":
-  version: 7.2.1
-  resolution: "uncontrollable@npm:7.2.1"
-  dependencies:
-    "@babel/runtime": ^7.6.3
-    "@types/react": ">=16.9.11"
-    invariant: ^2.2.4
-    react-lifecycles-compat: ^3.0.4
-  peerDependencies:
-    react: ">=15.0.0"
-  checksum: 3345c0c1916193ddb9cc6f2b78711dc9f22b919d780485e15b95690722e9d1797fc702c4ebb30c0acaae6a772b865d0a9ddc83fa1da44958f089aee78f2f5eab
   languageName: node
   linkType: hard
 
