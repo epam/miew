@@ -53,10 +53,10 @@
   },
   "devDependencies": {
     "@4c/tsconfig": "^0.4.1",
-    "@babel/core": "^7.29.7",
-    "@babel/eslint-parser": "^7.29.7",
-    "@babel/preset-env": "^7.29.7",
-    "@babel/preset-react": "^7.29.7",
+    "@babel/core": "^8.0.1",
+    "@babel/eslint-parser": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
+    "@babel/preset-react": "^8.0.1",
     "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^9.39.5",
@@ -81,8 +81,8 @@
     "postcss-scss": "^4.0.9",
     "rimraf": "^6.1.3",
     "style-loader": "^4.0.0",
-    "webpack": "^5.109.1",
+    "webpack": "^5.109.2",
     "webpack-cli": "^7.2.2",
-    "webpack-dev-server": "^5.2.6"
+    "webpack-dev-server": "^6.0.0"
   }
 }
