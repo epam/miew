@@ -5,6 +5,10 @@ addHook(
   { exts: ['.vert', '.frag'] },
 );
 
-require('@babel/register')({
+const babelRegisterModule = require('@babel/register');
+
+const babelRegister = babelRegisterModule.default || babelRegisterModule;
+
+babelRegister({
   rootMode: 'upward',
 });

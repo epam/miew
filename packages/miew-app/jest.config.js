@@ -13,6 +13,6 @@ module.exports = {
   coverageReporters: ["lcov", "text-summary"],
   coverageDirectory: "coverage",
   moduleNameMapper: {
-    "^.+\\.[sp]?css$": "babel-jest",
+    "^.+\\.[sp]?css$": "<rootDir>/__mocks__/emptyMock.js",
   },
 };

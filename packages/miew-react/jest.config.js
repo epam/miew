@@ -9,7 +9,7 @@ module.exports = {
   },
   moduleNameMapper: {
     '\\.module\\.[sp]?css$': 'identity-obj-proxy',
-    '^.+\\.[sp]?css$': 'babel-jest',
+    '^.+\\.[sp]?css$': '<rootDir>/__mocks__/emptyMock.js',
   },
   reporters: [['jest-simple-dot-reporter', { color: true }]],
   coverageReporters: ['lcov', 'text-summary'],
