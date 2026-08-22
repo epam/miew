@@ -23,6 +23,8 @@ Guidance for AI coding agents working in the Miew monorepo.
 - `Code Style`: ESLint 9, SCSS modules, Stylelint 17, testing frameworks, and resource disposal → [docs/agents/code-style.md](docs/agents/code-style.md)
 - `Domain Language`: Canonical terminology and forbidden synonyms → [CONTEXT.md](CONTEXT.md)
 - `Design System`: Visual tokens, UI architecture, responsive and touch guidelines → [DESIGN.md](DESIGN.md)
+- `Issue Tracker`: GitHub CLI operations and wayfinding workflow → [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md)
+- `Triage Labels`: Canonical triage roles to tracker labels mapping → [docs/agents/triage-labels.md](docs/agents/triage-labels.md)
 
 ## Commands
 
