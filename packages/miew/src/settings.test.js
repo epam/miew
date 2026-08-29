@@ -50,6 +50,62 @@ describe('settings', () => {
 
       expect(callback).to.be.called();
     });
+
+    it('normalizes boolean false for zooming to all channels false', () => {
+      const s = new Settings();
+
+      s.set('zooming', false);
+
+      expect(s.now.zooming).to.deep.equal({ wheel: false, drag: false, touch: false });
+    });
+
+    it('normalizes boolean true for zooming to all channels true', () => {
+      const s = new Settings();
+
+      s.set('zooming', false);
+      s.set('zooming', true);
+
+      expect(s.now.zooming).to.deep.equal({ wheel: true, drag: true, touch: true });
+    });
+
+    it('normalizes boolean zooming in an object parameter', () => {
+      const s = new Settings();
+
+      s.set({ zooming: false });
+
+      expect(s.now.zooming).to.deep.equal({ wheel: false, drag: false, touch: false });
+
+      s.set({ zooming: true });
+
+      expect(s.now.zooming).to.deep.equal({ wheel: true, drag: true, touch: true });
+    });
+
+    it('updates individual zooming channels independently', () => {
+      const s = new Settings();
+
+      s.set('zooming.wheel', false);
+      expect(s.now.zooming).to.deep.equal({ wheel: false, drag: true, touch: true });
+
+      s.set({ zooming: { touch: false } });
+      expect(s.now.zooming).to.deep.equal({ wheel: false, drag: true, touch: false });
+    });
+
+    it('emits change events when zooming is updated as a boolean', () => {
+      const s = new Settings();
+      const wheelCallback = sinon.spy();
+      const dragCallback = sinon.spy();
+      const touchCallback = sinon.spy();
+
+      s.addEventListener('change:zooming.wheel', wheelCallback);
+      s.addEventListener('change:zooming.drag', dragCallback);
+      s.addEventListener('change:zooming.touch', touchCallback);
+
+      s.set('zooming', false);
+
+      expect(wheelCallback).to.be.calledWith(sinon.match({ value: false }));
+      expect(dragCallback).to.be.calledWith(sinon.match({ value: false }));
+      expect(touchCallback).to.be.calledWith(sinon.match({ value: false }));
+    });
   });
 
   describe('.get()', () => {
@@ -67,6 +123,12 @@ describe('settings', () => {
       const s = new Settings();
 
       expect(s.now.autoBonding).to.equal('default');
+    });
+
+    it('defaults zooming to { wheel: true, drag: true, touch: true }', () => {
+      const s = new Settings();
+
+      expect(s.now.zooming).to.deep.equal({ wheel: true, drag: true, touch: true });
     });
   });
 

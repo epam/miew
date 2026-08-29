@@ -417,6 +417,22 @@ describe('options', () => {
     it('restores proper URL for complex with using double mode for duplicatee similar reps', () => {
       expect(options.fromURL(urlize(doubleModeRepsStr))).to.equalOptions(duplicatedRepsOpts);
     });
+
+    it('parses zooming boolean and channel options from URL', () => {
+      expect(options.fromURL('?zooming=false')).to.deep.equal({
+        settings: {
+          zooming: false,
+        },
+      });
+
+      expect(options.fromURL('?zooming.wheel=false')).to.deep.equal({
+        settings: {
+          zooming: {
+            wheel: false,
+          },
+        },
+      });
+    });
   });
 
   describe('.fromAttr()', () => {
