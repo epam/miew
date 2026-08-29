@@ -68,6 +68,35 @@ describe('settings', () => {
       expect(s.now.zooming).to.deep.equal({ wheel: true, drag: true, touch: true });
     });
 
+    it('normalizes integer 0 for zooming to all channels false', () => {
+      const s = new Settings();
+
+      s.set('zooming', 0);
+
+      expect(s.now.zooming).to.deep.equal({ wheel: false, drag: false, touch: false });
+    });
+
+    it('normalizes integer 1 for zooming to all channels true', () => {
+      const s = new Settings();
+
+      s.set('zooming', 0);
+      s.set('zooming', 1);
+
+      expect(s.now.zooming).to.deep.equal({ wheel: true, drag: true, touch: true });
+    });
+
+    it('normalizes integer zooming in an object parameter', () => {
+      const s = new Settings();
+
+      s.set({ zooming: 0 });
+
+      expect(s.now.zooming).to.deep.equal({ wheel: false, drag: false, touch: false });
+
+      s.set({ zooming: 1 });
+
+      expect(s.now.zooming).to.deep.equal({ wheel: true, drag: true, touch: true });
+    });
+
     it('normalizes boolean zooming in an object parameter', () => {
       const s = new Settings();
 

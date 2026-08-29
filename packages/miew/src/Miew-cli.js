@@ -230,7 +230,7 @@ class CLIUtils {
     if (path !== undefined) {
       let argExc = {};
       let adapter = options.adapters[typeof _.get(settings.defaults, path)];
-      if (path === 'zooming' && (typeof arg === 'boolean' || arg === 'false' || arg === 'true')) {
+      if (path === 'zooming') {
         adapter = options.adapters.boolean;
       }
       if (adapter === undefined) {
@@ -259,7 +259,8 @@ class CLIUtils {
       }
 
       if (arg !== undefined && adapter(arg) !== arg && adapter(arg) !== (arg > 0)) {
-        argExc = { message: `${path} must be a "${typeof _.get(settings.defaults, path)}"` };
+        const expectedType = path === 'zooming' ? 'boolean' : typeof _.get(settings.defaults, path);
+        argExc = { message: `${path} must be a "${expectedType}"` };
         throw argExc;
       }
     }

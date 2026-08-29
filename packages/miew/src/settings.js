@@ -955,11 +955,7 @@ utils.deriveClass(Settings, EventDispatcher, {
 
   set(path, value) {
     if (_.isString(path)) {
-      if (path === 'zooming' && typeof value === 'boolean') {
-        this.set({ zooming: value });
-        return;
-      }
-      if (path === 'zooming' && typeof value === 'object' && value !== null) {
+      if (path === 'zooming') {
         this.set({ zooming: value });
         return;
       }
@@ -970,13 +966,14 @@ utils.deriveClass(Settings, EventDispatcher, {
       }
     } else {
       let src = path;
-      if (src && typeof src.zooming === 'boolean') {
+      if (src && typeof src.zooming !== 'object' && src.zooming !== undefined) {
+        const boolVal = Boolean(src.zooming);
         src = {
           ...src,
           zooming: {
-            wheel: src.zooming,
-            drag: src.zooming,
-            touch: src.zooming,
+            wheel: boolVal,
+            drag: boolVal,
+            touch: boolVal,
           },
         };
       }
