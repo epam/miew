@@ -636,7 +636,17 @@ ObjectControls.prototype.mousedown = function (event) {
 
       this._affectedObj = workWithAltObj ? this._altObj : this._mainObj;
 
-      this._state = (workWithAltObj && event.ctrlKey && this._isTranslationAllowed) ? STATE.TRANSLATE : STATE.ROTATE;
+      if (event.altKey) {
+        this._state = (workWithAltObj && event.ctrlKey && this._isTranslationAllowed) ? STATE.TRANSLATE : STATE.ROTATE;
+      } else if (event.ctrlKey) {
+        this._state = STATE.SCALE;
+      } else {
+        this._state = STATE.ROTATE;
+      }
+    } else if (event.button === 1) {
+      this._affectedObj.stop();
+      this._affectedObj = this._mainObj;
+      this._state = STATE.SCALE;
     } else if (event.button === 2) {
       this._state = STATE.TRANSLATE_PIVOT;
     }
@@ -647,7 +657,7 @@ ObjectControls.prototype.mousedown = function (event) {
     this._mousePrevPos.copy(this._mouseCurPos);
   }
 
-  if (this._state === STATE.TRANSLATE || this._state === STATE.TRANSLATE_PIVOT) {
+  if (this._state === STATE.TRANSLATE || this._state === STATE.TRANSLATE_PIVOT || this._state === STATE.SCALE) {
     this.convertMouseToViewport(this._mouseCurPos, event.pageX, event.pageY);
     this._mousePrevPos.copy(this._mouseCurPos);
   }
@@ -681,12 +691,26 @@ ObjectControls.prototype.mousemove = function (event) {
       this.translatePivotByMouse();
       break;
 
+    case STATE.SCALE:
+      if (settings.now.zooming?.drag) {
+        this._mousePrevPos.copy(this._mouseCurPos);
+        this.convertMouseToViewport(this._mouseCurPos, event.pageX, event.pageY);
+        const deltaY = this._mouseCurPos.y - this._mousePrevPos.y;
+        let factor = 1.0 + deltaY;
+        factor = Math.max(factor, 0.01);
+        this.scale(factor);
+      }
+      break;
+
     default: break;
   }
 };
 
 ObjectControls.prototype.mousewheel = function (event) {
-  if (this.enabled === false || !settings.now.zooming || this._state !== STATE.NONE || event.shiftKey) {
+  if (this.enabled === false
+    || !settings.now.zooming?.wheel
+    || this._state !== STATE.NONE
+    || event.shiftKey) {
     return;
   }
 
@@ -773,7 +797,7 @@ ObjectControls.prototype.touchmove = function (event) {
       break;
 
     case STATE.SCALE:
-      if (settings.now.zooming) {
+      if (settings.now.zooming?.touch) {
         // update scale
         const dx = event.touches[0].pageX - event.touches[1].pageX;
         const dy = event.touches[0].pageY - event.touches[1].pageY;

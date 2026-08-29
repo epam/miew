@@ -229,7 +229,11 @@ class CLIUtils {
   propagateProp(path, arg) {
     if (path !== undefined) {
       let argExc = {};
-      const adapter = options.adapters[typeof _.get(settings.defaults, path)];
+      let adapter = options.adapters[typeof _.get(settings.defaults, path)];
+      if (path === 'zooming' && (typeof arg === 'boolean' || arg === 'false' || arg === 'true')) {
+        // for backward compatibility
+        adapter = options.adapters.boolean;
+      }
       if (adapter === undefined) {
         const pathExc = { message: `${path} is not existed` };
         throw pathExc;
