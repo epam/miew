@@ -136,24 +136,26 @@ const configureDemo = (prod) => ({
   ignoreWarnings,
 });
 
-const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
+const configureLib = (prod, libName, libFile, libType, minimize = false, includeDeps = false) => ({
   name: libName,
-  externals: {
-    three: {
-      module: 'three',
-      commonjs: 'three',
-      commonjs2: 'three',
-      amd: 'three',
-      root: 'THREE',
+  ...(!includeDeps && {
+    externals: {
+      three: {
+        module: 'three',
+        commonjs: 'three',
+        commonjs2: 'three',
+        amd: 'three',
+        root: 'THREE',
+      },
+      lodash: {
+        module: 'lodash',
+        commonjs: 'lodash',
+        commonjs2: 'lodash',
+        amd: 'lodash',
+        root: '_',
+      },
     },
-    lodash: {
-      module: 'lodash',
-      commonjs: 'lodash',
-      commonjs2: 'lodash',
-      amd: 'lodash',
-      root: '_',
-    },
-  },
+  }),
   entry: {
     Miew: resolvePath('src/index.js'),
   },
@@ -218,6 +220,7 @@ const configureLib = (prod, libName, libFile, libType, minimize = false) => ({
 module.exports = [
   (env, argv) => configureLib(argv.mode === 'production', 'miew', 'dist/[name].js', 'umd'),
   (env, argv) => configureLib(argv.mode === 'production', 'miew-min', 'dist/[name].min.js', 'umd', true),
+  (env, argv) => configureLib(argv.mode === 'production', 'miew-bundle', 'dist/[name].bundle.min.js', 'umd', true, true),
   (env, argv) => configureLib(argv.mode === 'production', 'miew-module', 'dist/[name].module.js', 'module'),
   (env, argv) => configureDemo(argv.mode === 'production'),
 ];
