@@ -829,11 +829,18 @@ const defaults = {
   autoRotationAxisFixed: true,
 
   /**
-   * Enable zooming with mouse wheel or pinch gesture.
-   * @type {boolean}
+   * Enable zooming with mouse wheel, mouse drag, or touch pinch gesture.
+   * @type {object}
+   * @property {boolean} wheel - Enable mouse wheel zoom.
+   * @property {boolean} drag - Enable secondary mouse drag zoom.
+   * @property {boolean} touch - Enable multi-touch pinch zoom.
    * @instance
    */
-  zooming: true,
+  zooming: {
+    wheel: true,
+    drag: true,
+    touch: true,
+  },
 
   /**
    * Enable picking atoms & residues with left mouse button or touch.
@@ -948,13 +955,29 @@ utils.deriveClass(Settings, EventDispatcher, {
 
   set(path, value) {
     if (_.isString(path)) {
+      if (path === 'zooming') {
+        this.set({ zooming: value });
+        return;
+      }
       const oldValue = _.get(this.now, path);
       if (oldValue !== value) {
         _.set(this.now, path, value);
         this._notifyChange(path, value);
       }
     } else {
-      const diff = utils.objectsDiff(path, this.now);
+      let src = path;
+      if (src && src.zooming !== undefined && !_.isPlainObject(src.zooming)) {
+        const boolVal = Boolean(src.zooming);
+        src = {
+          ...src,
+          zooming: {
+            wheel: boolVal,
+            drag: boolVal,
+            touch: boolVal,
+          },
+        };
+      }
+      const diff = utils.objectsDiff(src, this.now);
       if (!_.isEmpty(diff)) {
         _.merge(this.now, diff);
         this._notifyChanges(diff);
