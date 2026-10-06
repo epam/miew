@@ -242,7 +242,11 @@ function _fromArray(entries) {
 
     // either set a property or use specialized parser
     if (!action) {
-      const adapter = adapters[typeof _.get(settings.defaults, key)];
+      let adapter = adapters[typeof _.get(settings.defaults, key)];
+      if (key === 'zooming') {
+        // for backward compatibility
+        adapter = adapters.boolean;
+      }
       if (adapter) {
         _.set(opts, `settings.${key}`, adapter(value));
       } else {

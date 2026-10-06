@@ -229,7 +229,11 @@ class CLIUtils {
   propagateProp(path, arg) {
     if (path !== undefined) {
       let argExc = {};
-      const adapter = options.adapters[typeof _.get(settings.defaults, path)];
+      let adapter = options.adapters[typeof _.get(settings.defaults, path)];
+      if (path === 'zooming') {
+        // for backward compatibility
+        adapter = options.adapters.boolean;
+      }
       if (adapter === undefined) {
         const pathExc = { message: `${path} is not existed` };
         throw pathExc;
@@ -256,7 +260,8 @@ class CLIUtils {
       }
 
       if (arg !== undefined && adapter(arg) !== arg && adapter(arg) !== (arg > 0)) {
-        argExc = { message: `${path} must be a "${typeof _.get(settings.defaults, path)}"` };
+        const expectedType = path === 'zooming' ? 'boolean' : typeof _.get(settings.defaults, path);
+        argExc = { message: `${path} must be a "${expectedType}"` };
         throw argExc;
       }
     }
