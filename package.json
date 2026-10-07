@@ -31,7 +31,7 @@
     "uncontrollable": "^8.0.4",
     "markdown-it": "^14.3.0",
     "js-yaml": "^5.2.2",
-    "brace-expansion": "^1.1.17",
+    "brace-expansion": "^1.1.18",
     "body-parser": "^2.3.0",
     "bootstrap-switch-button-react@^1.2.0": "patch:bootstrap-switch-button-react@npm%3A1.2.0#./.yarn/patches/bootstrap-switch-button-react-npm-1.2.0-e97ab0d77d.patch",
     "react-github-fork-ribbon@^0.7.1": "patch:react-github-fork-ribbon@npm%3A0.7.1#./.yarn/patches/react-github-fork-ribbon-npm-0.7.1-8a5e219e19.patch",
