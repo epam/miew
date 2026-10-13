@@ -13,6 +13,7 @@ const {
   Strand,
   Assembly,
   Molecule,
+  UnitCell,
 } = chem;
 
 const cRequiredAtomFields = [
@@ -177,6 +178,7 @@ class CIFParser extends Parser {
     this._extractAssemblies(complex, complexData);
     this._extractMolecules(complex, complexData);
     this._extractMetadata(complex, complexData);
+    this._extractUnitCell(complex, complexData);
     complex.finalize({
       needAutoBonding: this.resolveAutoBonding(true),
       excludeHetatmFromAutoBonding: this.excludeHetatmFromAutoBonding(),
@@ -516,6 +518,53 @@ class CIFParser extends Parser {
       asm.matrices = assemblyOps;
       complex.units.push(asm);
     }
+  }
+
+  /**
+   * Extract crystallographic unit cell from CIF structure
+   * @param {Complex} complex
+   * @param complexData
+   * @private
+   */
+  _extractUnitCell(complex, complexData) {
+    const { cell } = complexData;
+    if (!cell) {
+      return;
+    }
+
+    const a = parseFloat(cell.length_a);
+    const b = parseFloat(cell.length_b);
+    const c = parseFloat(cell.length_c);
+
+    if (Number.isNaN(a) || Number.isNaN(b) || Number.isNaN(c) || a <= 0 || b <= 0 || c <= 0) {
+      return;
+    }
+
+    const alpha = parseFloat(cell.angle_alpha);
+    const beta = parseFloat(cell.angle_beta);
+    const gamma = parseFloat(cell.angle_gamma);
+
+    let spaceGroup = '';
+    const symmetry = complexData.symmetry || complexData.space_group;
+    if (symmetry) {
+      const rawSg = symmetry['space_group_name_H-M']
+        || symmetry.space_group_name_H_M
+        || symmetry['name_H-M_alt']
+        || symmetry.name_H_M_alt
+        || symmetry.space_group_name_Hall
+        || '';
+      spaceGroup = _.isString(rawSg) ? rawSg.replace(/^['"]|['"]$/g, '').trim() : '';
+    }
+
+    complex.unitCell = new UnitCell(
+      new THREE.Vector3(a, b, c),
+      new THREE.Vector3(
+        Number.isNaN(alpha) ? 90 : alpha,
+        Number.isNaN(beta) ? 90 : beta,
+        Number.isNaN(gamma) ? 90 : gamma,
+      ),
+      spaceGroup,
+    );
   }
 }
 

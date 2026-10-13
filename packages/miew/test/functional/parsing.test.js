@@ -152,6 +152,16 @@ describe('Parsed Complex data', () => {
 
               lookFor('_helices.length', entry.num.helices);
               lookFor('_sheets.length', entry.num.sheets);
+
+              if (entry.unitCell) {
+                lookFor('unitCell.a', entry.unitCell.a, 1e-2);
+                lookFor('unitCell.b', entry.unitCell.b, 1e-2);
+                lookFor('unitCell.c', entry.unitCell.c, 1e-2);
+                lookFor('unitCell.alpha', entry.unitCell.alpha, 1e-2);
+                lookFor('unitCell.beta', entry.unitCell.beta, 1e-2);
+                lookFor('unitCell.gamma', entry.unitCell.gamma, 1e-2);
+                lookFor('unitCell.spaceGroup', entry.unitCell.spaceGroup);
+              }
             });
         });
       });
