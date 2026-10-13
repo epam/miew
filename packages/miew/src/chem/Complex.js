@@ -60,6 +60,7 @@ class Complex {
     this.metadata = {};
 
     this.symmetry = [];
+    this.unitCell = null;
     this.units = [new BiologicalUnit(this)];
     this._currentUnit = 0; // default biological unit is the asymmetric unit
   }
