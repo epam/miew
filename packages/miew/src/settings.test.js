@@ -270,4 +270,22 @@ describe('settings', () => {
       expect(s.now.plugins[pluginName]).to.deep.equal(testPlugin);
     });
   });
+
+  describe('unitCell setting', () => {
+    it('defaults to false and toggles correctly', () => {
+      const s = new Settings();
+      expect(s.now.unitCell).to.be.false();
+
+      const callback = sinon.spy();
+      s.addEventListener('change:unitCell', callback);
+
+      s.set('unitCell', true);
+      expect(s.now.unitCell).to.be.true();
+      expect(callback.calledOnce).to.be.true();
+
+      s.set({ unitCell: false });
+      expect(s.now.unitCell).to.be.false();
+      expect(callback.calledTwice).to.be.true();
+    });
+  });
 });

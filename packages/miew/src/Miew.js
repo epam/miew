@@ -3795,6 +3795,13 @@ Miew.prototype._initOnSettingsChanged = function () {
     }
   });
 
+  on('unitCell', () => {
+    this._forEachComplexVisual((visual) => {
+      visual.showUnitCell(settings.now.unitCell);
+    });
+    this._needRender = true;
+  });
+
   on(['axes', 'fxaa', 'ao',
     'outline.on', 'outline.color', 'outline.threshold', 'outline.thickness'], () => {
     this._needRender = true;

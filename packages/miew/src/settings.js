@@ -718,6 +718,13 @@ const defaults = {
   },
 
   /**
+   * Display crystallographic unit cell bounding box wireframe.
+   * @type {boolean}
+   * @instance
+   */
+  unitCell: false,
+
+  /**
    * @type {boolean}
    * @instance
    */
