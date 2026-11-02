@@ -1,6 +1,6 @@
 {
   "name": "miew-react",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Miew - 3D Molecular Viewer (React component)",
   "author": "EPAM Systems, Inc.",
   "homepage": "https://github.com/epam/miew#readme",
@@ -32,10 +32,11 @@
     "lint-fix": "prettier . --write; eslint . --ext js,jsx --fix",
     "test": "jest",
     "test-cover": "jest --coverage",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "prepack": "npm run build"
   },
   "dependencies": {
-    "miew": "workspace:^"
+    "miew": "^0.12.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
