@@ -30,6 +30,15 @@ export default [{
       default: 1,
     },
   },
+  unitCell: {
+    a: { pdb: 40.96 },
+    b: { pdb: 18.65 },
+    c: { pdb: 22.52 },
+    alpha: { pdb: 90.0 },
+    beta: { pdb: 90.77 },
+    gamma: { pdb: 90.0 },
+    spaceGroup: { pdb: 'P 1 21 1' },
+  },
 }, {
   // hydrogens, waters, ligands, altloc, all aminoacids, biomolecules, symmetry, ANISOU, LINK
   name: '4NRE',
@@ -44,6 +53,15 @@ export default [{
     symmetries: { pdb: 18 },
     helices: { mmtf: 34, default: 33 },
     sheets: { mmtf: 19, default: 6 },
+  },
+  unitCell: {
+    a: { pdb: 155.794, cif: 155.794 },
+    b: { pdb: 155.794, cif: 155.794 },
+    c: { pdb: 263.219, cif: 263.219 },
+    alpha: { pdb: 90.0, cif: 90.0 },
+    beta: { pdb: 90.0, cif: 90.0 },
+    gamma: { pdb: 120.0, cif: 120.0 },
+    spaceGroup: { pdb: 'H 3 2', cif: 'H 3 2' },
   },
 }, {
   // lots of chains, models (+hydrogens)

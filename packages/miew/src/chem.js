@@ -14,6 +14,7 @@ import Volume from './chem/Volume';
 import VoxelWorld from './chem/VoxelWorld';
 import selectors from './chem/selectors';
 import Molecule from './chem/Molecule';
+import UnitCell from './chem/UnitCell';
 
 export default {
   Atom,
@@ -32,4 +33,5 @@ export default {
   VoxelWorld,
   selectors,
   Molecule,
+  UnitCell,
 };

@@ -13,6 +13,7 @@ import Representation from './gfx/Representation';
 import Visual from './Visual';
 import ComplexVisualEdit from './ComplexVisualEdit';
 import meshutils from './gfx/meshutils';
+import UnitCellObject from './gfx/UnitCellObject';
 
 const { selectors } = chem;
 
@@ -41,6 +42,19 @@ class ComplexVisual extends Visual {
     this._selectionCount = 0;
 
     this._selectionGeometry = new THREE.Group();
+
+    this._unitCell = null;
+    if (this._complex && this._complex.unitCell) {
+      this._unitCell = new UnitCellObject(this._complex.unitCell);
+      this.add(this._unitCell.getMesh());
+      this.showUnitCell(settings.now.unitCell);
+    }
+  }
+
+  showUnitCell(needShow) {
+    if (this._unitCell) {
+      this._unitCell.setVisible(needShow);
+    }
   }
 
   getBoundaries() {
@@ -48,6 +62,11 @@ class ComplexVisual extends Visual {
   }
 
   release() {
+    if (this._unitCell) {
+      this.remove(this._unitCell.getMesh());
+      this._unitCell.dispose();
+      this._unitCell = null;
+    }
     if (this._selectionGeometry.parent) {
       this._selectionGeometry.parent.remove(this._selectionGeometry);
     }
@@ -587,8 +606,17 @@ class ComplexVisual extends Visual {
   rebuild() {
     const self = this;
 
+    const unitCellMesh = this._unitCell ? this._unitCell.getMesh() : null;
+    if (unitCellMesh) {
+      this.remove(unitCellMesh);
+    }
+
     // Destroy current geometry
     gfxutils.clearTree(this);
+
+    if (unitCellMesh) {
+      this.add(unitCellMesh);
+    }
 
     return new Promise(((resolve) => {
       // Nothing to do?

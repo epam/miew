@@ -14,6 +14,7 @@ const {
   Strand,
   Bond,
   Molecule,
+  UnitCell,
 } = chem;
 
 const TAG_LENGTH = 6;
@@ -394,9 +395,25 @@ class PDBParser extends Parser {
     metadata.title[line - 1] = stream.readString(11, 80).trim();
   }
 
+  _parseCRYST1(stream) {
+    const unitCell = UnitCell.create({
+      a: stream.readFloat(7, 15),
+      b: stream.readFloat(16, 24),
+      c: stream.readFloat(25, 33),
+      alpha: stream.readFloat(34, 40),
+      beta: stream.readFloat(41, 47),
+      gamma: stream.readFloat(48, 54),
+      spaceGroup: stream.readString(56, 66).trim(),
+    });
+    if (unitCell) {
+      this._complex.unitCell = unitCell;
+    }
+  }
+
   static tagParsers = {
     HEADER: PDBParser.prototype._parseHEADER,
     'TITLE ': PDBParser.prototype._parseTITLE,
+    CRYST1: PDBParser.prototype._parseCRYST1,
     'ATOM  ': PDBParser.prototype._parseATOM,
     HETATM: PDBParser.prototype._parseATOM,
     ENDMDL: PDBParser.prototype._parseENDMDL,

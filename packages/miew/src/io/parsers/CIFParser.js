@@ -13,6 +13,7 @@ const {
   Strand,
   Assembly,
   Molecule,
+  UnitCell,
 } = chem;
 
 const cRequiredAtomFields = [
@@ -177,6 +178,7 @@ class CIFParser extends Parser {
     this._extractAssemblies(complex, complexData);
     this._extractMolecules(complex, complexData);
     this._extractMetadata(complex, complexData);
+    this._extractUnitCell(complex, complexData);
     complex.finalize({
       needAutoBonding: this.resolveAutoBonding(true),
       excludeHetatmFromAutoBonding: this.excludeHetatmFromAutoBonding(),
@@ -515,6 +517,44 @@ class CIFParser extends Parser {
       }
       asm.matrices = assemblyOps;
       complex.units.push(asm);
+    }
+  }
+
+  /**
+   * Extract crystallographic unit cell from CIF structure
+   * @param {Complex} complex
+   * @param complexData
+   * @private
+   */
+  _extractUnitCell(complex, complexData) {
+    const { cell } = complexData;
+    if (!cell) {
+      return;
+    }
+
+    let spaceGroup = '';
+    const symmetry = complexData.symmetry || complexData.space_group;
+    if (symmetry) {
+      const rawSg = symmetry['space_group_name_H-M']
+        || symmetry.space_group_name_H_M
+        || symmetry['name_H-M_alt']
+        || symmetry.name_H_M_alt
+        || symmetry.space_group_name_Hall
+        || '';
+      spaceGroup = _.isString(rawSg) ? rawSg.replace(/^['"]|['"]$/g, '').trim() : '';
+    }
+
+    const unitCell = UnitCell.create({
+      a: parseFloat(cell.length_a),
+      b: parseFloat(cell.length_b),
+      c: parseFloat(cell.length_c),
+      alpha: parseFloat(cell.angle_alpha),
+      beta: parseFloat(cell.angle_beta),
+      gamma: parseFloat(cell.angle_gamma),
+      spaceGroup,
+    });
+    if (unitCell) {
+      complex.unitCell = unitCell;
     }
   }
 }
