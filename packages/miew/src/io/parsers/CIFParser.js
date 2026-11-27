@@ -532,18 +532,6 @@ class CIFParser extends Parser {
       return;
     }
 
-    const a = parseFloat(cell.length_a);
-    const b = parseFloat(cell.length_b);
-    const c = parseFloat(cell.length_c);
-
-    if (Number.isNaN(a) || Number.isNaN(b) || Number.isNaN(c) || a <= 0 || b <= 0 || c <= 0) {
-      return;
-    }
-
-    const alpha = parseFloat(cell.angle_alpha);
-    const beta = parseFloat(cell.angle_beta);
-    const gamma = parseFloat(cell.angle_gamma);
-
     let spaceGroup = '';
     const symmetry = complexData.symmetry || complexData.space_group;
     if (symmetry) {
@@ -556,15 +544,18 @@ class CIFParser extends Parser {
       spaceGroup = _.isString(rawSg) ? rawSg.replace(/^['"]|['"]$/g, '').trim() : '';
     }
 
-    complex.unitCell = new UnitCell(
-      new THREE.Vector3(a, b, c),
-      new THREE.Vector3(
-        Number.isNaN(alpha) ? 90 : alpha,
-        Number.isNaN(beta) ? 90 : beta,
-        Number.isNaN(gamma) ? 90 : gamma,
-      ),
+    const unitCell = UnitCell.create({
+      a: parseFloat(cell.length_a),
+      b: parseFloat(cell.length_b),
+      c: parseFloat(cell.length_c),
+      alpha: parseFloat(cell.angle_alpha),
+      beta: parseFloat(cell.angle_beta),
+      gamma: parseFloat(cell.angle_gamma),
       spaceGroup,
-    );
+    });
+    if (unitCell) {
+      complex.unitCell = unitCell;
+    }
   }
 }
 

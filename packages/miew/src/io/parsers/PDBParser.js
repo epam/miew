@@ -396,24 +396,17 @@ class PDBParser extends Parser {
   }
 
   _parseCRYST1(stream) {
-    const a = stream.readFloat(7, 15);
-    const b = stream.readFloat(16, 24);
-    const c = stream.readFloat(25, 33);
-    const alpha = stream.readFloat(34, 40);
-    const beta = stream.readFloat(41, 47);
-    const gamma = stream.readFloat(48, 54);
-    const spaceGroup = stream.readString(56, 66).trim();
-
-    if (!Number.isNaN(a) && !Number.isNaN(b) && !Number.isNaN(c) && a > 0 && b > 0 && c > 0) {
-      this._complex.unitCell = new UnitCell(
-        new THREE.Vector3(a, b, c),
-        new THREE.Vector3(
-          Number.isNaN(alpha) ? 90 : alpha,
-          Number.isNaN(beta) ? 90 : beta,
-          Number.isNaN(gamma) ? 90 : gamma,
-        ),
-        spaceGroup,
-      );
+    const unitCell = UnitCell.create({
+      a: stream.readFloat(7, 15),
+      b: stream.readFloat(16, 24),
+      c: stream.readFloat(25, 33),
+      alpha: stream.readFloat(34, 40),
+      beta: stream.readFloat(41, 47),
+      gamma: stream.readFloat(48, 54),
+      spaceGroup: stream.readString(56, 66).trim(),
+    });
+    if (unitCell) {
+      this._complex.unitCell = unitCell;
     }
   }
 

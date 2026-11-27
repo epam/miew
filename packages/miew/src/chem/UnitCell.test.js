@@ -35,6 +35,53 @@ describe('UnitCell', () => {
     });
   });
 
+  describe('UnitCell.create', () => {
+    it('creates a UnitCell when cell lengths are positive finite numbers', () => {
+      const cell = UnitCell.create({
+        a: 12.5,
+        b: 15.0,
+        c: 18.25,
+        alpha: 85.0,
+        beta: 95.0,
+        gamma: 105.0,
+        spaceGroup: 'P 1',
+      });
+
+      expect(cell).to.be.an.instanceOf(UnitCell);
+      expect(cell.a).to.equal(12.5);
+      expect(cell.b).to.equal(15.0);
+      expect(cell.c).to.equal(18.25);
+      expect(cell.alpha).to.equal(85.0);
+      expect(cell.beta).to.equal(95.0);
+      expect(cell.gamma).to.equal(105.0);
+      expect(cell.spaceGroup).to.equal('P 1');
+    });
+
+    it('defaults non-finite or omitted angles to 90 degrees', () => {
+      const cell = UnitCell.create({
+        a: 10.0,
+        b: 20.0,
+        c: 30.0,
+        alpha: Number.NaN,
+        beta: undefined,
+        gamma: Number.POSITIVE_INFINITY,
+      });
+
+      expect(cell).to.be.an.instanceOf(UnitCell);
+      expect(cell.alpha).to.equal(90);
+      expect(cell.beta).to.equal(90);
+      expect(cell.gamma).to.equal(90);
+      expect(cell.spaceGroup).to.equal('');
+    });
+
+    it('returns null when any cell length is NaN, zero, negative, or infinite', () => {
+      expect(UnitCell.create({ a: Number.NaN, b: 10, c: 10 })).to.be.null();
+      expect(UnitCell.create({ a: 10, b: 0, c: 10 })).to.be.null();
+      expect(UnitCell.create({ a: 10, b: 10, c: -5 })).to.be.null();
+      expect(UnitCell.create({ a: Number.POSITIVE_INFINITY, b: 10, c: 10 })).to.be.null();
+    });
+  });
+
   describe('basis vectors calculation', () => {
     it('computes orthonormal basis for an orthorhombic cell', () => {
       const cell = new UnitCell(

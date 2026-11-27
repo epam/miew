@@ -54,5 +54,32 @@ describe('PDBParser', () => {
 
       expect(complex.unitCell).to.be.null();
     });
+
+    it('leaves complex.unitCell null when CRYST1 lengths are non-positive or malformed', () => {
+      const pdbData = [
+        'CRYST1    0.000   42.000   42.000  90.00  90.00  90.00 P 1           1',
+        DUMMY_ATOM,
+      ].join('\n');
+
+      const parser = new PDBParser(pdbData, {});
+      const complex = parser.parseSync();
+
+      expect(complex.unitCell).to.be.null();
+    });
+
+    it('defaults missing CRYST1 angles to 90 degrees', () => {
+      const pdbData = [
+        'CRYST1   42.000   42.000   42.000                      P 1           1',
+        DUMMY_ATOM,
+      ].join('\n');
+
+      const parser = new PDBParser(pdbData, {});
+      const complex = parser.parseSync();
+
+      expect(complex.unitCell).to.not.be.null();
+      expect(complex.unitCell.alpha).to.equal(90);
+      expect(complex.unitCell.beta).to.equal(90);
+      expect(complex.unitCell.gamma).to.equal(90);
+    });
   });
 });

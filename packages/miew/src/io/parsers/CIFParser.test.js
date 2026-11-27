@@ -81,5 +81,43 @@ ${MINIMAL_ATOM_LOOP}
 
       expect(complex.unitCell).to.be.null();
     });
+
+    it('leaves complex.unitCell null when _cell lengths are unknown (?) or non-positive', () => {
+      const cifData = `
+${MINIMAL_CIF_HEADER}
+_cell.entry_id TEST
+_cell.length_a ?
+_cell.length_b 60.000
+_cell.length_c 70.000
+${MINIMAL_ATOM_LOOP}
+`;
+
+      const parser = new CIFParser(cifData, {});
+      const complex = parser.parseSync();
+
+      expect(complex.unitCell).to.be.null();
+    });
+
+    it('defaults unknown (?) _cell angles to 90 degrees', () => {
+      const cifData = `
+${MINIMAL_CIF_HEADER}
+_cell.entry_id TEST
+_cell.length_a 50.000
+_cell.length_b 60.000
+_cell.length_c 70.000
+_cell.angle_alpha ?
+_cell.angle_beta ?
+_cell.angle_gamma ?
+${MINIMAL_ATOM_LOOP}
+`;
+
+      const parser = new CIFParser(cifData, {});
+      const complex = parser.parseSync();
+
+      expect(complex.unitCell).to.not.be.null();
+      expect(complex.unitCell.alpha).to.equal(90);
+      expect(complex.unitCell.beta).to.equal(90);
+      expect(complex.unitCell.gamma).to.equal(90);
+    });
   });
 });

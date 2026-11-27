@@ -26,6 +26,39 @@ class UnitCell {
   }
 
   /**
+   * Validates raw parsed cell parameters and creates a UnitCell if valid.
+   * Returns null if any cell length is non-finite or <= 0; defaults non-finite angles to 90°.
+   *
+   * @param {object} params
+   * @param {number} params.a - Cell length a (in Ångströms).
+   * @param {number} params.b - Cell length b (in Ångströms).
+   * @param {number} params.c - Cell length c (in Ångströms).
+   * @param {number} [params.alpha=90] - Cell angle alpha (in degrees).
+   * @param {number} [params.beta=90] - Cell angle beta (in degrees).
+   * @param {number} [params.gamma=90] - Cell angle gamma (in degrees).
+   * @param {string} [params.spaceGroup=''] - Space group name.
+   * @returns {UnitCell|null}
+   */
+  static create({
+    a, b, c, alpha, beta, gamma, spaceGroup = '',
+  }) {
+    if (!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(c)
+      || a <= 0 || b <= 0 || c <= 0) {
+      return null;
+    }
+
+    return new UnitCell(
+      new THREE.Vector3(a, b, c),
+      new THREE.Vector3(
+        Number.isFinite(alpha) ? alpha : 90,
+        Number.isFinite(beta) ? beta : 90,
+        Number.isFinite(gamma) ? gamma : 90,
+      ),
+      spaceGroup,
+    );
+  }
+
+  /**
    * Computes Cartesian basis vectors for the unit cell.
    * Uses standard crystallographic orthogonalization:
    *   - vector a along Cartesian X axis
