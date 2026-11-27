@@ -9,18 +9,18 @@ const DEG_TO_RAD = Math.PI / 180.0;
  */
 class UnitCell {
   /**
-   * @param {THREE.Vector3|number[]|object} lengths - Cell dimensions a, b, c (in Ångströms).
-   * @param {THREE.Vector3|number[]|object} angles - Cell angles alpha, beta, gamma (in degrees).
+   * @param {THREE.Vector3} lengths - Cell dimensions a, b, c (in Ångströms).
+   * @param {THREE.Vector3} angles - Cell angles alpha, beta, gamma (in degrees).
    * @param {string} [spaceGroup=''] - Space group name.
    */
   constructor(lengths, angles, spaceGroup = '') {
-    this.a = lengths.x ?? lengths[0] ?? lengths.a ?? 0;
-    this.b = lengths.y ?? lengths[1] ?? lengths.b ?? 0;
-    this.c = lengths.z ?? lengths[2] ?? lengths.c ?? 0;
+    this.a = lengths.x;
+    this.b = lengths.y;
+    this.c = lengths.z;
 
-    this.alpha = angles.x ?? angles[0] ?? angles.alpha ?? 90;
-    this.beta = angles.y ?? angles[1] ?? angles.beta ?? 90;
-    this.gamma = angles.z ?? angles[2] ?? angles.gamma ?? 90;
+    this.alpha = angles.x;
+    this.beta = angles.y;
+    this.gamma = angles.z;
 
     this.spaceGroup = spaceGroup || '';
   }
