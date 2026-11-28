@@ -4,7 +4,7 @@ module.exports = {
   plugins: [
     require('postcss-import')(),
     require('postcss-advanced-variables')(),
-    require('postcss-nested')(),
+    require('postcss-nested').default(),
     require('postcss-calc')(),
     require('autoprefixer')(),
   ],
