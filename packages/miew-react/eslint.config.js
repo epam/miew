@@ -4,7 +4,7 @@ const globals = require('globals');
 
 const { fixupConfigRules } = require('@eslint/compat');
 
-const reactRefresh = require('eslint-plugin-react-refresh');
+const { reactRefresh } = require('eslint-plugin-react-refresh');
 const js = require('@eslint/js');
 
 const { FlatCompat } = require('@eslint/eslintrc');
@@ -44,7 +44,7 @@ module.exports = defineConfig([
     },
 
     plugins: {
-      'react-refresh': reactRefresh,
+      'react-refresh': reactRefresh.plugin,
     },
 
     rules: {
